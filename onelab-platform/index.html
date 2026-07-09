@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OneLab Growth Platform</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+<!-- ═══ SIDEBAR — Category Rail + Flyout Panel (Virtu Digilab style) ═══ -->
+<aside class="sidebar-rail" id="sidebar-rail">
+  <div class="rail-logo" onclick="navigate('dashboard');closeFlyout()">
+    <div class="logo-mark">OL</div>
+  </div>
+
+  <nav class="rail-nav" id="rail-nav">
+    <button class="rail-item active" data-cat="utama" onclick="openFlyout('utama')" data-tooltip="Utama">
+      <span class="rail-icon">🏠</span>
+    </button>
+    <button class="rail-item" data-cat="marketing" onclick="openFlyout('marketing')" data-tooltip="Marketing & Sales">
+      <span class="rail-icon">🤝</span>
+      <span class="rail-badge" id="badge-partners-rail" style="display:none">0</span>
+    </button>
+    <button class="rail-item" data-cat="lab" onclick="openFlyout('lab')" data-tooltip="Operasional Lab">
+      <span class="rail-icon">🧪</span>
+    </button>
+    <button class="rail-item" data-cat="klinik" onclick="openFlyout('klinik')" data-tooltip="Layanan Klinik">
+      <span class="rail-icon">🏨</span>
+    </button>
+    <button class="rail-item" data-cat="homecare" onclick="openFlyout('homecare')" data-tooltip="Home Care">
+      <span class="rail-icon">🏡</span>
+    </button>
+    <button class="rail-item" data-cat="finance" onclick="openFlyout('finance')" data-tooltip="Finance & Billing">
+      <span class="rail-icon">💰</span>
+    </button>
+    <button class="rail-item" data-cat="inventory" onclick="openFlyout('inventory')" data-tooltip="Inventory & Logistik">
+      <span class="rail-icon">📦</span>
+    </button>
+    <button class="rail-item" data-cat="hrd" onclick="openFlyout('hrd')" data-tooltip="HRD & SDM">
+      <span class="rail-icon">👥</span>
+    </button>
+    <button class="rail-item" data-cat="produktivitas" onclick="openFlyout('produktivitas')" data-tooltip="Produktivitas">
+      <span class="rail-icon">📋</span>
+    </button>
+    <button class="rail-item" data-cat="konfigurasi" onclick="openFlyout('konfigurasi')" data-tooltip="Konfigurasi">
+      <span class="rail-icon">⚙️</span>
+    </button>
+  </nav>
+
+  <div class="rail-footer">
+    <span class="conn-dot" id="conn-dot" title="Status koneksi"></span>
+  </div>
+
+  <!-- User info — hidden compat refs, moved to topbar dropdown -->
+  <div id="sidebar-user" style="display:none">
+    <div id="user-avatar"></div>
+    <div><span id="user-name-sidebar"></span><span id="user-role-sidebar"></span></div>
+  </div>
+  <div id="conn-label" style="display:none"></div>
+</aside>
+
+<!-- ═══ FLYOUT PANEL — Submenu per Category ═══ -->
+<div class="flyout-overlay" id="flyout-overlay" onclick="closeFlyout()"></div>
+<div class="flyout-panel" id="flyout-panel">
+  <div class="flyout-header">
+    <div class="flyout-title" id="flyout-title">Menu</div>
+    <button class="flyout-close" onclick="closeFlyout()">✕</button>
+  </div>
+  <div class="flyout-body" id="flyout-body"></div>
+</div>
+
+
+<!-- ═══ TOPBAR ═══ -->
+<div class="topbar" id="topbar">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <div class="topbar-breadcrumb">
+    <span style="color:var(--text3);font-weight:500;font-size:12px">OneLab</span>
+    <span>/</span>
+    <span class="topbar-title" id="topbar-title" style="font-size:13.5px;font-weight:700;color:var(--text)">Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <div id="topbar-date" style="font-size:12px;color:var(--text3);font-weight:500;padding-right:4px"></div>
+    <button class="topbar-btn" title="Notifikasi" onclick="">
+      🔔
+      <span class="topbar-notif-dot"></span>
+    </button>
+    <!-- User dropdown -->
+    <div style="position:relative" id="topbar-user-wrap">
+      <div id="topbar-user" onclick="toggleUserDropdown()"
+        style="display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:var(--r);
+          background:var(--bg2);border:1px solid var(--border);cursor:pointer;
+          font-size:12.5px;font-weight:600;color:var(--text);user-select:none;transition:all .15s"
+        onmouseover="this.style.borderColor='var(--teal)';this.style.background='var(--teal-light)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg2)'">
+        <div id="topbar-avatar" style="width:28px;height:28px;background:linear-gradient(135deg,var(--teal),var(--accent));
+          border-radius:50%;display:flex;align-items:center;justify-content:center;
+          font-size:11px;font-weight:800;color:#fff;flex-shrink:0">U</div>
+        <div style="min-width:0">
+          <div id="topbar-user-name" style="font-size:13px;font-weight:700;color:var(--text);
+            white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px">—</div>
+          <div id="topbar-user-role" style="font-size:10px;color:var(--text3);margin-top:-1px">—</div>
+        </div>
+        <span style="font-size:10px;color:var(--text3);margin-left:2px">▾</span>
+      </div>
+
+      <!-- Dropdown menu -->
+      <div id="user-dropdown" style="display:none;position:absolute;top:calc(100% + 6px);right:0;
+        background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
+        box-shadow:var(--shadow-md);min-width:240px;z-index:999;overflow:hidden;
+        animation:modalIn .15s ease">
+
+        <!-- Header -->
+        <div style="padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg2)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="dropdown-avatar" style="width:38px;height:38px;border-radius:50%;
+              background:linear-gradient(135deg,var(--teal),var(--accent));
+              display:flex;align-items:center;justify-content:center;
+              font-size:15px;font-weight:800;color:#fff;flex-shrink:0">U</div>
+            <div style="min-width:0">
+              <div id="dropdown-name" style="font-weight:800;font-size:13.5px;color:var(--text)">—</div>
+              <div id="dropdown-email" style="font-size:11.5px;color:var(--text3);
+                white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px">—</div>
+              <div id="dropdown-role-badge" style="margin-top:3px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menu items -->
+        <div style="padding:6px 0">
+          <button onclick="closeUserDropdown();navigate('settings')"
+            class="dropdown-item">
+            ⚙️ Pengaturan Sistem
+          </button>
+          <button onclick="closeUserDropdown();openResetPassword()"
+            class="dropdown-item">
+            🔑 Ganti Password
+          </button>
+          <button onclick="closeUserDropdown();openEditProfile()"
+            class="dropdown-item">
+            👤 Edit Profil
+          </button>
+          <button onclick="closeUserDropdown();refreshMyRole()"
+            class="dropdown-item">
+            🔄 Refresh Role / Akses
+          </button>
+          <div style="border-top:1px solid var(--border);margin:4px 0"></div>
+          <button onclick="doLogout()"
+            class="dropdown-item" style="color:#EF4444">
+            ⏻ Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<main class="main-content" id="main-content">
+  <div class="loading-row" style="min-height:80vh"><div class="spinner"></div></div>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box"></div>
+</div>
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="js/core/api.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/router.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/auth.js"></script>
+
+<script src="modules/dashboard/index.js"></script>
+<script src="modules/partners/index.js"></script>
+<script src="modules/partners/deals.js"></script>
+<script src="modules/maps/index.js"></script>
+<script src="modules/marketing.js"></script>
+<script src="modules/voucher.js"></script>
+<script src="modules/surat.js"></script>
+<script src="modules/mou.js"></script>
+<script src="modules/leads.js"></script>
+<script src="modules/finance.js"></script>
+<script src="modules/inventory.js"></script>
+<script src="modules/hrd.js"></script>
+<script src="modules/work_schedule.js"></script>
+<script src="modules/task_management.js"></script>
+<script src="modules/org_structure.js"></script>
+<script src="modules/attendance.js"></script>
+<script src="modules/regulatory_reports.js"></script>
+<script src="modules/executive_dashboard.js"></script>
+<script src="modules/homecare.js"></script>
+<script src="modules/mcu.js"></script>
+<script src="modules/admission.js"></script>
+<script src="modules/lab.js"></script>
+<script src="modules/radiology.js"></script>
+<script src="modules/supportive.js"></script>
+<script src="modules/medrecord.js"></script>
+<script src="modules/cashier.js"></script>
+<script src="modules/config_product.js"></script>
+<script src="modules/config_package.js"></script>
+<script src="modules/settings.js"></script>
+<script src="modules/settings_users.js"></script>
+<script src="modules/import_excel.js"></script>
+
+<script>
+// ── Sidebar rail — always 64px, flyout handles submenu ──
+function toggleSidebar() {
+  // Mobile: toggle rail visibility (kept for compat with hamburger button)
+  document.getElementById('sidebar-rail')?.classList.toggle('open');
+}
+
+// ── Date display ─────────────────────────
+function updateDate() {
+  const el = document.getElementById('topbar-date');
+  if (!el) return;
+  el.textContent = new Date().toLocaleDateString('id-ID',{
+    weekday:'long', day:'numeric', month:'long', year:'numeric'
+  });
+}
+
+// ── Boot ─────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  updateDate();
+  setInterval(updateDate, 60000);
+
+  const token = localStorage.getItem('ol_token');
+  if (token) {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        headers: { ...SB_HEADERS, 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const user = await res.json();
+        if (user && user.id) {
+          console.log('[BOOT DEBUG] Auth UUID:', user.id, '| Auth email:', user.email);
+          window.currentUser = user;
+          try {
+            const profile = await sbGet('user_profiles',`select=*&id=eq.${user.id}`);
+            console.log('[BOOT DEBUG] Profile query result:', profile);
+            if (profile?.[0]) window.currentUser.profile = profile[0];
+          } catch(e) { console.log('[BOOT DEBUG] Profile query error:', e); }
+          setupAppUI();
+          applyRoleMenu();
+          if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
+          checkConnection();
+          navigate('dashboard');
+          // Check renewals after load
+          setTimeout(()=>{ if(typeof checkMOURenewals==='function') checkMOURenewals(); }, 2000);
+          return;
+        }
+      }
+    } catch(e) {}
+  }
+  showLoginScreen();
+});
+
+
+function setupAppUI() {
+  const name      = getUserName();
+  const role      = getUserRole();
+  const email     = window.currentUser?.email || '';
+  const roleLabel = typeof getRoleLabel === 'function' ? getRoleLabel(role) : role;
+  const initials  = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase() || name.charAt(0).toUpperCase();
+  const ROLE_COLORS = {
+    super_admin:'#7B1FA2', direktur:'#0A2342', manager:'#00897B', spv:'#0E7490',
+    sales:'#1565C0', operasional:'#2E7D32', hrd_staff:'#E65100',
+    finance_staff:'#00838F', viewer:'#546E7A',
+  };
+  const roleColor = ROLE_COLORS[role] || 'var(--teal)';
+
+  // Topbar user pill
+  const topbarAvEl   = document.getElementById('topbar-avatar');
+  const topbarNameEl = document.getElementById('topbar-user-name');
+  const topbarRoleEl = document.getElementById('topbar-user-role');
+  if (topbarAvEl)   { topbarAvEl.textContent = initials; topbarAvEl.style.background = `linear-gradient(135deg,${roleColor},${roleColor}99)`; }
+  if (topbarNameEl) topbarNameEl.textContent = name;
+  if (topbarRoleEl) topbarRoleEl.textContent = roleLabel;
+
+  // Dropdown header
+  const ddAvEl    = document.getElementById('dropdown-avatar');
+  const ddNameEl  = document.getElementById('dropdown-name');
+  const ddEmailEl = document.getElementById('dropdown-email');
+  const ddRoleEl  = document.getElementById('dropdown-role-badge');
+  if (ddAvEl)    { ddAvEl.textContent = initials; ddAvEl.style.background = `linear-gradient(135deg,${roleColor},${roleColor}99)`; }
+  if (ddNameEl)  ddNameEl.textContent  = name;
+  if (ddEmailEl) ddEmailEl.textContent = email;
+  if (ddRoleEl)  ddRoleEl.innerHTML    = `<span style="background:${roleColor}20;color:${roleColor};font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">${roleLabel}</span>`;
+
+  // Hidden sidebar refs (kept for JS compat)
+  // refs already updated above
+
+  // badge-partners-rail visibility handled by partners/index.js loadPartners()
+}
+
+async function checkConnection() {
+  const dot = document.getElementById('conn-dot');
+  const lbl = document.getElementById('conn-label');
+  try {
+    await sbGet('partners','select=count&limit=1');
+    if (dot) dot.className = 'conn-dot ok';
+    if (lbl) lbl.textContent = 'Terhubung';
+  } catch(e) {
+    if (dot) dot.className = 'conn-dot error';
+    if (lbl) lbl.textContent = 'Offline';
+  }
+}
+
+setInterval(checkConnection, 60000);
+
+// ── User Dropdown ─────────────────────────────────────
+function toggleUserDropdown() {
+  const dd = document.getElementById('user-dropdown');
+  if (!dd) return;
+  const isOpen = dd.style.display !== 'none';
+  dd.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    // Close when clicking outside
+    setTimeout(() => {
+      document.addEventListener('click', closeDropdownOutside, {once:true});
+    }, 10);
+  }
+}
+
+function closeDropdownOutside(e) {
+  const wrap = document.getElementById('topbar-user-wrap');
+  if (wrap && !wrap.contains(e.target)) closeUserDropdown();
+}
+
+function closeUserDropdown() {
+  const dd = document.getElementById('user-dropdown');
+  if (dd) dd.style.display = 'none';
+}
+
+function openResetPassword() {
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">🔑 Ganti Password</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+    <div class="form-group">
+      <label>Password Baru *</label>
+      <input type="password" id="rp-new" placeholder="Minimal 8 karakter">
+    </div>
+    <div class="form-group">
+      <label>Konfirmasi Password *</label>
+      <input type="password" id="rp-confirm" placeholder="Ulangi password baru">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="doResetPassword()">🔑 Simpan Password</button>
+    </div>`, 'narrow');
+}
+
+async function doResetPassword() {
+  const np = document.getElementById('rp-new')?.value;
+  const cp = document.getElementById('rp-confirm')?.value;
+  if (!np || np.length < 8) { toast('Password minimal 8 karakter','err'); return; }
+  if (np !== cp)            { toast('Password tidak cocok','err'); return; }
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method:'PUT',
+      headers:{...SB_HEADERS,'Authorization':`Bearer ${getStoredToken()}`},
+      body: JSON.stringify({password: np}),
+    });
+    if (!res.ok) throw new Error((await res.json()).message||'Gagal');
+    toast('✅ Password berhasil diubah','ok');
+    closeModalForce();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+function openEditProfile() {
+  const p      = window.currentUser?.profile || {};
+  const name   = getUserName ? getUserName() : '';
+  const email  = window.currentUser?.email || '';
+  const role   = getUserRole ? getUserRole() : 'sales';
+  const rc     = (typeof ROLES !== 'undefined' ? ROLES[role] : null) || {};
+
+  const DEPT_OPTIONS = ['Management','Medis','Lab & Analis','Finance','CS & Ops','Support','Marketing & Sales'];
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">👤 Edit Profil</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+
+    <div class="status-box" style="background:var(--bg2);font-size:12px;margin-bottom:14px">
+      📧 ${email} &nbsp;·&nbsp;
+      <span style="color:${rc.color||'var(--teal)'};font-weight:700">● ${rc.label||role}</span>
+      &nbsp;(role diatur oleh Super Admin di User Management)
+    </div>
+
+    <div class="form-group">
+      <label>Nama Lengkap *</label>
+      <input type="text" id="ep-name" value="${name}">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Jabatan</label>
+        <input type="text" id="ep-jabatan" value="${p.jabatan||''}" placeholder="Contoh: Head of Operations">
+      </div>
+      <div class="form-group">
+        <label>Divisi / Departemen</label>
+        <select id="ep-division">
+          <option value="">-- Pilih --</option>
+          ${DEPT_OPTIONS.map(d=>`<option value="${d}" ${p.division===d?'selected':''}>${d}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>No. HP / WA</label>
+        <input type="text" id="ep-phone" value="${p.phone||''}" placeholder="08xxxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>NIP / Employee ID</label>
+        <input type="text" id="ep-nip" value="${p.nip||''}" placeholder="Opsional">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Bio Singkat</label>
+      <textarea id="ep-bio" rows="2" placeholder="Deskripsi singkat peran...">${p.bio||''}</textarea>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="doSaveProfile()">💾 Simpan Profil</button>
+    </div>`, 'narrow');
+}
+
+async function refreshMyRole() {
+  const userId = window.currentUser?.id;
+  const userEmail = window.currentUser?.email;
+  if (!userId) { toast('Session tidak valid, silakan login ulang','err'); return; }
+  try {
+    const fresh = await sbGet('user_profiles', `select=*&id=eq.${userId}`);
+    console.log('[DEBUG] Session UUID:', userId, '| Session email:', userEmail);
+    console.log('[DEBUG] DB query result:', fresh);
+    if (fresh?.[0]) {
+      const oldRole = getUserRole();
+      window.currentUser.profile = fresh[0];
+      const newRole = getUserRole();
+      setupAppUI();
+      applyRoleMenu();
+      if (oldRole === newRole && newRole !== 'super_admin') {
+        openModal(`
+          <div class="modal-header">
+            <div class="modal-title">🔍 Diagnosa Role</div>
+            <button class="modal-close" onclick="closeModalForce()">✕</button>
+          </div>
+          <div style="font-size:13px;line-height:1.7">
+            <p><strong>Session login saat ini:</strong></p>
+            <p>UUID: <code style="background:var(--bg2);padding:2px 6px;border-radius:4px">${userId}</code></p>
+            <p>Email: <code style="background:var(--bg2);padding:2px 6px;border-radius:4px">${userEmail||'(tidak ada)'}</code></p>
+            <p><strong>Hasil dari database (user_profiles):</strong></p>
+            <p>Role: <code style="background:var(--bg2);padding:2px 6px;border-radius:4px">${fresh[0].role}</code></p>
+            <p>Email tersimpan: <code style="background:var(--bg2);padding:2px 6px;border-radius:4px">${fresh[0].email||'(kosong)'}</code></p>
+            <hr style="margin:14px 0;border:none;border-top:1px solid var(--border)">
+            <p style="color:#DC2626"><strong>⚠️ Jika UUID di atas BERBEDA dari UUID Ace di SQL Editor Supabase:</strong></p>
+            <p>Berarti browser ini sedang login dengan <strong>akun/session berbeda</strong> dari yang Anda update di SQL. Klik tombol di bawah untuk logout total dan login ulang dengan email Ace yang benar.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+            <button class="btn btn-danger" onclick="forceCleanLogout()">🚪 Logout Total & Bersihkan Session</button>
+          </div>`, 'narrow');
+      } else {
+        toast(`✅ Role: "${newRole}" · UUID: ${userId.slice(0,8)}...`, 'ok', 4000);
+      }
+    } else {
+      toast(`⚠️ TIDAK ADA baris user_profiles untuk UUID ${userId} — akun ini belum punya profile di database`, 'warn', 8000);
+    }
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+function forceCleanLogout() {
+  localStorage.clear();
+  closeModalForce();
+  location.reload();
+}
+
+async function doSaveProfile() {
+  const name     = document.getElementById('ep-name')?.value.trim();
+  const phone    = document.getElementById('ep-phone')?.value.trim();
+  const jabatan  = document.getElementById('ep-jabatan')?.value.trim();
+  const division = document.getElementById('ep-division')?.value;
+  const nip      = document.getElementById('ep-nip')?.value.trim();
+  const bio      = document.getElementById('ep-bio')?.value.trim();
+  if (!name) { toast('Nama tidak boleh kosong','err'); return; }
+  const userId = window.currentUser?.id;
+  if (!userId) { toast('Session tidak valid','err'); return; }
+  try {
+    const payload = {
+      full_name:  name,
+      phone:      phone||null,
+      jabatan:    jabatan||null,
+      division:   division||null,
+      nip:        nip||null,
+      bio:        bio||null,
+      updated_at: new Date().toISOString(),
+    };
+    await sbPatch('user_profiles', userId, payload);
+    if (window.currentUser?.profile) {
+      Object.assign(window.currentUser.profile, payload);
+    }
+    toast('✅ Profil diupdate','ok');
+    closeModalForce();
+    setupAppUI();
+  } catch(e) {
+    if (e.message && e.message.includes('column')) {
+      toast('⚠️ Jalankan migration SQL dulu untuk field jabatan/divisi','warn',5000);
+    } else {
+      toast('❌ '+e.message,'err');
+    }
+  }
+}
+
+
+// ═══════════════════════════════════════════════════════════════
+// FLYOUT PANEL — Category Rail Navigation (Virtu Digilab style)
+// ═══════════════════════════════════════════════════════════════
+
+const FLYOUT_MENUS = {
+  utama: {
+    label: 'Utama',
+    items: [
+      {page:'dashboard', icon:'🏠', label:'Dashboard', action:"navigate('dashboard')"},
+    ]
+  },
+  marketing: {
+    label: 'Marketing & Sales',
+    items: [
+      {page:'partners', icon:'🤝', label:'Partner Database', action:"navigate('partners')", badge:'badge-partners'},
+      {page:'maps', icon:'🗺️', label:'Maps Prospecting', action:"navigate('maps')"},
+      {page:'leads', icon:'🎯', label:'Leads Management', action:"navigate('leads')"},
+      {page:'marketing', icon:'📣', label:'Marketing & Voucher', action:"navigate('marketing')"},
+      {page:'okr', icon:'📈', label:'OKR & Target Sales', action:"navigate('okr')"},
+      {page:'mcu', icon:'🏥', label:'Project MCU', action:"navigate('mcu')"},
+      {page:'surat', icon:'📄', label:'Surat Keluar', action:"navigate('surat')"},
+      {page:'mou', icon:'📜', label:'MOU / Perjanjian', action:"navigate('mou')"},
+    ]
+  },
+  lab: {
+    label: 'Operasional Lab',
+    items: [
+      {page:'lab-checkin', icon:'🧪', label:'Check In Sampel', action:"navigate('lab')"},
+      {page:'lab-result', icon:'📝', label:'Enter Result', action:"navigate('lab')"},
+      {page:'lab-validation', icon:'✅', label:'Validasi Hasil', action:"navigate('lab')"},
+      {page:'lab-approval', icon:'🔏', label:'Approval', action:"navigate('lab')"},
+      {page:'medrecord', icon:'📁', label:'Medical Record', action:"navigate('medrecord')"},
+    ]
+  },
+  klinik: {
+    label: 'Layanan Klinik',
+    items: [
+      {page:'admission', icon:'🏨', label:'Admission', action:"navigate('admission')"},
+      {page:'radiology', icon:'🫁', label:'Radiology', action:"navigate('radiology')"},
+      {page:'supportive', icon:'❤️', label:'Supportive', action:"navigate('supportive')"},
+      {page:'package', icon:'🗂️', label:'Package Service', action:"navigate('package')"},
+      {page:'satusehat', icon:'🏛️', label:'Satu Sehat', action:"", soon:true},
+    ]
+  },
+  homecare: {
+    label: 'Home Care',
+    items: [
+      {page:'homecare', icon:'🏠', label:'Order Home Care', action:"navigate('homecare')"},
+      {page:'hc-schedule', icon:'📅', label:'Jadwal Kunjungan', action:"renderHCSchedule()"},
+      {page:'hc-billing', icon:'💵', label:'Billing Fee Nakes', action:"renderHCBilling()"},
+      {page:'hc-report', icon:'📊', label:'Report', action:"renderHCFullReport()"},
+    ]
+  },
+  finance: {
+    label: 'Finance & Billing',
+    items: [
+      {page:'cashier', icon:'🏧', label:'Cashier', action:"navigate('cashier')"},
+      {page:'finance', icon:'💰', label:'Invoice & Tagihan', action:"navigate('finance')"},
+      {page:'finance-ar', icon:'📑', label:'Tagihan AR', action:"navigate('finance')"},
+      {page:'finance-comm', icon:'🏆', label:'Komisi Sales', action:"navigate('finance')"},
+      {page:'finance-report', icon:'📊', label:'Laporan Keuangan', action:"navigate('finance')"},
+    ]
+  },
+  inventory: {
+    label: 'Inventory & Logistik',
+    items: [
+      {page:'inventory', icon:'📦', label:'Stock & Reagen', action:"navigate('inventory')"},
+      {page:'inventory-pr', icon:'🛒', label:'Purchase Request', action:"navigate('inventory')"},
+      {page:'inventory-supplier', icon:'🏭', label:'Supplier', action:"navigate('inventory')"},
+    ]
+  },
+  hrd: {
+    label: 'HRD & SDM',
+    items: [
+      {page:'hrd', icon:'👥', label:'Data Karyawan', action:"navigate('hrd')"},
+      {page:'org-structure', icon:'🏛️', label:'Struktur Organisasi', action:"navigate('org-structure')"},
+      {page:'work-schedule', icon:'📅', label:'Jadwal Kerja', action:"navigate('work-schedule')"},
+      {page:'attendance', icon:'⏰', label:'Absensi', action:"navigate('attendance')"},
+      {page:'hrd-cuti', icon:'🕐', label:'Cuti & Izin', action:"navigate('hrd')"},
+      {page:'hrd-payroll', icon:'💵', label:'Penggajian', action:"navigate('hrd')"},
+    ]
+  },
+  produktivitas: {
+    label: 'Produktivitas',
+    items: [
+      {page:'tasks', icon:'📋', label:'Task Management', action:"navigate('tasks')"},
+      {page:'regulatory', icon:'📊', label:'Pelaporan & Audit', action:"navigate('regulatory')"},
+    ]
+  },
+  konfigurasi: {
+    label: 'Konfigurasi',
+    items: [
+      {page:'users', icon:'👤', label:'User Management', action:"navigate('users')", adminOnly:true},
+      {page:'product', icon:'🧬', label:'Product', action:"navigate('product')"},
+      {page:'corporate', icon:'🏢', label:'Corporate', action:"navigate('corporate')"},
+      {page:'import', icon:'📥', label:'Import Excel', action:"navigate('import')"},
+      {page:'settings', icon:'⚙️', label:'Pengaturan', action:"navigate('settings')"},
+    ]
+  },
+};
+
+let activeFlyoutCat = null;
+
+function openFlyout(cat) {
+  const menu = FLYOUT_MENUS[cat];
+  if (!menu) return;
+  activeFlyoutCat = cat;
+
+  // Update rail active state
+  document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
+
+  // Get current allowed pages (role-based)
+  const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
+  const allowedPages = window.roleConfig?.pages || null;
+  const isSuperAdmin = role === 'super_admin';
+
+  document.getElementById('flyout-title').textContent = menu.label;
+  document.getElementById('flyout-body').innerHTML = menu.items.map(item => {
+    if (item.adminOnly && !['super_admin','manager','direktur'].includes(role)) return '';
+    if (!isSuperAdmin && allowedPages && !allowedPages.includes(item.page) && !item.soon) return '';
+    const currentPage = window.currentPage || '';
+    const isActive = currentPage === item.page;
+    if (item.soon) {
+      return `<div class="flyout-item flyout-item-soon">
+        <span class="flyout-item-icon">${item.icon}</span>
+        <span class="flyout-item-label">${item.label}</span>
+        <span class="flyout-soon-badge">soon</span>
+      </div>`;
+    }
+    return `<button class="flyout-item ${isActive?'active':''}" data-page="${item.page}"
+      onclick="${item.action};setActiveFlyoutItem('${item.page}')">
+      <span class="flyout-item-icon">${item.icon}</span>
+      <span class="flyout-item-label">${item.label}</span>
+      ${item.badge?`<span class="flyout-item-badge" id="${item.badge}-flyout" style="display:none">0</span>`:''}
+    </button>`;
+  }).join('');
+
+  document.getElementById('flyout-panel').classList.add('open');
+  document.getElementById('flyout-overlay').classList.add('open');
+}
+
+function closeFlyout() {
+  document.getElementById('flyout-panel')?.classList.remove('open');
+  document.getElementById('flyout-overlay')?.classList.remove('open');
+}
+
+function setActiveFlyoutItem(page) {
+  window.currentPage = page;
+  document.querySelectorAll('.flyout-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.flyout-item[data-page="${page}"]`)?.classList.add('active');
+  // Close flyout on mobile after click (keep open on desktop for convenience)
+  if (window.innerWidth < 900) closeFlyout();
+}
+
+// Auto-open category based on current page (called from navigate())
+function syncFlyoutToPage(page) {
+  for (const [cat, menu] of Object.entries(FLYOUT_MENUS)) {
+    if (menu.items.some(i => i.page === page)) {
+      document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
+      document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
+      activeFlyoutCat = cat;
+      window.currentPage = page;
+      break;
+    }
+  }
+}
+
+</script>
+</body>
+</html>
