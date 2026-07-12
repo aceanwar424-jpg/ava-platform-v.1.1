@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS public.sample_labels (
   label_barcode  text,
   admission_id   bigint references public.admissions(id) on delete cascade,
   visit_number   text,
+  mr_number      text,
   patient_name   text,
   patient_dob    date,
   patient_gender text,
@@ -144,6 +145,8 @@ CREATE TABLE IF NOT EXISTS public.sample_labels (
 CREATE INDEX IF NOT EXISTS idx_sample_labels_admission ON public.sample_labels(admission_id);
 CREATE INDEX IF NOT EXISTS idx_sample_labels_barcode   ON public.sample_labels(label_barcode);
 CREATE INDEX IF NOT EXISTS idx_sample_labels_status    ON public.sample_labels(status);
+-- jika sample_labels sudah ada sebelumnya, pastikan kolom mr_number ada
+ALTER TABLE public.sample_labels ADD COLUMN IF NOT EXISTS mr_number text;
 
 CREATE TABLE IF NOT EXISTS public.sample_label_items (
   id           bigint generated always as identity primary key,

@@ -171,6 +171,7 @@
 <script src="js/core/utils.js"></script>
 <script src="js/core/router.js"></script>
 <script src="js/core/storage.js"></script>
+<script src="js/core/barcode.js"></script>
 <script src="js/auth.js"></script>
 
 <script src="modules/dashboard/index.js"></script>
@@ -194,6 +195,7 @@
 <script src="modules/homecare.js"></script>
 <script src="modules/mcu.js"></script>
 <script src="modules/admission.js"></script>
+<script src="modules/anamnesa.js"></script>
 <!-- Laboratory Information System (LIS) — modular -->
 <script src="modules/lab/index.js"></script>
 <script src="modules/lab/checkin.js"></script>
@@ -566,6 +568,7 @@ const FLYOUT_MENUS = {
     label: 'Layanan Klinik',
     items: [
       {page:'admission', icon:'🏨', label:'Admission', action:"navigate('admission')"},
+      {page:'anamnesa', icon:'🩺', label:'Anamnesa', action:"navigate('anamnesa')"},
       {page:'radiology', icon:'🫁', label:'Radiology', action:"navigate('radiology')"},
       {page:'supportive', icon:'❤️', label:'Supportive', action:"navigate('supportive')"},
       {page:'package', icon:'🗂️', label:'Package Service', action:"navigate('package')"},

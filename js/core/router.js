@@ -8,7 +8,7 @@ const PAGE_TITLES = {
   mou:'MOU / Perjanjian', leads:'Leads Management', okr:'OKR & Target Sales',
   mcu:'Project MCU', finance:'Finance & Billing',
   inventory:'Inventory & Logistik', hrd:'HRD & SDM', homecare:'Home Care',
-  admission:'Admission / Registrasi', lab:'Operasional Lab',
+  admission:'Admission / Registrasi', anamnesa:'Anamnesa', lab:'Operasional Lab',
   product:'Master Produk & Tes', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
@@ -64,7 +64,7 @@ function navigate(page, params={}) {
     case 'cashier':     renderCashier();                break;
     case 'package':     renderConfigPackage();          break;
     case 'family':      renderConfigFamily();            break;
-    case 'anamnesa':    renderAdmission();              break;
+    case 'anamnesa':    renderAnamnesa();               break;
     case 'import':      renderImportExcel();            break;
     case 'settings':    renderSettings();               break;
     case 'users':       renderUsers();                  break;

@@ -600,6 +600,7 @@ async function openAdmissionForm(id=null) {
     voucher: (a.voucher_id ? { id:a.voucher_id, code:a.voucher_code, amount:a.voucher_discount||0,
       discType:null, discVal:0, campaign:'', minPurchase:0 } : null),
     packageId: a.package_id || null, packageName: a.package_name || '',
+    existingMR: a.mr_number || null,
   };
   if (id) {
     try {
@@ -668,7 +669,11 @@ async function openAdmissionForm(id=null) {
       <div style="display:flex;gap:16px">
         <div style="flex:1">
           <div class="form-row">
-            <div class="form-group" style="grid-column:1/-1"><label>Nama Lengkap *</label><input type="text" id="af-name" value="${a.patient_name||''}" placeholder="Nama sesuai KTP"></div>
+            <div class="form-group" style="grid-column:1/-1"><label>Nama Lengkap * <span style="font-weight:400;color:var(--gray)">— pasien lama? cari dulu agar tidak isi ulang</span></label>
+              <div style="display:flex;gap:6px">
+                <input type="text" id="af-name" value="${a.patient_name||''}" placeholder="Nama sesuai KTP" style="flex:1">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="openPatientSearch()" title="Cari pasien terdaftar">🔍 Cari Pasien</button>
+              </div></div>
             <div class="form-group">
               <label>Gender / Salutation</label>
               <div style="display:flex;gap:6px">
@@ -906,6 +911,104 @@ async function addPackageLines(pkgId) {
   renderServiceLines();
 }
 
+// ═══════════════════════════════════════════════════════════════
+// CARI PASIEN TERDAFTAR — popup (by Nama / Tgl Lahir / MR / No. ID)
+// Pilih → data pasien terisi otomatis + MR lama dipakai ulang.
+// Pengisian dari nol hanya untuk pasien baru.
+// ═══════════════════════════════════════════════════════════════
+let _patSearchField = 'name', _patSearchResults = [];
+
+function openPatientSearch() {
+  _patSearchField = 'name'; _patSearchResults = [];
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔍 Cari Pasien Terdaftar</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px" id="pat-search-tabs">
+      ${[['name','Nama'],['dob','Tgl Lahir'],['mr','No. MR'],['id','No. ID / KTP']].map(([k,l])=>`
+        <button type="button" class="btn ${k==='name'?'btn-teal':'btn-ghost'} btn-sm" id="pat-tab-${k}" onclick="setPatSearchField('${k}')">${l}</button>`).join('')}
+    </div>
+    <div id="pat-search-input-wrap">
+      <input class="table-search" id="pat-search-input" placeholder="Ketik nama pasien..." oninput="searchPatientDB(this.value)" style="width:100%"></div>
+    <div id="pat-search-results" style="max-height:340px;overflow-y:auto;margin-top:10px">
+      <div style="padding:20px;text-align:center;color:var(--gray)">Ketik untuk mencari…</div></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`);
+}
+
+function setPatSearchField(f) {
+  _patSearchField = f;
+  ['name','dob','mr','id'].forEach(k=>{ const b=document.getElementById(`pat-tab-${k}`); if(b) b.className=`btn ${k===f?'btn-teal':'btn-ghost'} btn-sm`; });
+  const wrap=document.getElementById('pat-search-input-wrap');
+  if(wrap){
+    const ph={name:'Ketik nama pasien...',mr:'Ketik No. MR...',id:'Ketik No. ID / KTP...'}[f];
+    wrap.innerHTML = f==='dob'
+      ? `<input type="date" class="table-search" id="pat-search-input" onchange="searchPatientDB(this.value)" style="width:100%">`
+      : `<input class="table-search" id="pat-search-input" placeholder="${ph}" oninput="searchPatientDB(this.value)" style="width:100%">`;
+  }
+  const res=document.getElementById('pat-search-results');
+  if(res) res.innerHTML='<div style="padding:20px;text-align:center;color:var(--gray)">Ketik untuk mencari…</div>';
+}
+
+async function searchPatientDB(q) {
+  q=(q||'').trim();
+  const el=document.getElementById('pat-search-results'); if(!el) return;
+  if(!q || (q.length<2 && _patSearchField!=='dob')){
+    el.innerHTML='<div style="padding:20px;text-align:center;color:var(--gray)">Ketik minimal 2 karakter…</div>'; return;
+  }
+  const cols='id,mr_number,patient_name,patient_salutation,patient_gender,patient_dob,patient_age,patient_place_of_birth,patient_country_of_birth,patient_phone,patient_email,patient_blood_type,patient_marital_status,patient_religion,patient_ethnicity,patient_category,patient_postal_code,patient_subdistrict,patient_district,patient_city,patient_province,patient_address,patient_id_type,patient_id_number';
+  let filter;
+  if(_patSearchField==='name')    filter=`patient_name=ilike.${encodeURIComponent('%'+q+'%')}`;
+  else if(_patSearchField==='mr') filter=`mr_number=ilike.${encodeURIComponent('%'+q+'%')}`;
+  else if(_patSearchField==='id') filter=`patient_id_number=ilike.${encodeURIComponent('%'+q+'%')}`;
+  else                            filter=`patient_dob=eq.${q}`;
+  el.innerHTML='<div class="loading-row"><div class="spinner"></div></div>';
+  try {
+    const rows=await sbGet('admissions',`select=${cols}&${filter}&order=created_at.desc&limit=40`)||[];
+    const seen={}, uniq=[];
+    for(const r of rows){ const key=r.mr_number||r.patient_id_number||`${r.patient_name}|${r.patient_dob}`; if(seen[key]) continue; seen[key]=1; uniq.push(r); }
+    _patSearchResults=uniq;
+    if(!uniq.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:var(--gray)">Tidak ditemukan — lanjutkan isi sebagai pasien baru.</div>'; return; }
+    el.innerHTML=uniq.map((r,i)=>`
+      <div onclick="pickPatient(${i})" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer">
+        <div style="display:flex;justify-content:space-between;gap:8px">
+          <div style="font-weight:600">${r.patient_name||'—'}</div>
+          <div style="font-family:monospace;font-size:11px;color:var(--teal);font-weight:700">${r.mr_number||''}</div></div>
+        <div style="font-size:11px;color:var(--gray)">${r.patient_gender||''} ${r.patient_age?'· '+r.patient_age+' th':''} ${r.patient_dob?'· '+r.patient_dob:''} ${r.patient_id_number?'· ID '+r.patient_id_number:''} ${r.patient_phone?'· '+r.patient_phone:''}</div>
+      </div>`).join('');
+  } catch(e){ el.innerHTML=`<div class="status-box status-err">❌ ${e.message}</div>`; }
+}
+
+async function pickPatient(i) {
+  const p=_patSearchResults[i]; if(!p) return;
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+  const sel=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=v; };
+  set('af-name',p.patient_name); set('af-salutation',p.patient_salutation);
+  sel('af-gender',p.patient_gender);
+  set('af-dob',p.patient_dob); set('af-age',p.patient_age);
+  set('af-pob',p.patient_place_of_birth); set('af-cob',p.patient_country_of_birth);
+  set('af-phone',p.patient_phone); set('af-email',p.patient_email);
+  sel('af-bloodtype',p.patient_blood_type); sel('af-marital',p.patient_marital_status); sel('af-religion',p.patient_religion);
+  set('af-ethnicity',p.patient_ethnicity);
+  set('af-postal',p.patient_postal_code); set('af-subdistrict',p.patient_subdistrict);
+  set('af-district',p.patient_district); set('af-city',p.patient_city); set('af-province',p.patient_province);
+  set('af-address',p.patient_address);
+  if(p.patient_category){ const rb=document.querySelector(`input[name="af-category"][value="${p.patient_category}"]`); if(rb) rb.checked=true; }
+  // ── MR dipakai ulang (kunci: MR unik per pasien) ──
+  if(p.mr_number) sel('af-mr',p.mr_number);
+  admFormState.existingMR = p.mr_number||null;
+  // Identitas: muat multi-ID dari kunjungan tsb; fallback ke kolom tunggal
+  admFormState.patientIds=[];
+  try {
+    const ids=await sbGet('patient_ids',`select=*&admission_id=eq.${p.id}`).catch(()=>[]);
+    admFormState.patientIds=(ids||[]).map(r=>({id_type:r.id_type,id_number:r.id_number,issuer_country:r.issuer_country,is_primary:r.is_primary}));
+  } catch(e){}
+  if(!admFormState.patientIds.length && p.patient_id_number){
+    admFormState.patientIds=[{id_type:p.patient_id_type||'ID Card Number',id_number:p.patient_id_number,issuer_country:'Indonesia',is_primary:true}];
+  }
+  renderPatientIdTable();
+  closeModalForce();
+  toast(`✅ Data pasien lama dimuat${p.mr_number?' — MR '+p.mr_number+' dipakai ulang':''}`,'ok',3500);
+}
+
 async function saveAdmission(id) {
   const name = document.getElementById('af-name').value.trim();
   if (!name) { toast('Nama pasien wajib diisi','err'); return; }
@@ -922,6 +1025,16 @@ async function saveAdmission(id) {
   })));
 
   const primaryId = admFormState.patientIds.find(r=>r.is_primary) || admFormState.patientIds[0];
+
+  // MR unik per pasien: untuk registrasi baru, jika No. ID/KTP sudah pernah
+  // terdaftar, pakai ulang MR-nya (tanpa harus lewat popup cari pasien).
+  if (!id && !admFormState.existingMR && primaryId?.id_number) {
+    try {
+      const ex = await sbGet('admissions',
+        `select=mr_number&patient_id_number=eq.${encodeURIComponent(primaryId.id_number)}&mr_number=not.is.null&order=created_at.asc&limit=1`);
+      if (ex?.[0]?.mr_number) { const mrEl=document.getElementById('af-mr'); if(mrEl) mrEl.value=ex[0].mr_number; }
+    } catch(e){}
+  }
 
   const payload={
     visit_number:      document.getElementById('af-visit').value,
@@ -1014,11 +1127,9 @@ async function saveAdmission(id) {
     closeModalForce();
     await loadAdmissions();
 
-    // Auto-generate sample labels dari SEMUA tes yang dipesan (satuan/panel/paket)
-    if (!id && admissionId) {
-      const productIds = admFormState.serviceLines.map(r=>r.product_id).filter(Boolean);
-      if (productIds.length) await generateSampleLabelsFromProducts(admissionId, payload, productIds);
-    }
+    // Label sampel & barcode TIDAK dicetak di sini — semua kunjungan wajib
+    // lewat modul Anamnesa; barcode digenerate & dicetak di sana, lalu
+    // (jika ada tes lab) pasien dilempar ke Lab.
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -1075,6 +1186,7 @@ async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
         label_barcode: barcode,
         admission_id: admissionId,
         visit_number: adm.visit_number,
+        mr_number: adm.mr_number||null,
         patient_name: adm.patient_name,
         patient_dob: adm.patient_dob||null,
         patient_gender: adm.patient_gender||null,
@@ -1092,48 +1204,16 @@ async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
       createdLabels.push({ ...labelPayload, id: labelId, tests });
     }
 
-    if (createdLabels.length) {
-      toast(`✅ ${createdLabels.length} label sampel digenerate (${totalComponents} item)`,'ok',4000);
-      printSampleLabels(createdLabels);
+    // Barcode dicetak di modul Anamnesa (bukan di sini) — kembalikan labelnya.
+    if (createdLabels.length && totalComponents) {
+      toast(`✅ ${createdLabels.length} label sampel digenerate (${totalComponents} item)`,'ok',3000);
     }
+    return createdLabels;
   } catch(e) {
     console.error('[generateSampleLabelsFromProducts] Failed:', e);
     toast('❌ Gagal generate label sampel: '+e.message,'err',6000);
+    return [];
   }
-}
-
-function printSampleLabels(labels) {
-  const w = window.open('','_blank');
-  w.document.write(`
-    <html><head><title>Label Sampel</title>
-    <style>
-      body{font-family:Arial,sans-serif;margin:0;padding:10px}
-      .label{width:7cm;min-height:4.5cm;border:1.5px dashed #999;border-radius:6px;padding:10px 12px;
-        margin-bottom:10px;page-break-inside:avoid;display:inline-block;vertical-align:top}
-      .barcode{font-family:'Courier New',monospace;font-size:15px;font-weight:700;letter-spacing:1px;
-        background:#000;color:#fff;padding:4px 8px;text-align:center;margin-bottom:6px;border-radius:3px}
-      .patient{font-size:12px;font-weight:700;margin-bottom:2px}
-      .meta{font-size:10px;color:#555;margin-bottom:6px}
-      .sampel-type{display:inline-block;background:#0891B2;color:#fff;font-size:10px;font-weight:700;
-        padding:2px 8px;border-radius:8px;margin-bottom:6px}
-      .tests{font-size:9.5px;color:#333;border-top:1px dashed #ccc;padding-top:5px}
-      .tests div{padding:1px 0}
-      @media print { .label{border:1px solid #333} }
-    </style></head><body>
-    ${labels.map(l => `
-      <div class="label">
-        <div class="barcode">${l.label_barcode}</div>
-        <div class="patient">${l.patient_name}</div>
-        <div class="meta">${l.visit_number} · ${l.patient_gender||''} ${l.patient_dob?'· '+l.patient_dob:''}</div>
-        <div class="sampel-type">${l.sampel_type}</div>
-        <div class="tests">
-          ${l.tests.map(t=>`<div>• ${t.product_name}</div>`).join('')}
-        </div>
-      </div>
-    `).join('')}
-    <script>window.print()</script>
-    </body></html>`);
-  w.document.close();
 }
 
 async function renderAdmissionReport() {
@@ -1162,16 +1242,16 @@ async function renderAdmissionReport() {
 // REPRINT LABEL — untuk label rusak/hilang sebelum check-in
 // ══════════════════════════════════════════════════════════════
 async function reprintSampleLabels(admissionId) {
+  // Cetak ulang barcode (Code 128). Barcode utama digenerate di modul Anamnesa;
+  // fungsi ini memakai ulang alur yang sama bila tersedia.
   try {
+    if (typeof printAnamnesaLabels === 'function') { await printAnamnesaLabels(admissionId); return; }
     const labels = await sbGet('sample_labels', `select=*&admission_id=eq.${admissionId}`).catch(()=>[]);
-    if (!labels || !labels.length) {
-      toast('⚠️ Belum ada label untuk kunjungan ini. Label hanya digenerate otomatis saat registrasi awal dengan paket.','warn',5000);
-      return;
-    }
+    if (!labels || !labels.length) { toast('⚠️ Belum ada barcode — selesaikan Anamnesa dulu.','warn',5000); return; }
     const withTests = await Promise.all(labels.map(async l => {
       const items = await sbGet('sample_label_items', `select=*&label_id=eq.${l.id}`).catch(()=>[]);
       return { ...l, tests: (items||[]).map(it=>({product_name:it.product_name})) };
     }));
-    printSampleLabels(withTests);
+    if (typeof printLabBarcodes === 'function') printLabBarcodes(withTests);
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
