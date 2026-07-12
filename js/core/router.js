@@ -12,7 +12,7 @@ const PAGE_TITLES = {
   product:'Master Produk & Tes', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
-  package:'Package Service',
+  package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
 };
 
@@ -63,6 +63,7 @@ function navigate(page, params={}) {
     case 'medrecord':   renderMedRecord();              break;
     case 'cashier':     renderCashier();                break;
     case 'package':     renderConfigPackage();          break;
+    case 'family':      renderConfigFamily();            break;
     case 'anamnesa':    renderAdmission();              break;
     case 'import':      renderImportExcel();            break;
     case 'settings':    renderSettings();               break;

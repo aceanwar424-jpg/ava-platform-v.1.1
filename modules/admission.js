@@ -310,6 +310,7 @@ function setPrimaryPatientId(i) { admFormState.patientIds.forEach((r,idx)=>r.is_
 
 // ── Services line-item table (dropdown sourced from master products) ──
 let admMasterProducts = [];
+let admMasterPackages = [];
 
 function renderServiceLines() {
   const el = document.getElementById('af-services-table'); if (!el) return;
@@ -327,10 +328,11 @@ function renderServiceLines() {
           return `
           <tr style="border-bottom:1px solid var(--border)">
             <td style="padding:3px">
+              ${row.pkg_name?`<div style="font-size:9px;color:var(--teal);font-weight:700;margin-bottom:2px">🗂️ ${row.pkg_name}</div>`:''}
               <select onchange="selectServiceLineProduct(${i},this)" style="font-size:11px;padding:3px;width:100%">
                 <option value="">-- Pilih Tes/Layanan --</option>
                 ${admMasterProducts.map(pr=>`<option value="${pr.id}" data-price="${pr.harga_normal||0}" data-name="${pr.nama_tes}"
-                  ${row.product_id==pr.id?'selected':''}>[${pr.kode_internal||'—'}] ${pr.nama_tes}</option>`).join('')}
+                  ${row.product_id==pr.id?'selected':''}>[${pr.kode_internal||'—'}] ${pr.nama_tes}${pr.is_panel?' 🧬 Panel':''}</option>`).join('')}
               </select>
             </td>
             <td style="padding:3px">
@@ -377,18 +379,196 @@ function selectServiceLineProduct(i, sel) {
   admFormState.serviceLines[i].unit_price = parseFloat(opt?.dataset.price||0);
   renderServiceLines();
 }
+// ── Mesin tagihan berjenjang: line → skema (family/corporate) → voucher ──
+function computeAdmBill() {
+  const gross = admFormState.serviceLines.reduce((s,r)=>s+(parseFloat(r.unit_price||0)),0);
+  const afterLine = admFormState.serviceLines.reduce((s,r)=>s+calcServiceLineSubtotal(r),0);
+  const lineDisc = Math.max(0, gross - afterLine);
+
+  // Diskon skema (hanya salah satu: family ATAU corporate)
+  let schemeDisc = 0;
+  if (admFormState.scheme==='family' || admFormState.scheme==='corporate') {
+    const t = admFormState.schemeDiscType, v = parseFloat(admFormState.schemeDiscVal||0);
+    schemeDisc = t==='fixed' ? v : afterLine * v/100;
+  }
+  schemeDisc = Math.min(schemeDisc, afterLine);
+  const afterScheme = afterLine - schemeDisc;
+
+  // Voucher (boleh ditumpuk di atas skema)
+  let voucherDisc = 0;
+  const vc = admFormState.voucher;
+  if (vc) {
+    if (vc.minPurchase && afterLine < vc.minPurchase) {
+      voucherDisc = 0; // belum memenuhi min. pembelian
+    } else if (vc.discType) {
+      voucherDisc = vc.discType==='fixed' ? parseFloat(vc.discVal||0) : afterScheme*parseFloat(vc.discVal||0)/100;
+    } else {
+      voucherDisc = parseFloat(vc.amount||0); // voucher tersimpan (edit mode)
+    }
+  }
+  voucherDisc = Math.min(voucherDisc, afterScheme);
+  if (vc) vc.amount = Math.round(voucherDisc);
+
+  const net = Math.max(0, afterScheme - voucherDisc);
+  const totalDisc = lineDisc + schemeDisc + voucherDisc;
+  return { gross, afterLine, lineDisc, schemeDisc, afterScheme, voucherDisc, net, totalDisc };
+}
+
 function recalcServiceTotals() {
-  const total = admFormState.serviceLines.reduce((s,r)=>s+calcServiceLineSubtotal(r),0);
-  const discTotal = admFormState.serviceLines.reduce((s,r)=>{
-    const unit = parseFloat(r.unit_price||0);
-    return s + (unit*parseFloat(r.discount_pct||0)/100) + parseFloat(r.discount_idr||0);
-  },0);
-  const setVal = (id,v) => { const el=document.getElementById(id); if (el) el.value = v; };
-  setVal('af-total-price', Math.round(total+discTotal));
-  setVal('af-discount', Math.round(discTotal));
-  setVal('af-total-net', Math.round(total));
-  // mirror into Payment/Cashier tab summary widgets if present
-  ['af-pay-total','af-cash-total'].forEach(id=>setVal(id, Math.round(total)));
+  const b = computeAdmBill();
+  const setVal = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v; };
+  setVal('af-total-price', Math.round(b.gross));
+  setVal('af-discount',   Math.round(b.totalDisc));
+  setVal('af-total-net',  Math.round(b.net));
+  setVal('af-pay-total',  Math.round(b.net));
+  setVal('af-cash-total', Math.round(b.net));
+  renderBillSummary(b);
+}
+
+function billRow(label, val, opts={}) {
+  const c = opts.color || 'var(--navy)';
+  const neg = opts.neg ? '− ' : '';
+  return `<div style="display:flex;justify-content:space-between;padding:${opts.big?'8px 0':'4px 0'};
+    ${opts.border?'border-top:1px solid var(--border);margin-top:4px;padding-top:8px':''}">
+    <span style="font-size:${opts.big?'13px':'12px'};color:${opts.big?'var(--navy)':'var(--gray)'};font-weight:${opts.big?'700':'400'}">${label}</span>
+    <span style="font-size:${opts.big?'15px':'12.5px'};font-weight:${opts.big?'800':'600'};color:${c}">${neg}${formatCurrency(Math.round(val))}</span>
+  </div>`;
+}
+
+function renderBillSummary(b) {
+  b = b || computeAdmBill();
+  const schemeLabel = admFormState.scheme==='family' ? `Diskon Family (${admFormState.schemeName||'-'})`
+    : admFormState.scheme==='corporate' ? `Diskon Corporate (${admFormState.schemeName||'-'})` : null;
+  const html = `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      ${billRow('Subtotal Layanan', b.gross)}
+      ${b.lineDisc>0 ? billRow('Diskon per-baris', b.lineDisc, {neg:true, color:'#EF4444'}) : ''}
+      ${schemeLabel && b.schemeDisc>0 ? billRow(schemeLabel, b.schemeDisc, {neg:true, color:'#EF4444'}) : ''}
+      ${admFormState.voucher && b.voucherDisc>0 ? billRow(`Voucher ${admFormState.voucher.code}`, b.voucherDisc, {neg:true, color:'#EF4444'}) : ''}
+      ${admFormState.voucher && b.voucherDisc===0 ? `<div style="font-size:11px;color:#F59E0B;padding:2px 0">⚠️ Voucher belum memenuhi min. pembelian</div>` : ''}
+      ${billRow('GRAND TOTAL', b.net, {big:true, border:true, color:'var(--teal)'})}
+      ${b.totalDisc>0 ? `<div style="font-size:11px;color:#16A34A;text-align:right;margin-top:4px">Total hemat ${formatCurrency(Math.round(b.totalDisc))}</div>` : ''}
+    </div>`;
+  ['af-bill-summary','af-cashier-summary'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=html; });
+}
+
+// ── Skema harga (Umum / Family / Corporate) ──────────────────────
+function setAdmScheme(scheme) {
+  admFormState.scheme = scheme;
+  ['umum','family','corporate'].forEach(k=>{
+    const btn=document.getElementById(`af-scheme-${k}`);
+    if(btn) btn.className = `btn ${k===scheme?'btn-teal':'btn-ghost'} btn-sm`;
+    const panel=document.getElementById(`af-scheme-${k}`);
+  });
+  const famBox=document.getElementById('af-scheme-family');
+  const corpBox=document.getElementById('af-scheme-corporate');
+  if(famBox) famBox.style.display = scheme==='family' ? '' : 'none';
+  if(corpBox) corpBox.style.display = scheme==='corporate' ? '' : 'none';
+  // reset skema aktif ke pilihan tab
+  if(scheme==='umum'){ admFormState.schemeRefId=null; admFormState.schemeName=''; admFormState.schemeDiscVal=0; }
+  else if(scheme==='family'){ const s=document.getElementById('af-family'); if(s) onFamilyChange(s); }
+  else if(scheme==='corporate'){ const s=document.getElementById('af-corp'); if(s) onCorporateChange(s); }
+  recalcServiceTotals();
+}
+
+async function onFamilyChange(sel) {
+  const o=sel.options[sel.selectedIndex];
+  admFormState.schemeRefId = parseInt(sel.value)||null;
+  admFormState.schemeName = o?.dataset.name||'';
+  admFormState.schemeDiscType = o?.dataset.discType||'percent';
+  admFormState.schemeDiscVal = parseFloat(o?.dataset.discVal||0);
+  recalcServiceTotals();
+
+  // Muat anggota keluarga untuk auto-isi data pasien
+  const box=document.getElementById('af-family-member-box');
+  const msel=document.getElementById('af-family-member');
+  if(!box||!msel) return;
+  if(!admFormState.schemeRefId){ box.style.display='none'; return; }
+  let members=[];
+  try { members=await sbGet('family_members',`select=*&family_id=eq.${admFormState.schemeRefId}&order=is_primary.desc,id.asc`)||[]; } catch(e){}
+  if(!members.length){ box.style.display='none'; return; }
+  msel.innerHTML='<option value="">-- Pilih anggota untuk auto-isi --</option>'+
+    members.map(m=>`<option value="${m.id}"
+      data-name="${(m.member_name||'').replace(/"/g,'&quot;')}" data-gender="${m.gender||''}"
+      data-dob="${m.birth_date||''}" data-phone="${m.phone||''}" data-nik="${m.id_number||''}">
+      ${m.member_name}${m.relationship?' · '+m.relationship:''}</option>`).join('');
+  box.style.display='';
+}
+
+function fillPatientFromMember(sel) {
+  const o=sel.options[sel.selectedIndex];
+  if(!o||!sel.value) return;
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=v; };
+  set('af-name',o.dataset.name);
+  set('af-phone',o.dataset.phone);
+  if(o.dataset.gender){ const g=document.getElementById('af-gender'); if(g) g.value=o.dataset.gender; }
+  if(o.dataset.dob){ const d=document.getElementById('af-dob'); if(d){ d.value=o.dataset.dob; calcAge(); } }
+  if(o.dataset.nik && !admFormState.patientIds.some(r=>r.id_number===o.dataset.nik)){
+    admFormState.patientIds.forEach(r=>r.is_primary=false);
+    admFormState.patientIds.unshift({ id_type:'ID Card Number', id_number:o.dataset.nik, issuer_country:'Indonesia', is_primary:true });
+    renderPatientIdTable();
+  }
+  toast('✅ Data pasien terisi dari anggota keluarga','ok');
+}
+function onCorporateChange(sel) {
+  const o=sel.options[sel.selectedIndex];
+  admFormState.schemeRefId = parseInt(sel.value)||null;
+  admFormState.schemeName = o?.dataset.name||'';
+  admFormState.schemeDiscType = (o?.dataset.discType && o.dataset.discType!=='none') ? o.dataset.discType : 'percent';
+  admFormState.schemeDiscVal = parseFloat(o?.dataset.discVal||0);
+  recalcServiceTotals();
+}
+
+// ── Voucher: validasi & terapkan (stackable) ─────────────────────
+async function applyVoucher() {
+  const code = (document.getElementById('af-voucher-code')?.value||'').trim().toUpperCase();
+  const msg = document.getElementById('af-voucher-msg');
+  if(!code){ if(msg) msg.innerHTML='<span style="color:#EF4444">Masukkan kode voucher</span>'; return; }
+  if(msg) msg.innerHTML='<span style="color:var(--gray)">⏳ Memeriksa...</span>';
+  try {
+    const rows = await sbGet('vouchers', `select=*&code=eq.${encodeURIComponent(code)}&limit=1`);
+    const v = rows?.[0];
+    if(!v){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Kode voucher tidak ditemukan</span>'; return; }
+    if(v.status && !['Active','Aktif'].includes(v.status)){ if(msg) msg.innerHTML=`<span style="color:#EF4444">❌ Voucher sudah ${v.status}</span>`; return; }
+    if(v.expires_at && new Date(v.expires_at) < new Date()){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Voucher kedaluwarsa</span>'; return; }
+
+    // Ambil detail campaign untuk nilai diskon
+    let camp={};
+    if(v.campaign_id){ const c=await sbGet('voucher_campaigns',`select=*&id=eq.${v.campaign_id}&limit=1`).catch(()=>[]); camp=c?.[0]||{}; }
+    if(camp.valid_until && new Date(camp.valid_until) < new Date()){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Campaign voucher sudah berakhir</span>'; return; }
+
+    admFormState.voucher = {
+      id: v.id, code: v.code, campaign: camp.campaign_name||v.campaign_name||'',
+      discType: camp.discount_type||'percent', discVal: parseFloat(camp.discount_value||0),
+      minPurchase: parseFloat(camp.min_purchase||0), amount:0,
+    };
+    // refresh voucher UI (input jadi readonly + tombol lepas)
+    refreshVoucherUI();
+    recalcServiceTotals();
+    const b=computeAdmBill();
+    if(msg) msg.innerHTML = b.voucherDisc>0
+      ? `<span style="color:#16A34A">✅ ${admFormState.voucher.campaign||'Voucher'} — hemat ${formatCurrency(b.voucherDisc)}</span>`
+      : `<span style="color:#F59E0B">⚠️ Voucher valid tapi min. pembelian ${formatCurrency(admFormState.voucher.minPurchase)} belum tercapai</span>`;
+  } catch(e){ if(msg) msg.innerHTML=`<span style="color:#EF4444">❌ ${e.message}</span>`; }
+}
+
+function removeVoucher() {
+  admFormState.voucher = null;
+  refreshVoucherUI();
+  recalcServiceTotals();
+  const msg=document.getElementById('af-voucher-msg'); if(msg) msg.innerHTML='';
+}
+
+function refreshVoucherUI() {
+  const input=document.getElementById('af-voucher-code');
+  const wrap=input?.parentElement;
+  if(!wrap) return;
+  const v=admFormState.voucher;
+  wrap.innerHTML = `
+    <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
+      value="${v?.code||''}" ${v?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
+    ${v ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">✕ Lepas</button>`
+        : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}`;
 }
 
 // ── Main tabbed Admission Form ───────────────────────────────
@@ -396,19 +576,31 @@ async function openAdmissionForm(id=null) {
   let a={};
   if (id) { const d=await sbGet('admissions',`select=*&id=eq.${id}`); a=d[0]||{}; }
 
-  // Load packages, corporates, projects, master products in parallel
-  let pkgs=[], corps=[], projs=[];
+  // Load packages, corporates, families, projects, master products in parallel
+  let pkgs=[], corps=[], fams=[], projs=[];
   try {
-    [pkgs, corps, projs, admMasterProducts] = await Promise.all([
-      sbGet('packages','select=id,nama_paket,harga_normal,kode_paket&is_active=eq.true&order=nama_paket').catch(()=>[]),
+    [pkgs, corps, fams, projs, admMasterProducts] = await Promise.all([
+      sbGet('packages','select=id,nama_paket,harga_normal,harga_korporat,kode_paket&is_active=eq.true&order=nama_paket').catch(()=>[]),
       sbGet('corporates','select=id,corporate_name,discount_type,discount_value&status=eq.Aktif&order=corporate_name').catch(()=>[]),
+      sbGet('families','select=id,family_code,family_name,discount_type,discount_value,status&status=eq.Aktif&order=family_name').catch(()=>[]),
       sbGet('projects','select=id,project_name,project_code&status=eq.Active&order=created_at.desc&limit=50').catch(()=>[]),
-      sbGet('products','select=id,kode_internal,nama_tes,hpp,harga_normal,kategori&is_active=eq.true&order=kategori,nama_tes').catch(()=>[]),
+      sbGet('products','select=id,kode_internal,nama_tes,hpp,harga_normal,kategori,is_panel,sampel_type&is_active=eq.true&order=kategori,nama_tes').catch(()=>[]),
     ]);
   } catch(e) {}
+  admMasterPackages = pkgs||[];
 
   // Load existing patient IDs and service lines if editing
-  admFormState = { patientIds: [], serviceLines: [], admissionId: id, activeTab: 'patient' };
+  admFormState = {
+    patientIds: [], serviceLines: [], admissionId: id, activeTab: 'patient',
+    // Diskon berjenjang
+    scheme: a.discount_scheme || 'umum',       // umum | family | corporate
+    schemeRefId: a.scheme_ref_id || a.corporate_id || a.family_id || null,
+    schemeName: a.scheme_name || '',
+    schemeDiscType: 'percent', schemeDiscVal: 0,
+    voucher: (a.voucher_id ? { id:a.voucher_id, code:a.voucher_code, amount:a.voucher_discount||0,
+      discType:null, discVal:0, campaign:'', minPurchase:0 } : null),
+    packageId: a.package_id || null, packageName: a.package_name || '',
+  };
   if (id) {
     try {
       const existingIds = await sbGet('patient_ids', `select=*&admission_id=eq.${id}`).catch(()=>[]);
@@ -426,12 +618,12 @@ async function openAdmissionForm(id=null) {
     admFormState.patientIds.push({ id_type: a.patient_id_type||'ID Card Number', id_number: a.patient_id_number, issuer_country:'Indonesia', is_primary:true });
   }
 
-  const pkgOpts = '<option value="">-- Pilih Paket (opsional) --</option>' +
-    (pkgs||[]).map(p=>`<option value="${p.id}" data-price="${p.harga_normal||0}" data-name="${p.nama_paket}"
-      ${a.package_id==p.id?'selected':''}>${p.kode_paket} — ${p.nama_paket} (${formatCurrency(p.harga_normal||0)})</option>`).join('');
-  const corpOpts = '<option value="">-- Umum (bukan korporat) --</option>' +
-    (corps||[]).map(c=>`<option value="${c.id}" data-disc-type="${c.discount_type||'none'}" data-disc-val="${c.discount_value||0}"
-      ${a.corporate_id==c.id?'selected':''}>${c.corporate_name}</option>`).join('');
+  const corpOpts = '<option value="">-- Pilih Korporat --</option>' +
+    (corps||[]).map(c=>`<option value="${c.id}" data-disc-type="${c.discount_type||'none'}" data-disc-val="${c.discount_value||0}" data-name="${c.corporate_name}"
+      ${a.corporate_id==c.id?'selected':''}>${c.corporate_name} (${c.discount_type==='fixed'?formatCurrency(c.discount_value||0):(c.discount_value||0)+'%'})</option>`).join('');
+  const famOpts = '<option value="">-- Pilih Keluarga --</option>' +
+    (fams||[]).map(fm=>`<option value="${fm.id}" data-disc-type="${fm.discount_type||'percent'}" data-disc-val="${fm.discount_value||0}" data-name="${fm.family_name}"
+      ${a.family_id==fm.id?'selected':''}>${fm.family_code?'['+fm.family_code+'] ':''}${fm.family_name} (${fm.discount_type==='fixed'?formatCurrency(fm.discount_value||0):(fm.discount_value||0)+'%'})</option>`).join('');
   const projOpts = '<option value="">-- Tidak terkait project --</option>' +
     (projs||[]).map(p=>`<option value="${p.id}" ${a.project_id==p.id?'selected':''}>${p.project_code} — ${p.project_name}</option>`).join('');
 
@@ -568,44 +760,67 @@ async function openAdmissionForm(id=null) {
 
     <!-- ═══ TAB: PAYMENT ═══ -->
     <div id="af-tab-content-payment" style="display:none">
+      <!-- Skema Harga / Diskon -->
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Skema Harga</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px" id="af-scheme-tabs">
+        ${[['umum','👤 Umum'],['family','👨‍👩‍👧 Family Member'],['corporate','🏢 Corporate']].map(([k,l])=>`
+          <button type="button" onclick="setAdmScheme('${k}')" id="af-scheme-${k}"
+            class="btn ${admFormState.scheme===k?'btn-teal':'btn-ghost'} btn-sm" style="flex:1">${l}</button>`).join('')}
+      </div>
+
+      <div id="af-scheme-family" style="display:${admFormState.scheme==='family'?'':'none'};margin-bottom:12px">
+        <div class="form-row">
+          <div class="form-group" style="grid-column:1/-1"><label>Pilih Keluarga (diskon otomatis)</label>
+            <select id="af-family" onchange="onFamilyChange(this)">${famOpts}</select></div>
+          <div class="form-group" id="af-family-member-box" style="grid-column:1/-1;display:none">
+            <label>Isi data pasien dari anggota (opsional)</label>
+            <select id="af-family-member" onchange="fillPatientFromMember(this)"></select></div>
+        </div>
+      </div>
+      <div id="af-scheme-corporate" style="display:${admFormState.scheme==='corporate'?'':'none'};margin-bottom:12px">
+        <div class="form-group"><label>Pilih Korporat (diskon otomatis)</label>
+          <select id="af-corp" onchange="onCorporateChange(this)">${corpOpts}</select></div>
+      </div>
+
+      <!-- Voucher (boleh ditumpuk) -->
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Voucher <span style="font-weight:400;text-transform:none">(bisa ditumpuk dengan skema di atas)</span></div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
+          value="${admFormState.voucher?.code||''}" ${admFormState.voucher?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
+        ${admFormState.voucher
+          ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">✕ Lepas</button>`
+          : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}
+      </div>
+      <div id="af-voucher-msg" style="font-size:11.5px;margin-bottom:14px">${admFormState.voucher?`<span style="color:#16A34A">✅ Voucher ${admFormState.voucher.code} aktif</span>`:''}</div>
+
       <div class="form-row">
-        <div class="form-group" style="grid-column:1/-1"><label>Corporate / Korporat</label><select id="af-corp">${corpOpts}</select></div>
-        <div class="form-group">
-          <label>Class</label>
-          <select id="af-class">${['Non Kelas','VIP','Kelas 1','Kelas 2','Kelas 3'].map(c=>`<option ${a.patient_class===c?'selected':''}>${c}</option>`).join('')}</select>
-        </div>
-        <div class="form-group">
-          <label>Payment Type</label>
-          <select id="af-paytype">${['Personal','Corporate','BPJS','Asuransi'].map(p=>`<option ${a.payment_type===p?'selected':''}>${p}</option>`).join('')}</select>
-        </div>
-      </div>
-      <div class="form-row" style="margin-top:10px">
-        <div class="form-group"><label>Total Price</label><input type="number" id="af-pay-total" readonly style="background:var(--lgray)"></div>
+        <div class="form-group"><label>Class</label>
+          <select id="af-class">${['Non Kelas','VIP','Kelas 1','Kelas 2','Kelas 3'].map(c=>`<option ${a.patient_class===c?'selected':''}>${c}</option>`).join('')}</select></div>
+        <div class="form-group"><label>Payment Type</label>
+          <select id="af-paytype">${['Personal','Corporate','BPJS','Asuransi'].map(p=>`<option ${a.payment_type===p?'selected':''}>${p}</option>`).join('')}</select></div>
         <div class="form-group"><label>Status Pembayaran</label>
-          <select id="af-paystatus">${['Unpaid','DP','Paid','Billed'].map(s=>`<option${(a.payment_status||'Unpaid')===s?' selected':''}>${s}</option>`).join('')}</select>
-        </div>
+          <select id="af-paystatus">${['Unpaid','DP','Paid','Billed'].map(s=>`<option${(a.payment_status||'Unpaid')===s?' selected':''}>${s}</option>`).join('')}</select></div>
       </div>
+
+      <div id="af-bill-summary" style="margin-top:14px"></div>
     </div>
 
     <!-- ═══ TAB: SERVICES ═══ -->
     <div id="af-tab-content-services" style="display:none">
-      <div class="form-row" style="margin-bottom:10px">
-        <div class="form-group" style="grid-column:1/-1">
-          <label>Paket Pemeriksaan (opsional — atau pilih layanan satuan di bawah)</label>
-          <select id="af-package" onchange="applyPackagePrefill()">${pkgOpts}</select>
-        </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="addServiceLine()">+ Satuan / Panel</button>
+        <button type="button" class="btn btn-teal btn-sm" onclick="openPackagePicker()">+ Paket</button>
+        <span style="font-size:11px;color:var(--gray)">🧬 Panel &amp; 🗂️ Paket otomatis terurai menjadi tes komponen dengan harga per-tes.</span>
       </div>
       <div id="af-services-table"></div>
     </div>
 
     <!-- ═══ TAB: CASHIER ═══ -->
     <div id="af-tab-content-cashier" style="display:none">
-      <div class="form-row">
-        <div class="form-group"><label>Total Price</label><input type="number" id="af-total-price" readonly style="background:var(--lgray)"></div>
-        <div class="form-group"><label>Discount (Rp)</label><input type="number" id="af-discount" readonly style="background:var(--lgray)"></div>
-        <div class="form-group"><label>Total Net</label><input type="number" id="af-total-net" readonly style="background:var(--lgray);font-weight:700;color:var(--teal)"></div>
-        <div class="form-group"><label>Cashier Total</label><input type="number" id="af-cash-total" readonly style="background:var(--lgray)"></div>
-      </div>
+      <div id="af-cashier-summary"></div>
+      <!-- hidden fields dipakai saat simpan -->
+      <input type="hidden" id="af-total-price"><input type="hidden" id="af-discount"><input type="hidden" id="af-total-net">
+      <input type="hidden" id="af-pay-total"><input type="hidden" id="af-cash-total">
     </div>
 
     <div class="modal-footer">
@@ -615,6 +830,10 @@ async function openAdmissionForm(id=null) {
 
   renderPatientIdTable();
   renderServiceLines();
+  // Inisialisasi skema harga + rincian tagihan
+  if (admFormState.scheme==='family')   { const s=document.getElementById('af-family'); if(s&&s.value) onFamilyChange(s); }
+  if (admFormState.scheme==='corporate'){ const s=document.getElementById('af-corp');   if(s&&s.value) onCorporateChange(s); }
+  recalcServiceTotals();
 }
 
 function switchAdmTab(tab) {
@@ -630,14 +849,60 @@ function switchAdmTab(tab) {
   });
 }
 
-function applyPackagePrefill() {
-  const sel = document.getElementById('af-package');
-  if (!sel?.value) return;
-  const opt = sel.options[sel.selectedIndex];
-  const price = parseFloat(opt?.dataset.price||0);
-  const name = opt?.dataset.name||'';
-  // Package adds as a single line item; individual tests can still be added alongside
-  admFormState.serviceLines.push({ product_id:null, name:`[PAKET] ${name}`, priority:'-', unit_price:price, discount_pct:0, discount_idr:0 });
+// ── Paket: picker + ekspansi menjadi tes komponen ────────────────
+function openPackagePicker() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🗂️ Pilih Paket</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <input class="table-search" placeholder="🔍 Cari paket..." oninput="filterPkgPicker(this.value)" style="margin-bottom:10px;width:100%">
+    <div id="pkg-picker-list" style="max-height:340px;overflow-y:auto">
+      ${(admMasterPackages||[]).map(p=>`
+        <div class="pkg-pick-item" data-s="${(p.nama_paket||'').toLowerCase()} ${(p.kode_paket||'').toLowerCase()}"
+          onclick="addPackageLines(${p.id});closeModalForce()"
+          style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;justify-content:space-between;gap:10px">
+          <div><div style="font-weight:600">${p.nama_paket}</div><div style="font-size:11px;color:var(--gray)">${p.kode_paket||''}</div></div>
+          <div style="font-weight:700;color:var(--teal);white-space:nowrap">${formatCurrency(p.harga_normal||0)}</div>
+        </div>`).join('') || '<div style="padding:20px;text-align:center;color:var(--gray)">Belum ada paket. Buat di Konfigurasi → Package & Panel.</div>'}
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`);
+}
+function filterPkgPicker(q) {
+  q=(q||'').toLowerCase();
+  document.querySelectorAll('#pkg-picker-list .pkg-pick-item').forEach(el=>el.style.display=el.dataset.s.includes(q)?'':'none');
+}
+
+async function addPackageLines(pkgId) {
+  const pkg=(admMasterPackages||[]).find(p=>p.id==pkgId);
+  if(!pkg){ toast('Paket tidak ditemukan','err'); return; }
+  let items=[];
+  try {
+    items=await sbGet('package_items',
+      `select=*,products(id,nama_tes,harga_normal,is_panel)&package_id=eq.${pkgId}`)||[];
+  } catch(e){}
+
+  if(!items.length){
+    // Paket tanpa rincian tes → tambahkan sebagai 1 baris di harga paket
+    admFormState.serviceLines.push({ product_id:null, name:`[PAKET] ${pkg.nama_paket}`, priority:'-',
+      unit_price:parseFloat(pkg.harga_normal||0), discount_pct:0, discount_idr:0, pkg_name:pkg.nama_paket });
+    toast('⚠️ Paket belum punya rincian tes — ditambah sebagai 1 baris. Lengkapi di Konfigurasi Paket.','warn',5000);
+  } else {
+    // Ekspansi: tiap tes jadi baris di harga individual, lalu diskon bundle proporsional
+    const sumInd=items.reduce((s,it)=>s+(parseFloat(it.products?.harga_normal||0)*(it.qty||1)),0);
+    const pkgPrice=parseFloat(pkg.harga_normal||0);
+    const bundlePct=(pkgPrice>0 && sumInd>pkgPrice) ? Math.round((1-pkgPrice/sumInd)*10000)/100 : 0;
+    items.forEach(it=>{
+      admFormState.serviceLines.push({
+        product_id: it.products?.id||it.product_id||null,
+        name: it.products?.nama_tes||it.product_name||'',
+        priority:'-', unit_price:parseFloat(it.products?.harga_normal||0),
+        discount_pct:bundlePct, discount_idr:0,
+        pkg_name:pkg.nama_paket, is_panel:it.products?.is_panel||false,
+      });
+    });
+    toast(`✅ Paket ${pkg.nama_paket}: ${items.length} tes ditambahkan${bundlePct?` (diskon bundle ${bundlePct}%)`:''}`,'ok',4000);
+  }
+  // Simpan referensi paket pertama (untuk pelaporan)
+  if(!admFormState.packageId){ admFormState.packageId=pkg.id; admFormState.packageName=pkg.nama_paket; }
   renderServiceLines();
 }
 
@@ -645,10 +910,11 @@ async function saveAdmission(id) {
   const name = document.getElementById('af-name').value.trim();
   if (!name) { toast('Nama pasien wajib diisi','err'); return; }
 
-  const pkgSel = document.getElementById('af-package');
-  const pkgName = pkgSel?.value ? pkgSel.options[pkgSel.selectedIndex]?.dataset.name||'' : '';
+  const pkgId = admFormState.packageId || null;
+  const pkgName = admFormState.packageName || null;
   const user = getUserName?getUserName():'User';
   const categoryEl = document.querySelector('input[name="af-category"]:checked');
+  const bill = computeAdmBill();
 
   const servicesJson = JSON.stringify(admFormState.serviceLines.map(r=>({
     product_id:r.product_id, name:r.name, priority:r.priority,
@@ -685,13 +951,23 @@ async function saveAdmission(id) {
     patient_address:   document.getElementById('af-address')?.value.trim()||null,
     patient_id_type:   primaryId?.id_type||'ID Card Number',
     patient_id_number: primaryId?.id_number||null,
-    package_id:        parseInt(pkgSel?.value)||null,
+    package_id:        pkgId||null,
     package_name:      pkgName||null,
-    corporate_id:      parseInt(document.getElementById('af-corp')?.value)||null,
+    corporate_id:      admFormState.scheme==='corporate' ? (admFormState.schemeRefId||null) : null,
+    family_id:         admFormState.scheme==='family' ? (admFormState.schemeRefId||null) : null,
+    discount_scheme:   admFormState.scheme||'umum',
+    scheme_ref_id:     admFormState.schemeRefId||null,
+    scheme_name:       admFormState.schemeName||null,
+    scheme_discount:   Math.round(bill.schemeDisc)||0,
+    voucher_id:        admFormState.voucher?.id||null,
+    voucher_code:      admFormState.voucher?.code||null,
+    voucher_discount:  Math.round(bill.voucherDisc)||0,
+    gross_amount:      Math.round(bill.gross)||0,
+    line_discount:     Math.round(bill.lineDisc)||0,
     services:          servicesJson,
-    total_amount:      parseFloat(document.getElementById('af-total-price')?.value)||0,
-    discount_amount:   parseFloat(document.getElementById('af-discount')?.value)||0,
-    net_amount:        parseFloat(document.getElementById('af-total-net')?.value)||0,
+    total_amount:      Math.round(bill.gross)||0,
+    discount_amount:   Math.round(bill.totalDisc)||0,
+    net_amount:        Math.round(bill.net)||0,
     payment_status:    document.getElementById('af-paystatus')?.value||'Unpaid',
     status:            id ? undefined : 'Registered',
     registered_by:     user,
@@ -725,49 +1001,52 @@ async function saveAdmission(id) {
       } catch(e) { console.error('[saveAdmission] patient_ids sync failed:', e); }
     }
 
+    // Tandai voucher terpakai (hanya registrasi baru dengan voucher)
+    if (!id && admissionId && admFormState.voucher?.id && bill.voucherDisc>0) {
+      try {
+        await sbPatch('vouchers', admFormState.voucher.id, {
+          status:'Used', used_at:new Date().toISOString(),
+          notes:`Dipakai di ${payload.visit_number} — ${name}`,
+        });
+      } catch(e){ console.error('[saveAdmission] mark voucher used failed:', e); }
+    }
+
     closeModalForce();
     await loadAdmissions();
 
-    // Auto-generate sample labels from package breakdown — only for new registrations with a package
-    if (!id && admissionId && payload.package_id) {
-      await generateSampleLabelsFromPackage(admissionId, payload);
+    // Auto-generate sample labels dari SEMUA tes yang dipesan (satuan/panel/paket)
+    if (!id && admissionId) {
+      const productIds = admFormState.serviceLines.map(r=>r.product_id).filter(Boolean);
+      if (productIds.length) await generateSampleLabelsFromProducts(admissionId, payload, productIds);
     }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
-async function generateSampleLabelsFromPackage(admissionId, adm) {
+async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
   try {
-    const items = await sbGet('package_items',
-      `select=*,products!product_id(id,nama_tes,kategori,sampel_type)&package_id=eq.${adm.package_id}`).catch(()=>[]);
-    if (!items || !items.length) {
-      toast('⚠️ Paket ini belum punya daftar tes (package_items kosong) — label tidak bisa digenerate otomatis. Lengkapi dulu di Konfigurasi Paket.','warn',6000);
-      return;
-    }
+    productIds = [...new Set((productIds||[]).filter(Boolean))];
+    if (!productIds.length) return;
 
-    // For each product, check if it has component-level breakdown (product_items with
-    // specimen_type set, e.g. WBC/RBC/HGB under "Hematologi Lengkap"). If so, expand
-    // into those components for grouping. If not, fall back to the whole-product
-    // sampel_type as before — keeps older packages without item breakdown working.
-    const productIds = [...new Set(items.map(it=>it.products?.id).filter(Boolean))];
+    const prods = await sbGet('products',
+      `select=id,nama_tes,kategori,sampel_type&id=in.(${productIds.join(',')})`).catch(()=>[]);
+    if (!prods || !prods.length) return;
+
+    // Rincian komponen panel (product_items dengan specimen_type, mis. WBC/RBC/HGB)
     let itemsByProduct = {};
-    if (productIds.length) {
-      try {
-        const allProdItems = await sbGet('product_items',
-          `select=*&product_id=in.(${productIds.join(',')})&is_active=eq.true&order=display_order.asc`).catch(()=>[]);
-        (allProdItems||[]).forEach(pi => {
-          (itemsByProduct[pi.product_id] = itemsByProduct[pi.product_id]||[]).push(pi);
-        });
-      } catch(e) { console.error('[generateSampleLabelsFromPackage] product_items lookup failed:', e); }
-    }
+    try {
+      const allProdItems = await sbGet('product_items',
+        `select=*&product_id=in.(${productIds.join(',')})&is_active=eq.true&order=display_order.asc`).catch(()=>[]);
+      (allProdItems||[]).forEach(pi => {
+        (itemsByProduct[pi.product_id] = itemsByProduct[pi.product_id]||[]).push(pi);
+      });
+    } catch(e) { console.error('[generateSampleLabelsFromProducts] product_items lookup failed:', e); }
 
-    // Group by specimen type — same specimen shares one label, different specimens get separate labels
+    // Kelompokkan per jenis spesimen — spesimen sama = 1 label
     const groups = {};
     let totalComponents = 0;
-    for (const it of items) {
-      const prod = it.products || {};
+    for (const prod of prods) {
       const components = itemsByProduct[prod.id];
       if (components && components.length) {
-        // Granular: one entry per component, grouped by its own specimen_type
         for (const comp of components) {
           const specimenType = comp.specimen_type || prod.sampel_type || 'Lainnya';
           if (!groups[specimenType]) groups[specimenType] = [];
@@ -775,10 +1054,9 @@ async function generateSampleLabelsFromPackage(admissionId, adm) {
           totalComponents++;
         }
       } else {
-        // Fallback: whole-product grouping (no item breakdown configured for this test yet)
         const specimenType = prod.sampel_type || 'Lainnya';
         if (!groups[specimenType]) groups[specimenType] = [];
-        groups[specimenType].push({ product_id: prod.id, product_name: prod.nama_tes||it.product_name, kategori: prod.kategori });
+        groups[specimenType].push({ product_id: prod.id, product_name: prod.nama_tes, kategori: prod.kategori });
         totalComponents++;
       }
     }
@@ -814,10 +1092,12 @@ async function generateSampleLabelsFromPackage(admissionId, adm) {
       createdLabels.push({ ...labelPayload, id: labelId, tests });
     }
 
-    toast(`✅ ${createdLabels.length} label sampel digenerate dari paket (${totalComponents} item)`,'ok',4000);
-    printSampleLabels(createdLabels);
+    if (createdLabels.length) {
+      toast(`✅ ${createdLabels.length} label sampel digenerate (${totalComponents} item)`,'ok',4000);
+      printSampleLabels(createdLabels);
+    }
   } catch(e) {
-    console.error('[generateSampleLabelsFromPackage] Failed:', e);
+    console.error('[generateSampleLabelsFromProducts] Failed:', e);
     toast('❌ Gagal generate label sampel: '+e.message,'err',6000);
   }
 }

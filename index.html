@@ -208,6 +208,7 @@
 <script src="modules/cashier.js"></script>
 <script src="modules/config_product.js"></script>
 <script src="modules/config_package.js"></script>
+<script src="modules/config_family.js"></script>
 <script src="modules/settings.js"></script>
 <script src="modules/settings_users.js"></script>
 <script src="modules/import_excel.js"></script>
@@ -621,7 +622,9 @@ const FLYOUT_MENUS = {
     items: [
       {page:'users', icon:'👤', label:'User Management', action:"navigate('users')", adminOnly:true},
       {page:'product', icon:'🧬', label:'Product', action:"navigate('product')"},
+      {page:'package', icon:'🗂️', label:'Package & Panel', action:"navigate('package')"},
       {page:'corporate', icon:'🏢', label:'Corporate', action:"navigate('corporate')"},
+      {page:'family', icon:'👨‍👩‍👧', label:'Family Registry', action:"navigate('family')"},
       {page:'import', icon:'📥', label:'Import Excel', action:"navigate('import')"},
       {page:'settings', icon:'⚙️', label:'Pengaturan', action:"navigate('settings')"},
     ]
