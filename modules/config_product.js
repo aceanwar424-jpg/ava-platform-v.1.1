@@ -63,6 +63,12 @@ async function loadProducts() {
   try {
     const data = await sbGet('products','select=*&order=kategori.asc,nama_tes.asc');
     prodAll = Array.isArray(data) ? data : [];
+    // jumlah code item aktif per produk (untuk badge panel)
+    try {
+      const items = await sbGet('product_items','select=product_id,is_active').catch(()=>[]);
+      const cnt={}; (items||[]).forEach(it=>{ if(it.is_active!==false) cnt[it.product_id]=(cnt[it.product_id]||0)+1; });
+      prodAll.forEach(p=>p._items=cnt[p.id]||0);
+    } catch(e){}
     renderProdKPI();
     applyProdFilter();
   } catch(e) {
@@ -128,7 +134,11 @@ function renderProdTable(data) {
       <td style="font-family:monospace;font-size:11px;color:var(--gray)">${p.kode_material||'—'}</td>
       <td style="font-family:monospace;font-size:11px;color:var(--gray)">${p.loinc_code||'—'}</td>
       <td>
-        <div style="font-weight:600;color:var(--navy)">${p.nama_tes||'—'}</div>
+        <div style="font-weight:600;color:var(--navy)">${p.nama_tes||'—'}
+          ${p._items>1?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL ${p._items}</span>`
+            :p._items===1?`<span style="background:#F1F5F9;color:#475569;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
+            :`<span title="Belum ada code item" style="background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">⚠ 0 item</span>`}
+        </div>
         ${p.sub_kategori?`<div style="font-size:10px;color:var(--gray)">${p.sub_kategori}</div>`:''}
       </td>
       <td><span class="badge badge-navy">${p.kategori||'—'}</span></td>
@@ -168,49 +178,109 @@ async function loadProductItems(productId) {
 
 const SPECIMEN_TYPES = ['BLOOD, WHOLE','BLOOD, SERUM','BLOOD, PLASMA','URINE','STOOL/FECES','SWAB, NASOPHARYNGEAL',
   'SWAB, THROAT','SPUTUM','SALIVA','CSF','TISSUE','OTHER'];
+const RESULT_TYPES = ['numeric','text','select'];
+
+function piVal(v){ return v==null?'':String(v).replace(/"/g,'&quot;'); }
 
 function renderProductItemTable() {
   const el = document.getElementById('pf-item-table'); if (!el) return;
   if (!prodItemState.length) {
-    el.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:10px;text-align:center">Belum ada item komponen — tambahkan jika tes ini adalah panel (misal Hematologi Lengkap berisi WBC/RBC/HGB/HCT)</div>`;
+    el.innerHTML = `<div style="font-size:12px;color:var(--text3);padding:12px;text-align:center;border:1px dashed var(--border);border-radius:8px">
+      Belum ada <strong>code item</strong>. Setiap tes wajib ≥1 code item.<br>
+      Tes tunggal → 1 item (SGOT→<code>SGOT</code>, Glukosa→<code>GLU</code>). Panel → banyak item (Darah Lengkap→<code>RBC/WBC/PLT…</code>).
+      <div style="margin-top:10px;display:flex;gap:6px;justify-content:center">
+        <button class="btn btn-teal btn-xs" onclick="autoSingleItem()">✨ 1 item = tes ini</button>
+        <button class="btn btn-ghost btn-xs" onclick="addProdItem()">+ Item kosong</button>
+      </div></div>`;
     return;
   }
   el.innerHTML = `
-    <table style="width:100%;font-size:11.5px;border-collapse:collapse">
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:8px">
+    <table style="font-size:11.5px;border-collapse:collapse;min-width:1080px">
       <thead><tr style="background:var(--bg)">
-        <th style="padding:4px;text-align:left">Code</th><th style="padding:4px;text-align:left">UoM</th>
-        <th style="padding:4px;text-align:left">Name (ID)</th><th style="padding:4px;text-align:left">Name (EN)</th>
-        <th style="padding:4px">Order</th><th style="padding:4px;text-align:left">Specimen</th>
-        <th style="padding:4px">Active</th><th style="padding:4px;width:36px"></th>
+        <th style="padding:5px;width:42px">Ord</th>
+        <th style="padding:5px;text-align:left;min-width:80px">Code *</th>
+        <th style="padding:5px;text-align:left;min-width:150px">Nama Analit *</th>
+        <th style="padding:5px;text-align:left;width:74px">Satuan</th>
+        <th style="padding:5px;width:82px">Tipe Hasil</th>
+        <th style="padding:5px;text-align:left;width:88px" title="LOINC per analit">LOINC</th>
+        <th style="padding:5px;width:66px">Normal↓</th>
+        <th style="padding:5px;width:66px">Normal↑</th>
+        <th style="padding:5px;text-align:left;min-width:100px">Rujukan teks</th>
+        <th style="padding:5px;text-align:left;min-width:118px">Specimen</th>
+        <th style="padding:5px;text-align:left;width:86px" title="Kode transmisi analyzer (integrasi alat)">Host Code</th>
+        <th style="padding:5px;width:32px" title="Aktif">✓</th><th style="padding:5px;width:28px"></th>
       </tr></thead>
       <tbody>
         ${prodItemState.map((row,i)=>`
           <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:3px"><input type="text" value="${row.code||''}" oninput="updateProdItem(${i},'code',this.value)" style="font-size:11px;padding:3px;width:70px"></td>
-            <td style="padding:3px"><input type="text" value="${row.uom||''}" oninput="updateProdItem(${i},'uom',this.value)" style="font-size:11px;padding:3px;width:60px"></td>
-            <td style="padding:3px"><input type="text" value="${row.name_id||''}" oninput="updateProdItem(${i},'name_id',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
-            <td style="padding:3px"><input type="text" value="${row.name_en||''}" oninput="updateProdItem(${i},'name_en',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
-            <td style="padding:3px"><input type="number" value="${row.display_order||i+1}" oninput="updateProdItem(${i},'display_order',this.value)" style="font-size:11px;padding:3px;width:50px"></td>
-            <td style="padding:3px">
-              <select onchange="updateProdItem(${i},'specimen_type',this.value)" style="font-size:11px;padding:3px;width:100%">
-                <option value="">-- Pilih --</option>
-                ${SPECIMEN_TYPES.map(s=>`<option ${row.specimen_type===s?'selected':''}>${s}</option>`).join('')}
-              </select>
-            </td>
+            <td style="padding:3px"><input type="number" value="${row.display_order||i+1}" oninput="updateProdItem(${i},'display_order',this.value)" style="font-size:11px;padding:3px;width:38px"></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.code)}" oninput="updateProdItem(${i},'code',this.value)" placeholder="RBC" style="font-size:11px;padding:3px;width:76px;font-family:monospace;font-weight:700"></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.name_id)}" oninput="updateProdItem(${i},'name_id',this.value)" placeholder="Eritrosit" style="font-size:11px;padding:3px;width:100%"></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.uom)}" oninput="updateProdItem(${i},'uom',this.value)" placeholder="10^6/µL" style="font-size:11px;padding:3px;width:70px"></td>
+            <td style="padding:3px"><select onchange="updateProdItem(${i},'result_type',this.value)" style="font-size:11px;padding:3px;width:80px">
+              ${RESULT_TYPES.map(t=>`<option ${((row.result_type||'numeric')===t)?'selected':''}>${t}</option>`).join('')}</select></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.loinc_code)}" oninput="updateProdItem(${i},'loinc_code',this.value)" placeholder="789-8" style="font-size:11px;padding:3px;width:84px;font-family:monospace"></td>
+            <td style="padding:3px"><input type="number" step="any" value="${row.ref_low??''}" oninput="updateProdItem(${i},'ref_low',this.value)" style="font-size:11px;padding:3px;width:62px"></td>
+            <td style="padding:3px"><input type="number" step="any" value="${row.ref_high??''}" oninput="updateProdItem(${i},'ref_high',this.value)" style="font-size:11px;padding:3px;width:62px"></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.ref_text)}" oninput="updateProdItem(${i},'ref_text',this.value)" placeholder="Negatif" style="font-size:11px;padding:3px;width:100%"></td>
+            <td style="padding:3px"><select onchange="updateProdItem(${i},'specimen_type',this.value)" style="font-size:11px;padding:3px;width:100%">
+              <option value="">-- Pilih --</option>${SPECIMEN_TYPES.map(s=>`<option ${row.specimen_type===s?'selected':''}>${s}</option>`).join('')}</select></td>
+            <td style="padding:3px"><input type="text" value="${piVal(row.host_code)}" oninput="updateProdItem(${i},'host_code',this.value)" placeholder="731" style="font-size:11px;padding:3px;width:84px;font-family:monospace"></td>
             <td style="padding:3px;text-align:center"><input type="checkbox" ${row.is_active!==false?'checked':''} onchange="updateProdItem(${i},'is_active',this.checked)"></td>
             <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeProdItem(${i})" style="color:#EF4444">✕</button></td>
           </tr>`).join('')}
       </tbody>
-    </table>`;
+    </table></div>
+    <div style="font-size:11px;color:var(--gray);margin-top:6px">
+      ${prodItemState.filter(r=>r.is_active!==false && r.name_id).length>1?'🧬 Tes ini = <strong>PANEL</strong> (banyak analit)':'▪️ Tes tunggal (1 analit)'} ·
+      <strong>Host Code</strong> = kode yang dikirim analyzer saat integrasi.
+    </div>`;
 }
-function addProdItem() {
-  prodItemState.push({ code:'', uom:'', name_id:'', name_en:'', display_order:prodItemState.length+1, specimen_type:'', is_active:true });
+
+// map SAMPEL_TYPES (produk) → SPECIMEN_TYPES (label)
+function mapSpecimenType(s){
+  s=(s||'').toLowerCase();
+  if(s.includes('serum')) return 'BLOOD, SERUM';
+  if(s.includes('plasma')) return 'BLOOD, PLASMA';
+  if(s.includes('edta')||s.includes('darah')||s.includes('kapiler')) return 'BLOOD, WHOLE';
+  if(s.includes('urin')) return 'URINE';
+  if(s.includes('feses')) return 'STOOL/FECES';
+  if(s.includes('nasofaring')) return 'SWAB, NASOPHARYNGEAL';
+  if(s.includes('swab')||s.includes('tenggorok')) return 'SWAB, THROAT';
+  if(s.includes('dahak')||s.includes('sputum')) return 'SPUTUM';
+  return '';
+}
+
+function newProdItem(over){
+  return Object.assign({ code:'', uom:'', name_id:'', name_en:'', display_order:prodItemState.length+1,
+    specimen_type:'', result_type:'numeric', decimals:1, loinc_code:'', ref_low:null, ref_high:null,
+    ref_text:'', host_code:'', analyzer_id:null, is_active:true }, over||{});
+}
+function addProdItem() { prodItemState.push(newProdItem()); renderProductItemTable(); }
+
+// Buat 1 code item otomatis dari data tes (untuk tes tunggal spt SGOT/Glukosa)
+function autoSingleItem() {
+  const kode = (document.getElementById('pf-kode')?.value||'').split('-').pop()||'';
+  prodItemState.push(newProdItem({
+    code: kode.toUpperCase(),
+    name_id: document.getElementById('pf-name')?.value||'',
+    uom: document.getElementById('pf-unit')?.value||'',
+    loinc_code: document.getElementById('pf-loinc')?.value||'',
+    specimen_type: mapSpecimenType(document.getElementById('pf-sampel')?.value),
+  }));
   renderProductItemTable();
 }
+
 function removeProdItem(i) { prodItemState.splice(i,1); renderProductItemTable(); }
 function updateProdItem(i,key,val) {
   if (!prodItemState[i]) return;
-  prodItemState[i][key] = key==='display_order' ? parseInt(val)||1 : val;
+  if (key==='display_order') prodItemState[i][key] = parseInt(val)||1;
+  else if (key==='decimals') prodItemState[i][key] = parseInt(val)||0;
+  else if (key==='ref_low' || key==='ref_high') prodItemState[i][key] = (val===''||val==null)?null:parseFloat(val);
+  else prodItemState[i][key] = val;
+  // refresh footer panel/tunggal saat toggle aktif/nama
+  if (key==='is_active' || key==='name_id') renderProductItemTable();
 }
 
 async function saveProductItems(productId) {
@@ -218,16 +288,19 @@ async function saveProductItems(productId) {
     await fetch(`${SUPABASE_URL}/rest/v1/product_items?product_id=eq.${productId}`,{
       method:'DELETE', headers:{...SB_HEADERS,'Prefer':'return=minimal'}
     });
-    const toSave = prodItemState.filter(r=>r.name_id);
+    const toSave = prodItemState.filter(r=>r.name_id || r.code);
     if (toSave.length) {
-      await sbPost('product_items', toSave.map(r=>({
+      await sbPost('product_items', toSave.map((r,idx)=>({
         product_id: productId, code:r.code||null, uom:r.uom||null,
-        name_id:r.name_id, name_en:r.name_en||null,
-        display_order:r.display_order||1, specimen_type:r.specimen_type||null,
+        name_id:r.name_id||r.code, name_en:r.name_en||null,
+        display_order:r.display_order||idx+1, specimen_type:r.specimen_type||null,
+        loinc_code:r.loinc_code||null, result_type:r.result_type||'numeric', decimals:(r.decimals==null?1:r.decimals),
+        ref_low:(r.ref_low===''?null:r.ref_low)??null, ref_high:(r.ref_high===''?null:r.ref_high)??null,
+        ref_text:r.ref_text||null, host_code:r.host_code||null, analyzer_id:r.analyzer_id||null,
         is_active: r.is_active!==false,
       })));
     }
-  } catch(e) { console.error('[saveProductItems] Failed:', e); toast('⚠️ Produk tersimpan, tapi gagal simpan item komponen: '+e.message,'warn',5000); }
+  } catch(e) { console.error('[saveProductItems] Failed:', e); toast('⚠️ Produk tersimpan, tapi gagal simpan code item: '+e.message,'warn',5000); }
 }
 
 async function openProductForm(id=null) {
@@ -266,6 +339,10 @@ async function openProductForm(id=null) {
         <div class="form-group">
           <label>LOINC Code</label>
           <input type="text" id="pf-loinc" value="${p.loinc_code||''}" placeholder="2345-7">
+        </div>
+        <div class="form-group">
+          <label title="Kode order tes ke analyzer saat integrasi alat">Host Code (alat)</label>
+          <input type="text" id="pf-host" value="${p.host_code||''}" placeholder="mis. CBC5">
         </div>
       </div>
     </div>
@@ -362,17 +439,21 @@ async function openProductForm(id=null) {
     <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase">
-          Product Item List (komponen tes — untuk panel multi-parameter)
+          Code Item / Analit — tiap tes dipecah per item di modul Lab
         </div>
-        <button class="btn btn-ghost btn-xs" onclick="addProdItem()">+ Add</button>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-teal btn-xs" onclick="autoSingleItem()">✨ 1 item = tes ini</button>
+          <button class="btn btn-ghost btn-xs" onclick="addProdItem()">+ Item</button>
+        </div>
       </div>
       <div style="font-size:11px;color:var(--text3);margin-bottom:8px">
-        Kolom Specimen di sini menentukan jenis label sampel yang dicetak per komponen — misalnya WBC/RBC/HGB di bawah panel "Hematologi Lengkap" semuanya "BLOOD, WHOLE".
+        Setiap analit punya <strong>Code</strong> (RBC/WBC/GLU…), <strong>LOINC</strong>, satuan, rentang normal, <strong>Specimen</strong> (jenis label),
+        dan <strong>Host Code</strong> (kode transmisi analyzer untuk integrasi alat). Saat pasien memesan, tes terpecah per code item dengan nilai masing-masing.
       </div>
       <div id="pf-item-table"></div>
     </div>` : `
     <div class="status-box status-info" style="margin-top:12px;font-size:11.5px">
-      ℹ️ Simpan produk dulu, lalu buka kembali untuk menambahkan Product Item List (komponen tes per parameter).
+      ℹ️ Simpan tes dulu, lalu buka kembali untuk menambahkan <strong>Code Item / Analit</strong> (RBC/WBC/GLU…) + LOINC + integrasi alat.
     </div>`}
 
     <div class="modal-footer">
@@ -421,6 +502,8 @@ async function saveProduct(id) {
     harga_korporat:   parseFloat(document.getElementById('pf-harga-corp').value)||0,
     hpp,
     margin_pct:       margin,
+    host_code:        document.getElementById('pf-host')?.value.trim()||null,
+    is_panel:         prodItemState.filter(r=>(r.name_id||r.code) && r.is_active!==false).length > 1,
     is_active:        document.getElementById('pf-active').value==='true',
     keterangan:       document.getElementById('pf-ket').value.trim()||null,
     created_by:       user,
@@ -435,7 +518,7 @@ async function saveProduct(id) {
       productId = created?.[0]?.id || created?.id;
       toast('✅ Produk ditambahkan','ok');
     }
-    if (productId && prodItemState.length) await saveProductItems(productId);
+    if (productId && (id || prodItemState.length)) await saveProductItems(productId);
     closeModalForce();
     await loadProducts();
   } catch(e) { toast('❌ '+e.message,'err'); }

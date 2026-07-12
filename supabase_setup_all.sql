@@ -34,6 +34,29 @@ CREATE TABLE IF NOT EXISTS public.product_items (
 );
 CREATE INDEX IF NOT EXISTS idx_product_items_product ON public.product_items(product_id);
 
+-- 1c. PRODUCT_ITEMS — perkaya: LOINC, satuan, tipe hasil, rentang, integrasi alat
+ALTER TABLE public.product_items
+  ADD COLUMN IF NOT EXISTS loinc_code   text,
+  ADD COLUMN IF NOT EXISTS result_type  text default 'numeric',   -- numeric | text | select
+  ADD COLUMN IF NOT EXISTS decimals     integer default 1,
+  ADD COLUMN IF NOT EXISTS ref_low      numeric,
+  ADD COLUMN IF NOT EXISTS ref_high     numeric,
+  ADD COLUMN IF NOT EXISTS ref_text     text,
+  ADD COLUMN IF NOT EXISTS host_code    text,     -- kode transmisi analyzer (integrasi alat)
+  ADD COLUMN IF NOT EXISTS analyzer_id  bigint;
+CREATE INDEX IF NOT EXISTS idx_product_items_host ON public.product_items(host_code);
+ALTER TABLE public.products     ADD COLUMN IF NOT EXISTS host_code text;
+ALTER TABLE public.ref_ranges   ADD COLUMN IF NOT EXISTS product_item_id bigint;
+CREATE INDEX IF NOT EXISTS idx_ref_ranges_item ON public.ref_ranges(product_item_id);
+-- lab_results: siap dipecah per code item (analit) saat entry hasil
+ALTER TABLE public.lab_results
+  ADD COLUMN IF NOT EXISTS product_item_id bigint,
+  ADD COLUMN IF NOT EXISTS item_code       text,
+  ADD COLUMN IF NOT EXISTS item_name       text,
+  ADD COLUMN IF NOT EXISTS loinc_code      text,
+  ADD COLUMN IF NOT EXISTS host_code       text;
+CREATE INDEX IF NOT EXISTS idx_lab_results_item ON public.lab_results(product_item_id);
+
 -- ─────────────────────────────────────────────────────────────────────
 -- 2. ADMISSIONS — demografi pasien (Virtu-style) + diskon berjenjang
 -- ─────────────────────────────────────────────────────────────────────
