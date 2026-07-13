@@ -616,7 +616,8 @@ function renderRRTable(data) {
       const prodCode = r.products?.kode_internal || '';
       return `<tr>
         <td>
-          <div style="font-size:12px;font-weight:600;color:var(--navy)">${prodName}</div>
+          <div style="font-size:12px;font-weight:600;color:var(--navy)">${prodName}
+            ${r.item_code?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 5px;border-radius:5px;font-size:9px;font-weight:700;font-family:monospace">${r.item_code}</span>`:''}</div>
           ${prodCode?`<div style="font-size:10px;color:var(--gray);font-family:monospace">${prodCode}</div>`:''}
         </td>
         <td style="font-size:12px;text-align:center">${r.gender||'All'}</td>
@@ -629,7 +630,9 @@ function renderRRTable(data) {
           </span>
         </td>
         <td style="font-size:12px;font-weight:600;white-space:nowrap">
-          ${r.range_min!==null&&r.range_max!==null?`${r.range_min} – ${r.range_max}`:'—'}
+          ${r.value_type==='qualitative'
+            ? `<span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:8px;font-size:11px">💬 ${r.expected_values||'—'}</span>`
+            : (r.range_min!==null&&r.range_max!==null?`${r.range_min} – ${r.range_max}`:'—')}
         </td>
         <td style="font-size:11px;color:var(--gray)">${r.unit||'—'}</td>
         <td style="font-size:11px;color:#EF4444;white-space:nowrap">
@@ -677,25 +680,34 @@ async function openRRForm(id=null) {
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
 
-    <div class="form-group">
-      <label>Tes / Produk *</label>
-      <select id="rrf-prod" onchange="document.getElementById('rrf-prod-name').value=this.options[this.selectedIndex].dataset.name||''">
-        ${prodOpts}
-      </select>
-      <input type="hidden" id="rrf-prod-name" value="${r.product_name||rrProductName}">
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Tes / Produk *</label>
+        <select id="rrf-prod" onchange="onRRProdChange(this)">${prodOpts}</select>
+        <input type="hidden" id="rrf-prod-name" value="${r.product_name||rrProductName}">
+      </div>
+      <div class="form-group">
+        <label>Analit / Code Item <span style="color:var(--gray);font-weight:400">(untuk panel)</span></label>
+        <select id="rrf-item"><option value="">-- Seluruh tes --</option></select>
+      </div>
+      <div class="form-group">
+        <label>Tipe Nilai</label>
+        <select id="rrf-vtype" onchange="onRRValueType(this.value)">
+          <option value="numeric" ${(r.value_type||'numeric')==='numeric'?'selected':''}>Numerik (angka)</option>
+          <option value="qualitative" ${r.value_type==='qualitative'?'selected':''}>Kualitatif (teks)</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-row">
       <div class="form-group">
         <label>Nama Kondisi *</label>
         <input type="text" id="rrf-cond" value="${r.condition_name||''}"
-          placeholder="Normal, Prediabetik, Diabetes, Hamil, Anak, ...">
+          placeholder="Normal, Negatif, Positif, Diabetes...">
         <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
-          ${['Normal','Prediabetik','Diabetes','Risiko Tinggi','Kritis Rendah','Kritis Tinggi','Hamil','Anak'].map(c=>
+          ${['Normal','Negatif','Positif','Reaktif','Non-Reaktif','Prediabetik','Diabetes','Borderline'].map(c=>
             `<button type="button" onclick="document.getElementById('rrf-cond').value='${c}'"
-              style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--lgray);cursor:pointer">
-              ${c}
-            </button>`).join('')}
+              style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;background:var(--lgray);cursor:pointer">${c}</button>`).join('')}
         </div>
       </div>
       <div class="form-group">
@@ -723,43 +735,57 @@ async function openRRForm(id=null) {
       </div>
       <div class="form-group">
         <label>Usia Maks (tahun)</label>
-        <input type="number" id="rrf-age-max" value="${r.age_max||999}" min="0">
+        <input type="number" id="rrf-age-max" value="${r.age_max??999}" min="0">
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Nilai Min (batas bawah normal)</label>
-        <input type="number" id="rrf-min" value="${r.range_min||''}" placeholder="70" step="0.01">
+    <!-- ── NUMERIK ── -->
+    <div id="rrf-numeric-group">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nilai Min (batas bawah normal)</label>
+          <input type="number" id="rrf-min" value="${r.range_min??''}" placeholder="70" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Nilai Maks (batas atas normal)</label>
+          <input type="number" id="rrf-max" value="${r.range_max??''}" placeholder="99" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Unit</label>
+          <input type="text" id="rrf-unit" value="${r.unit||''}" placeholder="mg/dL, %, IU/L">
+        </div>
       </div>
-      <div class="form-group">
-        <label>Nilai Maks (batas atas normal)</label>
-        <input type="number" id="rrf-max" value="${r.range_max||''}" placeholder="99" step="0.01">
-      </div>
-      <div class="form-group">
-        <label>Unit</label>
-        <input type="text" id="rrf-unit" value="${r.unit||''}" placeholder="mg/dL, %, IU/L">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Critical Low (kritis bawah)</label>
+          <input type="number" id="rrf-crit-lo" value="${r.critical_low??''}" placeholder="40" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Critical High (kritis atas)</label>
+          <input type="number" id="rrf-crit-hi" value="${r.critical_high??''}" placeholder="500" step="0.01">
+        </div>
       </div>
     </div>
 
-    <div class="form-row">
+    <!-- ── KUALITATIF ── -->
+    <div id="rrf-qual-group" style="display:none">
       <div class="form-group">
-        <label>Critical Low (nilai kritis bawah)</label>
-        <input type="number" id="rrf-crit-lo" value="${r.critical_low||''}" placeholder="40" step="0.01">
+        <label>Nilai Hasil yang Cocok (pisahkan koma) *</label>
+        <input type="text" id="rrf-expected" value="${r.expected_values||''}" placeholder="Negatif, Neg, Negative">
+        <div style="font-size:11px;color:var(--gray);margin-top:4px">
+          Semua hasil teks yang termasuk kondisi ini. Umumnya buat 2 baris: <strong>Negatif</strong> (hijau, Normal) &amp; <strong>Positif</strong> (merah, Kritis).
+        </div>
       </div>
-      <div class="form-group">
-        <label>Critical High (nilai kritis atas)</label>
-        <input type="number" id="rrf-crit-hi" value="${r.critical_high||''}" placeholder="500" step="0.01">
-      </div>
-      <div class="form-group">
-        <label>Warna Indikator</label>
-        <select id="rrf-color">
-          <option value="green"  ${(r.color_code||'green')==='green'?'selected':''}>🟢 Hijau (Normal)</option>
-          <option value="yellow" ${r.color_code==='yellow'?'selected':''}>🟡 Kuning (Borderline)</option>
-          <option value="orange" ${r.color_code==='orange'?'selected':''}>🟠 Oranye (Risiko)</option>
-          <option value="red"    ${r.color_code==='red'?'selected':''}>🔴 Merah (Kritis)</option>
-        </select>
-      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Warna Indikator</label>
+      <select id="rrf-color">
+        <option value="green"  ${(r.color_code||'green')==='green'?'selected':''}>🟢 Hijau (Normal)</option>
+        <option value="yellow" ${r.color_code==='yellow'?'selected':''}>🟡 Kuning (Borderline)</option>
+        <option value="orange" ${r.color_code==='orange'?'selected':''}>🟠 Oranye (Risiko)</option>
+        <option value="red"    ${r.color_code==='red'?'selected':''}>🔴 Merah (Kritis)</option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -785,34 +811,81 @@ async function openRRForm(id=null) {
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveRR(${id||'null'})">💾 Simpan</button>
     </div>`);
+
+  // init: muat analit produk, preselect, set tampilan tipe nilai
+  await onRRProdChange(document.getElementById('rrf-prod'));
+  if (r.product_item_id) { const s=document.getElementById('rrf-item'); if(s) s.value=r.product_item_id; }
+  onRRValueType(r.value_type||'numeric');
+}
+
+// muat code item (analit) milik produk terpilih ke dropdown analit
+async function onRRProdChange(sel) {
+  if (!sel) return;
+  const nameEl = document.getElementById('rrf-prod-name');
+  if (nameEl) nameEl.value = sel.options[sel.selectedIndex]?.dataset.name || nameEl.value || '';
+  const itemSel = document.getElementById('rrf-item');
+  if (!itemSel) return;
+  itemSel.innerHTML = '<option value="">-- Seluruh tes --</option>';
+  if (!sel.value) return;
+  try {
+    const items = await sbGet('product_items',
+      `select=id,code,name_id&product_id=eq.${sel.value}&order=display_order.asc`).catch(()=>[]);
+    (items||[]).forEach(it=>{
+      const o=document.createElement('option');
+      o.value=it.id; o.dataset.code=it.code||'';
+      o.textContent=`${it.code||''} — ${it.name_id||''}`;
+      itemSel.appendChild(o);
+    });
+  } catch(e){}
+}
+
+// toggle grup numerik vs kualitatif
+function onRRValueType(v) {
+  const num=document.getElementById('rrf-numeric-group');
+  const qual=document.getElementById('rrf-qual-group');
+  if (num)  num.style.display  = v==='qualitative' ? 'none' : '';
+  if (qual) qual.style.display = v==='qualitative' ? '' : 'none';
 }
 
 async function saveRR(id) {
   const prodId = document.getElementById('rrf-prod').value;
   const cond   = document.getElementById('rrf-cond').value.trim();
+  const vtype  = document.getElementById('rrf-vtype').value;
   if (!prodId) { toast('Pilih tes dulu','err'); return; }
   if (!cond)   { toast('Nama kondisi wajib diisi','err'); return; }
 
+  const expected = document.getElementById('rrf-expected')?.value.trim()||'';
+  if (vtype==='qualitative' && !expected) { toast('Isi nilai hasil yang cocok (mis. Negatif)','err'); return; }
+
+  const prodSel  = document.getElementById('rrf-prod');
   const prodName = document.getElementById('rrf-prod-name').value ||
-    document.getElementById('rrf-prod').options[document.getElementById('rrf-prod').selectedIndex]?.dataset.name||'';
+    prodSel.options[prodSel.selectedIndex]?.dataset.name||'';
+  const itemSel  = document.getElementById('rrf-item');
+  const itemId   = parseInt(itemSel?.value)||null;
+  const itemCode = itemSel?.options[itemSel.selectedIndex]?.dataset.code||null;
+  const isQual   = vtype==='qualitative';
 
   const payload = {
-    product_id:     parseInt(prodId),
-    product_name:   prodName,
-    condition_name: cond,
-    condition_type: document.getElementById('rrf-type').value,
-    gender:         document.getElementById('rrf-gender').value,
-    age_min:        parseInt(document.getElementById('rrf-age-min').value)||0,
-    age_max:        parseInt(document.getElementById('rrf-age-max').value)||999,
-    range_min:      parseFloat(document.getElementById('rrf-min').value)||null,
-    range_max:      parseFloat(document.getElementById('rrf-max').value)||null,
-    unit:           document.getElementById('rrf-unit').value.trim()||null,
-    critical_low:   parseFloat(document.getElementById('rrf-crit-lo').value)||null,
-    critical_high:  parseFloat(document.getElementById('rrf-crit-hi').value)||null,
-    color_code:     document.getElementById('rrf-color').value,
-    interpretation: document.getElementById('rrf-interp').value.trim()||null,
-    description:    document.getElementById('rrf-desc').value.trim()||null,
-    recommendation: document.getElementById('rrf-rec').value.trim()||null,
+    product_id:      parseInt(prodId),
+    product_name:    prodName,
+    product_item_id: itemId,
+    item_code:       itemCode,
+    value_type:      vtype,
+    expected_values: isQual ? expected : null,
+    condition_name:  cond,
+    condition_type:  document.getElementById('rrf-type').value,
+    gender:          document.getElementById('rrf-gender').value,
+    age_min:         parseInt(document.getElementById('rrf-age-min').value)||0,
+    age_max:         parseInt(document.getElementById('rrf-age-max').value)||999,
+    range_min:       isQual ? null : (parseFloat(document.getElementById('rrf-min').value)||null),
+    range_max:       isQual ? null : (parseFloat(document.getElementById('rrf-max').value)||null),
+    unit:            isQual ? null : (document.getElementById('rrf-unit').value.trim()||null),
+    critical_low:    isQual ? null : (parseFloat(document.getElementById('rrf-crit-lo').value)||null),
+    critical_high:   isQual ? null : (parseFloat(document.getElementById('rrf-crit-hi').value)||null),
+    color_code:      document.getElementById('rrf-color').value,
+    interpretation:  document.getElementById('rrf-interp').value.trim()||null,
+    description:     document.getElementById('rrf-desc').value.trim()||null,
+    recommendation:  document.getElementById('rrf-rec').value.trim()||null,
   };
 
   try {

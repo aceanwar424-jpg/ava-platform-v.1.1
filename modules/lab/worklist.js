@@ -124,13 +124,14 @@ function beInterpret(input){
   const tr=input.closest('tr');
   const pid=tr.dataset.prod;
   const cell=tr.querySelector('.be-interp');
-  const num=parseFloat(input.value);
+  const raw=input.value.trim();
   const rrs=_rrCache[pid]||[];
-  if(isNaN(num)||!rrs.length){ cell.textContent='—'; cell.style.color='var(--gray)'; input.style.borderColor='var(--border)'; return; }
-  const m=matchRefRange(rrs,num);
-  if(!m){ cell.textContent='—'; return; }
+  if(raw===''||!rrs.length){ cell.textContent='—'; cell.style.color='var(--gray)'; input.style.borderColor='var(--border)'; return; }
+  const m=matchRefRange(rrs,raw);
+  if(!m){ cell.textContent='—'; cell.style.color='var(--gray)'; input.style.borderColor='var(--border)'; return; }
+  const num=parseFloat(raw);
   const c=labColor(m.color_code);
-  const crit=(m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)||m.condition_type==='critical';
+  const crit=(!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical';
   cell.innerHTML=`<span style="color:${c};font-weight:700">${m.condition_name||m.interpretation||'—'}${crit?' 🚨':''}</span>`;
   input.style.borderColor=c;
 }
@@ -148,8 +149,8 @@ async function saveBatchEntry(){
     const s=labSamples.find(x=>x.id==sid)||{};
     const num=parseFloat(val);
     const rrs=_rrCache[pid]||[];
-    const m=!isNaN(num)?matchRefRange(rrs,num):null;
-    const crit=m?((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)||m.condition_type==='critical'):false;
+    const m=matchRefRange(rrs, val);
+    const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
     const payload={
       result_value:val, result_numeric:isNaN(num)?null:num, unit,
       ref_range_id:m?.id||null, normal_min:m?.range_min??null, normal_max:m?.range_max??null,

@@ -46,7 +46,11 @@ ALTER TABLE public.product_items
   ADD COLUMN IF NOT EXISTS analyzer_id  bigint;
 CREATE INDEX IF NOT EXISTS idx_product_items_host ON public.product_items(host_code);
 ALTER TABLE public.products     ADD COLUMN IF NOT EXISTS host_code text;
-ALTER TABLE public.ref_ranges   ADD COLUMN IF NOT EXISTS product_item_id bigint;
+ALTER TABLE public.ref_ranges
+  ADD COLUMN IF NOT EXISTS product_item_id bigint,
+  ADD COLUMN IF NOT EXISTS value_type      text default 'numeric',  -- numeric | qualitative
+  ADD COLUMN IF NOT EXISTS expected_values text,                    -- kualitatif: "Negatif,Neg"
+  ADD COLUMN IF NOT EXISTS item_code       text;                    -- kode analit (denormalisasi)
 CREATE INDEX IF NOT EXISTS idx_ref_ranges_item ON public.ref_ranges(product_item_id);
 -- lab_results: siap dipecah per code item (analit) saat entry hasil
 ALTER TABLE public.lab_results

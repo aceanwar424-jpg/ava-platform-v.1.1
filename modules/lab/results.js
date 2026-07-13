@@ -114,7 +114,9 @@ function renderRRChips(rrs){
       ${rrs.map(rr=>{const c=labColor(rr.color_code);
         return `<div style="background:${c}15;border:1px solid ${c}40;border-radius:8px;padding:4px 10px;font-size:11px">
           <strong style="color:${c}">${rr.condition_name}</strong>
-          ${rr.range_min!=null&&rr.range_max!=null?`: ${rr.range_min}–${rr.range_max} ${rr.unit||''}`:''}
+          ${rr.value_type==='qualitative'
+            ? `: ${rr.expected_values||''}`
+            : (rr.range_min!=null&&rr.range_max!=null?`: ${rr.range_min}–${rr.range_max} ${rr.unit||''}`:'')}
           ${(rr.critical_low!=null||rr.critical_high!=null)?`<span style="color:#DC2626"> · kritis ${rr.critical_low??'‹'}${rr.critical_low!=null&&rr.critical_high!=null?'/':''}${rr.critical_high??'›'}</span>`:''}</div>`;
       }).join('')}
     </div>`;
@@ -130,21 +132,22 @@ async function loadRRForResult(productId){
 }
 
 function interpretResult(val){
-  const numVal=parseFloat(val);
   const prodSel=document.getElementById('rf-prod');
   const box=document.getElementById('rf-interp-box');
-  if(!prodSel?.value||isNaN(numVal)){ if(box) box.innerHTML=''; return; }
+  const raw=(val==null?'':String(val)).trim();
+  if(!prodSel?.value||raw===''){ if(box) box.innerHTML=''; return; }
   const rrs=_rrCache[prodSel.value]||[];
   const admSel=document.getElementById('rf-adm');
   const gender=admSel?.options[admSel.selectedIndex]?.dataset.gender||null;
   const age=parseInt(admSel?.options[admSel.selectedIndex]?.dataset.age)||null;
-  const match=matchRefRange(rrs,numVal,gender,age);
+  const match=matchRefRange(rrs,raw,gender,age);
   if(!match){ if(box) box.innerHTML=''; return; }
 
+  const numVal=parseFloat(raw);
   const c=labColor(match.color_code);
   const iEl=document.getElementById('rf-interp');
   if(iEl) iEl.value=match.interpretation||match.condition_name||'';
-  const crit=(match.critical_low!=null&&numVal<=match.critical_low)||(match.critical_high!=null&&numVal>=match.critical_high)||match.condition_type==='critical';
+  const crit=(!isNaN(numVal)&&((match.critical_low!=null&&numVal<=match.critical_low)||(match.critical_high!=null&&numVal>=match.critical_high)))||match.condition_type==='critical';
 
   if(box) box.innerHTML=`
     <div style="background:${crit?'#FEF2F2':c+'15'};border:2px solid ${crit?'#DC2626':c+'40'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
@@ -195,8 +198,8 @@ async function saveLabResult(id){
 
   const numVal=parseFloat(val);
   const rrs=_rrCache[prodId]||[];
-  const m=!isNaN(numVal)?matchRefRange(rrs,numVal,gender,age):null;
-  const crit=m?((m.critical_low!=null&&numVal<=m.critical_low)||(m.critical_high!=null&&numVal>=m.critical_high)||m.condition_type==='critical'):false;
+  const m=matchRefRange(rrs, val, gender, age);
+  const crit=m?((!isNaN(numVal)&&((m.critical_low!=null&&numVal<=m.critical_low)||(m.critical_high!=null&&numVal>=m.critical_high)))||m.condition_type==='critical'):false;
 
   const payload={
     admission_id:parseInt(admId), sample_id:sampleId, visit_number:admVisit, patient_name:admName,

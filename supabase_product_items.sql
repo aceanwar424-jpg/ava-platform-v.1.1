@@ -28,9 +28,12 @@ CREATE INDEX IF NOT EXISTS idx_product_items_host ON public.product_items(host_c
 ALTER TABLE public.products
   ADD COLUMN IF NOT EXISTS host_code text;   -- kode order tes ke analyzer
 
--- ── 3. REF_RANGES — bisa mentarget 1 code item (analit) tertentu ────────
+-- ── 3. REF_RANGES — target code item + dukung hasil kualitatif (teks) ───
 ALTER TABLE public.ref_ranges
-  ADD COLUMN IF NOT EXISTS product_item_id bigint;
+  ADD COLUMN IF NOT EXISTS product_item_id bigint,                  -- ref range per analit
+  ADD COLUMN IF NOT EXISTS value_type      text default 'numeric',  -- numeric | qualitative
+  ADD COLUMN IF NOT EXISTS expected_values text,                    -- kualitatif: "Negatif,Neg,Negative"
+  ADD COLUMN IF NOT EXISTS item_code       text;
 CREATE INDEX IF NOT EXISTS idx_ref_ranges_item ON public.ref_ranges(product_item_id);
 
 -- ── 4. LAB_RESULTS — siap dipecah per code item (analit) ───────────────

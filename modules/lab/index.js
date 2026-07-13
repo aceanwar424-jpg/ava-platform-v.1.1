@@ -91,18 +91,34 @@ async function labLoadRR(productId){
   } catch(e){ _rrCache[productId] = []; }
   return _rrCache[productId];
 }
-// Cari ref range yang cocok utk sebuah nilai (opsional gender/umur)
-function matchRefRange(rrs, numVal, gender, age){
-  if(isNaN(numVal)) return null;
+// Cari ref range yang cocok untuk sebuah nilai (numerik ATAU teks/kualitatif),
+// dengan opsi filter gender & umur. rawVal boleh angka atau teks (Positif/Negatif).
+function matchRefRange(rrs, rawVal, gender, age){
   const cand = (rrs||[]).filter(rr=>{
     const gOk = !rr.gender || rr.gender==='All' || !gender || rr.gender===gender;
     const aOk = age==null || ((rr.age_min==null||age>=rr.age_min) && (rr.age_max==null||age<=rr.age_max));
     return gOk && aOk;
   });
-  return cand.find(rr=>
-    (rr.range_min==null||numVal>=rr.range_min) &&
-    (rr.range_max==null||numVal<=rr.range_max)
-  ) || null;
+  const num = parseFloat(rawVal);
+  const txt = String(rawVal==null?'':rawVal).trim().toLowerCase();
+
+  // 1) Numerik — cocokkan ke rentang (abaikan baris kualitatif & baris tanpa rentang)
+  if(!isNaN(num) && txt!==''){
+    const m = cand.find(rr=> rr.value_type!=='qualitative'
+      && !(rr.range_min==null && rr.range_max==null)
+      && (rr.range_min==null||num>=rr.range_min)
+      && (rr.range_max==null||num<=rr.range_max));
+    if(m) return m;
+  }
+  // 2) Kualitatif/teks — cocokkan ke daftar expected_values (mis. "Negatif,Neg")
+  if(txt){
+    const m = cand.find(rr=>{
+      const list=(rr.expected_values||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+      return list.includes(txt);
+    });
+    if(m) return m;
+  }
+  return null;
 }
 
 // ── Loaders utama ────────────────────────────────────────────────
