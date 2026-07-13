@@ -29,6 +29,7 @@ const IMPORT_TEMPLATES = {
       { key: 'hpp',              header: 'HPP (Rp)',            required: false, example: '15000', type:'number' },
       { key: 'kode_material',    header: 'Kode Material',       required: false, example: 'MAT-001'         },
       { key: 'loinc_code',       header: 'LOINC Code',          required: false, example: '718-7'           },
+      { key: 'host_code',        header: 'Host Code (alat)',    required: false, example: 'CBC5'            },
       { key: 'keterangan',       header: 'Keterangan',          required: false, example: 'Puasa 8 jam'     },
       { key: 'is_active',        header: 'Status Aktif',        required: false, example: 'true', note:'true|false' },
     ]
@@ -115,6 +116,102 @@ const IMPORT_TEMPLATES = {
       { key: 'notes',            header: 'Catatan',              required: false, example: 'Kontak via referral' },
     ]
   },
+
+  product_items: {
+    label: 'Code Item / Analit (per tes)',
+    table: 'product_items',
+    icon: '🔬',
+    sheet: 'CodeItems',
+    upsertKey: null,
+    special: 'product_items',
+    note: '⚠️ Kolom "Kode Tes Induk" wajib cocok dengan kode_internal tes yang sudah ada. Baris dengan (tes+code) sama akan di-update.',
+    columns: [
+      { key: '_kode_internal', header: 'Kode Tes Induk *', required: true,  example: 'OL-HEM-001', note:'kode_internal tes yang sudah ada' },
+      { key: 'code',           header: 'Code Item *',      required: true,  example: 'RBC' },
+      { key: 'name_id',        header: 'Nama Analit *',    required: true,  example: 'Eritrosit' },
+      { key: 'uom',            header: 'Satuan',           required: false, example: '10^6/µL' },
+      { key: 'result_type',    header: 'Tipe Hasil',       required: false, example: 'numeric', note:'numeric|text|select' },
+      { key: 'loinc_code',     header: 'LOINC',            required: false, example: '789-8' },
+      { key: 'ref_low',        header: 'Normal Bawah',     required: false, example: '4.5', type:'number' },
+      { key: 'ref_high',       header: 'Normal Atas',      required: false, example: '5.9', type:'number' },
+      { key: 'ref_text',       header: 'Rujukan Teks',     required: false, example: 'Negatif' },
+      { key: 'specimen_type',  header: 'Specimen',         required: false, example: 'BLOOD, WHOLE', note:'BLOOD, WHOLE|BLOOD, SERUM|BLOOD, PLASMA|URINE|STOOL/FECES|SWAB, NASOPHARYNGEAL|SWAB, THROAT|SPUTUM|SALIVA|CSF|TISSUE|OTHER' },
+      { key: 'host_code',      header: 'Host Code',        required: false, example: '731' },
+      { key: 'display_order',  header: 'Urutan',           required: false, example: '1', type:'number' },
+      { key: 'is_active',      header: 'Status Aktif',     required: false, example: 'true', note:'true|false' },
+    ]
+  },
+
+  ref_ranges: {
+    label: 'Reference Range / Nilai Rujukan',
+    table: 'ref_ranges',
+    icon: '📊',
+    sheet: 'RefRanges',
+    upsertKey: null,
+    special: 'ref_ranges',
+    note: '⚠️ "Kode Tes" wajib cocok dengan tes yang ada. Untuk panel, isi "Code Item" agar range menempel ke analit tertentu. Numerik → isi Min/Maks; Kualitatif → isi "Nilai Kualitatif".',
+    columns: [
+      { key: '_kode_internal',  header: 'Kode Tes *',      required: true,  example: 'OL-CHE-001', note:'kode_internal tes' },
+      { key: '_item_code',      header: 'Code Item',       required: false, example: '', note:'kosongkan jika tes tunggal' },
+      { key: 'condition_name',  header: 'Nama Kondisi *',  required: true,  example: 'Normal' },
+      { key: 'condition_type',  header: 'Tipe Kondisi',    required: false, example: 'normal', note:'normal|risk|critical' },
+      { key: 'value_type',      header: 'Tipe Nilai',      required: false, example: 'numeric', note:'numeric|qualitative' },
+      { key: 'gender',          header: 'Gender',          required: false, example: 'All', note:'All|M|F' },
+      { key: 'age_min',         header: 'Usia Min',        required: false, example: '0', type:'number' },
+      { key: 'age_max',         header: 'Usia Maks',       required: false, example: '999', type:'number' },
+      { key: 'range_min',       header: 'Nilai Min',       required: false, example: '70', type:'number' },
+      { key: 'range_max',       header: 'Nilai Maks',      required: false, example: '99', type:'number' },
+      { key: 'unit',            header: 'Unit',            required: false, example: 'mg/dL' },
+      { key: 'critical_low',    header: 'Kritis Bawah',    required: false, example: '40', type:'number' },
+      { key: 'critical_high',   header: 'Kritis Atas',     required: false, example: '500', type:'number' },
+      { key: 'expected_values', header: 'Nilai Kualitatif',required: false, example: '', note:'utk qualitative: "Negatif,Neg"' },
+      { key: 'color_code',      header: 'Warna',           required: false, example: 'green', note:'green|yellow|orange|red' },
+      { key: 'interpretation',  header: 'Interpretasi',    required: false, example: 'Normal' },
+      { key: 'description',     header: 'Deskripsi',       required: false, example: '' },
+      { key: 'recommendation',  header: 'Rekomendasi',     required: false, example: '' },
+    ]
+  },
+
+  families: {
+    label: 'Family Registry (Keluarga)',
+    table: 'families',
+    icon: '👨‍👩‍👧',
+    sheet: 'Families',
+    upsertKey: 'family_code',
+    columns: [
+      { key: 'family_code',    header: 'Kode Keluarga *', required: true,  example: 'FAM-0001' },
+      { key: 'family_name',    header: 'Nama Keluarga *', required: true,  example: 'Keluarga Budi' },
+      { key: 'pic_name',       header: 'PIC / Kepala',    required: false, example: 'Budi Santoso' },
+      { key: 'pic_phone',      header: 'No HP PIC',       required: false, example: '08123456789' },
+      { key: 'discount_type',  header: 'Tipe Diskon',     required: false, example: 'percent', note:'percent|fixed' },
+      { key: 'discount_value', header: 'Nilai Diskon',    required: false, example: '10', type:'number' },
+      { key: 'membership_no',  header: 'No Membership',   required: false, example: '' },
+      { key: 'valid_until',    header: 'Berlaku s/d',     required: false, example: '2027-12-31', type:'date' },
+      { key: 'status',         header: 'Status',          required: false, example: 'Aktif', note:'Aktif|Non-Aktif' },
+    ]
+  },
+
+  analyzers: {
+    label: 'Analyzer / Alat Lab',
+    table: 'analyzers',
+    icon: '🎛️',
+    sheet: 'Analyzers',
+    upsertKey: 'kode_alat',
+    skipCreatedBy: true,
+    columns: [
+      { key: 'kode_alat',     header: 'Kode Alat *',    required: true,  example: 'ANZ-001' },
+      { key: 'nama_alat',     header: 'Nama Alat *',    required: true,  example: 'Sysmex XN-550' },
+      { key: 'merk',          header: 'Merk',           required: false, example: 'Sysmex' },
+      { key: 'model',         header: 'Model',          required: false, example: 'XN-550' },
+      { key: 'serial_number', header: 'Serial Number',  required: false, example: '' },
+      { key: 'kategori',      header: 'Kategori',       required: false, example: 'Hematology', note:'Hematology|Chemistry|Immunology|Urinalysis|Coagulation|Lainnya' },
+      { key: 'lokasi',        header: 'Lokasi',         required: false, example: 'Lab Utama' },
+      { key: 'status',        header: 'Status',         required: false, example: 'Aktif', note:'Aktif|Maintenance|Rusak' },
+      { key: 'kalibrasi_berikutnya', header: 'Kalibrasi Berikutnya', required: false, example: '2026-12-01', type:'date' },
+      { key: 'integrasi_aktif',      header: 'Integrasi Aktif',      required: false, example: 'false', type:'boolean', note:'true|false' },
+      { key: 'integrasi_protocol',   header: 'Protokol Integrasi',   required: false, example: 'HL7', note:'HL7|ASTM|POCT' },
+    ]
+  },
 };
 
 // ── Main Render ───────────────────────────────────────
@@ -122,11 +219,11 @@ function renderImportExcel() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📥 Import Excel — Config Master</h1>
-        <p>Upload file Excel untuk import data massal. Download template terlebih dahulu.</p>
+        <h1>📥 Bulk Upload — Config Master</h1>
+        <p>Upload massal semua master data (tes, code item, ref range, paket, korporat, keluarga, alat). Download template (CSV) dulu, isi, lalu upload.</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="downloadAllTemplates()">⬇️ Download Semua Template</button>
+        <button class="btn btn-ghost btn-sm" onclick="downloadAllTemplates()">⬇️ Semua Template (XLSX)</button>
       </div>
     </div>
 
@@ -166,28 +263,47 @@ function renderImportExcel() {
 }
 
 // ── Download Template ─────────────────────────────────
+// Download template sebagai CSV (tanpa dependensi — bisa dibuka di Excel/Sheets).
 function downloadTemplate(key) {
   const tpl = IMPORT_TEMPLATES[key];
   if (!tpl) return;
+  const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const headers  = tpl.columns.map(c => c.header);
+  const examples = tpl.columns.map(c => c.example || '');
+  const notes    = tpl.columns.map(c => c.note ? `pilihan: ${c.note}` : (c.required?'WAJIB':''));
 
-  // Build CSV template with headers + example row + notes row
-  const headers = tpl.columns.map(c => c.header);
+  const csv = [
+    headers.map(esc).join(','),
+    examples.map(esc).join(','),
+    notes.map(esc).join(','),
+  ].join('\r\n');
+
+  const blob = new Blob(['﻿'+csv], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `template_${key}_onelab.csv`;
+  a.click();
+  toast(`✅ Template ${tpl.label} (CSV) didownload`, 'ok');
+}
+
+// Versi XLSX (opsional) — butuh SheetJS
+function downloadTemplateXLSX(key) {
+  const tpl = IMPORT_TEMPLATES[key]; if (!tpl) return;
+  const headers  = tpl.columns.map(c => c.header);
   const examples = tpl.columns.map(c => c.example || '');
   const notes    = tpl.columns.map(c => c.note ? `[${c.note}]` : '');
+  if (typeof XLSX !== 'undefined') _downloadXLSX(key, tpl, headers, examples, notes);
+  else loadSheetJS(() => _downloadXLSX(key, tpl, headers, examples, notes));
+}
 
-  const rows = [
-    headers.join(','),
-    examples.join(','),
-    notes.map(n => n ? `"${n}"` : '').join(','),
-  ];
-
-  // Also build as proper Excel with SheetJS if available
-  if (typeof XLSX !== 'undefined') {
-    _downloadXLSX(key, tpl, headers, examples, notes);
-  } else {
-    // Fallback: load SheetJS then download
-    loadSheetJS(() => _downloadXLSX(key, tpl, headers, examples, notes));
+// Normalisasi nilai tanggal → 'YYYY-MM-DD' (Date object dari XLSX atau teks)
+function _toDateStr(v) {
+  if (v instanceof Date && !isNaN(v)) {
+    const tz = v.getTimezoneOffset()*60000;
+    return new Date(v.getTime()-tz).toISOString().slice(0,10);
   }
+  const s = String(v).trim();
+  return s || null;
 }
 
 function _downloadXLSX(key, tpl, headers, examples, notes) {
@@ -382,7 +498,11 @@ function _parseFile(file, key, tpl) {
           let val = row[idx];
           if (val === '' || val === null || val === undefined) { obj[col.key] = null; return; }
           if (col.type === 'number') val = parseFloat(String(val).replace(/[^0-9.-]/g,'')) || 0;
-          else if (col.key === 'is_active') val = String(val).toLowerCase() === 'true' || val === 1 || val === '1';
+          else if (col.type === 'boolean' || col.key === 'is_active') {
+            const s = String(val).toLowerCase();
+            val = s === 'true' || s === 'ya' || s === '1' || val === 1;
+          }
+          else if (col.type === 'date') val = _toDateStr(val);
           else val = String(val).trim();
           obj[col.key] = val;
         });
@@ -456,9 +576,13 @@ async function doImport(key) {
   const user = getUserName ? getUserName() : 'User';
 
   try {
-    // Special handling for corporate_employees (need corporate_id lookup)
+    // Handler khusus yang butuh lookup relasi (product/kode induk)
     if (key === 'corporate_employees') {
       await _importCorpEmployees(parsed, user, (o, e, m) => { ok=o; err=e; errMsgs=m; });
+    } else if (tpl.special === 'product_items') {
+      await _importProductItems(parsed, (o, e, m) => { ok=o; err=e; errMsgs=m; });
+    } else if (tpl.special === 'ref_ranges') {
+      await _importRefRanges(parsed, (o, e, m) => { ok=o; err=e; errMsgs=m; });
     } else {
       for (const row of parsed) {
         try {
@@ -469,7 +593,7 @@ async function doImport(key) {
             }
           });
           payload.updated_at = new Date().toISOString();
-          if (!payload.created_by) payload.created_by = user;
+          if (!tpl.skipCreatedBy && !payload.created_by) payload.created_by = user;
 
           if (tpl.upsertKey && payload[tpl.upsertKey]) {
             // Check if exists
@@ -499,10 +623,13 @@ async function doImport(key) {
 
   // Reload relevant module
   const reloadMap = {
-    products: ()=>{ if(typeof loadProducts==='function') loadProducts(); },
-    packages: ()=>{ if(typeof loadPackages==='function') loadPackages(); },
-    corporates: ()=>{ if(typeof loadCorporates==='function') loadCorporates(); },
-    partners: ()=>{ if(typeof loadPartners==='function') loadPartners(); },
+    products:      ()=>{ if(typeof loadProducts==='function' && document.getElementById('prod-tbody')) loadProducts(); },
+    product_items: ()=>{ if(typeof loadProducts==='function' && document.getElementById('prod-tbody')) loadProducts(); },
+    ref_ranges:    ()=>{ if(typeof loadRefRanges==='function' && document.getElementById('rr-tbody')) loadRefRanges(); },
+    packages:      ()=>{ if(typeof loadPackages==='function') loadPackages(); },
+    corporates:    ()=>{ if(typeof loadCorporates==='function') loadCorporates(); },
+    families:      ()=>{ if(typeof loadFamilies==='function' && document.getElementById('fam-list')) loadFamilies(); },
+    partners:      ()=>{ if(typeof loadPartners==='function') loadPartners(); },
   };
   if (reloadMap[key]) reloadMap[key]();
 
@@ -540,6 +667,91 @@ async function _importCorpEmployees(parsed, user, callback) {
       err++;
       errMsgs.push(`Baris ${row._row}: ${e.message}`);
     }
+  }
+  callback(ok, err, errMsgs);
+}
+
+// Import code item — lookup product_id dari kode_internal, upsert by (product_id, code)
+async function _importProductItems(parsed, callback) {
+  let ok=0, err=0, errMsgs=[];
+  const prods = await sbGet('products','select=id,kode_internal').catch(()=>[]);
+  const pmap = {}; (prods||[]).forEach(p=>pmap[String(p.kode_internal).toLowerCase()] = p.id);
+
+  for (const row of parsed) {
+    try {
+      const pid = pmap[String(row._kode_internal||'').toLowerCase()];
+      if (!pid) throw new Error(`Kode tes "${row._kode_internal}" tidak ditemukan`);
+      const payload = {
+        product_id: pid, code: row.code||null, name_id: row.name_id||row.code,
+        uom: row.uom||null, result_type: row.result_type||'numeric', loinc_code: row.loinc_code||null,
+        ref_low: row.ref_low??null, ref_high: row.ref_high??null, ref_text: row.ref_text||null,
+        specimen_type: row.specimen_type||null, host_code: row.host_code||null,
+        display_order: row.display_order||1, is_active: row.is_active!==false,
+      };
+      const ex = await sbGet('product_items',
+        `select=id&product_id=eq.${pid}&code=eq.${encodeURIComponent(row.code||'')}`).catch(()=>[]);
+      if (ex?.length) await sbPatch('product_items', ex[0].id, payload);
+      else            await sbPost('product_items', payload);
+      ok++;
+    } catch(e) { err++; errMsgs.push(`Baris ${row._row}: ${e.message}`); }
+  }
+
+  // Recompute is_panel utk produk yang terpengaruh
+  const affected = [...new Set(parsed.map(r=>pmap[String(r._kode_internal||'').toLowerCase()]).filter(Boolean))];
+  for (const pid of affected) {
+    try {
+      const items = await sbGet('product_items',`select=id&product_id=eq.${pid}&is_active=eq.true`).catch(()=>[]);
+      await sbPatch('products', pid, { is_panel: (items||[]).length > 1 });
+    } catch(e){}
+  }
+  callback(ok, err, errMsgs);
+}
+
+// Import ref range — lookup product_id (+ product_item_id opsional), dukung numerik & kualitatif
+async function _importRefRanges(parsed, callback) {
+  let ok=0, err=0, errMsgs=[];
+  const prods = await sbGet('products','select=id,kode_internal,nama_tes').catch(()=>[]);
+  const pmap = {}; (prods||[]).forEach(p=>pmap[String(p.kode_internal).toLowerCase()] = {id:p.id,name:p.nama_tes});
+  const itemCache = {};
+
+  for (const row of parsed) {
+    try {
+      const pinfo = pmap[String(row._kode_internal||'').toLowerCase()];
+      if (!pinfo) throw new Error(`Kode tes "${row._kode_internal}" tidak ditemukan`);
+      let itemId=null, itemCode=null;
+      if (row._item_code) {
+        if (!itemCache[pinfo.id]) {
+          const its = await sbGet('product_items',`select=id,code&product_id=eq.${pinfo.id}`).catch(()=>[]);
+          const map={}; (its||[]).forEach(i=>map[String(i.code||'').toLowerCase()] = i.id);
+          itemCache[pinfo.id] = map;
+        }
+        itemId = itemCache[pinfo.id][String(row._item_code).toLowerCase()] || null;
+        itemCode = row._item_code;
+        if (!itemId) throw new Error(`Code item "${row._item_code}" tidak ada di tes ${row._kode_internal}`);
+      }
+      const isQual = String(row.value_type||'numeric').toLowerCase()==='qualitative';
+      const gender = row.gender||'All';
+      const ageMin = row.age_min??0;
+      const payload = {
+        product_id: pinfo.id, product_name: pinfo.name, product_item_id: itemId, item_code: itemCode,
+        value_type: isQual?'qualitative':'numeric',
+        condition_name: row.condition_name, condition_type: row.condition_type||'normal',
+        gender, age_min: ageMin, age_max: row.age_max??999,
+        range_min: isQual?null:(row.range_min??null), range_max: isQual?null:(row.range_max??null),
+        unit: isQual?null:(row.unit||null),
+        critical_low: isQual?null:(row.critical_low??null), critical_high: isQual?null:(row.critical_high??null),
+        expected_values: isQual?(row.expected_values||null):null,
+        color_code: row.color_code||'green', interpretation: row.interpretation||null,
+        description: row.description||null, recommendation: row.recommendation||null,
+      };
+      // upsert by product + item + condition + gender + age_min
+      let q = `select=id&product_id=eq.${pinfo.id}&condition_name=eq.${encodeURIComponent(row.condition_name)}&gender=eq.${gender}&age_min=eq.${ageMin}`;
+      q += itemId ? `&product_item_id=eq.${itemId}` : `&product_item_id=is.null`;
+      const ex = await sbGet('ref_ranges', q).catch(()=>[]);
+      if (ex?.length) await sbPatch('ref_ranges', ex[0].id, payload);
+      else            await sbPost('ref_ranges', payload);
+      ok++;
+    } catch(e) { err++; errMsgs.push(`Baris ${row._row}: ${e.message}`); }
   }
   callback(ok, err, errMsgs);
 }

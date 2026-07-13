@@ -624,11 +624,13 @@ const FLYOUT_MENUS = {
     label: 'Konfigurasi',
     items: [
       {page:'users', icon:'👤', label:'User Management', action:"navigate('users')", adminOnly:true},
-      {page:'product', icon:'🧬', label:'Product', action:"navigate('product')"},
+      {page:'product', icon:'🧬', label:'Master Tes / Produk', action:"navigate('product')"},
+      {page:'refrange', icon:'📊', label:'Reference Range', action:"navigate('refrange')"},
       {page:'package', icon:'🗂️', label:'Package & Panel', action:"navigate('package')"},
       {page:'corporate', icon:'🏢', label:'Corporate', action:"navigate('corporate')"},
       {page:'family', icon:'👨‍👩‍👧', label:'Family Registry', action:"navigate('family')"},
-      {page:'import', icon:'📥', label:'Import Excel', action:"navigate('import')"},
+      {page:'analyzer', icon:'🎛️', label:'Master Alat (Analyzer)', action:"navigate('lab',{tab:'qc'})"},
+      {page:'import', icon:'📥', label:'Bulk Upload', action:"navigate('import')"},
       {page:'settings', icon:'⚙️', label:'Pengaturan', action:"navigate('settings')"},
     ]
   },

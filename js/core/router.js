@@ -9,7 +9,7 @@ const PAGE_TITLES = {
   mcu:'Project MCU', finance:'Finance & Billing',
   inventory:'Inventory & Logistik', hrd:'HRD & SDM', homecare:'Home Care',
   admission:'Admission / Registrasi', anamnesa:'Anamnesa', lab:'Operasional Lab',
-  product:'Master Produk & Tes', corporate:'Corporate Management',
+  product:'Master Produk & Tes', refrange:'Reference Range', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
   package:'Package Service', family:'Family Registry',
@@ -56,6 +56,7 @@ function navigate(page, params={}) {
     case 'admission':   renderAdmission();              break;
     case 'lab':         renderLab(params.tab||'checkin'); break;
     case 'product':     renderConfigProduct();          break;
+    case 'refrange':    renderConfigRefRange();          break;
     case 'corporate':   renderConfigCorporate();        break;
     case 'radiology':   renderRadiology();              break;
     case 'supportive':  renderSupportive();             break;
