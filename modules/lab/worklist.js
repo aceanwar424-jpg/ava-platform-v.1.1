@@ -62,16 +62,10 @@ function renderWorklistTab(){
     }).join('')}`;
 }
 
-// Buka form input hasil untuk sebuah sampel (cari draft result-nya)
-async function entryFromSample(sampleId){
+// Buka input hasil per-tes (panel terpecah per parameter) untuk sebuah sampel
+function entryFromSample(sampleId){
   const s=labSamples.find(x=>x.id==sampleId); if(!s) return;
-  // cari lab_result draft yang cocok (by sample_id atau admission+product)
-  let r=labResults.find(x=>x.sample_id==sampleId);
-  if(!r) r=labResults.find(x=>x.admission_id==s.admission_id && x.product_id==s.product_id && x.status==='Draft');
-  if(r){ openResultForm(r.id); return; }
-  // fallback: buat form baru dengan konteks sampel
-  openResultForm(null, { admission_id:s.admission_id, visit_number:s.visit_number,
-    patient_name:s.patient_name, product_id:s.product_id, product_name:s.product_name, sample_id:s.id });
+  openResultEntry(s.admission_id, s.product_id);
 }
 
 // ── Input Batch: satu tabel utk seluruh worklist group ───────────
@@ -100,6 +94,15 @@ async function openBatchEntry(nameEnc){
       </tr></thead><tbody>
       ${inProc.map(s=>{
         const p=labProduct(s.product_id);
+        if(p?.is_panel){
+          return `<tr data-sample="${s.id}" data-prod="${s.product_id}">
+            <td style="font-size:12px"><div style="font-weight:600">${s.patient_name||'—'}</div>
+              <div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
+            <td style="font-size:12px">${s.product_name||'—'} <span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700">PANEL</span></td>
+            <td colspan="2"><button class="btn btn-teal btn-xs" onclick="closeModalForce();openResultEntry(${s.admission_id},${s.product_id})">📝 Input per parameter →</button></td>
+            <td class="be-interp" style="font-size:11px;color:var(--gray)">panel</td>
+          </tr>`;
+        }
         return `<tr data-sample="${s.id}" data-prod="${s.product_id}">
           <td style="font-size:12px"><div style="font-weight:600">${s.patient_name||'—'}</div>
             <div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
@@ -138,8 +141,8 @@ function beInterpret(input){
 
 async function saveBatchEntry(){
   const rows=[...document.querySelectorAll('#modal-box tbody tr')];
-  const toSave=rows.filter(tr=>tr.querySelector('.be-val').value.trim());
-  if(!toSave.length){ toast('Belum ada nilai diisi','warn'); return; }
+  const toSave=rows.filter(tr=>{ const i=tr.querySelector('.be-val'); return i && i.value.trim(); });
+  if(!toSave.length){ toast('Belum ada nilai diisi (panel diinput lewat tombol per parameter)','warn'); return; }
   let ok=0;
   for(const tr of toSave){
     const sid=parseInt(tr.dataset.sample);

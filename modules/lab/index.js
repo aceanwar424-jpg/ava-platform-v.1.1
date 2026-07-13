@@ -30,7 +30,7 @@ async function loadLabProducts(){
   if (_prodCache) return _prodCache;
   try {
     _prodCache = await sbGet('products',
-      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_active&is_active=eq.true&order=kategori,nama_tes') || [];
+      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_panel,is_active&is_active=eq.true&order=kategori,nama_tes') || [];
   } catch(e){ _prodCache = []; }
   return _prodCache;
 }
@@ -119,6 +119,39 @@ function matchRefRange(rrs, rawVal, gender, age){
     if(m) return m;
   }
   return null;
+}
+
+// ── Code item (analit) per produk ────────────────────────────────
+let _itemsCache = {};
+async function labProductItems(productId){
+  if(_itemsCache[productId]) return _itemsCache[productId];
+  try {
+    _itemsCache[productId] = (await sbGet('product_items',
+      `select=id,code,name_id,uom,loinc_code,ref_low,ref_high,ref_text,display_order,is_active&product_id=eq.${productId}&order=display_order.asc`)||[])
+      .filter(i=>i.is_active!==false);
+  } catch(e){ _itemsCache[productId] = []; }
+  return _itemsCache[productId];
+}
+
+// Buat draft lab_results untuk sebuah tes — PECAH per code item bila panel.
+// base: { admission_id, sample_id, visit_number, patient_name }
+async function labCreateDraftResults(base, productId, productName){
+  const items = await labProductItems(productId);
+  const now = new Date().toISOString();
+  if (items.length){
+    for (const it of items){
+      await sbPost('lab_results', { ...base,
+        product_id: productId, product_name: productName,
+        product_item_id: it.id, item_code: it.code||null, item_name: it.name_id||it.code||null,
+        unit: it.uom||null, loinc_code: it.loinc_code||null,
+        status:'Draft', entered_by: labUser(), entered_at: now });
+    }
+    return items.length;
+  }
+  await sbPost('lab_results', { ...base,
+    product_id: productId, product_name: productName,
+    status:'Draft', entered_by: labUser(), entered_at: now });
+  return 1;
 }
 
 // ── Loaders utama ────────────────────────────────────────────────

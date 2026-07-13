@@ -172,11 +172,9 @@ async function saveLabelCheckin(labelId){
         received_at:new Date().toISOString(), status:'Pending', notes, label_id:labelId,
       });
       const sid = Array.isArray(sample)? sample[0]?.id : sample?.id;
-      await sbPost('lab_results',{
-        admission_id:label.admission_id, sample_id:sid||null, visit_number:label.visit_number, patient_name:label.patient_name,
-        product_id:it.product_id, product_name:it.product_name,
-        status:'Draft', entered_by:labUser(), entered_at:new Date().toISOString(),
-      });
+      await labCreateDraftResults(
+        { admission_id:label.admission_id, sample_id:sid||null, visit_number:label.visit_number, patient_name:label.patient_name },
+        it.product_id, it.product_name);
     }
     await sbPatch('sample_labels',labelId,{status:'CheckedIn',checked_in_at:new Date().toISOString(),collected_at:collected,collected_by:collector});
     if(typeof logActivity==='function') logActivity('checkin','sample_labels',labelId,`Check-in ${items.length} tes`,label.patient_name);
@@ -280,11 +278,9 @@ async function saveSampleCheckin(admissionId){
       notes:document.getElementById('sc-notes').value.trim()||null,
     });
     const sid=Array.isArray(sample)?sample[0]?.id:sample?.id;
-    await sbPost('lab_results',{
-      admission_id:admissionId, sample_id:sid||null, visit_number:adm.visit_number, patient_name:adm.patient_name,
-      product_id:parseInt(prodId), product_name:prodName,
-      status:'Draft', entered_by:labUser(), entered_at:new Date().toISOString(),
-    });
+    await labCreateDraftResults(
+      { admission_id:admissionId, sample_id:sid||null, visit_number:adm.visit_number, patient_name:adm.patient_name },
+      parseInt(prodId), prodName);
     if(typeof logActivity==='function') logActivity('checkin','lab_samples',sid,`Check-in ${prodName}`,adm.patient_name);
     toast('✅ Sampel berhasil di check-in','ok');
     closeModalForce(); labRefresh();

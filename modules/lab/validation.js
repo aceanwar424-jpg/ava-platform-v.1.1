@@ -51,7 +51,7 @@ function renderResultReviewTable(data, nextStatus){
       return `<tr>
         <td><div style="font-weight:600">${r.patient_name||'—'}</div>
             <div style="font-size:10px;color:var(--gray)">${r.visit_number||'—'}</div></td>
-        <td style="font-size:12px">${r.product_name||'—'}</td>
+        <td style="font-size:12px">${r.item_name?`${r.item_name} <span style="font-size:9px;color:var(--gray)">· ${r.product_name}</span>`:(r.product_name||'—')}</td>
         <td style="font-size:14px;font-weight:800;color:${col}">${r.result_value||'—'} <span style="font-size:11px;color:var(--gray)">${r.unit||''}</span></td>
         <td><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
         <td>${crit?'<span title="Nilai kritis" style="color:#DC2626;font-weight:800">🚨</span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800;margin-left:2px">${flag}</span>`:(!crit?'—':'')}</td>

@@ -54,7 +54,7 @@ function renderReportTab(){
                       :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
             const crit=isCriticalResult(r);
             return `<tr style="border-bottom:1px solid #f1f5f9">
-              <td style="padding:6px 10px;font-weight:600">${r.product_name||'—'}</td>
+              <td style="padding:6px 10px;font-weight:600">${r.item_name||r.product_name||'—'}${r.item_name?`<div style="font-size:9px;color:var(--gray);font-weight:400">${r.product_name}</div>`:''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${col}">${r.result_value||'—'}${crit?' 🚨':''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${r.unit||'—'}</td>
@@ -172,7 +172,7 @@ function printLabReport(patientName, visitNumber){
         const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
                   :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
         return `<tr>
-          <td><strong>${r.product_name||'—'}</strong></td>
+          <td><strong>${r.item_name||r.product_name||'—'}</strong>${r.item_name?` <span style="font-size:9px;color:#94A3B8">${r.product_name}</span>`:''}</td>
           <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit">🚨</span>':''}</td>
           <td class="flag" style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
           <td style="color:#546E7A">${r.unit||'—'}</td>
