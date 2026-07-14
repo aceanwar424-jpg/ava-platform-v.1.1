@@ -918,21 +918,34 @@ async function addPackageLines(pkgId) {
 // ═══════════════════════════════════════════════════════════════
 let _patSearchField = 'name', _patSearchResults = [];
 
+// Popup cari pasien — overlay MANDIRI (bukan openModal), agar form registrasi
+// di #modal-box tetap ada saat pasien dipilih dan field bisa terisi.
 function openPatientSearch() {
   _patSearchField = 'name'; _patSearchResults = [];
-  openModal(`
-    <div class="modal-header"><div class="modal-title">🔍 Cari Pasien Terdaftar</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
-    <div style="display:flex;gap:6px;margin-bottom:10px" id="pat-search-tabs">
-      ${[['name','Nama'],['dob','Tgl Lahir'],['mr','No. MR'],['id','No. ID / KTP']].map(([k,l])=>`
-        <button type="button" class="btn ${k==='name'?'btn-teal':'btn-ghost'} btn-sm" id="pat-tab-${k}" onclick="setPatSearchField('${k}')">${l}</button>`).join('')}
-    </div>
-    <div id="pat-search-input-wrap">
-      <input class="table-search" id="pat-search-input" placeholder="Ketik nama pasien..." oninput="searchPatientDB(this.value)" style="width:100%"></div>
-    <div id="pat-search-results" style="max-height:340px;overflow-y:auto;margin-top:10px">
-      <div style="padding:20px;text-align:center;color:var(--gray)">Ketik untuk mencari…</div></div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`);
+  closePatientSearch();
+  const ov = document.createElement('div');
+  ov.id = 'pat-search-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10001;display:flex;align-items:flex-start;justify-content:center;padding:56px 16px';
+  ov.onclick = (e)=>{ if(e.target===ov) closePatientSearch(); };
+  ov.innerHTML = `
+    <div style="background:#fff;border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.28);width:100%;max-width:640px;max-height:82vh;display:flex;flex-direction:column;padding:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:800;color:var(--navy)">🔍 Cari Pasien Terdaftar</div>
+        <button onclick="closePatientSearch()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px" id="pat-search-tabs">
+        ${[['name','Nama'],['dob','Tgl Lahir'],['mr','No. MR'],['id','No. ID / KTP']].map(([k,l])=>`
+          <button type="button" class="btn ${k==='name'?'btn-teal':'btn-ghost'} btn-sm" id="pat-tab-${k}" onclick="setPatSearchField('${k}')">${l}</button>`).join('')}
+      </div>
+      <div id="pat-search-input-wrap">
+        <input class="table-search" id="pat-search-input" placeholder="Ketik nama pasien..." oninput="searchPatientDB(this.value)" style="width:100%"></div>
+      <div id="pat-search-results" style="flex:1;overflow-y:auto;margin-top:10px;min-height:120px">
+        <div style="padding:20px;text-align:center;color:var(--gray)">Ketik untuk mencari…</div></div>
+    </div>`;
+  document.body.appendChild(ov);
+  setTimeout(()=>document.getElementById('pat-search-input')?.focus(), 50);
 }
+function closePatientSearch(){ document.getElementById('pat-search-overlay')?.remove(); }
 
 function setPatSearchField(f) {
   _patSearchField = f;
@@ -1005,7 +1018,7 @@ async function pickPatient(i) {
     admFormState.patientIds=[{id_type:p.patient_id_type||'ID Card Number',id_number:p.patient_id_number,issuer_country:'Indonesia',is_primary:true}];
   }
   renderPatientIdTable();
-  closeModalForce();
+  closePatientSearch();
   toast(`✅ Data pasien lama dimuat${p.mr_number?' — MR '+p.mr_number+' dipakai ulang':''}`,'ok',3500);
 }
 
