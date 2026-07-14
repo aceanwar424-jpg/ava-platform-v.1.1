@@ -9,21 +9,22 @@
 let anamAll = [], anamSearch = '';
 
 async function renderAnamnesa() {
+  if(typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
+    <div class="pro-shell">
+    <div class="pro-header">
       <div><h1>🩺 Anamnesa</h1>
-        <p>Pemeriksaan awal wajib · TTV &amp; keluhan · cetak barcode sampel · rujuk ke Lab</p></div>
-      <div class="btn-row">
-        <input type="date" class="table-filter" id="anam-date" onchange="loadAnamnesaQueue()"
-          value="${new Date().toISOString().split('T')[0]}">
-      </div>
+        <span class="pro-sub">Pemeriksaan awal wajib · TTV &amp; antropometri · cetak barcode · rujuk ke Lab</span></div>
+      <input type="date" class="table-filter" id="anam-date" onchange="loadAnamnesaQueue()"
+        value="${new Date().toISOString().split('T')[0]}" style="max-width:170px">
     </div>
-    <div id="anam-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px"></div>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
+    <div id="anam-kpi" class="pro-kpi"></div>
+    <div class="pro-toolbar">
       <input class="table-search" id="anam-q" placeholder="🔍 Cari nama / no. kunjungan / MR..."
-        oninput="anamSearch=this.value;renderAnamnesaList()" style="flex:1">
+        oninput="anamSearch=this.value;renderAnamnesaList()" style="flex:1;min-width:220px">
     </div>
-    <div id="anam-list"><div class="loading-row"><div class="spinner"></div></div></div>`;
+    <div id="anam-list"><div class="loading-row"><div class="spinner"></div></div></div>
+    </div>`;
   await loadAnamnesaQueue();
 }
 
@@ -78,31 +79,26 @@ function renderAnamnesaList() {
       <h3>${anamAll.length?'Tidak ada hasil':'Belum ada antrian anamnesa'}</h3></div>`; return;
   }
   const stColor = {Registered:'#F59E0B', Anamnesa:'#8B5CF6', Lab:'#0EA5E9'};
-  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">
-    ${data.map(a=>{
-      const c = stColor[a.status]||'#94A3B8';
-      const stLabel = a.status==='Registered'?'Menunggu Anamnesa':a.status==='Anamnesa'?'Anamnesa Selesai':a.status;
-      return `<div class="card" style="padding:12px 16px;border-left:4px solid ${c}">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <div style="font-size:11px;font-family:monospace;color:var(--gray);min-width:110px">
-            ${a.mr_number?'<div style="font-weight:700;color:var(--navy)">'+a.mr_number+'</div>':''}${a.visit_number||'—'}</div>
-          <div style="flex:1;min-width:150px">
-            <div style="font-weight:700;color:var(--navy)">${a.patient_name||'—'}</div>
-            <div style="font-size:11px;color:var(--gray)">${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' th':''} ${a.patient_phone?'· '+a.patient_phone:''}</div>
-          </div>
-          <div style="min-width:150px">
-            <div style="font-size:12px;font-weight:600;color:var(--navy)">${anamServicesSummary(a)}</div>
-            <div style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</div>
-          </div>
-          <div><span style="background:${c}20;color:${c};padding:3px 10px;border-radius:10px;font-size:11px;font-weight:700">${stLabel}</span></div>
-          <div class="act-row" style="flex-shrink:0">
-            <button class="btn btn-teal btn-xs" onclick="openAnamnesaForm(${a.id})">🩺 Anamnesa</button>
-            <button class="act-btn" title="Cetak Barcode Sampel" onclick="printAnamnesaLabels(${a.id})">🏷️</button>
-          </div>
-        </div>
-      </div>`;
-    }).join('')}
-  </div>`;
+  el.innerHTML = `<div style="overflow-x:auto"><table class="pro-grid"><thead><tr>
+    <th>MR / Kunjungan</th><th>Pasien</th><th>Layanan</th><th>Tipe</th><th>Status</th><th>Aksi</th>
+  </tr></thead><tbody>
+  ${data.map(a=>{
+    const c = stColor[a.status]||'#94A3B8';
+    const stLabel = a.status==='Registered'?'Menunggu Anamnesa':a.status==='Anamnesa'?'Anamnesa Selesai':a.status;
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px">${a.mr_number?'<span style="font-weight:700;color:var(--navy)">'+a.mr_number+'</span>':''}<div style="color:var(--gray)">${a.visit_number||''}</div></td>
+      <td><div style="font-weight:700;color:var(--navy)">${a.patient_name||'—'}</div>
+        <div style="font-size:10.5px;color:var(--gray)">${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' th':''} ${a.patient_phone?'· '+a.patient_phone:''}</div></td>
+      <td style="font-size:12px">${anamServicesSummary(a)}</td>
+      <td style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</td>
+      <td><span style="background:${c}20;color:${c};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">${stLabel}</span></td>
+      <td><div class="act-row" style="flex-wrap:nowrap">
+        <button class="btn btn-teal btn-xs" onclick="openAnamnesaForm(${a.id})">🩺 Anamnesa</button>
+        <button class="act-btn" title="Cetak Barcode Sampel" onclick="printAnamnesaLabels(${a.id})">🏷️</button>
+      </div></td>
+    </tr>`;
+  }).join('')}
+  </tbody></table></div>`;
 }
 
 // ── Form Anamnesa ────────────────────────────────────────────────

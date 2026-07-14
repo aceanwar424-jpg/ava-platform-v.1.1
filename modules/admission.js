@@ -14,45 +14,59 @@ const ADM_STATUS = {
   'Cancelled':   {color:'#EF4444', icon:'❌'},
 };
 
+// ── Style shell profesional bersama (Layanan Klinik) ──────────────
+function injectProShell(){
+  if(document.getElementById('pro-shell-style')) return;
+  const s=document.createElement('style'); s.id='pro-shell-style';
+  s.textContent=`
+    .pro-shell{ font-size:12.5px;color:#1A2B3C; }
+    .pro-shell .pro-header{ display:flex;justify-content:space-between;align-items:center;
+      background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:9px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px; }
+    .pro-shell .pro-header h1{ font-size:16px;margin:0;color:#fff;font-weight:800;display:flex;align-items:center;gap:8px; }
+    .pro-shell .pro-sub{ font-size:11px;color:#9db4d0; }
+    .pro-shell .pro-kpi{ display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px; }
+    .pro-shell .pro-kpi > div{ padding:8px 10px !important;border-radius:8px !important; }
+    .pro-shell .pro-toolbar{ display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px; }
+    .pro-shell .pro-chip{ font-size:11.5px;padding:5px 11px;border-radius:7px;border:1px solid #d3dae1;background:#fff;cursor:pointer;font-weight:600;color:#1A2B3C; }
+    .pro-shell .pro-chip.active{ background:var(--teal);color:#fff;border-color:var(--teal); }
+    .pro-shell .pro-grid{ width:100%;border-collapse:collapse;background:#fff;border:1px solid #d3dae1;border-radius:8px;overflow:hidden; }
+    .pro-shell .pro-grid th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
+    .pro-shell .pro-grid td{ padding:5px 9px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
+    .pro-shell .pro-grid tbody tr:nth-child(even){ background:#f8fafc; }
+    .pro-shell .pro-grid tbody tr:hover{ background:#eaf5f3; }`;
+  document.head.appendChild(s);
+}
+
 async function renderAdmission() {
+  injectProShell();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Admission</h1>
-        <p>Registrasi pasien — Walk-in, Booking, Rujukan, Project MCU</p></div>
+    <div class="pro-shell">
+    <div class="pro-header">
+      <div><h1>🏨 Admission / Registrasi</h1>
+        <span class="pro-sub">Walk-in · Booking · Rujukan · Project MCU</span></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="renderAdmissionReport()">📊 Laporan</button>
-        <button class="btn btn-teal" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
+        <button class="btn btn-teal btn-sm" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
       </div>
     </div>
 
-    <!-- KPI -->
-    <div id="adm-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px">
-      <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
+    <div id="adm-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
+
+    <div class="pro-toolbar" id="adm-status-tabs">
+      <button class="pro-chip active" onclick="setAdmFilter('','',this)">Semua</button>
+      ${Object.entries(ADM_STATUS).map(([s,v])=>`<button class="pro-chip" onclick="setAdmFilter('status','${s}',this)">${v.icon} ${s}</button>`).join('')}
     </div>
 
-    <!-- Status Filter -->
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="adm-status-tabs">
-      <button class="btn btn-teal btn-sm" onclick="setAdmFilter('','',this)">Semua</button>
-      ${Object.entries(ADM_STATUS).map(([s,v])=>
-        `<button class="btn btn-ghost btn-sm" onclick="setAdmFilter('status','${s}',this)">${v.icon} ${s}</button>`
-      ).join('')}
-    </div>
-
-    <!-- Search + Date -->
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="pro-toolbar">
       <input class="table-search" id="adm-q" placeholder="🔍 Cari nama pasien, no. kunjungan..."
-        oninput="admFilter.search=this.value;applyAdmFilter()" style="flex:1">
+        oninput="admFilter.search=this.value;applyAdmFilter()" style="flex:1;min-width:220px">
       <select class="table-filter" id="adm-type" onchange="admFilter.type=this.value;applyAdmFilter()">
-        <option value="">Semua Tipe</option>
-        <option>Walk-in</option><option>Booking</option>
-        <option>Rujukan</option><option>Project MCU</option>
+        <option value="">Semua Tipe</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option>
       </select>
-      <input type="date" class="table-filter" id="adm-date" onchange="applyAdmFilter()"
-        value="${new Date().toISOString().split('T')[0]}">
+      <input type="date" class="table-filter" id="adm-date" onchange="applyAdmFilter()" value="${new Date().toISOString().split('T')[0]}">
     </div>
 
-    <div id="adm-list">
-      <div class="loading-row"><div class="spinner"></div></div>
+    <div id="adm-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
 
   await loadAdmissions();
@@ -93,9 +107,9 @@ function renderAdmKPI() {
 }
 
 function setAdmFilter(key, val, btn) {
-  document.querySelectorAll('#adm-status-tabs button').forEach(b=>b.className='btn btn-ghost btn-sm');
-  btn.className = 'btn btn-teal btn-sm';
-  if (key==='status') admFilter.status = val;
+  document.querySelectorAll('#adm-status-tabs .pro-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  admFilter.status = key==='status' ? val : '';
   applyAdmFilter();
 }
 
@@ -121,54 +135,29 @@ function renderAdmList(data) {
     </div>`; return;
   }
 
-  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">
-    ${data.map(a=>{
-      const st = ADM_STATUS[a.status]||ADM_STATUS['Registered'];
-      return `
-      <div class="card" style="padding:12px 16px;border-left:4px solid ${st.color}">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-          <!-- Visit Number -->
-          <div style="font-size:11px;font-family:monospace;color:var(--gray);min-width:120px">
-            ${a.visit_number||'—'}
-          </div>
-          <!-- Patient -->
-          <div style="flex:1;min-width:150px">
-            <div style="font-weight:700;color:var(--navy)">${a.patient_name||'—'}</div>
-            <div style="font-size:11px;color:var(--gray)">
-              ${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' thn':''} 
-              ${a.patient_phone?'· '+a.patient_phone:''}
-            </div>
-          </div>
-          <!-- Package/Service -->
-          <div style="min-width:140px">
-            <div style="font-size:12px;font-weight:600;color:var(--navy)">${a.package_name||'Layanan Individual'}</div>
-            <div style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</div>
-          </div>
-          <!-- Status -->
-          <div>
-            <span style="background:${st.color}20;color:${st.color};padding:3px 10px;
-              border-radius:10px;font-size:11px;font-weight:700">${st.icon} ${a.status}</span>
-          </div>
-          <!-- Amount -->
-          <div style="text-align:right;min-width:100px">
-            <div style="font-size:13px;font-weight:700;color:var(--navy)">${formatCurrency(a.net_amount||0)}</div>
-            <div style="font-size:10px;color:${a.payment_status==='Paid'?'#22C55E':'#F59E0B'}">
-              ${a.payment_status||'Unpaid'}
-            </div>
-          </div>
-          <!-- Actions -->
-          <div class="act-row" style="flex-shrink:0">
-            ${a.status==='Registered'?`<button class="btn btn-teal btn-xs" onclick="updateAdmStatus(${a.id},'Anamnesa')">→ Anamnesa</button>`:''}
-            ${a.status==='Anamnesa'?`<button class="btn btn-teal btn-xs" onclick="updateAdmStatus(${a.id},'Lab')">→ Lab</button>`:''}
-            ${a.status==='Lab'?`<button class="btn btn-teal btn-xs" onclick="updateAdmStatus(${a.id},'Done')">→ Selesai</button>`:''}
-            ${a.package_id?`<button class="act-btn" title="Cetak Ulang Label Sampel" onclick="reprintSampleLabels(${a.id})">🏷️</button>`:''}
-            <button class="act-btn edit" onclick="openAdmissionForm(${a.id})">✏️</button>
-            ${a.payment_status!=='Paid'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>`:''}
-          </div>
-        </div>
-      </div>`;
-    }).join('')}
-  </div>`;
+  el.innerHTML = `<div style="overflow-x:auto"><table class="pro-grid"><thead><tr>
+    <th>MR / Kunjungan</th><th>Pasien</th><th>Layanan</th><th>Tipe</th><th>Status</th><th style="text-align:right">Tagihan</th><th>Aksi</th>
+  </tr></thead><tbody>
+  ${data.map(a=>{
+    const st = ADM_STATUS[a.status]||ADM_STATUS['Registered'];
+    return `<tr>
+      <td style="font-family:monospace;font-size:11px">${a.mr_number||'—'}<div style="color:var(--gray)">${a.visit_number||''}</div></td>
+      <td><div style="font-weight:700;color:var(--navy)">${a.patient_name||'—'}</div>
+        <div style="font-size:10.5px;color:var(--gray)">${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' th':''} ${a.patient_phone?'· '+a.patient_phone:''}</div></td>
+      <td style="font-size:12px">${a.package_name||'Layanan Individual'}</td>
+      <td style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</td>
+      <td><span style="background:${st.color}20;color:${st.color};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">${st.icon} ${a.status}</span></td>
+      <td style="text-align:right"><div style="font-weight:700;color:var(--navy)">${formatCurrency(a.net_amount||0)}</div>
+        <div style="font-size:10px;color:${a.payment_status==='Paid'?'#22C55E':'#F59E0B'}">${a.payment_status||'Unpaid'}</div></td>
+      <td><div class="act-row" style="flex-wrap:nowrap">
+        ${['Registered','Anamnesa'].includes(a.status)?`<button class="btn btn-teal btn-xs" title="Buka Anamnesa" onclick="navigate('anamnesa')">🩺</button>`:''}
+        ${a.package_id?`<button class="act-btn" title="Cetak Ulang Barcode" onclick="reprintSampleLabels(${a.id})">🏷️</button>`:''}
+        <button class="act-btn edit" onclick="openAdmissionForm(${a.id})">✏️</button>
+        ${a.payment_status!=='Paid'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>`:''}
+      </div></td>
+    </tr>`;
+  }).join('')}
+  </tbody></table></div>`;
 }
 
 async function updateAdmStatus(id, status) {
