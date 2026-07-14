@@ -5,49 +5,204 @@
 // - Delta check: bandingkan dengan hasil sebelumnya pasien
 // ═══════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════
+// INPUT HASIL — Result Entry ala LIS profesional (Sysmex-style)
+// Kiri: worklist pasien · Atas: detail pasien · Tengah: grid tes/analit
+// Kanan: panel catatan/detail per parameter. Klik pasien → grid berubah.
+// ═══════════════════════════════════════════════════════════════
+let _resSel=null, _resAdm={}, _resNotes={};
+
+function resDraftPatients(){
+  const byAdm={};
+  labResults.filter(r=>r.status==='Draft').forEach(r=>{
+    const k=r.admission_id;
+    if(!byAdm[k]) byAdm[k]={admission_id:r.admission_id,patient_name:r.patient_name,
+      visit_number:r.visit_number,mr_number:r.mr_number,rows:[]};
+    byAdm[k].rows.push(r);
+  });
+  return Object.values(byAdm);
+}
+
 function renderResultTab(){
   const el=document.getElementById('lab-result'); if(!el) return;
-  const drafts=labResults.filter(r=>r.status==='Draft');
-
-  // Kelompokkan per (kunjungan + tes) — panel = banyak parameter dalam satu grup
-  const groups={};
-  drafts.forEach(r=>{
-    const k=`${r.admission_id}|${r.product_id}`;
-    if(!groups[k]) groups[k]={admission_id:r.admission_id, product_id:r.product_id,
-      product_name:r.product_name, patient_name:r.patient_name, visit_number:r.visit_number, rows:[]};
-    groups[k].rows.push(r);
-  });
-  const list=Object.values(groups);
+  const patients=resDraftPatients();
+  if(!patients.some(p=>p.admission_id==_resSel)) _resSel = patients.length?patients[0].admission_id:null;
 
   el.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div>
-        <span class="badge badge-gray" style="margin-right:6px">${list.length} tes dalam proses input</span>
-        <span style="font-size:12px;color:var(--gray)">Panel otomatis terpecah per parameter (analit) · hasil analyzer masuk otomatis bila terintegrasi</span>
-      </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span class="badge badge-gray">${patients.length} pasien menunggu input hasil</span>
       <button class="btn btn-teal btn-sm" onclick="openResultForm()">+ Input Manual</button>
     </div>
-    <div class="table-wrap">
-      <table><thead><tr>
-        <th>Pasien</th><th>Tes</th><th>Parameter</th><th>Terisi</th><th>Aksi</th>
-      </tr></thead><tbody>
-      ${list.length ? list.map(g=>{
-        const filled=g.rows.filter(r=>r.result_value).length;
-        const isPanel=g.rows.length>1 || g.rows.some(r=>r.product_item_id);
-        const anyCrit=g.rows.some(isCriticalResult);
-        return `<tr>
-          <td><div style="font-weight:600">${g.patient_name||'—'}</div>
-              <div style="font-size:10px;color:var(--gray)">${g.visit_number||'—'}</div></td>
-          <td style="font-size:12px">${g.product_name||'—'}
-            ${isPanel?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL</span>`:''}
-            ${anyCrit?' <span title="Ada nilai kritis">🚨</span>':''}</td>
-          <td style="font-size:12px">${g.rows.length} parameter</td>
-          <td><span style="font-size:12px;font-weight:800;color:${filled===g.rows.length?'#22C55E':'#F59E0B'}">${filled}/${g.rows.length}</span></td>
-          <td><button class="btn btn-teal btn-xs" onclick="openResultEntry(${g.admission_id},${g.product_id})">📝 Input Hasil</button></td>
-        </tr>`;
-      }).join('') : `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--gray)">✅ Semua hasil sudah diinput</td></tr>`}
-      </tbody></table>
+    ${patients.length?`
+    <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
+      <div id="res-worklist" style="border-right:1px solid var(--border);overflow-y:auto;max-height:640px;background:var(--lgray)"></div>
+      <div style="display:flex;flex-direction:column;min-width:0">
+        <div id="res-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC"></div>
+        <div id="res-grid" style="overflow:auto;max-height:600px"></div>
+      </div>
+      <div id="res-notes" style="border-left:1px solid var(--border);background:var(--lgray);padding:14px;overflow-y:auto;max-height:640px"></div>
+    </div>`:`<div class="empty-state"><div class="ico">✅</div><h3>Semua hasil sudah diinput</h3></div>`}`;
+
+  if(patients.length){
+    renderResWorklist(patients);
+    if(_resSel!=null) selectResultPatient(_resSel);
+  }
+}
+
+function renderResWorklist(patients){
+  const el=document.getElementById('res-worklist'); if(!el) return;
+  el.innerHTML=patients.map(p=>{
+    const filled=p.rows.filter(r=>r.result_value).length;
+    const sel=p.admission_id==_resSel;
+    const crit=p.rows.some(isCriticalResult);
+    return `<div onclick="selectResultPatient(${p.admission_id})"
+      style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;${sel?'background:var(--mint);border-left:3px solid var(--teal)':'border-left:3px solid transparent'}">
+      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' 🚨':''}</div>
+      <div style="font-size:10.5px;color:var(--gray);font-family:monospace">${p.mr_number||''} ${p.visit_number||''}</div>
+      <div style="font-size:10px;color:${filled===p.rows.length?'#22C55E':'#F59E0B'};font-weight:700;margin-top:2px">${filled}/${p.rows.length} parameter</div>
     </div>`;
+  }).join('') || '<div style="padding:16px;text-align:center;color:var(--gray);font-size:12px">Tidak ada pasien</div>';
+}
+
+async function selectResultPatient(admId){
+  _resSel=admId;
+  renderResWorklist(resDraftPatients());
+  const drafts=labResults.filter(r=>r.status==='Draft' && r.admission_id==admId);
+
+  const admD=await sbGet('admissions',`select=patient_name,patient_gender,patient_age,patient_dob,visit_number,patient_blood_type,mr_number&id=eq.${admId}`).catch(()=>[]);
+  _resAdm=admD?.[0]||{};
+  await Promise.all([...new Set(drafts.map(r=>r.product_id))].map(pid=>labLoadRR(pid)));
+
+  const pbar=document.getElementById('res-pbar');
+  if(pbar) pbar.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <span style="font-size:15px;font-weight:800;color:var(--navy)">${_resAdm.patient_name||''}</span>
+        ${_resAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_resAdm.patient_blood_type}</span>`:''}
+        <div style="font-size:11px;color:var(--gray);font-family:monospace">${_resAdm.mr_number||''} · ${_resAdm.visit_number||''} · ${_resAdm.patient_gender==='F'?'Perempuan':'Laki-laki'}${_resAdm.patient_age?' · '+_resAdm.patient_age+' th':''}</div>
+      </div>
+      <button class="btn btn-teal btn-sm" onclick="resSaveAll()">💾 Simpan Hasil</button>
+    </div>`;
+
+  const groups={};
+  drafts.forEach(r=>{ (groups[r.product_id]=groups[r.product_id]||{name:r.product_name,rows:[]}).rows.push(r); });
+  const grid=document.getElementById('res-grid');
+  if(grid) grid.innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead><tr style="background:var(--lgray);position:sticky;top:0;z-index:1">
+        <th style="padding:6px 10px;text-align:left">Test Name</th>
+        <th style="padding:6px 8px;text-align:left;width:110px">Curr Result</th>
+        <th style="padding:6px 8px;text-align:left;width:70px">Prev</th>
+        <th style="padding:6px 4px;width:36px">Flag</th>
+        <th style="padding:6px 8px;text-align:left;width:64px">Unit</th>
+        <th style="padding:6px 8px;text-align:left;width:110px">Reference</th>
+      </tr></thead><tbody>
+      ${Object.entries(groups).map(([pid,g])=>{
+        const isPanel=g.rows.length>1 || g.rows.some(r=>r.product_item_id);
+        let html=isPanel?`<tr><td colspan="6" style="background:#EEF2FF;color:#3730A3;font-weight:700;padding:5px 10px">${g.name}</td></tr>`:'';
+        html+=g.rows.map(r=>resRowHtml(r,pid,isPanel)).join('');
+        return html;
+      }).join('')}
+      </tbody></table>`;
+
+  const notes=document.getElementById('res-notes');
+  if(notes) notes.innerHTML=`<div style="font-size:11px;color:var(--gray);text-align:center;padding:24px 8px">Klik sebuah parameter untuk melihat riwayat &amp; menambah catatan.</div>`;
+
+  document.querySelectorAll('#res-grid .res-val').forEach(inp=>{ if(inp.value.trim()) resInterpret(inp); });
+}
+
+function resRowHtml(r, pid, indent){
+  const name = indent
+    ? `<span style="padding-left:14px">${r.item_name||'—'}${r.item_code?` <span style="font-size:9px;color:var(--gray);font-family:monospace">${r.item_code}</span>`:''}</span>`
+    : `<strong>${r.product_name||'—'}</strong>`;
+  const rr=(_rrCache[pid]||[]).filter(x=> r.product_item_id? (x.product_item_id==r.product_item_id||x.product_item_id==null):x.product_item_id==null);
+  const norm=rr.find(x=>x.value_type!=='qualitative'&&x.condition_type==='normal'&&x.range_min!=null&&x.range_max!=null);
+  const refTxt=norm?`${norm.range_min}–${norm.range_max}`:(rr.filter(x=>x.value_type==='qualitative').map(x=>x.condition_name).join('/')||'—');
+  return `<tr data-rid="${r.id}" data-item="${r.product_item_id||''}" data-prod="${pid}" onclick="resPickRow(${r.id})">
+    <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">${name}</td>
+    <td style="padding:4px 8px;border-bottom:1px solid #f1f5f9"><input type="text" class="res-val" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="resInterpret(this)" onclick="event.stopPropagation()" style="width:96px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px"></td>
+    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray)" class="res-prev">—</td>
+    <td style="padding:5px 4px;border-bottom:1px solid #f1f5f9;text-align:center" class="res-flag"></td>
+    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray)">${r.unit||''}</td>
+    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray);font-size:11px">${refTxt}</td>
+  </tr>`;
+}
+
+function resInterpret(input){
+  const tr=input.closest('tr');
+  const pid=tr.dataset.prod, itemId=tr.dataset.item?parseInt(tr.dataset.item):null;
+  const raw=input.value.trim();
+  const flagCell=tr.querySelector('.res-flag');
+  const rr=(_rrCache[pid]||[]).filter(x=> itemId? (x.product_item_id==itemId||x.product_item_id==null):x.product_item_id==null);
+  if(raw===''){ flagCell.innerHTML=''; input.style.borderColor='var(--border)'; return; }
+  const m=matchRefRange(rr, raw, _resAdm.patient_gender, _resAdm.patient_age);
+  const num=parseFloat(raw);
+  const norm=rr.find(x=>x.condition_type==='normal'&&x.range_min!=null&&x.range_max!=null);
+  let flag='';
+  if(norm&&!isNaN(num)){ if(num>norm.range_max) flag='H'; else if(num<norm.range_min) flag='L'; }
+  const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
+  const c=m?labColor(m.color_code):'#94A3B8';
+  flagCell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626">🚨</span>'
+    : flag?`<span style="font-weight:800;color:${flag==='H'?'#EF4444':'#0EA5E9'}">${flag}</span>`
+    : (m?`<span style="color:${c}">●</span>`:'');
+  input.style.borderColor=c;
+}
+
+async function resPickRow(rid){
+  const tr=document.querySelector(`#res-grid tr[data-rid="${rid}"]`); if(!tr) return;
+  document.querySelectorAll('#res-grid tr[data-rid]').forEach(t=>t.style.background='');
+  tr.style.background='var(--mint)';
+  const r=labResults.find(x=>x.id==rid)||{};
+  const notes=document.getElementById('res-notes'); if(!notes) return;
+  const noteVal=(_resNotes[rid]!=null?_resNotes[rid]:(r.notes||''));
+  notes.innerHTML=`
+    <div style="font-size:12.5px;font-weight:800;color:var(--navy)">${r.item_name||r.product_name||''}</div>
+    <div style="font-size:10.5px;color:var(--gray);margin-bottom:10px">${r.product_name||''}${r.loinc_code?' · LOINC '+r.loinc_code:''}${r.host_code?' · Host '+r.host_code:''}</div>
+    <div id="res-prevbox" style="font-size:11px;color:var(--gray);margin-bottom:12px">memuat riwayat…</div>
+    <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan / Komentar</label>
+    <textarea id="res-note-input" rows="6" style="width:100%;margin-top:4px;font-size:12px" oninput="_resNotes[${rid}]=this.value" placeholder="Catatan analis, kondisi sampel, dll...">${noteVal}</textarea>
+    <div style="font-size:10px;color:var(--gray);margin-top:6px">Catatan ikut tersimpan saat "Simpan Hasil".</div>`;
+  try {
+    const prev=await sbGet('lab_results',
+      `select=result_value,unit,created_at&patient_name=eq.${encodeURIComponent(r.patient_name||'')}&product_id=eq.${r.product_id}${r.product_item_id?`&product_item_id=eq.${r.product_item_id}`:''}&result_value=not.is.null&status=in.(Approved,Released,Validated)&order=created_at.desc&limit=1`).catch(()=>[]);
+    const p=prev?.[0];
+    const box=document.getElementById('res-prevbox');
+    if(box) box.innerHTML= p?`📊 Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:#94A3B8">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
+    const prevCell=tr.querySelector('.res-prev'); if(prevCell&&p) prevCell.textContent=p.result_value;
+  } catch(e){}
+}
+
+async function resSaveAll(){
+  const trs=[...document.querySelectorAll('#res-grid tr[data-rid]')];
+  let ok=0; const sampleIds=new Set();
+  for(const tr of trs){
+    const rid=parseInt(tr.dataset.rid);
+    const val=tr.querySelector('.res-val').value.trim();
+    const note=_resNotes[rid];
+    if(val==='' && note==null) continue;
+    const r=labResults.find(x=>x.id==rid)||{};
+    const pid=tr.dataset.prod, itemId=tr.dataset.item?parseInt(tr.dataset.item):null;
+    const rr=(_rrCache[pid]||[]).filter(x=> itemId? (x.product_item_id==itemId||x.product_item_id==null):x.product_item_id==null);
+    const num=parseFloat(val);
+    const m=val!==''?matchRefRange(rr,val,_resAdm.patient_gender,_resAdm.patient_age):null;
+    const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
+    const payload={ updated_at:new Date().toISOString() };
+    if(val!==''){
+      Object.assign(payload,{ result_value:val, result_numeric:isNaN(num)?null:num,
+        ref_range_id:m?.id||null, normal_min:m?.range_min??null, normal_max:m?.range_max??null,
+        critical_low:m?.critical_low??null, critical_high:m?.critical_high??null,
+        interpretation:m?.interpretation||m?.condition_name||null, color_code:m?.color_code||'green',
+        condition_name:m?.condition_name||null, condition_type:m?.condition_type||null,
+        is_critical:crit, is_auto:false, status:'Draft', entered_by:labUser(), entered_at:new Date().toISOString() });
+    }
+    if(note!=null) payload.notes=note||null;
+    try{ await sbPatch('lab_results',rid,payload); ok++; if(r.sample_id) sampleIds.add(r.sample_id); }catch(e){}
+  }
+  for(const sid of sampleIds){ await sbPatch('lab_samples',sid,{status:'Done',updated_at:new Date().toISOString()}).catch(()=>{}); }
+  _resNotes={};
+  toast(`✅ ${ok} hasil disimpan`,'ok');
+  await Promise.all([loadLabSamples(),loadLabResults()]);
+  renderLabKPI(); renderCriticalBanner(); renderResultTab();
 }
 
 // ── Input hasil per-tes: 1 tabel, 1 baris per parameter/analit ──────
