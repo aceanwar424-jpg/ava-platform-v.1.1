@@ -32,7 +32,7 @@ function renderWorklistTab(){
         <span class="badge badge-teal">${inProc.length} sampel diproses</span>
         ${overdueTotal?`<span class="badge" style="background:#FEF2F2;color:#DC2626;margin-left:6px">⏰ ${overdueTotal} TAT terlambat</span>`:''}
       </div>
-      <span style="font-size:12px;color:var(--gray)">Dikelompokkan per analyzer / kategori</span>
+      <button class="btn btn-ghost btn-sm" onclick="openAnalyzerIntake()">🔌 Terima Hasil Alat</button>
     </div>
     ${Object.entries(groups).map(([name,items])=>{
       const od=items.filter(s=>tatStatus(s).overdue).length;

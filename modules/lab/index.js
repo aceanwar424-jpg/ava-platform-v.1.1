@@ -30,7 +30,7 @@ async function loadLabProducts(){
   if (_prodCache) return _prodCache;
   try {
     _prodCache = await sbGet('products',
-      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_panel,is_active&is_active=eq.true&order=kategori,nama_tes') || [];
+      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_panel,host_code,is_active&is_active=eq.true&order=kategori,nama_tes') || [];
   } catch(e){ _prodCache = []; }
   return _prodCache;
 }
@@ -127,7 +127,7 @@ async function labProductItems(productId){
   if(_itemsCache[productId]) return _itemsCache[productId];
   try {
     _itemsCache[productId] = (await sbGet('product_items',
-      `select=id,code,name_id,uom,loinc_code,ref_low,ref_high,ref_text,display_order,is_active&product_id=eq.${productId}&order=display_order.asc`)||[])
+      `select=id,code,name_id,uom,loinc_code,host_code,ref_low,ref_high,ref_text,display_order,is_active&product_id=eq.${productId}&order=display_order.asc`)||[])
       .filter(i=>i.is_active!==false);
   } catch(e){ _itemsCache[productId] = []; }
   return _itemsCache[productId];
@@ -143,7 +143,7 @@ async function labCreateDraftResults(base, productId, productName){
       await sbPost('lab_results', { ...base,
         product_id: productId, product_name: productName,
         product_item_id: it.id, item_code: it.code||null, item_name: it.name_id||it.code||null,
-        unit: it.uom||null, loinc_code: it.loinc_code||null,
+        unit: it.uom||null, loinc_code: it.loinc_code||null, host_code: it.host_code||null,
         status:'Draft', entered_by: labUser(), entered_at: now });
     }
     return items.length;

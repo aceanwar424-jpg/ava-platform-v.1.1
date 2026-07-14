@@ -60,7 +60,7 @@ function renderReportTab(){
               <td style="padding:6px 10px;color:var(--gray)">${r.unit||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
               <td style="padding:6px 10px"><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
-              <td style="padding:6px 10px"><button class="btn btn-xs btn-ghost" onclick="showTrend('${(r.patient_name||'').replace(/'/g,'')}',${r.product_id},'${(r.product_name||'').replace(/'/g,'')}')">📈</button></td>
+              <td style="padding:6px 10px"><button class="btn btn-xs btn-ghost" onclick="showTrend('${(r.patient_name||'').replace(/'/g,'')}',${r.product_id},'${((r.item_name||r.product_name)||'').replace(/'/g,'')}',${r.product_item_id||'null'})">📈</button></td>
             </tr>`;
           }).join('')}
           </tbody>
@@ -78,11 +78,13 @@ function filterReportCards(q){
 }
 
 // ── Cumulative / Trend: riwayat 1 tes pada 1 pasien ──────────────
-async function showTrend(patientName, productId, productName){
+async function showTrend(patientName, productId, productName, itemId=null){
   let data=[];
   try {
-    data=await sbGet('lab_results',
-      `select=result_value,result_numeric,unit,normal_min,normal_max,color_code,created_at&patient_name=eq.${encodeURIComponent(patientName)}&product_id=eq.${productId}&result_value=not.is.null&order=created_at.asc&limit=30`)||[];
+    let q=`select=result_value,result_numeric,unit,normal_min,normal_max,color_code,created_at&patient_name=eq.${encodeURIComponent(patientName)}&product_id=eq.${productId}&result_value=not.is.null`;
+    q += (itemId!=null) ? `&product_item_id=eq.${itemId}` : '';
+    q += '&order=created_at.asc&limit=30';
+    data=await sbGet('lab_results',q)||[];
   } catch(e){}
   if(!data.length){ toast('Belum ada riwayat','warn'); return; }
 
@@ -166,19 +168,7 @@ function printLabReport(patientName, visitNumber){
     ${Object.entries(byCat).map(([cat,rows])=>`
       <div class="cat">${cat}</div>
       <table><thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Flag</th><th>Satuan</th><th>Rentang Normal</th><th>Interpretasi</th></tr></thead>
-      <tbody>${rows.map(r=>{
-        const col=labColor(r.color_code);
-        const crit=isCriticalResult(r);
-        const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
-                  :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
-        return `<tr>
-          <td><strong>${r.item_name||r.product_name||'—'}</strong>${r.item_name?` <span style="font-size:9px;color:#94A3B8">${r.product_name}</span>`:''}</td>
-          <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit">🚨</span>':''}</td>
-          <td class="flag" style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
-          <td style="color:#546E7A">${r.unit||'—'}</td>
-          <td style="color:#546E7A">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
-          <td><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
-        </tr>`;}).join('')}</tbody></table>`).join('')}
+      <tbody>${_labPrintCatRows(rows)}</tbody></table>`).join('')}
     <div style="font-size:10px;color:#94A3B8;margin-top:10px">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · 🚨 = nilai kritis</div>
     <div class="footer">
       <div style="display:flex;justify-content:space-between;margin-top:30px">
@@ -191,4 +181,34 @@ function printLabReport(patientName, visitNumber){
     </div>
     </body></html>`);
   w.document.close();
+}
+
+// Baris cetak per hasil (indent=analit di dalam panel)
+function _labPrintRow(r, indent){
+  const col=labColor(r.color_code);
+  const crit=isCriticalResult(r);
+  const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
+            :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
+  const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}</span>`:`<strong>${r.product_name||'—'}</strong>`;
+  return `<tr>
+    <td>${name}</td>
+    <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit">🚨</span>':''}</td>
+    <td class="flag" style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
+    <td style="color:#546E7A">${r.unit||'—'}</td>
+    <td style="color:#546E7A">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
+    <td><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
+  </tr>`;
+}
+// Kelompokkan hasil dalam 1 kategori per tes; panel diberi sub-header + analit terindent
+function _labPrintCatRows(rows){
+  const byProd={};
+  rows.forEach(r=>{ const k=r.product_name||'—'; (byProd[k]=byProd[k]||[]).push(r); });
+  return Object.entries(byProd).map(([prod,prows])=>{
+    const isPanel = prows.length>1 || prows.some(r=>r.item_name);
+    if(isPanel){
+      return `<tr><td colspan="6" style="background:#EEF2FF;font-weight:700;color:#3730A3;padding:5px 10px">${prod}</td></tr>`
+        + prows.map(r=>_labPrintRow(r,true)).join('');
+    }
+    return prows.map(r=>_labPrintRow(r,false)).join('');
+  }).join('');
 }
