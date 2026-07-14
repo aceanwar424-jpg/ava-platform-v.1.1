@@ -18,48 +18,91 @@ function renderCheckinTab(){
   const el=document.getElementById('lab-checkin'); if(!el) return;
   const pending=labSamples.filter(s=>['Pending','Rejected'].includes(s.status));
 
+  // Daftar tunggu — dikelompokkan per pasien (status check-in s/d selesai)
+  const byPat={};
+  labSamples.forEach(s=>{
+    const k=s.admission_id||s.visit_number||s.patient_name;
+    if(!byPat[k]) byPat[k]={admission_id:s.admission_id,patient_name:s.patient_name,
+      visit_number:s.visit_number,mr:s.mr_number,samples:[]};
+    byPat[k].samples.push(s);
+  });
+  const wait=Object.values(byPat);
+
   el.innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
       <input class="table-search" id="barcode-input" placeholder="🔍 Scan / ketik barcode label atau nama pasien..."
         onkeydown="if(event.key==='Enter')checkInBarcode(this.value)" style="flex:1">
       <button class="btn btn-teal" onclick="checkInBarcode(document.getElementById('barcode-input').value)">Check In</button>
       <button class="btn btn-ghost" onclick="openSampleForm()">+ Manual</button>
     </div>
     <div id="lab-pending-labels"></div>
-    <div class="table-wrap">
-      <table><thead><tr>
-        <th>Barcode</th><th>Pasien</th><th>Tes</th><th>Tipe Sampel</th>
-        <th>Waktu Terima</th><th>Petugas</th><th>Alat</th><th>Status</th><th>Aksi</th>
-      </tr></thead><tbody>
-      ${pending.length ? pending.map(s=>`<tr>
-        <td style="font-family:monospace;font-size:12px;font-weight:700">${s.barcode||'—'}</td>
-        <td>
-          <div style="font-weight:600">${s.patient_name||'—'}</div>
-          <div style="font-size:10px;color:var(--gray)">${s.visit_number||'—'}</div>
-        </td>
-        <td style="font-size:12px">${s.product_name||'—'}</td>
-        <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
-        <td style="font-size:11px;color:var(--gray)">${s.received_at?new Date(s.received_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'—'}</td>
-        <td style="font-size:12px">${s.collected_by||'—'}</td>
-        <td style="font-size:11px;color:var(--gray)">${s.analyzer_name||'—'}</td>
-        <td>
-          ${s.status==='Rejected'
-            ? `<span title="${s.rejection_reason||''}" style="background:#FFEBEE;color:#C62828;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">Ditolak</span>`
-            : `<span style="background:#FFF8E1;color:#92400E;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">Pending</span>`}
-        </td>
-        <td>
-          <div class="act-row">
-            ${s.status==='Pending'?`
-              <button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
-              <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>`
-            :`<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>`}
-          </div>
-        </td>
-      </tr>`).join('') : `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray)">
-        ✅ Tidak ada sampel pending</td></tr>`}
-      </tbody></table>
-    </div>`;
+
+    <div class="lis-title">Daftar Tunggu Pasien — check-in s/d selesai</div>
+    <div class="table-wrap"><table><thead><tr>
+      <th>MR / Kunjungan</th><th>Pasien</th><th>Sampel</th><th>Pending</th><th>Proses</th><th>Selesai</th><th>Progress</th><th>Aksi</th>
+    </tr></thead><tbody>
+    ${wait.length ? wait.map(p=>{
+      const total=p.samples.length;
+      const pend=p.samples.filter(s=>s.status==='Pending').length;
+      const proc=p.samples.filter(s=>s.status==='In Process').length;
+      const done=p.samples.filter(s=>s.status==='Done').length;
+      const rej =p.samples.filter(s=>s.status==='Rejected').length;
+      const pct=Math.round(done/Math.max(1,total)*100);
+      return `<tr>
+        <td style="font-family:monospace;font-size:11px">${p.mr||'—'}<div style="color:var(--gray)">${p.visit_number||''}</div></td>
+        <td style="font-weight:600">${p.patient_name||'—'}</td>
+        <td style="font-size:11px;color:var(--gray)">${total} sampel${rej?` · ${rej} ditolak`:''}</td>
+        <td style="text-align:center">${pend?`<span class="lis-badge warn">${pend}</span>`:'—'}</td>
+        <td style="text-align:center">${proc?`<span class="lis-badge info">${proc}</span>`:'—'}</td>
+        <td style="text-align:center">${done?`<span class="lis-badge ok">${done}</span>`:'—'}</td>
+        <td><div class="lis-bar"><span style="width:${pct}%"></span></div></td>
+        <td><div class="act-row">
+          ${pend?`<button class="btn btn-teal btn-xs" onclick="processAllForPatient(${p.admission_id})">Proses Semua</button>`:''}
+          <button class="btn btn-outline btn-xs" onclick="goInputResult(${p.admission_id})">Input Hasil</button>
+        </div></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="8" style="text-align:center;padding:26px;color:var(--gray)">Belum ada sampel. Scan barcode untuk check-in.</td></tr>`}
+    </tbody></table></div>
+
+    ${pending.length?`
+    <div class="lis-title">Sampel Pending — perlu diproses / ditolak</div>
+    <div class="table-wrap"><table><thead><tr>
+      <th>Barcode</th><th>Pasien</th><th>Tes</th><th>Sampel</th><th>Terima</th><th>Status</th><th>Aksi</th>
+    </tr></thead><tbody>
+    ${pending.map(s=>`<tr>
+      <td style="font-family:monospace;font-size:11.5px;font-weight:700">${s.barcode||'—'}</td>
+      <td><div style="font-weight:600">${s.patient_name||'—'}</div><div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
+      <td style="font-size:12px">${s.product_name||'—'}</td>
+      <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
+      <td style="font-size:11px;color:var(--gray)">${s.received_at?new Date(s.received_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'—'}</td>
+      <td>${s.status==='Rejected'
+        ? `<span title="${s.rejection_reason||''}" class="lis-badge" style="background:#FFEBEE;color:#C62828">Ditolak</span>`
+        : `<span class="lis-badge warn">Pending</span>`}</td>
+      <td><div class="act-row">
+        ${s.status==='Pending'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
+          <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>`
+          :`<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>`}
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table></div>`:''}`;
   loadPendingLabels();
+}
+
+// Proses semua sampel Pending milik satu pasien
+async function processAllForPatient(admissionId){
+  const ss=labSamples.filter(s=>s.admission_id==admissionId && s.status==='Pending');
+  if(!ss.length){ toast('Tidak ada sampel pending','warn'); return; }
+  for(const s of ss){ await sbPatch('lab_samples',s.id,{status:'In Process',received_at:new Date().toISOString()}).catch(()=>{}); }
+  toast(`✅ ${ss.length} sampel diproses`,'ok');
+  await loadLabSamples(); renderCheckinTab(); renderWorklistTab(); renderLabKPI();
+}
+
+// Loncat ke tab Input Hasil dengan pasien terpilih (hanya bisa setelah check-in)
+function goInputResult(admissionId){
+  const idx=LAB_TABS.indexOf('result');
+  const btn=document.querySelector(`#lab-tabs .tab-btn:nth-child(${idx+1})`);
+  switchLabTab('result', btn);
+  if(admissionId!=null){ if(typeof _resSel!=='undefined') _resSel=admissionId; renderResultTab(); }
 }
 
 async function loadPendingLabels(){

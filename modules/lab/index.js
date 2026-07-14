@@ -170,18 +170,53 @@ async function loadLabResults(){
   } catch(e){ labResults = []; }
 }
 
+// ── Gaya padat ala LIS desktop (Sysmex-like), scoped ke #lab-shell ──
+function injectLisStyle(){
+  if(document.getElementById('lis-style')) return;
+  const s=document.createElement('style'); s.id='lis-style';
+  s.textContent=`
+    #lab-shell{ font-size:12.5px; color:#1A2B3C; }
+    #lab-shell .lis-header{ display:flex;justify-content:space-between;align-items:center;
+      background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px; }
+    #lab-shell .lis-header h1{ font-size:15px;margin:0;color:#fff;font-weight:800; }
+    #lab-shell .lis-sub{ font-size:11px;color:#9db4d0; }
+    #lab-shell .lis-date{ font-size:11px;color:#cfe0f2; }
+    #lab-shell #lab-kpi{ gap:6px !important;margin-bottom:10px !important; }
+    #lab-shell #lab-kpi > div{ padding:6px 8px !important;border-radius:7px !important; }
+    #lab-shell #lab-kpi > div > div:nth-child(2){ font-size:16px !important; }
+    #lab-shell .tabs{ gap:2px;border-bottom:2px solid #d3dae1;margin-bottom:10px;flex-wrap:wrap; }
+    #lab-shell .tab-btn{ padding:6px 12px !important;font-size:11.5px !important;border-radius:6px 6px 0 0; }
+    #lab-shell .table-wrap{ border:1px solid #d3dae1;border-radius:8px;overflow:auto; }
+    #lab-shell .table-wrap table{ width:100%;border-collapse:collapse; }
+    #lab-shell .table-wrap th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;
+      letter-spacing:.03em;padding:5px 8px;text-align:left;position:sticky;top:0;white-space:nowrap; }
+    #lab-shell .table-wrap td{ padding:4px 8px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
+    #lab-shell .table-wrap tbody tr:nth-child(even){ background:#f8fafc; }
+    #lab-shell .table-wrap tbody tr:hover{ background:#eaf5f3; }
+    #lab-shell .lis-title{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;
+      letter-spacing:.04em;margin:12px 0 6px;padding-left:7px;border-left:3px solid var(--teal); }
+    #lab-shell .lis-badge{ display:inline-block;min-width:18px;padding:1px 7px;border-radius:9px;font-size:11px;font-weight:800;text-align:center; }
+    #lab-shell .lis-badge.warn{ background:#FEF3C7;color:#92400E; }
+    #lab-shell .lis-badge.info{ background:#DBEAFE;color:#1E40AF; }
+    #lab-shell .lis-badge.ok{ background:#DCFCE7;color:#166534; }
+    #lab-shell .lis-bar{ height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;min-width:56px; }
+    #lab-shell .lis-bar > span{ display:block;height:100%;background:var(--teal); }
+    #lab-shell .btn-xs{ padding:3px 8px !important;font-size:11px !important; }`;
+  document.head.appendChild(s);
+}
+
 // ═══════════════════════════════════════════════════════════════
 // SHELL HALAMAN
 // ═══════════════════════════════════════════════════════════════
 async function renderLab(tab='checkin'){
   if(!LAB_TABS.includes(tab)) tab='checkin';
+  injectLisStyle();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
+    <div id="lab-shell" class="lis">
+    <div class="lis-header">
       <div><h1>🔬 Laboratory Information System</h1>
-        <p>Penerimaan sampel · Worklist &amp; TAT · Input &amp; interpretasi hasil · Validasi berjenjang · Nilai kritis · QC alat</p></div>
-      <div class="btn-row">
-        <span id="lab-date-badge" style="font-size:12px;color:var(--gray)"></span>
-      </div>
+        <span class="lis-sub">Penerimaan · Worklist &amp; TAT · Input hasil · Validasi · Nilai kritis · QC</span></div>
+      <span id="lab-date-badge" class="lis-date"></span>
     </div>
 
     <div id="lab-critical-banner"></div>
@@ -206,7 +241,8 @@ async function renderLab(tab='checkin'){
     <div id="lab-validation" ${tab!=='validation'?'style="display:none"':''}></div>
     <div id="lab-approval"   ${tab!=='approval'?'style="display:none"':''}></div>
     <div id="lab-report"     ${tab!=='report'?'style="display:none"':''}></div>
-    <div id="lab-qc"         ${tab!=='qc'?'style="display:none"':''}></div>`;
+    <div id="lab-qc"         ${tab!=='qc'?'style="display:none"':''}></div>
+    </div>`;
 
   const badge = document.getElementById('lab-date-badge');
   if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});

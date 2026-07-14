@@ -141,17 +141,10 @@ async function openAnamnesaForm(admissionId) {
       <div class="form-group"><label>Puasa (jam)</label><input type="number" id="an-fasting" value="${an.fasting_hours||''}" placeholder="10"></div>
     </div>
 
-    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:8px 0">Keluhan &amp; Riwayat</div>
-    <div class="form-group"><label>Keluhan Utama</label><textarea id="an-chief" rows="2">${an.chief_complaint||''}</textarea></div>
-    <div class="form-row">
-      <div class="form-group"><label>Riwayat Penyakit</label><input type="text" id="an-history" value="${an.history||''}" placeholder="DM, HT, ..."></div>
-      <div class="form-group"><label>Alergi</label><input type="text" id="an-allergy" value="${an.allergies||''}" placeholder="Obat/makanan"></div>
-      <div class="form-group"><label>Obat Saat Ini</label><input type="text" id="an-meds" value="${an.current_meds||''}"></div>
-    </div>
-    <div class="form-row">
-      <div class="form-group"><label>Perawat</label><input type="text" id="an-nurse" value="${an.nurse_name||(getUserName?getUserName():'')}"></div>
-      <div class="form-group"><label>Dokter</label><input type="text" id="an-doctor" value="${an.doctor_name||''}"></div>
-    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:10px 0 8px">Catatan</div>
+    <div class="form-group"><label>Note / Catatan</label>
+      <textarea id="an-note" rows="3" placeholder="Catatan anamnesa, keluhan singkat, kondisi pasien...">${an.notes||an.chief_complaint||''}</textarea></div>
+    <div class="form-group"><label>Petugas</label><input type="text" id="an-nurse" value="${an.nurse_name||(getUserName?getUserName():'')}"></div>
 
     <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#1E40AF">
       ${hasLab
@@ -191,9 +184,8 @@ async function saveAnamnesa(admissionId, proceed) {
     systole:num('an-sys'), diastole:num('an-dia'), heart_rate:num('an-hr'),
     respiratory:num('an-rr'), temperature:num('an-temp'), spo2:num('an-spo2'),
     weight:num('an-weight'), height:num('an-height'), bmi:num('an-bmi'), fasting_hours:num('an-fasting'),
-    chief_complaint:val('an-chief')?.trim()||null, history:val('an-history')?.trim()||null,
-    allergies:val('an-allergy')?.trim()||null, current_meds:val('an-meds')?.trim()||null,
-    nurse_name:val('an-nurse')?.trim()||null, doctor_name:val('an-doctor')?.trim()||null,
+    notes:val('an-note')?.trim()||null, chief_complaint:val('an-note')?.trim()||null,
+    nurse_name:val('an-nurse')?.trim()||null,
   };
   try {
     // ambil identitas untuk kolom denormalisasi
