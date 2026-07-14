@@ -122,23 +122,38 @@ async function openAnamnesaForm(admissionId) {
       <strong>${a.mr_number||''}</strong> · ${a.visit_number} · ${a.patient_gender||''} ${a.patient_age?a.patient_age+' th':''} · ${anamServicesSummary(a)}
     </div>
 
-    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Tanda Vital (TTV)</div>
+    <div class="form-row" style="margin-bottom:8px">
+      <div class="form-group" style="grid-column:1/-1"><label>Practitioner *</label>
+        <input type="text" id="an-pract" value="${an.practitioner||(getUserName?getUserName():'')}"></div>
+      <div class="form-group"><label>Test Date</label>
+        <input type="date" id="an-testdate" value="${an.test_date||new Date().toISOString().slice(0,10)}"></div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin-bottom:8px">Vital Sign</div>
     <div class="form-row">
-      <div class="form-group"><label>Tekanan Darah (mmHg)</label>
+      <div class="form-group"><label>Blood Pressure (mmHg)</label>
         <div style="display:flex;gap:6px;align-items:center">
           <input type="number" id="an-sys" value="${an.systole||''}" placeholder="120" style="width:70px">
           <span>/</span>
           <input type="number" id="an-dia" value="${an.diastole||''}" placeholder="80" style="width:70px"></div></div>
-      <div class="form-group"><label>Nadi (x/mnt)</label><input type="number" id="an-hr" value="${an.heart_rate||''}" placeholder="72"></div>
-      <div class="form-group"><label>Napas (x/mnt)</label><input type="number" id="an-rr" value="${an.respiratory||''}" placeholder="18"></div>
-      <div class="form-group"><label>Suhu (°C)</label><input type="number" step="0.1" id="an-temp" value="${an.temperature||''}" placeholder="36.5"></div>
-      <div class="form-group"><label>SpO₂ (%)</label><input type="number" id="an-spo2" value="${an.spo2||''}" placeholder="98"></div>
+      <div class="form-group"><label>Heart Rate (bpm)</label><input type="number" id="an-hr" value="${an.heart_rate||''}" placeholder="72"></div>
+      <div class="form-group"><label>Temperature (°C)</label><input type="number" step="0.1" id="an-temp" value="${an.temperature||''}" placeholder="36.5"></div>
+      <div class="form-group"><label>Breath (x/mnt)</label><input type="number" id="an-rr" value="${an.respiratory||''}" placeholder="18"></div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin:10px 0 8px">Anthropometry</div>
+    <div class="form-row">
+      <div class="form-group"><label>Height (cm)</label><input type="number" step="0.1" id="an-height" value="${an.height||''}" oninput="calcBMI()"></div>
+      <div class="form-group"><label>Weight (kg)</label><input type="number" step="0.1" id="an-weight" value="${an.weight||''}" oninput="calcBMI()"></div>
+      <div class="form-group"><label>IMT (kg/m²)</label><input type="text" id="an-bmi" value="${an.bmi||''}" readonly style="background:var(--lgray)"></div>
+      <div class="form-group"><label>Ideal Weight (kg)</label><input type="number" step="0.1" id="an-idealw" value="${an.ideal_weight||''}" readonly style="background:var(--lgray)"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Berat (kg)</label><input type="number" step="0.1" id="an-weight" value="${an.weight||''}" oninput="calcBMI()"></div>
-      <div class="form-group"><label>Tinggi (cm)</label><input type="number" step="0.1" id="an-height" value="${an.height||''}" oninput="calcBMI()"></div>
-      <div class="form-group"><label>BMI</label><input type="text" id="an-bmi" value="${an.bmi||''}" readonly style="background:var(--lgray)"></div>
-      <div class="form-group"><label>Puasa (jam)</label><input type="number" id="an-fasting" value="${an.fasting_hours||''}" placeholder="10"></div>
+      <div class="form-group"><label>Abdomen Circ (cm)</label><input type="number" step="0.1" id="an-abd" value="${an.abdomen_circ||''}"></div>
+      <div class="form-group"><label>Chest Circ (cm)</label><input type="number" step="0.1" id="an-chest" value="${an.chest_circ||''}"></div>
+      <div class="form-group"><label>Head Circ (cm)</label><input type="number" step="0.1" id="an-head" value="${an.head_circ||''}"></div>
+      <div class="form-group"><label>O₂ Saturation (%)</label><input type="number" id="an-spo2" value="${an.spo2||''}" placeholder="98"></div>
+      <div class="form-group"><label>Fasting (jam)</label><input type="number" id="an-fasting" value="${an.fasting_hours||''}" placeholder="10"></div>
     </div>
 
     <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:10px 0 8px">Catatan</div>
@@ -164,7 +179,10 @@ async function openAnamnesaForm(admissionId) {
 function calcBMI() {
   const w = parseFloat(document.getElementById('an-weight')?.value);
   const h = parseFloat(document.getElementById('an-height')?.value);
-  const el = document.getElementById('an-bmi'); if (!el) return;
+  const el = document.getElementById('an-bmi');
+  const iw = document.getElementById('an-idealw');
+  if (h>0 && iw) iw.value = (22*Math.pow(h/100,2)).toFixed(1); else if(iw) iw.value='';
+  if (!el) return;
   if (w>0 && h>0) { const b = w/Math.pow(h/100,2); el.value = b.toFixed(1); } else el.value='';
 }
 
@@ -184,6 +202,8 @@ async function saveAnamnesa(admissionId, proceed) {
     systole:num('an-sys'), diastole:num('an-dia'), heart_rate:num('an-hr'),
     respiratory:num('an-rr'), temperature:num('an-temp'), spo2:num('an-spo2'),
     weight:num('an-weight'), height:num('an-height'), bmi:num('an-bmi'), fasting_hours:num('an-fasting'),
+    ideal_weight:num('an-idealw'), abdomen_circ:num('an-abd'), chest_circ:num('an-chest'), head_circ:num('an-head'),
+    practitioner:val('an-pract')?.trim()||null, test_date:val('an-testdate')||null,
     notes:val('an-note')?.trim()||null, chief_complaint:val('an-note')?.trim()||null,
     nurse_name:val('an-nurse')?.trim()||null,
   };

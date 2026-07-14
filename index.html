@@ -212,6 +212,7 @@
 <script src="modules/config_product.js"></script>
 <script src="modules/config_package.js"></script>
 <script src="modules/config_family.js"></script>
+<script src="modules/config_home.js"></script>
 <script src="modules/config_labreport.js"></script>
 <script src="modules/settings.js"></script>
 <script src="modules/settings_users.js"></script>
@@ -625,6 +626,7 @@ const FLYOUT_MENUS = {
   konfigurasi: {
     label: 'Konfigurasi',
     items: [
+      {page:'config', icon:'🏠', label:'Configuration Home', action:"navigate('config')"},
       {page:'users', icon:'👤', label:'User Management', action:"navigate('users')", adminOnly:true},
       {page:'product', icon:'🧬', label:'Master Tes / Produk', action:"navigate('product')"},
       {page:'refrange', icon:'📊', label:'Reference Range', action:"navigate('refrange')"},

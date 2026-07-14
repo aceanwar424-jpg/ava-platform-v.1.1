@@ -7,6 +7,8 @@ const PRODUCT_CATEGORIES = [
   'Mikrobiologi','Patologi Anatomi','Radiologi','Fisiologi',
   'Spirometry','EKG','Audiometri','Lainnya'
 ];
+const PRODUCT_TYPES = ['DIAGNOSTIC','RADIOLOGY','CONSULTATION','MCU','VACCINE','TREATMENT','OTHER'];
+const SERVICE_MAPPINGS = ['DIAGNOSTIC','RADIOLOGY','CONSULTATION','MCU','HOMECARE','TELEMEDICINE','OTHER'];
 
 const SAMPEL_TYPES = [
   'Darah Vena','Darah EDTA','Darah Kapiler','Urin Midstream',
@@ -347,22 +349,26 @@ async function openProductForm(id=null) {
       </div>
     </div>
 
-    <!-- Info Tes -->
+    <!-- Klasifikasi & Nama -->
     <div class="form-row">
-      <div class="form-group" style="grid-column:1/-1">
-        <label>Nama Tes *</label>
-        <input type="text" id="pf-name" value="${p.nama_tes||''}" placeholder="Gula Darah Puasa (GDP)">
-      </div>
-      <div class="form-group">
-        <label>Kategori</label>
-        <select id="pf-kat">
-          ${PRODUCT_CATEGORIES.map(c=>`<option${p.kategori===c?' selected':''}>${c}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Sub Kategori</label>
-        <input type="text" id="pf-subkat" value="${p.sub_kategori||''}" placeholder="Metabolisme, Lipid...">
-      </div>
+      <div class="form-group"><label>Type *</label>
+        <select id="pf-type">${PRODUCT_TYPES.map(t=>`<option ${(p.type||'DIAGNOSTIC')===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Service Mapping</label>
+        <select id="pf-svcmap">${SERVICE_MAPPINGS.map(t=>`<option ${(p.service_mapping||'DIAGNOSTIC')===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Kategori *</label>
+        <select id="pf-kat">${PRODUCT_CATEGORIES.map(c=>`<option${p.kategori===c?' selected':''}>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Sub Kategori</label>
+        <input type="text" id="pf-subkat" value="${p.sub_kategori||''}" placeholder="Darah, Lipid..."></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Name (ID) *</label>
+        <input type="text" id="pf-name" value="${p.nama_tes||''}" placeholder="Hematologi Rutin"></div>
+      <div class="form-group"><label>Name (En)</label>
+        <input type="text" id="pf-name-en" value="${p.nama_en||''}" placeholder="Routine Haematology"></div>
+      <div class="form-group"><label>Gender</label>
+        <select id="pf-gender">${['All','M','F'].map(x=>`<option value="${x}" ${(p.gender||'All')===x?'selected':''}>${x==='All'?'All':x==='M'?'Laki-laki':'Perempuan'}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Age (keterangan)</label>
+        <input type="text" id="pf-age" value="${p.age_note||''}" placeholder="All / 0-5 th / dewasa"></div>
     </div>
 
     <!-- Teknis -->
@@ -421,18 +427,32 @@ async function openProductForm(id=null) {
       </div>
     </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label>Status</label>
-        <select id="pf-active">
-          <option value="true" ${p.is_active!==false?'selected':''}>Aktif</option>
-          <option value="false" ${p.is_active===false?'selected':''}>Non-Aktif</option>
-        </select>
+    <!-- Deskripsi, Manfaat & Persiapan (ID/EN) -->
+    <div style="border-top:1px solid var(--border);padding-top:12px;margin:12px 0">
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Deskripsi · Manfaat · Persiapan</div>
+      <div class="form-row">
+        <div class="form-group"><label>Description (ID)</label><textarea id="pf-desc-id" rows="2">${p.description_id||p.keterangan||''}</textarea></div>
+        <div class="form-group"><label>Description (EN)</label><textarea id="pf-desc-en" rows="2">${p.description_en||''}</textarea></div>
       </div>
-      <div class="form-group" style="grid-column:2/-1">
-        <label>Keterangan</label>
-        <input type="text" id="pf-ket" value="${p.keterangan||''}" placeholder="Catatan tambahan...">
+      <div class="form-row">
+        <div class="form-group"><label>Benefit (ID)</label><textarea id="pf-ben-id" rows="2">${p.benefit_id||''}</textarea></div>
+        <div class="form-group"><label>Benefit (EN)</label><textarea id="pf-ben-en" rows="2">${p.benefit_en||''}</textarea></div>
       </div>
+      <div class="form-row">
+        <div class="form-group"><label>Preparation (ID)</label><textarea id="pf-prep-id" rows="2" placeholder="Puasa 8-10 jam / All Conditions">${p.preparation_id||''}</textarea></div>
+        <div class="form-group"><label>Preparation (EN)</label><textarea id="pf-prep-en" rows="2">${p.preparation_en||''}</textarea></div>
+      </div>
+    </div>
+
+    <!-- Flag Virtu -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;background:var(--lgray);border-radius:8px;padding:10px 12px">
+      ${[['pf-active','Active','is_active',p.is_active!==false],
+         ['pf-virtu','Show On Virtu','show_on_virtu',p.show_on_virtu!==false],
+         ['pf-homecare','Homecare','homecare',!!p.homecare],
+         ['pf-medkit','Medical Kit','medical_kit',!!p.medical_kit],
+         ['pf-peduli','Peduli Lindungi','peduli_lindungi',!!p.peduli_lindungi]].map(([id,lbl,,on])=>`
+        <label style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="${id}" ${on?'checked':''}> ${lbl}</label>`).join('')}
     </div>
 
     ${id?`
@@ -485,27 +505,44 @@ async function saveProduct(id) {
   const margin= harga > 0 ? Math.round((harga-hpp)/harga*100) : 0;
   const user  = getUserName?getUserName():'User';
 
+  const V=(id)=>document.getElementById(id)?.value?.trim()||null;
+  const C=(id)=>!!document.getElementById(id)?.checked;
   const payload = {
     kode_internal:    kode,
-    kode_material:    document.getElementById('pf-mat').value.trim()||null,
-    loinc_code:       document.getElementById('pf-loinc').value.trim()||null,
+    kode_material:    V('pf-mat'),
+    loinc_code:       V('pf-loinc'),
+    type:             V('pf-type'),
+    service_mapping:  V('pf-svcmap'),
     nama_tes:         name,
+    nama_en:          V('pf-name-en'),
+    gender:           V('pf-gender')||'All',
+    age_note:         V('pf-age'),
     kategori:         document.getElementById('pf-kat').value,
-    sub_kategori:     document.getElementById('pf-subkat').value.trim()||null,
+    sub_kategori:     V('pf-subkat'),
     sampel_type:      document.getElementById('pf-sampel').value,
-    volume_sampel:    document.getElementById('pf-vol').value.trim()||null,
-    satuan_hasil:     document.getElementById('pf-unit').value.trim()||null,
-    metode:           document.getElementById('pf-metode').value.trim()||null,
+    volume_sampel:    V('pf-vol'),
+    satuan_hasil:     V('pf-unit'),
+    metode:           V('pf-metode'),
     alat_id:          parseInt(document.getElementById('pf-alat').value)||null,
     waktu_tat_jam:    parseInt(document.getElementById('pf-tat').value)||4,
     harga_normal:     harga,
     harga_korporat:   parseFloat(document.getElementById('pf-harga-corp').value)||0,
     hpp,
     margin_pct:       margin,
-    host_code:        document.getElementById('pf-host')?.value.trim()||null,
+    host_code:        V('pf-host'),
+    description_id:   V('pf-desc-id'),
+    description_en:   V('pf-desc-en'),
+    benefit_id:       V('pf-ben-id'),
+    benefit_en:       V('pf-ben-en'),
+    preparation_id:   V('pf-prep-id'),
+    preparation_en:   V('pf-prep-en'),
+    show_on_virtu:    C('pf-virtu'),
+    homecare:         C('pf-homecare'),
+    medical_kit:      C('pf-medkit'),
+    peduli_lindungi:  C('pf-peduli'),
     is_panel:         prodItemState.filter(r=>(r.name_id||r.code) && r.is_active!==false).length > 1,
-    is_active:        document.getElementById('pf-active').value==='true',
-    keterangan:       document.getElementById('pf-ket').value.trim()||null,
+    is_active:        C('pf-active'),
+    keterangan:       V('pf-desc-id'),
     created_by:       user,
     updated_at:       new Date().toISOString(),
   };
