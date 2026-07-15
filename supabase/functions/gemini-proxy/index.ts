@@ -6,17 +6,25 @@
 //
 // Deploy: Supabase Dashboard → Edge Functions → Deploy new function →
 //         "Via Editor", beri nama: gemini-proxy
-// Secret: Settings → Edge Functions → Secrets → tambahkan:
-//         GEMINI_API_KEY = <key dari Google AI Studio>
-//         (opsional) GEMINI_MODEL = gemini-2.5-flash
-//                    GEMINI_IMAGE_MODEL = gemini-2.5-flash-image
+//
+// SECRETS (Settings → Edge Functions → Secrets):
+//   GEMINI_API_KEY = key1,key2,key3      ← BOLEH BANYAK, pisahkan koma
+//   (alternatif) GEMINI_API_KEY_1 / _2 / _3 ... (masing-masing 1 key)
+//   (opsional)   GEMINI_MODEL       = gemini-2.5-flash
+//                GEMINI_IMAGE_MODEL = gemini-2.5-flash-image
+//
+// MULTI-KEY: key dipakai bergiliran (round-robin) dan otomatis FAILOVER ke
+// key berikutnya bila kena rate-limit/kuota/key bermasalah (429/403/5xx).
+// Error permintaan (400) TIDAK di-retry — itu masalah prompt, bukan key.
+// CATATAN KUOTA: beberapa key dalam SATU project Google berbagi kuota yang
+// sama. Agar kuota benar-benar bertambah, pakai key dari PROJECT BERBEDA.
 //
 // Dipanggil dari app:
 //   POST ${SUPABASE_URL}/functions/v1/gemini-proxy
 //   body: { mode:'text'|'image', prompt, system?, files?:[{mime_type,data}],
 //           model?, temperature? }
-//   resp: { text }                (mode text)
-//         { images:[dataUri...] } (mode image)
+//   resp: { text, model, keyIndex, keyCount }                (mode text)
+//         { images:[dataUri...], model, keyIndex, keyCount } (mode image)
 // ─────────────────────────────────────────────────────────────────────
 
 const corsHeaders = {
@@ -31,13 +39,64 @@ const json = (body: unknown, status = 200) =>
 
 const API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
+// Kumpulkan semua key: GEMINI_API_KEY (boleh "k1,k2,k3") + GEMINI_API_KEY_1..8
+function collectKeys(): string[] {
+  const keys: string[] = [];
+  const push = (raw?: string | null) => {
+    (raw || '').split(/[,\s]+/).map((s) => s.trim()).filter(Boolean).forEach((k) => keys.push(k));
+  };
+  push(Deno.env.get('GEMINI_API_KEY'));
+  for (let i = 1; i <= 8; i++) push(Deno.env.get(`GEMINI_API_KEY_${i}`));
+  return [...new Set(keys)]; // buang duplikat
+}
+
+// Status yang layak dicoba ulang dengan KEY LAIN (masalah key/kuota/server).
+// 400 = permintaan salah → jangan buang-buang key lain.
+const RETRYABLE = new Set([401, 403, 429, 500, 502, 503, 504]);
+
+let rrCounter = 0; // round-robin (per instance)
+
+async function callGemini(model: string, payload: unknown, keys: string[]) {
+  const n = keys.length;
+  const start = rrCounter++ % n;
+  let last: { status: number; msg: string } = { status: 500, msg: 'Tidak ada percobaan' };
+
+  for (let i = 0; i < n; i++) {
+    const idx = (start + i) % n;
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE}/${model}:generateContent?key=${keys[idx]}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+    } catch (e) {
+      last = { status: 503, msg: e instanceof Error ? e.message : 'network error' };
+      continue; // jaringan gagal → coba key berikutnya
+    }
+
+    const data = await res.json().catch(() => null);
+    if (res.ok) return { data, keyIndex: idx + 1, keyCount: n };
+
+    last = { status: res.status, msg: data?.error?.message || `HTTP ${res.status}` };
+    if (!RETRYABLE.has(res.status)) break; // mis. 400 → hentikan
+  }
+  const err = new Error(
+    n > 1 && RETRYABLE.has(last.status)
+      ? `Semua ${n} API key gagal/kena limit. Terakhir: ${last.msg}`
+      : last.msg,
+  ) as Error & { status?: number };
+  err.status = last.status;
+  throw err;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'Gunakan POST' }, 405);
 
-  const KEY = Deno.env.get('GEMINI_API_KEY');
-  if (!KEY) {
-    return json({ error: 'GEMINI_API_KEY belum diset. Tambahkan di Settings → Edge Functions → Secrets.' }, 500);
+  const keys = collectKeys();
+  if (!keys.length) {
+    return json({ error: 'GEMINI_API_KEY belum diset. Tambahkan di Settings → Edge Functions → Secrets (boleh beberapa key dipisah koma).' }, 500);
   }
 
   try {
@@ -67,17 +126,8 @@ Deno.serve(async (req) => {
       };
     }
 
-    const res = await fetch(`${API_BASE}/${model}:generateContent?key=${KEY}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await res.json().catch(() => null);
-    if (!res.ok) {
-      const msg = data?.error?.message || `Gemini error HTTP ${res.status}`;
-      return json({ error: msg }, res.status);
-    }
+    // Panggil Gemini dengan rotasi key + failover otomatis
+    const { data, keyIndex, keyCount } = await callGemini(model, payload, keys);
 
     const cand = data?.candidates?.[0];
     if (!cand) return json({ error: 'Tidak ada hasil dari Gemini (kemungkinan diblokir filter).' }, 502);
@@ -89,13 +139,15 @@ Deno.serve(async (req) => {
         if (inline?.data) images.push(`data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`);
       }
       if (!images.length) return json({ error: 'Model tidak mengembalikan gambar. Coba ubah prompt.' }, 502);
-      return json({ images, model });
+      return json({ images, model, keyIndex, keyCount });
     }
 
     const text = (cand.content?.parts || []).map((p: Record<string, string>) => p.text || '').join('').trim();
     if (!text) return json({ error: 'Respons kosong dari model.' }, 502);
-    return json({ text, model, finishReason: cand.finishReason || null });
+    return json({ text, model, keyIndex, keyCount, finishReason: cand.finishReason || null });
   } catch (e) {
-    return json({ error: `Gagal memproses: ${e instanceof Error ? e.message : String(e)}` }, 500);
+    const status = (e as { status?: number })?.status;
+    const msg = e instanceof Error ? e.message : String(e);
+    return json({ error: msg }, status && status >= 400 && status < 600 ? status : 500);
   }
 });
