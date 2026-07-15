@@ -43,6 +43,9 @@
     <button class="rail-item" data-cat="produktivitas" onclick="openFlyout('produktivitas')" data-tooltip="Produktivitas">
       <span class="rail-icon">📋</span>
     </button>
+    <button class="rail-item" data-cat="wiki" onclick="openFlyout('wiki')" data-tooltip="Wiki OneLab">
+      <span class="rail-icon">📖</span>
+    </button>
     <button class="rail-item" data-cat="konfigurasi" onclick="openFlyout('konfigurasi')" data-tooltip="Konfigurasi">
       <span class="rail-icon">⚙️</span>
     </button>
@@ -212,6 +215,11 @@
 <script src="modules/config_product.js"></script>
 <script src="modules/config_package.js"></script>
 <script src="modules/config_family.js"></script>
+<!-- Wiki OneLab -->
+<script src="modules/wiki/index.js"></script>
+<script src="modules/wiki/sop.js"></script>
+<script src="modules/wiki/fix.js"></script>
+<script src="modules/wiki/studio.js"></script>
 <script src="modules/config_home.js"></script>
 <script src="modules/config_labreport.js"></script>
 <script src="modules/settings.js"></script>
@@ -621,6 +629,15 @@ const FLYOUT_MENUS = {
     items: [
       {page:'tasks', icon:'📋', label:'Task Management', action:"navigate('tasks')"},
       {page:'regulatory', icon:'📊', label:'Pelaporan & Audit', action:"navigate('regulatory')"},
+    ]
+  },
+  wiki: {
+    label: 'Wiki OneLab',
+    items: [
+      {page:'wiki-docs', icon:'📚', label:'Dokumen & SOP', action:"navigate('wiki',{tab:'docs'})"},
+      {page:'wiki-fix', icon:'🔧', label:'Perbaikan SOP (AI)', action:"navigate('wiki',{tab:'fix'})"},
+      {page:'wiki-content', icon:'✍️', label:'Content Studio', action:"navigate('wiki',{tab:'content'})"},
+      {page:'wiki-media', icon:'🖼️', label:'Media & Gambar', action:"navigate('wiki',{tab:'media'})"},
     ]
   },
   konfigurasi: {

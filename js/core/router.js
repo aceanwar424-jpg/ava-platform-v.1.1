@@ -9,6 +9,7 @@ const PAGE_TITLES = {
   mcu:'Project MCU', finance:'Finance & Billing',
   inventory:'Inventory & Logistik', hrd:'HRD & SDM', homecare:'Home Care',
   admission:'Admission / Registrasi', anamnesa:'Anamnesa', lab:'Operasional Lab',
+  wiki:'Wiki OneLab',
   config:'Configuration', product:'Master Produk & Tes', refrange:'Reference Range', labreport:'Setting Hasil PDF', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
@@ -49,6 +50,7 @@ function navigate(page, params={}) {
     case 'work-schedule': renderWorkSchedule();          break;
     case 'shift-calendar': renderShiftCalendar();         break;
     case 'tasks':       renderTaskManagement();          break;
+    case 'wiki':        renderWiki(params.tab||'docs');   break;
     case 'attendance':   renderAttendance();               break;
     case 'org-structure':renderOrgStructure();             break;
     case 'regulatory':   renderRegulatoryReports();        break;
