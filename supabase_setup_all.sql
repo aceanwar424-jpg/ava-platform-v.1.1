@@ -63,12 +63,23 @@ ALTER TABLE public.products
   ADD COLUMN IF NOT EXISTS homecare        boolean default false,
   ADD COLUMN IF NOT EXISTS medical_kit     boolean default false,
   ADD COLUMN IF NOT EXISTS peduli_lindungi boolean default false;
--- Anamnesa: practitioner, test date, antropometri
+-- Anamnesa: practitioner, test date, antropometri, observation
 ALTER TABLE public.anamnesas
   ADD COLUMN IF NOT EXISTS practitioner text, ADD COLUMN IF NOT EXISTS test_date date,
   ADD COLUMN IF NOT EXISTS ideal_weight numeric, ADD COLUMN IF NOT EXISTS abdomen_circ numeric,
   ADD COLUMN IF NOT EXISTS chest_circ numeric, ADD COLUMN IF NOT EXISTS head_circ numeric,
-  ADD COLUMN IF NOT EXISTS notes text;
+  ADD COLUMN IF NOT EXISTS notes text, ADD COLUMN IF NOT EXISTS observation text;
+-- ICD-X Diagnostic per kunjungan (tab ICD di Examination)
+CREATE TABLE IF NOT EXISTS public.icd_diagnostics (
+  id            bigint generated always as identity primary key,
+  admission_id  bigint references public.admissions(id) on delete cascade,
+  icd_code      text, diagnose_name text,
+  diagnose_type text default 'PRIMARY', case_type text default 'NEW',
+  description   text, dx_date date, created_by text,
+  created_at    timestamp default now()
+);
+ALTER TABLE public.icd_diagnostics DISABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_icd_admission ON public.icd_diagnostics(admission_id);
 ALTER TABLE public.ref_ranges
   ADD COLUMN IF NOT EXISTS product_item_id bigint,
   ADD COLUMN IF NOT EXISTS value_type      text default 'numeric',  -- numeric | qualitative

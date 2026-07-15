@@ -691,8 +691,8 @@ function setActiveFlyoutItem(page) {
   window.currentPage = page;
   document.querySelectorAll('.flyout-item').forEach(b => b.classList.remove('active'));
   document.querySelector(`.flyout-item[data-page="${page}"]`)?.classList.add('active');
-  // Close flyout on mobile after click (keep open on desktop for convenience)
-  if (window.innerWidth < 900) closeFlyout();
+  // Selalu tutup flyout setelah pilih menu — overlay full-screen memblokir klik konten
+  closeFlyout();
 }
 
 // Auto-open category based on current page (called from navigate())

@@ -31,4 +31,22 @@ ALTER TABLE public.anamnesas
   ADD COLUMN IF NOT EXISTS head_circ       numeric,  -- lingkar kepala (cm)
   ADD COLUMN IF NOT EXISTS notes           text;
 
-SELECT 'Virtu fields (products + anamnesas) ready' AS status;
+ALTER TABLE public.anamnesas ADD COLUMN IF NOT EXISTS observation text;
+
+-- ── ICD-X DIAGNOSTIC (per kunjungan) ───────────────────────────────
+CREATE TABLE IF NOT EXISTS public.icd_diagnostics (
+  id            bigint generated always as identity primary key,
+  admission_id  bigint references public.admissions(id) on delete cascade,
+  icd_code      text,
+  diagnose_name text,
+  diagnose_type text default 'PRIMARY',   -- PRIMARY | SECONDARY
+  case_type     text default 'NEW',       -- NEW | OLD
+  description   text,
+  dx_date       date,
+  created_by    text,
+  created_at    timestamp default now()
+);
+ALTER TABLE public.icd_diagnostics DISABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_icd_admission ON public.icd_diagnostics(admission_id);
+
+SELECT 'Virtu fields (products + anamnesas + ICD) ready' AS status;

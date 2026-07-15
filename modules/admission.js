@@ -14,6 +14,26 @@ const ADM_STATUS = {
   'Cancelled':   {color:'#EF4444', icon:'❌'},
 };
 
+// ── Ikon SVG line profesional (Feather-style) ─────────────────────
+const SVG_ICONS = {
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/>',
+  stethoscope:'<path d="M6 3v5a4 4 0 0 0 8 0V3"/><path d="M10 16a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/>',
+  tube:'<path d="M9 3h6M10 3v13a2 2 0 0 0 4 0V3"/><path d="M10 9h4"/>',
+  eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  note:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6"/><path d="M8 13h8M8 17h6"/>',
+  diagnosis:'<rect x="4" y="4" width="16" height="18" rx="2"/><path d="M9 2h6v4H9z"/><path d="M8 13h2l1 2 2-4 1 2h2"/>',
+  print:'<path d="M6 9V2h12v7"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M6 17h12v5H6z"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  chevron:'<path d="M9 18l6-6-6-6"/>',
+};
+function svgIcon(name, size, color){
+  const p=SVG_ICONS[name]||''; size=size||16;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color||'currentColor'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px">${p}</svg>`;
+}
+
 // ── Style shell profesional bersama (Layanan Klinik) ──────────────
 function injectProShell(){
   if(document.getElementById('pro-shell-style')) return;
@@ -33,7 +53,21 @@ function injectProShell(){
     .pro-shell .pro-grid th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
     .pro-shell .pro-grid td{ padding:5px 9px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
     .pro-shell .pro-grid tbody tr:nth-child(even){ background:#f8fafc; }
-    .pro-shell .pro-grid tbody tr:hover{ background:#eaf5f3; }`;
+    .pro-shell .pro-grid tbody tr:hover{ background:#eaf5f3; }
+    .pro-shell .pro-grid tbody tr.sel{ background:#e0f2f1 !important; }
+    /* Examination tab-rail (Virtu-style) */
+    .exam-wrap{ display:grid;grid-template-columns:210px 1fr;gap:0;border:1px solid #d3dae1;border-radius:10px;overflow:hidden;background:#fff;margin-top:12px; }
+    .exam-rail{ background:#f1f5f9;border-right:1px solid #d3dae1;padding:8px; }
+    .exam-tab{ display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:8px;
+      cursor:pointer;font-size:12.5px;font-weight:600;color:#334155;text-align:left;margin-bottom:2px; }
+    .exam-tab:hover{ background:#e2e8f0; }
+    .exam-tab.active{ background:#0A2342;color:#fff; }
+    .exam-tab svg{ flex-shrink:0; }
+    .exam-body{ padding:14px 16px;min-height:320px; }
+    .exam-topbar{ display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+      background:#f8fafc;border-bottom:1px solid #d3dae1;padding:10px 14px; }
+    .exam-sec{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;
+      background:#EAF3FB;border-left:3px solid var(--teal);padding:6px 10px;border-radius:4px;margin:2px 0 10px; }`;
   document.head.appendChild(s);
 }
 
