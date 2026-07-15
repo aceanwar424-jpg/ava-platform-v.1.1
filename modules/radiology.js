@@ -19,24 +19,20 @@ const RADIO_STATUS = {
 let radioAll = [];
 
 async function renderRadiology() {
+  if (typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Radiology</h1>
-        <p>Rontgen, USG — upload hasil, input nilai, interpretasi dokter</p></div>
-      <div class="btn-row">
-        <button class="btn btn-teal" onclick="openRadioForm()">+ Input Hasil Radiologi</button>
-      </div>
+    <div class="pro-shell">
+    <div class="pro-header">
+      <div><h1>${svgIcon('scan',18)} Radiology</h1>
+        <span class="pro-sub">Rontgen · USG — upload hasil, input nilai, interpretasi dokter</span></div>
+      <button class="btn btn-teal btn-sm" onclick="openRadioForm()">${svgIcon('plus',14)} Input Hasil Radiologi</button>
     </div>
 
-    <!-- KPI -->
-    <div id="radio-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px">
-      <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
-    </div>
+    <div id="radio-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
 
-    <!-- Filter -->
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+    <div class="pro-toolbar">
       <input class="table-search" id="radio-q" placeholder="🔍 Cari nama pasien, no. kunjungan..."
-        oninput="filterRadio()" style="flex:1">
+        oninput="filterRadio()" style="flex:1;min-width:220px">
       <select class="table-filter" id="radio-status" onchange="filterRadio()">
         <option value="">Semua Status</option>
         ${Object.keys(RADIO_STATUS).map(s=>`<option>${s}</option>`).join('')}
@@ -49,8 +45,7 @@ async function renderRadiology() {
         value="${new Date().toISOString().split('T')[0]}" onchange="loadRadiology()">
     </div>
 
-    <div id="radio-list">
-      <div class="loading-row"><div class="spinner"></div></div>
+    <div id="radio-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
 
   await loadRadiology();

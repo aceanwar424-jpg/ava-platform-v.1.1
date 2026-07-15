@@ -79,39 +79,34 @@ const SUPPORTIVE_TYPES = {
 let suppAll = [];
 
 async function renderSupportive() {
+  if (typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Supportive Examination</h1>
-        <p>EKG 12 Lead · EKG Treadmill · Audiometri · Spirometri</p></div>
-      <div class="btn-row">
-        <button class="btn btn-teal" onclick="openSupportiveForm()">+ Input Pemeriksaan</button>
-      </div>
+    <div class="pro-shell">
+    <div class="pro-header">
+      <div><h1>${svgIcon('heart',18)} Supportive Examination</h1>
+        <span class="pro-sub">EKG 12 Lead · EKG Treadmill · Audiometri · Spirometri</span></div>
+      <button class="btn btn-teal btn-sm" onclick="openSupportiveForm()">${svgIcon('plus',14)} Input Pemeriksaan</button>
     </div>
 
-    <!-- Type Filter Cards -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px" id="supp-type-cards">
+    <div class="pro-kpi" id="supp-type-cards">
       ${Object.entries(SUPPORTIVE_TYPES).map(([type,cfg])=>`
-        <div onclick="filterSuppType('${type}',this)"
-          style="background:#fff;border-radius:10px;padding:14px;text-align:center;cursor:pointer;
-            border:2px solid var(--border);transition:all .2s"
-          class="supp-type-card">
-          <div style="font-size:28px">${cfg.icon}</div>
-          <div style="font-size:12px;font-weight:700;color:var(--navy);margin-top:6px">${type}</div>
-          <div style="font-size:20px;font-weight:800;color:${cfg.color}" id="supp-count-${type.replace(/\s/g,'_')}">—</div>
+        <div onclick="filterSuppType('${type}',this)" class="supp-type-card"
+          style="background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;border:1px solid var(--border);border-left:4px solid ${cfg.color};transition:all .15s">
+          <div style="font-size:11px;font-weight:700;color:var(--navy)">${type}</div>
+          <div style="font-size:18px;font-weight:800;color:${cfg.color}" id="supp-count-${type.replace(/\s/g,'_')}">—</div>
         </div>`).join('')}
     </div>
 
-    <div style="display:flex;gap:8px;margin-bottom:14px">
+    <div class="pro-toolbar">
       <input class="table-search" id="supp-q" placeholder="🔍 Cari nama pasien..."
-        oninput="filterSupp()" style="flex:1">
+        oninput="filterSupp()" style="flex:1;min-width:220px">
       <select class="table-filter" id="supp-status" onchange="filterSupp()">
         <option value="">Semua Status</option>
         <option>Draft</option><option>Validated</option><option>Approved</option>
       </select>
     </div>
 
-    <div id="supp-list">
-      <div class="loading-row"><div class="spinner"></div></div>
+    <div id="supp-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
 
   await loadSupportive();
@@ -135,17 +130,18 @@ async function loadSupportive() {
 }
 
 function filterSuppType(type, card) {
+  // reset highlight tanpa menghapus aksen border-left tiap kartu
   document.querySelectorAll('.supp-type-card').forEach(c=>{
-    c.style.borderColor='var(--border)';
     c.style.background='#fff';
+    c.style.boxShadow='none';
   });
   if (suppActiveType===type) {
     suppActiveType='';
   } else {
     suppActiveType=type;
     const cfg=SUPPORTIVE_TYPES[type];
-    card.style.borderColor=cfg.color;
     card.style.background=cfg.color+'12';
+    card.style.boxShadow=`0 0 0 2px ${cfg.color}55`;
   }
   filterSupp();
 }

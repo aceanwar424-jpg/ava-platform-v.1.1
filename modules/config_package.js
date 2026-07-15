@@ -8,24 +8,22 @@ let pkgAll = [], corpAll = [];
 // PACKAGE SERVICE
 // ══════════════════════════════════════════
 async function renderConfigPackage() {
+  if (typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Paket Layanan</h1>
-        <p>Master paket pemeriksaan — MCU, Screening, Gut Health, dll</p></div>
+    <div class="pro-shell">
+    <div class="pro-header">
+      <div><h1>${svgIcon('box',18)} Package Service</h1>
+        <span class="pro-sub">Master paket pemeriksaan — MCU · Screening · Gut Health · Panel</span></div>
       <div class="btn-row">
-        <button class="btn btn-teal" onclick="navigate('import')">📥 Import Excel</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPackagesCSV()">📤 Export</button>
-        <button class="btn btn-teal" onclick="openPackageForm()">+ Buat Paket</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('import')">${svgIcon('plus',13)} Bulk Upload</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPackagesCSV()">${svgIcon('print',13)} Export</button>
+        <button class="btn btn-teal btn-sm" onclick="openPackageForm()">${svgIcon('plus',14)} Buat Paket</button>
       </div>
     </div>
 
-    <!-- KPI -->
-    <div id="pkg-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px">
-      <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
-    </div>
+    <div id="pkg-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
 
-    <div id="pkg-list">
-      <div class="loading-row"><div class="spinner"></div></div>
+    <div id="pkg-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
 
   await loadPackages();
