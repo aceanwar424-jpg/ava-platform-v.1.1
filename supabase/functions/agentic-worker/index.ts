@@ -28,17 +28,16 @@ const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const WORKER_ID = `edge-${crypto.randomUUID().slice(0, 8)}`;
 const MAX_PER_TICK = parseInt(Deno.env.get('WORKER_CONCURRENCY') || '2', 10);
 
+// Semua akses DB lewat wrapper RPC di schema public (tabel tetap di schema
+// agentic) — jadi tidak perlu mengubah "Exposed schemas" di dashboard.
 async function rpc(fn: string, args: Record<string, unknown>) {
   const res = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
     method: 'POST',
-    headers: {
-      apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json',
-      'Accept-Profile': 'agentic', 'Content-Profile': 'agentic',
-    },
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(args),
   });
   const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.message || `RPC ${fn} gagal (HTTP ${res.status})`);
+  if (!res.ok) throw new Error(data?.message || data?.hint || `RPC ${fn} gagal (HTTP ${res.status})`);
   return data;
 }
 
@@ -99,7 +98,7 @@ Deno.serve(async (req) => {
   for (let i = 0; i < max; i++) {
     let task: Task | null = null;
     try {
-      const rows = await rpc('claim_task', { p_worker: WORKER_ID, p_agent: agent });
+      const rows = await rpc('agentic_claim_task', { p_worker: WORKER_ID, p_agent: agent });
       task = Array.isArray(rows) ? rows[0] ?? null : rows ?? null;
     } catch (e) {
       return json({ error: `Gagal klaim task: ${e instanceof Error ? e.message : String(e)}` }, 500);
@@ -108,7 +107,7 @@ Deno.serve(async (req) => {
 
     const handler = HANDLERS[task.task_type];
     if (!handler) {
-      await rpc('transition_task', {
+      await rpc('agentic_transition', {
         p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER',
         p_error: `Handler '${task.task_type}' belum diimplementasikan (lihat Fase 2/3)`,
         p_note: 'handler tidak ditemukan',
@@ -119,14 +118,14 @@ Deno.serve(async (req) => {
 
     try {
       const { result, note } = await handler(task);
-      await rpc('transition_task', {
+      await rpc('agentic_transition', {
         p_task_id: task.id, p_to: 'DRAFT', p_actor_type: 'WORKER',
         p_result: result, p_note: note,
       });
       results.push({ taskId: task.id, status: 'DRAFT', note });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      await rpc('transition_task', {
+      await rpc('agentic_transition', {
         p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER', p_error: msg, p_note: 'handler error',
       }).catch(() => null);
       results.push({ taskId: task.id, status: 'FAILED', note: msg });

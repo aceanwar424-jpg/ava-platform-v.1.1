@@ -39,21 +39,18 @@ const RATE_LIMIT = parseInt(Deno.env.get('LLM_RATE_LIMIT_PER_KEY_PER_MIN') || '3
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 
-// ── DB helper (schema agentic via PostgREST) ─────────────────────────
-async function db(path: string, init: RequestInit = {}) {
-  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    ...init,
-    headers: {
-      apikey: SB_KEY,
-      Authorization: `Bearer ${SB_KEY}`,
-      'Content-Type': 'application/json',
-      'Accept-Profile': 'agentic',
-      'Content-Profile': 'agentic',
-      ...(init.headers || {}),
-    },
-  });
-  if (!res.ok) return null;
-  return await res.json().catch(() => null);
+// ── DB helper — lewat wrapper RPC di schema public (tanpa perlu
+//    mengubah "Exposed schemas"; tabel tetap di schema agentic) ───────
+async function rpc(fn: string, args: Record<string, unknown>) {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(args),
+    });
+    if (!res.ok) return null;
+    return await res.json().catch(() => null);
+  } catch { return null; }
 }
 
 function keysOf(env: string): string[] {
@@ -69,16 +66,12 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Rate limit per key: hitung request 60 detik terakhir (pengganti limiter Redis)
 async function isRateLimited(alias: string): Promise<boolean> {
-  const since = new Date(Date.now() - 60_000).toISOString();
-  const rows = await db(
-    `llm_requests?select=id&key_alias=eq.${encodeURIComponent(alias)}&created_at=gte.${since}&status=in.(OK,FALLBACK)&limit=${RATE_LIMIT}`,
-  );
-  return Array.isArray(rows) && rows.length >= RATE_LIMIT;
+  const n = await rpc('agentic_rate_count', { p_alias: alias });
+  return typeof n === 'number' && n >= RATE_LIMIT;
 }
 
 async function logReq(row: Record<string, unknown>) {
-  await db('llm_requests', { method: 'POST', body: JSON.stringify(row), headers: { Prefer: 'return=minimal' } })
-    .catch(() => null);
+  await rpc('agentic_log_llm', { p: row });
 }
 
 // ── Provider calls ───────────────────────────────────────────────────
@@ -148,11 +141,11 @@ Deno.serve(async (req) => {
   // ── Cache (khusus task idempotent) ────────────────────────────────
   const hash = await sha256(`${system || ''}|${prompt}|${nvModel}|${gmModel}|${temperature}`);
   if (body.cacheable) {
-    const hit = await db(`llm_cache?select=response,expires_at&prompt_hash=eq.${hash}&limit=1`);
-    if (Array.isArray(hit) && hit[0] && new Date(hit[0].expires_at) > new Date()) {
+    const hit = await rpc('agentic_cache_get', { p_hash: hash });
+    if (typeof hit === 'string' && hit) {
       await logReq({ task_id: taskId, provider: 'CACHE', model: nvModel, prompt_hash: hash,
-        prompt_preview: trunc(prompt), response_preview: trunc(hit[0].response), status: 'CACHED', latency_ms: 0 });
-      return json({ text: hit[0].response, provider: 'CACHE', model: nvModel, cached: true });
+        prompt_preview: trunc(prompt), response_preview: trunc(hit), status: 'CACHED', latency_ms: 0 });
+      return json({ text: hit, provider: 'CACHE', model: nvModel, cached: true });
     }
   }
 
@@ -203,10 +196,7 @@ Deno.serve(async (req) => {
           input_tokens: r.inTok, output_tokens: r.outTok, latency_ms: latency,
           status: isFallback ? 'FALLBACK' : 'OK' });
         if (body.cacheable) {
-          await db('llm_cache', { method: 'POST',
-            headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-            body: JSON.stringify({ prompt_hash: hash, model: a.model, response: r.text,
-              expires_at: new Date(Date.now() + 86_400_000).toISOString() }) }).catch(() => null);
+          await rpc('agentic_cache_put', { p_hash: hash, p_model: a.model, p_response: r.text });
         }
         return json({ text: r.text, provider: a.provider, model: a.model, cached: false,
           keyAlias: a.alias, latencyMs: latency });

@@ -313,6 +313,93 @@ GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA agentic TO anon, authenticated, service
 ALTER DEFAULT PRIVILEGES IN SCHEMA agentic GRANT ALL ON TABLES TO anon, authenticated, service_role;
 
 -- ══════════════════════════════════════════════════════════════════════
+-- PUBLIC API WRAPPER — supaya TIDAK perlu mengubah "Exposed schemas"
+-- ----------------------------------------------------------------------
+-- Supabase/PostgREST secara default hanya meng-expose schema "public".
+-- Tabel tetap terisolasi di schema "agentic" (sesuai spec §2), tapi diakses
+-- lewat beberapa fungsi tipis di "public" (SECURITY DEFINER).
+-- Hasilnya: Edge Function & UI cukup pakai REST biasa, tanpa setting apa pun.
+-- ══════════════════════════════════════════════════════════════════════
+
+CREATE OR REPLACE FUNCTION public.agentic_create_task(
+  p_agent TEXT, p_task_type TEXT, p_title TEXT,
+  p_payload JSONB DEFAULT '{}'::jsonb,
+  p_needs_medical_review BOOLEAN DEFAULT false,
+  p_priority SMALLINT DEFAULT 5
+) RETURNS JSONB
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  INSERT INTO agentic.tasks(agent, task_type, title, payload, needs_medical_review, priority)
+  VALUES (p_agent, p_task_type, p_title, COALESCE(p_payload,'{}'::jsonb), p_needs_medical_review, p_priority)
+  RETURNING to_jsonb(tasks);
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_claim_task(p_worker TEXT, p_agent TEXT DEFAULT NULL)
+RETURNS JSONB
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT to_jsonb(t) FROM agentic.claim_task(p_worker, p_agent) t LIMIT 1;
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_transition(
+  p_task_id UUID, p_to TEXT, p_actor_type TEXT, p_actor_id UUID DEFAULT NULL,
+  p_note TEXT DEFAULT NULL, p_result JSONB DEFAULT NULL, p_error TEXT DEFAULT NULL
+) RETURNS JSONB
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT to_jsonb(agentic.transition_task(p_task_id, p_to, p_actor_type, p_actor_id, p_note, p_result, p_error));
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_log_llm(p JSONB)
+RETURNS VOID
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  INSERT INTO agentic.llm_requests(task_id, provider, model, key_alias, prompt_hash,
+    prompt_preview, response_preview, input_tokens, output_tokens, latency_ms, status)
+  VALUES (NULLIF(p->>'task_id','')::uuid, p->>'provider', p->>'model', p->>'key_alias',
+    p->>'prompt_hash', p->>'prompt_preview', p->>'response_preview',
+    NULLIF(p->>'input_tokens','')::int, NULLIF(p->>'output_tokens','')::int,
+    NULLIF(p->>'latency_ms','')::int, p->>'status');
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_rate_count(p_alias TEXT)
+RETURNS INT
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT count(*)::int FROM agentic.llm_requests
+  WHERE key_alias = p_alias AND created_at > now() - INTERVAL '60 seconds'
+    AND status IN ('OK','FALLBACK');
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_cache_get(p_hash TEXT)
+RETURNS TEXT
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT response FROM agentic.llm_cache WHERE prompt_hash = p_hash AND expires_at > now() LIMIT 1;
+$$;
+
+CREATE OR REPLACE FUNCTION public.agentic_cache_put(p_hash TEXT, p_model TEXT, p_response TEXT)
+RETURNS VOID
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  INSERT INTO agentic.llm_cache(prompt_hash, model, response, expires_at)
+  VALUES (p_hash, p_model, p_response, now() + INTERVAL '24 hours')
+  ON CONFLICT (prompt_hash) DO UPDATE
+    SET response = EXCLUDED.response, model = EXCLUDED.model,
+        expires_at = EXCLUDED.expires_at, created_at = now();
+$$;
+
+-- View read-only untuk UI (Fase 1: Approval Inbox, monitor)
+CREATE OR REPLACE VIEW public.agentic_tasks_v        AS SELECT * FROM agentic.tasks;
+CREATE OR REPLACE VIEW public.agentic_task_events_v  AS SELECT * FROM agentic.task_events;
+CREATE OR REPLACE VIEW public.agentic_llm_requests_v AS SELECT * FROM agentic.llm_requests;
+
+GRANT EXECUTE ON FUNCTION
+  public.agentic_create_task(TEXT,TEXT,TEXT,JSONB,BOOLEAN,SMALLINT),
+  public.agentic_claim_task(TEXT,TEXT),
+  public.agentic_transition(UUID,TEXT,TEXT,UUID,TEXT,JSONB,TEXT),
+  public.agentic_log_llm(JSONB),
+  public.agentic_rate_count(TEXT),
+  public.agentic_cache_get(TEXT),
+  public.agentic_cache_put(TEXT,TEXT,TEXT)
+TO anon, authenticated, service_role;
+GRANT SELECT ON public.agentic_tasks_v, public.agentic_task_events_v, public.agentic_llm_requests_v
+TO anon, authenticated, service_role;
+
+-- ══════════════════════════════════════════════════════════════════════
 -- §CRON (opsional, Fase 0 boleh manual dulu)
 -- Aktifkan di Database → Extensions: pg_cron & pg_net. Lalu:
 --
