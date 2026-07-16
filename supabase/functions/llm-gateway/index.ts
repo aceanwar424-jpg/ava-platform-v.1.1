@@ -38,6 +38,10 @@ const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const RATE_LIMIT = parseInt(Deno.env.get('LLM_RATE_LIMIT_PER_KEY_PER_MIN') || '30', 10);
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
+// Anggaran waktu: Edge Function dibunuh gateway ±150 dtk. Tanpa timeout,
+// provider yang menggantung membuat task macet PROCESSING (tanpa log).
+const ATTEMPT_TIMEOUT_MS = 75_000;   // maksimal per percobaan provider
+const TOTAL_BUDGET_MS    = 115_000;  // maksimal total sebelum menyerah rapi
 
 // ── DB helper — lewat wrapper RPC di schema public (tanpa perlu
 //    mengubah "Exposed schemas"; tabel tetap di schema agentic) ───────
@@ -80,6 +84,7 @@ async function callNvidia(key: string, model: string, body: Record<string, unkno
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({ model, ...body }),
+    signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) return { ok: false, status: res.status, msg: data?.detail || data?.error?.message || `HTTP ${res.status}` };
@@ -103,6 +108,7 @@ async function callGemini(key: string, model: string, prompt: string, system: st
 
   const res = await fetch(`${GEMINI_BASE}/${model}:generateContent?key=${key}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+    signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS),
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) return { ok: false, status: res.status, msg: data?.error?.message || `HTTP ${res.status}` };
@@ -135,7 +141,7 @@ Deno.serve(async (req) => {
   const tier = body.tier === 'light' ? 'light' : 'main';
 
   const nvModel = body.model || Deno.env.get(tier === 'light' ? 'NVIDIA_MODEL_LIGHT' : 'NVIDIA_MODEL_MAIN')
-    || 'meta/llama-3.1-70b-instruct';
+    || (tier === 'light' ? 'meta/llama-3.1-8b-instruct' : 'meta/llama-3.3-70b-instruct');
   const gmModel = body.model || Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
 
   // ── Cache (khusus task idempotent) ────────────────────────────────
@@ -164,11 +170,15 @@ Deno.serve(async (req) => {
 
   const BACKOFF = [0, 2000, 8000]; // §3.1: 3 putaran
   let last = 'Belum ada percobaan';
+  const deadline = Date.now() + TOTAL_BUDGET_MS;
 
   for (let round = 0; round < BACKOFF.length; round++) {
     if (BACKOFF[round]) await sleep(BACKOFF[round]);
 
     for (const a of usable) {
+      if (Date.now() > deadline) {
+        return json({ error: `Anggaran waktu gateway habis (${TOTAL_BUDGET_MS / 1000}s). Terakhir → ${last}` }, 503);
+      }
       if (await isRateLimited(a.alias)) {
         await logReq({ task_id: taskId, provider: a.provider, model: a.model, key_alias: a.alias,
           prompt_hash: hash, prompt_preview: trunc(prompt), status: 'RATE_LIMITED' });
@@ -185,7 +195,10 @@ Deno.serve(async (req) => {
             })
           : await callGemini(a.key, a.model, prompt, system, temperature, maxTokens, files);
       } catch (e) {
-        r = { ok: false, status: 503, msg: e instanceof Error ? e.message : 'network error' };
+        const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+        r = { ok: false, status: 503,
+          msg: timedOut ? `timeout ${ATTEMPT_TIMEOUT_MS / 1000}s (provider tidak merespons)` :
+            (e instanceof Error ? e.message : 'network error') };
       }
       const latency = Date.now() - t0;
 

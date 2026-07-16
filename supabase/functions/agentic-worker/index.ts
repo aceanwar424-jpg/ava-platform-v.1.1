@@ -41,13 +41,23 @@ async function rpc(fn: string, args: Record<string, unknown>) {
   return data;
 }
 
-// Satu-satunya jalan ke LLM (§1.4) — lewat llm-gateway, bukan API provider langsung
+// Satu-satunya jalan ke LLM (§1.4) — lewat llm-gateway, bukan API provider langsung.
+// Timeout backstop: bila gateway sendiri macet, task tetap ditutup FAILED
+// (bukan menggantung PROCESSING sampai invocation dibunuh).
 async function askLLM(payload: Record<string, unknown>) {
-  const res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(130_000),
+    });
+  } catch (e) {
+    const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+    throw new Error(timedOut ? 'llm-gateway timeout 130s — coba Retry; bila berulang cek model/key di Secrets'
+      : (e instanceof Error ? e.message : 'network error ke llm-gateway'));
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.error || `llm-gateway HTTP ${res.status}`);
   return data;

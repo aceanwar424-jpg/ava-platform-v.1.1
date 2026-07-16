@@ -50,7 +50,9 @@ async function renderAgStudioTab(el){
   for(const h of agHealthDays){
     const d = new Date(now.getFullYear(), h.month-1, h.day);
     const diff = (d - now)/864e5;
-    if(diff >= -1 && diff <= 30) upcoming.push({...h, date: d.toISOString().slice(0,10)});
+    // format lokal, bukan toISOString (UTC menggeser tanggal mundur di WIB)
+    const iso = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(diff >= -1 && diff <= 30) upcoming.push({...h, date: iso});
   }
 
   el.innerHTML = `
