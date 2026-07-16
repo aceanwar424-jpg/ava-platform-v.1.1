@@ -211,7 +211,7 @@ async function runImageGen(){
     toast('✅ Gambar dibuat','ok');
   }catch(e){
     out.innerHTML=`<div class="status-box status-err">❌ ${e.message}
-      <div style="font-size:11.5px;margin-top:6px">Pastikan model gambar tersedia untuk API key kamu (<code>GEMINI_IMAGE_MODEL</code>, default <code>gemini-2.5-flash-image</code>).</div></div>`;
+      <div style="font-size:11.5px;margin-top:6px">Gambar kini via <strong>NVIDIA FLUX</strong> (llm-gateway, model diatur secret <code>NVIDIA_IMAGE_MODEL</code>, default <code>flux.1-schnell</code>) dengan fallback Gemini. Bila error: pastikan Edge Function <code>llm-gateway</code> versi terbaru sudah di-deploy, lalu cek <strong>Agentic AI → Monitor → Tes Koneksi AI</strong>.</div></div>`;
   }
   if(btn){ btn.disabled=false; btn.innerHTML=`${svgIcon('sparkle',15)} Generate Gambar`; }
 }

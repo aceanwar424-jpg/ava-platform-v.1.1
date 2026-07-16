@@ -102,7 +102,7 @@ async function renderWiki(tab){
     <div class="pro-header">
       <div><h1>${svgIcon('book',18)} Wiki OneLab</h1>
         <span class="pro-sub">Dokumen &amp; SOP · Perbaikan SOP (AI) · Content Studio · Media</span></div>
-      <span class="pro-sub" id="wiki-ai-state">AI: Gemini via Edge Function</span>
+      <span class="pro-sub" id="wiki-ai-state">AI: teks Gemini · gambar NVIDIA FLUX (fallback Gemini)</span>
     </div>
 
     <div id="wiki-kpi" class="pro-kpi"></div>
