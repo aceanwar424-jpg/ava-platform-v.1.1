@@ -104,14 +104,21 @@ async function renderAgStudioTab(el){
         <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${svgIcon('box',14)} Aset Konten Terakhir</div>
         ${agAssets.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
           <thead><tr><th>Waktu</th><th>Jenis</th><th>Isi</th><th></th></tr></thead>
-          <tbody>${agAssets.slice(0,20).map(a=>`<tr>
+          <tbody>${agAssets.slice(0,20).map(a=>{
+            const url = a.file_path ? `${SUPABASE_URL}/storage/v1/object/public/agentic/${a.file_path}` : '';
+            const isImg = a.asset_type==='IMAGE' && a.file_path;
+            return `<tr>
             <td style="white-space:nowrap">${new Date(a.created_at).toLocaleString('id-ID')}</td>
             <td>${agEsc(a.asset_type)}</td>
-            <td style="max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${agEsc((a.text_content||a.file_path||'').slice(0,120))}</td>
+            <td style="max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+              ${isImg?`<a href="${url}" target="_blank"><img src="${url}" alt="flyer" style="height:56px;border-radius:6px;border:1px solid var(--border);vertical-align:middle"></a>`
+                    :agEsc((a.text_content||a.file_path||'').slice(0,120))}</td>
             <td style="white-space:nowrap">
-              ${a.file_path?`<a class="ag-btn mut" style="padding:4px 9px;text-decoration:none" target="_blank" href="${SUPABASE_URL}/storage/v1/object/public/agentic/${agEsc(a.file_path)}">${svgIcon('eye',12)} Lihat</a>`:''}
-              ${a.text_content?`<button class="ag-btn mut" style="padding:4px 9px" onclick="agCopyAsset('${a.id}')">📋 Salin</button>`:''}
-            </td></tr>`).join('')}</tbody></table></div>`
+              ${isImg?`<button class="ag-btn mut" style="padding:4px 9px" onclick="agDownloadAsset('${a.id}')">${svgIcon('download',12)} Unduh</button>`:''}
+              ${a.file_path&&!isImg?`<a class="ag-btn mut" style="padding:4px 9px;text-decoration:none" target="_blank" href="${url}">${svgIcon('eye',12)} Lihat</a>`:''}
+              ${a.text_content?`<button class="ag-btn mut" style="padding:4px 9px" onclick="agCopyAsset('${a.id}')">📋 Salin</button>
+                <button class="ag-btn mut" style="padding:4px 9px" title="Unduh .docx" onclick="agDownloadAssetDocx('${a.id}')">${svgIcon('download',12)} .docx</button>`:''}
+            </td></tr>`;}).join('')}</tbody></table></div>`
         : '<div style="font-size:12px;color:var(--gray)">Belum ada aset — aset muncul setelah task MAKE_* selesai diproses worker.</div>'}
       </div>
     </div>
@@ -167,6 +174,25 @@ async function agSkipSlot(id){
 function agCopyAsset(id){
   const a = agAssets.find(x=>x.id===id); if(!a||!a.text_content) return;
   navigator.clipboard?.writeText(a.text_content).then(()=>toast('📋 Disalin','ok')).catch(()=>toast('Gagal menyalin','err'));
+}
+// Unduh file aset dari Storage sebagai file lokal (fetch → blob, karena
+// atribut download diabaikan utk URL lintas origin)
+async function agDownloadAsset(id){
+  const a = agAssets.find(x=>x.id===id); if(!a||!a.file_path) return;
+  try{
+    const res = await fetch(`${SUPABASE_URL}/storage/v1/object/public/agentic/${a.file_path}`);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const el = document.createElement('a');
+    el.href = URL.createObjectURL(blob);
+    el.download = a.file_path.split('/').pop() || 'flyer.png';
+    el.click();
+  }catch(e){ toast('Gagal unduh: '+e.message,'err'); }
+}
+function agDownloadAssetDocx(id){
+  const a = agAssets.find(x=>x.id===id); if(!a||!a.text_content) return;
+  const title = (a.meta&&a.meta.title) || `Aset ${a.asset_type}`;
+  if(typeof agDownloadDocx==='function') agDownloadDocx(a.text_content, title, title);
 }
 
 // Form slot manual
