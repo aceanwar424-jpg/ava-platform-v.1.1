@@ -53,9 +53,70 @@ async function askLLM(payload: Record<string, unknown>) {
   return data;
 }
 
-// ── HANDLERS ─────────────────────────────────────────────────────────
+// ── UTIL ─────────────────────────────────────────────────────────────
 type Task = { id: string; agent: string; task_type: string; title: string; payload: Record<string, unknown> };
+type Dict = Record<string, unknown>;
 
+// Isi {{placeholder}} pada template prompt (§4.10)
+function fillTemplate(tpl: string, vars: Dict): string {
+  return String(tpl || '').replace(/\{\{(\w+)\}\}/g, (_, k) =>
+    vars[k] === undefined || vars[k] === null ? '-' : String(vars[k]));
+}
+
+// Parse JSON dari output LLM: buang pagar ```json, ambil blok { } / [ ] pertama (§9.1)
+function parseJSONLoose(text: string): unknown {
+  let s = String(text || '').trim()
+    .replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+  try { return JSON.parse(s); } catch { /* lanjut cari blok */ }
+  const iO = s.indexOf('{'), iA = s.indexOf('[');
+  const start = (iA >= 0 && (iA < iO || iO < 0)) ? iA : iO;
+  if (start < 0) throw new Error('Output LLM bukan JSON');
+  const close = s[start] === '[' ? ']' : '}';
+  const end = s.lastIndexOf(close);
+  if (end <= start) throw new Error('Output LLM bukan JSON utuh');
+  return JSON.parse(s.slice(start, end + 1));
+}
+
+// Ambil prompt template dari DB; error jelas bila seed belum jalan
+async function getPrompt(code: string): Promise<Dict> {
+  const p = await rpc('agentic_get_prompt', { p_code: code });
+  if (!p) throw new Error(`Prompt template '${code}' tidak ditemukan — jalankan supabase_agentic_fase12.sql`);
+  return p as Dict;
+}
+
+// Panggil LLM dengan template + validasi JSON (retry 1x dgn pesan error, §9.1)
+async function askLLMJson(t: Task, tpl: Dict, vars: Dict, opts: Dict = {}) {
+  const base = {
+    taskId: t.id,
+    tier: tpl.model_hint === 'light' ? 'light' : 'main',
+    temperature: Number(tpl.temperature ?? 0.2),
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), vars),
+    ...opts,
+  };
+  let r = await askLLM(base);
+  try { return { data: parseJSONLoose(String(r.text)), provider: r.provider, model: r.model }; }
+  catch (e1) {
+    const msg = e1 instanceof Error ? e1.message : String(e1);
+    r = await askLLM({ ...base, cacheable: false,
+      prompt: base.prompt + `\n\nOUTPUT SEBELUMNYA GAGAL DIPARSE (${msg}). Ulangi — balas HANYA JSON valid.` });
+    return { data: parseJSONLoose(String(r.text)), provider: r.provider, model: r.model };
+  }
+}
+
+// Unduh file dari Storage bucket "agentic" → base64 (untuk ingest PDF via Gemini)
+async function storageBase64(path: string): Promise<string> {
+  const res = await fetch(`${SB_URL}/storage/v1/object/agentic/${path}`, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` },
+  });
+  if (!res.ok) throw new Error(`Gagal unduh storage agentic/${path} (HTTP ${res.status})`);
+  const buf = new Uint8Array(await res.arrayBuffer());
+  let bin = '';
+  for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+
+// ── HANDLERS ─────────────────────────────────────────────────────────
 async function handleSmokeTest(t: Task) {
   const useLLM = t.payload?.use_llm !== false;
   if (!useLLM) {
@@ -76,9 +137,194 @@ async function handleSmokeTest(t: Task) {
   };
 }
 
+// ═══ FASE 2 — DOCUMENT COMPLIANCE AGENT (§5.1) ═══════════════════════
+
+// DOC_INGEST: teks dokumen (dari browser) / PDF (dari Storage) → metadata LLM
+// → document_registry (DISCOVERED). Format tidak standar → NEEDS_REPAIR +
+// auto-task DOC_REPAIR. payload.enqueue_gap=true → auto-antri GAP_ANALYSIS.
+async function handleDocIngest(t: Task) {
+  const p = t.payload || {};
+  const fileName = String(p.file_name || 'dokumen');
+  let text = String(p.text || '');
+  const storagePath = String(p.storage_path || '');
+
+  const tpl = await getPrompt('DOC_INGEST_META');
+  let meta: Dict;
+  if (text) {
+    const { data } = await askLLMJson(t, tpl, { file_name: fileName, text: text.slice(0, 60000) }, { cacheable: true });
+    meta = data as Dict;
+  } else if (storagePath && /\.pdf$/i.test(storagePath)) {
+    // PDF: kirim langsung ke LLM sebagai lampiran (gateway memaksa Gemini utk files)
+    const b64 = await storageBase64(storagePath);
+    const r = await askLLM({
+      taskId: t.id, tier: 'light', temperature: Number(tpl.temperature ?? 0.2),
+      system: String(tpl.system_prompt || ''),
+      prompt: fillTemplate(String(tpl.user_prompt_template || ''), { file_name: fileName, text: '(lihat lampiran PDF)' }),
+      files: [{ mime_type: 'application/pdf', data: b64 }],
+    });
+    meta = parseJSONLoose(String(r.text)) as Dict;
+  } else {
+    throw new Error('Payload ingest butuh "text" (hasil ekstraksi browser) atau "storage_path" PDF di bucket agentic');
+  }
+
+  const formatOk = meta.format_ok !== false;
+  const reg = await rpc('agentic_registry_upsert', { p: {
+    title: meta.title || fileName,
+    doc_type: meta.doc_type || 'SOP',
+    doc_level: meta.doc_level || 2,
+    department: meta.department || 'MUTU',
+    doc_number: meta.doc_number || null,
+    iso_clause: meta.iso_clause || null,
+    effective_date: meta.effective_date || null,
+    status: formatOk ? 'DISCOVERED' : 'NEEDS_REPAIR',
+    source_file_path: storagePath || null,
+    gap_notes: formatOk ? null : String(meta.format_issues || 'Format tidak standar'),
+    extracted_meta: { ...meta, full_text: text.slice(0, 200000), file_name: fileName },
+  }}) as Dict;
+
+  let extra = '';
+  if (!formatOk && reg?.id) {
+    await rpc('agentic_create_task', {
+      p_agent: 'DOCUMENT', p_task_type: 'DOC_REPAIR',
+      p_title: `Perbaiki format: ${meta.title || fileName}`,
+      p_payload: { document_id: reg.id, mode: 'format_fix', prompt_code: 'DOC_REPAIR_SOP' },
+    });
+    extra += ' · auto-task DOC_REPAIR';
+  }
+  if (p.enqueue_gap === true) {
+    await rpc('agentic_create_task', {
+      p_agent: 'DOCUMENT', p_task_type: 'GAP_ANALYSIS',
+      p_title: 'Gap analysis otomatis pasca-ingest', p_payload: {},
+    });
+    extra += ' · auto-task GAP_ANALYSIS';
+  }
+  return {
+    result: { document_id: reg?.id, meta, format_ok: formatOk },
+    note: `Ingest "${meta.title || fileName}" → ${formatOk ? 'DISCOVERED' : 'NEEDS_REPAIR'}${extra}`,
+  };
+}
+
+// GAP_ANALYSIS: checklist aktif × inventaris dokumen → LLM matching
+// (batch 10 klausul/panggilan §5.1) → agentic_gap_apply (MISSING + auto-task).
+async function handleGapAnalysis(t: Task) {
+  const data = await rpc('agentic_gap_data', {}) as Dict;
+  const checklist = (data?.checklist || []) as Dict[];
+  const documents = (data?.documents || []) as Dict[];
+  if (!checklist.length) {
+    return { result: { matched: 0 }, note: 'Checklist kosong — jalankan seed supabase_agentic_fase12.sql' };
+  }
+
+  const tpl = await getPrompt('GAP_ANALYSIS_MATCH');
+  const docsJson = JSON.stringify(documents.map((d) => ({
+    id: d.id, title: d.title, doc_type: d.doc_type, department: d.department, iso_clause: d.iso_clause })));
+
+  const matches: Dict[] = [];
+  for (let i = 0; i < checklist.length; i += 10) {
+    const batch = checklist.slice(i, i + 10).map((c) => ({
+      checklist_id: c.id, clause_ref: c.clause_ref, requirement: c.requirement,
+      required_doc_type: c.required_doc_type, department: c.department }));
+    const { data: out } = await askLLMJson(t, tpl,
+      { clauses: JSON.stringify(batch), documents: docsJson }, { cacheable: true });
+    if (Array.isArray(out)) matches.push(...(out as Dict[]));
+  }
+
+  const applied = await rpc('agentic_gap_apply', { p: { matches } }) as Dict;
+  return {
+    result: { ...applied, clauses: checklist.length, documents: documents.length },
+    note: `Gap analysis: ${checklist.length} klausul · match ${applied?.matched ?? 0} · missing ${applied?.missing_created ?? 0} · task baru ${applied?.tasks_created ?? 0}`,
+  };
+}
+
+// DOC_REPAIR: dokumen registry → LLM perbaikan format (Firewall Isi vs Format
+// + placeholder policy di template) → markdown DRAFT.
+async function handleDocRepair(t: Task) {
+  const p = t.payload || {};
+  const docId = String(p.document_id || '');
+  if (!docId) throw new Error('payload.document_id wajib untuk DOC_REPAIR');
+  const doc = await rpc('agentic_doc_get', { p_id: docId }) as Dict;
+  if (!doc) throw new Error(`Dokumen ${docId} tidak ditemukan di registry`);
+
+  const em = (doc.extracted_meta || {}) as Dict;
+  const source = String(em.full_text || '');
+  if (!source) throw new Error('Teks sumber dokumen kosong — ulangi ingest dengan ekstraksi teks (docx/txt), atau isi extracted_meta.full_text');
+
+  const tpl = await getPrompt(String(p.prompt_code || 'DOC_REPAIR_SOP'));
+  const r = await askLLM({
+    taskId: t.id, tier: tpl.model_hint === 'light' ? 'light' : 'main',
+    temperature: Number(tpl.temperature ?? 0.4), maxTokens: 8192,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      title: doc.title, doc_type: doc.doc_type, doc_level: doc.doc_level,
+      department: doc.department, iso_clause: doc.iso_clause,
+      mode: p.mode || 'format_fix',
+      rejection_feedback: p.rejection_feedback || '-',
+      gap_notes: doc.gap_notes || '-',
+      source_text: source.slice(0, 100000),
+    }),
+  });
+  const markdown = String(r.text || '').trim();
+  if (markdown.length < 100) throw new Error('Hasil repair terlalu pendek — kemungkinan output LLM tidak valid');
+
+  await rpc('agentic_doc_update', { p_id: docId, p: { status: 'DRAFT', linked_task_id: t.id } });
+  const placeholders = (markdown.match(/\[\[KONFIRMASI:/g) || []).length;
+  return {
+    result: { document_id: docId, markdown, mode: p.mode || 'format_fix',
+      change_note: `Repair (${p.mode || 'format_fix'}) via ${r.provider}/${r.model}`, placeholders },
+    note: `Repair "${doc.title}" · ${markdown.length} char · ${placeholders} placeholder konfirmasi`,
+  };
+}
+
+// DOC_GENERATE: klausul checklist tanpa dokumen → LLM susun draft dokumen baru.
+async function handleDocGenerate(t: Task) {
+  const p = t.payload || {};
+  const clId = String(p.checklist_id || '');
+  if (!clId) throw new Error('payload.checklist_id wajib untuk DOC_GENERATE');
+  const cl = await rpc('agentic_checklist_get', { p_id: clId }) as Dict;
+  if (!cl) throw new Error(`Checklist ${clId} tidak ditemukan`);
+
+  const tpl = await getPrompt('DOC_GENERATE_SOP');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main',
+    temperature: Number(tpl.temperature ?? 0.4), maxTokens: 8192,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      framework: cl.framework, clause_ref: cl.clause_ref, requirement: cl.requirement,
+      doc_type: p.doc_type || cl.required_doc_type || 'SOP',
+      doc_level: p.doc_level || cl.required_doc_level || 2,
+      department: p.department || cl.department || 'MUTU',
+      rejection_feedback: p.rejection_feedback || '-',
+    }),
+  });
+  const markdown = String(r.text || '').trim();
+  if (markdown.length < 100) throw new Error('Hasil generate terlalu pendek — kemungkinan output LLM tidak valid');
+
+  const docId = String(p.document_id || '');
+  if (docId) {
+    await rpc('agentic_doc_update', { p_id: docId, p: { status: 'DRAFT', linked_task_id: t.id,
+      extracted_meta: { full_text: markdown } } });
+  }
+  const placeholders = (markdown.match(/\[\[KONFIRMASI:/g) || []).length;
+  return {
+    result: { document_id: docId || null, checklist_id: clId, markdown,
+      change_note: `Generate klausul ${cl.clause_ref} via ${r.provider}/${r.model}`, placeholders },
+    note: `Generate klausul ${cl.clause_ref} · ${markdown.length} char · ${placeholders} placeholder konfirmasi`,
+  };
+}
+
+// DOC_REVIEW_CYCLE: pemicu manual/cron — dokumen jatuh tempo review → task repair
+async function handleReviewCycle(_t: Task) {
+  const r = await rpc('agentic_review_cycle', {}) as Dict;
+  return { result: r, note: `Review cycle: ${r?.due_for_review ?? 0} dokumen jatuh tempo → task repair` };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
-  // Fase 2: DOC_INGEST, GAP_ANALYSIS, DOC_REPAIR, DOC_GENERATE, DOC_REVIEW_CYCLE
+  // Fase 2 — Document Compliance Agent:
+  DOC_INGEST: handleDocIngest,
+  GAP_ANALYSIS: handleGapAnalysis,
+  DOC_REPAIR: handleDocRepair,
+  DOC_GENERATE: handleDocGenerate,
+  DOC_REVIEW_CYCLE: handleReviewCycle,
   // Fase 3: PLAN_WEEKLY, MAKE_SOSMED, MAKE_ARTIKEL, MAKE_PPTX_DOKTER, MAKE_EVENT_BRIEF
 };
 

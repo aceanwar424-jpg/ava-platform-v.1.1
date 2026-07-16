@@ -46,6 +46,9 @@
     <button class="rail-item" data-cat="wiki" onclick="openFlyout('wiki')" data-tooltip="Wiki OneLab">
       <span class="rail-icon">📖</span>
     </button>
+    <button class="rail-item" data-cat="agentic" onclick="openFlyout('agentic')" data-tooltip="Agentic AI">
+      <span class="rail-icon">✨</span>
+    </button>
     <button class="rail-item" data-cat="konfigurasi" onclick="openFlyout('konfigurasi')" data-tooltip="Konfigurasi">
       <span class="rail-icon">⚙️</span>
     </button>
@@ -220,6 +223,11 @@
 <script src="modules/wiki/sop.js"></script>
 <script src="modules/wiki/fix.js"></script>
 <script src="modules/wiki/studio.js"></script>
+
+<!-- Agentic AI (Fase 1 & 2) -->
+<script src="modules/agentic/index.js"></script>
+<script src="modules/agentic/inbox.js"></script>
+<script src="modules/agentic/docs.js"></script>
 <script src="modules/config_home.js"></script>
 <script src="modules/config_labreport.js"></script>
 <script src="modules/settings.js"></script>
@@ -638,6 +646,15 @@ const FLYOUT_MENUS = {
       {page:'wiki-fix', icon:'🔧', label:'Perbaikan SOP (AI)', action:"navigate('wiki',{tab:'fix'})"},
       {page:'wiki-content', icon:'✍️', label:'Content Studio', action:"navigate('wiki',{tab:'content'})"},
       {page:'wiki-media', icon:'🖼️', label:'Media & Gambar', action:"navigate('wiki',{tab:'media'})"},
+    ]
+  },
+  agentic: {
+    label: 'Agentic AI',
+    items: [
+      {page:'agentic-inbox', icon:'📥', label:'Approval Inbox', action:"navigate('agentic',{tab:'inbox'})"},
+      {page:'agentic-docs', icon:'📄', label:'Dokumen QMS', action:"navigate('agentic',{tab:'docs'})"},
+      {page:'agentic-compliance', icon:'✅', label:'Compliance ISO 15189', action:"navigate('agentic',{tab:'compliance'})"},
+      {page:'agentic-monitor', icon:'📈', label:'Monitor & LLM Usage', action:"navigate('agentic',{tab:'monitor'})"},
     ]
   },
   konfigurasi: {
