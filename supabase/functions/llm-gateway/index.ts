@@ -124,11 +124,184 @@ async function callGemini(key: string, model: string, prompt: string, system: st
 
 const RETRYABLE = new Set([401, 403, 408, 429, 500, 502, 503, 504]);
 
+// ── MODE DIAGNOSTIK ──────────────────────────────────────────────────
+// POST {diag:true} → uji SETIAP provider × key × model dengan prompt mini
+// (timeout 15 dtk), balikan tabel status + verdict. Tidak dicatat ke log.
+async function runDiag() {
+  const nvMain  = Deno.env.get('NVIDIA_MODEL_MAIN')  || 'meta/llama-3.3-70b-instruct';
+  const nvLight = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+  const gmModel = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
+  const DIAG_TIMEOUT = 15_000;
+
+  type Check = { provider: string; key_alias: string; model: string };
+  const checks: Check[] = [];
+  keysOf('NVIDIA_API_KEYS').forEach((_, i) => {
+    checks.push({ provider: 'NVIDIA', key_alias: `NVIDIA#${i + 1}`, model: nvLight });
+    checks.push({ provider: 'NVIDIA', key_alias: `NVIDIA#${i + 1}`, model: nvMain });
+  });
+  keysOf('GEMINI_API_KEYS').forEach((_, i) =>
+    checks.push({ provider: 'GEMINI', key_alias: `GEMINI#${i + 1}`, model: gmModel }));
+  if (!checks.length) {
+    return json({ error: 'Tidak ada API key terpasang (NVIDIA_API_KEYS / GEMINI_API_KEYS kosong).' }, 500);
+  }
+
+  const nvKeys = keysOf('NVIDIA_API_KEYS'), gmKeys = keysOf('GEMINI_API_KEYS');
+  const results = await Promise.all(checks.map(async (c) => {
+    const key = c.provider === 'NVIDIA' ? nvKeys[parseInt(c.key_alias.split('#')[1]) - 1]
+                                        : gmKeys[parseInt(c.key_alias.split('#')[1]) - 1];
+    const t0 = Date.now();
+    try {
+      const res = c.provider === 'NVIDIA'
+        ? await fetch(NVIDIA_URL, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: c.model, messages: [{ role: 'user', content: 'ping' }], max_tokens: 4 }),
+            signal: AbortSignal.timeout(DIAG_TIMEOUT),
+          })
+        : await fetch(`${GEMINI_BASE}/${c.model}:generateContent?key=${key}`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
+              generationConfig: { maxOutputTokens: 4 } }),
+            signal: AbortSignal.timeout(DIAG_TIMEOUT),
+          });
+      const data = await res.json().catch(() => null);
+      const msg = res.ok ? 'OK' : (data?.detail || data?.error?.message || `HTTP ${res.status}`);
+      return { ...c, ok: res.ok, http: res.status, latency_ms: Date.now() - t0, msg: String(msg).slice(0, 220) };
+    } catch (e) {
+      const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+      return { ...c, ok: false, http: 0, latency_ms: Date.now() - t0,
+        msg: timedOut ? `TIMEOUT ${DIAG_TIMEOUT / 1000}s — endpoint/model tidak merespons` :
+          (e instanceof Error ? e.message : 'network error') };
+    }
+  }));
+
+  // Verdict cerdas: kesimpulan yang bisa langsung ditindaklanjuti
+  const verdicts: string[] = [];
+  const nvLightOk = results.some((r) => r.provider === 'NVIDIA' && r.model === nvLight && r.ok);
+  const nvMainOk  = results.some((r) => r.provider === 'NVIDIA' && r.model === nvMain && r.ok);
+  const gmOk      = results.some((r) => r.provider === 'GEMINI' && r.ok);
+  if (nvLightOk && !nvMainOk)
+    verdicts.push(`⚠ Model MAIN NVIDIA (${nvMain}) bermasalah padahal key valid (model light OK) — ganti Secret NVIDIA_MODEL_MAIN ke model yang tersedia di build.nvidia.com.`);
+  if (!nvLightOk && !nvMainOk && nvKeys.length)
+    verdicts.push('❌ Semua percobaan NVIDIA gagal — cek key (nvapi-…), kuota, atau jaringan.');
+  if (!gmOk && gmKeys.length) verdicts.push('❌ Semua percobaan Gemini gagal — cek GEMINI_API_KEYS / kuota.');
+  if (gmOk && !nvMainOk) verdicts.push('ℹ Fallback Gemini sehat — task tetap bisa jalan walau NVIDIA main bermasalah.');
+  if (nvMainOk && gmOk) verdicts.push('✅ Semua jalur sehat.');
+  else if (nvMainOk) verdicts.push('✅ NVIDIA main sehat.');
+
+  return json({ diag: true, checked: results.length, results, verdicts,
+    models: { nvidia_main: nvMain, nvidia_light: nvLight, gemini: gmModel } });
+}
+
+// ── MODE GAMBAR (Fase 5) ─────────────────────────────────────────────
+// POST {mode:'image', prompt, model?, width?, height?}
+// Urutan: NVIDIA FLUX (ai.api.nvidia.com/v1/genai/<model>, respons
+// artifacts[0].base64) per key → endpoint gaya OpenAI images bila 404
+// (model tertentu spt flux.2-klein) → fallback Gemini image.
+// RESPONSE: { images:[dataUri], provider, model, latencyMs }
+function b64Mime(b64: string): string {
+  if (b64.startsWith('iVBORw0KGgo')) return 'image/png';
+  if (b64.startsWith('/9j/')) return 'image/jpeg';
+  if (b64.startsWith('UklGR')) return 'image/webp';
+  return 'image/png';
+}
+async function runImage(body: Record<string, unknown>) {
+  const prompt = String(body.prompt || '').trim().slice(0, 9500);
+  if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
+  const model = String(body.model || Deno.env.get('NVIDIA_IMAGE_MODEL') || 'black-forest-labs/flux.1-schnell');
+  const isSchnell = /schnell/i.test(model);
+  // FLUX hanya menerima kelipatan 64 (768–1344); 896×1152 ≈ rasio IG 4:5
+  const width = Number(body.width) || 896;
+  const height = Number(body.height) || 1152;
+  const taskId = body.taskId || null;
+  const hash = await sha256(`img|${model}|${prompt}|${width}x${height}`);
+  let last = 'Belum ada percobaan';
+
+  // 1) NVIDIA FLUX per key
+  for (const [i, key] of keysOf('NVIDIA_API_KEYS').entries()) {
+    const alias = `NVIDIA#${i + 1}`;
+    const t0 = Date.now();
+    try {
+      let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ prompt, mode: 'base', width, height,
+          seed: Math.floor(Math.random() * 1e9),
+          steps: isSchnell ? 4 : 30, ...(isSchnell ? {} : { cfg_scale: 3.5 }) }),
+        signal: AbortSignal.timeout(90_000),
+      });
+      let data = await res.json().catch(() => null);
+      let b64 = data?.artifacts?.[0]?.base64 || null;
+
+      // beberapa model image NIM memakai endpoint gaya OpenAI
+      if (res.status === 404) {
+        res = await fetch('https://integrate.api.nvidia.com/v1/images/generations', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ model, prompt, n: 1, response_format: 'b64_json', size: `${width}x${height}` }),
+          signal: AbortSignal.timeout(90_000),
+        });
+        data = await res.json().catch(() => null);
+        b64 = data?.data?.[0]?.b64_json || null;
+      }
+
+      const latency = Date.now() - t0;
+      if (res.ok && b64) {
+        await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+          prompt_preview: trunc(prompt), response_preview: `[image ${width}x${height}]`,
+          latency_ms: latency, status: 'OK' });
+        return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
+      }
+      last = `${alias}: ${data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`}`;
+      await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+        prompt_preview: trunc(prompt), response_preview: trunc(String(last)), latency_ms: latency, status: 'ERROR' });
+      if (!RETRYABLE.has(res.status) && res.status !== 404) break; // 400/422 = prompt/parameter salah
+    } catch (e) {
+      const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+      last = `${alias}: ${timedOut ? 'timeout 90s' : (e instanceof Error ? e.message : 'network error')}`;
+    }
+  }
+
+  // 2) Fallback Gemini image
+  const gmImgModel = String(Deno.env.get('GEMINI_IMAGE_MODEL') || 'gemini-2.5-flash-image');
+  for (const [i, key] of keysOf('GEMINI_API_KEYS').entries()) {
+    const alias = `GEMINI#${i + 1}`;
+    const t0 = Date.now();
+    try {
+      const res = await fetch(`${GEMINI_BASE}/${gmImgModel}:generateContent?key=${key}`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
+        signal: AbortSignal.timeout(90_000),
+      });
+      const data = await res.json().catch(() => null);
+      const latency = Date.now() - t0;
+      const parts = data?.candidates?.[0]?.content?.parts || [];
+      const inline = parts.map((p: Record<string, Record<string, string>>) => p.inlineData || p.inline_data).find(Boolean);
+      if (res.ok && inline?.data) {
+        await logReq({ task_id: taskId, provider: 'GEMINI', model: gmImgModel, key_alias: alias, prompt_hash: hash,
+          prompt_preview: trunc(prompt), response_preview: '[image]', latency_ms: latency, status: 'FALLBACK' });
+        return json({ images: [`data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`],
+          provider: 'GEMINI', model: gmImgModel, latencyMs: latency });
+      }
+      last = `${alias}: ${data?.error?.message || `HTTP ${res.status} (tanpa gambar)`}`;
+      await logReq({ task_id: taskId, provider: 'GEMINI', model: gmImgModel, key_alias: alias, prompt_hash: hash,
+        prompt_preview: trunc(prompt), response_preview: trunc(String(last)), latency_ms: latency, status: 'ERROR' });
+    } catch (e) {
+      last = `${alias}: ${e instanceof Error ? e.message : 'network error'}`;
+    }
+  }
+
+  return json({ error: `Semua provider gambar gagal. Terakhir → ${last}` }, 503);
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'Gunakan POST' }, 405);
 
   const body = await req.json().catch(() => ({}));
+  if (body.diag === true) return await runDiag();
+  if (body.mode === 'image') return await runImage(body);
+
   const prompt: string = String(body.prompt || '').trim();
   if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
 
@@ -158,8 +331,16 @@ Deno.serve(async (req) => {
   // ── Susun daftar percobaan: NVIDIA dulu, lalu Gemini (§3.1) ───────
   type Attempt = { provider: 'NVIDIA' | 'GEMINI'; key: string; alias: string; model: string };
   const plan: Attempt[] = [];
-  if (want === 'AUTO' || want === 'NVIDIA')
+  if (want === 'AUTO' || want === 'NVIDIA') {
     keysOf('NVIDIA_API_KEYS').forEach((k, i) => plan.push({ provider: 'NVIDIA', key: k, alias: `NVIDIA#${i + 1}`, model: nvModel }));
+    // Jaring pengaman: bila model MAIN mati/hang, coba model LIGHT dulu
+    // di key pertama sebelum lompat ke Gemini (§3.1 diperluas)
+    const nvLight = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+    const k0 = keysOf('NVIDIA_API_KEYS')[0];
+    if (k0 && tier === 'main' && nvLight !== nvModel && !body.model) {
+      plan.push({ provider: 'NVIDIA', key: k0, alias: 'NVIDIA#1-light', model: nvLight });
+    }
+  }
   if (want === 'AUTO' || want === 'GEMINI')
     keysOf('GEMINI_API_KEYS').forEach((k, i) => plan.push({ provider: 'GEMINI', key: k, alias: `GEMINI#${i + 1}`, model: gmModel }));
 

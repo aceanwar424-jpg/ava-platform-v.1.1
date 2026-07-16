@@ -329,14 +329,17 @@ async function handleReviewCycle(_t: Task) {
 
 // ═══ FASE 3 — CONTENT & BRANDING AGENT (§5.2) ════════════════════════
 
-// Gambar flyer via Edge Function gemini-proxy (reuse Wiki OneLab) → Storage.
+// Gambar flyer via llm-gateway mode 'image' (§1.4 satu pintu):
+// NVIDIA FLUX primary → Gemini fallback. Model diatur secret
+// NVIDIA_IMAGE_MODEL (default black-forest-labs/flux.1-schnell).
 // Non-fatal: gagal gambar tidak menggagalkan task (copy tetap DRAFT).
 async function makeImage(t: Task, prompt: string): Promise<string | null> {
   try {
-    const res = await fetch(`${SB_URL}/functions/v1/gemini-proxy`, {
+    const res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'image', prompt }),
+      body: JSON.stringify({ mode: 'image', prompt, taskId: t.id }),
+      signal: AbortSignal.timeout(130_000),
     });
     const d = await res.json().catch(() => ({}));
     if (!res.ok || !Array.isArray(d.images) || !d.images[0]) return null;

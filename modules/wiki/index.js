@@ -32,7 +32,20 @@ async function wikiAI(payload){
   return data;
 }
 async function wikiAskText(prompt, opts){ const d = await wikiAI(Object.assign({mode:'text', prompt}, opts||{})); return d.text||''; }
-async function wikiGenImage(prompt, opts){ const d = await wikiAI(Object.assign({mode:'image', prompt}, opts||{})); return d.images||[]; }
+// Gambar: utamakan llm-gateway (NVIDIA FLUX → Gemini); fallback gemini-proxy lama
+async function wikiGenImage(prompt, opts){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify(Object.assign({mode:'image', prompt}, opts||{})),
+    });
+    const d = await res.json().catch(()=>({}));
+    if(res.ok && Array.isArray(d.images) && d.images.length) return d.images;
+  }catch(e){ /* lanjut ke gemini-proxy */ }
+  const d = await wikiAI(Object.assign({mode:'image', prompt}, opts||{}));
+  return d.images||[];
+}
 
 // ── Storage helper ───────────────────────────────────────────────
 function wikiToken(){ try{ return (typeof getStoredToken==='function' && getStoredToken()) || SUPABASE_KEY; }catch(e){ return SUPABASE_KEY; } }
@@ -116,10 +129,72 @@ function switchWikiTab(t){
 
 function renderWikiTab(){
   const el=document.getElementById('wiki-body'); if(!el) return;
-  if(_wikiTab==='docs')         renderWikiDocsTab(el);
-  else if(_wikiTab==='fix')     renderWikiFixTab(el);
-  else if(_wikiTab==='content') renderWikiContentTab(el);
+  if(_wikiTab==='docs'){        renderWikiDocsTab(el); wikiPrependOfficialDocs(el); }
+  else if(_wikiTab==='fix'){    wikiTabWithBanner(el, 'fix',    renderWikiFixTab); }
+  else if(_wikiTab==='content'){wikiTabWithBanner(el, 'content',renderWikiContentTab); }
   else if(_wikiTab==='media')   renderWikiMediaTab(el);
+}
+
+// ── Penataan: Wiki = perpustakaan manual · produksi AI pindah ke Agentic ──
+// Tab AI lama tetap bisa dipakai (di bawah banner), tapi jalur utama kini
+// modul Agentic (ada approval + audit trail + nomor dokumen resmi).
+function wikiTabWithBanner(el, kind, legacyRenderer){
+  const isFix = kind==='fix';
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg,#0A2342,#13856B);border-radius:10px;padding:14px 16px;margin-bottom:12px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-weight:800;font-size:13.5px">✨ ${isFix?'Perbaikan SOP':'Produksi konten'} kini ditangani Agentic AI</div>
+        <div style="font-size:11.5px;opacity:.85;margin-top:3px">
+          ${isFix
+            ? 'Document Compliance Agent: perbaikan + generate dokumen ISO 15189, lewat approval, dapat nomor resmi & riwayat revisi.'
+            : 'Content & Branding Agent: kalender konten + planner mingguan + copy & gambar, semua lewat Approval Inbox.'}</div>
+      </div>
+      <button class="btn btn-sm" style="background:#fff;color:#0A2342;font-weight:800;border:none"
+        onclick="navigate('agentic',{tab:'${isFix?'docs':'studio'}'})">Buka Agentic AI →</button>
+    </div>
+    <details style="margin-bottom:10px">
+      <summary style="cursor:pointer;font-size:12px;color:var(--gray)">Pakai mode lama (tanpa approval) — klik untuk membuka</summary>
+      <div id="wiki-legacy-${kind}" style="margin-top:10px"></div>
+    </details>`;
+  const legacy = el.querySelector(`#wiki-legacy-${kind}`);
+  const det = el.querySelector('details');
+  let rendered = false;
+  det.addEventListener('toggle', ()=>{ if(det.open && !rendered){ rendered = true; legacyRenderer(legacy); } });
+}
+
+// Seksi "Dokumen Resmi" — hasil publish Agentic (registry) tampil di perpustakaan
+async function wikiPrependOfficialDocs(el){
+  let rows = [];
+  try{ rows = await sbGet('agentic_registry_v',
+    'status=eq.PUBLISHED&select=id,doc_number,title,doc_type,department,current_revision,effective_date,next_review_date,extracted_meta&order=doc_number.asc&limit=200') || []; }
+  catch(e){ return; }
+  if(!rows.length) return;
+  const box = document.createElement('div');
+  box.innerHTML = `
+    <div class="wiki-card" style="margin-bottom:12px;border-left:4px solid #22C55E">
+      <div class="wiki-sec" style="margin-bottom:8px">📌 Dokumen Resmi — diterbitkan via Agentic AI (${rows.length})</div>
+      <div style="overflow-x:auto"><table class="pro-grid" style="width:100%;font-size:11.5px">
+        <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Jenis</th><th>Dept</th><th>Rev</th><th>Berlaku</th><th>Review</th><th></th></tr></thead>
+        <tbody>${rows.map(d=>`<tr>
+          <td style="font-family:monospace;white-space:nowrap">${d.doc_number||'—'}</td>
+          <td style="font-weight:700;color:var(--navy)">${(d.title||'').replace(/</g,'&lt;')}</td>
+          <td>${d.doc_type||''}</td><td>${d.department||''}</td>
+          <td>v${d.current_revision||1}</td>
+          <td style="white-space:nowrap">${d.effective_date||'—'}</td>
+          <td style="white-space:nowrap">${d.next_review_date||'—'}</td>
+          <td>${(d.extracted_meta&&d.extracted_meta.full_text)?
+            `<button class="act-btn" title="Unduh .docx" onclick="wikiDlOfficial('${d.id}')">${svgIcon('download',14)}</button>`:''}</td>
+        </tr>`).join('')}</tbody></table></div>
+    </div>`;
+  el.prepend(box);
+  window._wikiOfficialDocs = rows;
+}
+function wikiDlOfficial(id){
+  const d = (window._wikiOfficialDocs||[]).find(x=>x.id===id);
+  if(!d || !(d.extracted_meta&&d.extracted_meta.full_text)){ toast('Konten tidak tersedia','warn'); return; }
+  if(typeof agDownloadDocx==='function')
+    agDownloadDocx(d.extracted_meta.full_text, `${d.doc_number||d.title}`, `${d.doc_number?d.doc_number+' — ':''}${d.title}`);
+  else wikiDownload(d.extracted_meta.full_text, `${d.doc_number||d.title}.md`);
 }
 
 function renderWikiKPI(){

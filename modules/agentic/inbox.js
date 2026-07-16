@@ -88,7 +88,20 @@ async function agRenderTaskDetail(id){
     actions += `<button class="ag-btn mut" onclick="agInvokeWorkerBtn()">${svgIcon('refresh',13)} Jalankan Worker</button>
       <button class="ag-btn err" onclick="agActCancel('${t.id}')">✕ Batalkan</button>`;
   }
-  if(md) actions += `<button class="ag-btn mut" onclick="agDownloadMd('${t.id}')">${svgIcon('download',13)} Unduh .md</button>`;
+  if(md) actions += `<button class="ag-btn mut" onclick="agDownloadMd('${t.id}')">${svgIcon('download',13)} .md</button>
+    <button class="ag-btn mut" onclick="agDownloadDocxFromTask('${t.id}')">${svgIcon('download',13)} .docx</button>`;
+
+  // Deteksi task macet: PROCESSING terlalu lama = worker mati sebelum menutup task
+  let stuckWarn = '';
+  if(t.status==='PROCESSING'){
+    const mins = Math.floor((Date.now() - new Date(t.updated_at).getTime())/60000);
+    stuckWarn = mins >= 3
+      ? `<div style="margin-top:10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C">
+          <strong>⚠ Diproses sudah ${mins} menit — kemungkinan macet.</strong><br>
+          Buka tab <strong>Monitor</strong> → <strong>Tes Koneksi AI</strong> untuk cek provider LLM,
+          lalu <strong>Bebaskan Task Macet</strong> untuk antri ulang otomatis.</div>`
+      : `<div style="margin-top:10px;font-size:12px;color:#0EA5E9">⏳ Sedang diproses worker (${mins} menit)… panggilan LLM model besar bisa 1–2 menit.</div>`;
+  }
 
   box.innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap">
@@ -102,6 +115,7 @@ async function agRenderTaskDetail(id){
       ${agChip(t.status)}
     </div>
 
+    ${stuckWarn}
     ${t.error_message ? `<div style="margin-top:10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
     ${t.payload && t.payload.rejection_feedback ? `<div style="margin-top:10px;background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 12px;font-size:12px;color:#9A3412"><strong>Feedback penolakan terakhir:</strong> ${agEsc(t.payload.rejection_feedback)}</div>` : ''}
     ${placeholders ? `<div style="margin-top:10px;background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;font-size:12px;color:#92400E"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
@@ -110,6 +124,19 @@ async function agRenderTaskDetail(id){
         : (t.result ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Hasil</div><pre class="ag-md" style="white-space:pre-wrap">${agEsc(JSON.stringify(t.result,null,2)).slice(0,4000)}</pre></div>` : '')}
 
     <div class="ag-actions">${actions}</div>
+
+    ${t.status==='APPROVED' ? `<div style="margin-top:10px;background:#ECFDF5;border:1px solid #86EFAC;border-radius:8px;padding:9px 12px;font-size:12px;color:#065F46">
+        <strong>Langkah terakhir:</strong> klik <strong>Publish</strong> di atas.
+        ${t.agent==='DOCUMENT' ? 'Dokumen akan dapat nomor resmi & tampil di <strong>Dokumen QMS</strong> + <strong>Wiki → Dokumen Resmi</strong>.'
+          : 'Aset (caption + gambar) akan siap diunduh di <strong>Content Studio → Aset Konten</strong> dan slot kalender jadi READY.'}</div>` : ''}
+    ${t.status==='PUBLISHED' ? `<div style="margin-top:10px;background:#EFF6FF;border:1px solid #93C5FD;border-radius:8px;padding:9px 12px;font-size:12px;color:#1E40AF">
+        <strong>📍 Konten ini sudah terbit. Hasilnya ada di:</strong><br>
+        ${t.agent==='DOCUMENT'
+          ? `• Tab <a href="javascript:switchAgenticTab('docs')" style="font-weight:700">Dokumen QMS</a> (registry + nomor resmi & jadwal review)<br>
+             • Menu <a href="javascript:navigate('wiki',{tab:'docs'})" style="font-weight:700">Wiki OneLab → Dokumen Resmi</a> (bisa unduh .docx)`
+          : `• Tab <a href="javascript:switchAgenticTab('studio')" style="font-weight:700">Content Studio → Aset Konten</a> (salin caption / lihat gambar / unduh)<br>
+             • Slot kalendernya berstatus <strong>READY</strong> — siap diposting manual ke ${agEsc((t.payload&&t.payload.channel)||'channel')}`}
+        <br>• Tombol <strong>.md</strong> / <strong>.docx</strong> di atas untuk arsip file</div>` : ''}
 
     <div style="margin-top:14px">
       <div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Audit Trail</div>
@@ -153,7 +180,7 @@ async function agActPublish(id){
   if(!confirm(`Publish "${t?t.title:''}"?\nDokumen akan mendapat nomor resmi & masuk registry.`)) return;
   try{
     const r = await agRpc('agentic_publish', { p_task_id:id });
-    toast(`🚀 Published${r&&r.doc_number?` · No. ${r.doc_number}`:''}`,'ok');
+    toast(`🚀 Published${r&&r.doc_number?` · No. ${r.doc_number} → lihat Dokumen QMS / Wiki`:' → aset di Content Studio'}`,'ok');
     await agReload();
   }catch(e){ toast(e.message,'err'); }
 }
@@ -179,7 +206,30 @@ async function renderAgMonitorTab(el){
   const err7 = llm7.reduce((a,r)=>a+(r.errors||0),0);
   const failed = (m7&&m7.failed_open)||[];
 
+  // task PROCESSING dgn durasi (deteksi macet)
+  const processing = agTasks.filter(t=>t.status==='PROCESSING')
+    .map(t=>({...t, mins: Math.floor((Date.now()-new Date(t.updated_at).getTime())/60000)}));
+  const stuckN = processing.filter(p=>p.mins>=3).length;
+
   el.innerHTML = `
+    <div class="ag-detail" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:12px;font-weight:800;color:#0A2342">🩺 Kesehatan Sistem AI</div>
+          <div style="font-size:11px;color:var(--gray)">Tes semua provider × key × model (±15 detik) dan bebaskan task yang macet</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ag-btn pub" id="ag-diag-btn" onclick="agRunDiag()">${svgIcon('sparkle',13)} Tes Koneksi AI</button>
+          <button class="ag-btn ${stuckN?'warn':'mut'}" onclick="agReapStuck()">${svgIcon('refresh',13)} Bebaskan Task Macet${stuckN?` (${stuckN})`:''}</button>
+        </div>
+      </div>
+      ${processing.length?`<div style="margin-top:10px">
+        ${processing.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+          <span>⏳ ${agEsc(p.title)} <span style="color:var(--gray)">(${agEsc(p.task_type)})</span></span>
+          <strong style="color:${p.mins>=3?'#EF4444':'#0EA5E9'}">${p.mins} menit${p.mins>=3?' — macet?':''}</strong>
+        </div>`).join('')}</div>`:''}
+      <div id="ag-diag-out" style="margin-top:10px"></div>
+    </div>
     ${m7?`<div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px">
       ${[[llm7.reduce((a,r)=>a+(r.n||0),0),'Panggilan LLM (7 hari)','#0EA5E9'],
          [tokIn.toLocaleString('id-ID'),'Token Masuk (7 hari)','#0A2342'],
@@ -225,4 +275,52 @@ async function renderAgMonitorTab(el){
         </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray)">Belum ada log</td></tr>'}</tbody>
       </table></div>
     </div>`;
+}
+
+// ── DIAGNOSTIK AI (Fase 5): tes provider×key×model via llm-gateway ──
+async function agRunDiag(){
+  const btn = document.getElementById('ag-diag-btn');
+  const out = document.getElementById('ag-diag-out');
+  if(btn){ btn.disabled = true; btn.textContent = 'Menguji semua jalur…'; }
+  if(out) out.innerHTML = '<div class="loading-row"><div class="spinner"></div></div>';
+  try{
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({ diag:true }),
+    });
+    const d = await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(d.error || `llm-gateway HTTP ${res.status} — pastikan llm-gateway versi terbaru sudah di-deploy`);
+    if(!d.diag) throw new Error('Gateway versi lama (belum ada mode diag) — re-deploy supabase/functions/llm-gateway/index.ts');
+
+    if(out) out.innerHTML = `
+      ${(d.verdicts||[]).map(v=>`<div style="font-size:12.5px;font-weight:700;padding:7px 10px;border-radius:8px;margin-bottom:6px;
+        background:${v.startsWith('✅')?'#F0FDF4':v.startsWith('❌')?'#FEF2F2':v.startsWith('⚠')?'#FEF3C7':'#EFF6FF'};
+        border:1px solid ${v.startsWith('✅')?'#86EFAC':v.startsWith('❌')?'#FCA5A5':v.startsWith('⚠')?'#F59E0B':'#93C5FD'}">${agEsc(v)}</div>`).join('')}
+      <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Provider</th><th>Key</th><th>Model</th><th>Status</th><th>Latensi</th><th>Keterangan</th></tr></thead>
+        <tbody>${(d.results||[]).map(r=>`<tr>
+          <td>${agEsc(r.provider)}</td><td>${agEsc(r.key_alias)}</td><td>${agEsc(r.model)}</td>
+          <td style="font-weight:800;color:${r.ok?'#22C55E':'#EF4444'}">${r.ok?'✅ OK':'❌ GAGAL'}</td>
+          <td>${r.latency_ms!=null?r.latency_ms+'ms':'—'}</td>
+          <td style="max-width:340px">${agEsc(r.msg||'')}</td>
+        </tr>`).join('')}</tbody></table></div>`;
+  }catch(e){
+    if(out) out.innerHTML = `<div style="font-size:12px;color:#B91C1C;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px">${agEsc(e.message)}</div>`;
+  }
+  if(btn){ btn.disabled = false; btn.innerHTML = `${svgIcon('sparkle',13)} Tes Koneksi AI`; }
+}
+
+// Bebaskan task PROCESSING yang macet ≥3 menit → antri ulang / FAILED
+async function agReapStuck(){
+  try{
+    const r = await agRpc('agentic_reap', { p_minutes: 3 });
+    const n = (r && r.reaped) || 0;
+    toast(n ? `♻ ${n} task macet dibebaskan (antri ulang / FAILED sesuai budget)` :
+      'Tidak ada task macet ≥3 menit', n?'ok':'info');
+    await agReload();
+  }catch(e){
+    toast(e.message.includes('agentic_reap') ?
+      'Jalankan supabase_agentic_fase5.sql dulu (fungsi agentic_reap belum ada)' : e.message, 'err');
+  }
 }

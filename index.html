@@ -229,6 +229,7 @@
 <script src="modules/agentic/inbox.js"></script>
 <script src="modules/agentic/docs.js"></script>
 <script src="modules/agentic/studio.js"></script>
+<script src="modules/agentic/render.js"></script>
 <script src="modules/config_home.js"></script>
 <script src="modules/config_labreport.js"></script>
 <script src="modules/settings.js"></script>
@@ -644,9 +645,9 @@ const FLYOUT_MENUS = {
     label: 'Wiki OneLab',
     items: [
       {page:'wiki-docs', icon:'📚', label:'Dokumen & SOP', action:"navigate('wiki',{tab:'docs'})"},
-      {page:'wiki-fix', icon:'🔧', label:'Perbaikan SOP (AI)', action:"navigate('wiki',{tab:'fix'})"},
-      {page:'wiki-content', icon:'✍️', label:'Content Studio', action:"navigate('wiki',{tab:'content'})"},
       {page:'wiki-media', icon:'🖼️', label:'Media & Gambar', action:"navigate('wiki',{tab:'media'})"},
+      {page:'agentic-docs', icon:'🔧', label:'Perbaikan SOP → Agentic', action:"navigate('agentic',{tab:'docs'})"},
+      {page:'agentic-studio', icon:'✍️', label:'Content Studio → Agentic', action:"navigate('agentic',{tab:'studio'})"},
     ]
   },
   agentic: {
