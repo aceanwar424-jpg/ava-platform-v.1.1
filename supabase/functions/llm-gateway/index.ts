@@ -61,6 +61,12 @@ function keysOf(env: string): string[] {
   return (Deno.env.get(env) || '').split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
     .filter((v, i, a) => a.indexOf(v) === i);
 }
+// Gemini: terima GEMINI_API_KEYS (jamak) ATAU GEMINI_API_KEY (tunggal, sudah
+// dipakai gemini-proxy Wiki) — supaya fallback jalan tanpa setting ganda.
+function geminiKeys(): string[] {
+  const k = keysOf('GEMINI_API_KEYS');
+  return k.length ? k : keysOf('GEMINI_API_KEY');
+}
 async function sha256(s: string) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
@@ -139,13 +145,13 @@ async function runDiag() {
     checks.push({ provider: 'NVIDIA', key_alias: `NVIDIA#${i + 1}`, model: nvLight });
     checks.push({ provider: 'NVIDIA', key_alias: `NVIDIA#${i + 1}`, model: nvMain });
   });
-  keysOf('GEMINI_API_KEYS').forEach((_, i) =>
+  geminiKeys().forEach((_, i) =>
     checks.push({ provider: 'GEMINI', key_alias: `GEMINI#${i + 1}`, model: gmModel }));
   if (!checks.length) {
     return json({ error: 'Tidak ada API key terpasang (NVIDIA_API_KEYS / GEMINI_API_KEYS kosong).' }, 500);
   }
 
-  const nvKeys = keysOf('NVIDIA_API_KEYS'), gmKeys = keysOf('GEMINI_API_KEYS');
+  const nvKeys = keysOf('NVIDIA_API_KEYS'), gmKeys = geminiKeys();
   const results = await Promise.all(checks.map(async (c) => {
     const key = c.provider === 'NVIDIA' ? nvKeys[parseInt(c.key_alias.split('#')[1]) - 1]
                                         : gmKeys[parseInt(c.key_alias.split('#')[1]) - 1];
@@ -228,9 +234,28 @@ async function runImage(body: Record<string, unknown>) {
         body: JSON.stringify({ prompt, mode: 'base', width, height,
           seed: Math.floor(Math.random() * 1e9),
           steps: isSchnell ? 4 : 30, ...(isSchnell ? {} : { cfg_scale: 3.5 }) }),
-        signal: AbortSignal.timeout(90_000),
+        signal: AbortSignal.timeout(60_000),
       });
       let data = await res.json().catch(() => null);
+
+      // Pola antrian NVCF: server balas 202 + header NVCF-REQID → poll status
+      // sampai selesai (maks ~100 dtk) alih-alih menunggu buta.
+      if (res.status === 202) {
+        const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
+        const pollDeadline = Date.now() + 100_000;
+        while (reqId && Date.now() < pollDeadline) {
+          await sleep(3_000);
+          res = await fetch(`https://ai.api.nvidia.com/v1/status/${reqId}`, {
+            headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+            signal: AbortSignal.timeout(20_000),
+          });
+          if (res.status === 202) continue;
+          data = await res.json().catch(() => null);
+          break;
+        }
+        if (res.status === 202) { last = `${alias}: antrian NVCF belum selesai >100s`; continue; }
+      }
+
       let b64 = data?.artifacts?.[0]?.base64 || null;
 
       // beberapa model image NIM memakai endpoint gaya OpenAI
@@ -258,13 +283,13 @@ async function runImage(body: Record<string, unknown>) {
       if (!RETRYABLE.has(res.status) && res.status !== 404) break; // 400/422 = prompt/parameter salah
     } catch (e) {
       const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
-      last = `${alias}: ${timedOut ? 'timeout 90s' : (e instanceof Error ? e.message : 'network error')}`;
+      last = `${alias}: ${timedOut ? 'timeout 60s (endpoint tidak merespons)' : (e instanceof Error ? e.message : 'network error')}`;
     }
   }
 
   // 2) Fallback Gemini image
   const gmImgModel = String(Deno.env.get('GEMINI_IMAGE_MODEL') || 'gemini-2.5-flash-image');
-  for (const [i, key] of keysOf('GEMINI_API_KEYS').entries()) {
+  for (const [i, key] of geminiKeys().entries()) {
     const alias = `GEMINI#${i + 1}`;
     const t0 = Date.now();
     try {
@@ -342,7 +367,7 @@ Deno.serve(async (req) => {
     }
   }
   if (want === 'AUTO' || want === 'GEMINI')
-    keysOf('GEMINI_API_KEYS').forEach((k, i) => plan.push({ provider: 'GEMINI', key: k, alias: `GEMINI#${i + 1}`, model: gmModel }));
+    geminiKeys().forEach((k, i) => plan.push({ provider: 'GEMINI', key: k, alias: `GEMINI#${i + 1}`, model: gmModel }));
 
   if (!plan.length) return json({ error: 'Tidak ada API key. Set NVIDIA_API_KEYS dan/atau GEMINI_API_KEYS di Edge Function Secrets.' }, 500);
   // NVIDIA (text-only) tidak bisa memproses lampiran → paksa Gemini bila ada files
