@@ -65,7 +65,7 @@ Tambahkan satu per satu (**Name** → **Value**):
 | `GEMINI_MODEL` | `gemini-2.5-flash` | opsional |
 | `LLM_RATE_LIMIT_PER_KEY_PER_MIN` | `30` | opsional |
 | `WORKER_CONCURRENCY` | `2` | opsional |
-| `AGENTIC_PAUSED` | `true` | opsional — kill switch darurat |
+| `AGENTIC_PAUSED` | ⚠️ **JANGAN diisi saat setup!** | Hanya dibuat (value `true`) saat DARURAT untuk mematikan semua agent. Kalau ada, worker menolak jalan (`"paused": true`). |
 
 **Banyak key → pisahkan dengan koma**, tanpa spasi wajib. Rotasi & failover otomatis.
 
@@ -175,7 +175,8 @@ Harus gagal: `Transisi tidak sah: DRAFT → PUBLISHED` ✅
 | `status: FAILED`, note `Tidak ada API key` | Secrets belum diisi / salah nama. Cek `NVIDIA_API_KEYS` (Langkah 2). |
 | note `Semua key & provider gagal` | Key salah/kuota habis. Cek log: `select * from agentic.llm_requests order by created_at desc limit 10;` |
 | `llm-gateway HTTP 404` | Fungsi `llm-gateway` belum di-deploy atau namanya typo. |
-| Worker diam saja | Cek secret `AGENTIC_PAUSED` — kalau `true`, hapus/ubah ke `false`. |
+| Respons `{"paused": true, "processed": 0}` | Kill switch aktif. Hapus secret `AGENTIC_PAUSED` di Settings → Edge Functions → Secrets, lalu Invoke ulang. |
+| PowerShell `401 Unauthorized` | Anon key terpotong saat paste. Pakai saja panel **Test** di dashboard (Edge Functions → agentic-worker → Test). |
 
 ---
 
