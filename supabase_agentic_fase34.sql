@@ -264,15 +264,19 @@ CREATE OR REPLACE FUNCTION public.agentic_monitor_7d()
 RETURNS JSONB
 LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
   SELECT jsonb_build_object(
-    'llm_7d', COALESCE((SELECT jsonb_agg(r ORDER BY r->>'day') FROM (
-        SELECT jsonb_build_object('day', date_trunc('day', created_at)::date,
-          'provider', provider, 'n', count(*),
-          'tokens_in', COALESCE(sum(input_tokens),0), 'tokens_out', COALESCE(sum(output_tokens),0),
-          'errors', count(*) FILTER (WHERE status='ERROR')) AS r
+    'llm_7d', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+          'day', s.day, 'provider', s.provider, 'n', s.n,
+          'tokens_in', s.tokens_in, 'tokens_out', s.tokens_out, 'errors', s.errors)
+        ORDER BY s.day) FROM (
+        SELECT date_trunc('day', created_at)::date AS day, provider,
+               count(*) AS n,
+               COALESCE(sum(input_tokens),0)  AS tokens_in,
+               COALESCE(sum(output_tokens),0) AS tokens_out,
+               count(*) FILTER (WHERE status='ERROR') AS errors
         FROM agentic.llm_requests WHERE created_at > now() - INTERVAL '7 days'
-        GROUP BY 1, provider) s), '[]'::jsonb),
-    'tasks_7d', COALESCE((SELECT jsonb_agg(r) FROM (
-        SELECT jsonb_build_object('status', status, 'n', count(*)) AS r
+        GROUP BY 1, 2) s), '[]'::jsonb),
+    'tasks_7d', COALESCE((SELECT jsonb_agg(jsonb_build_object('status', s.status, 'n', s.n)) FROM (
+        SELECT status, count(*) AS n
         FROM agentic.tasks WHERE updated_at > now() - INTERVAL '7 days'
         GROUP BY status) s), '[]'::jsonb),
     'failed_open', COALESCE((SELECT jsonb_agg(jsonb_build_object(
