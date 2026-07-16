@@ -112,21 +112,28 @@ select public.agentic_create_task(
 ```
 Hasil: JSON task dengan `"status": "QUEUED"`.
 
-### 2) Jalankan worker
-**Edge Functions** → klik **`agentic-worker`** → tab **Invoke** (atau "Test") →
-body `{}` → **Send**.
+### 2) Jalankan worker — BUKAN di SQL Editor!
+Worker adalah Edge Function; menjalankannya lewat salah satu cara ini:
 
-Respons yang diharapkan:
-```json
-{
-  "worker": "edge-a1b2c3d4",
-  "processed": 1,
-  "results": [
-    { "taskId": "…", "status": "DRAFT",
-      "note": "LLM NVIDIA/meta/llama-3.1-8b-instruct · 812ms" }
-  ]
-}
+**Cara A — PowerShell (paling pasti):**
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri "https://<PROJECT-REF>.supabase.co/functions/v1/agentic-worker" `
+  -Headers @{ Authorization = "Bearer <ANON_KEY dari js/core/api.js>"; "Content-Type" = "application/json" } `
+  -Body '{}' | ConvertTo-Json -Depth 5
 ```
+
+**Cara B — Dashboard:** **Edge Functions** → klik **`agentic-worker`** →
+tombol/tab **Test** (panel *Invoke function*) → Method POST, Body `{}` → **Send**.
+
+⚠️ **JANGAN paste blok di bawah ini ke SQL Editor** — ini **contoh respons**
+yang akan Anda terima, bukan perintah:
+```json
+{ "worker": "edge-a1b2c3d4", "processed": 1,
+  "results": [ { "taskId": "…", "status": "DRAFT",
+    "note": "LLM NVIDIA/meta/llama-3.1-8b-instruct · 812ms" } ] }
+```
+Jika hasilnya **HTTP 404** → fungsi belum di-deploy (ulangi Langkah 3 setup).
 
 ### 3) Verifikasi — SQL Editor
 ```sql
