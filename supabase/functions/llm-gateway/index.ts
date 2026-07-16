@@ -242,11 +242,15 @@ async function runImage(body: Record<string, unknown>) {
   for (const model of models) {
     const isFlux = /flux/i.test(model);
     const isSchnell = /schnell|klein/i.test(model); // distilled → langkah sedikit
-    // FLUX endpoint /genai menerima parameter penuh; model lain (qwen dsb)
-    // dikirim minimal agar tidak ditolak validator (422)
-    const genaiBody = isFlux
-      ? { prompt, mode: 'base', width, height, seed: Math.floor(Math.random() * 1e9),
-          steps: isSchnell ? 4 : 30, ...(isSchnell ? {} : { cfg_scale: 3.5 }) }
+    // Batasan per model (dok resmi): flux.1-schnell HANYA 1024×1024, steps 1-4,
+    // TANPA cfg_scale. flux.1-dev: 768–1344 kelipatan 64. Lainnya: body minimal.
+    const dim64 = (v: number) => Math.min(1344, Math.max(768, Math.round(v / 64) * 64));
+    const genaiBody = isSchnell
+      ? { prompt, mode: 'base', width: 1024, height: 1024, steps: 4,
+          seed: Math.floor(Math.random() * 1e9) }
+      : isFlux
+      ? { prompt, mode: 'base', width: dim64(width), height: dim64(height),
+          seed: Math.floor(Math.random() * 1e9), steps: 30, cfg_scale: 3.5 }
       : { prompt, seed: Math.floor(Math.random() * 1e9) };
 
     for (const [i, key] of nvKeys.entries()) {
@@ -261,14 +265,15 @@ async function runImage(body: Record<string, unknown>) {
         });
         let data = await res.json().catch(() => null);
 
-        // Pola antrian NVCF: server balas 202 + header NVCF-REQID → poll status
-        // sampai selesai (maks ~100 dtk) alih-alih menunggu buta.
+        // Pola antrian NVCF: server balas 202 + header NVCF-REQID → poll
+        // https://api.nvcf.nvidia.com/v2/nvcf/pexec/status/<id> (URL resmi
+        // sample NVIDIA) sampai selesai (maks ~100 dtk).
         if (res.status === 202) {
           const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
           const pollDeadline = Date.now() + 100_000;
           while (reqId && Date.now() < pollDeadline) {
             await sleep(3_000);
-            res = await fetch(`https://ai.api.nvidia.com/v1/status/${reqId}`, {
+            res = await fetch(`https://api.nvcf.nvidia.com/v2/nvcf/pexec/status/${reqId}`, {
               headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
               signal: AbortSignal.timeout(20_000),
             });
@@ -276,7 +281,12 @@ async function runImage(body: Record<string, unknown>) {
             data = await res.json().catch(() => null);
             break;
           }
-          if (res.status === 202) { last = `${alias}/${model}: antrian NVCF belum selesai >100s`; continue; }
+          if (res.status === 202) {
+            last = `${alias}/${model}: antrian NVCF belum selesai >100s`;
+            await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+              prompt_preview: trunc(prompt), response_preview: trunc(last), latency_ms: Date.now() - t0, status: 'ERROR' });
+            continue;
+          }
         }
 
         let b64 = data?.artifacts?.[0]?.base64 || null;
@@ -310,6 +320,9 @@ async function runImage(body: Record<string, unknown>) {
       } catch (e) {
         const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
         last = `${alias}/${model}: ${timedOut ? 'timeout 60s (endpoint tidak merespons)' : (e instanceof Error ? e.message : 'network error')}`;
+        // exception juga HARUS tercatat — jangan ada kegagalan yang tak terlihat
+        await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+          prompt_preview: trunc(prompt), response_preview: trunc(last), latency_ms: Date.now() - t0, status: 'ERROR' });
       }
     }
   }
