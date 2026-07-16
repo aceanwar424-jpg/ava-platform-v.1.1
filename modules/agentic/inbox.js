@@ -165,14 +165,40 @@ function agDownloadMd(id){
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
 }
 
-// ── MONITOR TAB (queue + LLM usage §7 /monitor) ──────────────────
+// ── MONITOR TAB (queue + LLM usage §7 /monitor + hardening Fase 4) ──
 async function renderAgMonitorTab(el){
   await agLoadLlm();
+  let m7 = null;
+  try{ m7 = await agRpc('agentic_monitor_7d', {}); }catch(e){}
   const q = s => agTasks.filter(t=>t.status===s).length;
   const prov = {};
   agLlmLogs.forEach(l=>{ const k=`${l.provider}/${l.model}`; prov[k]=(prov[k]||0)+1; });
+  const llm7 = (m7&&m7.llm_7d)||[];
+  const tokIn = llm7.reduce((a,r)=>a+(r.tokens_in||0),0);
+  const tokOut = llm7.reduce((a,r)=>a+(r.tokens_out||0),0);
+  const err7 = llm7.reduce((a,r)=>a+(r.errors||0),0);
+  const failed = (m7&&m7.failed_open)||[];
 
   el.innerHTML = `
+    ${m7?`<div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:12px">
+      ${[[llm7.reduce((a,r)=>a+(r.n||0),0),'Panggilan LLM (7 hari)','#0EA5E9'],
+         [tokIn.toLocaleString('id-ID'),'Token Masuk (7 hari)','#0A2342'],
+         [tokOut.toLocaleString('id-ID'),'Token Keluar (7 hari)','#0A2342'],
+         [err7,'Error LLM (7 hari)', err7?'#EF4444':'#22C55E'],
+         [failed.length,'Task FAILED terbuka', failed.length?'#EF4444':'#22C55E']]
+        .map(([v,l,c])=>`<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${c};border-radius:8px;padding:8px 10px">
+          <div style="font-size:17px;font-weight:800;color:${c}">${v}</div>
+          <div style="font-size:10px;color:var(--gray)">${l}</div></div>`).join('')}
+    </div>`:''}
+    ${failed.length?`<div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
+      <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Task Gagal — perlu perhatian</div>
+      ${failed.slice(0,8).map(f=>`<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed #fecaca;align-items:center">
+        <div style="min-width:0"><strong>${agEsc(f.title)}</strong><br><span style="color:#64748B;font-size:11px">${agEsc(f.error||'')}</span></div>
+        <button class="ag-btn warn" style="padding:4px 10px" onclick="agActRetry('${f.id}')">${svgIcon('refresh',12)} Retry</button>
+      </div>`).join('')}
+    </div>`:''}`;
+
+  el.innerHTML += `
     <div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
       <div class="ag-detail">
         <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">Kedalaman Antrian</div>

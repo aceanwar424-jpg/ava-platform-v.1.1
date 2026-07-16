@@ -317,6 +317,178 @@ async function handleReviewCycle(_t: Task) {
   return { result: r, note: `Review cycle: ${r?.due_for_review ?? 0} dokumen jatuh tempo → task repair` };
 }
 
+// ═══ FASE 3 — CONTENT & BRANDING AGENT (§5.2) ════════════════════════
+
+// Gambar flyer via Edge Function gemini-proxy (reuse Wiki OneLab) → Storage.
+// Non-fatal: gagal gambar tidak menggagalkan task (copy tetap DRAFT).
+async function makeImage(t: Task, prompt: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${SB_URL}/functions/v1/gemini-proxy`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'image', prompt }),
+    });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok || !Array.isArray(d.images) || !d.images[0]) return null;
+    const [meta, b64] = String(d.images[0]).split(',');
+    const mime = (meta.match(/data:([^;]+)/) || [])[1] || 'image/png';
+    const bin = atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const path = `renders/${t.id}_${Date.now()}.png`;
+    const up = await fetch(`${SB_URL}/storage/v1/object/agentic/${path}`, {
+      method: 'POST',
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': mime },
+      body: arr,
+    });
+    return up.ok ? path : null;
+  } catch { return null; }
+}
+
+// PLAN_WEEKLY: kalender 14 hari + hari kesehatan → LLM slot baru → planner_apply
+async function handlePlanWeekly(t: Task) {
+  const data = await rpc('agentic_planner_data', {}) as Dict;
+  const tpl = await getPrompt('PLAN_WEEKLY');
+  const { data: out } = await askLLMJson(t, tpl, {
+    today: data.today, window_end: data.window_end,
+    posts_per_week: t.payload?.posts_per_week ?? 3,
+    articles_per_week: t.payload?.articles_per_week ?? 1,
+    existing_slots: JSON.stringify(data.existing_slots || []),
+    health_days: JSON.stringify(data.health_days || []),
+  });
+  const slots = Array.isArray(out) ? out : [];
+  const applied = await rpc('agentic_planner_apply', { p: {
+    slots, produce_within_days: t.payload?.produce_within_days ?? 4 } }) as Dict;
+  return {
+    result: { ...applied, proposed: slots.length,
+      markdown: `## Rencana Konten Mingguan\n\n${slots.map((s: Dict) =>
+        `- **${s.target_date}** · ${s.content_type} · ${s.topic} _(${s.channel}, ${s.framework})_`).join('\n')}` },
+    note: `Planner: ${slots.length} usulan → ${applied?.slots_created ?? 0} slot baru, ${applied?.production_started ?? 0} langsung produksi`,
+  };
+}
+
+// MAKE_SOSMED: copy (hook/caption/hashtag/CTA) + gambar flyer AI (opsional)
+async function handleMakeSosmed(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('MAKE_SOSMED');
+  const { data } = await askLLMJson(t, tpl, {
+    topic: p.topic, angle: p.angle, framework: p.framework || 'PAS',
+    channel: p.channel || 'IG', target_date: p.target_date,
+    related_test_codes: JSON.stringify(p.related_test_codes || []),
+    health_day_ref: p.health_day_ref || '-',
+    rejection_feedback: p.rejection_feedback || '-',
+  });
+  const c = data as Dict;
+  if (!c.caption) throw new Error('Output LLM tanpa field caption');
+
+  let imagePath: string | null = null;
+  if (p.make_image !== false && c.image_prompt) {
+    imagePath = await makeImage(t, String(c.image_prompt));
+  }
+
+  const hashtags = Array.isArray(c.hashtags) ? c.hashtags.join(' ') : '';
+  const markdown = `## ${c.hook || p.topic}\n\n${c.caption}\n\n**CTA:** ${c.cta || '-'}\n\n${hashtags}` +
+    (imagePath ? `\n\n🖼 Gambar: agentic/${imagePath}` : '\n\n_(gambar tidak dibuat)_');
+
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'COPY', text_content: `${c.caption}\n\n${hashtags}`, meta: { hook: c.hook, cta: c.cta } } });
+  if (imagePath) {
+    await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+      asset_type: 'IMAGE', file_path: imagePath, meta: { prompt: c.image_prompt } } });
+  }
+  return {
+    result: { markdown, copy: c, image_path: imagePath, calendar_id: p.calendar_id || null },
+    note: `Sosmed "${p.topic}" · caption ${String(c.caption).length} char${imagePath ? ' + gambar' : ''}`,
+  };
+}
+
+// MAKE_ARTIKEL: artikel 800-1200 kata WAJIB sitasi (§9.4) — kurang sitasi = FAILED
+async function handleMakeArtikel(t: Task) {
+  const p = t.payload || {};
+  const minCit = Number(p.min_citations ?? 3);
+  const tpl = await getPrompt('MAKE_ARTIKEL');
+  const vars = {
+    topic: p.topic, angle: p.angle || '-', audience: p.audience || 'awam',
+    target_words: p.target_words || 1000, min_citations: minCit,
+    related_test_codes: JSON.stringify(p.related_test_codes || []),
+    rejection_feedback: p.rejection_feedback || '-',
+  };
+  let { data } = await askLLMJson(t, tpl, vars, { maxTokens: 8192 });
+  let a = data as Dict;
+  let cits = Array.isArray(a.citations) ? a.citations : [];
+  if (cits.length < minCit) {
+    // satu kesempatan perbaikan, lalu auto-reject internal (§9.4)
+    ({ data } = await askLLMJson(t, tpl, {
+      ...vars, rejection_feedback:
+        `Sitasi hanya ${cits.length}, minimal ${minCit}. Tambahkan sumber ilmiah NYATA. ${vars.rejection_feedback}`,
+    }, { maxTokens: 8192, cacheable: false }));
+    a = data as Dict;
+    cits = Array.isArray(a.citations) ? a.citations : [];
+    if (cits.length < minCit) {
+      throw new Error(`Auto-reject internal: sitasi ${cits.length} < minimal ${minCit} (§9.4)`);
+    }
+  }
+  const md = `# ${a.title || p.topic}\n\n${a.markdown || ''}\n\n## Sumber\n${cits.map((c: Dict, i: number) =>
+    `${i + 1}. ${c.source || ''} — ${c.title || ''} (${c.year || 'n.d.'})${c.url ? ` · ${c.url}` : ''}`).join('\n')}`;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'HTML', text_content: md, meta: { title: a.title, citations: cits.length } } });
+  return {
+    result: { markdown: md, title: a.title, meta_description: a.meta_description,
+      citations: cits, calendar_id: p.calendar_id || null },
+    note: `Artikel "${a.title || p.topic}" · ${String(a.markdown || '').split(/\s+/).length} kata · ${cits.length} sitasi · menunggu review medis`,
+  };
+}
+
+// MAKE_PPTX_DOKTER: outline slide + speaker notes + referensi (render PPTX menyusul)
+async function handleMakePptx(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('MAKE_PPTX_DOKTER');
+  const { data } = await askLLMJson(t, tpl, {
+    topic: p.topic, audience: p.audience || 'dokter umum',
+    duration_min: p.duration_min || 30, slide_count_hint: p.slide_count_hint || 15,
+    rejection_feedback: p.rejection_feedback || '-',
+  }, { maxTokens: 8192 });
+  const d = data as Dict;
+  const slides = Array.isArray(d.slides) ? d.slides : [];
+  if (!slides.length) throw new Error('Output LLM tanpa slides');
+  const md = `# ${d.title || p.topic}\n_Audiens: ${d.audience || '-'} · ${d.duration_min || '-'} menit · ${slides.length} slide_\n\n` +
+    slides.map((s: Dict) => `## Slide ${s.n}: ${s.title}\n${(Array.isArray(s.bullets) ? s.bullets : [])
+      .map((b: string) => `- ${b}`).join('\n')}\n\n> 🗒 ${s.speaker_notes || ''}`).join('\n\n') +
+    `\n\n## Referensi\n${(Array.isArray(d.references) ? d.references : []).map((r: string, i: number) => `${i + 1}. ${r}`).join('\n')}`;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'PPTX', text_content: md, meta: { title: d.title, slides: slides.length } } });
+  return {
+    result: { markdown: md, outline: d, calendar_id: p.calendar_id || null },
+    note: `PPTX outline "${d.title || p.topic}" · ${slides.length} slide · menunggu review medis`,
+  };
+}
+
+// MAKE_EVENT_BRIEF: brief acara + slot promo otomatis H-14/H-7/H-1
+async function handleMakeEventBrief(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('MAKE_EVENT_BRIEF');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.5), maxTokens: 8192,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      event_name: p.event_name || p.topic, event_date: p.event_date || p.target_date,
+      location: p.location || '-', theme: p.theme || p.angle || '-',
+      target_participants: p.target_participants || '-', angle: p.angle || '-',
+      rejection_feedback: p.rejection_feedback || '-',
+    }),
+  });
+  const md = String(r.text || '').trim();
+  if (md.length < 100) throw new Error('Brief terlalu pendek — output LLM tidak valid');
+  const promo = await rpc('agentic_event_promo', { p: {
+    event_name: p.event_name || p.topic, event_date: p.event_date || p.target_date } }) as Dict;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'DOCX', text_content: md, meta: { event_date: p.event_date || p.target_date } } });
+  return {
+    result: { markdown: md, promo_slots: promo?.slots_created ?? 0, calendar_id: p.calendar_id || null },
+    note: `Event brief "${p.event_name || p.topic}" · +${promo?.slots_created ?? 0} slot promo otomatis`,
+  };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
   // Fase 2 — Document Compliance Agent:
@@ -325,8 +497,31 @@ const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: str
   DOC_REPAIR: handleDocRepair,
   DOC_GENERATE: handleDocGenerate,
   DOC_REVIEW_CYCLE: handleReviewCycle,
-  // Fase 3: PLAN_WEEKLY, MAKE_SOSMED, MAKE_ARTIKEL, MAKE_PPTX_DOKTER, MAKE_EVENT_BRIEF
+  // Fase 3 — Content & Branding Agent:
+  PLAN_WEEKLY: handlePlanWeekly,
+  MAKE_SOSMED: handleMakeSosmed,
+  MAKE_ARTIKEL: handleMakeArtikel,
+  MAKE_PPTX_DOKTER: handleMakePptx,
+  MAKE_EVENT_BRIEF: handleMakeEventBrief,
 };
+
+// ═══ FASE 4 — NOTIFIKASI (opsional, §Fase4) ═════════════════════════
+// Set secret AGENTIC_NOTIFY_WEBHOOK = URL webhook (n8n / WhatsApp gateway /
+// Slack-compatible). Dipanggil non-fatal saat ada draft baru menunggu approval.
+async function notifyDrafts(results: Record<string, unknown>[]) {
+  const url = Deno.env.get('AGENTIC_NOTIFY_WEBHOOK');
+  if (!url) return;
+  const drafts = results.filter((r) => r.status === 'DRAFT');
+  if (!drafts.length) return;
+  const text = `🤖 OneLab Agentic: ${drafts.length} draft baru menunggu approval:\n` +
+    drafts.map((d) => `• ${d.note}`).join('\n') + `\nBuka menu Agentic AI → Approval Inbox.`;
+  try {
+    await fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, source: 'onelab-agentic', count: drafts.length }),
+    });
+  } catch { /* non-fatal */ }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -378,5 +573,6 @@ Deno.serve(async (req) => {
     }
   }
 
+  await notifyDrafts(results);
   return json({ worker: WORKER_ID, processed: results.length, results });
 });
