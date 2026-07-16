@@ -4,8 +4,12 @@
     {
       "name": "onelab-static",
       "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "5544"],
-      "port": 5544
+      "runtimeArgs": [
+        "-c",
+        "import os,http.server;http.server.test(HandlerClass=http.server.SimpleHTTPRequestHandler,port=int(os.environ.get('PORT','5544')),bind='127.0.0.1')"
+      ],
+      "port": 5544,
+      "autoPort": true
     }
   ]
 }

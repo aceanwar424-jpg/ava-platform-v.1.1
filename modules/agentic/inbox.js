@@ -216,7 +216,7 @@ async function renderAgMonitorTab(el){
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
         <div>
           <div style="font-size:12px;font-weight:800;color:#0A2342">🩺 Kesehatan Sistem AI</div>
-          <div style="font-size:11px;color:var(--gray)">Tes semua provider × key × model (±15 detik) dan bebaskan task yang macet</div>
+          <div style="font-size:11px;color:var(--gray)">Tes semua provider × key × model (bisa ±1 menit — model besar lambat) dan bebaskan task yang macet</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="ag-btn pub" id="ag-diag-btn" onclick="agRunDiag()">${svgIcon('sparkle',13)} Tes Koneksi AI</button>

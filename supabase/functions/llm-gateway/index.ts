@@ -137,7 +137,9 @@ async function runDiag() {
   const nvMain  = Deno.env.get('NVIDIA_MODEL_MAIN')  || 'meta/llama-3.3-70b-instruct';
   const nvLight = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
   const gmModel = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
-  const DIAG_TIMEOUT = 15_000;
+  // 60 dtk: model reasoning raksasa (mis. Nemotron Ultra) bisa >30 dtk utk
+  // merespons — 15 dtk menghasilkan false alarm "model mati"
+  const DIAG_TIMEOUT = 60_000;
 
   type Check = { provider: string; key_alias: string; model: string };
   const checks: Check[] = [];
@@ -186,8 +188,13 @@ async function runDiag() {
   const nvLightOk = results.some((r) => r.provider === 'NVIDIA' && r.model === nvLight && r.ok);
   const nvMainOk  = results.some((r) => r.provider === 'NVIDIA' && r.model === nvMain && r.ok);
   const gmOk      = results.some((r) => r.provider === 'GEMINI' && r.ok);
-  if (nvLightOk && !nvMainOk)
-    verdicts.push(`⚠ Model MAIN NVIDIA (${nvMain}) bermasalah padahal key valid (model light OK) — ganti Secret NVIDIA_MODEL_MAIN ke model yang tersedia di build.nvidia.com.`);
+  if (nvLightOk && !nvMainOk) {
+    const mainFails = results.filter((r) => r.provider === 'NVIDIA' && r.model === nvMain && !r.ok);
+    const allTimeout = mainFails.length > 0 && mainFails.every((r) => String(r.msg).startsWith('TIMEOUT'));
+    verdicts.push(allTimeout
+      ? `⚠ Model MAIN NVIDIA (${nvMain}) LAMBAT (>60 dtk belum merespons) — key valid. Model reasoning besar memang lambat; produksi masih bisa jalan (timeout produksi 75 dtk), tapi bila sering gagal, ganti NVIDIA_MODEL_MAIN ke model lebih cepat (mis. meta/llama-3.3-70b-instruct).`
+      : `⚠ Model MAIN NVIDIA (${nvMain}) bermasalah padahal key valid (model light OK) — ganti Secret NVIDIA_MODEL_MAIN ke model yang tersedia di build.nvidia.com.`);
+  }
   if (!nvLightOk && !nvMainOk && nvKeys.length)
     verdicts.push('❌ Semua percobaan NVIDIA gagal — cek key (nvapi-…), kuota, atau jaringan.');
   if (!gmOk && gmKeys.length) verdicts.push('❌ Semua percobaan Gemini gagal — cek GEMINI_API_KEYS / kuota.');
@@ -214,76 +221,96 @@ function b64Mime(b64: string): string {
 async function runImage(body: Record<string, unknown>) {
   const prompt = String(body.prompt || '').trim().slice(0, 9500);
   if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
-  const model = String(body.model || Deno.env.get('NVIDIA_IMAGE_MODEL') || 'black-forest-labs/flux.1-schnell');
-  const isSchnell = /schnell/i.test(model);
+  // NVIDIA_IMAGE_MODEL boleh BERISI BANYAK model dipisah koma → dicoba
+  // berurutan (failover antar model). Isi NAMA MODEL persis dari
+  // build.nvidia.com (mis. black-forest-labs/flux.1-schnell,
+  // black-forest-labs/flux.2-klein-4b, qwen/qwen-image) — BUKAN API key.
+  const models = String(body.model || Deno.env.get('NVIDIA_IMAGE_MODEL') || 'black-forest-labs/flux.1-schnell')
+    .split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
+    .filter((m) => !/^nvapi-/i.test(m)); // jaga-jaga: key nyasar ke secret model
+  if (!models.length) models.push('black-forest-labs/flux.1-schnell');
   // FLUX hanya menerima kelipatan 64 (768–1344); 896×1152 ≈ rasio IG 4:5
   const width = Number(body.width) || 896;
   const height = Number(body.height) || 1152;
   const taskId = body.taskId || null;
-  const hash = await sha256(`img|${model}|${prompt}|${width}x${height}`);
+  const hash = await sha256(`img|${models.join('+')}|${prompt}|${width}x${height}`);
   let last = 'Belum ada percobaan';
+  const nvKeys = keysOf('NVIDIA_API_KEYS');
 
-  // 1) NVIDIA FLUX per key
-  for (const [i, key] of keysOf('NVIDIA_API_KEYS').entries()) {
-    const alias = `NVIDIA#${i + 1}`;
-    const t0 = Date.now();
-    try {
-      let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ prompt, mode: 'base', width, height,
-          seed: Math.floor(Math.random() * 1e9),
-          steps: isSchnell ? 4 : 30, ...(isSchnell ? {} : { cfg_scale: 3.5 }) }),
-        signal: AbortSignal.timeout(60_000),
-      });
-      let data = await res.json().catch(() => null);
+  // 1) NVIDIA: model demi model × key demi key
+  modelLoop:
+  for (const model of models) {
+    const isFlux = /flux/i.test(model);
+    const isSchnell = /schnell|klein/i.test(model); // distilled → langkah sedikit
+    // FLUX endpoint /genai menerima parameter penuh; model lain (qwen dsb)
+    // dikirim minimal agar tidak ditolak validator (422)
+    const genaiBody = isFlux
+      ? { prompt, mode: 'base', width, height, seed: Math.floor(Math.random() * 1e9),
+          steps: isSchnell ? 4 : 30, ...(isSchnell ? {} : { cfg_scale: 3.5 }) }
+      : { prompt, seed: Math.floor(Math.random() * 1e9) };
 
-      // Pola antrian NVCF: server balas 202 + header NVCF-REQID → poll status
-      // sampai selesai (maks ~100 dtk) alih-alih menunggu buta.
-      if (res.status === 202) {
-        const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
-        const pollDeadline = Date.now() + 100_000;
-        while (reqId && Date.now() < pollDeadline) {
-          await sleep(3_000);
-          res = await fetch(`https://ai.api.nvidia.com/v1/status/${reqId}`, {
-            headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
-            signal: AbortSignal.timeout(20_000),
-          });
-          if (res.status === 202) continue;
-          data = await res.json().catch(() => null);
-          break;
-        }
-        if (res.status === 202) { last = `${alias}: antrian NVCF belum selesai >100s`; continue; }
-      }
-
-      let b64 = data?.artifacts?.[0]?.base64 || null;
-
-      // beberapa model image NIM memakai endpoint gaya OpenAI
-      if (res.status === 404) {
-        res = await fetch('https://integrate.api.nvidia.com/v1/images/generations', {
+    for (const [i, key] of nvKeys.entries()) {
+      const alias = `NVIDIA#${i + 1}`;
+      const t0 = Date.now();
+      try {
+        let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, prompt, n: 1, response_format: 'b64_json', size: `${width}x${height}` }),
-          signal: AbortSignal.timeout(90_000),
+          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(genaiBody),
+          signal: AbortSignal.timeout(60_000),
         });
-        data = await res.json().catch(() => null);
-        b64 = data?.data?.[0]?.b64_json || null;
-      }
+        let data = await res.json().catch(() => null);
 
-      const latency = Date.now() - t0;
-      if (res.ok && b64) {
+        // Pola antrian NVCF: server balas 202 + header NVCF-REQID → poll status
+        // sampai selesai (maks ~100 dtk) alih-alih menunggu buta.
+        if (res.status === 202) {
+          const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
+          const pollDeadline = Date.now() + 100_000;
+          while (reqId && Date.now() < pollDeadline) {
+            await sleep(3_000);
+            res = await fetch(`https://ai.api.nvidia.com/v1/status/${reqId}`, {
+              headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+              signal: AbortSignal.timeout(20_000),
+            });
+            if (res.status === 202) continue;
+            data = await res.json().catch(() => null);
+            break;
+          }
+          if (res.status === 202) { last = `${alias}/${model}: antrian NVCF belum selesai >100s`; continue; }
+        }
+
+        let b64 = data?.artifacts?.[0]?.base64 || null;
+
+        // beberapa model image NIM memakai endpoint gaya OpenAI —
+        // coba juga saat 404 (path tak dikenal) atau 400/422 (skema beda)
+        if (res.status === 404 || res.status === 400 || res.status === 422) {
+          res = await fetch('https://integrate.api.nvidia.com/v1/images/generations', {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model, prompt, n: 1, response_format: 'b64_json', size: `${width}x${height}` }),
+            signal: AbortSignal.timeout(90_000),
+          });
+          data = await res.json().catch(() => null);
+          b64 = data?.data?.[0]?.b64_json || null;
+        }
+
+        const latency = Date.now() - t0;
+        if (res.ok && b64) {
+          await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+            prompt_preview: trunc(prompt), response_preview: `[image ${width}x${height}]`,
+            latency_ms: latency, status: 'OK' });
+          return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
+        }
+        last = `${alias}/${model}: ${data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`}`;
         await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
-          prompt_preview: trunc(prompt), response_preview: `[image ${width}x${height}]`,
-          latency_ms: latency, status: 'OK' });
-        return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
+          prompt_preview: trunc(prompt), response_preview: trunc(String(last)), latency_ms: latency, status: 'ERROR' });
+        // 400/422/404 di kedua endpoint = masalah model/parameter, bukan key
+        // → percuma coba key lain, langsung ke MODEL berikutnya
+        if (!RETRYABLE.has(res.status)) continue modelLoop;
+      } catch (e) {
+        const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+        last = `${alias}/${model}: ${timedOut ? 'timeout 60s (endpoint tidak merespons)' : (e instanceof Error ? e.message : 'network error')}`;
       }
-      last = `${alias}: ${data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`}`;
-      await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
-        prompt_preview: trunc(prompt), response_preview: trunc(String(last)), latency_ms: latency, status: 'ERROR' });
-      if (!RETRYABLE.has(res.status) && res.status !== 404) break; // 400/422 = prompt/parameter salah
-    } catch (e) {
-      const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
-      last = `${alias}: ${timedOut ? 'timeout 60s (endpoint tidak merespons)' : (e instanceof Error ? e.message : 'network error')}`;
     }
   }
 
