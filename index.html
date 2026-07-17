@@ -230,6 +230,7 @@
 <script src="modules/agentic/docs.js"></script>
 <script src="modules/agentic/studio.js"></script>
 <script src="modules/agentic/render.js"></script>
+<script src="modules/agentic/org.js"></script>
 <script src="modules/config_home.js"></script>
 <script src="modules/config_labreport.js"></script>
 <script src="modules/settings.js"></script>
@@ -654,6 +655,7 @@ const FLYOUT_MENUS = {
     label: 'Agentic AI',
     items: [
       {page:'agentic-inbox', icon:'📥', label:'Approval Inbox', action:"navigate('agentic',{tab:'inbox'})"},
+      {page:'agentic-org', icon:'👔', label:'Organisasi Agent', action:"navigate('agentic',{tab:'org'})"},
       {page:'agentic-docs', icon:'📄', label:'Dokumen QMS', action:"navigate('agentic',{tab:'docs'})"},
       {page:'agentic-compliance', icon:'✅', label:'Compliance ISO 15189', action:"navigate('agentic',{tab:'compliance'})"},
       {page:'agentic-studio', icon:'🎨', label:'Content Studio (AI)', action:"navigate('agentic',{tab:'studio'})"},

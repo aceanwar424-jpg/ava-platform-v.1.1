@@ -8,7 +8,7 @@
 // Schema: supabase_agentic.sql (Fase 0) + supabase_agentic_fase12.sql
 // ═══════════════════════════════════════════════════════════════
 
-const AG_TABS = ['inbox','docs','compliance','studio','monitor'];
+const AG_TABS = ['inbox','org','docs','compliance','studio','monitor'];
 let _agTab = 'inbox';
 let agTasks = [], agRegistry = [], agChecklist = [], agLlmLogs = [];
 
@@ -104,7 +104,8 @@ async function renderAgentic(tab){
     <div id="ag-kpi" class="pro-kpi"></div>
 
     <div class="pro-toolbar" id="ag-tabs">
-      ${[['inbox','Approval Inbox','check'],['docs','Dokumen QMS','book'],
+      ${[['inbox','Approval Inbox','check'],['org','Organisasi','user'],
+         ['docs','Dokumen QMS','book'],
          ['compliance','Compliance','diagnosis'],['studio','Content Studio','image'],
          ['monitor','Monitor','eye']]
         .map(([k,l,ic])=>`<button class="pro-chip ${_agTab===k?'active':''}" onclick="switchAgenticTab('${k}')">${svgIcon(ic,13)} ${l}</button>`).join('')}
@@ -127,6 +128,7 @@ function switchAgenticTab(t){
 function agRenderTab(){
   const el=document.getElementById('ag-body'); if(!el) return;
   if(_agTab==='inbox')            renderAgInboxTab(el);
+  else if(_agTab==='org')         renderAgOrgTab(el);
   else if(_agTab==='docs')        renderAgDocsTab(el);
   else if(_agTab==='compliance')  renderAgComplianceTab(el);
   else if(_agTab==='studio')      renderAgStudioTab(el);

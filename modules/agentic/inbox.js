@@ -62,8 +62,9 @@ async function agRenderTaskDetail(id){
   const box = document.getElementById('ag-inbox-detail'); if(!box) return;
   const t = agTasks.find(x=>x.id===id); if(!t){ box.innerHTML=''; return; }
 
-  let events = [];
+  let events = [], qas = [];
   try{ events = await sbGet('agentic_task_events_v', `task_id=eq.${id}&select=*&order=created_at.asc`) || []; }catch(e){}
+  try{ qas = await sbGet('agentic_qa_v', `task_id=eq.${id}&select=*&order=created_at.desc&limit=3`) || []; }catch(e){}
 
   const r = t.result || {};
   const md = r.markdown || (r.text ? String(r.text) : '');
@@ -119,6 +120,14 @@ async function agRenderTaskDetail(id){
     ${t.error_message ? `<div style="margin-top:10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
     ${t.payload && t.payload.rejection_feedback ? `<div style="margin-top:10px;background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 12px;font-size:12px;color:#9A3412"><strong>Feedback penolakan terakhir:</strong> ${agEsc(t.payload.rejection_feedback)}</div>` : ''}
     ${placeholders ? `<div style="margin-top:10px;background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;font-size:12px;color:#92400E"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
+    ${qas.length ? qas.map(q=>{
+      const qc = q.verdict==='PASS' ? '#22C55E' : '#EF4444';
+      const finds = Array.isArray(q.findings)?q.findings:[];
+      return `<div style="margin-top:10px;background:${qc}0d;border:1px solid ${qc}55;border-radius:8px;padding:9px 12px;font-size:12px">
+        <strong style="color:${qc}">🧪 QA ${agEsc(q.agent_code)}: ${agEsc(q.verdict)} · skor ${q.score}/100</strong>
+        ${finds.length?`<ul style="margin:4px 0 0 16px;color:#475569">${finds.slice(0,6).map(f=>`<li>${agEsc(f)}</li>`).join('')}</ul>`:''}
+        ${q.notes?`<div style="color:#475569;margin-top:3px"><em>Saran: ${agEsc(q.notes)}</em></div>`:''}
+      </div>`;}).join('') : ''}
 
     ${md ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Preview Draft</div><div class="ag-md">${agMd(md)}</div></div>`
         : (t.result ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Hasil</div><pre class="ag-md" style="white-space:pre-wrap">${agEsc(JSON.stringify(t.result,null,2)).slice(0,4000)}</pre></div>` : '')}

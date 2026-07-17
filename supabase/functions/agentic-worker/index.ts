@@ -502,8 +502,176 @@ async function handleMakeEventBrief(t: Task) {
   };
 }
 
+// ═══ FASE 6 — ORGANISASI AGENT (HEAD · QA · IT) ══════════════════════
+
+// QA_REVIEW: LLM-as-judge. payload {target_task_id, qa_agent, min_score}
+async function handleQaReview(t: Task) {
+  const p = t.payload || {};
+  const targetId = String(p.target_task_id || '');
+  const qaCode = String(p.qa_agent || 'QA_KONTEN');
+  const minScore = Number(p.min_score ?? 75);
+  if (!targetId) throw new Error('payload.target_task_id wajib');
+
+  const target = await rpc('agentic_task_get', { p_id: targetId }) as Dict | null;
+  if (!target) throw new Error(`Task target ${targetId} tidak ditemukan`);
+  if (target.status !== 'DRAFT') {
+    return { result: { skipped: true }, note: `Target sudah ${target.status} — QA dilewati` };
+  }
+  const agent = await rpc('agentic_agent_get', { p_code: qaCode }) as Dict | null;
+  if (!agent) throw new Error(`Agent QA '${qaCode}' tidak terdaftar/aktif — jalankan supabase_agentic_fase6.sql`);
+
+  const res = (target.result || {}) as Dict;
+  const content = String(res.markdown || res.text || JSON.stringify(res)).slice(0, 14000);
+
+  const r = await askLLM({
+    taskId: t.id, tier: agent.model_tier === 'light' ? 'light' : 'main',
+    temperature: 0, maxTokens: 1200,
+    system: String(agent.charter),
+    prompt: `AMBANG LULUS: score >= ${minScore}.\nJENIS TASK: ${target.task_type}\nJUDUL: ${target.title}\n\nDRAFT YANG DINILAI:\n${content}`,
+  });
+  const out = parseJSONLoose(String(r.text)) as Dict;
+  const score = Math.max(0, Math.min(100, Number(out.score ?? 0)));
+  // verdict dipaksa konsisten dgn ambang (LLM tidak boleh meluluskan di bawah ambang)
+  const verdict = (out.verdict === 'PASS' && score >= minScore) ? 'PASS' : 'FAIL';
+  const findings = Array.isArray(out.findings) ? out.findings : [];
+
+  await rpc('agentic_qa_add', { p: { task_id: targetId, agent_code: qaCode,
+    score, verdict, findings, notes: String(out.saran || '') } });
+
+  return {
+    result: { target_task_id: targetId, score, verdict, findings,
+      markdown: `## QA ${qaCode} — ${verdict} (${score}/100)\n\n${findings.map((f: string) => `- ${f}`).join('\n') || '- (tanpa temuan)'}\n\n**Saran:** ${out.saran || '-'}` },
+    note: `QA ${qaCode} → "${target.title}": ${verdict} ${score}/100`,
+  };
+}
+
+// HEAD_TICK: orkestrator. Deterministik: keputusan dari Matriks Mandat + QA.
+// payload {standup:true} → tambahkan digest harian ke CEO.
+async function handleHeadTick(t: Task) {
+  const d = await rpc('agentic_head_data', {}) as Dict;
+  const drafts = (d.drafts || []) as Dict[];
+  const failed = (d.failed || []) as Dict[];
+  const lines: string[] = [];
+  let qaMade = 0, decided = 0, escalated = 0, retried = 0;
+
+  for (const dr of drafts) {
+    const action = String(dr.auto_action || 'AUTO_APPROVE');
+    const isOrg = dr.agent === 'ORG';
+    try {
+      // 1) Log organ / task tanpa-QA → langsung tutup sesuai mandat
+      if (action === 'AUTO_PUBLISH_NOQA') {
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'APPROVE',
+          p_reason: `mandat ${dr.risk} (${dr.task_type}) tanpa QA` });
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'PUBLISH',
+          p_reason: `mandat ${dr.risk}` });
+        decided++;
+        if (!isOrg) lines.push(`✅ Auto-selesai (${dr.risk}): ${dr.title}`);
+        continue;
+      }
+      // 2) Butuh QA tapi belum ada → tugaskan QA agent
+      if (!dr.qa) {
+        if (!dr.qa_open && dr.qa_agent) {
+          await rpc('agentic_create_task', {
+            p_agent: 'ORG', p_task_type: 'QA_REVIEW',
+            p_title: `QA ${dr.qa_agent}: ${String(dr.title).slice(0, 200)}`,
+            p_payload: { target_task_id: dr.id, qa_agent: dr.qa_agent, min_score: dr.min_score },
+          });
+          qaMade++;
+        }
+        continue; // tunggu hasil QA di tick berikutnya
+      }
+      // 3) QA sudah ada → putuskan sesuai mandat
+      const qa = dr.qa as Dict;
+      const pass = qa.verdict === 'PASS';
+      const qaStr = `QA ${dr.qa_agent} ${qa.verdict} ${qa.score}/100`;
+      if (!pass && action !== 'RECOMMEND') {
+        const fb = `${qaStr}. Temuan: ${(qa.findings as string[] || []).join('; ') || '-'}. ${qa.notes || ''}`;
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'REJECT', p_reason: fb.slice(0, 900) });
+        decided++; lines.push(`↩ Ditolak+perbaiki (${qaStr}): ${dr.title}`);
+      } else if (action === 'AUTO_PUBLISH') {
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'APPROVE', p_reason: `mandat R1, ${qaStr}` });
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'PUBLISH', p_reason: `mandat R1, ${qaStr}` });
+        decided++; lines.push(`🚀 AUTO-PUBLISH (R1, ${qaStr}): ${dr.title}`);
+      } else if (action === 'AUTO_APPROVE' && pass) {
+        await rpc('agentic_head_decide', { p_task_id: dr.id, p_action: 'APPROVE', p_reason: `mandat R2, ${qaStr}` });
+        decided++; lines.push(`👍 Disetujui, menunggu publish CEO (R2, ${qaStr}): ${dr.title}`);
+      } else if (action === 'RECOMMEND' && !dr.escalated) {
+        await rpc('agentic_msg_add', { p: { from_agent: 'HEAD', to_agent: 'ACE', task_id: dr.id,
+          kind: 'ESCALATION',
+          body: `R3 menunggu keputusan Anda: "${dr.title}" — ${qaStr}.` +
+            ` Rekomendasi HEAD: ${pass ? 'LAYAK approve' : 'PERLU perbaikan'}.` +
+            ` ${qa.notes ? 'Catatan QA: ' + qa.notes : ''}` } });
+        escalated++; lines.push(`🛎 Eskalasi R3 ke Anda (${qaStr}): ${dr.title}`);
+      }
+    } catch (e) {
+      lines.push(`⚠ Gagal memproses "${dr.title}": ${e instanceof Error ? e.message : e}`);
+    }
+  }
+
+  // 4) Retry otomatis task gagal yang masih punya budget
+  for (const f of failed) {
+    try { await rpc('agentic_retry', { p_task_id: f.id }); retried++; }
+    catch { /* biarkan utk manusia */ }
+  }
+
+  // 5) Standup digest harian (payload.standup) / ringkasan aksi
+  const st = (d.standup || {}) as Dict;
+  const digest = `## Laporan HEAD — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `24 jam: ${st.published_24h ?? 0} terbit · ${st.failed_24h ?? 0} gagal · antri ${st.queued_now ?? 0} · draft ${st.draft_now ?? 0}\n` +
+    `Menunggu publish Anda (R2): ${((d.approved_waiting || []) as Dict[]).length}\n` +
+    (lines.length ? `\nAksi tick ini:\n${lines.map((l) => `- ${l}`).join('\n')}` : '\nTidak ada aksi tick ini.');
+
+  if (t.payload?.standup === true || lines.length > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'HEAD', to_agent: 'ACE',
+      kind: t.payload?.standup === true ? 'STANDUP' : 'INFO', body: digest } });
+  }
+
+  return {
+    result: { qa_made: qaMade, decided, escalated, retried, markdown: digest },
+    note: `HEAD: ${qaMade} QA ditugaskan · ${decided} diputus · ${escalated} eskalasi · ${retried} retry`,
+  };
+}
+
+// IT_CHECK: Kepala IT — diag semua jalur + bebaskan task macet + laporan.
+async function handleItCheck(t: Task) {
+  let diag: Dict = {};
+  try {
+    const res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ diag: true }),
+      signal: AbortSignal.timeout(130_000),
+    });
+    diag = await res.json().catch(() => ({}));
+  } catch (e) {
+    diag = { error: e instanceof Error ? e.message : 'diag gagal' };
+  }
+  const reap = await rpc('agentic_reap', { p_minutes: 10 }).catch(() => null) as Dict | null;
+  const m7 = await rpc('agentic_monitor_7d', {}).catch(() => null) as Dict | null;
+
+  const verdicts = (diag.verdicts || []) as string[];
+  const bad = verdicts.filter((v) => v.includes('❌'));
+  const failedOpen = ((m7?.failed_open || []) as Dict[]).length;
+  const md = `## Laporan Kepala IT — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    (verdicts.length ? verdicts.map((v) => `- ${v}`).join('\n') : `- diag: ${diag.error || 'tidak ada data'}`) +
+    `\n- Task macet dibebaskan: ${reap?.reaped ?? 0}\n- Task FAILED terbuka: ${failedOpen}`;
+
+  if (bad.length || failedOpen > 3 || diag.error) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'IT_HEAD', to_agent: 'ACE', kind: 'ALERT',
+      body: md } });
+  }
+  return {
+    result: { verdicts, reaped: reap?.reaped ?? 0, failed_open: failedOpen, markdown: md },
+    note: `IT: ${bad.length ? bad.length + ' jalur bermasalah' : 'semua jalur sehat'} · reap ${reap?.reaped ?? 0} · FAILED ${failedOpen}`,
+  };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 6 — Organisasi:
+  QA_REVIEW: handleQaReview,
+  HEAD_TICK: handleHeadTick,
+  IT_CHECK: handleItCheck,
   // Fase 2 — Document Compliance Agent:
   DOC_INGEST: handleDocIngest,
   GAP_ANALYSIS: handleGapAnalysis,
