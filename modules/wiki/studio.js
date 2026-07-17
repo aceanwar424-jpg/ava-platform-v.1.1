@@ -211,7 +211,7 @@ async function runImageGen(){
     toast('✅ Gambar dibuat','ok');
   }catch(e){
     out.innerHTML=`<div class="status-box status-err">❌ ${e.message}
-      <div style="font-size:11.5px;margin-top:6px">Gambar <strong>100% NVIDIA</strong> — prompt <strong>otomatis diterjemahkan ke Inggris</strong> (filter model hanya andal berbahasa Inggris), jadi silakan menulis dalam Bahasa Indonesia. Filter konten memblokir tema pasien/jarum/darah/prosedur medis pada orang — yang lolos: interior klinik/lab, alat lab, ilustrasi tenaga medis tanpa pasien, orang di konteks non-medis. Detail: <strong>Agentic AI → Monitor → Log LLM</strong>.</div></div>`;
+      <div style="font-size:11.5px;margin-top:6px">Gambar <strong>100% NVIDIA</strong> — tulis bebas (Bahasa Indonesia pun otomatis diterjemahkan). <strong>Blokir prompt dinonaktifkan</strong>: bila filter NVIDIA menolak tema tertentu, sistem menulis-ulang prompt jadi versi aman lalu mencoba lagi otomatis. Kalau tetap gagal, itu penolakan di server NVIDIA (batasan tema medis-invasif pada orang), bukan sistem kita. Detail: <strong>Agentic AI → Monitor → Log LLM</strong>.</div></div>`;
   }
   if(btn){ btn.disabled=false; btn.innerHTML=`${svgIcon('sparkle',15)} Generate Gambar`; }
 }

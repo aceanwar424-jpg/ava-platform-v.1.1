@@ -333,9 +333,15 @@ async function runImage(body: Record<string, unknown>) {
   // TERBUKTI (uji 17 Jul 2026): safety filter NIM flux.1-dev mem-blacklist
   // prompt berbahasa Indonesia apa pun isinya (gambar hitam), sedangkan
   // terjemahan Inggris yang identik LOLOS. Gagal terjemah → pakai asli.
+  // IMAGE_FILTER_STRICT=true → blokir keras (perilaku lama). Default OFF:
+  // JANGAN blokir prompt apa pun — bila model menolak (gambar hitam),
+  // tulis-ulang otomatis ke versi aman lalu retry (§permintaan user).
+  const strictFilter = (Deno.env.get('IMAGE_FILTER_STRICT') || '').toLowerCase() === 'true';
+  const trModel = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+  let usedSafeRewrite = false;
+
   let genPrompt = prompt;
   try {
-    const trModel = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
     const tr = await callNvidia(nvKeys[0], trModel, {
       messages: [
         { role: 'system', content: 'Rewrite the user text as one concise English image-generation prompt. Keep every visual detail, style, ratio, and constraint. Output ONLY the prompt text, no quotes, no explanation.' },
@@ -348,6 +354,21 @@ async function runImage(body: Record<string, unknown>) {
     }
   } catch { /* pakai prompt asli */ }
 
+  // Tulis-ulang prompt yang ditolak filter → versi aman yang setara makna
+  async function safeRewrite(src: string): Promise<string | null> {
+    try {
+      const r = await callNvidia(nvKeys[0], trModel, {
+        messages: [
+          { role: 'system', content: 'The following image prompt was rejected by a safety filter. Rewrite it into a SAFE English prompt that keeps the same topic, mood, style, colors and composition, but REMOVES anything a medical-imagery filter blocks: no patients, no needles, no blood, no injections, no invasive medical procedures on people. Prefer clinic/lab interiors, equipment, abstract health motifs, or a smiling healthcare worker without a patient. Output ONLY the rewritten prompt.' },
+          { role: 'user', content: src },
+        ],
+        temperature: 0.3, max_tokens: 350,
+      });
+      const t = (r.ok && typeof r.text === 'string') ? r.text.trim() : '';
+      return t.length > 10 ? t.slice(0, 2500) : null;
+    } catch { return null; }
+  }
+
   // 1) NVIDIA: model demi model × key demi key
   modelLoop:
   for (const model of models) {
@@ -359,75 +380,70 @@ async function runImage(body: Record<string, unknown>) {
     // Batasan per model (dok resmi): flux.1-schnell HANYA 1024×1024, steps 1-4,
     // TANPA cfg_scale. flux.1-dev: 768–1344 kelipatan 64. Lainnya: body minimal.
     const dim64 = (v: number) => Math.min(1344, Math.max(768, Math.round(v / 64) * 64));
-    const genaiBody = isSchnell
-      ? { prompt: genPrompt, mode: 'base', width: 1024, height: 1024, steps: 4,
-          seed: Math.floor(Math.random() * 1e9) }
+    const buildBody = (pr: string) => isSchnell
+      ? { prompt: pr, mode: 'base', width: 1024, height: 1024, steps: 4, seed: Math.floor(Math.random() * 1e9) }
       : isFlux
-      ? { prompt: genPrompt, mode: 'base', width: dim64(width), height: dim64(height),
+      ? { prompt: pr, mode: 'base', width: dim64(width), height: dim64(height),
           seed: Math.floor(Math.random() * 1e9), steps: 30, cfg_scale: 3.5 }
-      : { prompt: genPrompt, seed: Math.floor(Math.random() * 1e9) };
+      : { prompt: pr, seed: Math.floor(Math.random() * 1e9) };
 
     for (const [i, key] of nvKeys.entries()) {
       const alias = `NVIDIA#${i + 1}`;
       const t0 = Date.now();
       let errA = ''; // kegagalan endpoint genai (utk pesan gabungan)
 
-      // ── Percobaan A: endpoint genai (ai.api.nvidia.com) ──
-      try {
-        let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(genaiBody),
-          signal: AbortSignal.timeout(60_000),
-        });
-        let data = await res.json().catch(() => null);
+      // ── Percobaan A: endpoint genai — hingga 2x (retry safe-rewrite bila
+      //    kena filter konten & IMAGE_FILTER_STRICT tidak aktif) ──
+      for (let att = 0; att < 2; att++) {
+        try {
+          let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(buildBody(genPrompt)),
+            signal: AbortSignal.timeout(60_000),
+          });
+          let data = await res.json().catch(() => null);
 
-        // Pola antrian NVCF: 202 + header NVCF-REQID → poll status resmi
-        if (res.status === 202) {
-          const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
-          const pollDeadline = Date.now() + 90_000;
-          while (reqId && Date.now() < pollDeadline) {
-            await sleep(3_000);
-            res = await fetch(`https://api.nvcf.nvidia.com/v2/nvcf/pexec/status/${reqId}`, {
-              headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
-              signal: AbortSignal.timeout(20_000),
-            });
-            if (res.status === 202) continue;
-            data = await res.json().catch(() => null);
-            break;
+          // Pola antrian NVCF: 202 + header NVCF-REQID → poll status resmi
+          if (res.status === 202) {
+            const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
+            const pollDeadline = Date.now() + 90_000;
+            while (reqId && Date.now() < pollDeadline) {
+              await sleep(3_000);
+              res = await fetch(`https://api.nvcf.nvidia.com/v2/nvcf/pexec/status/${reqId}`, {
+                headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+                signal: AbortSignal.timeout(20_000),
+              });
+              if (res.status === 202) continue;
+              data = await res.json().catch(() => null);
+              break;
+            }
           }
-        }
 
-        const b64 = data?.artifacts?.[0]?.base64 || null;
-        // Deteksi gambar HITAM hasil filter konten: PNG polos ≈ <12 KB pada
-        // 896×1152 (gambar sungguhan ≥40 KB) — anggap gagal & jelaskan sebabnya
-        if (res.ok && b64 && b64.length * 0.75 < 12_000) {
-          errA = 'diblokir filter konten model (gambar hitam) — hindari kata jarum/darah/prosedur invasif di prompt';
-        } else if (res.ok && b64) {
-          const latency = Date.now() - t0;
-          await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
-            prompt_preview: trunc(prompt), response_preview: `[image genai]`, latency_ms: latency, status: 'OK' });
-          return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
-        } else {
-        errA = res.status === 202 ? 'antrian belum selesai >90s'
-          : errStr(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+          const b64 = data?.artifacts?.[0]?.base64 || null;
+          const black = res.ok && b64 && b64.length * 0.75 < 12_000; // <12 KB = filter (gambar hitam)
+          if (res.ok && b64 && !black) {
+            const latency = Date.now() - t0;
+            await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+              prompt_preview: trunc(prompt), response_preview: `[image genai]`, latency_ms: latency, status: 'OK' });
+            return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
+          }
+          if (black) {
+            errA = 'filter konten model (gambar hitam)';
+            // Auto safe-rewrite SEKALI, lalu ulangi model ini (att=1)
+            if (!strictFilter && att === 0 && !usedSafeRewrite) {
+              const safe = await safeRewrite(genPrompt);
+              if (safe) { genPrompt = safe; usedSafeRewrite = true; continue; }
+            }
+          } else {
+            errA = res.status === 202 ? 'antrian belum selesai >90s'
+              : errStr(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+          }
+        } catch (e) {
+          const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+          errA = timedOut ? 'timeout 60s' : (e instanceof Error ? e.message : 'network error');
         }
-      } catch (e) {
-        const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
-        errA = timedOut ? 'timeout 60s' : (e instanceof Error ? e.message : 'network error');
-      }
-
-      // FAIL-FAST filter konten: ini masalah PROMPT, bukan model/key — model
-      // lain akan memblokir juga. Hentikan rantai & beri tahu jujur (hemat
-      // 60+ dtk dan pesan error tidak lagi tertutup model terakhir).
-      if (errA.startsWith('diblokir filter konten')) {
-        await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
-          prompt_preview: trunc(prompt), response_preview: trunc(`${alias}/${model}: ${errA}`),
-          latency_ms: Date.now() - t0, status: 'ERROR' });
-        return json({ error:
-          `Prompt DIBLOKIR filter konten model gambar (hasilnya gambar hitam). ` +
-          `Ubah deskripsi: hindari kata pasien, jarum, darah, atau prosedur medis pada orang. ` +
-          `Prompt terpakai (hasil terjemahan): "${genPrompt.slice(0, 160)}"` }, 400);
+        break; // tidak ada percobaan genai lain → lanjut endpoint B
       }
 
       // ── Percobaan B: endpoint gaya OpenAI (integrate.api.nvidia.com) ──
@@ -465,9 +481,12 @@ async function runImage(body: Record<string, unknown>) {
   }
 
   // Tidak ada fallback Gemini utk gambar (kebijakan: Gemini khusus teks).
+  const filterHit = /gambar hitam/.test(last);
   return json({ error:
     `Semua model gambar NVIDIA gagal (${models.length} model dicoba). Terakhir → ${last}. ` +
-    `Detail tiap percobaan: Agentic AI → Monitor → Log LLM.` }, 503);
+    (filterHit
+      ? `Filter keamanan NVIDIA menolak tema ini bahkan setelah ditulis-ulang otomatis — ini batasan di server NVIDIA, bukan sistem kita. Coba deskripsi tanpa unsur medis pada orang (interior lab, alat, ilustrasi abstrak).`
+      : `Detail tiap percobaan: Agentic AI → Monitor → Log LLM.`) }, 503);
 }
 
 Deno.serve(async (req) => {
