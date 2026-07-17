@@ -157,9 +157,9 @@ async function runDiag() {
 
   // Tes JALUR GAMBAR (key #1, model gambar pertama) — berjalan paralel.
   // Mencoba genai dulu lalu endpoint gaya OpenAI, persis alur produksi.
-  const imgModel = (Deno.env.get('NVIDIA_IMAGE_MODEL') || 'black-forest-labs/flux.1-schnell')
+  const imgModel = (Deno.env.get('NVIDIA_IMAGE_MODEL') || '')
     .split(/[,\s]+/).map((s) => s.trim()).filter((m) => m && !/^nvapi-/i.test(m))[0]
-    || 'black-forest-labs/flux.1-schnell';
+    || DEFAULT_IMAGE_MODELS[0];
   const imgPromise = (async () => {
     if (!nvKeys.length) return null;
     const key = nvKeys[0];
@@ -263,18 +263,37 @@ async function runDiag() {
     results.push(imgRes);
     verdicts.push(imgRes.ok
       ? `🖼✅ Jalur GAMBAR sehat (${imgRes.model} · ${Math.round(imgRes.latency_ms / 1000)}s via ${imgRes.msg.replace('OK ', '')}).`
-      : `🖼❌ Jalur GAMBAR gagal (${imgRes.model}): ${imgRes.msg} — cek isi NVIDIA_IMAGE_MODEL (harus nama model hosted, mis. black-forest-labs/flux.1-schnell).`);
+      : `🖼❌ Jalur GAMBAR gagal (${imgRes.model}): ${imgRes.msg} — produksi masih mencoba ${DEFAULT_IMAGE_MODELS.length} model lain berurutan; cek Monitor → Log LLM utk detail.`);
   }
 
   return json({ diag: true, checked: results.length, results, verdicts,
     models: { nvidia_main: nvMain, nvidia_light: nvLight, gemini: gmModel, image: imgModel } });
 }
 
+// Daftar LENGKAP model text-to-image NVIDIA hosted yang dikenal — dicoba
+// berurutan sampai ada yang berhasil. Yang terbukti hidup di akun ini di
+// depan; yang rawan menggantung (timeout 60 dtk) paling belakang.
+// Prioritas bisa ditimpa lewat secret NVIDIA_IMAGE_MODEL (daftar koma) —
+// isinya ditaruh di DEPAN rantai ini, bukan menggantikannya.
+const DEFAULT_IMAGE_MODELS = [
+  'black-forest-labs/flux.1-dev',            // ✅ terbukti hidup (uji 16 Jul 2026)
+  'stabilityai/stable-diffusion-3.5-large',
+  'stabilityai/stable-diffusion-3-medium',
+  'stabilityai/stable-diffusion-xl',
+  'stabilityai/sdxl-turbo',
+  'briaai/bria-2.3',
+  'black-forest-labs/flux.2-klein-4b',
+  'qwen/qwen-image',
+  'black-forest-labs/flux.1-kontext-dev',    // rawan lambat
+  'black-forest-labs/flux.1-schnell',        // hosted NIM menggantung — cadangan terakhir
+];
+
 // ── MODE GAMBAR (Fase 5) ─────────────────────────────────────────────
 // POST {mode:'image', prompt, model?, width?, height?}
-// Urutan: NVIDIA FLUX (ai.api.nvidia.com/v1/genai/<model>, respons
-// artifacts[0].base64) per key → endpoint gaya OpenAI images bila 404
-// (model tertentu spt flux.2-klein) → fallback Gemini image.
+// KEBIJAKAN: gambar = 100% NVIDIA (rantai semua model text-to-image);
+// Gemini TIDAK dipakai utk gambar — khusus teks.
+// Tiap model dicoba di endpoint genai (artifacts[0].base64) lalu endpoint
+// gaya OpenAI (data[0].b64_json); anggaran waktu total 120 dtk.
 // RESPONSE: { images:[dataUri], provider, model, latencyMs }
 function b64Mime(b64: string): string {
   if (b64.startsWith('iVBORw0KGgo')) return 'image/png';
@@ -285,14 +304,16 @@ function b64Mime(b64: string): string {
 async function runImage(body: Record<string, unknown>) {
   const prompt = String(body.prompt || '').trim().slice(0, 9500);
   if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
-  // NVIDIA_IMAGE_MODEL boleh BERISI BANYAK model dipisah koma → dicoba
-  // berurutan (failover antar model). Isi NAMA MODEL persis dari
-  // build.nvidia.com (mis. black-forest-labs/flux.1-schnell,
-  // black-forest-labs/flux.2-klein-4b, qwen/qwen-image) — BUKAN API key.
-  const models = String(body.model || Deno.env.get('NVIDIA_IMAGE_MODEL') || 'black-forest-labs/flux.1-schnell')
+  // body.model (dari probe/tes) = pakai model itu SAJA.
+  // Selain itu: prioritas dari secret NVIDIA_IMAGE_MODEL (opsional, koma)
+  // + SEMUA model default di belakangnya (dedupe). Gemini TIDAK dipakai
+  // untuk gambar — kebijakan: Gemini khusus teks.
+  const pref = String(Deno.env.get('NVIDIA_IMAGE_MODEL') || '')
     .split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
     .filter((m) => !/^nvapi-/i.test(m)); // jaga-jaga: key nyasar ke secret model
-  if (!models.length) models.push('black-forest-labs/flux.1-schnell');
+  const models = body.model
+    ? [String(body.model)]
+    : [...new Set([...pref, ...DEFAULT_IMAGE_MODELS])];
   // FLUX hanya menerima kelipatan 64 (768–1344); 896×1152 ≈ rasio IG 4:5
   const width = Number(body.width) || 896;
   const height = Number(body.height) || 1152;
@@ -300,10 +321,17 @@ async function runImage(body: Record<string, unknown>) {
   const hash = await sha256(`img|${models.join('+')}|${prompt}|${width}x${height}`);
   let last = 'Belum ada percobaan';
   const nvKeys = keysOf('NVIDIA_API_KEYS');
+  if (!nvKeys.length) return json({ error: 'NVIDIA_API_KEYS belum diset (gambar hanya lewat NVIDIA).' }, 500);
+  // Anggaran waktu total: rantai panjang + model yang menggantung tidak boleh
+  // melebihi umur invocation Edge Function (~150 dtk)
+  const imgDeadline = Date.now() + 120_000;
 
   // 1) NVIDIA: model demi model × key demi key
   modelLoop:
   for (const model of models) {
+    if (Date.now() > imgDeadline) {
+      return json({ error: `Anggaran waktu gambar habis (120 dtk). Terakhir → ${last}` }, 503);
+    }
     const isFlux = /flux/i.test(model);
     const isSchnell = /schnell|klein/i.test(model); // distilled → langkah sedikit
     // Batasan per model (dok resmi): flux.1-schnell HANYA 1024×1024, steps 1-4,
@@ -401,36 +429,10 @@ async function runImage(body: Record<string, unknown>) {
     }
   }
 
-  // 2) Fallback Gemini image
-  const gmImgModel = String(Deno.env.get('GEMINI_IMAGE_MODEL') || 'gemini-2.5-flash-image');
-  for (const [i, key] of geminiKeys().entries()) {
-    const alias = `GEMINI#${i + 1}`;
-    const t0 = Date.now();
-    try {
-      const res = await fetch(`${GEMINI_BASE}/${gmImgModel}:generateContent?key=${key}`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: prompt }] }] }),
-        signal: AbortSignal.timeout(90_000),
-      });
-      const data = await res.json().catch(() => null);
-      const latency = Date.now() - t0;
-      const parts = data?.candidates?.[0]?.content?.parts || [];
-      const inline = parts.map((p: Record<string, Record<string, string>>) => p.inlineData || p.inline_data).find(Boolean);
-      if (res.ok && inline?.data) {
-        await logReq({ task_id: taskId, provider: 'GEMINI', model: gmImgModel, key_alias: alias, prompt_hash: hash,
-          prompt_preview: trunc(prompt), response_preview: '[image]', latency_ms: latency, status: 'FALLBACK' });
-        return json({ images: [`data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`],
-          provider: 'GEMINI', model: gmImgModel, latencyMs: latency });
-      }
-      last = `${alias}: ${data?.error?.message || `HTTP ${res.status} (tanpa gambar)`}`;
-      await logReq({ task_id: taskId, provider: 'GEMINI', model: gmImgModel, key_alias: alias, prompt_hash: hash,
-        prompt_preview: trunc(prompt), response_preview: trunc(String(last)), latency_ms: latency, status: 'ERROR' });
-    } catch (e) {
-      last = `${alias}: ${e instanceof Error ? e.message : 'network error'}`;
-    }
-  }
-
-  return json({ error: `Semua provider gambar gagal. Terakhir → ${last}` }, 503);
+  // Tidak ada fallback Gemini utk gambar (kebijakan: Gemini khusus teks).
+  return json({ error:
+    `Semua model gambar NVIDIA gagal (${models.length} model dicoba). Terakhir → ${last}. ` +
+    `Detail tiap percobaan: Agentic AI → Monitor → Log LLM.` }, 503);
 }
 
 Deno.serve(async (req) => {

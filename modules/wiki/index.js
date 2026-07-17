@@ -32,18 +32,16 @@ async function wikiAI(payload){
   return data;
 }
 async function wikiAskText(prompt, opts){ const d = await wikiAI(Object.assign({mode:'text', prompt}, opts||{})); return d.text||''; }
-// Gambar: utamakan llm-gateway (NVIDIA FLUX → Gemini); fallback gemini-proxy lama
+// Gambar: 100% NVIDIA via llm-gateway (rantai semua model text-to-image).
+// Kebijakan: Gemini KHUSUS teks — tidak ada fallback gemini utk gambar.
 async function wikiGenImage(prompt, opts){
-  try{
-    const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
-      body: JSON.stringify(Object.assign({mode:'image', prompt}, opts||{})),
-    });
-    const d = await res.json().catch(()=>({}));
-    if(res.ok && Array.isArray(d.images) && d.images.length) return d.images;
-  }catch(e){ /* lanjut ke gemini-proxy */ }
-  const d = await wikiAI(Object.assign({mode:'image', prompt}, opts||{}));
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
+    body: JSON.stringify(Object.assign({mode:'image', prompt}, opts||{})),
+  });
+  const d = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(d.error || `Gagal generate gambar (HTTP ${res.status})`);
   return d.images||[];
 }
 
@@ -102,7 +100,7 @@ async function renderWiki(tab){
     <div class="pro-header">
       <div><h1>${svgIcon('book',18)} Wiki OneLab</h1>
         <span class="pro-sub">Dokumen &amp; SOP · Perbaikan SOP (AI) · Content Studio · Media</span></div>
-      <span class="pro-sub" id="wiki-ai-state">AI: teks Gemini · gambar NVIDIA FLUX (fallback Gemini)</span>
+      <span class="pro-sub" id="wiki-ai-state">AI: teks Gemini/NVIDIA · gambar 100% NVIDIA</span>
     </div>
 
     <div id="wiki-kpi" class="pro-kpi"></div>

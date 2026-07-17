@@ -43,11 +43,12 @@ DRAFT ──Setujui──► APPROVED ──Publish──► PUBLISHED
 | flux.1-schnell | ❌ hosted NIM menggantung (timeout) | Apache-2.0 | Mati di sisi NVIDIA |
 | flux.2-klein-4b, qwen-image | ❌ 404 | — | Tidak di-host NVIDIA (hanya partner berbayar spt Together AI) |
 | SD3-medium, SDXL, Bria | ❌ "Function not found for account" | — | Tidak tersedia utk akun ini |
-| Gemini image (fallback) | key valid, kuota free tier = 0 | — | Aktifkan billing Google utk jalur produksi legal-komersial (±Rp600/gambar) |
+| Gemini image | **DIHAPUS dari jalur gambar** | — | Kebijakan (keputusan user): Gemini KHUSUS teks; gambar 100% NVIDIA |
 
-**Setting yang dipakai:** `NVIDIA_IMAGE_MODEL = black-forest-labs/flux.1-dev`
-(HANYA satu model — jangan taruh schnell di depan, tiap gambar akan menunggu
-50 dtk timeout dulu).
+**Setting gambar:** secret `NVIDIA_IMAGE_MODEL` kini **opsional** — gateway
+otomatis mencoba SEMUA model text-to-image NVIDIA berurutan (flux.1-dev di
+depan karena terbukti hidup; schnell yang menggantung ditaruh paling belakang;
+anggaran waktu total 120 dtk). Isi secret hanya bila mau mengubah prioritas.
 
 **⚠ Filter konten flux.1-dev:** prompt berbau jarum/darah/prosedur invasif →
 model mengembalikan **gambar hitam**. Gateway kini mendeteksinya (<12 KB =

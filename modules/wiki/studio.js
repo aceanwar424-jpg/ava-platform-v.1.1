@@ -211,7 +211,7 @@ async function runImageGen(){
     toast('✅ Gambar dibuat','ok');
   }catch(e){
     out.innerHTML=`<div class="status-box status-err">❌ ${e.message}
-      <div style="font-size:11.5px;margin-top:6px">Gambar kini via <strong>NVIDIA FLUX</strong> (llm-gateway, model diatur secret <code>NVIDIA_IMAGE_MODEL</code>, default <code>flux.1-schnell</code>) dengan fallback Gemini. Bila error: pastikan Edge Function <code>llm-gateway</code> versi terbaru sudah di-deploy, lalu cek <strong>Agentic AI → Monitor → Tes Koneksi AI</strong>.</div></div>`;
+      <div style="font-size:11.5px;margin-top:6px">Gambar <strong>100% NVIDIA</strong> — llm-gateway mencoba semua model text-to-image berurutan (prioritas via secret <code>NVIDIA_IMAGE_MODEL</code>, default dimulai <code>flux.1-dev</code>). Hindari kata jarum/darah/prosedur invasif di prompt (kena filter konten → gambar hitam). Detail kegagalan: <strong>Agentic AI → Monitor → Log LLM</strong>.</div></div>`;
   }
   if(btn){ btn.disabled=false; btn.innerHTML=`${svgIcon('sparkle',15)} Generate Gambar`; }
 }
