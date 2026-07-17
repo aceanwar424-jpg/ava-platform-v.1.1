@@ -716,8 +716,13 @@ Deno.serve(async (req) => {
   const max = Math.min(parseInt(body.max ?? MAX_PER_TICK, 10) || MAX_PER_TICK, 5);
   const agent = body.agent ?? null;
   const results: Record<string, unknown>[] = [];
+  // Anggaran waktu: task berat (Nemotron 550B ±50 dtk) tidak boleh membuat
+  // invocation menembus batas kill Edge Function (~150 dtk → HTTP 504).
+  // Setelah 1 task selesai & waktu terpakai >100 dtk, berhenti klaim baru.
+  const tickDeadline = Date.now() + 100_000;
 
   for (let i = 0; i < max; i++) {
+    if (i > 0 && Date.now() > tickDeadline) break;
     let task: Task | null = null;
     try {
       const rows = await rpc('agentic_claim_task', { p_worker: WORKER_ID, p_agent: agent });
