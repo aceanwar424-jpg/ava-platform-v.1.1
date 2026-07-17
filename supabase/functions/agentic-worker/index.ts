@@ -652,17 +652,57 @@ async function handleItCheck(t: Task) {
   const verdicts = (diag.verdicts || []) as string[];
   const bad = verdicts.filter((v) => v.includes('❌'));
   const failedOpen = ((m7?.failed_open || []) as Dict[]).length;
+
+  // ── FASE 6C: analisis kegagalan → perbaiki PROMPT sendiri (autonomous) ──
+  const fixes: string[] = [];
+  try {
+    const itData = await rpc('agentic_it_data', {}) as Dict | null;
+    const llmErrors = (itData?.llm_errors || []) as Dict[];
+    const qaFails = (itData?.qa_fails || []) as Dict[];
+    const imgBlocked = Number(itData?.image_blocked || 0);
+    const templates = (itData?.templates || []) as Dict[];
+    // hanya analisis bila ADA sinyal masalah yang bisa diperbaiki lewat prompt
+    const worthAnalyzing = imgBlocked >= 3 || qaFails.length >= 2;
+
+    if (worthAnalyzing && templates.length) {
+      const itAgent = await rpc('agentic_agent_get', { p_code: 'IT_HEAD' }) as Dict | null;
+      const analysis = await askLLM({
+        taskId: t.id, tier: 'main', temperature: 0.2, maxTokens: 3000,
+        system: String(itAgent?.charter || '') +
+          '\nBalas HANYA JSON: {"diagnosis":string,"prompt_fixes":[{"code":string,"new_system_prompt":string,"reason":string}]}.' +
+          ' Perbaiki HANYA template yang benar-benar menyebabkan kegagalan di data. Pertahankan SEMUA aturan keamanan yang ada, hanya tambahkan/pertegas. new_system_prompt = versi LENGKAP hasil perbaikan (bukan diff). Kosongkan prompt_fixes bila tidak ada yang perlu diperbaiki.',
+        prompt: `SINYAL 24 JAM:\n- Gambar diblokir filter: ${imgBlocked}x\n- Error LLM per model: ${JSON.stringify(llmErrors).slice(0, 1500)}\n- QA gagal: ${JSON.stringify(qaFails).slice(0, 1500)}\n\nTEMPLATE AKTIF (perbaiki bila relevan):\n${JSON.stringify(templates).slice(0, 8000)}`,
+      });
+      const parsed = parseJSONLoose(String(analysis.text)) as Dict;
+      const pfs = Array.isArray(parsed.prompt_fixes) ? parsed.prompt_fixes as Dict[] : [];
+      for (const pf of pfs.slice(0, 3)) { // maks 3 perbaikan per patroli
+        try {
+          const r = await rpc('agentic_prompt_apply', { p: {
+            code: pf.code, system_prompt: pf.new_system_prompt,
+            reason: String(pf.reason || 'perbaikan otomatis IT'), changed_by: 'IT_HEAD' } }) as Dict;
+          if (r && !r.skipped) fixes.push(`🔧 Prompt **${pf.code}** diperbaiki (v${r.from_version}→v${r.to_version}): ${pf.reason}`);
+        } catch (e) {
+          fixes.push(`⚠ Gagal memperbaiki ${pf.code}: ${e instanceof Error ? e.message : e}`);
+        }
+      }
+    }
+  } catch (e) {
+    fixes.push(`⚠ Analisis prompt gagal: ${e instanceof Error ? e.message : e}`);
+  }
+
   const md = `## Laporan Kepala IT — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
     (verdicts.length ? verdicts.map((v) => `- ${v}`).join('\n') : `- diag: ${diag.error || 'tidak ada data'}`) +
-    `\n- Task macet dibebaskan: ${reap?.reaped ?? 0}\n- Task FAILED terbuka: ${failedOpen}`;
+    `\n- Task macet dibebaskan: ${reap?.reaped ?? 0}\n- Task FAILED terbuka: ${failedOpen}` +
+    (fixes.length ? `\n\n**Perbaikan prompt (otomatis, bisa di-rollback di tab Organisasi):**\n${fixes.map((f) => `- ${f}`).join('\n')}` : '\n- Tidak ada prompt yang perlu diperbaiki');
 
-  if (bad.length || failedOpen > 3 || diag.error) {
-    await rpc('agentic_msg_add', { p: { from_agent: 'IT_HEAD', to_agent: 'ACE', kind: 'ALERT',
-      body: md } });
+  // Lapor bila ada masalah ATAU ada perbaikan yang dilakukan
+  if (bad.length || failedOpen > 3 || diag.error || fixes.length) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'IT_HEAD', to_agent: 'ACE',
+      kind: fixes.length ? 'INFO' : 'ALERT', body: md } });
   }
   return {
-    result: { verdicts, reaped: reap?.reaped ?? 0, failed_open: failedOpen, markdown: md },
-    note: `IT: ${bad.length ? bad.length + ' jalur bermasalah' : 'semua jalur sehat'} · reap ${reap?.reaped ?? 0} · FAILED ${failedOpen}`,
+    result: { verdicts, reaped: reap?.reaped ?? 0, failed_open: failedOpen, prompt_fixes: fixes, markdown: md },
+    note: `IT: ${bad.length ? bad.length + ' jalur bermasalah' : 'semua jalur sehat'} · reap ${reap?.reaped ?? 0} · FAILED ${failedOpen} · ${fixes.length} prompt diperbaiki`,
   };
 }
 

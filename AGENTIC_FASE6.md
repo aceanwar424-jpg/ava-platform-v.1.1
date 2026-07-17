@@ -90,7 +90,23 @@ Tombol manual tetap ada di tab Organisasi: **Jalankan HEAD · IT Check · Minta 
 | HEAD tidak memutuskan draft lama | Wajar 2 tick: tick-1 menugaskan QA, tick-2 memutuskan |
 | Mau cabut mandat R1 | `update agentic.decision_rights set auto_action='AUTO_APPROVE' where task_type='MAKE_SOSMED';` |
 
-## Berikutnya (backlog F6C–E)
+## Fase 6C — Kepala IT memperbaiki PROMPT sendiri (self-heal)
+Jalankan **`supabase_agentic_fase6c.sql`** (setelah 6 & 6B), lalu re-deploy
+`agentic-worker`. Kini saat patroli (IT_CHECK), Kepala IT:
+1. tes semua jalur AI + bebaskan task macet (seperti sebelumnya)
+2. **menganalisis kegagalan berulang** — gambar diblokir filter ≥3x atau QA
+   gagal ≥2x dalam 24 jam
+3. **memperbaiki prompt template yang bermasalah SENDIRI** (mis. menambah
+   guardrail "hindari tema pasien/jarum" ke prompt gambar), maks 3 per patroli
+4. **melapor** ke Anda di tab Organisasi — panel *🔧 Perbaikan Prompt* berisi
+   apa yang diubah + tombol **Rollback** per perubahan
+
+Pengaman: IT hanya boleh MENGEDIT template yang sudah ada (tidak boleh bikin
+baru), prompt baru wajib ≥120 char & ≥60% panjang lama (mencegah guardrail
+tergerus), versi lama selalu di-backup ke `prompt_history`. IT **tidak** bisa
+menyentuh kode program (repo) — itu batas keamanan yang disengaja.
+
+## Berikutnya (backlog)
 Memori RAG (pgvector + NVIDIA embeddings — QA menilai berdasar SOP Anda sendiri),
 Kepala Team (SLA & standup kaya), Logistik (baca inventory nyata → draft PO),
-bus pesan antar-agent penuh.
+bus pesan antar-agent penuh, kotak "Beri Tugas ke HEAD" bahasa bebas.

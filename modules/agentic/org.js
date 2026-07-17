@@ -109,8 +109,45 @@ async function renderAgOrgTab(el){
     <div class="ag-detail" style="margin-top:12px" id="ag-cron-box">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⏰ Penjadwal Otomatis (cron)</div>
       <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
+    <div class="ag-detail" style="margin-top:12px" id="ag-prompthist-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔧 Perbaikan Prompt oleh Kepala IT</div>
+      <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
   agRenderCronBox();
+  agRenderPromptHist();
+}
+
+// ── Riwayat perbaikan prompt IT + rollback ───────────────────────
+async function agRenderPromptHist(){
+  const box = document.getElementById('ag-prompthist-box'); if(!box) return;
+  let hist = [];
+  try{ hist = await sbGet('agentic_prompt_hist_v','select=*&order=created_at.desc&limit=20') || []; }catch(e){ hist = null; }
+  const inner = hist===null
+    ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase6c.sql</strong> untuk mengaktifkan self-heal prompt oleh Kepala IT.</div>`
+    : !hist.length
+    ? `<div style="font-size:12px;color:var(--gray)">Belum ada perbaikan. Kepala IT akan memperbaiki prompt otomatis saat mendeteksi kegagalan berulang (gambar diblokir / QA gagal), lalu tercatat di sini dengan tombol rollback.</div>`
+    : hist.map(h=>`<div style="border:1px solid var(--border);border-left:4px solid #8B5CF6;border-radius:8px;padding:8px 12px;margin-bottom:7px">
+        <div style="display:flex;justify-content:space-between;gap:8px;font-size:12px">
+          <span><strong>${agEsc(h.code)}</strong> <span style="color:var(--gray)">v${h.version} · oleh ${agEsc(h.changed_by)}</span></span>
+          <span style="color:var(--gray)">${agAgo(h.created_at)}</span>
+        </div>
+        <div style="font-size:11.5px;color:#475569;margin-top:2px">${agEsc(h.reason||'')}</div>
+        <button class="ag-btn warn" style="padding:3px 10px;margin-top:5px;font-size:11px" onclick="agPromptRollback('${agEsc(h.code)}')">${svgIcon('refresh',11)} Rollback ke versi ini</button>
+      </div>`).join('');
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">🔧 Perbaikan Prompt oleh Kepala IT</div>
+      <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderPromptHist()">${svgIcon('refresh',11)} Muat ulang</button>
+    </div>${inner}`;
+}
+async function agPromptRollback(code){
+  if(!confirm(`Kembalikan prompt "${code}" ke versi sebelum perbaikan terakhir?`)) return;
+  try{
+    const r = await agRpc('agentic_prompt_rollback', { p_code: code });
+    toast(`Prompt ${code} dikembalikan ke v${r&&r.restored_from_version}`,'ok');
+    agRenderPromptHist();
+  }catch(e){ toast(e.message,'err'); }
 }
 
 // ── Panel cron: pantau + jeda/aktifkan tanpa SQL ─────────────────
