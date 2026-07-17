@@ -73,6 +73,9 @@ async function sha256(s: string) {
 }
 const trunc = (s: string, n = 2000) => (s || '').slice(0, n);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// Error provider bisa berupa string/objek/array — jangan sampai "[object Object]"
+const errStr = (v: unknown): string =>
+  typeof v === 'string' ? v : (v == null ? '' : JSON.stringify(v).slice(0, 300));
 
 // Rate limit per key: hitung request 60 detik terakhir (pengganti limiter Redis)
 async function isRateLimited(alias: string): Promise<boolean> {
@@ -326,6 +329,25 @@ async function runImage(body: Record<string, unknown>) {
   // melebihi umur invocation Edge Function (~150 dtk)
   const imgDeadline = Date.now() + 120_000;
 
+  // TERJEMAHKAN prompt ke Inggris via model teks light (±1-2 dtk).
+  // TERBUKTI (uji 17 Jul 2026): safety filter NIM flux.1-dev mem-blacklist
+  // prompt berbahasa Indonesia apa pun isinya (gambar hitam), sedangkan
+  // terjemahan Inggris yang identik LOLOS. Gagal terjemah → pakai asli.
+  let genPrompt = prompt;
+  try {
+    const trModel = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+    const tr = await callNvidia(nvKeys[0], trModel, {
+      messages: [
+        { role: 'system', content: 'Rewrite the user text as one concise English image-generation prompt. Keep every visual detail, style, ratio, and constraint. Output ONLY the prompt text, no quotes, no explanation.' },
+        { role: 'user', content: prompt },
+      ],
+      temperature: 0.1, max_tokens: 350,
+    });
+    if (tr.ok && typeof tr.text === 'string' && tr.text.trim().length > 10) {
+      genPrompt = tr.text.trim().slice(0, 2500);
+    }
+  } catch { /* pakai prompt asli */ }
+
   // 1) NVIDIA: model demi model × key demi key
   modelLoop:
   for (const model of models) {
@@ -338,12 +360,12 @@ async function runImage(body: Record<string, unknown>) {
     // TANPA cfg_scale. flux.1-dev: 768–1344 kelipatan 64. Lainnya: body minimal.
     const dim64 = (v: number) => Math.min(1344, Math.max(768, Math.round(v / 64) * 64));
     const genaiBody = isSchnell
-      ? { prompt, mode: 'base', width: 1024, height: 1024, steps: 4,
+      ? { prompt: genPrompt, mode: 'base', width: 1024, height: 1024, steps: 4,
           seed: Math.floor(Math.random() * 1e9) }
       : isFlux
-      ? { prompt, mode: 'base', width: dim64(width), height: dim64(height),
+      ? { prompt: genPrompt, mode: 'base', width: dim64(width), height: dim64(height),
           seed: Math.floor(Math.random() * 1e9), steps: 30, cfg_scale: 3.5 }
-      : { prompt, seed: Math.floor(Math.random() * 1e9) };
+      : { prompt: genPrompt, seed: Math.floor(Math.random() * 1e9) };
 
     for (const [i, key] of nvKeys.entries()) {
       const alias = `NVIDIA#${i + 1}`;
@@ -388,11 +410,24 @@ async function runImage(body: Record<string, unknown>) {
           return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
         } else {
         errA = res.status === 202 ? 'antrian belum selesai >90s'
-          : String(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+          : errStr(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
         }
       } catch (e) {
         const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
         errA = timedOut ? 'timeout 60s' : (e instanceof Error ? e.message : 'network error');
+      }
+
+      // FAIL-FAST filter konten: ini masalah PROMPT, bukan model/key — model
+      // lain akan memblokir juga. Hentikan rantai & beri tahu jujur (hemat
+      // 60+ dtk dan pesan error tidak lagi tertutup model terakhir).
+      if (errA.startsWith('diblokir filter konten')) {
+        await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
+          prompt_preview: trunc(prompt), response_preview: trunc(`${alias}/${model}: ${errA}`),
+          latency_ms: Date.now() - t0, status: 'ERROR' });
+        return json({ error:
+          `Prompt DIBLOKIR filter konten model gambar (hasilnya gambar hitam). ` +
+          `Ubah deskripsi: hindari kata pasien, jarum, darah, atau prosedur medis pada orang. ` +
+          `Prompt terpakai (hasil terjemahan): "${genPrompt.slice(0, 160)}"` }, 400);
       }
 
       // ── Percobaan B: endpoint gaya OpenAI (integrate.api.nvidia.com) ──
@@ -403,7 +438,7 @@ async function runImage(body: Record<string, unknown>) {
         const res = await fetch('https://integrate.api.nvidia.com/v1/images/generations', {
           method: 'POST',
           headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ model, prompt, n: 1, response_format: 'b64_json' }),
+          body: JSON.stringify({ model, prompt: genPrompt, n: 1, response_format: 'b64_json' }),
           signal: AbortSignal.timeout(60_000),
         });
         const data = await res.json().catch(() => null);
@@ -414,7 +449,7 @@ async function runImage(body: Record<string, unknown>) {
             prompt_preview: trunc(prompt), response_preview: `[image openai-style]`, latency_ms: latency, status: 'OK' });
           return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
         }
-        const errB = String(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+        const errB = errStr(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
         last = `${alias}/${model}: genai=[${errA}] openai=[${errB}]`;
         await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
           prompt_preview: trunc(prompt), response_preview: trunc(last), latency_ms: latency, status: 'ERROR' });
