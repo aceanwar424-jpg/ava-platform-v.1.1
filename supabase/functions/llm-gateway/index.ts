@@ -349,14 +349,19 @@ async function runImage(body: Record<string, unknown>) {
         }
 
         const b64 = data?.artifacts?.[0]?.base64 || null;
-        if (res.ok && b64) {
+        // Deteksi gambar HITAM hasil filter konten: PNG polos ≈ <12 KB pada
+        // 896×1152 (gambar sungguhan ≥40 KB) — anggap gagal & jelaskan sebabnya
+        if (res.ok && b64 && b64.length * 0.75 < 12_000) {
+          errA = 'diblokir filter konten model (gambar hitam) — hindari kata jarum/darah/prosedur invasif di prompt';
+        } else if (res.ok && b64) {
           const latency = Date.now() - t0;
           await logReq({ task_id: taskId, provider: 'NVIDIA', model, key_alias: alias, prompt_hash: hash,
             prompt_preview: trunc(prompt), response_preview: `[image genai]`, latency_ms: latency, status: 'OK' });
           return json({ images: [`data:${b64Mime(b64)};base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
-        }
+        } else {
         errA = res.status === 202 ? 'antrian belum selesai >90s'
           : String(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+        }
       } catch (e) {
         const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
         errA = timedOut ? 'timeout 60s' : (e instanceof Error ? e.message : 'network error');

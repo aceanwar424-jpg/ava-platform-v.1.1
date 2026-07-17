@@ -35,17 +35,24 @@ DRAFT ──Setujui──► APPROVED ──Publish──► PUBLISHED
 ```
 *Auto-posting ke IG/Meta sengaja belum dibuat (spec §5.2) — posting tetap manusia.*
 
-## Pilihan model gambar NVIDIA (analisis)
+## Pilihan model gambar NVIDIA (HASIL UJI NYATA 16 Jul 2026, akun OneLab)
 
-| Model | Lisensi | Cocok? |
-|---|---|---|
-| **flux.1-schnell** ✅ default | Apache-2.0 (bebas komersial) | Tercepat (4 langkah), kualitas bagus utk flyer — **pilihan aman utk konten marketing OneLab** |
-| flux.2-klein-4b | Apache-2.0, generasi terbaru (FLUX.2) | Kualitas lebih baru + bisa image editing; ganti `NVIDIA_IMAGE_MODEL=black-forest-labs/flux.2-klein-4b` bila tersedia di akun Anda |
-| flux.1-dev / Kontext-dev | **Non-Commercial** | ⚠ Hindari utk materi marketing komersial |
+| Model | Hasil probe | Lisensi | Kesimpulan |
+|---|---|---|---|
+| **flux.1-dev** | ✅ **JALAN** (±5 dtk) | ⚠ Non-Commercial | **Satu-satunya yang hidup** — pakai utk uji coba/draft; JANGAN publikasikan sbg materi promosi |
+| flux.1-schnell | ❌ hosted NIM menggantung (timeout) | Apache-2.0 | Mati di sisi NVIDIA |
+| flux.2-klein-4b, qwen-image | ❌ 404 | — | Tidak di-host NVIDIA (hanya partner berbayar spt Together AI) |
+| SD3-medium, SDXL, Bria | ❌ "Function not found for account" | — | Tidak tersedia utk akun ini |
+| Gemini image (fallback) | key valid, kuota free tier = 0 | — | Aktifkan billing Google utk jalur produksi legal-komersial (±Rp600/gambar) |
 
-Kuota: endpoint hosted build.nvidia.com memakai **kredit developer gratis** (sama
-dgn key nvapi Anda). Untuk produksi volume tinggi nanti bisa self-host (model
-"Downloadable") — arsitektur tidak berubah, cukup ganti endpoint.
+**Setting yang dipakai:** `NVIDIA_IMAGE_MODEL = black-forest-labs/flux.1-dev`
+(HANYA satu model — jangan taruh schnell di depan, tiap gambar akan menunggu
+50 dtk timeout dulu).
+
+**⚠ Filter konten flux.1-dev:** prompt berbau jarum/darah/prosedur invasif →
+model mengembalikan **gambar hitam**. Gateway kini mendeteksinya (<12 KB =
+diblokir) dan template MAKE_SOSMED sudah dilarang menulis prompt semacam itu —
+fokus suasana klinik, alat lab, ilustrasi abstrak.
 
 ---
 
