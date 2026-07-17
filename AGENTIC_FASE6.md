@@ -32,9 +32,11 @@ ANDA (CEO) ── hanya: eskalasi R3 · publish R2 · laporan harian
 
 # SETUP (3 LANGKAH)
 
-## ✅ 1 — SQL
+## ✅ 1 — SQL (dua file, berurutan)
 SQL Editor → paste **`supabase_agentic_fase6.sql`** → Run.
-(`Agentic Fase 6 siap — …`)
+Lalu paste **`supabase_agentic_fase6b.sql`** → Run.
+(6B = kendali dari UI: edit job desc, ubah mandat, pantau/jeda cron —
+semuanya dari tab Organisasi, tanpa SQL manual lagi.)
 
 ## ✅ 2 — Re-deploy `agentic-worker`
 Ganti isi dgn file repo `supabase/functions/agentic-worker/index.ts` → Deploy.
@@ -64,6 +66,14 @@ Hard refresh app → **Agentic AI → Organisasi**.
    alert bila ada jalur mati.
 
 Tombol manual tetap ada di tab Organisasi: **Jalankan HEAD · IT Check · Minta Standup**.
+
+## Kendali dari UI (Fase 6B) — tab Organisasi
+- **✎ di kartu organ** → edit nama/jabatan/model/aktif + **Job Description (charter)**
+  — ini "perintah kerja" agent; berubah seketika untuk task berikutnya
+- **Klik baris Matriks Mandat** → ubah aksi otomatis (R1/R2/R3), QA penilai,
+  skor minimal — berlaku di tick HEAD berikutnya
+- **Panel ⏰ Penjadwal** → daftar cron agentic + riwayat eksekusi + tombol
+  **Jeda/Aktifkan** per job (kill switch tanpa SQL)
 
 # Uji cepat setelah setup
 1. Tab Organisasi → **Jalankan HEAD** → HEAD menugaskan QA utk semua draft lama.
