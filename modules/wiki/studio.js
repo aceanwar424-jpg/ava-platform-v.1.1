@@ -211,7 +211,7 @@ async function runImageGen(){
     toast('✅ Gambar dibuat','ok');
   }catch(e){
     out.innerHTML=`<div class="status-box status-err">❌ ${e.message}
-      <div style="font-size:11.5px;margin-top:6px">Gambar <strong>100% NVIDIA</strong> — llm-gateway mencoba semua model text-to-image berurutan (prioritas via secret <code>NVIDIA_IMAGE_MODEL</code>, default dimulai <code>flux.1-dev</code>). Hindari kata jarum/darah/prosedur invasif di prompt (kena filter konten → gambar hitam). Detail kegagalan: <strong>Agentic AI → Monitor → Log LLM</strong>.</div></div>`;
+      <div style="font-size:11.5px;margin-top:6px">Gambar <strong>100% NVIDIA</strong> — llm-gateway mencoba semua model text-to-image berurutan (default dimulai <code>flux.1-dev</code>). <strong>Filter konten model memblokir kata "pasien"/prosedur medis pada orang</strong> (jarum/darah/pengambilan sampel). Yang LOLOS: interior klinik/lab, alat lab, ilustrasi flat tenaga medis <em>tanpa pasien</em>, orang di konteks non-medis. Detail kegagalan: <strong>Agentic AI → Monitor → Log LLM</strong>.</div></div>`;
   }
   if(btn){ btn.disabled=false; btn.innerHTML=`${svgIcon('sparkle',15)} Generate Gambar`; }
 }
