@@ -91,6 +91,12 @@ async function agRenderTaskDetail(id){
   }
   if(md) actions += `<button class="ag-btn mut" onclick="agDownloadMd('${t.id}')">${svgIcon('download',13)} .md</button>
     <button class="ag-btn mut" onclick="agDownloadDocxFromTask('${t.id}')">${svgIcon('download',13)} .docx</button>`;
+  // Konten sosmed yang sudah jadi tapi TANPA gambar → buat gambarnya saja
+  // (caption tidak disentuh; pakai image_prompt yang sudah ditulis AI)
+  if(t.task_type==='MAKE_SOSMED' && ['DRAFT','APPROVED','PUBLISHED'].includes(t.status)
+     && !(t.result && t.result.image_path)){
+    actions += `<button class="ag-btn ok" id="ag-genimg-${t.id}" onclick="agGenImageForTask('${t.id}')">${svgIcon('image',13)} Buat Gambar</button>`;
+  }
 
   // Deteksi task macet: PROCESSING terlalu lama = worker mati sebelum menutup task
   let stuckWarn = '';
@@ -199,6 +205,55 @@ function agDownloadMd(id){
   const name = (t.title||'draft').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'_')+'.md';
   const blob = new Blob([md],{type:'text/markdown;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+}
+
+// Buat gambar utk konten yang sudah jadi (susulan) — caption tidak berubah.
+// Alur: image_prompt dari result.copy → llm-gateway mode:image (NVIDIA,
+// auto-translate) → upload Storage agentic/renders → content_assets IMAGE.
+async function agGenImageForTask(id){
+  const t = agTasks.find(x=>x.id===id); if(!t) return;
+  const btn = document.getElementById(`ag-genimg-${id}`);
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ Membuat gambar…'; }
+  try{
+    const copy = (t.result && t.result.copy) || {};
+    const topic = (t.payload && t.payload.topic) || t.title || 'layanan laboratorium klinik';
+    const prompt = copy.image_prompt ||
+      `clean modern healthcare flyer visual about "${topic}", teal and navy OneLab branding, laboratory equipment or abstract medical shapes, soft lighting, no people, no text`;
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
+      body: JSON.stringify({ mode:'image', prompt, taskId:id }),
+    });
+    const d = await res.json().catch(()=>({}));
+    if(!res.ok || !Array.isArray(d.images) || !d.images[0])
+      throw new Error(d.error || `Gagal generate (HTTP ${res.status})`);
+
+    // upload dataUri → Storage bucket agentic
+    const [meta,b64] = String(d.images[0]).split(',');
+    const mime = (meta.match(/data:([^;]+)/)||[])[1] || 'image/png';
+    const bin = atob(b64); const arr = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    const path = `renders/${id}_${Date.now()}.png`;
+    const up = await fetch(`${SUPABASE_URL}/storage/v1/object/agentic/${path}`, {
+      method:'POST',
+      headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, 'Content-Type': mime },
+      body: arr,
+    });
+    if(!up.ok) throw new Error('Upload Storage gagal — pastikan bucket "agentic" ada (supabase_agentic_fase12.sql)');
+
+    await agRpc('agentic_asset_add', { p:{
+      task_id:id, calendar_id:(t.payload && t.payload.calendar_id) || null,
+      asset_type:'IMAGE', file_path:path,
+      meta:{ prompt, provider:d.provider, model:d.model, susulan:true } }});
+
+    toast(`🖼 Gambar jadi (${d.provider}/${(d.model||'').split('/').pop()}, ${Math.round((d.latencyMs||0)/1000)}s) → lihat di Content Studio → Aset`, 'ok');
+    if(btn){ btn.outerHTML = `<a class="ag-btn mut" style="text-decoration:none" target="_blank"
+      href="${SUPABASE_URL}/storage/v1/object/public/agentic/${path}">${svgIcon('eye',13)} Lihat Gambar</a>`; }
+  }catch(e){
+    toast(e.message,'err');
+    if(btn){ btn.disabled = false; btn.innerHTML = `${svgIcon('image',13)} Buat Gambar`; }
+  }
 }
 
 // ── MONITOR TAB (queue + LLM usage §7 /monitor + hardening Fase 4) ──
