@@ -10,11 +10,20 @@
 if (typeof window.currentUser === 'undefined') window.currentUser = null;
 
 async function initAuth(){
-  // Check active session via Supabase
+  // Cek sesi aktif; bila token kedaluwarsa, coba perbarui dulu sebelum
+  // memaksa pengguna login ulang (Fase 1.0).
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+    let res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
       headers: { ...SB_HEADERS, 'Authorization': `Bearer ${getStoredToken()}` }
     });
+    if(!res.ok && getStoredRefresh() && typeof sbRefreshSession === 'function'){
+      const ok = await sbRefreshSession();
+      if(ok){
+        res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+          headers: { ...SB_HEADERS, 'Authorization': `Bearer ${getStoredToken()}` }
+        });
+      }
+    }
     if(res.ok){
       const user = await res.json();
       if(user && user.id){
@@ -30,7 +39,9 @@ async function initAuth(){
 
 function getStoredToken(){ return localStorage.getItem('ol_token')||''; }
 function setStoredToken(t){ localStorage.setItem('ol_token', t); }
-function clearStoredToken(){ localStorage.removeItem('ol_token'); }
+function getStoredRefresh(){ return localStorage.getItem('ol_refresh')||''; }
+function setStoredRefresh(t){ if(t) localStorage.setItem('ol_refresh', t); }
+function clearStoredToken(){ localStorage.removeItem('ol_token'); localStorage.removeItem('ol_refresh'); }
 
 async function loadUserProfile(){
   if(!window.currentUser) return;
@@ -149,6 +160,7 @@ async function doLogin(){
     const data = await res.json();
     if(data.access_token){
       setStoredToken(data.access_token);
+      setStoredRefresh(data.refresh_token);   // agar sesi bisa diperpanjang (Fase 1.0)
       window.currentUser = data.user;
       await loadUserProfile();
       showApp();

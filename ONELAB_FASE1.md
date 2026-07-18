@@ -9,6 +9,53 @@ apa pun di atas fondasi ini hanya memperbesar paparan.
 
 ---
 
+## Koreksi atas audit awal (temuan saat mulai mengerjakan)
+
+Pembacaan kode lebih dalam **membantah sebagian dugaan di dokumen ini**. Dicatat apa adanya:
+
+| Dugaan semula | Kenyataan |
+|---|---|
+| Ambang nilai kritis belum ada | **Sudah ada** — `ref_ranges.critical_low/critical_high/condition_type` |
+| Deteksi nilai kritis belum ada | **Sudah berjalan** — `interpretResult()` menampilkan "🚨 NILAI KRITIS", `lab_results.is_critical` diisi di 4 titik penyimpanan |
+| Belum ada tindak lanjut sama sekali | **Sudah ada banner + `ackCritical()`**, tetapi hanya `prompt()` teks bebas |
+| `activity_logs` belum punya pengguna | **Sudah ada** `user_id` dan `user_name` |
+
+**Akibatnya cakupan 1.3 menyempit** — bukan membangun deteksi, melainkan mengganti catatan teks
+bebas menjadi rekaman terstruktur yang memenuhi ISO 15189.
+
+### Langkah 1.0 — prasyarat yang belum tercatat
+
+Ditemukan saat memeriksa `js/core/api.js`: **`SB_HEADERS` adalah konstanta statis yang memakai
+anon key sebagai Bearer token.** JWT pengguna tidak pernah dikirim, padahal login menyimpannya
+di `localStorage.ol_token`.
+
+Artinya **RLS tidak mungkin diaktifkan sebelum ini diperbaiki** — setiap query akan
+mengembalikan nol baris dan aplikasi mati total. Ditambah, `refresh_token` tidak disimpan,
+sehingga berpindah ke JWT tanpa penanganan akan memutus sesi setiap ±1 jam.
+
+---
+
+## 1.0 Kirim JWT pengguna + perbarui sesi ✅ SELESAI
+
+**Yang dikerjakan.**
+
+| Berkas | Perubahan |
+|---|---|
+| `js/core/api.js` | `Authorization` pada `SB_HEADERS` diubah menjadi **getter**. Object spread memanggil getter dan menyalin hasilnya, sehingga ~18 pemanggil yang sudah ada ikut mengirim JWT **tanpa satu pun diubah**. Selama belum login, jatuh kembali ke anon key agar layar login tetap berfungsi |
+| `js/core/api.js` | `sbFetch()` — membungkus semua permintaan; saat ditolak 401, sesi diperbarui sekali lalu permintaan diulang |
+| `js/core/api.js` | `sbRefreshSession()` — permintaan perbaruan yang bersamaan berbagi satu proses |
+| `js/core/api.js` | `sbRpc()` — pemanggil fungsi Postgres, disiapkan untuk 1.2 & 1.4 |
+| `js/auth.js` | `refresh_token` disimpan saat login; `initAuth()` mencoba memperbarui sesi sebelum memaksa login ulang |
+
+**Terverifikasi.** Sebelum login header memakai anon key; sesudah login memakai JWT pengguna;
+`apikey` tetap anon key (disyaratkan PostgREST); penimpaan manual di `auth.js` tetap menang;
+perbaruan tanpa refresh token mengembalikan `false` tanpa membuat aplikasi gagal.
+
+**Belum berdampak apa pun pada perilaku** karena RLS masih nonaktif — ini memang disengaja,
+supaya bisa diuji terpisah sebelum langkah berisiko.
+
+---
+
 ## 1.1 RLS aktif + kebijakan berbasis peran
 
 **Masalah.** Sekitar **109 tabel** memakai `DISABLE ROW LEVEL SECURITY`, termasuk

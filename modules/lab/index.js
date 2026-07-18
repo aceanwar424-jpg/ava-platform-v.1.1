@@ -312,8 +312,11 @@ function renderCriticalBanner(){
   if(!crit.length){ el.innerHTML=''; return; }
   el.innerHTML=`
     <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:10px;padding:12px 16px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#B91C1C;font-size:13px;margin-bottom:8px">
-        🚨 ${crit.length} NILAI KRITIS memerlukan tindak lanjut
+      <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#B91C1C;font-size:13px;margin-bottom:4px">
+        🚨 ${crit.length} NILAI KRITIS belum dilaporkan
+      </div>
+      <div style="font-size:11.5px;color:#991B1B;margin-bottom:8px">
+        Wajib dilaporkan ke dokter penanggung jawab beserta bukti read-back (ISO 15189).
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         ${crit.slice(0,8).map(r=>`
@@ -321,24 +324,155 @@ function renderCriticalBanner(){
             <strong>${r.patient_name||'—'}</strong> · ${r.product_name||'—'}:
             <span style="color:#DC2626;font-weight:800">${r.result_value||'—'} ${r.unit||''}</span>
             <button class="btn btn-xs" style="margin-left:6px;background:#DC2626;color:#fff;border:none"
-              onclick="ackCritical(${r.id})">Acknowledge</button>
+              onclick="ackCritical(${r.id})">Lapor</button>
           </div>`).join('')}
       </div>
     </div>`;
 }
 
+// ══════════════════════════════════════════════════════════════
+// NILAI KRITIS — pencatatan komunikasi terstruktur (Fase 1.3)
+// ISO 15189 menuntut bukti SIAPA dihubungi, KAPAN, DENGAN CARA APA,
+// dan bahwa penerima MENGULANG kembali nilainya (read-back).
+// Catatan teks bebas tidak memenuhi syarat itu.
+// ══════════════════════════════════════════════════════════════
 async function ackCritical(id){
-  const note = prompt('Catatan tindak lanjut nilai kritis (mis. dilaporkan ke dr. Sinta 14:20):');
-  if(note===null) return;
+  const r = labResults.find(x=>x.id===id);
+  if(!r){ toast('Hasil tidak ditemukan','err'); return; }
+
+  // Riwayat upaya sebelumnya — upaya yang gagal tetap harus terlihat
+  const prev = await sbGet('critical_value_notifications',
+    `select=*&result_id=eq.${id}&order=notified_at.desc`).catch(()=>[]);
+
+  const ambang = [
+    r.critical_low  != null ? `< ${r.critical_low}`  : null,
+    r.critical_high != null ? `> ${r.critical_high}` : null,
+  ].filter(Boolean).join(' atau ') || '—';
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">🚨 Pelaporan Nilai Kritis</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+
+    <div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:#B91C1C">${r.patient_name||'—'}</div>
+      <div style="font-size:12.5px;margin-top:3px">${r.product_name||'—'}:
+        <b style="color:#DC2626;font-size:15px">${r.result_value||'—'} ${r.unit||''}</b></div>
+      <div style="font-size:11.5px;color:#991B1B;margin-top:2px">Ambang kritis: ${ambang}</div>
+    </div>
+
+    ${prev.length?`
+    <div style="margin-bottom:14px">
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">
+        Riwayat upaya (${prev.length})</div>
+      ${prev.map(p=>`
+        <div style="font-size:11.5px;padding:6px 9px;background:var(--bg2);border-radius:6px;margin-bottom:4px">
+          <b>${p.attempt_status==='Berhasil'?'✅':'⚠️'} ${p.notified_to||'—'}</b>
+          <span style="color:var(--gray)">(${p.notified_role||'—'}) · ${p.method||'—'} ·
+          ${p.notified_at?new Date(p.notified_at).toLocaleString('id-ID'):'—'} · oleh ${p.notified_by||'—'}</span>
+          ${p.response?`<div style="margin-top:2px">Instruksi: ${p.response}</div>`:''}
+        </div>`).join('')}
+    </div>`:''}
+
+    <div class="form-row">
+      <div class="form-group"><label>Dilaporkan kepada *</label>
+        <input type="text" id="cv-to" placeholder="dr. Sinta Wijaya"></div>
+      <div class="form-group"><label>Peran</label>
+        <select id="cv-role">${['Dokter','DPJP','Perawat','Bidan','Lainnya'].map(x=>`<option>${x}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Cara</label>
+        <select id="cv-method">${['Telepon','WhatsApp','Langsung'].map(x=>`<option>${x}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Waktu lapor</label>
+        <input type="datetime-local" id="cv-at" value="${new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16)}"></div>
+    </div>
+    <div class="form-group"><label>Hasil upaya</label>
+      <select id="cv-status" onchange="cvToggleReached()">
+        <option value="Berhasil">Berhasil — penerima menerima laporan</option>
+        <option value="Tidak Terjangkau">Tidak terjangkau — perlu upaya ulang</option>
+      </select></div>
+
+    <div id="cv-reached">
+      <div class="form-group" style="display:flex;align-items:center;gap:8px">
+        <input type="checkbox" id="cv-readback" style="width:auto" checked>
+        <label style="margin:0">Penerima <b>mengulang kembali</b> nilai &amp; nama pasien (read-back)</label>
+      </div>
+      <div class="form-group"><label>Instruksi / tindakan dari penerima</label>
+        <textarea id="cv-response" rows="2" placeholder="mis. pasien diminta segera ke IGD"></textarea></div>
+    </div>
+
+    <div class="form-group"><label>Catatan tambahan</label>
+      <input type="text" id="cv-notes"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-danger" onclick="saveCriticalNotification(${id})">💾 Simpan Pelaporan</button>
+    </div>`, 'wide');
+}
+
+function cvToggleReached(){
+  const st = document.getElementById('cv-status')?.value;
+  const box = document.getElementById('cv-reached');
+  if (box) box.style.display = st==='Berhasil' ? 'block' : 'none';
+}
+
+async function saveCriticalNotification(id){
+  const r = labResults.find(x=>x.id===id) || {};
+  const to     = document.getElementById('cv-to').value.trim();
+  const status = document.getElementById('cv-status').value;
+  if(!to){ toast('Nama penerima laporan wajib diisi','err'); return; }
+
+  const readback = document.getElementById('cv-readback')?.checked || false;
+  if(status==='Berhasil' && !readback){
+    if(!confirm('Read-back belum dicentang. ISO 15189 mensyaratkan penerima mengulang kembali nilainya. Tetap simpan?')) return;
+  }
+
+  const atLocal = document.getElementById('cv-at').value;
+  const notifiedAt = atLocal ? new Date(atLocal).toISOString() : new Date().toISOString();
+  const ambang = [
+    r.critical_low  != null ? `< ${r.critical_low}`  : null,
+    r.critical_high != null ? `> ${r.critical_high}` : null,
+  ].filter(Boolean).join(' atau ') || null;
+
   try {
-    await sbPatch('lab_results', id, {
-      critical_ack_by: labUser(),
-      critical_ack_at: new Date().toISOString(),
-      critical_ack_note: note || 'Diketahui',
+    await sbPost('critical_value_notifications', {
+      result_id: id, sample_id: r.sample_id||null, admission_id: r.admission_id||null,
+      patient_name: r.patient_name||'', test_name: r.product_name||'',
+      result_value: String(r.result_value||''), unit: r.unit||'',
+      critical_range: ambang,
+      notified_by: labUser(), notified_to: to,
+      notified_role: document.getElementById('cv-role').value,
+      method: document.getElementById('cv-method').value,
+      notified_at: notifiedAt,
+      readback: status==='Berhasil' ? readback : false,
+      response: status==='Berhasil' ? (document.getElementById('cv-response').value.trim()||null) : null,
+      attempt_status: status,
+      notes: document.getElementById('cv-notes').value.trim()||null,
+      updated_at: new Date().toISOString(),
     });
+
+    // Hasil hanya dianggap tuntas bila upaya BERHASIL.
+    // Upaya gagal tetap tercatat, dan hasil tetap muncul di banner.
+    if(status==='Berhasil'){
+      await sbPatch('lab_results', id, {
+        critical_ack_by:   labUser(),
+        critical_ack_at:   new Date().toISOString(),
+        critical_ack_note: `Dilaporkan ke ${to} via ${document.getElementById('cv-method').value}`,
+        critical_notified_at: notifiedAt,
+        critical_notified_by: labUser(),
+      });
+    }
+
     if (typeof logActivity==='function')
-      logActivity('critical_ack','lab_results',id,'Nilai kritis di-acknowledge: '+note);
-    toast('✅ Nilai kritis di-acknowledge','ok');
+      logActivity('critical_notify','lab_results',id,
+        `Nilai kritis ${r.product_name||''} ${r.result_value||''} dilaporkan ke ${to} (${status})`,
+        r.patient_name||'');
+
+    toast(status==='Berhasil' ? '✅ Pelaporan tercatat' : '⚠️ Upaya tercatat — hasil tetap perlu tindak lanjut','ok');
+    closeModalForce();
     await loadLabResults(); renderCriticalBanner(); renderLabKPI();
-  } catch(e){ toast('⚠️ Kolom acknowledgment belum ada — jalankan supabase_lab_lis.sql','warn'); }
+  } catch(e){
+    toast('❌ '+e.message+' — jalankan supabase_fase1_fondasi.sql bila tabel belum ada','err');
+  }
 }

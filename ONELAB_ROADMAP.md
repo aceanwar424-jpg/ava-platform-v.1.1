@@ -46,9 +46,10 @@ Dokumen induk hasil audit fungsional **18 Juli 2026** atas 50 berkas modul / 31.
 Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 
 ### Fase 1 — Fondasi, Keamanan & Keselamatan Pasien
+- [x] 1.0 Kirim JWT pengguna + perbarui sesi (prasyarat RLS)
 - [ ] 1.1 RLS aktif + kebijakan berbasis peran
 - [ ] 1.2 Penegakan peran di sisi server (RPC), bukan browser
-- [ ] 1.3 Nilai kritis lab + notifikasi wajib-baca (ISO 15189)
+- [~] 1.3 Nilai kritis lab — pelaporan terstruktur ISO 15189 (SELESAI; deteksi ternyata sudah ada)
 - [ ] 1.4 Operasi multi-tabel jadi atomik (RPC)
 - [ ] 1.5 Jejak audit terstandar
 
