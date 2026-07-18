@@ -48,6 +48,7 @@ async function renderInventory(initialTab='stock') {
       <button class="tab-btn" onclick="switchInvTab('mrp',this)">📊 MRP</button>
       <button class="tab-btn" onclick="switchInvTab('report',this)">📈 Laporan</button>
       <button class="tab-btn" onclick="switchInvTab('supplier',this)">🏭 Supplier</button>
+      <button class="tab-btn" onclick="switchInvTab('recipe',this)">🧪 Resep BHP</button>
     </div>
 
     <div id="inv-stock">
@@ -73,11 +74,12 @@ async function renderInventory(initialTab='stock') {
     <div id="inv-mrp" style="display:none"></div>
     <div id="inv-report" style="display:none"></div>
     <div id="inv-supplier" style="display:none"></div>
+    <div id="inv-recipe" style="display:none"></div>
   `;
   await loadInventory();
   // Deep-link ke tab tertentu dari menu flyout (Fase 1)
   if (initialTab && initialTab!=='stock') {
-    const idx = {stock:1, pr:2, po:3, issue:4, opname:5, ledger:6, mrp:7, report:8, supplier:9}[initialTab];
+    const idx = {stock:1, pr:2, po:3, issue:4, opname:5, ledger:6, mrp:7, report:8, supplier:9, recipe:10}[initialTab];
     const btn = document.querySelector(`#inv-tabs .tab-btn:nth-child(${idx})`);
     if (btn) switchInvTab(initialTab, btn);
   }
@@ -86,7 +88,7 @@ async function renderInventory(initialTab='stock') {
 function switchInvTab(tab, btn) {
   document.querySelectorAll('#inv-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['stock','pr','po','issue','opname','ledger','mrp','report','supplier'].forEach(t=>{
+  ['stock','pr','po','issue','opname','ledger','mrp','report','supplier','recipe'].forEach(t=>{
     const el = document.getElementById('inv-'+t);
     if (el) el.style.display = t===tab?'block':'none';
   });
@@ -98,6 +100,7 @@ function switchInvTab(tab, btn) {
   if (tab==='mrp')     renderMRPDashboard();
   if (tab==='report')  renderInvReport();
   if (tab==='supplier')renderSupplierList();
+  if (tab==='recipe')  renderRecipeTab();
 }
 
 async function loadInventory() {
@@ -1624,6 +1627,175 @@ function exportInvABC() {
   const valued = active.map(i=>({...i,value:(i.stock_qty||0)*(i.unit_price||0)})).sort((a,b)=>b.value-a.value);
   let cum=0; valued.forEach(i=>{cum+=i.value; const p=totalVal?cum/totalVal:1; i.abc=p<=0.8?'A':p<=0.95?'B':'C';});
   invExportCSV(`abc_analysis_${new Date().toISOString().split('T')[0]}.csv`, ['Kode','Nama','Nilai','Kelas'], valued.map(i=>[i.item_code||'',i.item_name,i.value,i.abc]));
+}
+
+// ══════════════════════════════════════════════════════════════
+// RESEP BHP — barang yang terpakai per tes (Fase 2.1)
+// Tanpa resep ini, pemotongan stok otomatis dari Lab tidak jalan.
+// ══════════════════════════════════════════════════════════════
+let recProducts = [], recRecipes = [];
+
+async function renderRecipeTab() {
+  const el = document.getElementById('inv-recipe');
+  el.innerHTML = `
+    <div class="page-header" style="margin-bottom:14px">
+      <div><p style="color:var(--text3);font-size:13px">
+        Tentukan barang yang terpakai setiap satu tes dijalankan. Begitu resep terisi,
+        stok berkurang <b>otomatis</b> saat hasil pemeriksaan dibuat — tanpa input manual.
+      </p></div>
+      <button class="btn btn-teal" onclick="openRecipeForm()">+ Tambah Resep</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <input class="table-search" id="rec-q" placeholder="🔍 Cari nama tes..." oninput="renderRecipeTable()">
+      </div>
+      <div id="rec-tbody"><div class="loading-row"><div class="spinner"></div></div></div>
+    </div>`;
+  await loadRecipes();
+}
+
+async function loadRecipes() {
+  try {
+    const [prods, recs] = await Promise.all([
+      recProducts.length ? recProducts
+        : sbGet('products','select=id,nama_tes,kode_internal,kategori&is_active=eq.true&order=nama_tes.asc&limit=1000').catch(()=>[]),
+      sbGet('product_consumables','select=*&order=product_id.asc').catch(()=>null),
+    ]);
+    recProducts = Array.isArray(prods)?prods:[];
+    if (recs === null) {
+      document.getElementById('rec-tbody').innerHTML =
+        `<div class="status-box status-err" style="margin:16px">Tabel resep belum ada — jalankan <code>supabase_fase2.sql</code> di Supabase SQL Editor.</div>`;
+      return;
+    }
+    recRecipes = Array.isArray(recs)?recs:[];
+    renderRecipeTable();
+  } catch(e) {
+    document.getElementById('rec-tbody').innerHTML = `<div class="status-box status-err">❌ ${e.message}</div>`;
+  }
+}
+
+function renderRecipeTable() {
+  const el = document.getElementById('rec-tbody'); if (!el) return;
+  const q = (document.getElementById('rec-q')?.value||'').toLowerCase();
+
+  // Kelompokkan resep per tes
+  const byProduct = {};
+  recRecipes.forEach(r => { (byProduct[r.product_id] = byProduct[r.product_id]||[]).push(r); });
+  let ids = Object.keys(byProduct);
+  if (q) ids = ids.filter(pid => (recProducts.find(p=>String(p.id)===String(pid))?.nama_tes||'').toLowerCase().includes(q));
+
+  if (!ids.length) {
+    el.innerHTML = `<div class="empty-state"><div class="ico">🧪</div>
+      <h3>${recRecipes.length?'Tidak ada hasil':'Belum ada resep BHP'}</h3>
+      <p>Selama belum ada resep, pemakaian reagen tidak tercatat dan MRP tidak akurat.</p>
+      <button class="btn btn-teal" style="margin-top:10px" onclick="openRecipeForm()">+ Tambah Resep</button></div>`;
+    return;
+  }
+
+  el.innerHTML = `<table><thead><tr>
+    <th>Tes / Layanan</th><th>Barang Terpakai</th><th>Biaya BHP / tes</th><th>Aksi</th>
+  </tr></thead><tbody>${ids.map(pid=>{
+    const p = recProducts.find(x=>String(x.id)===String(pid));
+    const list = byProduct[pid];
+    const cost = list.reduce((s,r)=>{
+      const it = invItems.find(i=>i.id===r.item_id);
+      return s + (it?.unit_price||0)*(r.qty_per_test||0);
+    },0);
+    return `<tr>
+      <td><div style="font-weight:600">${p?.nama_tes||'(tes id '+pid+')'}</div>
+        <div style="font-size:11px;color:var(--gray)">${p?.kode_internal||''}</div></td>
+      <td>${list.map(r=>{
+        const it = invItems.find(i=>i.id===r.item_id);
+        return `<div style="font-size:12px">${it?.item_name||'(barang id '+r.item_id+')'}
+          <b>× ${r.qty_per_test}</b> <span style="color:var(--gray)">${it?.unit||''}</span></div>`;
+      }).join('')}</td>
+      <td style="font-weight:700">${formatCurrency(cost)}</td>
+      <td><div class="act-row">
+        <button class="act-btn edit" onclick="openRecipeForm(${pid})">✏️</button>
+      </div></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+async function openRecipeForm(productId=null) {
+  if (!recProducts.length) await loadRecipes();
+  const existing = productId ? recRecipes.filter(r=>String(r.product_id)===String(productId)) : [];
+  recLines = existing.length
+    ? existing.map(r=>({ id:r.id, item_id:r.item_id, qty_per_test:r.qty_per_test }))
+    : [{ item_id:'', qty_per_test:1 }];
+
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🧪 ${productId?'Ubah':'Tambah'} Resep BHP</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Tes / Layanan *</label>
+      <select id="rec-prod" ${productId?'disabled style="background:var(--bg2)"':''}>
+        <option value="">-- Pilih tes --</option>
+        ${recProducts.map(p=>`<option value="${p.id}" ${String(productId)===String(p.id)?'selected':''}>${p.nama_tes}${p.kode_internal?' · '+p.kode_internal:''}</option>`).join('')}
+      </select></div>
+    <div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase">Barang yang terpakai</div>
+        <button class="btn btn-xs btn-ghost" onclick="addRecLine()">+ Barang</button>
+      </div>
+      <div id="rec-lines"></div>
+      <div style="text-align:right;font-weight:700;margin-top:8px;font-size:13px">
+        Biaya BHP per tes: <span id="rec-cost" style="color:var(--teal)">Rp 0</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveRecipe(${productId||'null'})">💾 Simpan</button>
+    </div>`, 'wide');
+  renderRecLines();
+}
+
+let recLines = [];
+function addRecLine(){ recLines.push({ item_id:'', qty_per_test:1 }); renderRecLines(); }
+function removeRecLine(i){ recLines.splice(i,1); renderRecLines(); }
+function updateRecLine(i,f,v){ if(recLines[i]) recLines[i][f] = f==='qty_per_test'?(parseFloat(v)||0):v; renderRecLines(); }
+
+function renderRecLines() {
+  const el = document.getElementById('rec-lines'); if(!el) return;
+  el.innerHTML = `<table style="width:100%;font-size:12px"><tbody>${recLines.map((l,i)=>{
+    const it = invItems.find(x=>String(x.id)===String(l.item_id));
+    return `<tr>
+      <td style="padding:3px"><select onchange="updateRecLine(${i},'item_id',this.value)" style="font-size:11px;padding:4px;width:100%">
+        <option value="">-- Pilih barang --</option>
+        ${invItems.filter(x=>x.is_active!==false).map(x=>`<option value="${x.id}" ${String(l.item_id)===String(x.id)?'selected':''}>${x.item_name} (${x.unit||''})</option>`).join('')}
+      </select></td>
+      <td style="padding:3px;width:90px"><input type="number" step="0.001" min="0" value="${l.qty_per_test}"
+        onchange="updateRecLine(${i},'qty_per_test',this.value)" style="width:80px;font-size:11px;padding:4px"></td>
+      <td style="padding:3px;width:110px;text-align:right">${formatCurrency((it?.unit_price||0)*(l.qty_per_test||0))}</td>
+      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeRecLine(${i})">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+  const total = recLines.reduce((s,l)=>{ const it=invItems.find(x=>String(x.id)===String(l.item_id)); return s+(it?.unit_price||0)*(l.qty_per_test||0); },0);
+  const c = document.getElementById('rec-cost'); if(c) c.textContent = formatCurrency(total);
+}
+
+async function saveRecipe(productId) {
+  const pid = productId || parseInt(document.getElementById('rec-prod').value);
+  if (!pid) { toast('Pilih tes dulu','err'); return; }
+  const lines = recLines.filter(l=>l.item_id && (l.qty_per_test||0)>0);
+  if (!lines.length) { toast('Tambahkan minimal 1 barang','err'); return; }
+
+  try {
+    // Ganti seluruh resep tes ini: hapus yang lama, tulis yang baru
+    const old = recRecipes.filter(r=>String(r.product_id)===String(pid));
+    for (const o of old) await sbDelete('product_consumables', o.id).catch(()=>{});
+    for (const l of lines) {
+      await sbPost('product_consumables', {
+        product_id: pid, item_id: parseInt(l.item_id),
+        qty_per_test: l.qty_per_test, is_active: true,
+        updated_at: new Date().toISOString(),
+      });
+    }
+    const p = recProducts.find(x=>String(x.id)===String(pid));
+    await logActivity('recipe','product_consumables',pid,
+      `Resep BHP ${p?.nama_tes||''}: ${lines.length} barang`, p?.nama_tes||'');
+    toast('✅ Resep tersimpan — pemakaian akan terpotong otomatis','ok');
+    closeModalForce();
+    recRecipes = []; await loadRecipes();
+  } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
 // ══════════════════════════════════════════════════════════════

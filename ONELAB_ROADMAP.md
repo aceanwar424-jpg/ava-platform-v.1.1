@@ -55,13 +55,13 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 1.5 Jejak audit terstandar — write_audit() + before_data/after_data, ditulis di dalam RPC
 
 ### Fase 2 — Menyambung yang Sudah Ada
-- [ ] 2.1 Auto goods-issue dari Lab / MCU / Radiologi
+- [x] 2.1 Auto goods-issue — resep BHP + trigger di lab_results (tak bisa dilewati jalur mana pun)
 - [ ] 2.2 Home Care → rekam medis pasien
 - [ ] 2.3 Komisi nakes → penggajian
-- [ ] 2.4 Pencocokan tiga arah PO–Penerimaan–Faktur
-- [ ] 2.5 Kontrol anggaran pada PR
-- [ ] 2.6 Multi-gudang & pemindahan antar lokasi
-- [ ] 2.7 Tautan hasil ke lot reagen
+- [x] 2.4 Pencocokan tiga arah — vendor_invoices + match_vendor_invoice()
+- [~] 2.5 Anggaran — tabel budgets + budget_remaining() siap, UI PR menyusul
+- [~] 2.6 Multi-gudang — tabel warehouses + stock_transfers siap, UI menyusul
+- [x] 2.7 Telusur lot — lab_result_consumption mencatat batch per hasil (dua arah)
 
 ### Fase 3 — Rekam Medis & Alur Klinik
 - [ ] 3.1 Rekam medis bisa ditulis (SOAP / CPPT)
