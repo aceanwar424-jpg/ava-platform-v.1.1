@@ -130,6 +130,8 @@ function renderAgDocsTab(el){
           <td style="white-space:nowrap">
             ${d.status!=='PUBLISHED' && (d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
+            ${(d.extracted_meta&&d.extracted_meta.full_text) ?
+              `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">🧩 .docx</button>` : ''}
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
@@ -201,6 +203,44 @@ async function agMakeRepairTask(docId){
     });
     toast('Task repair dibuat — jalankan worker untuk memproses','ok');
     await agReload();
+  }catch(e){ toast(e.message,'err'); }
+}
+
+// ── Fase 7D bridge: isi hasil AI → placeholder → .docx final (fidelity 100%) ──
+async function agLLMText(system, prompt, tier){
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
+    method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
+    body: JSON.stringify({ system, prompt, tier:tier||'main', temperature:0.2, maxTokens:2500 }) });
+  const d = await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(d.error || `llm-gateway HTTP ${res.status}`);
+  return String(d.text||'');
+}
+async function agBuildDocFromTemplate(docId){
+  const d = agRegistry.find(x=>x.id===docId); if(!d){ toast('Dokumen tak ditemukan','err'); return; }
+  const content = d.extracted_meta && d.extracted_meta.full_text;
+  if(!content){ toast('Dokumen belum punya isi — generate/repair dulu','warn'); return; }
+  if(typeof agDocxFill!=='function' || typeof agDownloadStorage!=='function'){ toast('Modul docxfill/org belum dimuat — reload','err'); return; }
+  try{
+    toast('Ambil template & rakit .docx…','info');
+    const tpl = await agRpc('agentic_template_get', { p_level:d.doc_level, p_type:d.doc_type, p_dept:d.department });
+    if(!tpl || !tpl.storage_path){ toast(`Belum ada master .docx untuk ${d.doc_type} L${d.doc_level}/${d.department} — unggah di tab Organisasi → Template`,'warn'); return; }
+    const buf = await agDownloadStorage(tpl.storage_path);
+    let phs = Array.isArray(tpl.placeholders)?tpl.placeholders.slice():[];
+    try{ const scan = await agDocxScanPlaceholders(buf); scan.forEach(k=>{ if(!phs.includes(k)) phs.push(k); }); }catch(e){}
+    if(!phs.length){ toast('Master tidak punya {{placeholder}} — tak ada yang diisi','warn'); return; }
+    // Map isi dokumen → nilai per placeholder via LLM
+    const sys = 'Anda mengisi template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Untuk tiap placeholder pada DAFTAR, ambil/ringkas nilai yang relevan dari ISI DOKUMEN. Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang nilai operasional/angka/nama.';
+    const raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(phs)}\n\nISI DOKUMEN:\n${String(content).slice(0,12000)}`, 'main');
+    let map={}; try{ map = JSON.parse(raw.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim()); }catch(e){ map={}; }
+    phs.forEach(k=>{ if(typeof map[k]!=='string') map[k] = map[k]==null?'':String(map[k]); });
+    const filled = Object.keys(map).filter(k=>phs.includes(k) && map[k]).length;
+    const out = await agDocxFill(buf, map);
+    const blob = new Blob([out], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url;
+    a.download = `${String(d.doc_number||d.title||'dokumen').replace(/[^\w.\-]+/g,'_')}.docx`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast(`.docx final dirakit — ${filled}/${phs.length} field terisi, format identik master`,'ok');
   }catch(e){ toast(e.message,'err'); }
 }
 

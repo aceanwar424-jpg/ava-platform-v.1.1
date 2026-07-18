@@ -69,6 +69,7 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 7 | `supabase_agentic_fase7i_hr.sql` | **Departemen People & Credentialing** (HR_CRED·HR_ROSTER) + tabel `staff_credentials` + RPC scan/CRUD + task HR_TICK/CRED_WATCH |
 | 8 | `supabase_agentic_fase7g_it.sql` | **Perluasan IT** — `INTEGRATION_HEALTH` (sampel tertahan + analyzer diam) & `BACKUP_VERIFY` (tabel `agentic.backup_log` + kesegaran pg_dump) |
 | 9 | `supabase_agentic_fase7h_lab.sql` | **Departemen Lab Operations Assurance** (LAB_QC·LAB_TAT·LAB_CRIT) + RPC `agentic_lab_scan` + task LAB_TICK/QC_WATCH/TAT_MONITOR/CRITICAL_WATCH |
+| 10 | `supabase_agentic_fase7k_cleanup.sql` | **Clear-up** — aktifkan task reserved (MASTER_LIST/DOC_DISTRIBUTE/DOC_OBSOLETE/PLAN_CAMPAIGN/ROSTER_CHECK), hapus IT_BACKUP_CHECK usang, **wire video** (MAKE_VIDEO) |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.
@@ -331,10 +332,13 @@ Jika ya → master Anda valid dan siap dipakai generator.
 | `SEO_RESEARCH` | MKT | R1 log | ✅ |
 | `MAKE_BLOG_SEO` | MKT | R2 · QA_KONTEN 80 | ✅ |
 | `MAKE_DESIGN_BRIEF` | MKT | R1 log | ✅ |
-| `PLAN_CAMPAIGN` | MKT | R2 · QA_KONTEN 70 | ⏳ reserved |
+| `PLAN_CAMPAIGN` | MKT | R2 · QA_KONTEN 70 | ✅ (tombol Rencana Kampanye) |
+| `MASTER_LIST` · `DOC_DISTRIBUTE` · `DOC_OBSOLETE` | SA | R1 | ✅ (7K — auto via SA_TICK / tombol Daftar Induk) |
+| `ROSTER_CHECK` | People | R1 | ✅ (7K — auto via HR_TICK, baca `attendance`) |
+| `MAKE_VIDEO` | MKT | R2 · QA_KONTEN 75 | ✅ (7K — tombol Buat Video; render aktif bila VIDEO_ENABLED+model) |
 | `IT_CHECK` | IT | R1 log | ✅ (diag + reaper + self-heal) |
 | `IT_SEC_AUDIT` | IT | R1 log | ✅ (audit postur keamanan) |
-| `IT_BACKUP_CHECK` | IT | R2 | ⏳ reserved (butuh hook eksternal) |
+| `INTEGRATION_HEALTH` · `BACKUP_VERIFY` | IT | R1 | ✅ (7G) |
 
 > "⏳ reserved" = sudah ada di Matriks Mandat (terlihat di UI) tapi **belum ada handler**;
 > jangan dibuat manual dulu — akan `FAILED` "handler belum diimplementasikan". Tidak ada
@@ -361,17 +365,21 @@ Jika ya → master Anda valid dan siap dipakai generator.
 
 ## 6. Yang MASIH perlu Anda kerjakan (untuk menyempurnakan)
 
-1. **Master `.docx` + jembatan isi→placeholder.** Engine perakit sudah jadi & teruji.
-   Tersisa dua hal: **(a)** Anda buat & unggah master per level/jenis dengan token `{{…}}`
-   (§4.4); **(b)** langkah kecil di sisi kode yang **memetakan hasil LLM `DOC_GENERATE`
-   (markdown) → pasangan placeholder→nilai**, memanggil `agDocxFill`, lalu menyimpan
-   `.docx` final ke revisi dokumen. Langkah (b) akan dipasang **setelah** ada minimal satu
-   master contoh Anda (agar pemetaan token sesuai kenyataan, bukan tebakan).
+Jembatan `.docx` dan video **sudah dibangun** (Fase 7K/7D). Yang tersisa = **input Anda**:
 
-2. **Video — kesiapan model.** Jalur teknis siap (gateway + Konfig AI). Anda tinggal
-   memastikan **model text-to-video aktif** di akun NVIDIA lalu isi `NVIDIA_VIDEO_MODEL`
-   + `VIDEO_ENABLED=true`. Untuk produksi video penuh (durasi menit) perlu **background
-   job**; beri tahu bila mau dilanjut ke sana.
+1. **Master `.docx`.** Jembatan isi→placeholder **sudah jalan**: di **Dokumen QMS** tiap
+   dokumen ber-isi punya tombol **🧩 .docx** yang mengambil template master (per level/jenis),
+   memetakan isi ke placeholder via LLM, lalu mengunduh `.docx` final **berformat identik master**.
+   Anda tinggal **unggah master `.docx` bertoken `{{…}}`** (tab Organisasi → Template). Tanpa
+   master, tombol memberi tahu "belum ada master untuk level/jenis ini".
+
+2. **Video.** Pipeline **sudah di-wire**: Content Studio → **🎬 Buat Video** membuat script +
+   memanggil `mode:'video'`. Anda tinggal isi **`NVIDIA_VIDEO_MODEL` + `VIDEO_ENABLED=true`**
+   (Konfig AI) dengan model text-to-video aktif. Bila belum, task tetap menghasilkan **script**
+   (video ditandai "belum dibuat"). Untuk video durasi menit perlu **background job** menyusul.
+
+3. **Backup logging.** `BACKUP_VERIFY` butuh skrip pg_dump Anda mencatat tiap dump ke
+   `agentic_backup_log_add` (snippet curl di §CRON `supabase_agentic_fase7g_it.sql`).
 
 3. **Sub-modul SA lanjutan (Fase 7C+).** `DOC_DISTRIBUTE`, `DOC_OBSOLETE`, `MASTER_LIST`,
    `PLAN_CAMPAIGN` masih "reserved". Bila diperlukan, minta implementasi handler-nya.

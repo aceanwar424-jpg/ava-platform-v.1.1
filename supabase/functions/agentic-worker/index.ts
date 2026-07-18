@@ -949,6 +949,20 @@ async function handleSaTick(t: Task) {
   if (made) lines.push(`📝 ${made} dokumen wajib diusulkan (DOC_GENERATE)`);
   if (scan.templates_missing) lines.push(`📐 ${scan.templates_missing} kombinasi jenis/level belum punya TEMPLATE master — unggah di tab Organisasi agar format terjaga.`);
 
+  // Fase 7K: admin dokumen — distribusi & review/obsolete (dedup)
+  try {
+    const da = await rpc('agentic_doc_admin', {}) as Dict;
+    const das = (da.summary || {}) as Dict;
+    if (Number(das.recent || 0) > 0 && !(await rpc('agentic_queued_exists', { p_type: 'DOC_DISTRIBUTE' }))) {
+      await rpc('agentic_create_task', { p_agent: 'ORG', p_task_type: 'DOC_DISTRIBUTE', p_title: 'Distribusi dokumen terbit baru' });
+      lines.push(`📤 ${das.recent} dokumen terbit baru → task distribusi`);
+    }
+    if (Number(das.overdue || 0) > 0 && !(await rpc('agentic_queued_exists', { p_type: 'DOC_OBSOLETE' }))) {
+      await rpc('agentic_create_task', { p_agent: 'ORG', p_task_type: 'DOC_OBSOLETE', p_title: 'Cek dokumen jatuh tempo/obsolete' });
+      lines.push(`♻ ${das.overdue} dokumen jatuh tempo review → task obsolete/review`);
+    }
+  } catch { /* non-fatal */ }
+
   const md = `## Patroli Service Assurance — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
     `Jatuh tempo review: ${due.length} · gap klausul wajib: ${missing.length}\n` +
     (lines.length ? lines.map((l) => `- ${l}`).join('\n') : '- Tidak ada tindakan diperlukan');
@@ -1166,6 +1180,12 @@ async function handleHrTick(t: Task) {
   const scan = await rpc('agentic_hr_cred_scan', {}) as Dict;
   const s = (scan.summary || {}) as Dict;
   const md = credReport(scan);
+  // Fase 7K: pantau roster/absensi juga (dedup)
+  try {
+    if (!(await rpc('agentic_queued_exists', { p_type: 'ROSTER_CHECK' }))) {
+      await rpc('agentic_create_task', { p_agent: 'ORG', p_task_type: 'ROSTER_CHECK', p_title: 'Cek roster & absensi' });
+    }
+  } catch { /* non-fatal */ }
   if (Number(s.expired || 0) > 0) {
     await rpc('agentic_msg_add', { p: { from_agent: 'HR_CRED', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
   } else if (Number(s.expiring_90 || 0) > 0 || Number(s.no_expiry || 0) > 0) {
@@ -1263,8 +1283,120 @@ const handleQcWatch = (t: Task) => handleLabScan(t, 'qc');
 const handleTatMonitor = (t: Task) => handleLabScan(t, 'tat');
 const handleCriticalWatch = (t: Task) => handleLabScan(t, 'critical');
 
+// ═══ POINT C — video wiring ══════════════════════════════════════════
+// makeVideo: gateway mode:'video' → simpan .mp4 ke storage (bila base64) atau URL.
+// Non-fatal: gagal/nonaktif → null (script tetap jadi DRAFT).
+async function makeVideo(t: Task, prompt: string): Promise<{ path?: string; url?: string } | null> {
+  try {
+    const res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
+      method: 'POST', headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: 'video', prompt, taskId: t.id }), signal: AbortSignal.timeout(130_000),
+    });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok || !Array.isArray(d.videos) || !d.videos[0]) return null;
+    const v = String(d.videos[0]);
+    if (/^https?:\/\//.test(v)) return { url: v };
+    const b64 = v.split(',')[1] || '';
+    if (!b64) return null;
+    const bin = atob(b64); const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    const path = `renders/${t.id}_${Date.now()}.mp4`;
+    const up = await fetch(`${SB_URL}/storage/v1/object/agentic/${path}`, {
+      method: 'POST', headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'video/mp4' }, body: arr,
+    });
+    return up.ok ? { path } : null;
+  } catch { return null; }
+}
+async function handleMakeVideo(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('MAKE_VIDEO');
+  const { data } = await askLLMJson(t, tpl, {
+    topic: p.topic, channel: p.channel || 'IG_STORY', angle: p.angle || '-', rejection_feedback: p.rejection_feedback || '-' });
+  const c = data as Dict;
+  if (!c.script && !c.video_prompt) throw new Error('Output LLM tanpa script/video_prompt');
+  const vid = p.make_video === false ? null : await makeVideo(t, String(c.video_prompt || c.title || p.topic));
+  const hashtags = Array.isArray(c.hashtags) ? (c.hashtags as string[]).join(' ') : '';
+  const md = `## ${c.title || p.topic} — Video\n\n${c.caption || ''}\n\n**Script:**\n${c.script || ''}\n\n` +
+    (vid?.path ? `🎬 Video: agentic/${vid.path}` : vid?.url ? `🎬 Video: ${vid.url}` : '_(video belum dibuat — aktifkan VIDEO_ENABLED + NVIDIA_VIDEO_MODEL di Konfig AI)_') +
+    `\n\n${hashtags}`;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: vid ? 'VIDEO' : 'COPY', file_path: vid?.path || null,
+    text_content: vid?.url ? md + `\nurl:${vid.url}` : md, meta: { title: c.title, video_prompt: c.video_prompt } } }).catch(() => null);
+  return { result: { markdown: md, video: vid, copy: c, calendar_id: p.calendar_id || null },
+    note: `Video "${p.topic}" · ${vid ? 'video dibuat' : 'script saja (video nonaktif/gagal)'}${c.needs_medical_review ? ' · perlu review medis' : ''}` };
+}
+
+// ═══ FASE 7K — task "reserved" diaktifkan ════════════════════════════
+async function handleMasterList(_t: Task) {
+  const d = await rpc('agentic_doc_admin', {}) as Dict;
+  const pub = (d.published || []) as Dict[];
+  const s = (d.summary || {}) as Dict;
+  const md = `## Daftar Induk Dokumen — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Terbit: ${s.published ?? 0} · Jatuh tempo review: ${s.overdue ?? 0} · Obsolete: ${s.obsolete ?? 0}\n\n` +
+    `| No. Dokumen | Judul | Jenis | Dept | Rev | Review Berikut |\n|---|---|---|---|---|---|\n` +
+    pub.map((x) => `| ${x.doc_number || '—'} | ${x.title || ''} | ${x.doc_type || ''} L${x.doc_level || ''} | ${x.department || ''} | ${x.revision ?? 0} | ${x.next_review_date || '—'} |`).join('\n');
+  return { result: { markdown: md, ...d }, note: `Daftar induk: ${s.published ?? 0} dokumen terbit` };
+}
+async function handleDocDistribute(_t: Task) {
+  const d = await rpc('agentic_doc_admin', {}) as Dict;
+  const recent = (d.recent_published || []) as Dict[];
+  const md = `## Distribusi Dokumen — ${new Date().toLocaleDateString('id-ID')}\n` +
+    (recent.length
+      ? `Dokumen terbit terbaru yang perlu **didistribusikan & dicatat acknowledgement**-nya:\n` +
+        recent.map((x) => `- ${x.doc_number || '—'} · ${x.title} (${x.department}) · terbit ${x.effective_date}`).join('\n') +
+        `\n\n_Distribusi & tanda terima dilakukan & dicatat oleh manusia._`
+      : `Tidak ada dokumen terbit baru yang perlu distribusi.`);
+  if (recent.length) await rpc('agentic_msg_add', { p: { from_agent: 'SA_DOC', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  return { result: { markdown: md }, note: `Distribusi: ${recent.length} dokumen baru` };
+}
+async function handleDocObsolete(_t: Task) {
+  const d = await rpc('agentic_doc_admin', {}) as Dict;
+  const over = (d.overdue_review || []) as Dict[];
+  const md = `## Kandidat Review/Obsolete — ${new Date().toLocaleDateString('id-ID')}\n` +
+    (over.length
+      ? `Dokumen **melewati tanggal review** — tinjau lalu perbarui atau tandai OBSOLETE (aksi manusia):\n` +
+        over.map((x) => `- ${x.doc_number || '—'} · ${x.title} (${x.department}) · jatuh tempo ${x.next_review_date} (telat ${x.days_overdue} hari)`).join('\n')
+      : `Tidak ada dokumen yang melewati tanggal review.`);
+  if (over.length) await rpc('agentic_msg_add', { p: { from_agent: 'SA_DOC', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  return { result: { markdown: md }, note: `Obsolete/review: ${over.length} dokumen jatuh tempo` };
+}
+async function handleRosterCheck(t: Task) {
+  const scan = await rpc('agentic_roster_scan', { p_days: Number(t.payload?.days ?? 14) }) as Dict;
+  const s = (scan.summary || {}) as Dict;
+  const alpa = (scan.alpa || []) as Dict[];
+  const noOut = (scan.no_clockout || []) as Dict[];
+  const md = `## Roster & Absensi (14 hari) — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Alpa: ${s.alpa ?? 0} · Tanpa clock-out: ${s.no_clockout ?? 0} · Terlambat parah: ${s.very_late ?? 0} · Terlambat: ${s.late ?? 0}\n\n` +
+    (alpa.length ? `**Alpa:** ` + alpa.slice(0, 20).map((a) => `${a.employee_name} (${a.tanggal})`).join(', ') + '\n\n' : '') +
+    (noOut.length ? `**Lupa clock-out:** ` + noOut.slice(0, 20).map((a) => `${a.employee_name} (${a.tanggal})`).join(', ') : '');
+  if (Number(s.alpa || 0) > 0) await rpc('agentic_msg_add', { p: { from_agent: 'HR_ROSTER', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  return { result: { markdown: md, ...scan }, note: `Roster: ${s.alpa ?? 0} alpa · ${s.very_late ?? 0} telat parah` };
+}
+async function handlePlanCampaign(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('PLAN_CAMPAIGN');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.5), maxTokens: 6000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      goal: p.goal || p.topic || 'meningkatkan kesadaran layanan lab', period: p.period || '1 bulan',
+      notes: p.notes || '-', rejection_feedback: p.rejection_feedback || '-' }),
+  });
+  const md = String(r.text || '').trim();
+  if (md.length < 100) throw new Error('Rencana kampanye terlalu pendek — output LLM tidak valid');
+  return { result: { markdown: md, change_note: `Campaign plan via ${r.provider}/${r.model}` },
+    note: `Rencana kampanye "${p.goal || p.topic || ''}" · ${md.length} char` };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 7K — task reserved diaktifkan + video wiring:
+  MASTER_LIST: handleMasterList,
+  DOC_DISTRIBUTE: handleDocDistribute,
+  DOC_OBSOLETE: handleDocObsolete,
+  ROSTER_CHECK: handleRosterCheck,
+  PLAN_CAMPAIGN: handlePlanCampaign,
+  MAKE_VIDEO: handleMakeVideo,
   // Fase 7H — Lab Operations Assurance:
   LAB_TICK: handleLabTick,
   QC_WATCH: handleQcWatch,

@@ -92,6 +92,8 @@ async function renderAgOrgTab(el){
           <button class="ag-btn mut" onclick="agItSecAudit()">🔐 Audit Keamanan</button>
           <button class="ag-btn mut" onclick="agItTask('INTEGRATION_HEALTH','Cek integrasi lab')">🔌 Cek Integrasi</button>
           <button class="ag-btn mut" onclick="agItTask('BACKUP_VERIFY','Verifikasi backup')">💾 Cek Backup</button>
+          <button class="ag-btn mut" onclick="agItTask('MASTER_LIST','Daftar induk dokumen')">📋 Daftar Induk</button>
+          <button class="ag-btn mut" onclick="agPlanCampaign()">📣 Rencana Kampanye</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>
         </div>
       </div>
@@ -679,6 +681,22 @@ async function agItTask(type, title){
     await agReload();
     if(_agTab==='org') agRenderTab();
   }catch(e){
-    toast(/INTEGRATION_HEALTH|BACKUP_VERIFY|integration_scan|backup_status/.test(e.message)?'Jalankan supabase_agentic_fase7g_it.sql dulu':e.message,'err');
+    toast(/INTEGRATION_HEALTH|BACKUP_VERIFY|integration_scan|backup_status/.test(e.message)?'Jalankan supabase_agentic_fase7g_it.sql dulu':
+      /MASTER_LIST|doc_admin/.test(e.message)?'Jalankan supabase_agentic_fase7k_cleanup.sql dulu':e.message,'err');
+  }
+}
+async function agPlanCampaign(){
+  const goal = prompt('Tujuan kampanye (mis. promosi paket MCU korporat Q3):','');
+  if(goal===null || !goal.trim()) return;
+  const period = prompt('Periode (mis. 1 bulan / Juli-Agustus):','1 bulan') || '1 bulan';
+  try{
+    await agRpc('agentic_create_task', { p_agent:'CONTENT', p_task_type:'PLAN_CAMPAIGN',
+      p_title:`Rencana kampanye: ${goal.slice(0,80)}`, p_payload:{ goal, period } });
+    toast('Rencana kampanye ditugaskan — menjalankan worker…','ok');
+    await agRunWorker(3);
+    await agReload();
+    if(_agTab==='org') agRenderTab();
+  }catch(e){
+    toast(/PLAN_CAMPAIGN/.test(e.message)?'Jalankan supabase_agentic_fase7k_cleanup.sql dulu':e.message,'err');
   }
 }

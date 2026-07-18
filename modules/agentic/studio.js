@@ -67,6 +67,7 @@ async function renderAgStudioTab(el){
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="ag-btn pub" onclick="agRunPlanner()">${svgIcon('sparkle',13)} Jalankan Planner Mingguan</button>
             <button class="ag-btn mut" onclick="agOpenSlotForm()">${svgIcon('plus',13)} Slot Manual</button>
+            <button class="ag-btn mut" onclick="agMakeVideo()">🎬 Buat Video</button>
           </div>
         </div>
       </div>
@@ -158,6 +159,18 @@ async function agRunPlanner(){
     await agRunWorker(2);
     await agReload();
   }catch(e){ toast(e.message,'err'); }
+}
+async function agMakeVideo(){
+  const topic = prompt('Topik video pendek (mis. pentingnya cek gula darah rutin):','');
+  if(topic===null || !topic.trim()) return;
+  const channel = prompt('Kanal (IG_STORY / TIKTOK / IG_FEED):','IG_STORY') || 'IG_STORY';
+  try{
+    await agRpc('agentic_create_task', { p_agent:'CONTENT', p_task_type:'MAKE_VIDEO',
+      p_title:`Video: ${topic.slice(0,80)}`, p_payload:{ topic, channel } });
+    toast('Task video dibuat — menjalankan worker… (butuh VIDEO_ENABLED+model utk render)','ok');
+    await agRunWorker(3);
+    await agReload();
+  }catch(e){ toast(/MAKE_VIDEO/.test(e.message)?'Jalankan supabase_agentic_fase7k_cleanup.sql dulu':e.message,'err'); }
 }
 async function agProduceSlot(id){
   try{

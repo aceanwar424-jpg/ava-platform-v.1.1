@@ -80,7 +80,15 @@ const ICON_PATHS = {
   factory:     '<path d="M3 21h18"/><path d="M4 21V10l6 4V10l6 4V7h4v14"/><path d="M7.5 17h.01M13.5 17h.01"/>',
   truck:       '<path d="M3 6h10v10H3Z"/><path d="M13 9h4l3 3v4h-7Z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/>',
 
+  // — Rawat inap & farmasi —
+  bed:         '<path d="M3 20V8"/><path d="M3 12h15a3 3 0 0 1 3 3v5"/><path d="M3 16h18"/><circle cx="7.5" cy="9.5" r="1.8"/>',
+  pill:        '<path d="M10.5 20.5a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 7Z"/><path d="m8.5 8.5 7 7"/>',
+  syringe:     '<path d="m18 2 4 4"/><path d="m17 7 3-3"/><path d="M19 9 9 19a2 2 0 0 1-3 0l-1-1a2 2 0 0 1 0-3L15 5Z"/><path d="m9 11 2 2M12 8l2 2M6 14l2 2"/><path d="m5 15-3 3 2 2 3-3"/>',
+  activity:    '<path d="M3 12h4l3 8 4-16 3 8h4"/>',
+
   // — Analitik —
+  kanban:      '<rect x="3" y="3" width="5" height="14" rx="1"/><rect x="10" y="3" width="5" height="9" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/>',
+  funnel:      '<path d="M3 4h18l-7 8v7l-4 2v-9Z"/>',
   'bar-chart': '<path d="M3 21h18"/><path d="M6 21V11M11 21V4M16 21v-6"/>',
   'line-chart':'<path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/>',
   'trending-up':'<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
