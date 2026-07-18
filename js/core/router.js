@@ -64,7 +64,8 @@ function navigate(page, params={}) {
     case 'refrange':    renderConfigRefRange();          break;
     case 'labreport':   renderLabReportConfig();          break;
     case 'corporate':   renderConfigCorporate();        break;
-    case 'radiology':   renderRadiology();              break;
+    case 'radiology':   renderRIS();                    break;
+    case 'radiology-old':renderRadiology();             break;
     case 'supportive':  renderSupportive();             break;
     case 'spirometry':  renderSupportive();             break;
     case 'medrecord':   renderMedRecord();              break;

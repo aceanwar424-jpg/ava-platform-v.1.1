@@ -81,9 +81,9 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 4.7 Tutup kas per shift — total sistem dihitung dari transaksi, selisih wajib dijelaskan
 
 ### Fase 5 — Kepatuhan & Ekspansi
-- [ ] 5.1 Satu Sehat (FHIR) Kemenkes
-- [ ] 5.2 Klaim BPJS / INA-CBG
-- [ ] 5.3 RIS sebagai modul tersendiri
+- [~] 5.1 Satu Sehat — DIPARKIR sampai kerja sama tersedia
+- [~] 5.2 Klaim BPJS — DIPARKIR sampai kerja sama tersedia
+- [x] 5.3 RIS modul tersendiri + PACS rancangan sendiri (arsip Storage + penampil kanvas)
 - [ ] 5.4 Laporan Kemenkes RL 1–5 terisi otomatis
 - [~] 5.5 LIS lanjutan — autoverifikasi + Westgard multi-run + Levey-Jennings SELESAI; antarmuka alat langsung & rujukan luar menyusul
 - [ ] 5.6 Multi-cabang / unit

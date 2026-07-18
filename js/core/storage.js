@@ -4,9 +4,15 @@
 
 const STORAGE_URL = `${SUPABASE_URL}/storage/v1`;
 
+// Sama seperti SB_HEADERS di api.js: 'Authorization' berupa getter agar token
+// pengguna yang sedang login ikut terkirim. Tanpa ini, unggah ke bucket privat
+// (mis. arsip citra PACS) akan ditolak begitu RLS Storage diaktifkan.
 const STORAGE_HEADERS = {
   'apikey': SUPABASE_KEY,
-  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  get 'Authorization'() {
+    const t = (typeof sbAccessToken === 'function') ? sbAccessToken() : '';
+    return `Bearer ${t || SUPABASE_KEY}`;
+  },
 };
 
 // Bucket names
