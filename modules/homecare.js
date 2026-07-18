@@ -533,7 +533,16 @@ async function openHCForm(id=null) {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="form-group" style="grid-column:1/-1">
         <label>Nama Pasien *</label>
-        <input type="text" id="hf-name" value="${o.patient_name||''}" placeholder="Nama lengkap pasien">
+        <div style="display:flex;gap:6px">
+          <input type="text" id="hf-name" value="${o.patient_name||''}" placeholder="Nama lengkap pasien"
+            oninput="hcSearchPatient(this.value)" autocomplete="off" style="flex:1">
+          <input type="text" id="hf-mr" value="${o.mr_number||''}" placeholder="No. RM" readonly
+            style="width:130px;background:var(--bg2);font-family:ui-monospace,monospace;font-size:12px">
+        </div>
+        <div id="hf-pat-results" style="position:relative"></div>
+        <div class="form-hint" id="hf-pat-hint">${o.mr_number
+          ? '✅ Tertaut ke rekam medis '+o.mr_number
+          : 'Ketik nama untuk menautkan ke pasien yang sudah terdaftar — agar kunjungan masuk ke riwayat rekam medisnya.'}</div>
       </div>
       <div class="form-group">
         <label>No. HP / WA Pasien</label>
@@ -596,6 +605,50 @@ async function openHCForm(id=null) {
     </div>`);
   hcUpdateCommissionPreview();
   hcCheckScheduleConflict(id);
+}
+
+// ── Fase 2.2 — tautkan order ke pasien terdaftar (rekam medis) ──
+// Sebelumnya order Home Care terputus dari riwayat pasien: pasien yang sama
+// bisa punya kunjungan Home Care dan hasil lab tanpa keduanya saling terlihat.
+let _hcPatTimer = null;
+function hcSearchPatient(q) {
+  clearTimeout(_hcPatTimer);
+  const box = document.getElementById('hf-pat-results');
+  if (!box) return;
+  if (!q || q.trim().length < 3) { box.innerHTML = ''; return; }
+  _hcPatTimer = setTimeout(async () => {
+    try {
+      const rows = await sbGet('admissions',
+        `select=mr_number,patient_name,patient_phone,patient_address,patient_dob&patient_name=ilike.${encodeURIComponent('%'+q.trim()+'%')}&mr_number=not.is.null&order=created_at.desc&limit=20`);
+      // satu baris per pasien, bukan per kunjungan
+      const seen = {}, uniq = [];
+      (rows||[]).forEach(r => { if (!seen[r.mr_number]) { seen[r.mr_number] = 1; uniq.push(r); } });
+      if (!uniq.length) { box.innerHTML = ''; return; }
+      box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+        border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:210px;overflow:auto">
+        ${uniq.slice(0,8).map(r=>`
+          <div onclick='hcPickPatient(${JSON.stringify(r).replace(/'/g,"&#39;")})'
+            style="padding:8px 11px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12.5px"
+            onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='#fff'">
+            <div style="font-weight:650">${r.patient_name}</div>
+            <div style="font-size:11px;color:var(--gray)">
+              <span style="font-family:ui-monospace,monospace;color:var(--teal)">${r.mr_number}</span>
+              ${r.patient_phone?' · '+r.patient_phone:''}</div>
+          </div>`).join('')}
+      </div>`;
+    } catch(e) { box.innerHTML = ''; }
+  }, 300);
+}
+
+function hcPickPatient(p) {
+  const set = (id,v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+  set('hf-name', p.patient_name);
+  set('hf-mr',   p.mr_number);
+  if (p.patient_phone)   set('hf-phone', p.patient_phone);
+  if (p.patient_address) set('hf-addr',  p.patient_address);
+  const box = document.getElementById('hf-pat-results'); if (box) box.innerHTML = '';
+  const hint = document.getElementById('hf-pat-hint');
+  if (hint) { hint.textContent = `✅ Tertaut ke rekam medis ${p.mr_number}`; hint.style.color = 'var(--teal)'; }
 }
 
 // ── Helper form: nama nakes terpilih (dari master atau order lama) ──
@@ -676,6 +729,7 @@ async function saveHCOrder(id) {
 
   const payload = {
     patient_name:    name,
+    mr_number:       document.getElementById('hf-mr')?.value.trim() || null,  // Fase 2.2
     patient_phone:   document.getElementById('hf-phone').value.trim(),
     patient_address: addr,
     service_type:    svc,

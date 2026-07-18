@@ -56,7 +56,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 
 ### Fase 2 — Menyambung yang Sudah Ada
 - [x] 2.1 Auto goods-issue — resep BHP + trigger di lab_results (tak bisa dilewati jalur mana pun)
-- [ ] 2.2 Home Care → rekam medis pasien
+- [x] 2.2 Home Care → rekam medis — pencarian pasien + tautan mr_number
 - [ ] 2.3 Komisi nakes → penggajian
 - [x] 2.4 Pencocokan tiga arah — vendor_invoices + match_vendor_invoice()
 - [~] 2.5 Anggaran — tabel budgets + budget_remaining() siap, UI PR menyusul
@@ -68,8 +68,8 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 3.2 Alergi (banner keselamatan), daftar masalah, tanda vital + tren — menempel di mr_number
 - [~] 3.3 ICD-10 — kolom is_primary + trigger satu diagnosis utama; UI dokter menyusul
 - [ ] 3.4 Garis waktu kunjungan pasien
-- [~] 3.5 Antrian — tabel + issue_queue_ticket() anti-bentrok siap; UI loket menyusul
-- [~] 3.6 Perjanjian — tabel appointments siap; UI menyusul
+- [x] 3.5 Antrian bernomor + layar ruang tunggu (auto-refresh 15 dtk)
+- [x] 3.6 Perjanjian + pengingat WhatsApp + deteksi bentrok sumber daya
 
 ### Fase 4 — Keuangan & SDM
 - [ ] 4.1 Bagan akun + jurnal + buku besar

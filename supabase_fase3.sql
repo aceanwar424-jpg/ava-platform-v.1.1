@@ -290,3 +290,13 @@ UNION ALL
 SELECT 'pemicu', tgname FROM pg_trigger
 WHERE tgname IN ('clinical_notes_lock','icd_single_primary')
 ORDER BY 1,2;
+
+-- ══════════════════════════════════════════════════════════════
+-- 2.2  Home Care → rekam medis (tautan pasien)
+-- ══════════════════════════════════════════════════════════════
+-- Order Home Care sebelumnya terputus dari riwayat pasien. Kolom ini
+-- menautkannya ke mr_number yang sama dengan rekam medis, sehingga kunjungan
+-- rumah muncul di riwayat pasien bersama hasil lab dan catatan klinisnya.
+ALTER TABLE public.homecare_orders
+  ADD COLUMN IF NOT EXISTS mr_number text;
+CREATE INDEX IF NOT EXISTS idx_hc_mr ON public.homecare_orders(mr_number);
