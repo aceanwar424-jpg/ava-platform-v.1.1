@@ -86,7 +86,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 5.3 RIS modul tersendiri + PACS rancangan sendiri (arsip Storage + penampil kanvas)
 - [x] 5.4 Laporan RL — rekapitulasi otomatis dari data + export CSV & cetak
 - [~] 5.5 LIS lanjutan — autoverifikasi + Westgard multi-run + Levey-Jennings SELESAI; antarmuka alat langsung & rujukan luar menyusul
-- [ ] 5.6 Multi-cabang / unit
+- [~] 5.6 Multi-cabang — fondasi terpasang (penanda cabang + fungsi); penyaringan RLS sengaja belum dinyalakan
 
 ---
 
@@ -124,3 +124,29 @@ tergerus saat mengejar modul lain.
 - **Urutan rilis:** jalankan SQL fase tersebut **sebelum** hard-refresh, karena kode fase
   bergantung pada skemanya.
 - **Cache:** naikkan `?v=` pada aset di `index.html` setiap merilis perubahan CSS/modul.
+
+---
+
+## Status penyelesaian (19 Juli 2026)
+
+Seluruh migrasi Fase 1–5 sudah dijalankan dan terverifikasi terhadap basis data:
+36 tabel baru, 13 fungsi RPC (seluruhnya menolak akses tanpa login), 8 tabel
+master terisi data awal, serta 14 tabel klinis dan keuangan terlindungi RLS.
+Bucket `pacs` aktif dan bersifat privat.
+
+### Yang sengaja belum dikerjakan, beserta alasannya
+
+| Bagian | Alasan |
+|---|---|
+| **1.1b** — RLS per peran | SQL siap. Perlu diuji dengan satu akun per peran; kebijakan yang keliru membuat layar pengguna kosong |
+| **5.1** — Satu Sehat | Diparkir atas keputusan pemilik sistem sampai kerja samanya tersedia |
+| **5.2** — Klaim BPJS | Sama seperti di atas |
+| **5.6** — Penyaringan per cabang | Fondasi terpasang, penyaringan dinyalakan saat cabang kedua dibuka dan seluruh pengguna sudah ditautkan |
+| **Rawat inap & farmasi** | Masing-masing sebesar modul Inventory; hanya dikerjakan bila layanannya memang dibuka |
+
+### Yang menunggu konfirmasi manusia sebelum diandalkan
+
+- **Bagan akun** — template standar terpasang, perlu diperiksa akuntan
+- **Parameter PPh 21 dan BPJS** — sistem menolak memfinalkan gaji sebelum dicentang "dikonfirmasi"
+- **Autoverifikasi lab** — nonaktif secara bawaan, aktifkan per pemeriksaan setelah yakin
+- **Format laporan RL** — rekapitulasi dari data, cocokkan dengan format resmi yang berlaku
