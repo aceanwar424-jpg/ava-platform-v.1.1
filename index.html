@@ -202,6 +202,13 @@
 <script src="modules/mcu.js"></script>
 <script src="modules/admission.js"></script>
 <script src="modules/anamnesa.js"></script>
+
+<!-- Laboratory Services (ISO 15189 Compliance) — Auto-Conclusion, Audit, PKI -->
+<script src="js/core/conclusionEngine.js"></script>
+<script src="js/core/auditLogger.js"></script>
+<script src="js/core/pkiService.js"></script>
+<script src="js/core/ntpService.js"></script>
+
 <!-- Laboratory Information System (LIS) — modular -->
 <script src="modules/lab/index.js"></script>
 <script src="modules/lab/checkin.js"></script>
@@ -228,6 +235,7 @@
 <script src="modules/agentic/index.js"></script>
 <script src="modules/agentic/inbox.js"></script>
 <script src="modules/agentic/docs.js"></script>
+<script src="modules/agentic/docxfill.js"></script>
 <script src="modules/agentic/studio.js"></script>
 <script src="modules/agentic/render.js"></script>
 <script src="modules/agentic/org.js"></script>
@@ -603,6 +611,8 @@ const FLYOUT_MENUS = {
       {page:'homecare', icon:'🏠', label:'Order Home Care', action:"navigate('homecare')"},
       {page:'hc-schedule', icon:'📅', label:'Jadwal Kunjungan', action:"renderHCSchedule()"},
       {page:'hc-billing', icon:'💵', label:'Billing Fee Nakes', action:"renderHCBilling()"},
+      {page:'hc-staff', icon:'👥', label:'Master Nakes', action:"renderHCStaff()"},
+      {page:'hc-tariff', icon:'🏷️', label:'Master Tarif', action:"renderHCTariff()"},
       {page:'hc-report', icon:'📊', label:'Report', action:"renderHCFullReport()"},
     ]
   },
@@ -619,9 +629,12 @@ const FLYOUT_MENUS = {
   inventory: {
     label: 'Inventory & Logistik',
     items: [
-      {page:'inventory', icon:'📦', label:'Stock & Reagen', action:"navigate('inventory')"},
-      {page:'inventory-pr', icon:'🛒', label:'Purchase Request', action:"navigate('inventory')"},
-      {page:'inventory-supplier', icon:'🏭', label:'Supplier', action:"navigate('inventory')"},
+      {page:'inventory', icon:'📦', label:'Stock & Reagen', action:"navigate('inventory',{tab:'stock'})"},
+      {page:'inventory-pr', icon:'🛒', label:'Purchase Request', action:"navigate('inventory',{tab:'pr'})"},
+      {page:'inventory-po', icon:'📄', label:'Purchase Order', action:"navigate('inventory',{tab:'po'})"},
+      {page:'inventory-opname', icon:'📋', label:'Stock Opname', action:"navigate('inventory',{tab:'opname'})"},
+      {page:'inventory-mrp', icon:'📊', label:'MRP', action:"navigate('inventory',{tab:'mrp'})"},
+      {page:'inventory-supplier', icon:'🏭', label:'Supplier', action:"navigate('inventory',{tab:'supplier'})"},
     ]
   },
   hrd: {

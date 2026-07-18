@@ -7,7 +7,15 @@
 
 let agOrgAgents = [], agOrgRights = [], agOrgMsgs = [];
 
-const AG_ORG_ICON = { HEAD:'👔', QA_KONTEN:'✍️', QA_MUTU:'🧪', IT_HEAD:'🖥️', TEAM_OPS:'📋', LOGISTIK:'🚚' };
+const AG_ORG_ICON = {
+  HEAD:'👔', IT_HEAD:'🖥️', TEAM_OPS:'📋', LOGISTIK:'🚚',
+  SA_HEAD:'🧪', SA_DOC:'📚', SA_AUDIT:'🔍', SA_REG:'📜', SA_CAPA:'🛠️', QA_MUTU:'✅',
+  MKT_HEAD:'✍️', MKT_SEO:'🔑', MKT_COPY:'📝', MKT_DESIGN:'🎨', MKT_SOCIAL:'📣', QA_KONTEN:'✅',
+};
+const AG_DEPT_META = {
+  SERVICE_ASSURANCE:{ icon:'🧪', label:'Service Assurance', head:'SA_HEAD', color:'#0EA5E9' },
+  MARKETING:        { icon:'✍️', label:'Marketing',         head:'MKT_HEAD', color:'#8B5CF6' },
+};
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
   R2:{c:'#F59E0B', l:'R2 — HEAD setujui, publish oleh Anda'},
@@ -32,7 +40,34 @@ async function renderAgOrgTab(el){
   }
 
   const head = agOrgAgents.find(a=>a.code==='HEAD');
-  const staff = agOrgAgents.filter(a=>a.code!=='HEAD');
+  // Lapis 2: kepala departemen + organ lintas-fungsi yang lapor langsung ke HEAD
+  const deptHeads = Object.values(AG_DEPT_META).map(m=>agOrgAgents.find(a=>a.code===m.head)).filter(Boolean);
+  const deptHeadCodes = deptHeads.map(a=>a.code);
+  const crossFn = agOrgAgents.filter(a=>a.code!=='HEAD' && a.reports_to==='HEAD' && !deptHeadCodes.includes(a.code));
+  // Kartu 1 departemen: kepala + anggotanya (reports_to = kode kepala)
+  const deptCard = (m)=>{
+    const dh = agOrgAgents.find(a=>a.code===m.head); if(!dh) return '';
+    const members = agOrgAgents.filter(a=>a.reports_to===m.head);
+    return `<div class="ag-detail" style="border-top:3px solid ${m.color};padding:10px 12px;min-width:250px;flex:1">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:12.5px;font-weight:800;color:#0A2342">${m.icon} ${agEsc(m.label)}</div>
+        <button class="ag-btn mut" style="padding:3px 8px;font-size:10.5px" onclick="agOrgKick('${m.head==='SA_HEAD'?'SA_TICK':'MKT_TICK'}')">${svgIcon('sparkle',10)} Patroli</button>
+      </div>
+      <div class="ag-detail" style="border:1px solid ${m.color};padding:7px 10px;margin-top:8px;text-align:center;position:relative;${dh.active?'':'opacity:.45'}">
+        <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${dh.code}')">${svgIcon('edit',10)}</button>
+        <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[dh.code]||'🤖'} ${agEsc(dh.name)}</div>
+        <div style="font-size:9.5px;color:var(--gray)">${agEsc(dh.role_title)}</div>
+      </div>
+      <div style="width:2px;height:8px;background:#cbd5e1;margin:0 auto"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${members.map(a=>`<div class="ag-detail" style="padding:6px 9px;position:relative;${a.active?'':'opacity:.45'}">
+          <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',10)}</button>
+          <div style="font-size:11.5px;font-weight:700;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
+          <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)} · ${agEsc(a.model_tier)}${a.active?'':' · NONAKTIF'}</div>
+        </div>`).join('') || '<div style="font-size:10.5px;color:var(--gray);text-align:center">belum ada anggota</div>'}
+      </div>
+    </div>`;
+  };
 
   el.innerHTML = `
     <div class="ag-detail" style="margin-bottom:12px">
@@ -43,6 +78,8 @@ async function renderAgOrgTab(el){
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="ag-btn pub" onclick="agOrgKick('HEAD_TICK')">${svgIcon('sparkle',13)} Jalankan HEAD</button>
+          <button class="ag-btn mut" onclick="agOrgKick('SA_TICK')">🧪 Patroli Mutu</button>
+          <button class="ag-btn mut" onclick="agOrgKick('MKT_TICK')">${svgIcon('sparkle',13)} Patroli Marketing</button>
           <button class="ag-btn mut" onclick="agOrgKick('IT_CHECK')">${svgIcon('eye',13)} IT Check</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>
         </div>
@@ -58,16 +95,20 @@ async function renderAgOrgTab(el){
           <span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
         </div>`:''}
         <div style="width:2px;height:14px;background:#cbd5e1"></div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%">
+          ${Object.values(AG_DEPT_META).map(deptCard).join('')}
+        </div>
+        ${crossFn.length?`<div style="width:2px;height:10px;background:#cbd5e1"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
-          ${staff.map(a=>`<div class="ag-detail" style="padding:9px 14px;text-align:center;min-width:150px;position:relative;${a.active?'':'opacity:.45'}">
+          ${crossFn.map(a=>`<div class="ag-detail" style="padding:8px 13px;text-align:center;min-width:140px;position:relative;${a.active?'':'opacity:.45'}">
             <button class="act-btn" title="Edit job desc" style="position:absolute;top:5px;right:5px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',11)}</button>
-            <div style="font-size:12.5px;font-weight:800;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
-            <div style="font-size:10px;color:var(--gray)">${agEsc(a.role_title)}</div>
+            <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
+            <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)}</div>
             <span class="ag-badge" style="margin-top:4px;display:inline-block;${a.active
               ?'background:#DCFCE7;color:#15803D;border:1px solid #86EFAC':'background:#F1F5F9;color:#64748B;border:1px solid #CBD5E1'}">
               ${a.active?'AKTIF':'NONAKTIF'} · ${agEsc(a.model_tier)}</span>
           </div>`).join('')}
-        </div>
+        </div>`:''}
       </div>
     </div>
 
@@ -111,12 +152,207 @@ async function renderAgOrgTab(el){
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
+    <div class="ag-detail" style="margin-top:12px" id="ag-templates-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
+    <div class="ag-detail" style="margin-top:12px" id="ag-aiconfig-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⚙️ Konfigurasi AI (model · API · video)</div>
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
     <div class="ag-detail" style="margin-top:12px" id="ag-prompthist-box">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔧 Perbaikan Prompt oleh Kepala IT</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
   agRenderCronBox();
+  agRenderTemplates();
+  agRenderAiConfig();
   agRenderPromptHist();
+}
+
+// ── Panel Konfig AI: set model/API/flag langsung dari web (Fase 7B) ──
+const AG_CFG_CAT = { NVIDIA:'🟢 NVIDIA', GAMBAR:'🖼 Gambar', VIDEO:'🎬 Video', GEMINI:'🔵 Gemini', LANJUT:'⚙️ Lanjutan' };
+async function agRenderAiConfig(){
+  const box = document.getElementById('ag-aiconfig-box'); if(!box) return;
+  let rows = [];
+  try{ rows = await agRpc('agentic_config_ui', {}) || []; }catch(e){ rows = null; }
+  let inner;
+  if(rows===null){
+    inner = `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7b.sql</strong> untuk mengaktifkan konfigurasi AI di web, lalu re-deploy <strong>llm-gateway</strong>.</div>`;
+  } else {
+    const cats = [...new Set(rows.map(r=>r.category))];
+    inner = `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Kosongkan nilai untuk memakai Secret/env lama. Perubahan berlaku di panggilan AI berikutnya (tanpa re-deploy).</div>` +
+      cats.map(cat=>`<div style="margin-bottom:10px">
+        <div style="font-size:11px;font-weight:800;color:#0A2342;margin:6px 0 4px">${AG_CFG_CAT[cat]||cat}</div>
+        ${rows.filter(r=>r.category===cat).map(r=>`
+          <div style="display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+            <div>
+              <div style="font-size:11.5px;font-weight:700;color:#334155">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:#B91C1C">🔒</span>':''}</div>
+              <div style="font-size:10px;color:var(--gray)">${agEsc(r.notes||'')}</div>
+            </div>
+            <input id="agc-${agEsc(r.key)}" class="form-input" style="width:100%;font-size:11.5px"
+              placeholder="${agEsc(r.is_secret&&r.has_value?'•••••• tersimpan — isi utk ganti':(r.placeholder||''))}"
+              value="${r.is_secret?'':agEsc(r.value||'')}">
+            <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agConfigSet('${agEsc(r.key)}')">${svgIcon('check',12)} Simpan</button>
+          </div>`).join('')}
+      </div>`).join('');
+  }
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">⚙️ Konfigurasi AI (model · API · video)</div>
+      <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderAiConfig()">${svgIcon('refresh',11)} Muat ulang</button>
+    </div>${inner}`;
+}
+async function agConfigSet(key){
+  const el = document.getElementById('agc-'+key); if(!el) return;
+  try{
+    await agRpc('agentic_config_set', { p_key:key, p_value:el.value });
+    toast(`${key} disimpan`,'ok');
+    agRenderAiConfig();
+  }catch(e){ toast(e.message,'err'); }
+}
+
+// ── Panel template dokumen: daftar + unggah master .docx per level/jenis ──
+const AG_DOC_LEVELS = { 1:'L1 · Kebijakan/Pedoman Mutu', 2:'L2 · Prosedur (SOP)', 3:'L3 · Instruksi Kerja', 4:'L4 · Formulir/Rekaman' };
+async function agRenderTemplates(){
+  const box = document.getElementById('ag-templates-box'); if(!box) return;
+  let rows = [];
+  try{ rows = await sbGet('agentic_templates_v','select=*&order=doc_level.asc,doc_type.asc') || []; }catch(e){ rows = null; }
+  const inner = rows===null
+    ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7.sql</strong> untuk mengaktifkan registry template.</div>`
+    : `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Unggah master <strong>.docx</strong> asli per level per jenis. Generator dokumen (SA_DOC) akan mengisi isi ke dalam master ini — header, footer, tipe huruf, ukuran, margin, dan spasi tetap PERSIS. Tanpa template, dokumen dibuat dari format standar (belum terjamin identik).</div>
+      <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Level</th><th>Jenis</th><th>Dept</th><th>Nama</th><th>Master .docx</th><th>Contoh</th><th></th></tr></thead>
+        <tbody>${rows.map(r=>`<tr>
+          <td style="white-space:nowrap">${AG_DOC_LEVELS[r.doc_level]||('L'+r.doc_level)}</td>
+          <td>${agEsc(r.doc_type)}</td>
+          <td>${agEsc(r.department)}</td>
+          <td>${agEsc(r.name)}</td>
+          <td>${r.storage_path?`<span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">belum ada</span>'}</td>
+          <td>${r.sample_path?'✅':'—'}</td>
+          <td style="white-space:nowrap">
+            ${r.storage_path?`<button class="act-btn" title="Tes rakit .docx dari master" onclick="agTemplateTestBuild('${r.id}')">${svgIcon('download',11)||'⬇'}</button>`:''}
+            <button class="act-btn" title="Edit / unggah" onclick="agTemplateEdit('${r.id}')">${svgIcon('edit',11)}</button></td>
+        </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:14px">Belum ada template — tambah lalu unggah master .docx contoh Anda.</td></tr>'}</tbody>
+      </table></div>`;
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div style="display:flex;gap:6px">
+        <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agTemplateEdit()">${svgIcon('plus',11)} Tambah Template</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderTemplates()">${svgIcon('refresh',11)} Muat ulang</button>
+      </div>
+    </div>${inner}`;
+}
+
+let _agTplRows = [];
+async function agTemplateEdit(id){
+  try{ _agTplRows = await sbGet('agentic_templates_v','select=*') || []; }catch(e){ _agTplRows = []; }
+  const r = id ? _agTplRows.find(x=>x.id===id) : null;
+  const fs = (r && r.format_spec) || {};
+  const mg = fs.margins_cm || {};
+  openModal(`
+    <div style="max-width:560px">
+      <h3 style="margin:0 0 10px;color:#0A2342">📐 ${r?'Edit':'Tambah'} Template Dokumen</h3>
+      <div style="display:grid;gap:9px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Level
+            <select id="agt-level" class="form-input" style="width:100%">
+              ${[1,2,3,4].map(l=>`<option value="${l}" ${r&&r.doc_level==l?'selected':''}>${AG_DOC_LEVELS[l]}</option>`).join('')}
+            </select></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
+            <input id="agt-type" class="form-input" style="width:100%" placeholder="SOP / IK / FORM …" value="${agEsc(r?r.doc_type:'SOP')}"></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Dept
+            <input id="agt-dept" class="form-input" style="width:100%" value="${agEsc(r?r.department:'MUTU')}"></label>
+        </div>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Nama template
+          <input id="agt-name" class="form-input" style="width:100%" value="${agEsc(r?r.name:'')}" placeholder="mis. SOP Pra-Analitik OneLab"></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Font
+            <input id="agt-font" class="form-input" style="width:100%" value="${agEsc(fs.font||'')}" placeholder="Arial / Times New Roman"></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Ukuran (pt)
+            <input id="agt-size" class="form-input" style="width:100%" value="${agEsc(fs.size_pt||'')}" placeholder="11"></label>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr) 1fr;gap:8px">
+          <label style="font-size:11px;font-weight:700;color:#334155">Margin atas
+            <input id="agt-mt" class="form-input" style="width:100%" value="${agEsc(mg.t||'')}" placeholder="cm"></label>
+          <label style="font-size:11px;font-weight:700;color:#334155">bawah
+            <input id="agt-mb" class="form-input" style="width:100%" value="${agEsc(mg.b||'')}"></label>
+          <label style="font-size:11px;font-weight:700;color:#334155">kiri
+            <input id="agt-ml" class="form-input" style="width:100%" value="${agEsc(mg.l||'')}"></label>
+          <label style="font-size:11px;font-weight:700;color:#334155">kanan
+            <input id="agt-mr" class="form-input" style="width:100%" value="${agEsc(mg.r||'')}"></label>
+          <label style="font-size:11px;font-weight:700;color:#334155">Spasi baris
+            <input id="agt-ls" class="form-input" style="width:100%" value="${agEsc(fs.line_spacing||'')}" placeholder="1.0/1.5"></label>
+        </div>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Master .docx (mengunci header/footer/format)
+          <input type="file" id="agt-file" class="form-input" style="width:100%" accept=".docx">
+          ${r&&r.storage_path?`<span style="font-size:10.5px;color:#15803D">master terpasang — unggah baru hanya bila ingin mengganti</span>`:''}</label>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Contoh dokumen jadi (referensi — .docx/.pdf)
+          <input type="file" id="agt-sample" class="form-input" style="width:100%" accept=".docx,.pdf">
+          <span style="font-size:10.5px;color:var(--gray)">Unggah contoh dokumen asli Anda di sini. Dipakai sebagai acuan format & isi saat menyusun master.${r&&r.sample_path?' <span style="color:#15803D">contoh terpasang</span>':''}</span></label>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Daftar placeholder di master (satu per baris, tanpa kurung)
+          <span style="font-weight:400;color:var(--gray)">— mis. JUDUL, NO_DOKUMEN, TUJUAN. Di file .docx tulis <code>{{JUDUL}}</code>.</span>
+          <textarea id="agt-ph" class="form-input" style="width:100%;font-size:12px" rows="3" placeholder="JUDUL&#10;NO_DOKUMEN&#10;TANGGAL_TERBIT">${agEsc(r&&Array.isArray(r.placeholders)?r.placeholders.join('\n'):'')}</textarea></label>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Catatan (header/footer, penomoran, dll)
+          <textarea id="agt-notes" class="form-input" style="width:100%;font-size:12px" rows="3">${agEsc(r?r.notes||'':'')}</textarea></label>
+      </div>
+      <div id="agt-log" style="font-size:11.5px;margin-top:6px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+        <button class="ag-btn mut" onclick="closeModal()">Batal</button>
+        <button class="ag-btn pub" onclick="agTemplateSave()">${svgIcon('check',13)} Simpan</button>
+      </div>
+    </div>`);
+}
+async function agTemplateSave(){
+  const g = id=>(document.getElementById(id)||{}).value;
+  const log = document.getElementById('agt-log');
+  const put = (m,c)=>{ if(log) log.innerHTML = `<div style="color:${c||'#334155'}">${m}</div>`; };
+  try{
+    let storage_path, sample_path;
+    const f = (document.getElementById('agt-file')||{}).files;
+    if(f && f[0]){ put('⏳ Mengunggah master .docx…'); storage_path = await agUploadStorage(f[0]); }
+    const sf = (document.getElementById('agt-sample')||{}).files;
+    if(sf && sf[0]){ put('⏳ Mengunggah contoh dokumen…'); sample_path = await agUploadStorage(sf[0]); }
+    const spec = { font:g('agt-font')||null, size_pt:Number(g('agt-size'))||null,
+      margins_cm:{ t:Number(g('agt-mt'))||null, b:Number(g('agt-mb'))||null, l:Number(g('agt-ml'))||null, r:Number(g('agt-mr'))||null },
+      line_spacing:g('agt-ls')||null };
+    const phList = (g('agt-ph')||'').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+    const p = { doc_level:Number(g('agt-level')), doc_type:g('agt-type')||'SOP', department:g('agt-dept')||'MUTU',
+      name:g('agt-name')||'Template', format_spec:spec, placeholders:phList, notes:g('agt-notes')||null };
+    if(storage_path) p.storage_path = storage_path;
+    if(sample_path) p.sample_path = sample_path;
+    await agRpc('agentic_template_upsert', { p });
+    closeModal(); toast('Template disimpan','ok'); agRenderTemplates();
+  }catch(e){ put('❌ '+agEsc(e.message),'#B91C1C'); }
+}
+
+// Unduh file mentah dari Storage bucket "agentic"
+async function agDownloadStorage(path){
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/agentic/${path}`, {
+    headers:{ apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}` } });
+  if(!res.ok) throw new Error(`Gagal unduh master (HTTP ${res.status})`);
+  return await res.arrayBuffer();
+}
+// Tes rakit .docx: master → isi placeholder dgn nilai contoh → unduh (bukti format identik)
+async function agTemplateTestBuild(id){
+  try{
+    const rows = await sbGet('agentic_templates_v', `select=*&id=eq.${id}`) || [];
+    const r = rows[0]; if(!r || !r.storage_path){ toast('Master .docx belum diunggah','warn'); return; }
+    if(typeof agDocxFill!=='function'){ toast('docxfill.js belum dimuat — reload halaman','err'); return; }
+    toast('Mengunduh master & merakit…','info');
+    const buf = await agDownloadStorage(r.storage_path);
+    let phs = Array.isArray(r.placeholders)?r.placeholders.slice():[];
+    try{ const scan = await agDocxScanPlaceholders(buf); scan.forEach(k=>{ if(!phs.includes(k)) phs.push(k); }); }catch(e){}
+    const repl = {}; phs.forEach(k=> repl[k] = `[CONTOH: ${k}]`);
+    const out = await agDocxFill(buf, repl);
+    const blob = new Blob([out], { type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url;
+    a.download = `TES_${String(r.name||'template').replace(/[^\w.\-]+/g,'_')}.docx`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    toast(phs.length?`Tes rakit selesai — ${phs.length} placeholder diisi contoh`:'Tes rakit selesai — tidak ada {{placeholder}} di master','ok');
+  }catch(e){ toast(e.message,'err'); }
 }
 
 // ── Riwayat perbaikan prompt IT + rollback ───────────────────────
@@ -294,7 +530,8 @@ async function agOrgKick(type){
   try{
     const r = await agRpc('agentic_org_kick', { p_type: type });
     if(r && r.skipped){ toast('Masih ada yang antri/berjalan — tunggu selesai','info'); return; }
-    toast(`${type==='HEAD_TICK'?'HEAD':'Kepala IT'} ditugaskan — menjalankan worker…`,'ok');
+    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing' };
+    toast(`${_lbl[type]||type} ditugaskan — menjalankan worker…`,'ok');
     await agRunWorker(4);
     await agReload();
     if(_agTab==='org') agRenderTab();

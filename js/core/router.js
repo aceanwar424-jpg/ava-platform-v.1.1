@@ -45,7 +45,7 @@ function navigate(page, params={}) {
     case 'okr':         renderOKR();                    break;
     case 'mcu':         renderMCU(params);              break;
     case 'finance':     renderFinance();                break;
-    case 'inventory':   renderInventory();              break;
+    case 'inventory':   renderInventory(params.tab||'stock'); break;
     case 'hrd':         renderHRD();                    break;
     case 'work-schedule': renderWorkSchedule();          break;
     case 'shift-calendar': renderShiftCalendar();         break;

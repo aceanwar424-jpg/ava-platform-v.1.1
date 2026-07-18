@@ -198,9 +198,14 @@ async function agMakeRepairTask(docId){
 }
 
 // ── TAB COMPLIANCE (dashboard skor §5.1) ─────────────────────────
+let _agChkFw = 'ALL', _agComplEl = null;
+function agChkFwSet(v){ _agChkFw = v; if(_agComplEl) renderAgComplianceTab(_agComplEl); }
 async function renderAgComplianceTab(el){
+  _agComplEl = el;
   let score = [];
   try{ score = await agRpc('agentic_compliance_score', {}) || []; }catch(e){}
+  const agFws = [...new Set(agChecklist.map(c=>c.framework).filter(Boolean))].sort();
+  const agChk = _agChkFw==='ALL' ? agChecklist : agChecklist.filter(c=>c.framework===_agChkFw);
   const totAll   = score.reduce((a,s)=>a+(s.total||0),0);
   const matchAll = score.reduce((a,s)=>a+(s.matched||0),0);
   const pctAll   = totAll ? Math.round(1000*matchAll/totAll)/10 : 0;
@@ -226,6 +231,7 @@ async function renderAgComplianceTab(el){
 
     <div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:12px">
       ${score.map(s=>`<div class="ag-detail">
+        <div style="font-size:9.5px;font-weight:800;color:#64748B;letter-spacing:.3px">${agEsc(s.framework||'—')}</div>
         <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:#0A2342">
           <span>${agEsc(s.department)}</span><span>${s.pct}%</span></div>
         <div class="ag-bar" style="margin:6px 0"><div style="width:${s.pct}%"></div></div>
@@ -234,13 +240,21 @@ async function renderAgComplianceTab(el){
     </div>
 
     <div class="ag-detail">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">Checklist Klausul (${agChecklist.length})</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:800;color:#0A2342">Checklist Klausul (${agChk.length}${_agChkFw!=='ALL'?` dari ${agChecklist.length}`:''})</div>
+        <label style="font-size:11px;color:#334155;display:flex;align-items:center;gap:6px">Framework:
+          <select class="form-input" style="padding:3px 6px;font-size:11px" onchange="agChkFwSet(this.value)">
+            <option value="ALL" ${_agChkFw==='ALL'?'selected':''}>Semua (${agChecklist.length})</option>
+            ${agFws.map(f=>`<option value="${agEsc(f)}" ${_agChkFw===f?'selected':''}>${agEsc(f)} (${agChecklist.filter(c=>c.framework===f).length})</option>`).join('')}
+          </select></label>
+      </div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
-        <thead><tr><th>Klausul</th><th>Persyaratan</th><th>Dok. Dibutuhkan</th><th>Dept</th><th>Match</th><th>Conf.</th></tr></thead>
-        <tbody>${agChecklist.map(c=>{
+        <thead><tr><th>Framework</th><th>Klausul</th><th>Persyaratan</th><th>Dok. Dibutuhkan</th><th>Dept</th><th>Match</th><th>Conf.</th></tr></thead>
+        <tbody>${agChk.map(c=>{
           const doc = c.matched_document_id ? agRegistry.find(d=>d.id===c.matched_document_id) : null;
           const conf = c.match_confidence!=null ? Number(c.match_confidence) : null;
           return `<tr>
+            <td style="white-space:nowrap;font-size:10px;color:#64748B">${agEsc(c.framework||'—')}</td>
             <td style="white-space:nowrap;font-weight:700">${agEsc(c.clause_ref)}</td>
             <td>${agEsc(c.requirement)}</td>
             <td style="white-space:nowrap">${agEsc(c.required_doc_type||'—')} L${c.required_doc_level||'—'}</td>
@@ -248,9 +262,89 @@ async function renderAgComplianceTab(el){
             <td>${doc?agEsc(doc.title):'<span style="color:#EF4444;font-weight:700">BELUM ADA</span>'}</td>
             <td style="white-space:nowrap">${conf==null?'—':
               `<span style="font-weight:700;color:${conf>=0.7?'#22C55E':'#F59E0B'}">${(conf*100).toFixed(0)}%</span>`}</td>
-          </tr>`;}).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--gray);padding:16px">Checklist kosong — jalankan supabase_agentic_fase12.sql (seed ISO 15189:2022).</td></tr>'}</tbody>
+          </tr>`;}).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:16px">Checklist kosong — jalankan seed framework (supabase_agentic_fase12.sql + supabase_agentic_frameworks.sql).</td></tr>'}</tbody>
       </table></div>
+    </div>
+
+    <div class="ag-detail" style="margin-top:12px" id="ag-audit-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔍 Audit Internal & CAPA</div>
+      <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
+  agRenderAuditPanel();
+}
+
+// ── Panel Audit Internal + CAPA (Fase 7C) ────────────────────────────
+const AG_SEV_COLOR = { MAYOR:'#EF4444', MINOR:'#F59E0B', OBSERVASI:'#0EA5E9' };
+const AG_CAPA_COLOR = { OPEN:'#EF4444', IN_PROGRESS:'#F59E0B', VERIFICATION:'#8B5CF6', CLOSED:'#22C55E' };
+async function agRenderAuditPanel(){
+  const box = document.getElementById('ag-audit-box'); if(!box) return;
+  let d = null;
+  try{ d = await agRpc('agentic_audit_data', {}); }catch(e){ d = null; }
+  let inner;
+  if(d===null){
+    inner = `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7c.sql</strong> untuk mengaktifkan audit & CAPA.</div>`;
+  } else {
+    const s = d.summary||{}; const findings = d.findings||[]; const capa = d.capa||[];
+    inner = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">MAYOR ${s.open_mayor||0}</span>
+        <span class="ag-badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D">MINOR ${s.open_minor||0}</span>
+        <span class="ag-badge" style="background:#E0F2FE;color:#075985;border:1px solid #7DD3FC">OBSERVASI ${s.open_obs||0}</span>
+        <span class="ag-badge" style="background:#F1F5F9;color:#334155;border:1px solid #CBD5E1">CAPA terbuka ${s.capa_open||0}</span>
+        ${s.capa_overdue?`<span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">CAPA lewat tempo ${s.capa_overdue}</span>`:''}
+      </div>
+      <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin:6px 0 4px">Temuan terbuka (${findings.length})</div>
+      ${findings.length?`<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Severity</th><th>Klausul</th><th>Area</th><th>Temuan</th><th>Status</th></tr></thead>
+        <tbody>${findings.map(f=>`<tr>
+          <td><span class="ag-badge" style="background:${AG_SEV_COLOR[f.severity]||'#64748B'}22;color:${AG_SEV_COLOR[f.severity]||'#64748B'};border:1px solid ${AG_SEV_COLOR[f.severity]||'#64748B'}">${agEsc(f.severity)}</span></td>
+          <td style="white-space:nowrap">${agEsc(f.clause_ref||'—')}</td>
+          <td>${agEsc(f.area||'—')}</td>
+          <td>${agEsc(f.finding||'')}</td>
+          <td><span style="color:var(--gray)">${agEsc(f.status)}</span></td>
+        </tr>`).join('')}</tbody></table></div>`:'<div style="font-size:11.5px;color:var(--gray)">Belum ada temuan terbuka.</div>'}
+      <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin:12px 0 4px">CAPA berjalan (${capa.length})</div>
+      ${capa.length?`<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Judul</th><th>Akar Masalah</th><th>PIC</th><th>Target</th><th>Status</th><th></th></tr></thead>
+        <tbody>${capa.map(c=>`<tr>
+          <td>${agEsc(c.title||'')}</td>
+          <td>${agEsc((c.root_cause||'').slice(0,80))}</td>
+          <td style="white-space:nowrap">${agEsc(c.pic||'—')}</td>
+          <td style="white-space:nowrap;${c.due_date&&c.due_date<new Date().toISOString().slice(0,10)&&c.status!=='CLOSED'?'color:#B91C1C;font-weight:700':''}">${agEsc(c.due_date||'—')}</td>
+          <td><span class="ag-badge" style="background:${AG_CAPA_COLOR[c.status]||'#64748B'}22;color:${AG_CAPA_COLOR[c.status]||'#64748B'};border:1px solid ${AG_CAPA_COLOR[c.status]||'#64748B'}">${agEsc(c.status)}</span></td>
+          <td style="white-space:nowrap">
+            <select class="form-input" style="padding:2px 4px;font-size:10.5px" onchange="agCapaStatus('${c.id}', this.value)">
+              ${['OPEN','IN_PROGRESS','VERIFICATION','CLOSED'].map(st=>`<option ${c.status===st?'selected':''}>${st}</option>`).join('')}
+            </select></td>
+        </tr>`).join('')}</tbody></table></div>`:'<div style="font-size:11.5px;color:var(--gray)">Belum ada CAPA berjalan.</div>'}`;
+  }
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">🔍 Audit Internal & CAPA</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agRunAudit()">${svgIcon('sparkle',12)} Jalankan Audit Internal</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderAuditPanel()">${svgIcon('refresh',11)} Muat ulang</button>
+      </div>
+    </div>${inner}`;
+}
+async function agRunAudit(){
+  const area = prompt('Area/proses yang diaudit (mis. Pra-analitik, Manajemen mutu):','Pra-analitik');
+  if(area===null) return;
+  try{
+    await agRpc('agentic_create_task', {
+      p_agent:'ORG', p_task_type:'AUDIT_EXECUTE',
+      p_title:`Audit internal: ${area||'umum'}`,
+      p_payload:{ area:area||'umum', clauses:'Klausul kritis ISO 15189:2022', context:'Audit internal terjadwal' },
+    });
+    toast('Task audit dibuat — menjalankan worker…','ok');
+    await agRunWorker(2);
+    agRenderAuditPanel();
+  }catch(e){ toast(e.message,'err'); }
+}
+async function agCapaStatus(id, status){
+  try{
+    await agRpc('agentic_capa_update', { p_id:id, p:{ status } });
+    toast(`CAPA → ${status}`,'ok');
+    agRenderAuditPanel();
+  }catch(e){ toast(e.message,'err'); }
 }
 
 async function agRunGapNow(){

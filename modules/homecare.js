@@ -19,6 +19,30 @@ const HC_STATUS = {
 };
 
 let hcAll = [];
+let hcStaff = [];     // master Nakes (homecare_staff) — Fase 1
+let hcTariffs = [];   // master tarif (homecare_tariffs) — Fase 1
+
+// Muat master Nakes & tarif sekali, di-cache untuk dipakai form & billing.
+async function loadHCMasters(force=false) {
+  if (!force && hcStaff.length && hcTariffs.length) return;
+  try {
+    const [staff, tariffs] = await Promise.all([
+      sbGet('homecare_staff','select=*&order=staff_name.asc').catch(()=>[]),
+      sbGet('homecare_tariffs','select=*&order=service_type.asc').catch(()=>[]),
+    ]);
+    hcStaff   = Array.isArray(staff)?staff:[];
+    hcTariffs = Array.isArray(tariffs)?tariffs:[];
+  } catch(e) { /* master opsional; form tetap jalan tanpa cache */ }
+}
+
+// Cari persentase komisi untuk sebuah order: prioritas nakes → tarif layanan → 15% default.
+function hcCommissionPct(staffId, serviceType) {
+  const st = hcStaff.find(s=>String(s.id)===String(staffId));
+  if (st && st.commission_pct!=null && st.commission_pct!=='') return parseFloat(st.commission_pct)||0;
+  const tf = hcTariffs.find(t=>t.service_type===serviceType);
+  if (tf && tf.commission_pct!=null && tf.commission_pct!=='') return parseFloat(tf.commission_pct)||0;
+  return 15;
+}
 
 async function renderHomeCare() {
   document.getElementById('main-content').innerHTML = `
@@ -26,6 +50,8 @@ async function renderHomeCare() {
       <div><h1>Home Care</h1>
         <p>Manajemen order layanan kunjungan rumah — jadwal, nakes, billing</p></div>
       <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="renderHCStaff()">👥 Master Nakes</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderHCTariff()">🏷️ Master Tarif</button>
         <button class="btn btn-ghost btn-sm" onclick="renderHCReport()">📊 Laporan</button>
         <button class="btn btn-teal" onclick="openHCForm()">+ Order Baru</button>
       </div>
@@ -60,6 +86,7 @@ async function renderHomeCare() {
 
 async function loadHCOrders() {
   try {
+    await loadHCMasters();
     const data = await sbGet('homecare_orders','select=*&order=scheduled_date.asc,created_at.desc');
     hcAll = Array.isArray(data) ? data : [];
     renderHCKPI();
@@ -174,7 +201,7 @@ function renderHCList(orders) {
           ${o.status==='Sedang Dilayani'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Selesai')">🎉 Selesai</button>`:''}
           ${o.patient_phone?`<button class="btn btn-outline btn-sm" onclick="window.open('https://wa.me/${(o.patient_phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')">💬 WA Pasien</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">✏️ Edit</button>
-          ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="updateHCStatus(${o.id},'Dibatalkan')">Batal</button>`:''}
+          ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="cancelHCOrder(${o.id})">Batal</button>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -189,16 +216,51 @@ async function updateHCStatus(id, status) {
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
+// Pembatalan wajib alasan (Fase 1)
+function cancelHCOrder(id) {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">❌ Batalkan Order Home Care</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Alasan Pembatalan *</label>
+      <textarea id="hc-cancel-reason" rows="3" placeholder="Contoh: pasien reschedule, salah input, dll"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Kembali</button>
+      <button class="btn btn-danger" onclick="confirmCancelHC(${id})">Batalkan Order</button>
+    </div>`);
+}
+
+async function confirmCancelHC(id) {
+  const reason = document.getElementById('hc-cancel-reason')?.value.trim();
+  if (!reason) { toast('Alasan pembatalan wajib diisi','err'); return; }
+  try {
+    await sbPatch('homecare_orders', id, { status:'Dibatalkan', cancel_reason:reason, updated_at:new Date().toISOString() });
+    toast('Order dibatalkan','info');
+    closeModalForce();
+    await loadHCOrders();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
 async function openHCForm(id=null) {
   let o = {};
+  await loadHCMasters();
   if (id) { const d=await sbGet('homecare_orders',`select=*&id=eq.${id}`); o=d[0]||{}; }
-  
+
   // Load partners for reference
   let partnerOpts = '<option value="">-- Dari Partner (opsional) --</option>';
   try {
     const pts=await sbGet('partners','select=id,partner_name&status=eq.Aktif&order=partner_name&limit=100');
     partnerOpts+=(pts||[]).map(p=>`<option value="${p.id}" ${o.partner_id==p.id?'selected':''}>${p.partner_name}</option>`).join('');
   } catch(e){}
+
+  // Master Nakes dropdown — jika assigned_staff lama tak ada di master, tetap tampilkan
+  const activeStaff = hcStaff.filter(s=>s.is_active!==false);
+  const staffInMaster = activeStaff.some(s=>String(s.id)===String(o.staff_id) || s.staff_name===o.assigned_staff);
+  let staffOpts = '<option value="">-- Pilih Nakes --</option>';
+  staffOpts += activeStaff.map(s=>{
+    const sel = (o.staff_id && String(o.staff_id)===String(s.id)) || (!o.staff_id && o.assigned_staff===s.staff_name);
+    return `<option value="${s.id}" data-name="${(s.staff_name||'').replace(/"/g,'&quot;')}" ${sel?'selected':''}>${s.staff_name}${s.role_title?' · '+s.role_title:''}</option>`;
+  }).join('');
+  if (o.assigned_staff && !staffInMaster) staffOpts += `<option value="" data-name="${o.assigned_staff.replace(/"/g,'&quot;')}" selected>${o.assigned_staff} (lama)</option>`;
 
   const user = getUserName?getUserName():'User';
   const today = new Date().toISOString().split('T')[0];
@@ -220,7 +282,7 @@ async function openHCForm(id=null) {
       </div>
       <div class="form-group">
         <label>Tipe Layanan *</label>
-        <select id="hf-service">
+        <select id="hf-service" onchange="hcOnServiceChange()">
           ${HC_SERVICES.map(s=>`<option${o.service_type===s?' selected':''}>${s}</option>`).join('')}
         </select>
       </div>
@@ -230,25 +292,34 @@ async function openHCForm(id=null) {
       </div>
       <div class="form-group">
         <label>Tanggal Kunjungan</label>
-        <input type="date" id="hf-date" value="${o.scheduled_date||today}">
+        <input type="date" id="hf-date" value="${o.scheduled_date||today}" onchange="hcCheckScheduleConflict(${id||'null'})">
       </div>
       <div class="form-group">
         <label>Jam Kunjungan</label>
-        <input type="time" id="hf-time" value="${o.scheduled_time||'08:00'}">
+        <input type="time" id="hf-time" value="${o.scheduled_time||'08:00'}" onchange="hcCheckScheduleConflict(${id||'null'})">
       </div>
       <div class="form-group">
         <label>Nakes / Tim yang Bertugas</label>
-        <input type="text" id="hf-staff" value="${o.assigned_staff||''}" placeholder="Nama perawat/analis">
+        <select id="hf-staff" onchange="hcOnStaffChange()">${staffOpts}</select>
+        ${activeStaff.length?'':'<div class="form-hint" style="color:#F59E0B">Belum ada master Nakes. Tambah via tombol "👥 Master Nakes".</div>'}
       </div>
       <div class="form-group">
         <label>Status</label>
-        <select id="hf-status">
+        <select id="hf-status" onchange="hcOnStatusChange()">
           ${Object.keys(HC_STATUS).map(s=>`<option${(o.status||'Baru')===s?' selected':''}>${s}</option>`).join('')}
         </select>
       </div>
       <div class="form-group">
         <label>Tarif Layanan (Rp)</label>
-        <input type="number" id="hf-amount" value="${o.total_amount||''}" placeholder="0">
+        <input type="number" id="hf-amount" value="${o.total_amount||''}" placeholder="0" oninput="hcUpdateCommissionPreview()">
+        <div class="form-hint" id="hf-comm-preview" style="color:var(--teal)"></div>
+      </div>
+      <div class="form-group" id="hf-cancel-wrap" style="grid-column:1/-1;display:${o.status==='Dibatalkan'?'block':'none'}">
+        <label>Alasan Pembatalan ${o.status==='Dibatalkan'?'*':''}</label>
+        <input type="text" id="hf-cancel-reason" value="${o.cancel_reason||''}" placeholder="Alasan order dibatalkan">
+      </div>
+      <div class="form-group" id="hf-conflict-wrap" style="grid-column:1/-1;display:none">
+        <div id="hf-conflict" style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:12px;color:#B91C1C"></div>
       </div>
       <div class="form-group">
         <label>Referral Partner</label>
@@ -264,6 +335,64 @@ async function openHCForm(id=null) {
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveHCOrder(${id||'null'})">💾 Simpan</button>
     </div>`);
+  hcUpdateCommissionPreview();
+  hcCheckScheduleConflict(id);
+}
+
+// ── Helper form: nama nakes terpilih (dari master atau order lama) ──
+function hcSelectedStaffName() {
+  const sel = document.getElementById('hf-staff');
+  if (!sel) return '';
+  const opt = sel.options[sel.selectedIndex];
+  return opt ? (opt.getAttribute('data-name')||'') : '';
+}
+
+// Ganti layanan → auto-isi tarif dari master (hanya jika field tarif masih kosong/0)
+function hcOnServiceChange() {
+  const svc = document.getElementById('hf-service')?.value;
+  const amtEl = document.getElementById('hf-amount');
+  const tf = hcTariffs.find(t=>t.service_type===svc);
+  if (tf && amtEl && (!parseFloat(amtEl.value))) amtEl.value = tf.base_price||'';
+  hcUpdateCommissionPreview();
+}
+
+function hcOnStaffChange() { hcUpdateCommissionPreview(); hcCheckScheduleConflict(); }
+
+function hcOnStatusChange() {
+  const st = document.getElementById('hf-status')?.value;
+  const wrap = document.getElementById('hf-cancel-wrap');
+  if (wrap) wrap.style.display = st==='Dibatalkan' ? 'block' : 'none';
+}
+
+// Preview komisi nakes berdasarkan pct efektif (nakes → tarif → 15%)
+function hcUpdateCommissionPreview() {
+  const el = document.getElementById('hf-comm-preview'); if (!el) return;
+  const amt = parseFloat(document.getElementById('hf-amount')?.value)||0;
+  const staffId = document.getElementById('hf-staff')?.value||'';
+  const svc = document.getElementById('hf-service')?.value||'';
+  const pct = hcCommissionPct(staffId, svc);
+  const comm = Math.round(amt * pct / 100);
+  el.textContent = amt ? `Komisi nakes ≈ ${formatCurrency(comm)} (${pct}%)` : '';
+}
+
+// Deteksi bentrok jadwal: nakes sama, tanggal sama, jam sama (order lain aktif)
+function hcCheckScheduleConflict(currentId=null) {
+  const wrap = document.getElementById('hf-conflict-wrap');
+  const box  = document.getElementById('hf-conflict');
+  if (!wrap || !box) return;
+  const staffName = hcSelectedStaffName();
+  const date = document.getElementById('hf-date')?.value;
+  const time = document.getElementById('hf-time')?.value;
+  if (!staffName || !date || !time) { wrap.style.display='none'; return; }
+  const clash = hcAll.filter(o =>
+    String(o.id)!==String(currentId) &&
+    o.assigned_staff===staffName && o.scheduled_date===date && o.scheduled_time===time &&
+    !['Dibatalkan','Selesai'].includes(o.status)
+  );
+  if (clash.length) {
+    box.innerHTML = `⚠️ ${staffName} sudah ada jadwal lain pada ${formatDateShort(date)} ${time}: ${clash.map(c=>c.patient_name).join(', ')}`;
+    wrap.style.display='block';
+  } else { wrap.style.display='none'; }
 }
 
 async function saveHCOrder(id) {
@@ -273,8 +402,18 @@ async function saveHCOrder(id) {
   if (!name) { toast('Nama pasien wajib diisi','err'); return; }
   if (!addr) { toast('Alamat wajib diisi','err'); return; }
 
+  const status = document.getElementById('hf-status').value;
+  const cancelReason = document.getElementById('hf-cancel-reason')?.value.trim()||'';
+  if (status==='Dibatalkan' && !cancelReason) { toast('Alasan pembatalan wajib diisi','err'); return; }
+
   const user = getUserName?getUserName():'User';
   const num  = id ? '' : `HC-${Date.now().toString().slice(-6)}`;
+
+  const staffSel  = document.getElementById('hf-staff');
+  const staffId   = parseInt(staffSel.value)||null;
+  const staffName = hcSelectedStaffName();
+  const amount    = parseFloat(document.getElementById('hf-amount').value)||0;
+  const commPct   = hcCommissionPct(staffId, svc);
 
   const payload = {
     patient_name:    name,
@@ -283,9 +422,12 @@ async function saveHCOrder(id) {
     service_type:    svc,
     scheduled_date:  document.getElementById('hf-date').value||null,
     scheduled_time:  document.getElementById('hf-time').value||null,
-    assigned_staff:  document.getElementById('hf-staff').value.trim(),
-    status:          document.getElementById('hf-status').value,
-    total_amount:    parseFloat(document.getElementById('hf-amount').value)||0,
+    assigned_staff:  staffName,
+    staff_id:        staffId,
+    status:          status,
+    cancel_reason:   status==='Dibatalkan' ? cancelReason : null,
+    total_amount:    amount,
+    commission_amount: Math.round(amount * commPct / 100),
     partner_id:      parseInt(document.getElementById('hf-partner').value)||null,
     notes:           document.getElementById('hf-notes').value.trim(),
     created_by_name: user,
@@ -515,6 +657,7 @@ async function loadHCBilling() {
   const to    = `${year}-${m}-31`;
 
   try {
+    await loadHCMasters();
     const data = await sbGet('homecare_orders',
       `select=*&status=eq.Selesai&scheduled_date=gte.${from}&scheduled_date=lte.${to}&order=assigned_staff.asc`);
     const orders = Array.isArray(data)?data:[];
@@ -525,7 +668,11 @@ async function loadHCBilling() {
       if (!byNakes[n]) byNakes[n]={name:n,orders:[],total:0,fee:0};
       byNakes[n].orders.push(o);
       byNakes[n].total+=(o.total_amount||0);
-      byNakes[n].fee  +=(o.total_amount||0)*0.15; // 15% fee default
+      // Fase 1: komisi dari order (commission_amount), fallback pct efektif master
+      const fee = (o.commission_amount!=null && o.commission_amount!=='')
+        ? (parseFloat(o.commission_amount)||0)
+        : Math.round((o.total_amount||0) * hcCommissionPct(o.staff_id, o.service_type) / 100);
+      byNakes[n].fee += fee;
     });
 
     const sumEl=document.getElementById('hcb-summary');
@@ -537,7 +684,7 @@ async function loadHCBilling() {
 
     el.innerHTML=`<div class="table-wrap"><table>
       <thead><tr>
-        <th>Nakes</th><th>Jumlah Order</th><th>Total Revenue</th><th>Fee 15%</th><th>Detail</th>
+        <th>Nakes</th><th>Jumlah Order</th><th>Total Revenue</th><th>Fee Komisi</th><th>Detail</th>
       </tr></thead><tbody>
       ${Object.values(byNakes).map(n=>`<tr>
         <td style="font-weight:700;color:var(--navy)">${n.name}</td>
@@ -613,4 +760,195 @@ async function loadHCReport() {
           </div>`).join('')||'<div style="color:var(--gray)">Belum ada data</div>'}
       </div>`;
   } catch(e) { el.innerHTML=`<div class="status-box status-err">${e.message}</div>`; }
+}
+
+// Detail order per nakes (dipanggil dari tabel billing) — sebelumnya belum ada
+function showNakesDetail(name, ids) {
+  const orders = hcAll.filter(o=>ids.includes(o.id));
+  openModal(`
+    <div class="modal-header"><div class="modal-title">👤 Detail Order — ${name}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
+      <th style="padding:5px;text-align:left">Tanggal</th><th style="padding:5px;text-align:left">Pasien</th>
+      <th style="padding:5px;text-align:left">Layanan</th><th style="padding:5px;text-align:right">Tarif</th><th style="padding:5px;text-align:right">Komisi</th>
+    </tr></thead><tbody>${orders.map(o=>{
+      const fee = (o.commission_amount!=null&&o.commission_amount!=='')?parseFloat(o.commission_amount)||0:Math.round((o.total_amount||0)*hcCommissionPct(o.staff_id,o.service_type)/100);
+      return `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:5px">${o.scheduled_date?formatDateShort(o.scheduled_date):'—'}</td>
+        <td style="padding:5px">${o.patient_name||'—'}</td>
+        <td style="padding:5px">${o.service_type||'—'}</td>
+        <td style="padding:5px;text-align:right">${formatCurrency(o.total_amount||0)}</td>
+        <td style="padding:5px;text-align:right;font-weight:700;color:#22C55E">${formatCurrency(fee)}</td>
+      </tr>`;
+    }).join('')||'<tr><td colspan="5" style="padding:8px;color:var(--gray)">Tidak ada data</td></tr>'}</tbody></table>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`, 'wide');
+}
+
+// ══════════════════════════════════════════════════════════════
+// MASTER NAKES (homecare_staff) — Fase 1
+// ══════════════════════════════════════════════════════════════
+async function renderHCStaff() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div><h1>👥 Master Nakes</h1><p>Tenaga kesehatan Home Care — kompetensi, wilayah, komisi</p></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Orders</button>
+        <button class="btn btn-teal" onclick="openHCStaffForm()">+ Tambah Nakes</button>
+      </div>
+    </div>
+    <div class="table-wrap"><div id="hcs-tbody"><div class="loading-row"><div class="spinner"></div></div></div></div>`;
+  await loadHCMasters(true);
+  renderHCStaffTable();
+}
+
+function renderHCStaffTable() {
+  const el = document.getElementById('hcs-tbody'); if (!el) return;
+  if (!hcStaff.length) { el.innerHTML = `<div class="empty-state"><div class="ico">👥</div><h3>Belum ada Nakes</h3><p>Klik "+ Tambah Nakes".</p></div>`; return; }
+  el.innerHTML = `<table><thead><tr>
+    <th>Nama</th><th>Peran</th><th>Kompetensi</th><th>Wilayah</th><th>Komisi</th><th>Status</th><th>Aksi</th>
+  </tr></thead><tbody>${hcStaff.map(s=>`<tr>
+    <td><div style="font-weight:600;color:var(--navy)">${s.staff_name||'—'}</div><div style="font-size:11px;color:var(--gray)">${s.phone||''}</div></td>
+    <td style="font-size:12px">${s.role_title||'—'}</td>
+    <td style="font-size:11px;color:var(--gray)">${s.competencies||'—'}</td>
+    <td style="font-size:11px;color:var(--gray)">${s.coverage_area||'—'}</td>
+    <td style="text-align:center;font-weight:700">${s.commission_pct!=null?s.commission_pct+'%':'—'}</td>
+    <td><span class="badge ${s.is_active!==false?'badge-teal':'badge-gray'}">${s.is_active!==false?'Aktif':'Nonaktif'}</span></td>
+    <td><div class="act-row">
+      <button class="act-btn edit" onclick="openHCStaffForm(${s.id})">✏️</button>
+      <button class="act-btn del" onclick="deleteHCStaff(${s.id})">🗑</button>
+    </div></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+async function openHCStaffForm(id=null) {
+  const s = id ? (hcStaff.find(x=>x.id===id)||{}) : {};
+  let empOpts = '<option value="">-- Tautkan Karyawan (opsional) --</option>';
+  try {
+    const emps = await sbGet('employees','select=id,full_name&order=full_name&limit=200').catch(()=>[]);
+    empOpts += (emps||[]).map(e=>`<option value="${e.id}" ${s.employee_id==e.id?'selected':''}>${e.full_name}</option>`).join('');
+  } catch(e){}
+  openModal(`
+    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit Nakes':'👥 Tambah Nakes'}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Nama Nakes *</label><input type="text" id="hcs-name" value="${s.staff_name||''}"></div>
+      <div class="form-group"><label>No. HP / WA</label><input type="text" id="hcs-phone" value="${s.phone||''}"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Peran</label>
+        <select id="hcs-role">${['Perawat','Analis','Fisioterapis','Dokter','Bidan','Lainnya'].map(r=>`<option${s.role_title===r?' selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Komisi (%)</label><input type="number" id="hcs-comm" value="${s.commission_pct!=null?s.commission_pct:15}" min="0" max="100"></div>
+    </div>
+    <div class="form-group"><label>Kompetensi (layanan yang dikuasai)</label>
+      <input type="text" id="hcs-comp" value="${s.competencies||''}" placeholder="Pengambilan Sampel, Injeksi, Perawatan Luka"></div>
+    <div class="form-group"><label>Wilayah Cakupan</label>
+      <input type="text" id="hcs-area" value="${s.coverage_area||''}" placeholder="Jakarta Selatan, Depok"></div>
+    <div class="form-group"><label>Tautkan ke Karyawan (HRD)</label><select id="hcs-emp">${empOpts}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Status</label>
+        <select id="hcs-active"><option value="true"${s.is_active!==false?' selected':''}>Aktif</option><option value="false"${s.is_active===false?' selected':''}>Nonaktif</option></select></div>
+      <div class="form-group"><label>Catatan</label><input type="text" id="hcs-notes" value="${s.notes||''}"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveHCStaff(${id||'null'})">💾 Simpan</button>
+    </div>`);
+}
+
+async function saveHCStaff(id) {
+  const name = document.getElementById('hcs-name').value.trim();
+  if (!name) { toast('Nama Nakes wajib diisi','err'); return; }
+  const payload = {
+    staff_name: name,
+    phone: document.getElementById('hcs-phone').value.trim(),
+    role_title: document.getElementById('hcs-role').value,
+    commission_pct: parseFloat(document.getElementById('hcs-comm').value)||0,
+    competencies: document.getElementById('hcs-comp').value.trim(),
+    coverage_area: document.getElementById('hcs-area').value.trim(),
+    employee_id: parseInt(document.getElementById('hcs-emp').value)||null,
+    is_active: document.getElementById('hcs-active').value==='true',
+    notes: document.getElementById('hcs-notes').value.trim(),
+    updated_at: new Date().toISOString(),
+  };
+  try {
+    if (id) { await sbPatch('homecare_staff',id,payload); toast('✅ Nakes diupdate','ok'); }
+    else { await sbPost('homecare_staff',payload); toast('✅ Nakes ditambahkan','ok'); }
+    closeModalForce(); await loadHCMasters(true); renderHCStaffTable();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+async function deleteHCStaff(id) {
+  if (!confirm('Hapus Nakes ini?')) return;
+  try { await sbDelete('homecare_staff',id); toast('🗑 Dihapus','info'); await loadHCMasters(true); renderHCStaffTable(); }
+  catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MASTER TARIF (homecare_tariffs) — Fase 1
+// ══════════════════════════════════════════════════════════════
+async function renderHCTariff() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div><h1>🏷️ Master Tarif Home Care</h1><p>Tarif dasar & komisi per jenis layanan</p></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Orders</button>
+        <button class="btn btn-teal" onclick="openHCTariffForm()">+ Tambah Tarif</button>
+      </div>
+    </div>
+    <div class="table-wrap"><div id="hct-tbody"><div class="loading-row"><div class="spinner"></div></div></div></div>`;
+  await loadHCMasters(true);
+  renderHCTariffTable();
+}
+
+function renderHCTariffTable() {
+  const el = document.getElementById('hct-tbody'); if (!el) return;
+  if (!hcTariffs.length) { el.innerHTML = `<div class="empty-state"><div class="ico">🏷️</div><h3>Belum ada tarif</h3></div>`; return; }
+  el.innerHTML = `<table><thead><tr>
+    <th>Jenis Layanan</th><th>Tarif Dasar</th><th>Komisi %</th><th>Komisi Flat</th><th>Status</th><th>Aksi</th>
+  </tr></thead><tbody>${hcTariffs.map(t=>`<tr>
+    <td style="font-weight:600">${t.service_type||'—'}</td>
+    <td style="font-weight:700">${formatCurrency(t.base_price||0)}</td>
+    <td style="text-align:center">${t.commission_pct!=null?t.commission_pct+'%':'—'}</td>
+    <td style="text-align:right">${t.commission_flat?formatCurrency(t.commission_flat):'—'}</td>
+    <td><span class="badge ${t.is_active!==false?'badge-teal':'badge-gray'}">${t.is_active!==false?'Aktif':'Nonaktif'}</span></td>
+    <td><div class="act-row"><button class="act-btn edit" onclick="openHCTariffForm(${t.id})">✏️</button></div></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+
+function openHCTariffForm(id=null) {
+  const t = id ? (hcTariffs.find(x=>x.id===id)||{}) : {};
+  openModal(`
+    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit Tarif':'🏷️ Tambah Tarif'}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Jenis Layanan *</label>
+      <select id="hct-svc">${HC_SERVICES.map(s=>`<option${t.service_type===s?' selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label>Tarif Dasar (Rp)</label><input type="number" id="hct-price" value="${t.base_price||0}"></div>
+      <div class="form-group"><label>Komisi (%)</label><input type="number" id="hct-comm" value="${t.commission_pct!=null?t.commission_pct:15}" min="0" max="100"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Komisi Flat (Rp, opsional)</label><input type="number" id="hct-flat" value="${t.commission_flat||0}"></div>
+      <div class="form-group"><label>Status</label>
+        <select id="hct-active"><option value="true"${t.is_active!==false?' selected':''}>Aktif</option><option value="false"${t.is_active===false?' selected':''}>Nonaktif</option></select></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveHCTariff(${id||'null'})">💾 Simpan</button>
+    </div>`);
+}
+
+async function saveHCTariff(id) {
+  const payload = {
+    service_type: document.getElementById('hct-svc').value,
+    base_price: parseFloat(document.getElementById('hct-price').value)||0,
+    commission_pct: parseFloat(document.getElementById('hct-comm').value)||0,
+    commission_flat: parseFloat(document.getElementById('hct-flat').value)||0,
+    is_active: document.getElementById('hct-active').value==='true',
+    updated_at: new Date().toISOString(),
+  };
+  try {
+    if (id) { await sbPatch('homecare_tariffs',id,payload); toast('✅ Tarif diupdate','ok'); }
+    else { await sbPost('homecare_tariffs',payload); toast('✅ Tarif ditambahkan','ok'); }
+    closeModalForce(); await loadHCMasters(true); renderHCTariffTable();
+  } catch(e) { toast('❌ '+e.message,'err'); }
 }

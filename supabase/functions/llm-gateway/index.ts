@@ -35,7 +35,6 @@ const json = (b: unknown, s = 200) =>
 
 const SB_URL = Deno.env.get('SUPABASE_URL')!;
 const SB_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const RATE_LIMIT = parseInt(Deno.env.get('LLM_RATE_LIMIT_PER_KEY_PER_MIN') || '30', 10);
 const NVIDIA_URL = 'https://integrate.api.nvidia.com/v1/chat/completions';
 const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
 // Anggaran waktu: Edge Function dibunuh gateway ±150 dtk. Tanpa timeout,
@@ -57,8 +56,23 @@ async function rpc(fn: string, args: Record<string, unknown>) {
   } catch { return null; }
 }
 
+// ── Konfig AI dari DB (Fase 7B) — override Secret/env; kosong = fallback env ──
+let CONFIG: Record<string, string> = {};
+async function loadConfig() {
+  const m = await rpc('agentic_config_map', {});
+  CONFIG = (m && typeof m === 'object' && !Array.isArray(m)) ? m as Record<string, string> : {};
+}
+// Ambil setelan: DB dulu (bila terisi), lalu Secret/env.
+function cfg(key: string): string | undefined {
+  const v = CONFIG[key];
+  if (v !== undefined && v !== null && String(v).trim() !== '') return String(v);
+  const e = Deno.env.get(key);
+  return e && e.trim() !== '' ? e : undefined;
+}
+const rateLimit = () => parseInt(cfg('LLM_RATE_LIMIT_PER_KEY_PER_MIN') || '30', 10) || 30;
+
 function keysOf(env: string): string[] {
-  return (Deno.env.get(env) || '').split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
+  return String(cfg(env) || '').split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
     .filter((v, i, a) => a.indexOf(v) === i);
 }
 // Gemini: terima GEMINI_API_KEYS (jamak) ATAU GEMINI_API_KEY (tunggal, sudah
@@ -80,7 +94,7 @@ const errStr = (v: unknown): string =>
 // Rate limit per key: hitung request 60 detik terakhir (pengganti limiter Redis)
 async function isRateLimited(alias: string): Promise<boolean> {
   const n = await rpc('agentic_rate_count', { p_alias: alias });
-  return typeof n === 'number' && n >= RATE_LIMIT;
+  return typeof n === 'number' && n >= rateLimit();
 }
 
 async function logReq(row: Record<string, unknown>) {
@@ -137,9 +151,9 @@ const RETRYABLE = new Set([401, 403, 408, 429, 500, 502, 503, 504]);
 // POST {diag:true} → uji SETIAP provider × key × model dengan prompt mini
 // (timeout 15 dtk), balikan tabel status + verdict. Tidak dicatat ke log.
 async function runDiag() {
-  const nvMain  = Deno.env.get('NVIDIA_MODEL_MAIN')  || 'meta/llama-3.3-70b-instruct';
-  const nvLight = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
-  const gmModel = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
+  const nvMain  = cfg('NVIDIA_MODEL_MAIN')  || 'meta/llama-3.3-70b-instruct';
+  const nvLight = cfg('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+  const gmModel = cfg('GEMINI_MODEL') || 'gemini-2.5-flash';
   // 60 dtk: model reasoning raksasa (mis. Nemotron Ultra) bisa >30 dtk utk
   // merespons — 15 dtk menghasilkan false alarm "model mati"
   const DIAG_TIMEOUT = 60_000;
@@ -160,7 +174,7 @@ async function runDiag() {
 
   // Tes JALUR GAMBAR (key #1, model gambar pertama) — berjalan paralel.
   // Mencoba genai dulu lalu endpoint gaya OpenAI, persis alur produksi.
-  const imgModel = (Deno.env.get('NVIDIA_IMAGE_MODEL') || '')
+  const imgModel = (cfg('NVIDIA_IMAGE_MODEL') || '')
     .split(/[,\s]+/).map((s) => s.trim()).filter((m) => m && !/^nvapi-/i.test(m))[0]
     || DEFAULT_IMAGE_MODELS[0];
   const imgPromise = (async () => {
@@ -311,7 +325,7 @@ async function runImage(body: Record<string, unknown>) {
   // Selain itu: prioritas dari secret NVIDIA_IMAGE_MODEL (opsional, koma)
   // + SEMUA model default di belakangnya (dedupe). Gemini TIDAK dipakai
   // untuk gambar — kebijakan: Gemini khusus teks.
-  const pref = String(Deno.env.get('NVIDIA_IMAGE_MODEL') || '')
+  const pref = String(cfg('NVIDIA_IMAGE_MODEL') || '')
     .split(/[,\s]+/).map((s) => s.trim()).filter(Boolean)
     .filter((m) => !/^nvapi-/i.test(m)); // jaga-jaga: key nyasar ke secret model
   const models = body.model
@@ -336,8 +350,8 @@ async function runImage(body: Record<string, unknown>) {
   // IMAGE_FILTER_STRICT=true → blokir keras (perilaku lama). Default OFF:
   // JANGAN blokir prompt apa pun — bila model menolak (gambar hitam),
   // tulis-ulang otomatis ke versi aman lalu retry (§permintaan user).
-  const strictFilter = (Deno.env.get('IMAGE_FILTER_STRICT') || '').toLowerCase() === 'true';
-  const trModel = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+  const strictFilter = (cfg('IMAGE_FILTER_STRICT') || '').toLowerCase() === 'true';
+  const trModel = cfg('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
   let usedSafeRewrite = false;
 
   let genPrompt = prompt;
@@ -489,13 +503,92 @@ async function runImage(body: Record<string, unknown>) {
       : `Detail tiap percobaan: Agentic AI → Monitor → Log LLM.`) }, 503);
 }
 
+// ── MODE VIDEO (Fase 7B) ─────────────────────────────────────────────
+// POST {mode:'video', prompt, model?, seed?, duration?}
+// Memakai API NVIDIA yang SAMA dengan gambar (endpoint genai + antrian NVCF).
+// Aktif hanya bila VIDEO_ENABLED=true DAN NVIDIA_VIDEO_MODEL terisi (config web).
+// Video bersifat long-running; kita poll dalam anggaran waktu invocation, dan
+// bila belum selesai dikembalikan rapi (bukan menggantung).
+// RESPONSE sukses: { videos:[dataUriMp4 | url], provider, model, latencyMs }
+async function runVideo(body: Record<string, unknown>) {
+  const enabled = (cfg('VIDEO_ENABLED') || '').toLowerCase() === 'true';
+  const model = String(cfg('NVIDIA_VIDEO_MODEL') || '').split(/[,\s]+/).map((s) => s.trim())
+    .filter((m) => m && !/^nvapi-/i.test(m))[0] || '';
+  if (!enabled || !model) {
+    return json({ error: 'Video nonaktif. Aktifkan di Konfig AI (VIDEO_ENABLED=true) dan isi NVIDIA_VIDEO_MODEL dengan model text-to-video dari build.nvidia.com.' }, 400);
+  }
+  const prompt = String(body.prompt || '').trim().slice(0, 4000);
+  if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
+  const nvKeys = keysOf('NVIDIA_API_KEYS');
+  if (!nvKeys.length) return json({ error: 'NVIDIA_API_KEYS belum diset (video hanya lewat NVIDIA).' }, 500);
+
+  const key = nvKeys[0];
+  const t0 = Date.now();
+  const reqBody: Record<string, unknown> = { prompt, seed: Number(body.seed) || Math.floor(Math.random() * 1e9) };
+  if (body.duration) reqBody.duration = Number(body.duration);
+  if (body.width) reqBody.width = Number(body.width);
+  if (body.height) reqBody.height = Number(body.height);
+
+  try {
+    let res = await fetch(`https://ai.api.nvidia.com/v1/genai/${model}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(reqBody), signal: AbortSignal.timeout(60_000),
+    });
+    let data = await res.json().catch(() => null);
+
+    // Antrian NVCF: 202 + NVCF-REQID → poll status (video butuh menit; poll s/d anggaran)
+    if (res.status === 202) {
+      const reqId = res.headers.get('NVCF-REQID') || res.headers.get('nvcf-reqid');
+      const pollDeadline = Date.now() + 110_000;
+      while (reqId && Date.now() < pollDeadline) {
+        await sleep(5_000);
+        res = await fetch(`https://api.nvcf.nvidia.com/v2/nvcf/pexec/status/${reqId}`, {
+          headers: { Authorization: `Bearer ${key}`, Accept: 'application/json' },
+          signal: AbortSignal.timeout(30_000),
+        });
+        if (res.status === 202) continue;
+        data = await res.json().catch(() => null);
+        break;
+      }
+      if (res.status === 202) {
+        return json({ error: `Video masih diproses NVIDIA (>110 dtk) — model "${model}" perlu pemrosesan latar belakang. reqId=${reqId}`, pending: true, reqId, model }, 504);
+      }
+    }
+
+    // Ekstraksi output: base64 (artifacts/video) atau URL (assets)
+    const b64 = data?.artifacts?.[0]?.base64 || data?.video?.[0]?.base64 || data?.data?.[0]?.b64_json || null;
+    const url = data?.artifacts?.[0]?.url || data?.assets?.[0]?.url || data?.video?.url || null;
+    const latency = Date.now() - t0;
+    if (res.ok && b64) {
+      await logReq({ task_id: body.taskId || null, provider: 'NVIDIA', model, key_alias: 'NVIDIA#1',
+        prompt_preview: trunc(prompt), response_preview: '[video base64]', latency_ms: latency, status: 'OK' });
+      return json({ videos: [`data:video/mp4;base64,${b64}`], provider: 'NVIDIA', model, latencyMs: latency });
+    }
+    if (res.ok && url) {
+      await logReq({ task_id: body.taskId || null, provider: 'NVIDIA', model, key_alias: 'NVIDIA#1',
+        prompt_preview: trunc(prompt), response_preview: '[video url]', latency_ms: latency, status: 'OK' });
+      return json({ videos: [url], provider: 'NVIDIA', model, latencyMs: latency });
+    }
+    const msg = errStr(data?.detail || data?.error?.message || data?.title || `HTTP ${res.status}`);
+    await logReq({ task_id: body.taskId || null, provider: 'NVIDIA', model, key_alias: 'NVIDIA#1',
+      prompt_preview: trunc(prompt), response_preview: trunc(msg), latency_ms: latency, status: 'ERROR' });
+    return json({ error: `Model video "${model}" gagal: ${msg}. Bila skema body berbeda, sesuaikan model di Konfig AI atau beri tahu jenis API video yang Anda buat.` }, 503);
+  } catch (e) {
+    const timedOut = e instanceof DOMException && (e.name === 'TimeoutError' || e.name === 'AbortError');
+    return json({ error: timedOut ? `Timeout memanggil model video "${model}".` : (e instanceof Error ? e.message : 'network error') }, 503);
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (req.method !== 'POST') return json({ error: 'Gunakan POST' }, 405);
 
   const body = await req.json().catch(() => ({}));
+  await loadConfig(); // Fase 7B: setelan model/API dari web (fallback ke Secret)
   if (body.diag === true) return await runDiag();
   if (body.mode === 'image') return await runImage(body);
+  if (body.mode === 'video') return await runVideo(body);
 
   const prompt: string = String(body.prompt || '').trim();
   if (!prompt) return json({ error: 'prompt wajib diisi' }, 400);
@@ -508,9 +601,9 @@ Deno.serve(async (req) => {
   const want = (body.provider || 'auto').toUpperCase();
   const tier = body.tier === 'light' ? 'light' : 'main';
 
-  const nvModel = body.model || Deno.env.get(tier === 'light' ? 'NVIDIA_MODEL_LIGHT' : 'NVIDIA_MODEL_MAIN')
+  const nvModel = body.model || cfg(tier === 'light' ? 'NVIDIA_MODEL_LIGHT' : 'NVIDIA_MODEL_MAIN')
     || (tier === 'light' ? 'meta/llama-3.1-8b-instruct' : 'meta/llama-3.3-70b-instruct');
-  const gmModel = body.model || Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash';
+  const gmModel = body.model || cfg('GEMINI_MODEL') || 'gemini-2.5-flash';
 
   // ── Cache (khusus task idempotent) ────────────────────────────────
   const hash = await sha256(`${system || ''}|${prompt}|${nvModel}|${gmModel}|${temperature}`);
@@ -530,7 +623,7 @@ Deno.serve(async (req) => {
     keysOf('NVIDIA_API_KEYS').forEach((k, i) => plan.push({ provider: 'NVIDIA', key: k, alias: `NVIDIA#${i + 1}`, model: nvModel }));
     // Jaring pengaman: bila model MAIN mati/hang, coba model LIGHT dulu
     // di key pertama sebelum lompat ke Gemini (§3.1 diperluas)
-    const nvLight = Deno.env.get('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
+    const nvLight = cfg('NVIDIA_MODEL_LIGHT') || 'meta/llama-3.1-8b-instruct';
     const k0 = keysOf('NVIDIA_API_KEYS')[0];
     if (k0 && tier === 'main' && nvLight !== nvModel && !body.model) {
       plan.push({ provider: 'NVIDIA', key: k0, alias: 'NVIDIA#1-light', model: nvLight });

@@ -1,12 +1,15 @@
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════════
 // LIS · VALIDASI & APPROVAL BERJENJANG (3-KOLOM LAYOUT)
-// - Validasi teknis (analis)  : Draft → Validated
-// - Approval klinis (dokter)  : Validated → Approved (Released)
-// - Layout: Sidebar kiri (pasien list) | Center (hasil grid) | Right (notes/detail)
-// - Per-patient bulk action: checkbox selection + bulk validate/approve
-// ═══════════════════════════════════════════════════════════════
+// - Validasi teknis (analis)     : Draft → Validated
+// - AI Conclusion generation     : Triggered on validation
+// - Approval klinis (dokter)     : Validated → Approved (Released)
+// - Digital signature on approval: PKI-signed for ISO 15189
+// - Layout: Sidebar (patients) | Center (results grid) | Right (conclusions/notes)
+// - Per-patient bulk action      : Checkbox selection + bulk validate/approve
+// ═══════════════════════════════════════════════════════════════════════════════
 
 let _valSel=null, _valChecked=new Set(), _valNotes={};
+let _conclusionEngine=null, _auditLogger=null, _pkiService=null;
 
 function valPatientsByStatus(targetStatus){
   const byAdm={};
@@ -177,6 +180,20 @@ function selectValResult(rid){
   tr.style.background='var(--mint)';
   const r=labResults.find(x=>x.id==rid)||{};
   const notes=document.getElementById('val-notes'); if(!notes) return;
+  
+  // ⭐ NEW: Show AI conclusion in approval tab
+  const isApprovalTab=document.getElementById('lab-approval')?.style.display!=='none';
+  const conclusionSection=r.ai_conclusion?`
+    <div style="background:#F0F9FF;border-left:3px solid #0EA5E9;border-radius:6px;padding:10px;margin-bottom:8px;font-size:11px">
+      <div style="font-weight:700;color:#0369A1;margin-bottom:4px">✅ AI Conclusion</div>
+      <div style="color:var(--navy);line-height:1.4;margin-bottom:6px">${r.ai_conclusion}</div>
+      ${isApprovalTab?`
+        <textarea id="val-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:#fff;color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
+        <button onclick="saveConclusionEdit(${rid})" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">📝 Save Edit</button>
+      `:''}
+    </div>
+  `:'';
+  
   notes.innerHTML=`
     <div style="font-size:12.5px;font-weight:800;color:var(--navy)">${r.item_name||r.product_name||''}</div>
     <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">${r.product_name||''}${r.loinc_code?' · LOINC '+r.loinc_code:''}${r.host_code?' · Host '+r.host_code:''}</div>
@@ -186,29 +203,80 @@ function selectValResult(rid){
       ${r.normal_min!=null?`<div><strong>Rujukan:</strong> ${r.normal_min}–${r.normal_max}</div>`:''}
       ${isCriticalResult(r)?`<div><strong style="color:#DC2626">🚨 NILAI KRITIS</strong></div>`:''}
     </div>
+    ${conclusionSection}
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>
     <textarea id="val-note-input" rows="4" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:6px;margin-top:4px" placeholder="Catatan validasi...">${_valNotes[rid]||''}</textarea>`;
 }
 
 async function validateSelectedResults(){
   if(!_valChecked.size){ toast('⚠️ Pilih minimal 1 test','warn'); return; }
+  
+  // Initialize services on first call
+  if(!_conclusionEngine) {
+    if(typeof ConclusionEngine !== 'undefined') _conclusionEngine=new ConclusionEngine(supabase);
+    if(typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
+  }
+  
   const now=new Date().toISOString();
-  let ok=0;
+  let ok=0, generated=0;
+  
   for(const rid of _valChecked){
     const r=labResults.find(x=>x.id==rid);
     if(!r || r.status!=='Draft') continue;
+    
     const crit=isCriticalResult(r);
     if(crit && !r.critical_ack_at){ 
       toast(`⚠️ ${r.product_name}: nilai kritis belum di-acknowledge`,'warn');
       continue;
     }
+    
     const note=_valNotes[rid];
     const payload={status:'Validated',validated_by:labUser(),validated_at:now,updated_at:now};
     if(note) payload.validation_notes=note;
-    try { await sbPatch('lab_results',rid,payload); ok++; } catch(e){}
+    
+    try { 
+      await sbPatch('lab_results',rid,payload); 
+      ok++;
+      
+      // ⭐ NEW: Generate AI conclusion on validation trigger
+      if(_conclusionEngine) {
+        const prevResult=labResults.find(x=>x.patient_name===r.patient_name && 
+                                           x.product_id===r.product_id && 
+                                           x.id!==r.id && 
+                                           x.status==='Approved');
+        const refRange=_rrCache[r.product_id]?.[0];
+        
+        const conclusion=await _conclusionEngine.generateConclusion(r, prevResult, refRange);
+        
+        // Save conclusion to DB
+        await sbPatch('lab_results',rid,{
+          ai_conclusion:conclusion.conclusion,
+          conclusion_generated_at:new Date().toISOString(),
+          conclusion_generated_by:'system/ai'
+        }).catch(e=>console.warn('Failed to save conclusion:',e));
+        
+        generated++;
+        
+        // Log to audit trail
+        if(_auditLogger) {
+          await _auditLogger.logConclusionGenerated(rid, 'system/ai', conclusion.conclusion, 
+                                                   conclusion.pattern_used, 
+                                                   '127.0.0.1');
+        }
+      }
+      
+      // Log validation action
+      if(_auditLogger) {
+        await _auditLogger.logResultValidated(rid, labUser(), {status:'Draft'}, 
+                                            {status:'Validated'}, note, '127.0.0.1');
+      }
+    } catch(e){
+      console.error('Validation error:',e);
+    }
   }
+  
   if(ok>0){
-    toast(`✅ ${ok} hasil tervalidasi`,'ok');
+    toast(`✅ ${ok} hasil tervalidasi${generated>' + '?` (${generated} conclusion dibuat)':''}`,'ok');
     _valChecked.clear(); _valNotes={};
     await loadLabResults();
     renderValidationTab(); renderLabKPI(); renderCriticalBanner();
@@ -229,16 +297,60 @@ async function validateAllResults(){
 
 async function approveSelectedResults(){
   if(!_valChecked.size){ toast('⚠️ Pilih minimal 1 test','warn'); return; }
+  
+  // Initialize services
+  if(!_auditLogger && typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
+  if(!_pkiService && typeof PKIService !== 'undefined') _pkiService=new PKIService(supabase);
+  
   const now=new Date().toISOString();
   let ok=0;
+  
   for(const rid of _valChecked){
     const r=labResults.find(x=>x.id==rid);
     if(!r || r.status!=='Validated') continue;
-    const payload={status:'Approved',approved_by:labUser(),approved_at:now,released_by:labUser(),released_at:now,updated_at:now};
-    try { await sbPatch('lab_results',rid,payload); ok++; } catch(e){}
+    
+    // Prepare approval payload
+    const payload={
+      status:'Approved',
+      approved_by:labUser(),
+      approved_at:now,
+      released_by:labUser(),
+      released_at:now,
+      updated_at:now
+    };
+    
+    // ⭐ NEW: Sign the approval (if PKI available)
+    let signature=null;
+    if(_pkiService && window.userPrivateKey) {
+      try {
+        const contentToSign=`APPROVAL|${rid}|${labUser()}|${now}|${r.ai_conclusion||''}`;
+        signature=await _pkiService.sign(contentToSign, window.userPrivateKey);
+        payload.digital_signature=signature;
+        payload.signature_timestamp=now;
+      } catch(e) {
+        console.warn('Signature failed, continuing without it:',e);
+      }
+    }
+    
+    try { 
+      await sbPatch('lab_results',rid,payload); 
+      ok++;
+      
+      // Log approval with signature
+      if(_auditLogger) {
+        await _auditLogger.logResultApproved(rid, labUser(), signature, 
+                                           {status:'Validated'}, 
+                                           {status:'Approved'}, 
+                                           'Doctor approval and release', 
+                                           '127.0.0.1');
+      }
+    } catch(e){
+      console.error('Approval error:',e);
+    }
   }
+  
   if(ok>0){
-    toast(`✅ ${ok} hasil approved & rilis`,'ok');
+    toast(`✅ ${ok} hasil approved & rilis${signature?' (ditandatangani)':''}`,'ok');
     _valChecked.clear(); _valNotes={};
     await loadLabResults();
     renderApprovalTab(); renderLabKPI();
@@ -246,13 +358,74 @@ async function approveSelectedResults(){
 }
 
 async function approveAllResults(){
+  if(!_auditLogger && typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
+  if(!_pkiService && typeof PKIService !== 'undefined') _pkiService=new PKIService(supabase);
+  
   const toApprove=labResults.filter(r=>r.status==='Validated');
   const now=new Date().toISOString();
+  let ok=0;
+  
   for(const r of toApprove){
-    await sbPatch('lab_results',r.id,{status:'Approved',approved_by:labUser(),approved_at:now,released_by:labUser(),released_at:now,updated_at:now}).catch(()=>{});
+    const payload={status:'Approved',approved_by:labUser(),approved_at:now,released_by:labUser(),released_at:now,updated_at:now};
+    
+    let signature=null;
+    if(_pkiService && window.userPrivateKey) {
+      try {
+        const contentToSign=`APPROVAL|${r.id}|${labUser()}|${now}|${r.ai_conclusion||''}`;
+        signature=await _pkiService.sign(contentToSign, window.userPrivateKey);
+        payload.digital_signature=signature;
+        payload.signature_timestamp=now;
+      } catch(e) {
+        console.warn('Signature failed:',e);
+      }
+    }
+    
+    try {
+      await sbPatch('lab_results',r.id,payload);
+      ok++;
+      
+      if(_auditLogger) {
+        await _auditLogger.logResultApproved(r.id, labUser(), signature, {status:'Validated'}, 
+                                           {status:'Approved'}, 'Bulk approval', '127.0.0.1');
+      }
+    } catch(e){}
   }
-  toast(`✅ ${toApprove.length} hasil approved & rilis`,'ok');
+  
+  toast(`✅ ${ok} hasil approved & rilis`,'ok');
   _valChecked.clear(); _valNotes={};
   await loadLabResults();
   renderApprovalTab(); renderLabKPI();
+}
+
+// ⭐ NEW: Save edited conclusion
+async function saveConclusionEdit(rid) {
+  const textarea=document.getElementById('val-conclusion-edit');
+  if(!textarea) return;
+  const editedConclusion=textarea.value.trim();
+  
+  const r=labResults.find(x=>x.id==rid);
+  if(!r) return;
+  
+  const originalConclusion=r.ai_conclusion;
+  
+  try {
+    await sbPatch('lab_results',rid,{
+      ai_conclusion:editedConclusion,
+      conclusion_modified:true,
+      conclusion_modified_at:new Date().toISOString(),
+      conclusion_modified_by:labUser()
+    });
+    
+    // Log edit
+    if(_auditLogger) {
+      await _auditLogger.logConclusionEdited(rid, labUser(), originalConclusion, 
+                                           editedConclusion, 'Doctor revision', '127.0.0.1');
+    }
+    
+    toast('✅ Conclusion saved','ok');
+    await loadLabResults();
+    selectValResult(rid);
+  } catch(e) {
+    toast('❌ Save failed: '+e.message,'error');
+  }
 }

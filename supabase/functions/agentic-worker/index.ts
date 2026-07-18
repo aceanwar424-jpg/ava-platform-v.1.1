@@ -333,12 +333,13 @@ async function handleReviewCycle(_t: Task) {
 // NVIDIA FLUX primary → Gemini fallback. Model diatur secret
 // NVIDIA_IMAGE_MODEL (default black-forest-labs/flux.1-schnell).
 // Non-fatal: gagal gambar tidak menggagalkan task (copy tetap DRAFT).
-async function makeImage(t: Task, prompt: string): Promise<string | null> {
+async function makeImage(t: Task, prompt: string, dim?: { width?: number; height?: number }): Promise<string | null> {
   try {
     const res = await fetch(`${SB_URL}/functions/v1/llm-gateway`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mode: 'image', prompt, taskId: t.id }),
+      body: JSON.stringify({ mode: 'image', prompt, taskId: t.id,
+        ...(dim?.width ? { width: dim.width } : {}), ...(dim?.height ? { height: dim.height } : {}) }),
       signal: AbortSignal.timeout(130_000),
     });
     const d = await res.json().catch(() => ({}));
@@ -706,8 +707,390 @@ async function handleItCheck(t: Task) {
   };
 }
 
+// ═══ FASE 7 — DEPARTEMEN SERVICE ASSURANCE & MARKETING ═══════════════
+
+// Dimensi gambar per kanal (selaras channel_specs di supabase_agentic_fase7.sql)
+const CHANNEL_DIM: Record<string, { w: number; h: number; aspect: string }> = {
+  IG_FEED: { w: 1080, h: 1350, aspect: '4:5' }, IG_SQUARE: { w: 1080, h: 1080, aspect: '1:1' },
+  IG_STORY: { w: 1080, h: 1920, aspect: '9:16' }, TIKTOK: { w: 1080, h: 1920, aspect: '9:16' },
+  WA: { w: 1080, h: 1080, aspect: '1:1' }, FB_FEED: { w: 1200, h: 1500, aspect: '4:5' },
+  YT_THUMB: { w: 1280, h: 720, aspect: '16:9' },
+};
+const chanDim = (code?: string) => CHANNEL_DIM[String(code || 'IG_FEED').toUpperCase()] || CHANNEL_DIM.IG_FEED;
+
+// CONTENT_ANALYSIS: topik → BRIEF (angle, kanal, format, jumlah slide, SEO, risiko)
+async function handleContentAnalysis(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('CONTENT_ANALYSIS');
+  const { data } = await askLLMJson(t, tpl, {
+    topic: p.topic, angle: p.angle || '-',
+    channels: JSON.stringify(p.channels || ['IG_FEED', 'IG_STORY', 'WA', 'TIKTOK']),
+    notes: p.notes || '-',
+  });
+  const b = data as Dict;
+  const md = `## Brief Konten — ${p.topic}\n\n**Angle:** ${b.angle || '-'}\n**Audiens:** ${b.audience || '-'}\n` +
+    `**Format:** ${b.recommended_format || '-'} · **Kanal:** ${(b.recommended_channels as string[] || []).join(', ')}\n` +
+    `**Slide:** ${b.slide_count || '-'} · **Tone:** ${b.tone || '-'}\n\n` +
+    `**Poin kunci:**\n${(b.key_points as string[] || []).map((x) => `- ${x}`).join('\n')}\n\n` +
+    `**Hooks:**\n${(b.hooks as string[] || []).map((x) => `- ${x}`).join('\n')}\n\n**CTA:** ${b.cta || '-'}\n` +
+    `**SEO:** ${(b.seo_keywords as string[] || []).join(', ')}` +
+    (b.needs_medical_review ? `\n\n⚠ **Perlu review medis**` : '');
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'COPY', text_content: md, meta: { brief: b } } });
+
+  // Auto-produksi bila diminta & non-medis
+  let extra = '';
+  if (p.auto_produce === true && b.needs_medical_review !== true &&
+      String(b.recommended_format || '').toUpperCase() === 'CAROUSEL') {
+    const ch = (b.recommended_channels as string[] || ['IG_FEED'])[0] || 'IG_FEED';
+    await rpc('agentic_create_task', {
+      p_agent: 'CONTENT', p_task_type: 'MAKE_CAROUSEL',
+      p_title: `Carousel: ${p.topic}`,
+      p_payload: { topic: p.topic, angle: b.angle, brief: md, channel: ch,
+        slide_count: b.slide_count || 6, calendar_id: p.calendar_id || null },
+    });
+    extra = ' · auto-task MAKE_CAROUSEL';
+  }
+  return { result: { markdown: md, brief: b, calendar_id: p.calendar_id || null },
+    note: `Analisis "${p.topic}" → ${b.recommended_format || '-'}, ${(b.recommended_channels as string[] || []).length} kanal${extra}` };
+}
+
+// MAKE_CAROUSEL: brief → N slide (copy per-slide) + N gambar berdimensi kanal
+async function handleMakeCarousel(t: Task) {
+  const p = t.payload || {};
+  const dim = chanDim(String(p.channel));
+  const wantSlides = Math.max(3, Math.min(10, Number(p.slide_count ?? 6)));
+  const tpl = await getPrompt('MAKE_CAROUSEL');
+  const { data } = await askLLMJson(t, tpl, {
+    brief: p.brief || '-', topic: p.topic || '-', channel: p.channel || 'IG_FEED',
+    aspect: dim.aspect, slide_count: wantSlides, angle: p.angle || '-',
+    rejection_feedback: p.rejection_feedback || '-',
+  }, { maxTokens: 4096 });
+  const c = data as Dict;
+  const slides = Array.isArray(c.slides) ? (c.slides as Dict[]) : [];
+  if (!slides.length) throw new Error('Output LLM tanpa slides carousel');
+
+  // Batasi jumlah render gambar agar tidak menembus anggaran waktu invocation.
+  const maxImg = Math.min(slides.length, Number(p.max_images ?? 6));
+  const imagePaths: (string | null)[] = [];
+  for (let i = 0; i < maxImg; i++) {
+    const prompt = String(slides[i].image_prompt || slides[i].headline || p.topic || 'ilustrasi klinis bersih');
+    imagePaths.push(p.make_image === false ? null : await makeImage(t, prompt, { width: dim.w, height: dim.h }));
+  }
+
+  const hashtags = Array.isArray(c.hashtags) ? (c.hashtags as string[]).join(' ') : '';
+  const md = `## ${c.title || p.topic} — Carousel ${p.channel || 'IG_FEED'} (${dim.aspect})\n\n${c.caption || ''}\n\n` +
+    slides.map((s, i) => `**Slide ${s.n ?? i + 1} — ${s.headline || ''}**\n${s.body || ''}` +
+      (imagePaths[i] ? `\n🖼 agentic/${imagePaths[i]}` : (i < maxImg ? '\n_(gambar gagal dibuat)_' : ''))).join('\n\n') +
+    `\n\n**CTA:** ${c.cta || '-'}\n\n${hashtags}`;
+
+  // Aset: 1 COPY caption + IMAGE per slide (meta.slide) + 1 CAROUSEL ringkasan
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'COPY', text_content: `${c.caption || ''}\n\n${hashtags}`, meta: { title: c.title, cta: c.cta } } });
+  for (let i = 0; i < imagePaths.length; i++) {
+    if (!imagePaths[i]) continue;
+    await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+      asset_type: 'IMAGE', file_path: imagePaths[i],
+      meta: { slide: slides[i].n ?? i + 1, channel: p.channel, aspect: dim.aspect, prompt: slides[i].image_prompt } } });
+  }
+  const madeImgs = imagePaths.filter(Boolean).length;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'CAROUSEL', text_content: md,
+    meta: { channel: p.channel, aspect: dim.aspect, slides: slides.length, images: madeImgs } } });
+
+  return { result: { markdown: md, carousel: c, image_paths: imagePaths, calendar_id: p.calendar_id || null },
+    note: `Carousel "${p.topic}" · ${slides.length} slide · ${madeImgs} gambar ${dim.aspect}` };
+}
+
+// SEO_RESEARCH: topik → kata kunci + outline + meta
+async function handleSeoResearch(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('SEO_RESEARCH');
+  const { data } = await askLLMJson(t, tpl, { topic: p.topic, audience: p.audience || 'awam', notes: p.notes || '-' });
+  const s = data as Dict;
+  const md = `## Riset SEO — ${p.topic}\n\n**Kata kunci utama:** ${s.primary_keyword || '-'}\n` +
+    `**Sekunder:** ${(s.secondary_keywords as string[] || []).join(', ')}\n**Intent:** ${s.search_intent || '-'}\n\n` +
+    `**Judul usulan:** ${s.suggested_title || '-'}\n**Meta:** ${s.meta_description || '-'}\n\n` +
+    `**Outline:**\n${(s.outline_headings as string[] || []).map((x) => `- ${x}`).join('\n')}\n\n` +
+    `**Gap konten:**\n${(s.content_gaps as string[] || []).map((x) => `- ${x}`).join('\n')}`;
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'COPY', text_content: md, meta: { seo: s } } });
+
+  let extra = '';
+  if (p.auto_produce === true) {
+    await rpc('agentic_create_task', {
+      p_agent: 'CONTENT', p_task_type: 'MAKE_BLOG_SEO',
+      p_title: `Artikel SEO: ${s.suggested_title || p.topic}`,
+      p_payload: { topic: p.topic, primary_keyword: s.primary_keyword,
+        outline: JSON.stringify(s.outline_headings || []), audience: p.audience || 'awam', calendar_id: p.calendar_id || null },
+    });
+    extra = ' · auto-task MAKE_BLOG_SEO';
+  }
+  return { result: { markdown: md, seo: s, calendar_id: p.calendar_id || null },
+    note: `SEO "${p.topic}" · kw utama: ${s.primary_keyword || '-'}${extra}` };
+}
+
+// MAKE_BLOG_SEO: artikel blog 800–1200 kata ter-optimasi + meta + sitasi
+async function handleMakeBlogSeo(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('MAKE_BLOG_SEO');
+  const { data } = await askLLMJson(t, tpl, {
+    topic: p.topic, primary_keyword: p.primary_keyword || p.topic,
+    outline: p.outline || '-', audience: p.audience || 'awam',
+    rejection_feedback: p.rejection_feedback || '-',
+  }, { maxTokens: 8192 });
+  const a = data as Dict;
+  const cits = Array.isArray(a.citations) ? (a.citations as Dict[]) : [];
+  const md = `# ${a.title || p.topic}\n_meta: ${a.meta_description || '-'} · slug: ${a.slug || '-'}_\n\n${a.markdown || ''}` +
+    (cits.length ? `\n\n## Sumber\n${cits.map((c, i) => `${i + 1}. ${c.source || ''} — ${c.title || ''} (${c.year || 'n.d.'})${c.url ? ` · ${c.url}` : ''}`).join('\n')}` : '');
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'HTML', text_content: md, meta: { title: a.title, slug: a.slug, meta_description: a.meta_description } } });
+  return { result: { markdown: md, title: a.title, slug: a.slug, meta_description: a.meta_description,
+      needs_medical_review: !!a.needs_medical_review, calendar_id: p.calendar_id || null },
+    note: `Artikel SEO "${a.title || p.topic}" · ${String(a.markdown || '').split(/\s+/).length} kata${a.needs_medical_review ? ' · perlu review medis' : ''}` };
+}
+
+// MAKE_DESIGN_BRIEF: konten → brief kreatif; opsi auto-antre MAKE_CAROUSEL
+async function handleMakeDesignBrief(t: Task) {
+  const p = t.payload || {};
+  const dim = chanDim(String(p.channel));
+  const tpl = await getPrompt('MAKE_DESIGN_BRIEF');
+  const { data } = await askLLMJson(t, tpl, {
+    content: p.content || p.topic || '-', channel: p.channel || 'IG_FEED', aspect: dim.aspect,
+    format: p.format || 'CAROUSEL', slide_count: p.slide_count || 6,
+  });
+  const d = data as Dict;
+  const md = `## Brief Kreatif — ${p.topic || d.concept}\n**Konsep:** ${d.concept || '-'}\n` +
+    `**Style:** ${d.style || '-'} · **Palet:** ${(d.palette as string[] || []).join(', ')}\n` +
+    `**Kanal:** ${d.channel || p.channel} (${dim.aspect}) · **Format:** ${d.format || '-'}\n\n` +
+    (Array.isArray(d.slides) ? (d.slides as Dict[]).map((s) => `**Slide ${s.n}** — ${s.visual || ''}\n\`${s.image_prompt || ''}\``).join('\n\n') : '');
+  await rpc('agentic_asset_add', { p: { calendar_id: p.calendar_id || null, task_id: t.id,
+    asset_type: 'COPY', text_content: md, meta: { design: d } } });
+
+  let extra = '';
+  if (p.auto_produce === true && String(d.format || '').toUpperCase() === 'CAROUSEL') {
+    await rpc('agentic_create_task', {
+      p_agent: 'CONTENT', p_task_type: 'MAKE_CAROUSEL',
+      p_title: `Carousel: ${p.topic || d.concept}`,
+      p_payload: { topic: p.topic || d.concept, brief: md, channel: d.channel || p.channel || 'IG_FEED',
+        slide_count: d.slide_count || p.slide_count || 6, calendar_id: p.calendar_id || null },
+    });
+    extra = ' · auto-task MAKE_CAROUSEL';
+  }
+  return { result: { markdown: md, design: d, calendar_id: p.calendar_id || null },
+    note: `Brief kreatif "${p.topic || d.concept}" · ${(d.slides as Dict[] || []).length} slide${extra}` };
+}
+
+// AUDIT_PLAN: rencana audit internal berbasis risiko (markdown)
+async function handleAuditPlan(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('AUDIT_PLAN');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.4), maxTokens: 6000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      period: p.period || 'Tahunan', focus: p.focus || 'seluruh klausul kritis',
+      areas: p.areas || 'Pra-analitik, Analitik, Pasca-analitik, Manajemen',
+      rejection_feedback: p.rejection_feedback || '-',
+    }),
+  });
+  const md = String(r.text || '').trim();
+  if (md.length < 100) throw new Error('Rencana audit terlalu pendek — output LLM tidak valid');
+  return { result: { markdown: md, change_note: `Audit plan via ${r.provider}/${r.model}` },
+    note: `Rencana audit "${p.period || 'Tahunan'}" · ${md.length} char` };
+}
+
+// REG_WATCH: analisis kepatuhan dari checklist → gap & rekomendasi (markdown)
+async function handleRegWatch(t: Task) {
+  const scan = await rpc('agentic_sa_scan', {}).catch(() => null) as Dict | null;
+  const missing = (scan?.missing || []) as Dict[];
+  const summary = `Klausul wajib tanpa dokumen: ${missing.length}. ` +
+    missing.slice(0, 20).map((m) => `${m.clause_ref} (${m.required_doc_type} L${m.required_doc_level})`).join('; ');
+  const tpl = await getPrompt('REG_WATCH');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.3), maxTokens: 4000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), {
+      framework: t.payload?.framework || 'ISO 15189:2022',
+      checklist_summary: summary, notes: t.payload?.notes || '-',
+    }),
+  });
+  const md = String(r.text || '').trim();
+  return { result: { markdown: md, missing_count: missing.length },
+    note: `Reg watch: ${missing.length} gap klausul dianalisis` };
+}
+
+// SA_TICK: Kepala Service Assurance — patroli dokumen jatuh tempo + gap wajib
+async function handleSaTick(t: Task) {
+  const scan = await rpc('agentic_sa_scan', {}) as Dict;
+  const due = (scan.due_review || []) as Dict[];
+  const missing = (scan.missing || []) as Dict[];
+  const lines: string[] = [];
+  let made = 0;
+
+  // 1) Dokumen jatuh tempo review → repair cycle (dibatasi RPC bawaan)
+  try {
+    const rc = await rpc('agentic_review_cycle', {}) as Dict;
+    if (rc?.due_for_review) lines.push(`🔁 ${rc.due_for_review} dokumen jatuh tempo → task repair`);
+  } catch { /* non-fatal */ }
+
+  // 2) Klausul wajib tanpa dokumen → DOC_GENERATE (maks 3 per tick)
+  for (const m of missing.slice(0, 3)) {
+    try {
+      await rpc('agentic_create_task', {
+        p_agent: 'DOCUMENT', p_task_type: 'DOC_GENERATE',
+        p_title: `Generate ${m.required_doc_type || 'SOP'} — klausul ${m.clause_ref}`,
+        p_payload: { checklist_id: m.checklist_id, doc_type: m.required_doc_type,
+          doc_level: m.required_doc_level, department: m.department },
+      });
+      made++;
+    } catch (e) { lines.push(`⚠ gagal generate ${m.clause_ref}: ${e instanceof Error ? e.message : e}`); }
+  }
+  if (made) lines.push(`📝 ${made} dokumen wajib diusulkan (DOC_GENERATE)`);
+  if (scan.templates_missing) lines.push(`📐 ${scan.templates_missing} kombinasi jenis/level belum punya TEMPLATE master — unggah di tab Organisasi agar format terjaga.`);
+
+  const md = `## Patroli Service Assurance — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `Jatuh tempo review: ${due.length} · gap klausul wajib: ${missing.length}\n` +
+    (lines.length ? lines.map((l) => `- ${l}`).join('\n') : '- Tidak ada tindakan diperlukan');
+  if (lines.length) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'SA_HEAD', to_agent: 'ACE',
+      kind: (missing.length > 5 || due.length > 5) ? 'ALERT' : 'INFO', body: md } });
+  }
+  return { result: { due_review: due.length, missing: missing.length, tasks_made: made, markdown: md },
+    note: `SA: ${due.length} jatuh tempo · ${missing.length} gap · ${made} task dibuat` };
+}
+
+// MKT_TICK: Kepala Marketing — jaga kalender terisi 14 hari ke depan
+async function handleMktTick(t: Task) {
+  const scan = await rpc('agentic_mkt_scan', {}) as Dict;
+  const upcoming = Number(scan.upcoming_slots || 0);
+  const due = (scan.due_production || []) as Dict[];
+  const lines: string[] = [];
+  const minSlots = Number(t.payload?.min_slots ?? 6);
+
+  if (upcoming < minSlots) {
+    try {
+      await rpc('agentic_create_task', {
+        p_agent: 'CONTENT', p_task_type: 'PLAN_WEEKLY',
+        p_title: 'Perencanaan konten mingguan (auto)', p_payload: { produce_within_days: 4 } });
+      lines.push(`🗓 Kalender tipis (${upcoming}/${minSlots}) → task PLAN_WEEKLY dibuat`);
+    } catch (e) { lines.push(`⚠ gagal PLAN_WEEKLY: ${e instanceof Error ? e.message : e}`); }
+  } else {
+    lines.push(`🗓 Kalender 14 hari: ${upcoming} slot — cukup`);
+  }
+  if (due.length) lines.push(`⏳ ${due.length} slot jatuh tempo produksi (H-3)`);
+
+  const md = `## Patroli Marketing — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    lines.map((l) => `- ${l}`).join('\n');
+  await rpc('agentic_msg_add', { p: { from_agent: 'MKT_HEAD', to_agent: 'ACE', kind: 'INFO', body: md } });
+  return { result: { upcoming, due: due.length, markdown: md },
+    note: `MKT: ${upcoming} slot mendatang · ${due.length} jatuh tempo` };
+}
+
+// ═══ FASE 7C — AUDIT INTERNAL + CAPA ═════════════════════════════════
+
+// AUDIT_EXECUTE: audit area → temuan terstruktur (NC) → simpan + auto-CAPA
+async function handleAuditExecute(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('AUDIT_EXECUTE');
+  const { data } = await askLLMJson(t, tpl, {
+    area: p.area || 'Seluruh area', clauses: p.clauses || 'Klausul kritis ISO 15189:2022',
+    context: p.context || '-', rejection_feedback: p.rejection_feedback || '-',
+  }, { maxTokens: 4000 });
+  const d = data as Dict;
+  const findings = Array.isArray(d.findings) ? (d.findings as Dict[]) : [];
+  let capaMade = 0;
+  const stored: string[] = [];
+  for (const f of findings) {
+    try {
+      const row = await rpc('agentic_finding_add', { p: {
+        audit_task_id: t.id, clause_ref: f.clause_ref || null, area: f.area || p.area || null,
+        severity: f.severity || 'OBSERVASI', finding: f.finding || '', evidence: f.evidence || null,
+      }}) as Dict;
+      stored.push(`[${f.severity || 'OBSERVASI'}] ${f.clause_ref || '-'}: ${f.finding || ''}`);
+      // MAYOR/MINOR → antre CAPA otomatis
+      if (row?.id && ['MAYOR', 'MINOR'].includes(String(f.severity || '').toUpperCase())) {
+        await rpc('agentic_create_task', {
+          p_agent: 'ORG', p_task_type: 'CAPA_TRACK',
+          p_title: `CAPA: ${String(f.finding || f.clause_ref || 'temuan').slice(0, 120)}`,
+          p_payload: { finding_id: row.id, finding: f.finding, severity: f.severity,
+            clause_ref: f.clause_ref, area: f.area || p.area },
+        });
+        await rpc('agentic_finding_set_status', { p_id: row.id, p_status: 'CAPA' }).catch(() => null);
+        capaMade++;
+      }
+    } catch (e) { stored.push(`⚠ gagal simpan temuan: ${e instanceof Error ? e.message : e}`); }
+  }
+  const md = `## Audit — ${p.area || 'area'}\n${d.summary || ''}\n\n**Temuan (${findings.length}):**\n` +
+    findings.map((f) => `- **${f.severity || 'OBSERVASI'}** · ${f.clause_ref || '-'} — ${f.finding || ''}` +
+      (f.evidence ? `\n  _bukti:_ ${f.evidence}` : '')).join('\n') +
+    (capaMade ? `\n\n➡ ${capaMade} temuan MAYOR/MINOR → CAPA otomatis dibuat.` : '');
+  return { result: { markdown: md, findings, capa_created: capaMade },
+    note: `Audit "${p.area || 'area'}" · ${findings.length} temuan · ${capaMade} CAPA` };
+}
+
+// CAPA_TRACK: temuan → CAPA (akar masalah, tindakan korektif/preventif) tersimpan
+async function handleCapaTrack(t: Task) {
+  const p = t.payload || {};
+  const tpl = await getPrompt('CAPA_TRACK');
+  const today = new Date().toISOString().slice(0, 10);
+  const { data } = await askLLMJson(t, tpl, {
+    finding: p.finding || '-', severity: p.severity || 'MINOR',
+    clause_ref: p.clause_ref || '-', area: p.area || '-', today,
+  });
+  const c = data as Dict;
+  const row = await rpc('agentic_capa_add', { p: {
+    finding_id: p.finding_id || null, source: p.source || 'AUDIT',
+    title: c.title || `CAPA ${p.clause_ref || ''}`.trim(), root_cause: c.root_cause || null,
+    corrective_action: c.corrective_action || null, preventive_action: c.preventive_action || null,
+    pic: c.pic || null, due_date: /^\d{4}-\d{2}-\d{2}$/.test(String(c.due_date || '')) ? c.due_date : null,
+  }}) as Dict;
+  const md = `## CAPA — ${c.title || ''}\n**Akar masalah:** ${c.root_cause || '-'}\n` +
+    `**Korektif:** ${c.corrective_action || '-'}\n**Preventif:** ${c.preventive_action || '-'}\n` +
+    `**PIC:** ${c.pic || '[[KONFIRMASI]]'} · **Target:** ${c.due_date || '[[KONFIRMASI]]'}`;
+  return { result: { markdown: md, capa_id: row?.id, capa: c },
+    note: `CAPA "${c.title || p.clause_ref || ''}" tersimpan` };
+}
+
+// ═══ FASE 7F — DEPARTEMEN IT: audit postur keamanan ═════════════════
+async function handleItSecAudit(t: Task) {
+  const posture = await rpc('agentic_it_sec_scan', {}) as Dict;
+  const tpl = await getPrompt('IT_SEC_AUDIT');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.2), maxTokens: 3000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), { posture: JSON.stringify(posture).slice(0, 6000) }),
+  });
+  const md = String(r.text || '').trim();
+  const secrets = (posture?.secrets || []) as Dict[];
+  const missing = secrets.filter((s) => !s.has_value).length;
+  const medicalAuto = Number(posture?.medical_auto || 0);
+  // Kirim ALERT ke CEO bila ada sinyal kritis
+  if (medicalAuto > 0 || Number(posture?.no_qa_publish || 0) > 8) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'IT_SEC', to_agent: 'ACE',
+      kind: 'ALERT', body: `## Audit Keamanan IT\n${md}` } }).catch(() => null);
+  }
+  return { result: { markdown: md, posture },
+    note: `IT_SEC audit · ${missing} secret kosong · ${posture?.failed_7d ?? 0} gagal/7hr${medicalAuto ? ` · ⚠ ${medicalAuto} medis auto` : ''}` };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 7F — Departemen IT:
+  IT_SEC_AUDIT: handleItSecAudit,
+  // Fase 7C — Audit & CAPA:
+  AUDIT_EXECUTE: handleAuditExecute,
+  CAPA_TRACK: handleCapaTrack,
+  // Fase 7 — Departemen Service Assurance & Marketing:
+  SA_TICK: handleSaTick,
+  MKT_TICK: handleMktTick,
+  CONTENT_ANALYSIS: handleContentAnalysis,
+  MAKE_CAROUSEL: handleMakeCarousel,
+  SEO_RESEARCH: handleSeoResearch,
+  MAKE_BLOG_SEO: handleMakeBlogSeo,
+  MAKE_DESIGN_BRIEF: handleMakeDesignBrief,
+  AUDIT_PLAN: handleAuditPlan,
+  REG_WATCH: handleRegWatch,
   // Fase 6 — Organisasi:
   QA_REVIEW: handleQaReview,
   HEAD_TICK: handleHeadTick,

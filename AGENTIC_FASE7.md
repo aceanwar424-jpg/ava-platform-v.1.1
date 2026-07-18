@@ -1,0 +1,308 @@
+# AGENTIC — FASE 7 : Panduan Implementasi Lengkap
+### Departemenisasi (Service Assurance & Marketing) · Konfig AI di web · Audit/CAPA · Perakit .docx
+
+Dokumen ini adalah panduan **implementasi & pemakaian** Fase 7 (7 · 7B · 7C · 7D).
+Ikuti berurutan dari atas. Bagian 1–3 = pasang. Bagian 4 = pakai. Bagian 5 = referensi.
+Bagian 6 = yang masih perlu Anda kerjakan.
+
+---
+
+## 0. Ringkasan — apa yang berubah
+
+Organisasi agent naik dari **flat** (HEAD → semua organ) menjadi **3 lapis**
+(HEAD → Kepala Departemen → anggota). Peran QA lama menjadi **gerbang mutu** di
+dalam departemennya.
+
+```
+👑 CEO (Anda)
+└── 👔 HEAD  (Chief of Staff — mengambil keputusan sesuai Matriks Mandat)
+    ├── 🧪 SERVICE ASSURANCE — SA_HEAD (Manajer Mutu)
+    │     ├── 📚 SA_DOC    Document Controller (kendali dokumen L1–L4)
+    │     ├── 🔍 SA_AUDIT  Auditor Mutu Internal
+    │     ├── 📜 SA_REG    Regulatory & Compliance Watch
+    │     ├── 🛠️ SA_CAPA   CAPA & Manajemen Risiko
+    │     └── ✅ QA_MUTU   Gerbang Mutu (penilai dokumen)
+    ├── ✍️ MARKETING — MKT_HEAD (Kepala Marketing)
+    │     ├── 🔑 MKT_SEO     SEO & Content Strategist
+    │     ├── 📝 MKT_COPY    Copywriter
+    │     ├── 🎨 MKT_DESIGN  Designer / Creative
+    │     ├── 📣 MKT_SOCIAL  Social & Community
+    │     └── ✅ QA_KONTEN   Gerbang Konten (penilai konten)
+    └── 🖥️ IT_HEAD · 📋 TEAM_OPS · 🚚 LOGISTIK (lintas-fungsi, lapor ke HEAD)
+```
+
+Tambahan besar lain:
+- **Konfig AI di web** — set model/API/video dari tab Organisasi tanpa re-deploy.
+- **Audit internal + CAPA** terstruktur.
+- **Mesin perakit `.docx`** — dokumen resmi dengan format 100% identik master.
+
+---
+
+## 1. Prasyarat
+
+- Fase 0–6c **sudah terpasang** (tabel `agentic.*`, `agentic-worker`, `llm-gateway`).
+- Akses ke **Supabase SQL Editor** dan **Edge Functions** (deploy).
+- Bucket Storage **`agentic`** aktif (dari Fase 12) — dipakai upload master `.docx`.
+
+Semua SQL Fase 7 **idempoten** (aman dijalankan ulang).
+
+---
+
+## 2. Deploy — urutan WAJIB
+
+Jalankan **berurutan**. Jangan lewati langkah.
+
+### 2.1 SQL (Supabase → SQL Editor)
+| Urutan | File | Isi |
+|---|---|---|
+| 1 | `supabase_agentic_fase7.sql` | Organ departemen, kolom `department`, registry template, channel_specs, decision_rights, prompt, RPC |
+| 2 | `supabase_agentic_fase7b.sql` | Tabel `ai_config` + RPC konfig (map = service_role saja) |
+| 3 | `supabase_agentic_fase7c.sql` | Tabel `audit_findings` + `capa` + RPC + prompt audit/CAPA |
+| 4 | `supabase_agentic_frameworks.sql` | Seed checklist **Akreditasi Klinik** (fokus lab) + **ISO 9001:2015** (melengkapi ISO 15189 yang sudah ada) |
+
+Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
+perbaiki sebelum lanjut file berikutnya.
+
+### 2.2 Edge Functions (re-deploy)
+| Fungsi | Kenapa |
+|---|---|
+| `agentic-worker` | Handler baru: SA/MKT tick, carousel, SEO, blog, brief, audit, CAPA |
+| `llm-gateway` | Kini baca setelan dari DB (Konfig AI) + `mode:'video'` |
+
+### 2.3 UI (tanpa build)
+Refresh browser. File berikut sudah berisi semua perubahan UI:
+`modules/agentic/org.js`, `modules/agentic/docs.js`, `modules/agentic/docxfill.js`
+(dimuat via `index.html`).
+
+### 2.4 Cron (opsional, disarankan)
+Di SQL Editor tambahkan (ganti `<PROJECT>` & `<SERVICE_ROLE_KEY>` — lihat blok
+`§CRON DEPARTEMEN` di akhir `supabase_agentic_fase7.sql`):
+```sql
+select cron.schedule('agentic-sa-tick','*/30 * * * *',  $$ select public.agentic_org_kick('SA_TICK'); $$);
+select cron.schedule('agentic-mkt-tick','15,45 * * * *', $$ select public.agentic_org_kick('MKT_TICK'); $$);
+```
+
+---
+
+## 3. Verifikasi pasca-deploy (checklist)
+
+Buka **Agentic AI → tab Organisasi**:
+- [ ] Struktur tampil **3 lapis** (dua kartu departemen berisi kepala + anggota).
+- [ ] Ada tombol **🧪 Patroli Mutu** & **✍️ Patroli Marketing** di header.
+- [ ] Panel **📐 Template Dokumen Resmi** muncul.
+- [ ] Panel **⚙️ Konfigurasi AI** muncul dan menampilkan daftar setelan.
+
+Tab **Compliance**:
+- [ ] Panel **🔍 Audit Internal & CAPA** muncul di bawah checklist klausul.
+
+Uji cepat:
+- [ ] Klik **Patroli Mutu** → toast "Service Assurance ditugaskan"; setelah worker jalan,
+  muncul pesan patroli di kotak pesan HEAD.
+- [ ] Konfig AI → ubah satu nilai non-rahasia (mis. model) → **Simpan** → toast sukses.
+
+> Kalau panel bertuliskan "Jalankan supabase_agentic_fase7X.sql" → SQL terkait belum
+> dijalankan. Kalau video/model tak berubah → `llm-gateway` belum di-redeploy.
+
+---
+
+## 4. Cara memakai tiap komponen
+
+### 4.1 Departemen Service Assurance
+
+**Patroli otomatis (SA_TICK)** — via tombol *Patroli Mutu* atau cron. Yang dilakukan:
+1. Dokumen **jatuh tempo review** → dibuatkan task perbaikan.
+2. Klausul **wajib tanpa dokumen** → dibuatkan `DOC_GENERATE` (maks 3 per tick).
+3. Melapor gap & kombinasi jenis/level yang **belum punya template master**.
+
+**Audit internal (AUDIT_EXECUTE)** — tab Compliance → panel Audit → **Jalankan Audit
+Internal** → isi area (mis. "Pra-analitik"). Hasil: temuan NC (MAYOR/MINOR/OBSERVASI)
+tersimpan; temuan MAYOR/MINOR **otomatis** memicu CAPA.
+
+**CAPA** — tabel CAPA di panel yang sama; ubah status lewat dropdown
+(OPEN → IN_PROGRESS → VERIFICATION → CLOSED).
+
+**Analisis lain:** `AUDIT_PLAN` (rencana audit tahunan) & `REG_WATCH` (analisis
+kepatuhan) menghasilkan draft markdown.
+
+**Framework kepatuhan (checklist).** Semula hanya **ISO 15189:2022**. Dengan
+`supabase_agentic_frameworks.sql` kini juga mencakup **Akreditasi Klinik** (Bab TKK ·
+PMKP · PPK, dengan blok **PPK-LAB** khusus pelayanan laboratorium) dan **ISO 9001:2015**.
+Gap analysis, compliance score, dan patroli SA otomatis membaca ketiganya. Di tab
+**Compliance** ada **filter Framework** pada tabel checklist, dan kartu skor kini
+berlabel framework. *Catatan: kode Elemen Penilaian (EP) Akreditasi Klinik memakai
+pengelompokan standar; sesuaikan `clause_ref` ke nomor EP resmi Kepdirjen bila perlu
+untuk berkas survei.*
+
+### 4.2 Departemen Marketing
+
+Alur produksi konten (bisa dirantai):
+```
+CONTENT_ANALYSIS  →  MAKE_CAROUSEL / MAKE_BLOG_SEO
+ (topik → brief)      (brief → slide+gambar / artikel SEO)
+```
+- **CONTENT_ANALYSIS** — topik → brief (angle, kanal, format, jumlah slide, kata kunci
+  SEO, risiko medis). Set payload `auto_produce:true` → langsung antre carousel bila non-medis.
+- **MAKE_CAROUSEL** — brief → N slide (copy per slide) + **N gambar berdimensi kanal**
+  (lihat tabel kanal di §5.4). Dibatasi maks 6 gambar/task (anggaran waktu).
+- **SEO_RESEARCH → MAKE_BLOG_SEO** — riset kata kunci → artikel blog 800–1200 kata +
+  judul/meta/heading + sitasi.
+- **MAKE_DESIGN_BRIEF** — konten → brief kreatif; opsi auto-antre carousel.
+- **MKT_TICK** (tombol *Patroli Marketing*/cron) — jaga kalender 14 hari terisi;
+  bila tipis → buat `PLAN_WEEKLY`.
+
+### 4.3 Konfig AI (tab Organisasi → ⚙️ Konfigurasi AI)
+
+Set model/API langsung dari web. **Kosongkan** nilai = pakai Secret/env lama.
+Perubahan berlaku di **panggilan AI berikutnya** (tanpa re-deploy).
+
+| Key | Kategori | Fungsi |
+|---|---|---|
+| `NVIDIA_API_KEYS` 🔒 | NVIDIA | Kunci API (pisah koma). Rahasia — tak ditampilkan balik. |
+| `NVIDIA_MODEL_MAIN` | NVIDIA | Model teks berat (task utama). |
+| `NVIDIA_MODEL_LIGHT` | NVIDIA | Model teks cepat (QA/terjemah). |
+| `NVIDIA_IMAGE_MODEL` | Gambar | Model gambar prioritas (koma). |
+| `NVIDIA_VIDEO_MODEL` | Video | Model text-to-video (kosong = video mati). |
+| `VIDEO_ENABLED` | Video | `true`/`false`. |
+| `GEMINI_API_KEYS` 🔒 | Gemini | Kunci fallback teks + pembaca PDF. |
+| `GEMINI_MODEL` | Gemini | Model Gemini. |
+| `IMAGE_FILTER_STRICT` | Lanjut | `true` = tolak prompt gambar berisiko. |
+| `LLM_RATE_LIMIT_PER_KEY_PER_MIN` | Lanjut | Batas request/kunci/menit. |
+
+> **Keamanan:** nilai 🔒 hanya dibaca `llm-gateway` (service_role) via
+> `agentic_config_map`; UI (anon) tak pernah bisa membacanya kembali.
+
+### 4.4 Template Dokumen + Perakit .docx (fidelity 100%)
+
+Inti fitur Service Assurance. Langkah pemakaian:
+
+**a. Siapkan master `.docx`.** Buat file Word **persis** dokumen resmi Anda (kop,
+header, footer, font, ukuran, margin, spasi, penomoran — semua final). Di posisi isi
+yang berubah, tulis token, contoh:
+```
+Judul       : {{JUDUL}}
+No. Dokumen : {{NO_DOKUMEN}}
+Tujuan      : {{TUJUAN}}
+Prosedur    : {{PROSEDUR}}
+```
+Aturan penulisan token (penting agar terbaca engine):
+- Pakai **kurung ganda** `{{NAMA}}`, huruf besar + garis bawah.
+- Ketik tiap token **dalam sekali ketik** (jangan pindah kursor di tengah `{{` atau `}}`).
+  Nama di dalamnya boleh terpecah antar-run — engine tahan itu; yang tak boleh hanya
+  `{{` / `}}`-nya sendiri yang terbelah.
+- **Matikan autocorrect / smart-quotes** di Word saat mengetik token.
+- Token boleh diletakkan di **header/footer** juga.
+- **Belum didukung:** baris tabel berulang/loop (mis. daftar langkah dinamis). Bila
+  butuh, minta penambahan dukungan loop.
+
+**b. Daftarkan template.** Tab Organisasi → panel Template → **Tambah Template**:
+pilih **Level (L1–L4)** & **Jenis** (SOP/IK/FORM/…), unggah **master `.docx`**, isi
+**Daftar placeholder** (satu per baris), opsional isi spesifikasi format & unggah
+**contoh dokumen jadi** (referensi).
+
+**c. Uji.** Klik **⬇ Tes Rakit .docx** pada baris template → sistem mengisi tiap
+`{{…}}` dengan `[CONTOH: nama]` lalu **mengunduh** hasilnya. Buka di Word: header,
+footer, font, margin, spasi harus **identik master**, hanya isi token yang berubah.
+Jika ya → master Anda valid dan siap dipakai generator.
+
+> Engine inti: `agDocxFill(masterArrayBuffer, {KEY:value})` di
+> `modules/agentic/docxfill.js` (sudah diuji round-trip otomatis: placeholder normal &
+> terpecah antar-run, header/footer, dan entri biner utuh).
+
+### 4.5 Video (opsional)
+
+1. Konfig AI → isi `NVIDIA_VIDEO_MODEL` (model text-to-video aktif di akun NVIDIA) +
+   `VIDEO_ENABLED=true`.
+2. Gateway menerima `POST {mode:'video', prompt}` lewat endpoint NVIDIA yang sama dengan
+   gambar (genai + antrian NVCF).
+3. Video long-running (menit) vs Edge Function ±150 dtk → bila model lambat >110 dtk,
+   gateway membalas **rapi** `{pending:true, reqId}` (HTTP 504), bukan menggantung.
+   Untuk produksi video penuh perlu pola **background job** (belum di-wire ke task konten).
+
+---
+
+## 5. Referensi
+
+### 5.1 File yang ditamb/diubah
+| File | Peran |
+|---|---|
+| `supabase_agentic_fase7.sql` | Organ departemen, template registry, channel_specs, decision_rights, prompt, RPC |
+| `supabase_agentic_fase7b.sql` | `ai_config` + RPC konfig |
+| `supabase_agentic_fase7c.sql` | `audit_findings` + `capa` + RPC + prompt |
+| `supabase/functions/agentic-worker/index.ts` | Handler task baru (§5.3) |
+| `supabase/functions/llm-gateway/index.ts` | Baca Konfig AI dari DB + `mode:'video'` |
+| `modules/agentic/org.js` | Render pohon 3 lapis, panel Template & Konfig AI, tombol patroli |
+| `modules/agentic/docs.js` | Panel Audit & CAPA di tab Compliance |
+| `modules/agentic/docxfill.js` | **Baru** — mesin perakit `.docx` |
+| `index.html` | Memuat `docxfill.js` |
+
+### 5.2 Tabel DB baru
+`agentic.doc_templates` · `agentic.channel_specs` · `agentic.ai_config` ·
+`agentic.audit_findings` · `agentic.capa` · kolom `agentic.agents.department` ·
+`content_assets.asset_type` +`CAROUSEL` +`VIDEO`.
+
+### 5.3 Task type — pemilik, mandat, handler
+| task_type | Dept | Mandat | Handler? |
+|---|---|---|---|
+| `SA_TICK` | SA | R1 log | ✅ |
+| `AUDIT_PLAN` | SA | R2 · QA_MUTU 70 | ✅ |
+| `AUDIT_EXECUTE` | SA | R2 · QA_MUTU 75 | ✅ (→ auto CAPA) |
+| `CAPA_TRACK` | SA | R2 · QA_MUTU 70 | ✅ |
+| `REG_WATCH` | SA | R1 log | ✅ |
+| `DOC_DISTRIBUTE` | SA | R1 log | ⏳ reserved (handler menyusul) |
+| `DOC_OBSOLETE` | SA | R2 | ⏳ reserved |
+| `MASTER_LIST` | SA | R1 log | ⏳ reserved |
+| `MKT_TICK` | MKT | R1 log | ✅ |
+| `CONTENT_ANALYSIS` | MKT | R1 log | ✅ |
+| `MAKE_CAROUSEL` | MKT | R1 · QA_KONTEN 75 | ✅ |
+| `SEO_RESEARCH` | MKT | R1 log | ✅ |
+| `MAKE_BLOG_SEO` | MKT | R2 · QA_KONTEN 80 | ✅ |
+| `MAKE_DESIGN_BRIEF` | MKT | R1 log | ✅ |
+| `PLAN_CAMPAIGN` | MKT | R2 · QA_KONTEN 70 | ⏳ reserved |
+
+> "⏳ reserved" = sudah ada di Matriks Mandat (terlihat di UI) tapi **belum ada handler**;
+> jangan dibuat manual dulu — akan `FAILED` "handler belum diimplementasikan". Tidak ada
+> patroli yang membuatnya otomatis, jadi aman.
+
+### 5.4 Dimensi gambar per kanal (`agentic.channel_specs`)
+| Kode | Kanal | Ukuran | Rasio |
+|---|---|---|---|
+| `IG_FEED` | Instagram Feed | 1080×1350 | 4:5 |
+| `IG_SQUARE` | Instagram Kotak | 1080×1080 | 1:1 |
+| `IG_STORY` | Story (IG/FB) | 1080×1920 | 9:16 |
+| `TIKTOK` | TikTok | 1080×1920 | 9:16 |
+| `WA` | WhatsApp | 1080×1080 | 1:1 |
+| `FB_FEED` | Facebook Feed | 1200×1500 | 4:5 |
+| `YT_THUMB` | YouTube Thumb | 1280×720 | 16:9 |
+
+### 5.5 Catatan mandat (keamanan konten)
+- `MAKE_CAROUSEL` = R1 (mandat penuh HEAD, gerbang QA_KONTEN ≥75).
+- `MAKE_BLOG_SEO` = R2 (HEAD menyetujui, **publish tetap CEO**). Artikel terdeteksi
+  `needs_medical_review` → publish manual Anda + gerbang QA_KONTEN ≥80.
+- Konten klaim medis **selalu** jalur manusia, apa pun matriksnya.
+
+---
+
+## 6. Yang MASIH perlu Anda kerjakan (untuk menyempurnakan)
+
+1. **Master `.docx` + jembatan isi→placeholder.** Engine perakit sudah jadi & teruji.
+   Tersisa dua hal: **(a)** Anda buat & unggah master per level/jenis dengan token `{{…}}`
+   (§4.4); **(b)** langkah kecil di sisi kode yang **memetakan hasil LLM `DOC_GENERATE`
+   (markdown) → pasangan placeholder→nilai**, memanggil `agDocxFill`, lalu menyimpan
+   `.docx` final ke revisi dokumen. Langkah (b) akan dipasang **setelah** ada minimal satu
+   master contoh Anda (agar pemetaan token sesuai kenyataan, bukan tebakan).
+
+2. **Video — kesiapan model.** Jalur teknis siap (gateway + Konfig AI). Anda tinggal
+   memastikan **model text-to-video aktif** di akun NVIDIA lalu isi `NVIDIA_VIDEO_MODEL`
+   + `VIDEO_ENABLED=true`. Untuk produksi video penuh (durasi menit) perlu **background
+   job**; beri tahu bila mau dilanjut ke sana.
+
+3. **Sub-modul SA lanjutan (Fase 7C+).** `DOC_DISTRIBUTE`, `DOC_OBSOLETE`, `MASTER_LIST`,
+   `PLAN_CAMPAIGN` masih "reserved". Bila diperlukan, minta implementasi handler-nya.
+
+### Checklist tindakan Anda
+- [ ] Deploy 3 SQL berurutan (§2.1) + re-deploy 2 edge function (§2.2).
+- [ ] Verifikasi UI (§3).
+- [ ] Isi/verifikasi Konfig AI (§4.3).
+- [ ] Buat & unggah **minimal 1 master `.docx`** dengan token, lalu **Tes Rakit** (§4.4).
+- [ ] Kirim master itu (atau daftar placeholder finalnya) untuk memasang jembatan §6.1(b).
+- [ ] (Opsional) isi model video (§4.5).

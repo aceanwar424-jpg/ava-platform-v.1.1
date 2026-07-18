@@ -14,7 +14,22 @@ function invCanApproveSPV()     { return ['spv','manager','direktur','super_admi
 function invCanApproveManager() { return ['manager','direktur','super_admin'].includes(getUserRole?getUserRole():''); }
 function invCanApproveHeadOps() { return ['super_admin','direktur'].includes(getUserRole?getUserRole():''); }
 
-async function renderInventory() {
+// ── Approval matrix dinamis berbasis nominal (Fase 1) ──
+// < 1jt        : cukup SPV
+// 1jt – 5jt    : SPV + Manager
+// > 5jt        : SPV + Manager + Head of Operations
+const PR_APPROVAL_THRESHOLDS = { manager: 1000000, headops: 5000000 };
+function prRequiredTiers(total) {
+  const t = ['spv'];
+  if ((total||0) >= PR_APPROVAL_THRESHOLDS.manager) t.push('manager');
+  if ((total||0) >= PR_APPROVAL_THRESHOLDS.headops) t.push('headops');
+  return t;
+}
+const TIER_LABEL = { spv:'SPV', manager:'Manager', headops:'Head Ops' };
+// Sebuah tier dianggap "lolos" jika sudah Approved atau memang di-Skip (tak diperlukan)
+function tierPassed(status) { return status==='Approved' || status==='Skip'; }
+
+async function renderInventory(initialTab='stock') {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>📦 Inventory &amp; Logistik</h1>
@@ -54,6 +69,12 @@ async function renderInventory() {
     <div id="inv-supplier" style="display:none"></div>
   `;
   await loadInventory();
+  // Deep-link ke tab tertentu dari menu flyout (Fase 1)
+  if (initialTab && initialTab!=='stock') {
+    const idx = {stock:1, pr:2, po:3, opname:4, ledger:5, mrp:6, supplier:7}[initialTab];
+    const btn = document.querySelector(`#inv-tabs .tab-btn:nth-child(${idx})`);
+    if (btn) switchInvTab(initialTab, btn);
+  }
 }
 
 function switchInvTab(tab, btn) {
@@ -444,9 +465,9 @@ function renderApprovalSteps(p) {
     {label:'Mgr', status:p.manager_status||'Pending'},
     {label:'HeadOps', status:p.headops_status||'Pending'},
   ];
-  const icon = s => s==='Approved'?'✅':s==='Rejected'?'❌':'⏳';
+  const icon = s => s==='Approved'?'✅':s==='Rejected'?'❌':s==='Skip'?'➖':'⏳';
   return `<div style="display:flex;gap:4px;font-size:10px">
-    ${steps.map(s=>`<span title="${s.label}: ${s.status}">${icon(s.status)}${s.label}</span>`).join(' → ')}
+    ${steps.map(s=>`<span title="${s.label}: ${s.status==='Skip'?'Tidak diperlukan':s.status}" style="${s.status==='Skip'?'opacity:.45':''}">${icon(s.status)}${s.label}</span>`).join(' → ')}
   </div>`;
 }
 
@@ -569,6 +590,7 @@ async function savePR(id) {
   if (!prLineItems.length) { toast('Tambahkan minimal 1 item','err'); return; }
   const total = prLineItems.reduce((s,it)=>s+((it.unit_price||0)*(it.qty||0)),0);
 
+  const required = prRequiredTiers(total);
   const payload = {
     requested_by: getUserName?getUserName():'User',
     division:     document.getElementById('pf-div').value.trim(),
@@ -576,7 +598,10 @@ async function savePR(id) {
     reason:       reason,
     total_amount: total,
     status:       'Menunggu SPV',
-    spv_status: 'Pending', manager_status: 'Pending', headops_status: 'Pending',
+    // Tier yang tak diperlukan menurut nominal → 'Skip' (dilewati otomatis)
+    spv_status:     required.includes('spv')     ? 'Pending' : 'Skip',
+    manager_status: required.includes('manager') ? 'Pending' : 'Skip',
+    headops_status: required.includes('headops') ? 'Pending' : 'Skip',
     updated_at:   new Date().toISOString(),
   };
 
@@ -615,8 +640,8 @@ async function openPRDetail(id) {
 
   const role = getUserRole?getUserRole():'';
   const canSPV     = invCanApproveSPV()     && p.spv_status==='Pending';
-  const canManager = invCanApproveManager() && p.spv_status==='Approved' && p.manager_status==='Pending';
-  const canHeadOps = invCanApproveHeadOps() && p.manager_status==='Approved' && p.headops_status==='Pending';
+  const canManager = invCanApproveManager() && tierPassed(p.spv_status) && p.manager_status==='Pending';
+  const canHeadOps = invCanApproveHeadOps() && tierPassed(p.manager_status) && p.headops_status==='Pending';
 
   openModal(`
     <div class="modal-header"><div class="modal-title">🛒 ${p.pr_number}</div>
@@ -682,12 +707,13 @@ async function openPRDetail(id) {
 }
 
 function renderApprovalDetailRow(label, status, approver, at, note) {
-  const icon = status==='Approved'?'✅':status==='Rejected'?'❌':'⏳';
+  const icon = status==='Approved'?'✅':status==='Rejected'?'❌':status==='Skip'?'➖':'⏳';
   const color = status==='Approved'?'#22C55E':status==='Rejected'?'#EF4444':'#94A3B8';
-  return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px">
+  const statusText = status==='Skip'?'Tidak diperlukan (nominal di bawah ambang)':status;
+  return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;font-size:12px;${status==='Skip'?'opacity:.6':''}">
     <span style="font-size:16px">${icon}</span>
     <div style="flex:1">
-      <strong>${label}</strong> — <span style="color:${color};font-weight:600">${status}</span>
+      <strong>${label}</strong> — <span style="color:${color};font-weight:600">${statusText}</span>
       ${approver?`<span style="color:var(--text3)"> oleh ${approver}${at?' · '+new Date(at).toLocaleString('id-ID'):''}</span>`:''}
       ${note?`<div style="font-size:11px;color:var(--text3);font-style:italic">"${note}"</div>`:''}
     </div>
@@ -698,10 +724,20 @@ async function approvePRStep(id, step) {
   const note = document.getElementById('approval-note')?.value.trim()||null;
   const approver = getUserName?getUserName():'User';
   const now = new Date().toISOString();
+
+  // Ambil state terkini untuk menentukan tier berikutnya (matrix dinamis)
+  const pr = (await sbGet('purchase_requests',`select=*&id=eq.${id}`))?.[0] || {};
+  const st = { spv:pr.spv_status, manager:pr.manager_status, headops:pr.headops_status };
+
   let payload = {};
-  if (step==='spv') payload = { spv_status:'Approved', spv_approver:approver, spv_at:now, spv_note:note, status:'Menunggu Manager' };
-  if (step==='manager') payload = { manager_status:'Approved', manager_approver:approver, manager_at:now, manager_note:note, status:'Menunggu Head Ops' };
-  if (step==='headops') payload = { headops_status:'Approved', headops_approver:approver, headops_at:now, headops_note:note, status:'Approved' };
+  if (step==='spv')     { payload = { spv_status:'Approved', spv_approver:approver, spv_at:now, spv_note:note }; st.spv='Approved'; }
+  if (step==='manager') { payload = { manager_status:'Approved', manager_approver:approver, manager_at:now, manager_note:note }; st.manager='Approved'; }
+  if (step==='headops') { payload = { headops_status:'Approved', headops_approver:approver, headops_at:now, headops_note:note }; st.headops='Approved'; }
+
+  // Tentukan status header: tier Pending berikutnya, atau 'Approved' bila semua lolos
+  const nextTier = ['spv','manager','headops'].find(t => st[t]==='Pending');
+  payload.status = nextTier ? `Menunggu ${TIER_LABEL[nextTier]}` : 'Approved';
+
   try {
     await sbPatch('purchase_requests', id, {...payload, updated_at:now});
     toast(`✅ PR di-approve di jenjang ${step.toUpperCase()}`,'ok');
