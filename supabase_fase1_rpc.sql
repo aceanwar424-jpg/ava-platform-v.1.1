@@ -468,6 +468,16 @@ BEGIN
 END $$;
 
 -- ── Hak pakai: hanya pengguna yang sudah login ─────────────────
+-- PENTING: fungsi penolong ikut ditutup. Bila terlewat, anon dapat memanggil
+-- write_audit (SECURITY DEFINER, menulis ke activity_logs) dan memalsukan
+-- jejak audit — terbukti pada pengujian pertama. Lihat supabase_fase1_rpc_fix.sql.
+REVOKE ALL ON FUNCTION public.write_audit(text,text,text,text,text,jsonb,jsonb)
+  FROM public, anon, authenticated;   -- internal saja
+REVOKE ALL ON FUNCTION public.current_app_role() FROM public, anon;
+REVOKE ALL ON FUNCTION public.current_app_name() FROM public, anon;
+GRANT EXECUTE ON FUNCTION public.current_app_role() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.current_app_name() TO authenticated;
+
 REVOKE ALL ON FUNCTION public.approve_pr(bigint,text,text)        FROM public, anon;
 REVOKE ALL ON FUNCTION public.reject_pr(bigint,text,text)         FROM public, anon;
 REVOKE ALL ON FUNCTION public.adjust_stock(bigint,numeric,text)   FROM public, anon;
