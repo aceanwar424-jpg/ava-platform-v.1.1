@@ -47,9 +47,15 @@ COMMENT ON FUNCTION public.current_app_role() IS
 
 -- ── Aktifkan RLS + kebijakan "harus sudah login" ───────────────
 -- Batch 1 sengaja hanya berisi tabel yang memuat data pasien.
+-- PENTING: seluruh kebijakan lama dihapus lebih dulu, bukan hanya yang
+-- bernama "<tabel>_authenticated". Migrasi terdahulu sempat memasang
+-- kebijakan tanpa klausa TO (berlaku untuk PUBLIC, termasuk anon), dan
+-- karena kebijakan RLS bersifat permisif, satu saja yang longgar sudah
+-- membatalkan seluruh pengetatan. Lihat supabase_fase1_rls_a_fix.sql.
 DO $$
 DECLARE
-  t text;
+  t   text;
+  pol record;
   daftar text[] := ARRAY[
     'lab_results',
     'lab_samples',
@@ -69,8 +75,16 @@ BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables
                WHERE table_schema = 'public' AND table_name = t) THEN
 
+      FOR pol IN
+        SELECT p.polname FROM pg_policy p
+        JOIN pg_class c     ON c.oid = p.polrelid
+        JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = 'public' AND c.relname = t
+      LOOP
+        EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', pol.polname, t);
+      END LOOP;
+
       EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
-      EXECUTE format('DROP POLICY IF EXISTS %I ON public.%I', t || '_authenticated', t);
       EXECUTE format(
         'CREATE POLICY %I ON public.%I FOR ALL TO authenticated USING (true) WITH CHECK (true)',
         t || '_authenticated', t
