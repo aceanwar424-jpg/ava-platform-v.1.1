@@ -13,7 +13,7 @@ const PAGE_TITLES = {
   config:'Configuration', product:'Master Produk & Tes', refrange:'Reference Range', labreport:'Setting Hasil PDF', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
-  queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian',
+  queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi',
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
 };
@@ -72,6 +72,7 @@ function navigate(page, params={}) {
     case 'queue-kiosk': renderQueueKiosk();                 break;
     case 'appointments':renderAppointments();           break;
     case 'cashier':     renderCashier();                break;
+    case 'accounting':  renderAccounting();             break;
     case 'package':     renderConfigPackage();          break;
     case 'family':      renderConfigFamily();            break;
     case 'anamnesa':    renderAnamnesa();               break;

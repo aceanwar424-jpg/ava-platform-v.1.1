@@ -72,10 +72,10 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 3.6 Perjanjian + pengingat WhatsApp + deteksi bentrok sumber daya
 
 ### Fase 4 — Keuangan & SDM
-- [ ] 4.1 Bagan akun + jurnal + buku besar
-- [ ] 4.2 Posting otomatis dari kasir, faktur, inventory
-- [ ] 4.3 Hutang usaha (AP) + jadwal bayar
-- [ ] 4.4 Pusat biaya → profitabilitas per layanan
+- [x] 4.1 Bagan akun (template klinik, dapat dikoreksi) + jurnal + buku besar + periode
+- [x] 4.2 Posting otomatis via trigger — kasir, pengeluaran barang, opname, komisi home care
+- [x] 4.3 Hutang usaha — pembayaran hanya untuk faktur yang lolos pencocokan tiga arah
+- [x] 4.4 Pusat biaya → laba rugi per unit layanan
 - [~] 4.5 Jadwal kalibrasi alat SELESAI; penyusutan menunggu bagan akun
 - [ ] 4.6 Penggajian sungguhan (PPh21, slip, lembur, saldo cuti)
 - [x] 4.7 Tutup kas per shift — total sistem dihitung dari transaksi, selisih wajib dijelaskan
