@@ -1,47 +1,105 @@
 {
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "kiosk.avahealth.sbs"
         }
       ],
-      "destination": "/kiosk/$1"
+      "destination": "/kiosk/index.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "kiosk.avahelath.sbs"
         }
       ],
-      "destination": "/kiosk/$1"
+      "destination": "/kiosk/index.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahealth.sbs"
+        }
+      ],
+      "destination": "/kiosk/:path+"
+    },
+    {
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahelath.sbs"
+        }
+      ],
+      "destination": "/kiosk/:path+"
+    },
+    {
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "apps.avahealth.sbs"
         }
       ],
-      "destination": "/apps/$1"
+      "destination": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
+      "source": "/",
       "has": [
         {
           "type": "host",
           "value": "apps.avahelath.sbs"
         }
       ],
-      "destination": "/apps/$1"
+      "destination": "/apps/index.html"
+    },
+    {
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahealth.sbs"
+        }
+      ],
+      "destination": "/apps/:path+"
+    },
+    {
+      "source": "/:path+",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahelath.sbs"
+        }
+      ],
+      "destination": "/apps/:path+"
     },
     {
       "source": "/(.*)",
+      "missing": [
+        {
+          "type": "host",
+          "value": "kiosk.avahealth.sbs"
+        },
+        {
+          "type": "host",
+          "value": "kiosk.avahelath.sbs"
+        },
+        {
+          "type": "host",
+          "value": "apps.avahealth.sbs"
+        },
+        {
+          "type": "host",
+          "value": "apps.avahelath.sbs"
+        }
+      ],
       "destination": "/index.html"
     }
   ]
