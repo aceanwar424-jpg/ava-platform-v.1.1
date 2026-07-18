@@ -65,6 +65,10 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 3 | `supabase_agentic_fase7c.sql` | Tabel `audit_findings` + `capa` + RPC + prompt audit/CAPA |
 | 4 | `supabase_agentic_frameworks.sql` | Seed checklist **Akreditasi Klinik** (fokus lab) + **ISO 9001:2015** (melengkapi ISO 15189 yang sudah ada) |
 | 5 | `supabase_agentic_fase7f_it.sql` | **Departemen IT Profesional** (IT_SRE·IT_SEC·IT_DATA·IT_DEV) + task `IT_SEC_AUDIT` + RPC postur keamanan |
+| 6 | `supabase_agentic_fase7j_scm.sql` | **Departemen Supply Chain** (aktifkan LOGISTIK: SCM_STOCK·SCM_PO) + RPC `agentic_scm_scan` + task SCM_TICK/STOCK_WATCH/PO_DRAFT |
+| 7 | `supabase_agentic_fase7i_hr.sql` | **Departemen People & Credentialing** (HR_CRED·HR_ROSTER) + tabel `staff_credentials` + RPC scan/CRUD + task HR_TICK/CRED_WATCH |
+| 8 | `supabase_agentic_fase7g_it.sql` | **Perluasan IT** — `INTEGRATION_HEALTH` (sampel tertahan + analyzer diam) & `BACKUP_VERIFY` (tabel `agentic.backup_log` + kesegaran pg_dump) |
+| 9 | `supabase_agentic_fase7h_lab.sql` | **Departemen Lab Operations Assurance** (LAB_QC·LAB_TAT·LAB_CRIT) + RPC `agentic_lab_scan` + task LAB_TICK/QC_WATCH/TAT_MONITOR/CRITICAL_WATCH |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.
@@ -156,6 +160,22 @@ CONTENT_ANALYSIS  →  MAKE_CAROUSEL / MAKE_BLOG_SEO
 - **MKT_TICK** (tombol *Patroli Marketing*/cron) — jaga kalender 14 hari terisi;
   bila tipis → buat `PLAN_WEEKLY`.
 
+### 4.2a Departemen Lab Operations Assurance (Fase 7H) — CORE
+
+Departemen **LAB_OPS** (LAB_HEAD → LAB_QC · LAB_TAT · LAB_CRIT). Membaca `lab_qc_runs`,
+`lab_results`, `lab_samples` nyata.
+- **LAB_TICK** (kartu dept Lab Operations → *Patroli*, atau cron): pindai sekaligus —
+  QC menyimpang, nilai kritis belum dirilis, sampel lewat TAT → laporan + **ALERT** ke CEO
+  bila ada QC **REJECT** atau **nilai kritis** belum dirilis.
+- **QC_WATCH**: `lab_qc_runs` verdict Warning/REJECT (Westgard). REJECT = hasil pada rentang
+  itu mungkin tak valid → tahan rilis & ulang QC. Kait PMI/PME (ISO 15189 §7.3.5-6).
+- **CRITICAL_WATCH**: hasil interpretasi **Kritis** yang **belum `Released`** → keselamatan
+  pasien; ALERT agar segera diverifikasi & dikomunikasikan.
+- **TAT_MONITOR**: sampel `Pending`/`In Process` >24 jam sejak diterima.
+- **GUARDRAIL KLINIS:** agent hanya **memantau & flag**. Verifikasi, rilis hasil, dan
+  komunikasi nilai kritis **SELALU manusia** — agent tidak pernah mengubah `lab_results`.
+- Cron opsional: `select cron.schedule('agentic-lab-tick','*/20 * * * *', $$ select public.agentic_org_kick('LAB_TICK'); $$);`
+
 ### 4.2b Departemen IT Profesional
 
 Kepala IT (`IT_HEAD`) memimpin: **IT_SRE** (keandalan), **IT_SEC** (keamanan),
@@ -166,7 +186,43 @@ Kepala IT (`IT_HEAD`) memimpin: **IT_SRE** (keandalan), **IT_SEC** (keamanan),
   nyata: kunci/secret belum diset, task auto-publish tanpa QA, task macet, kegagalan 7 hari,
   dan **konten medis yang ter-auto** (harus 0 — kalau >0 ditandai KRITIS + ALERT ke CEO).
   **Nilai secret tidak pernah ditampilkan** — hanya status terisi/kosong.
-- `IT_BACKUP_CHECK` (IT_DATA) masih *reserved* — verifikasi backup butuh hook eksternal.
+**Perluasan IT (Fase 7G):**
+- **🔌 Cek Integrasi** (`INTEGRATION_HEALTH`, tombol header): deteksi sampel tertahan
+  `In Process` >6 jam (hasil tak masuk) + analyzer **terintegrasi & aktif** yang tak mengirim
+  hasil auto (integrasi mungkin putus) → ALERT ke CEO. Baca `lab_samples`/`lab_results`/`analyzers`.
+- **💾 Cek Backup** (`BACKUP_VERIFY`, tombol header): verifikasi kesegaran backup via
+  `agentic.backup_log`. **Wajib:** skrip pg_dump Anda mencatat tiap dump ke
+  `agentic_backup_log_add` (snippet curl di §CRON `supabase_agentic_fase7g_it.sql`). Backup basi
+  (>26 jam) / tak ada catatan / gagal → ALERT. Kalau belum mencatat, agent menandai "tidak ada
+  catatan backup" sebagai temuan.
+
+### 4.2c Departemen Supply Chain (Fase 7J)
+
+LOGISTIK kini aktif sebagai **Kepala Supply Chain** memimpin **SCM_STOCK** (pengawas stok
+& FEFO) dan **SCM_PO** (draft pengadaan). Membaca inventory nyata (`inventory_items`,
+`inventory_batches`, `suppliers`).
+- **SCM_TICK** (kartu dept Supply Chain → *Patroli*, atau cron): scan item di bawah reorder
+  point + batch mendekati/melewati kedaluwarsa (FEFO) → laporan; item menipis → antre
+  **PO_DRAFT**; kirim **ALERT** ke CEO bila ada stok habis / kedaluwarsa masih bertumpuk.
+- **STOCK_WATCH**: laporan stok/kedaluwarsa on-demand (detail).
+- **PO_DRAFT**: draft usulan pembelian per pemasok (jumlah dari `suggested_qty`, harga
+  `[[KONFIRMASI]]` bila 0) → dikirim ke CEO. **Guardrail: pembelian/PR resmi = manusia**;
+  agent tidak pernah menyentuh `purchase_requests` atau transaksi.
+- Cron opsional: `select cron.schedule('agentic-scm-tick','0 */4 * * *', $$ select public.agentic_org_kick('SCM_TICK'); $$);`
+
+### 4.2d Departemen People & Credentialing (Fase 7I)
+
+Departemen **PEOPLE** (HR_HEAD → HR_CRED, HR_ROSTER). Membuat tabel `public.staff_credentials`.
+- **Input data:** tab Organisasi → panel **🪪 Kredensial Nakes** → **Tambah**: nama, profesi,
+  jenis (STR/SIP/sertifikat), nomor, tanggal terbit & **kedaluwarsa**, penerbit.
+- **HR_TICK** (panel → *Patroli Kredensial*, atau cron): pindai STR/SIP/sertifikat →
+  **KEDALUWARSA** (ALERT ke CEO) & **≤90 hari** (INFO). Langsung menyuplai Akreditasi Klinik
+  (TKK kredensial) & ISO 15189 §6.2.
+- **CRED_WATCH**: laporan on-demand.
+- Tabel juga menandai kredensial **tanpa tanggal kedaluwarsa** untuk dilengkapi.
+- Guardrail: agent hanya memantau & mengingatkan; keputusan SDM = manusia.
+- (HR_ROSTER: reserved — deteksi anomali absensi menyusul.)
+- Cron opsional: `select cron.schedule('agentic-hr-tick','0 8 * * *', $$ select public.agentic_org_kick('HR_TICK'); $$);`
 
 ### 4.3 Konfig AI (tab Organisasi → ⚙️ Konfigurasi AI)
 
