@@ -138,7 +138,6 @@ function copyReferralCode() {
   navigator.clipboard.writeText(codeText).then(() => {
     alert(`Kode Referral ${codeText} berhasil disalin ke clipboard!`);
   }).catch(err => {
-    // Fallback if copy fails
     const dummy = document.createElement('textarea');
     document.body.appendChild(dummy);
     dummy.value = codeText;
@@ -152,6 +151,76 @@ function copyReferralCode() {
 function seeReferralPackages() {
   closeMemberModal();
   openBookingModal();
+}
+
+// --- BOOK HOME CARE MODAL TRIGGERS ---
+function openHomeCareModal() {
+  const modal = document.getElementById('homecare-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeHomeCareModal() {
+  const modal = document.getElementById('homecare-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function submitHomeCareForm(event) {
+  event.preventDefault();
+  const service = document.getElementById('hc-service').value.trim();
+  const address = document.getElementById('hc-address').value.trim();
+  
+  closeHomeCareModal();
+  alert(`Booking Home Care sukses! Tenaga medis AvaHealth akan melakukan kunjungan untuk layanan "${service}" ke alamat Anda pada tanggal kunjungan.`);
+}
+
+// --- BUY PACKAGE MODAL TRIGGERS ---
+function openPackageModal() {
+  const modal = document.getElementById('package-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closePackageModal() {
+  const modal = document.getElementById('package-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function buyPackage(packageName) {
+  closePackageModal();
+  alert(`Pembelian paket "${packageName}" berhasil diproses! Silakan periksa email/invoice Anda untuk detail pembayaran.`);
+}
+
+// --- NEAR ME MODAL TRIGGERS ---
+function openNearMeModal() {
+  const modal = document.getElementById('nearme-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeNearMeModal() {
+  const modal = document.getElementById('nearme-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+// --- PROFILE MODAL TRIGGERS ---
+function openProfileModal() {
+  const modal = document.getElementById('profile-modal');
+  const nameEl = document.getElementById('prof-fullname');
+  const emailEl = document.getElementById('prof-email');
+
+  if (!modal) return;
+
+  const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+  const finalName = isSuperAdmin ? 'Ace Darojatun Anwar' : (currentUsername || 'Budi Santoso');
+  const finalEmail = isSuperAdmin ? 'aceanwar424@gmail.com' : `${finalName.toLowerCase().replace(/\s+/g, '')}@email.com`;
+
+  if (nameEl) nameEl.innerHTML = `${finalName} <span class="verified-badge-blue">✓</span>`;
+  if (emailEl) emailEl.textContent = finalEmail;
+
+  modal.classList.add('open');
+}
+
+function closeProfileModal() {
+  const modal = document.getElementById('profile-modal');
+  if (modal) modal.classList.remove('open');
 }
 
 // Render Corporate List

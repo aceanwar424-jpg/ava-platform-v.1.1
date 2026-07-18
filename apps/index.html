@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260719e">
+  <link rel="stylesheet" href="style.css?v=20260719f">
 </head>
 <body>
   <div class="app-container">
@@ -186,18 +186,42 @@
           <div class="section-title">Menu Utama Pasien</div>
           <div class="menu-list">
             <button class="menu-item" onclick="openBookingModal()">
-              <span class="menu-ico">📅</span>
+              <span class="menu-ico">🩺</span>
               <div class="menu-text">
-                <h5>Pesan Janji Temu</h5>
-                <p>Buat janji temu dengan dokter umum atau spesialis</p>
+                <h5>Book Lab Test</h5>
+                <p>Pesan pemeriksaan tes laboratorium mandiri</p>
               </div>
               <span class="menu-arrow">❯</span>
             </button>
-            <button class="menu-item" onclick="openLabResultsModal()">
-              <span class="menu-ico">📄</span>
+            <button class="menu-item" onclick="openHomeCareModal()">
+              <span class="menu-ico">🏠</span>
               <div class="menu-text">
-                <h5>Riwayat Medis & Lab</h5>
-                <p>Lihat hasil lab, rontgen, dan catatan rekam medis</p>
+                <h5>Book Home Care</h5>
+                <p>Panggil tenaga medis AvaHealth ke rumah Anda</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="openPackageModal()">
+              <span class="menu-ico">📦</span>
+              <div class="menu-text">
+                <h5>Buy Package</h5>
+                <p>Beli paket MCU dan medical check-up lengkap</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="openNearMeModal()">
+              <span class="menu-ico">📍</span>
+              <div class="menu-text">
+                <h5>AvaHealth Near Me</h5>
+                <p>Temukan cabang klinik & laboratorium terdekat</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="openProfileModal()">
+              <span class="menu-ico">👤</span>
+              <div class="menu-text">
+                <h5>My Profile</h5>
+                <p>Detail profil pribadi dan status verifikasi Akun</p>
               </div>
               <span class="menu-arrow">❯</span>
             </button>
@@ -206,6 +230,14 @@
               <div class="menu-text">
                 <h5>Program Member & Afiliasi</h5>
                 <p>Dapatkan komisi rujukan teman & keluarga</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="handleLogout()" style="border-color: rgba(239, 68, 68, 0.15)">
+              <span class="menu-ico">🚪</span>
+              <div class="menu-text">
+                <h5 style="color: var(--error)">Sign Out</h5>
+                <p>Keluar dari sesi portal saat ini</p>
               </div>
               <span class="menu-arrow">❯</span>
             </button>
@@ -604,7 +636,7 @@
               <strong class="glow-cyan" style="font-size:24px;">92.5% Optimal</strong>
             </div>
             <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
-              Faskes Referral saat ini bertindak sebagai stasiun penyerahan lokal rekayasa obat molekuler yang dirancang khusus per DNA pasien.
+              Faskes Referral saat ini bertindak as stasiun penyerahan lokal rekayasa obat molekuler yang dirancang khusus per DNA pasien.
             </p>
           </div>
         </div>
@@ -727,6 +759,128 @@
       </div>
     </div>
 
+    <!-- ════════════════════════ MODAL: BOOK HOME CARE ════════════════════════ -->
+    <div id="homecare-modal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Book Home Care</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Layanan petugas medis profesional langsung ke kediaman Anda</p>
+        <form onsubmit="submitHomeCareForm(event)">
+          <div class="input-group" style="text-align:left;">
+            <label for="hc-service">Jenis Layanan</label>
+            <input type="text" id="hc-service" placeholder="Contoh: Pengambilan Sampel Darah Home Care" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="hc-address">Alamat Pengambilan Sampel</label>
+            <input type="text" id="hc-address" placeholder="Alamat lengkap rumah Anda" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="hc-date">Tanggal Kunjungan</label>
+            <input type="date" id="hc-date" required>
+          </div>
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeHomeCareModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Pesan Home Care</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: BUY PACKAGE ════════════════════════ -->
+    <div id="package-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px;">
+        <h3 style="text-align:center; margin-bottom:4px;">Buy Package</h3>
+        <p style="color: var(--text-muted); font-size:12px; text-align:center; margin-bottom: 20px;">Pilih paket pemeriksaan laboratorium pilihan Anda</p>
+        
+        <div class="package-list-wrapper" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+          <div class="package-card" style="border:1px solid var(--border); padding:12px; border-radius:12px; background:rgba(255,255,255,0.01); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h5 style="font-size:14px; font-weight:700; color:white;">Paket Healthy Life (Basic)</h5>
+              <p style="font-size:11px; color:var(--text-muted);">Darah lengkap, urine lengkap, gula darah</p>
+              <strong style="color:var(--teal); font-size:13px; display:block; margin-top:4px;">Rp 250.000</strong>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="buyPackage('Healthy Life (Basic)')" style="padding:6px 12px; font-size:11px;">Beli</button>
+          </div>
+          <div class="package-card" style="border:1px solid rgba(14, 165, 233, 0.2); padding:12px; border-radius:12px; background:rgba(14, 165, 233, 0.03); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h5 style="font-size:14px; font-weight:700; color:white;">Paket Prime Gold (MCU Executive)</h5>
+              <p style="font-size:11px; color:var(--text-muted);">Profil lipid, ginjal, fungsi hati, EKG</p>
+              <strong style="color:var(--primary-hover); font-size:13px; display:block; margin-top:4px;">Rp 750.000</strong>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="buyPackage('Prime Gold (MCU Executive)')" style="padding:6px 12px; font-size:11px; margin-top:0;">Beli</button>
+          </div>
+        </div>
+
+        <button class="btn btn-close" onclick="closePackageModal()" style="width:100%;">Tutup</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: AVAHEALTH NEAR ME ════════════════════════ -->
+    <div id="nearme-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px;">
+        <h3 style="text-align:center; margin-bottom:4px;">AvaHealth Near Me</h3>
+        <p style="color: var(--text-muted); font-size:12px; text-align:center; margin-bottom:20px;">Temukan outlet lab & klinik cabang terdekat</p>
+
+        <div class="map-mock-container" style="height:180px; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:12px; margin-bottom:16px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          <div style="position:absolute; width:100%; height:1px; background:rgba(255,255,255,0.05); top:30%;"></div>
+          <div style="position:absolute; width:100%; height:1px; background:rgba(255,255,255,0.05); top:70%;"></div>
+          <div style="position:absolute; width:1px; height:100%; background:rgba(255,255,255,0.05); left:30%;"></div>
+          <div style="position:absolute; width:1px; height:100%; background:rgba(255,255,255,0.05); left:70%;"></div>
+          <span style="position:absolute; top:40%; left:45%; font-size:24px; animation:bounce 2s infinite;">📍</span>
+          <span style="position:absolute; top:48%; left:48%; background:rgba(14,165,233,0.2); border:1px solid var(--primary); padding:2px 6px; border-radius:4px; font-size:8px; font-weight:700; color:white;">Cabang Utama</span>
+          <span style="position:absolute; top:20%; left:75%; font-size:18px;">📍</span>
+          <span style="position:absolute; top:75%; left:20%; font-size:18px;">📍</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px;">
+            <h6 style="font-size:13px; font-weight:700; color:white;">1. Cabang Utama AvaHealth SIMRS</h6>
+            <p style="font-size:11px; color:var(--text-muted);">Jl. Kesehatan Raya No. 42 (0.4 km) &bull; Buka 24 Jam</p>
+          </div>
+          <div>
+            <h6 style="font-size:13px; font-weight:700; color:white;">2. AvaHealth Express Diponegoro</h6>
+            <p style="font-size:11px; color:var(--text-muted);">Jl. Diponegoro No. 89 (1.8 km) &bull; Buka s/d 22:00</p>
+          </div>
+        </div>
+
+        <button class="btn btn-close" onclick="closeNearMeModal()" style="width:100%; margin-top:20px;">Tutup</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: MY PROFILE ════════════════════════ -->
+    <div id="profile-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px; text-align:left; padding: 24px;">
+        <div style="text-align:center; margin-bottom:20px;">
+          <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--teal)); color:white; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; margin: 0 auto 12px auto;">P</div>
+          <h4 id="prof-fullname" style="font-size:18px; font-weight:800; color:white; display:flex; align-items:center; justify-content:center; gap:6px;">
+            Ace Darojatun Anwar
+            <span class="verified-badge-blue" title="Verified Account">✓</span>
+          </h4>
+          <span style="font-size:11px; background:rgba(14,165,233,0.15); color:var(--primary-hover); padding:2px 8px; border-radius:12px; font-weight:700; text-transform:uppercase;">Verified Patient</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:16px;">
+          <div>
+            <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Email</span>
+            <strong id="prof-email" style="font-size:13px; color:white;">aceanwar424@gmail.com</strong>
+          </div>
+          <div>
+            <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Rekam Medis (RM)</span>
+            <strong style="font-size:13px; color:white; font-family:monospace;">RM-12948</strong>
+          </div>
+          <div>
+            <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Handphone</span>
+            <strong style="font-size:13px; color:white;">0812-3456-7890</strong>
+          </div>
+          <div>
+            <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Alamat KTP</span>
+            <strong style="font-size:13px; color:white;">Komp. Graha Indah Blok C-4, Bandung</strong>
+          </div>
+        </div>
+
+        <button class="btn btn-close" onclick="closeProfileModal()" style="width:100%; margin-top:24px;">Tutup Profil</button>
+      </div>
+    </div>
+
     <!-- ════════════════════════ MODAL: BUAT RUJUKAN ════════════════════════ -->
     <div id="referral-modal" class="modal-overlay">
       <div class="modal-box">
@@ -822,6 +976,6 @@
 
   </div>
 
-  <script src="app.js?v=20260719e"></script>
+  <script src="app.js?v=20260719f"></script>
 </body>
 </html>
