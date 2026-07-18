@@ -47,7 +47,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 
 ### Fase 1 — Fondasi, Keamanan & Keselamatan Pasien
 - [x] 1.0 Kirim JWT pengguna + perbarui sesi (prasyarat RLS)
-- [ ] 1.1 RLS aktif + kebijakan berbasis peran
+- [~] 1.1 RLS — SQL siap: 1.1a (tutup akses anon) + 1.1b (per peran), menunggu dijalankan & diuji
 - [ ] 1.2 Penegakan peran di sisi server (RPC), bukan browser
 - [~] 1.3 Nilai kritis lab — pelaporan terstruktur ISO 15189 (SELESAI; deteksi ternyata sudah ada)
 - [ ] 1.4 Operasi multi-tabel jadi atomik (RPC)

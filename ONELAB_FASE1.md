@@ -74,12 +74,33 @@ administratif dan pidana.
 | Autentikasi nyata | Pastikan semua akses memakai token pengguna (`Authorization: Bearer <jwt>`), bukan anon key polos |
 | Tabel peran | `user_profiles.role` jadi sumber kebenaran, dibaca dari JWT claim — bukan dari objek browser |
 | Kebijakan bertingkat | Data pasien: hanya staf klinis & admin. Data keuangan: finance & manajemen. Data SDM: HRD & atasan langsung |
-| Aktifkan bertahap | Mulai dari tabel paling sensitif (`admissions`, `anamnesas`, `lab_results`, `homecare_*`, `medrecord`), bukan 109 sekaligus |
+| Aktifkan bertahap | Mulai dari tabel paling sensitif (`admissions`, `anamnesas`, `lab_results`, `homecare_*`), bukan 109 sekaligus |
 | Uji regresi | Tiap tabel yang diaktifkan RLS-nya harus diuji dengan akun tiap peran sebelum lanjut |
 
 **Peringatan.** Mengaktifkan RLS tanpa kebijakan yang benar akan **membuat aplikasi tampak
 kosong** — semua query mengembalikan nol baris. Karena itu dikerjakan tabel demi tabel dengan
 pengujian, bukan sekali jalan.
+
+### Dipecah dua langkah — alasannya
+
+Lubang keamanan yang sebenarnya adalah **akses tanpa login**. Pemisahan per peran adalah
+penyempurnaan di atasnya. Keduanya punya profil risiko yang jauh berbeda, jadi dipisah:
+
+| Langkah | Isi | Risiko terkunci | Bisa dibuktikan? |
+|---|---|---|---|
+| **1.1a** — `supabase_fase1_rls_a.sql` | RLS aktif, kebijakan "harus sudah login" pada 12 tabel data pasien | Hampir nol — semua pengguna nyata sudah login | **Ya** — cukup uji anon key mendapat nol baris |
+| **1.1b** — `supabase_fase1_rls_b.sql` | Pengetatan per peran (sales tidak boleh lihat data klinis) | Nyata — kebijakan salah membuat layar kosong | Tidak sepenuhnya — butuh akun tiap peran |
+
+**Matriks 1.1b bukan rancangan baru.** Ia menerjemahkan `ROLE_DEFAULT_PAGES` yang sudah ada di
+`modules/settings_users.js` ke tingkat basis data. Kebetulan yang menguntungkan: `sales` di sana
+memang **sudah tidak punya satu pun halaman klinis**, jadi kebijakannya sejalan dengan perilaku
+aplikasi hari ini.
+
+Kedua berkas memuat blok **pembatalan** di bagian bawah, tinggal dilepas komentarnya bila
+aplikasi bermasalah.
+
+**Prasyarat mutlak:** Fase 1.0 harus sudah live. Bila aplikasi masih mengirim anon key,
+menjalankan 1.1a akan mengosongkan seluruh layar.
 
 ---
 
