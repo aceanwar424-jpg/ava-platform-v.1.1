@@ -85,7 +85,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [ ] 5.2 Klaim BPJS / INA-CBG
 - [ ] 5.3 RIS sebagai modul tersendiri
 - [ ] 5.4 Laporan Kemenkes RL 1–5 terisi otomatis
-- [ ] 5.5 LIS lanjutan (autoverifikasi, antarmuka alat, rujukan luar, Westgard)
+- [~] 5.5 LIS lanjutan — autoverifikasi + Westgard multi-run + Levey-Jennings SELESAI; antarmuka alat langsung & rujukan luar menyusul
 - [ ] 5.6 Multi-cabang / unit
 
 ---

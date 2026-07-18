@@ -62,11 +62,15 @@ async function renderQCTab(){
       <div class="card">
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">📊 Log Quality Control (Westgard)</div>
         <div class="table-wrap"><table><thead><tr>
-          <th>Waktu</th><th>Alat</th><th>Tes</th><th>Level</th><th>Target±SD</th><th>Terukur</th><th>Z-score</th><th>Evaluasi</th>
+          <th>Waktu</th><th>Alat</th><th>Tes</th><th>Level</th><th>Target±SD</th><th>Terukur</th><th>Z-score</th><th>Evaluasi</th><th></th>
         </tr></thead><tbody>
         ${qcRuns.length?qcRuns.map(q=>{
           const z=(q.sd&&q.target!=null)?((q.measured-q.target)/q.sd):null;
-          const ev=qcVerdict(z);
+          // Evaluasi kini mempertimbangkan pola antar run pada alat+tes yang sama,
+          // bukan hanya titik ini sendiri (aturan Westgard 2-2s, R-4s, 4-1s, 10x).
+          const seri = qcRuns.filter(x=>x.analyzer_id===q.analyzer_id && x.test_name===q.test_name
+                                     && new Date(x.run_at) <= new Date(q.run_at));
+          const ev = (typeof westgardEvaluate==='function') ? westgardEvaluate(seri) : qcVerdict(z);
           return `<tr>
             <td style="font-size:11px;color:var(--gray)">${q.run_at?new Date(q.run_at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
             <td style="font-size:12px">${q.analyzer_name||'—'}</td>
@@ -75,9 +79,12 @@ async function renderQCTab(){
             <td style="font-size:12px">${q.target??'—'} ± ${q.sd??'—'}</td>
             <td style="font-size:13px;font-weight:700">${q.measured??'—'}</td>
             <td style="font-size:12px;font-weight:700;color:${ev.color}">${z!=null?z.toFixed(2):'—'}</td>
-            <td><span style="background:${ev.color}20;color:${ev.color};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${ev.label}</span></td>
+            <td><span style="background:${ev.color}20;color:${ev.color};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700"
+              title="${(ev.detail||'').replace(/"/g,'')}">${ev.label}${ev.rule?' · '+ev.rule:''}</span></td>
+            <td>${q.analyzer_id&&q.test_name?`<button class="btn btn-ghost btn-xs"
+              onclick="openLJChart(${q.analyzer_id},'${String(q.test_name).replace(/'/g,"\\'")}')">📈</button>`:''}</td>
           </tr>`;
-        }).join(''):`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--gray)">Belum ada log QC. Klik "+ Log QC".</td></tr>`}
+        }).join(''):`<tr><td colspan="9" style="text-align:center;padding:30px;color:var(--gray)">Belum ada log QC. Klik "+ Log QC".</td></tr>`}
         </tbody></table></div>
       </div>`}`;
 }
@@ -197,4 +204,111 @@ async function saveQCRun(){
     });
     toast('✅ Log QC tersimpan','ok'); closeModalForce(); renderQCTab();
   } catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// WESTGARD MULTI-RUN & LEVEY-JENNINGS (Fase 5.5)
+// qcVerdict() yang ada hanya menilai SATU titik (1-2s / 1-3s). Aturan Westgard
+// yang sesungguhnya menilai POLA antar run berurutan — pergeseran sistematis
+// justru tidak terlihat bila hanya melihat satu titik.
+// ══════════════════════════════════════════════════════════════
+
+// runs: urut dari TERBARU ke terlama (sesuai query renderQCTab)
+function westgardEvaluate(runs) {
+  const z = runs.map(r => r.z_score).filter(v => v != null);
+  if (!z.length) return { label:'—', color:'#94A3B8', rule:null, detail:'Belum ada data QC' };
+
+  const cur = z[0], a = Math.abs(cur);
+
+  // 1-3s — satu titik di luar 3SD → tolak
+  if (a > 3) return { label:'TOLAK', color:'#B91C1C', rule:'1-3s',
+    detail:'Satu titik melewati 3SD. Jangan keluarkan hasil; ulangi QC dan periksa alat.' };
+
+  // 2-2s — dua run berurutan di sisi sama, keduanya >2SD
+  if (z.length >= 2 && Math.abs(z[0]) > 2 && Math.abs(z[1]) > 2 && Math.sign(z[0]) === Math.sign(z[1]))
+    return { label:'TOLAK', color:'#B91C1C', rule:'2-2s',
+      detail:'Dua run berurutan melewati 2SD pada sisi yang sama — indikasi kesalahan sistematis.' };
+
+  // R-4s — selisih dua run berurutan melebihi 4SD (kesalahan acak)
+  if (z.length >= 2 && Math.abs(z[0] - z[1]) > 4)
+    return { label:'TOLAK', color:'#B91C1C', rule:'R-4s',
+      detail:'Rentang antar dua run melebihi 4SD — indikasi kesalahan acak.' };
+
+  // 4-1s — empat run berurutan di sisi sama, semuanya >1SD
+  if (z.length >= 4 && z.slice(0,4).every(v => Math.abs(v) > 1) &&
+      z.slice(0,4).every(v => Math.sign(v) === Math.sign(z[0])))
+    return { label:'PERINGATAN', color:'#B45309', rule:'4-1s',
+      detail:'Empat run berurutan melewati 1SD pada sisi yang sama — mulai bergeser.' };
+
+  // 10x — sepuluh run berurutan pada sisi rata-rata yang sama
+  if (z.length >= 10 && z.slice(0,10).every(v => Math.sign(v) === Math.sign(z[0]) && v !== 0))
+    return { label:'PERINGATAN', color:'#B45309', rule:'10x',
+      detail:'Sepuluh run berurutan pada sisi yang sama — pergeseran sistematis.' };
+
+  // 1-2s — peringatan awal, belum menolak
+  if (a > 2) return { label:'PERINGATAN', color:'#B45309', rule:'1-2s',
+    detail:'Satu titik melewati 2SD. Amati run berikutnya.' };
+
+  return { label:'TERKENDALI', color:'#15803D', rule:null, detail:'QC dalam kendali.' };
+}
+
+// Grafik kendali sederhana — SVG, tanpa pustaka luar
+function ljChartSVG(runs, w = 720, h = 220) {
+  const pts = runs.slice().reverse().filter(r => r.z_score != null); // lama → baru
+  if (!pts.length) return '<div style="color:var(--gray);font-size:12px">Belum ada data QC</div>';
+
+  const pad = { l:38, r:12, t:12, b:24 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const yOf = z => pad.t + ch/2 - (Math.max(-4, Math.min(4, z)) / 4) * (ch/2);
+  const xOf = i => pad.l + (pts.length === 1 ? cw/2 : (i/(pts.length-1)) * cw);
+
+  const band = (z, col, dash) =>
+    `<line x1="${pad.l}" y1="${yOf(z)}" x2="${w-pad.r}" y2="${yOf(z)}"
+      stroke="${col}" stroke-width="1" ${dash?'stroke-dasharray="4 3"':''}/>`;
+
+  const line = pts.map((p,i)=>`${i?'L':'M'}${xOf(i).toFixed(1)},${yOf(p.z_score).toFixed(1)}`).join(' ');
+  const dots = pts.map((p,i)=>{
+    const a = Math.abs(p.z_score);
+    const c = a > 3 ? '#B91C1C' : a > 2 ? '#B45309' : '#0E7C86';
+    return `<circle cx="${xOf(i).toFixed(1)}" cy="${yOf(p.z_score).toFixed(1)}" r="3.5" fill="${c}">
+      <title>${new Date(p.run_at).toLocaleString('id-ID')} · z=${(+p.z_score).toFixed(2)} · ${p.verdict||''}</title>
+    </circle>`;
+  }).join('');
+
+  const lbl = z => `<text x="4" y="${yOf(z)+3.5}" font-size="9" fill="#6B7A8B">${z>0?'+':''}${z}SD</text>`;
+
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:8px">
+    ${band(3,'#FCA5A5')}${band(2,'#FDE68A')}${band(1,'#E3E7EC',true)}
+    ${band(0,'#0E7C86')}
+    ${band(-1,'#E3E7EC',true)}${band(-2,'#FDE68A')}${band(-3,'#FCA5A5')}
+    ${lbl(3)}${lbl(2)}${lbl(0)}${lbl(-2)}${lbl(-3)}
+    <path d="${line}" fill="none" stroke="#123A5C" stroke-width="1.5"/>
+    ${dots}
+  </svg>`;
+}
+
+// Dipanggil dari tombol di tabel QC
+async function openLJChart(analyzerId, testName) {
+  let runs = [];
+  try {
+    runs = await sbGet('lab_qc_runs',
+      `select=*&analyzer_id=eq.${analyzerId}&test_name=eq.${encodeURIComponent(testName)}&order=run_at.desc&limit=40`) || [];
+  } catch(e) { toast('Gagal memuat data QC','err'); return; }
+
+  const ev = westgardEvaluate(runs);
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📈 Levey-Jennings — ${testName}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="background:${ev.color}14;border:1px solid ${ev.color}55;border-radius:8px;
+      padding:10px 14px;margin-bottom:12px">
+      <div style="font-weight:800;color:${ev.color};font-size:13px">
+        ${ev.label}${ev.rule?` · aturan ${ev.rule}`:''}</div>
+      <div style="font-size:12.5px;color:var(--text2);margin-top:3px">${ev.detail}</div>
+    </div>
+    ${ljChartSVG(runs)}
+    <div style="font-size:11.5px;color:var(--gray);margin-top:8px">
+      Menampilkan ${runs.length} run terakhir, kiri ke kanan dari yang terlama.
+      Arahkan kursor ke titik untuk melihat detailnya.
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`, 'wide');
 }

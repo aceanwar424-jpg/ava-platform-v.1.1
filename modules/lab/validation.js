@@ -35,6 +35,7 @@ function renderValidationTab(){
   if(!patients.some(p=>p.admission_id==_valSel)) _valSel = patients.length?patients[0].admission_id:null;
 
   el.innerHTML=`
+    <div id="lab-autoverify-panel"></div>
     <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span class="badge badge-gold">${toValidate.length} hasil siap divalidasi</span>
@@ -57,6 +58,10 @@ function renderValidationTab(){
     renderValWorklist(patients);
     if(_valSel!=null) selectValidationPatient(_valSel);
   }
+
+  // Fase 5.5 — panel autoverifikasi (tidak mengganggu bila tabelnya belum ada)
+  if (typeof renderAutoverifyPanel === 'function')
+    renderAutoverifyPanel('lab-autoverify-panel', labResults);
 }
 
 function renderApprovalTab(){
@@ -276,7 +281,7 @@ async function validateSelectedResults(){
   }
   
   if(ok>0){
-    toast(`✅ ${ok} hasil tervalidasi${generated>' + '?` (${generated} conclusion dibuat)':''}`,'ok');
+    toast(`✅ ${ok} hasil tervalidasi${generated>0?` (${generated} conclusion dibuat)`:''}`,'ok');
     _valChecked.clear(); _valNotes={};
     await loadLabResults();
     renderValidationTab(); renderLabKPI(); renderCriticalBanner();
