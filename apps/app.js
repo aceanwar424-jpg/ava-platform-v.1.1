@@ -20,6 +20,7 @@ const MOCK_REFERRALS = [
 // --- APP RUNTIME STATE ---
 let currentRole = 'patient';
 let currentPhase = 'fase1';
+let currentUsername = '';
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
 let currentCalledQueue = 40; // Counter queue starts at A-040
@@ -113,6 +114,46 @@ function handleRegistrationSubmit(event) {
   if (inputEl) inputEl.value = 'RM-12948';
 }
 
+// Open/Close Member & Affiliate Modal
+function openMemberModal() {
+  const modal = document.getElementById('member-modal');
+  const titleEl = document.getElementById('member-welcome-title');
+
+  if (!modal) return;
+
+  const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+  const nameToDisplay = isSuperAdmin ? 'Ace' : (currentUsername || 'Ace');
+
+  if (titleEl) titleEl.textContent = `Halo, ${nameToDisplay}`;
+  modal.classList.add('open');
+}
+
+function closeMemberModal() {
+  const modal = document.getElementById('member-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function copyReferralCode() {
+  const codeText = document.getElementById('ref-code-text').textContent;
+  navigator.clipboard.writeText(codeText).then(() => {
+    alert(`Kode Referral ${codeText} berhasil disalin ke clipboard!`);
+  }).catch(err => {
+    // Fallback if copy fails
+    const dummy = document.createElement('textarea');
+    document.body.appendChild(dummy);
+    dummy.value = codeText;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+    alert(`Kode Referral ${codeText} berhasil disalin ke clipboard!`);
+  });
+}
+
+function seeReferralPackages() {
+  closeMemberModal();
+  openBookingModal();
+}
+
 // Render Corporate List
 function renderCorporateList() {
   const container = document.getElementById('corporate-list-container');
@@ -185,6 +226,7 @@ function handleLogin(event) {
   const usernameInput = document.getElementById('username').value.trim();
   const selectedRole = document.querySelector('input[name="login-role"]:checked').value;
   
+  currentUsername = usernameInput;
   currentRole = selectedRole;
   
   const avatarEl = document.getElementById('user-avatar');
@@ -247,6 +289,7 @@ function handleLogin(event) {
 function handleLogout() {
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
+  currentUsername = '';
   if (queueSimulatorInterval) {
     clearInterval(queueSimulatorInterval);
     queueSimulatorInterval = null;

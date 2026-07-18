@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260719d">
+  <link rel="stylesheet" href="style.css?v=20260719e">
 </head>
 <body>
   <div class="app-container">
@@ -198,6 +198,14 @@
               <div class="menu-text">
                 <h5>Riwayat Medis & Lab</h5>
                 <p>Lihat hasil lab, rontgen, dan catatan rekam medis</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="openMemberModal()">
+              <span class="menu-ico">👑</span>
+              <div class="menu-text">
+                <h5>Program Member & Afiliasi</h5>
+                <p>Dapatkan komisi rujukan teman & keluarga</p>
               </div>
               <span class="menu-arrow">❯</span>
             </button>
@@ -605,6 +613,94 @@
 
     </div>
 
+    <!-- ════════════════════════ MODAL: PROGRAM MEMBER & AFILIASI ════════════════════════ -->
+    <div id="member-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+          <h3 id="member-welcome-title" style="margin-bottom:0; font-size:18px; font-weight:800;">Halo, Ace</h3>
+          <button class="logout-btn" onclick="closeMemberModal()" style="padding: 4px 8px; font-size: 11px;">Tutup</button>
+        </div>
+
+        <!-- Saldo Card (Indigo-blue gradient) -->
+        <div class="saldo-card">
+          <div class="saldo-card-left">
+            <span>Saldo Tersedia ℹ️</span>
+            <h2>Rp 0</h2>
+          </div>
+          <button class="btn btn-sm btn-pencairan" disabled>Ajukan Pencairan</button>
+        </div>
+        <p style="font-size:10px; color:var(--text-muted); margin-top:-6px; margin-bottom:16px; padding-left:12px;">Rp 0 / Rp 50.000 minimum</p>
+
+        <!-- Stats Bar -->
+        <div class="member-stats-bar">
+          <div class="m-stat-item">
+            <span class="m-stat-icon-circle">👥</span>
+            <div>
+              <span>Referral</span>
+              <strong>0 kali</strong>
+            </div>
+          </div>
+          <div class="m-stat-item">
+            <span class="m-stat-icon-circle">💵</span>
+            <div>
+              <span>Komisi</span>
+              <strong>Rp 0</strong>
+            </div>
+          </div>
+          <div class="m-stat-item">
+            <span class="m-stat-icon-circle">↗️</span>
+            <div>
+              <span>Dicairkan</span>
+              <strong>Rp 0</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Code & Cara Kerja -->
+        <div class="qr-workflow-container">
+          <div class="qr-box-col">
+            <div class="qr-code-img">
+              <svg width="100" height="100" viewBox="0 0 29 29" style="background:#fff; padding:6px; border-radius:8px;">
+                <path d="M0 0h7v7H0zm22 0h7v7h-7zM0 22h7v7H0z" fill="#000"/>
+                <path d="M2 2h3v3H2zm20 0h3v3h-3zM2 24h3v3H2z" fill="#fff"/>
+                <path d="M9 1h2v2H9zm3 3h2v2h-2zm4-3h1v3h-1zm1 4h2v2h-2zm-6 3v2h2v-2zm8 0h3v3h-3zm-12 4h3v2H9zm1 3v2h2v-2zm4-3h2v1h-2zm3 4v2h3v-2zm-3-1v1h1v-1zm5-3h1v2h-1zm-15 8h3v1H5zm6-1h1v3h-1zm3-2h2v2h-2zm4 1h1v2h-1zm3 1h2v1h-2z" fill="#000"/>
+              </svg>
+            </div>
+            <div class="referral-code-label">
+              <strong id="ref-code-text">AFF-AAD86TB</strong>
+              <button class="btn-copy-code" onclick="copyReferralCode()" title="Salin Kode">📋</button>
+            </div>
+          </div>
+
+          <div class="workflow-steps">
+            <h5 style="font-size:12px; font-weight:700; margin-bottom:8px; color:white;">Cara Kerja</h5>
+            <div class="w-step-item">
+              <span class="step-num">1</span>
+              <p><strong>Bagikan QR Code / Kode</strong><br>Tunjukkan atau kirim ke teman/keluarga</p>
+            </div>
+            <div class="w-step-item">
+              <span class="step-num">2</span>
+              <p><strong>Teman Scan di Klinik</strong><br>Staff akan scan QR code saat transaksi</p>
+            </div>
+            <div class="w-step-item">
+              <span class="step-num">3</span>
+              <p><strong>Anda Dapat Komisi</strong><br>Otomatis dapat komisi sesuai layanan</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aktivitas Terbaru -->
+        <h5 style="font-size:12px; font-weight:700; margin-top:20px; margin-bottom:10px; color:white;">Aktivitas Terbaru <a href="#" style="float:right; font-size:10px; color:var(--primary);">Lihat Semua ❯</a></h5>
+        <div class="empty-activity-card">
+          <div class="empty-icon">👥</div>
+          <h6>Mulai Dapatkan Komisi!</h6>
+          <p>Lihat paket layanan yang tersedia dan bagikan ke teman & keluarga untuk mulai dapatkan komisi.</p>
+          <button class="btn btn-sm btn-primary" onclick="seeReferralPackages()" style="width:auto; padding:6px 16px; margin-top:8px;">Lihat Paket</button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- ════════════════════════ MODAL: DAFTAR PASIEN MANDIRI ════════════════════════ -->
     <div id="register-modal" class="modal-overlay">
       <div class="modal-box">
@@ -631,8 +727,101 @@
       </div>
     </div>
 
+    <!-- ════════════════════════ MODAL: BUAT RUJUKAN ════════════════════════ -->
+    <div id="referral-modal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Form Rujukan Pasien</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Kirim rujukan pasien baru ke laboratorium/klinik kami</p>
+        
+        <form onsubmit="submitReferralForm(event)">
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-patient-name">Nama Lengkap Pasien</label>
+            <input type="text" id="ref-patient-name" placeholder="Nama lengkap pasien" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-patient-phone">No. Handphone Pasien</label>
+            <input type="tel" id="ref-patient-phone" placeholder="08xxxxxxxxxx" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-lab-test">Rujukan Pemeriksaan</label>
+            <input type="text" id="ref-lab-test" placeholder="Contoh: Darah Lengkap, MCU Paket A" required>
+          </div>
+          
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeReferralForm()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Kirim Rujukan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: BOOKING ANTRIAN ════════════════════════ -->
+    <div id="booking-modal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Pesan Janji Temu</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Pilih tipe pemeriksaan dan jadwal kedatangan Anda</p>
+        
+        <form onsubmit="submitBookingForm(event)">
+          <div class="input-group" style="text-align:left;">
+            <label for="book-service">Jenis Layanan</label>
+            <input type="text" id="book-service" placeholder="Klinik Umum, Spesialis Anak, Laboratorium, dll" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="book-date">Tanggal Kedatangan</label>
+            <input type="date" id="book-date" required>
+          </div>
+          
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeBookingModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Konfirmasi & Ambil Antrean</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: LAB RESULTS (AI ASSESSOR) ════════════════════════ -->
+    <div id="lab-results-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left;">
+        <h3 style="text-align:center;">Hasil Pemeriksaan Lab</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px; text-align:center;">Pasien: <strong id="lab-patient-name">Budi Santoso</strong> &bull; RM-12948</p>
+        
+        <!-- Lab Value Table -->
+        <div class="lab-values-container" style="margin-bottom:20px;">
+          <div class="lab-row">
+            <span class="lab-label">Hemoglobin (Hb)</span>
+            <span class="lab-val val-normal">14.5 g/dL</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Kolesterol Total</span>
+            <span class="lab-val val-high">245 mg/dL ⚠️</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Asam Urat</span>
+            <span class="lab-val val-normal">5.8 mg/dL</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Glukosa Puasa</span>
+            <span class="lab-val val-high">126 mg/dL ⚠️</span>
+          </div>
+        </div>
+
+        <!-- AI Health Assessor Section -->
+        <div class="ai-assessor-box">
+          <div class="ai-assessor-header">
+            <span>✨ Analisis AI AvaHealth</span>
+            <span class="ai-badge">V1.0</span>
+          </div>
+          <div class="ai-assessor-body" id="ai-assessment-text">
+            Menganalisis hasil pemeriksaan Anda...
+          </div>
+        </div>
+
+        <button class="btn btn-close" onclick="closeLabResultsModal()" style="margin-top:20px;">Tutup Hasil</button>
+      </div>
+    </div>
+
   </div>
 
-  <script src="app.js?v=20260719d"></script>
+  <script src="app.js?v=20260719e"></script>
 </body>
 </html>
