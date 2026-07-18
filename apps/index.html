@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260719b">
 </head>
 <body>
   <div class="app-container">
@@ -73,13 +73,31 @@
 
       <!-- ──────── VIEW: PASIEN ──────── -->
       <div id="patient-view" class="view-panel">
+        <!-- Live Queue Ticket Alert (Hidden by default, shown when user has booked) -->
+        <div id="p-active-ticket-box" class="ticket-widget" style="display:none;">
+          <div class="ticket-widget-header">
+            <span>🎟️ Tiket Antrean Aktif</span>
+            <span class="pulse-dot"></span>
+          </div>
+          <div class="ticket-widget-body">
+            <div class="ticket-widget-num" id="p-ticket-number">A-045</div>
+            <div class="ticket-widget-info">
+              <p>Layanan: <strong id="p-ticket-service">Klinik Umum</strong></p>
+              <p>Estimasi Panggilan: <span id="p-ticket-time">10 Menit lagi</span></p>
+            </div>
+          </div>
+          <div class="ticket-widget-footer">
+            <span>Antrean Sekarang di Counter: <strong id="p-ticket-current">A-042</strong></span>
+          </div>
+        </div>
+
         <div class="quick-stats">
-          <div class="stat-card">
+          <div class="stat-card" onclick="alert('Anda memiliki 1 janji temu aktif.')">
             <span class="stat-icon">📅</span>
             <h4>Janji Temu</h4>
             <p id="p-appointments">1 Aktif</p>
           </div>
-          <div class="stat-card">
+          <div class="stat-card" onclick="openLabResultsModal()">
             <span class="stat-icon">🧪</span>
             <h4>Hasil Lab</h4>
             <p id="p-labresults">2 Tersedia</p>
@@ -88,7 +106,7 @@
 
         <div class="section-title">Menu Utama Pasien</div>
         <div class="menu-list">
-          <button class="menu-item" onclick="alert('Layanan Booking Janji Temu sedang disiapkan')">
+          <button class="menu-item" onclick="openBookingModal()">
             <span class="menu-ico">📅</span>
             <div class="menu-text">
               <h5>Pesan Janji Temu</h5>
@@ -96,7 +114,7 @@
             </div>
             <span class="menu-arrow">❯</span>
           </button>
-          <button class="menu-item" onclick="alert('Layanan Riwayat Rekam Medis sedang disiapkan')">
+          <button class="menu-item" onclick="openLabResultsModal()">
             <span class="menu-ico">📄</span>
             <div class="menu-text">
               <h5>Riwayat Medis & Lab</h5>
@@ -131,13 +149,37 @@
         </div>
 
         <!-- Progress Bar MCU -->
-        <div class="glass-card progress-card" style="margin-bottom: 24px;">
+        <div class="glass-card progress-card" style="margin-bottom: 20px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
             <span>Progres Proyek MCU</span>
             <span id="c-progress-label">80%</span>
           </div>
           <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="c-progress-bar" style="width: 80%;"></div>
+          </div>
+        </div>
+
+        <!-- Wellness Chart (Pure SVG) -->
+        <div class="glass-card chart-card" style="margin-bottom: 24px;">
+          <div class="chart-header">
+            <h4>Analisis Kesehatan Karyawan</h4>
+          </div>
+          <div class="chart-content">
+            <svg width="120" height="120" viewBox="0 0 42 42" class="donut-chart">
+              <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="transparent"></circle>
+              <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="4"></circle>
+              <!-- 70% Fit (Teal), 10% Pending (Warning), 20% Unfit (Error) -->
+              <circle class="donut-segment segment-fit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--teal)" stroke-width="4" stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
+              <circle class="donut-segment segment-unfit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--error)" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="55"></circle>
+              <circle class="donut-segment segment-pending" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--warning)" stroke-width="4" stroke-dasharray="10 90" stroke-dashoffset="35"></circle>
+              <text x="50%" y="55%" class="donut-text" text-anchor="middle" fill="#fff" font-size="8" font-weight="800">70%</text>
+              <text x="50%" y="67%" class="donut-subtext" text-anchor="middle" fill="var(--text-muted)" font-size="3" font-weight="600">FIT</text>
+            </svg>
+            <div class="chart-legend">
+              <div class="legend-item"><span class="legend-dot dot-fit"></span> <span>Fit to Work (70%)</span></div>
+              <div class="legend-item"><span class="legend-dot dot-unfit"></span> <span>Unfit/Review (20%)</span></div>
+              <div class="legend-item"><span class="legend-dot dot-pending"></span> <span>Pending (10%)</span></div>
+            </div>
           </div>
         </div>
 
@@ -151,6 +193,22 @@
             <h5>Unfit / Review</h5>
             <span id="c-unfit-count">15</span>
           </div>
+        </div>
+
+        <!-- Corporate Invoices / Billing -->
+        <div class="section-title">Billing & Invoice Korporat</div>
+        <div class="glass-card invoice-widget" style="margin-bottom: 24px;">
+          <div class="invoice-row">
+            <div class="invoice-info">
+              <h5>INV-202607-001</h5>
+              <p>MCU Tahunan Tahap 1 &bull; 19 Juli 2026</p>
+            </div>
+            <div style="text-align:right;">
+              <span class="invoice-amount">Rp 45.000.000</span>
+              <span class="badge badge-unfit" style="display:block; width:fit-content; margin-left:auto; margin-top:4px;">Belum Bayar</span>
+            </div>
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="alert('Pembayaran Invoice via Virtual Account disimulasikan!')" style="width:100%; margin-top:12px;">Bayar Invoice Sekarang</button>
         </div>
 
         <div class="section-title">Daftar Peserta MCU</div>
@@ -172,6 +230,33 @@
             <h4>Akumulasi Fee/Poin</h4>
             <p id="r-commission">Rp 1.200.000</p>
           </div>
+        </div>
+
+        <!-- Chat Konsultasi Dokter (Simulator Peer-to-Peer) -->
+        <div class="section-title">Konsultasi Dokter (Peer-to-Peer)</div>
+        <div class="glass-card chat-widget" style="margin-bottom: 24px;">
+          <div class="chat-header-widget">
+            <div class="chat-avatar-pic">🧪</div>
+            <div>
+              <h6>Dr. Haryanto, Sp.PK</h6>
+              <p>Patologi Klinik Laboratorium</p>
+            </div>
+            <span class="chat-status-dot"></span>
+          </div>
+          <div class="chat-body-widget" id="chat-messages-container">
+            <div class="chat-msg msg-received">
+              <p>Selamat pagi Dokter. Untuk sampel pasien Budi Santoso, kadar Trombositnya terpantau kritis (45.000). Apakah perlu kami lakukan sediaan apus darah tepi ulang?</p>
+              <span class="msg-time">05:15</span>
+            </div>
+            <div class="chat-msg msg-sent">
+              <p>Selamat pagi dr. Haryanto. Ya, mohon lakukan sediaan apus untuk menyingkirkan adanya false thrombocytopenia / platelet clumping. Terima kasih.</p>
+              <span class="msg-time">05:20</span>
+            </div>
+          </div>
+          <form onsubmit="sendConsultMessage(event)" class="chat-input-form">
+            <input type="text" id="chat-input" placeholder="Tulis jawaban dokter..." required autocomplete="off">
+            <button type="submit" class="chat-send-btn">➡️</button>
+          </form>
         </div>
 
         <!-- Kirim Rujukan Baru -->
@@ -215,8 +300,73 @@
       </div>
     </div>
 
+    <!-- ════════════════════════ MODAL: BOOKING ANTRIAN ════════════════════════ -->
+    <div id="booking-modal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Pesan Janji Temu</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Pilih tipe pemeriksaan dan jadwal kedatangan Anda</p>
+        
+        <form onsubmit="submitBookingForm(event)">
+          <div class="input-group" style="text-align:left;">
+            <label for="book-service">Jenis Layanan</label>
+            <input type="text" id="book-service" placeholder="Klinik Umum, Spesialis Anak, Laboratorium, dll" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="book-date">Tanggal Kedatangan</label>
+            <input type="date" id="book-date" required>
+          </div>
+          
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeBookingModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Konfirmasi & Ambil Antrean</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: LAB RESULTS (AI ASSESSOR) ════════════════════════ -->
+    <div id="lab-results-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left;">
+        <h3 style="text-align:center;">Hasil Pemeriksaan Lab</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px; text-align:center;">Pasien: <strong id="lab-patient-name">Budi Santoso</strong> &bull; RM-12948</p>
+        
+        <!-- Lab Value Table -->
+        <div class="lab-values-container" style="margin-bottom:20px;">
+          <div class="lab-row">
+            <span class="lab-label">Hemoglobin (Hb)</span>
+            <span class="lab-val val-normal">14.5 g/dL</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Kolesterol Total</span>
+            <span class="lab-val val-high">245 mg/dL ⚠️</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Asam Urat</span>
+            <span class="lab-val val-normal">5.8 mg/dL</span>
+          </div>
+          <div class="lab-row">
+            <span class="lab-label">Glukosa Puasa</span>
+            <span class="lab-val val-high">126 mg/dL ⚠️</span>
+          </div>
+        </div>
+
+        <!-- AI Health Assessor Section -->
+        <div class="ai-assessor-box">
+          <div class="ai-assessor-header">
+            <span>✨ Analisis AI AvaHealth</span>
+            <span class="ai-badge">V1.0</span>
+          </div>
+          <div class="ai-assessor-body" id="ai-assessment-text">
+            Menganalisis hasil pemeriksaan Anda...
+          </div>
+        </div>
+
+        <button class="btn btn-close" onclick="closeLabResultsModal()" style="margin-top:20px;">Tutup Hasil</button>
+      </div>
+    </div>
+
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=20260719b"></script>
 </body>
 </html>

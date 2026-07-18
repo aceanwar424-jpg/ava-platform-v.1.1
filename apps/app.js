@@ -4,11 +4,11 @@
 
 // --- MOCK DATASETS ---
 const MOCK_CORPORATES = [
-  { name: 'Ahmad Subarjo', id: 'EMP-001', test: 'Paket MCU Eksekutif A', status: 'fit', remark: 'Fit to Work' },
-  { name: 'Siti Rahma', id: 'EMP-002', test: 'Paket MCU Dasar', status: 'fit', remark: 'Fit to Work' },
+  { name: 'Ahmad Subarjo', id: 'EMP-001', test: 'Paket MCU Eksekutif A', status: 'fit', remark: 'Fit to Work &bull; Sehat' },
+  { name: 'Siti Rahma', id: 'EMP-002', test: 'Paket MCU Dasar', status: 'fit', remark: 'Fit to Work &bull; Sehat' },
   { name: 'Bambang Wijaya', id: 'EMP-003', test: 'Paket MCU Driver', status: 'unfit', remark: 'Unfit / Review (Hipertensi Gr. II)' },
   { name: 'Indah Permata', id: 'EMP-004', test: 'Paket MCU Dasar', status: 'pending', remark: 'Proses Analisa Lab' },
-  { name: 'Dedi Kurniawan', id: 'EMP-005', test: 'Paket MCU Eksekutif B', status: 'fit', remark: 'Fit to Work' }
+  { name: 'Dedi Kurniawan', id: 'EMP-005', test: 'Paket MCU Eksekutif B', status: 'fit', remark: 'Fit to Work &bull; Sehat' }
 ];
 
 const MOCK_REFERRALS = [
@@ -20,6 +20,8 @@ const MOCK_REFERRALS = [
 // --- APP RUNTIME STATE ---
 let currentRole = 'patient';
 let referrals = [...MOCK_REFERRALS];
+let queueSimulatorInterval = null;
+let currentCalledQueue = 40; // Counter queue starts at A-040
 
 // Switch Screens
 function showScreen(screenId) {
@@ -153,7 +155,100 @@ function handleLogin(event) {
 function handleLogout() {
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
+  if (queueSimulatorInterval) {
+    clearInterval(queueSimulatorInterval);
+    queueSimulatorInterval = null;
+  }
+  // Hide active queue ticket on logout
+  document.getElementById('p-active-ticket-box').style.display = 'none';
   showScreen('login-screen');
+}
+
+// --- BOOKING MODAL & QUEUE SIMULATOR ---
+function openBookingModal() {
+  const modal = document.getElementById('booking-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeBookingModal() {
+  const modal = document.getElementById('booking-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function submitBookingForm(event) {
+  event.preventDefault();
+  
+  const serviceName = document.getElementById('book-service').value.trim();
+  if (!serviceName) return;
+
+  // Show ticket widget
+  const ticketBox = document.getElementById('p-active-ticket-box');
+  const ticketNumEl = document.getElementById('p-ticket-number');
+  const ticketServiceEl = document.getElementById('p-ticket-service');
+  const ticketTimeEl = document.getElementById('p-ticket-time');
+  const ticketCurrentEl = document.getElementById('p-ticket-current');
+
+  const myQueueNum = 45; // Fixed queue ticket: A-045
+  currentCalledQueue = 40; // Reset simulator
+
+  ticketNumEl.textContent = `A-0${myQueueNum}`;
+  ticketServiceEl.textContent = serviceName;
+  ticketTimeEl.textContent = '12 Menit lagi';
+  ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
+  ticketBox.style.display = 'block';
+
+  closeBookingModal();
+  alert('Booking berhasil! Tiket antrean aktif Anda telah dibuat.');
+
+  // Start live simulator
+  if (queueSimulatorInterval) clearInterval(queueSimulatorInterval);
+  
+  queueSimulatorInterval = setInterval(() => {
+    if (currentCalledQueue < myQueueNum) {
+      currentCalledQueue += 1;
+      ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
+      
+      const minutesLeft = (myQueueNum - currentCalledQueue) * 2.5;
+      if (minutesLeft > 0) {
+        ticketTimeEl.textContent = `${Math.ceil(minutesLeft)} Menit lagi`;
+      } else {
+        ticketTimeEl.textContent = 'Silakan menuju Counter!';
+        ticketTimeEl.style.color = 'var(--success)';
+        clearInterval(queueSimulatorInterval);
+      }
+    }
+  }, 10000); // Progress queue counter every 10 seconds
+}
+
+// --- LAB RESULTS & AI ASSESSOR ---
+function openLabResultsModal() {
+  const modal = document.getElementById('lab-results-modal');
+  if (!modal) return;
+
+  const aiTextEl = document.getElementById('ai-assessment-text');
+  aiTextEl.innerHTML = '<span style="color: var(--text-muted);">🤖 Membaca hasil lab dan memproses analisis medis...</span>';
+  
+  modal.classList.add('open');
+
+  // Simulate AI typing after 1.8 seconds
+  setTimeout(() => {
+    aiTextEl.innerHTML = `
+      <p style="margin-bottom:8px; font-weight: 600; color:var(--error);">⚠️ Temuan Utama:</p>
+      <ul style="margin-left: 16px; margin-bottom: 12px; display:flex; flex-direction:column; gap:4px;">
+        <li><strong>Hiperkolesterolemia Ringan:</strong> Kolesterol Total Anda (245 mg/dL) berada di atas batas normal (&lt;200).</li>
+        <li><strong>Batas Glukosa Puasa Tinggi:</strong> Gula darah puasa Anda (126 mg/dL) mengindikasikan kondisi Prediabetes.</li>
+      </ul>
+      <p style="margin-bottom:8px; font-weight: 600; color:var(--teal);">💡 Rekomendasi AvaHealth:</p>
+      <p style="color: var(--text-muted); font-size:12px; line-height:1.4;">
+        Kurangi asupan lemak jenuh dan karbohidrat sederhana. Lakukan aktivitas fisik sedang (jalan cepat) minimal 150 menit per minggu. Jadwalkan konsultasi dengan dokter untuk memverifikasi kondisi gula darah puasa Anda.
+      </p>
+    `;
+  }, 1800);
+}
+
+function closeLabResultsModal() {
+  const modal = document.getElementById('lab-results-modal');
+  if (modal) modal.classList.remove('open');
 }
 
 // --- REFERRAL MODAL FORM ---
@@ -185,7 +280,7 @@ function submitReferralForm(event) {
     phone: phone,
     test: test,
     status: 'waiting',
-    fee: 90000, // Flat mock fee for new referrals
+    fee: 90000,
     date: dateStr
   });
 
@@ -201,4 +296,47 @@ function submitReferralForm(event) {
   closeReferralForm();
   
   alert('Rujukan pasien berhasil dikirim!');
+}
+
+// --- PEER-TO-PEER CHAT CONSULTATION ---
+function sendConsultMessage(event) {
+  event.preventDefault();
+  
+  const inputEl = document.getElementById('chat-input');
+  const messageText = inputEl.value.trim();
+  if (!messageText) return;
+
+  const container = document.getElementById('chat-messages-container');
+  if (!container) return;
+
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+  // Append sent message
+  const msgSent = document.createElement('div');
+  msgSent.className = 'chat-msg msg-sent';
+  msgSent.innerHTML = `
+    <p>${messageText}</p>
+    <span class="msg-time">${timeStr}</span>
+  `;
+  container.appendChild(msgSent);
+  
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+  
+  // Reset input
+  inputEl.value = '';
+
+  // Simulate Pathology Response after 2.5 seconds
+  setTimeout(() => {
+    const responseTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    const msgReceived = document.createElement('div');
+    msgReceived.className = 'chat-msg msg-received';
+    msgReceived.innerHTML = `
+      <p>Baik Dokter, kami segera lakukan konfirmasi mikroskopis manual sediaan apus darah tepi. Hasil koreksinya akan kami unggah langsung ke sistem rujukan dalam waktu 30 menit.</p>
+      <span class="msg-time">${responseTime}</span>
+    `;
+    container.appendChild(msgReceived);
+    container.scrollTop = container.scrollHeight;
+  }, 2500);
 }
