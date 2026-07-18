@@ -57,7 +57,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 ### Fase 2 — Menyambung yang Sudah Ada
 - [x] 2.1 Auto goods-issue — resep BHP + trigger di lab_results (tak bisa dilewati jalur mana pun)
 - [x] 2.2 Home Care → rekam medis — pencarian pasien + tautan mr_number
-- [ ] 2.3 Komisi nakes → penggajian
+- [x] 2.3 Komisi nakes → penggajian — ditarik otomatis saat gaji dihitung
 - [x] 2.4 Pencocokan tiga arah — vendor_invoices + match_vendor_invoice()
 - [x] 2.5 Kontrol anggaran — sisa pagu tampil saat menyusun PR + peringatan bila melampaui
 - [x] 2.6 Multi-gudang — stok per lokasi + pemindahan atomik (total tidak berubah)
@@ -77,7 +77,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 4.3 Hutang usaha — pembayaran hanya untuk faktur yang lolos pencocokan tiga arah
 - [x] 4.4 Pusat biaya → laba rugi per unit layanan
 - [~] 4.5 Jadwal kalibrasi alat SELESAI; penyusutan menunggu bagan akun
-- [ ] 4.6 Penggajian sungguhan (PPh21, slip, lembur, saldo cuti)
+- [x] 4.6 Penggajian sungguhan — komponen, BPJS, PPh 21 berlapis, slip gaji, periode terkunci
 - [x] 4.7 Tutup kas per shift — total sistem dihitung dari transaksi, selisih wajib dijelaskan
 
 ### Fase 5 — Kepatuhan & Ekspansi
