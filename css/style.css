@@ -73,7 +73,7 @@ body {
    SIDEBAR RAIL (icon-only category nav)
 ══════════════════════════════════════ */
 :root {
-  --rail-w: 64px;
+  --rail-w: 88px;
   --flyout-w: 240px;
 }
 
@@ -125,15 +125,15 @@ body {
 
 .rail-item {
   position: relative;
-  width: 46px; height: 46px;
-  border-radius: 12px;
+  width: 72px; min-height: 58px;
+  padding: 8px 4px 7px;
+  border-radius: 10px;
   background: transparent;
   border: none;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 19px;
-  color: rgba(255,255,255,.55);
-  transition: all .15s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  color: rgba(255,255,255,.62);
+  transition: background .15s, color .15s;
   flex-shrink: 0;
 }
 .rail-item:hover {
@@ -1594,4 +1594,61 @@ select { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .cat-card, .cat-card-go, .subnav-item, .subnav-home { transition: none; }
   .cat-card:hover .cat-card-go { transform: none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   RAIL — ikon SVG + label (tidak lagi menebak arti ikon)
+══════════════════════════════════════════════════════════════ */
+.rail-icon {
+  display: grid; place-items: center;
+  width: 24px; height: 24px; line-height: 0;
+}
+.rail-icon svg { display: block; }
+
+.rail-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.15;
+  text-align: center;
+  max-width: 68px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: .9;
+}
+
+/* Item aktif: blok solid + penanda garis di tepi kiri rail */
+.rail-item.active {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  box-shadow: none;
+}
+.rail-item.active::before {
+  content: '';
+  position: absolute;
+  left: -8px; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 26px;
+  border-radius: 0 3px 3px 0;
+  background: var(--teal2);
+}
+.rail-item.active .rail-label { opacity: 1; font-weight: 700; }
+.rail-item:focus-visible { outline: 2px solid var(--teal2); outline-offset: 2px; }
+
+/* Label sudah tampil — tooltip hover tidak diperlukan lagi */
+.rail-item::after { content: none; }
+
+/* Badge menyesuaikan tata letak baru */
+.rail-nav .rail-badge { top: 4px; right: 10px; }
+
+/* Ikon SVG di halaman kategori & pintasan */
+.cat-card-ico svg { display: block; color: var(--text3); }
+.cat-card:hover .cat-card-ico svg { color: var(--teal); }
+.subnav-home-ico { display: grid; place-items: center; line-height: 0; }
+.subnav-home-ico svg { display: block; }
+.flyout-item-icon { display: grid; place-items: center; width: 20px; line-height: 0; }
+.flyout-item-icon svg { display: block; }
+
+@media (max-width: 767px) {
+  .rail-label { font-size: 9.5px; max-width: 60px; }
 }

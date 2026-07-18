@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OneLab Growth Platform</title>
-<link rel="stylesheet" href="css/style.css?v=20260718c">
-<link rel="stylesheet" href="css/dashboard.css?v=20260718c">
+<link rel="stylesheet" href="css/style.css?v=20260718d">
+<link rel="stylesheet" href="css/dashboard.css?v=20260718d">
 </head>
 <body>
 <!-- ═══ SIDEBAR — Category Rail + Flyout Panel (Virtu Digilab style) ═══ -->
@@ -16,41 +16,53 @@
 
   <nav class="rail-nav" id="rail-nav">
     <button class="rail-item active" data-cat="utama" onclick="openCategory('utama')" data-tooltip="Utama">
-      <span class="rail-icon">🏠</span>
+      <span class="rail-icon" data-icon="utama"></span>
+      <span class="rail-label">Utama</span>
     </button>
     <button class="rail-item" data-cat="marketing" onclick="openCategory('marketing')" data-tooltip="Marketing & Sales">
-      <span class="rail-icon">🤝</span>
+      <span class="rail-icon" data-icon="marketing"></span>
+      <span class="rail-label">Marketing</span>
       <span class="rail-badge" id="badge-partners-rail" style="display:none">0</span>
     </button>
     <button class="rail-item" data-cat="lab" onclick="openCategory('lab')" data-tooltip="Operasional Lab">
-      <span class="rail-icon">🧪</span>
+      <span class="rail-icon" data-icon="lab"></span>
+      <span class="rail-label">Lab</span>
     </button>
     <button class="rail-item" data-cat="klinik" onclick="openCategory('klinik')" data-tooltip="Layanan Klinik">
-      <span class="rail-icon">🏨</span>
+      <span class="rail-icon" data-icon="klinik"></span>
+      <span class="rail-label">Klinik</span>
     </button>
     <button class="rail-item" data-cat="homecare" onclick="openCategory('homecare')" data-tooltip="Home Care">
-      <span class="rail-icon">🏡</span>
+      <span class="rail-icon" data-icon="homecare"></span>
+      <span class="rail-label">Home Care</span>
     </button>
     <button class="rail-item" data-cat="finance" onclick="openCategory('finance')" data-tooltip="Finance & Billing">
-      <span class="rail-icon">💰</span>
+      <span class="rail-icon" data-icon="finance"></span>
+      <span class="rail-label">Finance</span>
     </button>
     <button class="rail-item" data-cat="inventory" onclick="openCategory('inventory')" data-tooltip="Inventory & Logistik">
-      <span class="rail-icon">📦</span>
+      <span class="rail-icon" data-icon="inventory"></span>
+      <span class="rail-label">Inventory</span>
     </button>
     <button class="rail-item" data-cat="hrd" onclick="openCategory('hrd')" data-tooltip="HRD & SDM">
-      <span class="rail-icon">👥</span>
+      <span class="rail-icon" data-icon="hrd"></span>
+      <span class="rail-label">HRD</span>
     </button>
     <button class="rail-item" data-cat="produktivitas" onclick="openCategory('produktivitas')" data-tooltip="Produktivitas">
-      <span class="rail-icon">📋</span>
+      <span class="rail-icon" data-icon="produktivitas"></span>
+      <span class="rail-label">Tugas</span>
     </button>
     <button class="rail-item" data-cat="wiki" onclick="openCategory('wiki')" data-tooltip="Wiki OneLab">
-      <span class="rail-icon">📖</span>
+      <span class="rail-icon" data-icon="wiki"></span>
+      <span class="rail-label">Wiki</span>
     </button>
     <button class="rail-item" data-cat="agentic" onclick="openCategory('agentic')" data-tooltip="Agentic AI">
-      <span class="rail-icon">✨</span>
+      <span class="rail-icon" data-icon="agentic"></span>
+      <span class="rail-label">Agentic</span>
     </button>
     <button class="rail-item" data-cat="konfigurasi" onclick="openCategory('konfigurasi')" data-tooltip="Konfigurasi">
-      <span class="rail-icon">⚙️</span>
+      <span class="rail-icon" data-icon="konfigurasi"></span>
+      <span class="rail-label">Konfigurasi</span>
     </button>
   </nav>
 
@@ -176,77 +188,78 @@
 <div class="toast-container" id="toast-container"></div>
 
 <!-- ═══ SCRIPTS ═══ -->
-<script src="js/core/api.js?v=20260718c"></script>
-<script src="js/core/utils.js?v=20260718c"></script>
-<script src="js/core/router.js?v=20260718c"></script>
-<script src="js/core/storage.js?v=20260718c"></script>
-<script src="js/core/barcode.js?v=20260718c"></script>
-<script src="js/auth.js?v=20260718c"></script>
+<script src="js/core/icons.js?v=20260718d"></script>
+<script src="js/core/api.js?v=20260718d"></script>
+<script src="js/core/utils.js?v=20260718d"></script>
+<script src="js/core/router.js?v=20260718d"></script>
+<script src="js/core/storage.js?v=20260718d"></script>
+<script src="js/core/barcode.js?v=20260718d"></script>
+<script src="js/auth.js?v=20260718d"></script>
 
-<script src="modules/dashboard/index.js?v=20260718c"></script>
-<script src="modules/partners/index.js?v=20260718c"></script>
-<script src="modules/partners/deals.js?v=20260718c"></script>
-<script src="modules/maps/index.js?v=20260718c"></script>
-<script src="modules/marketing.js?v=20260718c"></script>
-<script src="modules/voucher.js?v=20260718c"></script>
-<script src="modules/surat.js?v=20260718c"></script>
-<script src="modules/mou.js?v=20260718c"></script>
-<script src="modules/leads.js?v=20260718c"></script>
-<script src="modules/finance.js?v=20260718c"></script>
-<script src="modules/inventory.js?v=20260718c"></script>
-<script src="modules/hrd.js?v=20260718c"></script>
-<script src="modules/work_schedule.js?v=20260718c"></script>
-<script src="modules/task_management.js?v=20260718c"></script>
-<script src="modules/org_structure.js?v=20260718c"></script>
-<script src="modules/attendance.js?v=20260718c"></script>
-<script src="modules/regulatory_reports.js?v=20260718c"></script>
-<script src="modules/executive_dashboard.js?v=20260718c"></script>
-<script src="modules/homecare.js?v=20260718c"></script>
-<script src="modules/mcu.js?v=20260718c"></script>
-<script src="modules/admission.js?v=20260718c"></script>
-<script src="modules/anamnesa.js?v=20260718c"></script>
+<script src="modules/dashboard/index.js?v=20260718d"></script>
+<script src="modules/partners/index.js?v=20260718d"></script>
+<script src="modules/partners/deals.js?v=20260718d"></script>
+<script src="modules/maps/index.js?v=20260718d"></script>
+<script src="modules/marketing.js?v=20260718d"></script>
+<script src="modules/voucher.js?v=20260718d"></script>
+<script src="modules/surat.js?v=20260718d"></script>
+<script src="modules/mou.js?v=20260718d"></script>
+<script src="modules/leads.js?v=20260718d"></script>
+<script src="modules/finance.js?v=20260718d"></script>
+<script src="modules/inventory.js?v=20260718d"></script>
+<script src="modules/hrd.js?v=20260718d"></script>
+<script src="modules/work_schedule.js?v=20260718d"></script>
+<script src="modules/task_management.js?v=20260718d"></script>
+<script src="modules/org_structure.js?v=20260718d"></script>
+<script src="modules/attendance.js?v=20260718d"></script>
+<script src="modules/regulatory_reports.js?v=20260718d"></script>
+<script src="modules/executive_dashboard.js?v=20260718d"></script>
+<script src="modules/homecare.js?v=20260718d"></script>
+<script src="modules/mcu.js?v=20260718d"></script>
+<script src="modules/admission.js?v=20260718d"></script>
+<script src="modules/anamnesa.js?v=20260718d"></script>
 
 <!-- Laboratory Services (ISO 15189 Compliance) — Auto-Conclusion, Audit, PKI -->
-<script src="js/core/conclusionEngine.js?v=20260718c"></script>
-<script src="js/core/auditLogger.js?v=20260718c"></script>
-<script src="js/core/pkiService.js?v=20260718c"></script>
-<script src="js/core/ntpService.js?v=20260718c"></script>
+<script src="js/core/conclusionEngine.js?v=20260718d"></script>
+<script src="js/core/auditLogger.js?v=20260718d"></script>
+<script src="js/core/pkiService.js?v=20260718d"></script>
+<script src="js/core/ntpService.js?v=20260718d"></script>
 
 <!-- Laboratory Information System (LIS) — modular -->
-<script src="modules/lab/index.js?v=20260718c"></script>
-<script src="modules/lab/checkin.js?v=20260718c"></script>
-<script src="modules/lab/worklist.js?v=20260718c"></script>
-<script src="modules/lab/results.js?v=20260718c"></script>
-<script src="modules/lab/validation.js?v=20260718c"></script>
-<script src="modules/lab/report.js?v=20260718c"></script>
-<script src="modules/lab/qc.js?v=20260718c"></script>
-<script src="modules/lab/integration.js?v=20260718c"></script>
-<script src="modules/radiology.js?v=20260718c"></script>
-<script src="modules/supportive.js?v=20260718c"></script>
-<script src="modules/medrecord.js?v=20260718c"></script>
-<script src="modules/cashier.js?v=20260718c"></script>
-<script src="modules/config_product.js?v=20260718c"></script>
-<script src="modules/config_package.js?v=20260718c"></script>
-<script src="modules/config_family.js?v=20260718c"></script>
+<script src="modules/lab/index.js?v=20260718d"></script>
+<script src="modules/lab/checkin.js?v=20260718d"></script>
+<script src="modules/lab/worklist.js?v=20260718d"></script>
+<script src="modules/lab/results.js?v=20260718d"></script>
+<script src="modules/lab/validation.js?v=20260718d"></script>
+<script src="modules/lab/report.js?v=20260718d"></script>
+<script src="modules/lab/qc.js?v=20260718d"></script>
+<script src="modules/lab/integration.js?v=20260718d"></script>
+<script src="modules/radiology.js?v=20260718d"></script>
+<script src="modules/supportive.js?v=20260718d"></script>
+<script src="modules/medrecord.js?v=20260718d"></script>
+<script src="modules/cashier.js?v=20260718d"></script>
+<script src="modules/config_product.js?v=20260718d"></script>
+<script src="modules/config_package.js?v=20260718d"></script>
+<script src="modules/config_family.js?v=20260718d"></script>
 <!-- Wiki OneLab -->
-<script src="modules/wiki/index.js?v=20260718c"></script>
-<script src="modules/wiki/sop.js?v=20260718c"></script>
-<script src="modules/wiki/fix.js?v=20260718c"></script>
-<script src="modules/wiki/studio.js?v=20260718c"></script>
+<script src="modules/wiki/index.js?v=20260718d"></script>
+<script src="modules/wiki/sop.js?v=20260718d"></script>
+<script src="modules/wiki/fix.js?v=20260718d"></script>
+<script src="modules/wiki/studio.js?v=20260718d"></script>
 
 <!-- Agentic AI (Fase 1 & 2) -->
-<script src="modules/agentic/index.js?v=20260718c"></script>
-<script src="modules/agentic/inbox.js?v=20260718c"></script>
-<script src="modules/agentic/docs.js?v=20260718c"></script>
-<script src="modules/agentic/docxfill.js?v=20260718c"></script>
-<script src="modules/agentic/studio.js?v=20260718c"></script>
-<script src="modules/agentic/render.js?v=20260718c"></script>
-<script src="modules/agentic/org.js?v=20260718c"></script>
-<script src="modules/config_home.js?v=20260718c"></script>
-<script src="modules/config_labreport.js?v=20260718c"></script>
-<script src="modules/settings.js?v=20260718c"></script>
-<script src="modules/settings_users.js?v=20260718c"></script>
-<script src="modules/import_excel.js?v=20260718c"></script>
+<script src="modules/agentic/index.js?v=20260718d"></script>
+<script src="modules/agentic/inbox.js?v=20260718d"></script>
+<script src="modules/agentic/docs.js?v=20260718d"></script>
+<script src="modules/agentic/docxfill.js?v=20260718d"></script>
+<script src="modules/agentic/studio.js?v=20260718d"></script>
+<script src="modules/agentic/render.js?v=20260718d"></script>
+<script src="modules/agentic/org.js?v=20260718d"></script>
+<script src="modules/config_home.js?v=20260718d"></script>
+<script src="modules/config_labreport.js?v=20260718d"></script>
+<script src="modules/settings.js?v=20260718d"></script>
+<script src="modules/settings_users.js?v=20260718d"></script>
+<script src="modules/import_excel.js?v=20260718d"></script>
 
 <script>
 // ── Sidebar rail — always 64px, flyout handles submenu ──
@@ -567,134 +580,146 @@ async function doSaveProfile() {
 const FLYOUT_MENUS = {
   utama: {
     label: 'Utama',
+    icon: 'home',
     items: [
-      {page:'dashboard', icon:'🏠', label:'Dashboard', action:"navigate('dashboard')"},
+      {page:'dashboard', icon:'home', label:'Dashboard', action:"navigate('dashboard')"},
     ]
   },
   marketing: {
     label: 'Marketing & Sales',
+    icon: 'megaphone',
     items: [
-      {page:'partners', icon:'🤝', label:'Partner Database', action:"navigate('partners')", badge:'badge-partners'},
-      {page:'maps', icon:'🗺️', label:'Maps Prospecting', action:"navigate('maps')"},
-      {page:'leads', icon:'🎯', label:'Leads Management', action:"navigate('leads')"},
-      {page:'marketing', icon:'📣', label:'Marketing & Voucher', action:"navigate('marketing')"},
-      {page:'okr', icon:'📈', label:'OKR & Target Sales', action:"navigate('okr')"},
-      {page:'mcu', icon:'🏥', label:'Project MCU', action:"navigate('mcu')"},
-      {page:'surat', icon:'📄', label:'Surat Keluar', action:"navigate('surat')"},
-      {page:'mou', icon:'📜', label:'MOU / Perjanjian', action:"navigate('mou')"},
+      {page:'partners', icon:'briefcase', label:'Partner Database', action:"navigate('partners')", badge:'badge-partners'},
+      {page:'maps', icon:'map', label:'Maps Prospecting', action:"navigate('maps')"},
+      {page:'leads', icon:'target', label:'Leads Management', action:"navigate('leads')"},
+      {page:'marketing', icon:'megaphone', label:'Marketing & Voucher', action:"navigate('marketing')"},
+      {page:'okr', icon:'trending-up', label:'OKR & Target Sales', action:"navigate('okr')"},
+      {page:'mcu', icon:'hospital', label:'Project MCU', action:"navigate('mcu')"},
+      {page:'surat', icon:'file-text', label:'Surat Keluar', action:"navigate('surat')"},
+      {page:'mou', icon:'scroll', label:'MOU / Perjanjian', action:"navigate('mou')"},
     ]
   },
   lab: {
     label: 'Laboratory Information System',
+    icon: 'flask',
     items: [
-      {page:'lab-checkin',    icon:'🧪', label:'Penerimaan Sampel', action:"navigate('lab',{tab:'checkin'})"},
-      {page:'lab-worklist',   icon:'🔬', label:'Worklist & TAT',    action:"navigate('lab',{tab:'worklist'})"},
-      {page:'lab-result',     icon:'📝', label:'Input Hasil',       action:"navigate('lab',{tab:'result'})"},
-      {page:'lab-validation', icon:'✅', label:'Validasi',          action:"navigate('lab',{tab:'validation'})"},
-      {page:'lab-approval',   icon:'🔏', label:'Approval',          action:"navigate('lab',{tab:'approval'})"},
-      {page:'lab-report',     icon:'📁', label:'Rekam Medis Lab',   action:"navigate('lab',{tab:'report'})"},
-      {page:'lab-qc',         icon:'🎛️', label:'QC & Analyzer',     action:"navigate('lab',{tab:'qc'})"},
-      {page:'medrecord',      icon:'🗂️', label:'Rekam Medis Umum',  action:"navigate('medrecord')"},
+      {page:'lab-checkin', icon:'flask', label:'Penerimaan Sampel', action:"navigate('lab',{tab:'checkin'})"},
+      {page:'lab-worklist', icon:'microscope', label:'Worklist & TAT',    action:"navigate('lab',{tab:'worklist'})"},
+      {page:'lab-result', icon:'edit', label:'Input Hasil',       action:"navigate('lab',{tab:'result'})"},
+      {page:'lab-validation', icon:'check-circle', label:'Validasi',          action:"navigate('lab',{tab:'validation'})"},
+      {page:'lab-approval', icon:'shield-check', label:'Approval',          action:"navigate('lab',{tab:'approval'})"},
+      {page:'lab-report', icon:'folder', label:'Rekam Medis Lab',   action:"navigate('lab',{tab:'report'})"},
+      {page:'lab-qc', icon:'sliders', label:'QC & Analyzer',     action:"navigate('lab',{tab:'qc'})"},
+      {page:'medrecord', icon:'folders', label:'Rekam Medis Umum',  action:"navigate('medrecord')"},
     ]
   },
   klinik: {
     label: 'Layanan Klinik',
+    icon: 'hospital',
     items: [
-      {page:'admission', icon:'🏨', label:'Admission', action:"navigate('admission')"},
-      {page:'anamnesa', icon:'🩺', label:'Anamnesa', action:"navigate('anamnesa')"},
-      {page:'radiology', icon:'🫁', label:'Radiology', action:"navigate('radiology')"},
-      {page:'supportive', icon:'❤️', label:'Supportive', action:"navigate('supportive')"},
-      {page:'package', icon:'🗂️', label:'Package Service', action:"navigate('package')"},
-      {page:'satusehat', icon:'🏛️', label:'Satu Sehat', action:"", soon:true},
+      {page:'admission', icon:'building', label:'Admission', action:"navigate('admission')"},
+      {page:'anamnesa', icon:'stethoscope', label:'Anamnesa', action:"navigate('anamnesa')"},
+      {page:'radiology', icon:'scan', label:'Radiology', action:"navigate('radiology')"},
+      {page:'supportive', icon:'heart', label:'Supportive', action:"navigate('supportive')"},
+      {page:'package', icon:'layers', label:'Package Service', action:"navigate('package')"},
+      {page:'satusehat', icon:'landmark', label:'Satu Sehat', action:"", soon:true},
     ]
   },
   homecare: {
     label: 'Home Care',
+    icon: 'home-heart',
     items: [
-      {page:'homecare', icon:'🏠', label:'Order Kunjungan', group:'Operasional', desc:'Buat & pantau order layanan ke rumah pasien', action:"navigate('homecare')"},
-      {page:'hc-schedule', icon:'📅', label:'Jadwal & Penugasan', group:'Operasional', desc:'Kalender harian dan pembagian tugas nakes', action:"renderHCSchedule()"},
-      {page:'hc-billing', icon:'💵', label:'Penagihan & Komisi', group:'Keuangan', desc:'Rekap fee nakes dan status penagihan', action:"renderHCBilling()"},
-      {page:'hc-staff', icon:'👥', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"renderHCStaff()"},
-      {page:'hc-tariff', icon:'🏷️', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"renderHCTariff()"},
-      {page:'hc-report', icon:'📊', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"renderHCFullReport()"},
+      {page:'homecare', icon:'home-heart', label:'Order Kunjungan', group:'Operasional', desc:'Buat & pantau order layanan ke rumah pasien', action:"navigate('homecare')"},
+      {page:'hc-schedule', icon:'calendar', label:'Jadwal & Penugasan', group:'Operasional', desc:'Kalender harian dan pembagian tugas nakes', action:"renderHCSchedule()"},
+      {page:'hc-billing', icon:'banknote', label:'Penagihan & Komisi', group:'Keuangan', desc:'Rekap fee nakes dan status penagihan', action:"renderHCBilling()"},
+      {page:'hc-staff', icon:'users', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"renderHCStaff()"},
+      {page:'hc-tariff', icon:'tag', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"renderHCTariff()"},
+      {page:'hc-report', icon:'bar-chart', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"renderHCFullReport()"},
     ]
   },
   finance: {
     label: 'Finance & Billing',
+    icon: 'wallet',
     items: [
-      {page:'cashier', icon:'🏧', label:'Cashier', action:"navigate('cashier')"},
-      {page:'finance', icon:'💰', label:'Invoice & Tagihan', action:"navigate('finance')"},
-      {page:'finance-ar', icon:'📑', label:'Tagihan AR', action:"navigate('finance')"},
-      {page:'finance-comm', icon:'🏆', label:'Komisi Sales', action:"navigate('finance')"},
-      {page:'finance-report', icon:'📊', label:'Laporan Keuangan', action:"navigate('finance')"},
+      {page:'cashier', icon:'credit-card', label:'Cashier', action:"navigate('cashier')"},
+      {page:'finance', icon:'wallet', label:'Invoice & Tagihan', action:"navigate('finance')"},
+      {page:'finance-ar', icon:'receipt', label:'Tagihan AR', action:"navigate('finance')"},
+      {page:'finance-comm', icon:'trophy', label:'Komisi Sales', action:"navigate('finance')"},
+      {page:'finance-report', icon:'bar-chart', label:'Laporan Keuangan', action:"navigate('finance')"},
     ]
   },
   inventory: {
     label: 'Inventory & Logistik',
+    icon: 'box',
     items: [
-      {page:'inventory', icon:'📦', label:'Stok Barang', group:'Persediaan', desc:'Master barang, level stok, dan batas minimum', action:"navigate('inventory',{tab:'stock'})"},
-      {page:'inventory-issue', icon:'📤', label:'Pengeluaran Barang', group:'Persediaan', desc:'Catat pemakaian barang ke divisi atau layanan', action:"navigate('inventory',{tab:'issue'})"},
-      {page:'inventory-opname', icon:'📋', label:'Stock Opname', group:'Persediaan', desc:'Hitung fisik dan sesuaikan selisih stok', action:"navigate('inventory',{tab:'opname'})"},
-      {page:'inventory-ledger', icon:'📜', label:'Kartu Stok', group:'Persediaan', desc:'Riwayat seluruh pergerakan stok masuk & keluar', action:"navigate('inventory',{tab:'ledger'})"},
-      {page:'inventory-pr', icon:'🛒', label:'Permintaan Pembelian', group:'Pengadaan', desc:'Ajukan pengadaan dengan persetujuan berjenjang', action:"navigate('inventory',{tab:'pr'})"},
-      {page:'inventory-po', icon:'📄', label:'Pesanan Pembelian', group:'Pengadaan', desc:'Pesanan ke supplier, penerimaan, dan retur', action:"navigate('inventory',{tab:'po'})"},
-      {page:'inventory-supplier', icon:'🏭', label:'Supplier', group:'Pengadaan', desc:'Data pemasok dan kategori barang yang disuplai', action:"navigate('inventory',{tab:'supplier'})"},
-      {page:'inventory-mrp', icon:'📊', label:'Perencanaan MRP', group:'Perencanaan & Analitik', desc:'Titik pemesanan ulang dan rekomendasi pembelian', action:"navigate('inventory',{tab:'mrp'})"},
-      {page:'inventory-report', icon:'📈', label:'Laporan', group:'Perencanaan & Analitik', desc:'Valuasi stok, analisis ABC, dan belanja supplier', action:"navigate('inventory',{tab:'report'})"},
+      {page:'inventory', icon:'box', label:'Stok Barang', group:'Persediaan', desc:'Master barang, level stok, dan batas minimum', action:"navigate('inventory',{tab:'stock'})"},
+      {page:'inventory-issue', icon:'box-out', label:'Pengeluaran Barang', group:'Persediaan', desc:'Catat pemakaian barang ke divisi atau layanan', action:"navigate('inventory',{tab:'issue'})"},
+      {page:'inventory-opname', icon:'clipboard-check', label:'Stock Opname', group:'Persediaan', desc:'Hitung fisik dan sesuaikan selisih stok', action:"navigate('inventory',{tab:'opname'})"},
+      {page:'inventory-ledger', icon:'list', label:'Kartu Stok', group:'Persediaan', desc:'Riwayat seluruh pergerakan stok masuk & keluar', action:"navigate('inventory',{tab:'ledger'})"},
+      {page:'inventory-pr', icon:'cart', label:'Permintaan Pembelian', group:'Pengadaan', desc:'Ajukan pengadaan dengan persetujuan berjenjang', action:"navigate('inventory',{tab:'pr'})"},
+      {page:'inventory-po', icon:'file-check', label:'Pesanan Pembelian', group:'Pengadaan', desc:'Pesanan ke supplier, penerimaan, dan retur', action:"navigate('inventory',{tab:'po'})"},
+      {page:'inventory-supplier', icon:'factory', label:'Supplier', group:'Pengadaan', desc:'Data pemasok dan kategori barang yang disuplai', action:"navigate('inventory',{tab:'supplier'})"},
+      {page:'inventory-mrp', icon:'line-chart', label:'Perencanaan MRP', group:'Perencanaan & Analitik', desc:'Titik pemesanan ulang dan rekomendasi pembelian', action:"navigate('inventory',{tab:'mrp'})"},
+      {page:'inventory-report', icon:'bar-chart', label:'Laporan', group:'Perencanaan & Analitik', desc:'Valuasi stok, analisis ABC, dan belanja supplier', action:"navigate('inventory',{tab:'report'})"},
     ]
   },
   hrd: {
     label: 'HRD & SDM',
+    icon: 'users',
     items: [
-      {page:'hrd', icon:'👥', label:'Data Karyawan', action:"navigate('hrd')"},
-      {page:'org-structure', icon:'🏛️', label:'Struktur Organisasi', action:"navigate('org-structure')"},
-      {page:'work-schedule', icon:'📅', label:'Jadwal Kerja', action:"navigate('work-schedule')"},
-      {page:'attendance', icon:'⏰', label:'Absensi', action:"navigate('attendance')"},
-      {page:'hrd-cuti', icon:'🕐', label:'Cuti & Izin', action:"navigate('hrd')"},
-      {page:'hrd-payroll', icon:'💵', label:'Penggajian', action:"navigate('hrd')"},
+      {page:'hrd', icon:'users', label:'Data Karyawan', action:"navigate('hrd')"},
+      {page:'org-structure', icon:'sitemap', label:'Struktur Organisasi', action:"navigate('org-structure')"},
+      {page:'work-schedule', icon:'calendar', label:'Jadwal Kerja', action:"navigate('work-schedule')"},
+      {page:'attendance', icon:'clock', label:'Absensi', action:"navigate('attendance')"},
+      {page:'hrd-cuti', icon:'calendar-off', label:'Cuti & Izin', action:"navigate('hrd')"},
+      {page:'hrd-payroll', icon:'banknote', label:'Penggajian', action:"navigate('hrd')"},
     ]
   },
   produktivitas: {
     label: 'Produktivitas',
+    icon: 'clipboard',
     items: [
-      {page:'tasks', icon:'📋', label:'Task Management', action:"navigate('tasks')"},
-      {page:'regulatory', icon:'📊', label:'Pelaporan & Audit', action:"navigate('regulatory')"},
+      {page:'tasks', icon:'check-square', label:'Task Management', action:"navigate('tasks')"},
+      {page:'regulatory', icon:'bar-chart', label:'Pelaporan & Audit', action:"navigate('regulatory')"},
     ]
   },
   wiki: {
     label: 'Wiki OneLab',
+    icon: 'book-open',
     items: [
-      {page:'wiki-docs', icon:'📚', label:'Dokumen & SOP', action:"navigate('wiki',{tab:'docs'})"},
-      {page:'wiki-media', icon:'🖼️', label:'Media & Gambar', action:"navigate('wiki',{tab:'media'})"},
-      {page:'agentic-docs', icon:'🔧', label:'Perbaikan SOP → Agentic', action:"navigate('agentic',{tab:'docs'})"},
-      {page:'agentic-studio', icon:'✍️', label:'Content Studio → Agentic', action:"navigate('agentic',{tab:'studio'})"},
+      {page:'wiki-docs', icon:'book-open', label:'Dokumen & SOP', action:"navigate('wiki',{tab:'docs'})"},
+      {page:'wiki-media', icon:'image', label:'Media & Gambar', action:"navigate('wiki',{tab:'media'})"},
+      {page:'agentic-docs', icon:'wrench', label:'Perbaikan SOP → Agentic', action:"navigate('agentic',{tab:'docs'})"},
+      {page:'agentic-studio', icon:'pen-tool', label:'Content Studio → Agentic', action:"navigate('agentic',{tab:'studio'})"},
     ]
   },
   agentic: {
     label: 'Agentic AI',
+    icon: 'sparkles',
     items: [
-      {page:'agentic-inbox', icon:'📥', label:'Approval Inbox', action:"navigate('agentic',{tab:'inbox'})"},
-      {page:'agentic-org', icon:'👔', label:'Organisasi Agent', action:"navigate('agentic',{tab:'org'})"},
-      {page:'agentic-docs', icon:'📄', label:'Dokumen QMS', action:"navigate('agentic',{tab:'docs'})"},
-      {page:'agentic-compliance', icon:'✅', label:'Compliance ISO 15189', action:"navigate('agentic',{tab:'compliance'})"},
-      {page:'agentic-studio', icon:'🎨', label:'Content Studio (AI)', action:"navigate('agentic',{tab:'studio'})"},
-      {page:'agentic-monitor', icon:'📈', label:'Monitor & LLM Usage', action:"navigate('agentic',{tab:'monitor'})"},
+      {page:'agentic-inbox', icon:'inbox', label:'Approval Inbox', action:"navigate('agentic',{tab:'inbox'})"},
+      {page:'agentic-org', icon:'user-square', label:'Organisasi Agent', action:"navigate('agentic',{tab:'org'})"},
+      {page:'agentic-docs', icon:'file-text', label:'Dokumen QMS', action:"navigate('agentic',{tab:'docs'})"},
+      {page:'agentic-compliance', icon:'shield-check', label:'Compliance ISO 15189', action:"navigate('agentic',{tab:'compliance'})"},
+      {page:'agentic-studio', icon:'palette', label:'Content Studio (AI)', action:"navigate('agentic',{tab:'studio'})"},
+      {page:'agentic-monitor', icon:'gauge', label:'Monitor & LLM Usage', action:"navigate('agentic',{tab:'monitor'})"},
     ]
   },
   konfigurasi: {
     label: 'Konfigurasi',
+    icon: 'settings',
     items: [
-      {page:'config', icon:'🏠', label:'Configuration Home', action:"navigate('config')"},
-      {page:'users', icon:'👤', label:'User Management', action:"navigate('users')", adminOnly:true},
-      {page:'product', icon:'🧬', label:'Master Tes / Produk', action:"navigate('product')"},
-      {page:'refrange', icon:'📊', label:'Reference Range', action:"navigate('refrange')"},
-      {page:'package', icon:'🗂️', label:'Package & Panel', action:"navigate('package')"},
-      {page:'corporate', icon:'🏢', label:'Corporate', action:"navigate('corporate')"},
-      {page:'family', icon:'👨‍👩‍👧', label:'Family Registry', action:"navigate('family')"},
-      {page:'analyzer', icon:'🎛️', label:'Master Alat (Analyzer)', action:"navigate('lab',{tab:'qc'})"},
-      {page:'labreport', icon:'🖨️', label:'Setting Hasil PDF', action:"navigate('labreport')"},
-      {page:'import', icon:'📥', label:'Bulk Upload', action:"navigate('import')"},
-      {page:'settings', icon:'⚙️', label:'Pengaturan', action:"navigate('settings')"},
+      {page:'config', icon:'home', label:'Configuration Home', action:"navigate('config')"},
+      {page:'users', icon:'user', label:'User Management', action:"navigate('users')", adminOnly:true},
+      {page:'product', icon:'dna', label:'Master Tes / Produk', action:"navigate('product')"},
+      {page:'refrange', icon:'bar-chart', label:'Reference Range', action:"navigate('refrange')"},
+      {page:'package', icon:'layers', label:'Package & Panel', action:"navigate('package')"},
+      {page:'corporate', icon:'building-2', label:'Corporate', action:"navigate('corporate')"},
+      {page:'family', icon:'users-round', label:'Family Registry', action:"navigate('family')"},
+      {page:'analyzer', icon:'sliders', label:'Master Alat (Analyzer)', action:"navigate('lab',{tab:'qc'})"},
+      {page:'labreport', icon:'printer', label:'Setting Hasil PDF', action:"navigate('labreport')"},
+      {page:'import', icon:'upload', label:'Bulk Upload', action:"navigate('import')"},
+      {page:'settings', icon:'settings', label:'Pengaturan', action:"navigate('settings')"},
     ]
   },
 };
@@ -723,14 +748,14 @@ function openFlyout(cat) {
     const isActive = currentPage === item.page;
     if (item.soon) {
       return `<div class="flyout-item flyout-item-soon">
-        <span class="flyout-item-icon">${item.icon}</span>
+        <span class="flyout-item-icon">${icon(item.icon,17)}</span>
         <span class="flyout-item-label">${item.label}</span>
         <span class="flyout-soon-badge">soon</span>
       </div>`;
     }
     return `<button class="flyout-item ${isActive?'active':''}" data-page="${item.page}"
       onclick="${item.action};setActiveFlyoutItem('${item.page}')">
-      <span class="flyout-item-icon">${item.icon}</span>
+      <span class="flyout-item-icon">${icon(item.icon,17)}</span>
       <span class="flyout-item-label">${item.label}</span>
       ${item.badge?`<span class="flyout-item-badge" id="${item.badge}-flyout" style="display:none">0</span>`:''}
     </button>`;
@@ -782,6 +807,17 @@ function syncFlyoutToPage(page) {
 // KATEGORI: halaman indeks + pintasan atas (pengganti flyout)
 // ══════════════════════════════════════════════════════════════
 
+// Isi ikon rail dari definisi kategori (dipanggil saat halaman siap)
+function paintRailIcons() {
+  document.querySelectorAll('.rail-icon[data-icon]').forEach(el => {
+    const cat = el.getAttribute('data-icon');
+    const name = FLYOUT_MENUS[cat]?.icon || 'home';
+    el.innerHTML = typeof icon === 'function' ? icon(name, 20) : '';
+  });
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paintRailIcons);
+else paintRailIcons();
+
 // Item yang boleh dilihat user berdasarkan role
 function visibleCategoryItems(cat) {
   const menu = FLYOUT_MENUS[cat];
@@ -806,7 +842,7 @@ function renderSubnav(cat, activePage) {
 
   el.innerHTML = `
     <button class="subnav-home ${!activePage?'active':''}" onclick="openCategory('${cat}')" title="Ringkasan ${menu.label}">
-      <span class="subnav-home-ico">${menu.items[0]?.icon||'▪'}</span>
+      <span class="subnav-home-ico">${icon(menu.icon,15)}</span>
       <span>${menu.label}</span>
     </button>
     <span class="subnav-sep"></span>
@@ -864,14 +900,14 @@ function openCategory(cat) {
           <div class="cat-grid">
             ${gitems.map(it => it.soon
               ? `<div class="cat-card disabled">
-                   <span class="cat-card-ico">${it.icon||'▪'}</span>
+                   <span class="cat-card-ico">${icon(it.icon,18)}</span>
                    <div class="cat-card-body">
                      <div class="cat-card-label">${it.label}<span class="cat-card-soon">segera</span></div>
                      ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
                    </div>
                  </div>`
               : `<button class="cat-card" onclick="${it.action};setActiveFlyoutItem('${it.page}')">
-                   <span class="cat-card-ico">${it.icon||'▪'}</span>
+                   <span class="cat-card-ico">${icon(it.icon,18)}</span>
                    <div class="cat-card-body">
                      <div class="cat-card-label">${it.label}</div>
                      ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
