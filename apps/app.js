@@ -19,6 +19,7 @@ const MOCK_REFERRALS = [
 
 // --- APP RUNTIME STATE ---
 let currentRole = 'patient';
+let currentPhase = 'fase1';
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
 let currentCalledQueue = 40; // Counter queue starts at A-040
@@ -30,6 +31,31 @@ function showScreen(screenId) {
   });
   const target = document.getElementById(screenId);
   if (target) target.classList.add('active');
+}
+
+// Switch Timeline Phase
+function switchTimelinePhase(phaseId) {
+  currentPhase = phaseId;
+
+  // Sync tab active states
+  document.querySelectorAll('.t-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.id === `btn-${phaseId}`);
+  });
+
+  // Hide all panels
+  document.querySelectorAll('.phase-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+
+  // Show active panel matching role + phase
+  let prefix = 'p';
+  if (currentRole === 'corporate') prefix = 'c';
+  if (currentRole === 'referral') prefix = 'r';
+
+  const targetPanel = document.getElementById(`${prefix}-${phaseId}-panel`);
+  if (targetPanel) {
+    targetPanel.classList.add('active');
+  }
 }
 
 // Render Corporate List
@@ -122,7 +148,7 @@ function handleLogin(event) {
     roleBadgeEl.textContent = 'Mitra Korporasi';
     roleBadgeEl.style.color = '#f59e0b';
     
-    // Render and show Corporate View
+    // Render Corporate List
     renderCorporateList();
     document.getElementById('corporate-view').classList.add('active');
   } 
@@ -133,7 +159,7 @@ function handleLogin(event) {
     roleBadgeEl.textContent = 'Faskes / Dokter Perujuk';
     roleBadgeEl.style.color = '#14b8a6';
     
-    // Render and show Referral View
+    // Render Referral List
     renderReferralList();
     document.getElementById('referral-view').classList.add('active');
   } 
@@ -153,6 +179,8 @@ function handleLogin(event) {
     document.getElementById('patient-view').classList.add('active');
   }
   
+  // Always reset timeline phase to Fase 1 on login
+  switchTimelinePhase('fase1');
   showScreen('dashboard-screen');
 }
 
@@ -369,4 +397,43 @@ function syncWearableData() {
 
     alert('Data kesehatan dari Smartwatch berhasil disinkronkan!');
   }, 1200);
+}
+
+// ════════════════════════ FUTURISTIC SIMULATORS ════════════════════════
+
+// Fase 2: Continuous Biosensor Pulse Scanner
+function simulateBiosensorPulse() {
+  const sugarEl = document.getElementById('f2-sugar-val');
+  const uricEl = document.getElementById('f2-uric-val');
+
+  if (!sugarEl || !uricEl) return;
+
+  sugarEl.textContent = 'Scanning...';
+  uricEl.textContent = 'Scanning...';
+
+  setTimeout(() => {
+    const randomSugar = Math.floor(Math.random() * (116 - 92 + 1)) + 92;
+    const randomUric = (Math.random() * (6.6 - 5.0) + 5.0).toFixed(1);
+
+    sugarEl.textContent = `${randomSugar} mg/dL`;
+    uricEl.textContent = `${randomUric} mg/dL`;
+
+    alert('Scan sensor tubuh selesai. Data biosensor Anda stabil dan sinkron.');
+  }, 1200);
+}
+
+// Fase 4: CRISPR Age Reversal
+function simulateAgeReversal() {
+  const ageEl = document.getElementById('f4-bio-age');
+  if (!ageEl) return;
+
+  let currentAge = parseInt(ageEl.textContent) || 25;
+  
+  if (currentAge > 21) {
+    currentAge -= 1;
+    ageEl.textContent = `${currentAge} Tahun`;
+    alert(`Terapi sel penuaan berhasil dipicu. Usia biologis Anda ter-update menjadi ${currentAge} tahun.`);
+  } else {
+    alert('Usia biologis Anda telah mencapai performa puncak seluler (21 tahun). Terapi optimal tercapai!');
+  }
 }

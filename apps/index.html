@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260719c">
+  <link rel="stylesheet" href="style.css?v=20260719d">
 </head>
 <body>
   <div class="app-container">
@@ -60,7 +60,7 @@
 
     <!-- ════════════════════════ DASHBOARD SCREEN ════════════════════════ -->
     <div id="dashboard-screen" class="screen">
-      <header class="app-header">
+      <header class="app-header" style="margin-bottom:12px;">
         <div class="user-profile">
           <div class="avatar" id="user-avatar">P</div>
           <div class="user-info">
@@ -71,277 +71,537 @@
         <button class="logout-btn" onclick="handleLogout()">Keluar</button>
       </header>
 
+      <!-- Timeline Tabs Navigation -->
+      <div class="timeline-tabs-container">
+        <div class="timeline-tabs">
+          <button class="t-tab active" id="btn-fase1" onclick="switchTimelinePhase('fase1')">Fase 1<br><small>2026-2031</small></button>
+          <button class="t-tab" id="btn-fase2" onclick="switchTimelinePhase('fase2')">Fase 2<br><small>2031-2046</small></button>
+          <button class="t-tab" id="btn-fase3" onclick="switchTimelinePhase('fase3')">Fase 3<br><small>2046-2076</small></button>
+          <button class="t-tab" id="btn-fase4" onclick="switchTimelinePhase('fase4')">Fase 4<br><small>2076-2126</small></button>
+        </div>
+      </div>
+
       <!-- ──────── VIEW: PASIEN ──────── -->
       <div id="patient-view" class="view-panel">
         
-        <!-- Premium Digital Member Card -->
-        <div class="member-card" id="p-member-card">
-          <div class="member-card-header">
-            <div class="member-logo">AH</div>
-            <span class="member-tier">GOLD MEMBER</span>
-          </div>
-          <div class="member-card-body">
-            <h4 id="p-member-name">Budi Santoso</h4>
-            <p class="member-id">ID: AH-9902-12948</p>
-          </div>
-          <div class="member-card-footer">
-            <div class="member-points">
-              <span>Loyalty Points</span>
-              <strong id="p-member-points">1.250 pts</strong>
+        <!-- P - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
+        <div id="p-fase1-panel" class="phase-panel active">
+          <!-- Premium Digital Member Card -->
+          <div class="member-card" id="p-member-card">
+            <div class="member-card-header">
+              <div class="member-logo">AH</div>
+              <span class="member-tier">GOLD MEMBER</span>
             </div>
-            <!-- Mock Barcode -->
-            <div class="member-barcode" title="Check-in QR/Barcode">
-              <div class="barcode-line w-2"></div>
-              <div class="barcode-line w-1"></div>
-              <div class="barcode-line w-3"></div>
-              <div class="barcode-line w-1"></div>
-              <div class="barcode-line w-2"></div>
-              <div class="barcode-line w-4"></div>
-              <div class="barcode-line w-1"></div>
-              <div class="barcode-line w-2"></div>
+            <div class="member-card-body">
+              <h4 id="p-member-name">Budi Santoso</h4>
+              <p class="member-id">ID: AH-9902-12948</p>
             </div>
-          </div>
-        </div>
-
-        <!-- Live Queue Ticket Alert (Hidden by default, shown when user has booked) -->
-        <div id="p-active-ticket-box" class="ticket-widget" style="display:none;">
-          <div class="ticket-widget-header">
-            <span>🎟️ Tiket Antrean Aktif</span>
-            <span class="pulse-dot"></span>
-          </div>
-          <div class="ticket-widget-body">
-            <div class="ticket-widget-num" id="p-ticket-number">A-045</div>
-            <div class="ticket-widget-info">
-              <p>Layanan: <strong id="p-ticket-service">Klinik Umum</strong></p>
-              <p>Estimasi Panggilan: <span id="p-ticket-time">10 Menit lagi</span></p>
-            </div>
-          </div>
-          <div class="ticket-widget-footer">
-            <span>Antrean Sekarang di Counter: <strong id="p-ticket-current">A-042</strong></span>
-          </div>
-        </div>
-
-        <!-- Wellness Tracker (Like AvaHealth wearable sync) -->
-        <div class="section-title">Status Wellness Anda</div>
-        <div class="glass-card wellness-container" style="margin-bottom: 24px;">
-          <div class="wellness-grid">
-            
-            <!-- Metric 1: Steps -->
-            <div class="wellness-metric">
-              <span class="well-icon">👟</span>
-              <div class="well-info">
-                <h5>Langkah</h5>
-                <strong id="w-steps">7.420</strong>
-                <span>/ 10k target</span>
+            <div class="member-card-footer">
+              <div class="member-points">
+                <span>Loyalty Points</span>
+                <strong id="p-member-points">1.250 pts</strong>
               </div>
-              <div class="progress-bar-bg mini-progress">
-                <div class="progress-bar-fill" id="w-steps-bar" style="width: 74%;"></div>
+              <div class="member-barcode">
+                <div class="barcode-line w-2"></div>
+                <div class="barcode-line w-1"></div>
+                <div class="barcode-line w-3"></div>
+                <div class="barcode-line w-1"></div>
+                <div class="barcode-line w-2"></div>
+                <div class="barcode-line w-4"></div>
+                <div class="barcode-line w-1"></div>
+                <div class="barcode-line w-2"></div>
               </div>
             </div>
+          </div>
 
-            <!-- Metric 2: Heart Rate -->
-            <div class="wellness-metric">
-              <span class="well-icon beating-heart-icon">❤️</span>
-              <div class="well-info">
-                <h5>Jantung</h5>
-                <strong id="w-heart">72 <small>bpm</small></strong>
-                <span>Rileks</span>
+          <!-- Active Ticket Box -->
+          <div id="p-active-ticket-box" class="ticket-widget" style="display:none;">
+            <div class="ticket-widget-header">
+              <span>🎟️ Tiket Antrean Aktif</span>
+              <span class="pulse-dot"></span>
+            </div>
+            <div class="ticket-widget-body">
+              <div class="ticket-widget-num" id="p-ticket-number">A-045</div>
+              <div class="ticket-widget-info">
+                <p>Layanan: <strong id="p-ticket-service">Klinik Umum</strong></p>
+                <p>Estimasi Panggilan: <span id="p-ticket-time">10 Menit lagi</span></p>
               </div>
             </div>
+            <div class="ticket-widget-footer">
+              <span>Antrean Sekarang di Counter: <strong id="p-ticket-current">A-042</strong></span>
+            </div>
+          </div>
 
-            <!-- Metric 3: Sleep -->
-            <div class="wellness-metric">
-              <span class="well-icon">🌙</span>
-              <div class="well-info">
-                <h5>Tidur</h5>
-                <strong id="w-sleep">7.5 <small>jam</small></strong>
-                <span>Kualitas: 85%</span>
+          <!-- Wellness Tracker -->
+          <div class="section-title">Status Wellness Anda</div>
+          <div class="glass-card wellness-container" style="margin-bottom: 24px;">
+            <div class="wellness-grid">
+              <div class="wellness-metric">
+                <span class="well-icon">👟</span>
+                <div class="well-info">
+                  <h5>Langkah</h5>
+                  <strong id="w-steps">7.420</strong>
+                  <span>/ 10k target</span>
+                </div>
+                <div class="progress-bar-bg mini-progress">
+                  <div class="progress-bar-fill" id="w-steps-bar" style="width: 74%;"></div>
+                </div>
+              </div>
+              <div class="wellness-metric">
+                <span class="well-icon beating-heart-icon">❤️</span>
+                <div class="well-info">
+                  <h5>Jantung</h5>
+                  <strong id="w-heart">72 <small>bpm</small></strong>
+                  <span>Rileks</span>
+                </div>
+              </div>
+              <div class="wellness-metric">
+                <span class="well-icon">🌙</span>
+                <div class="well-info">
+                  <h5>Tidur</h5>
+                  <strong id="w-sleep">7.5 <small>jam</small></strong>
+                  <span>Kualitas: 85%</span>
+                </div>
               </div>
             </div>
-
+            <button class="btn btn-sm btn-close" onclick="syncWearableData()" style="width:100%; margin-top:14px; font-size:11px;">
+              🔄 Sinkronkan Wearables / Smartwatch
+            </button>
           </div>
-          <button class="btn btn-sm btn-close" onclick="syncWearableData()" style="width:100%; margin-top:14px; font-size:11px;">
-            🔄 Sinkronkan Wearables / Smartwatch
-          </button>
+
+          <div class="quick-stats">
+            <div class="stat-card" onclick="alert('Anda memiliki 1 janji temu aktif.')">
+              <span class="stat-icon">📅</span>
+              <h4>Janji Temu</h4>
+              <p>1 Aktif</p>
+            </div>
+            <div class="stat-card" onclick="openLabResultsModal()">
+              <span class="stat-icon">🧪</span>
+              <h4>Hasil Lab</h4>
+              <p>2 Tersedia</p>
+            </div>
+          </div>
+
+          <div class="section-title">Menu Utama Pasien</div>
+          <div class="menu-list">
+            <button class="menu-item" onclick="openBookingModal()">
+              <span class="menu-ico">📅</span>
+              <div class="menu-text">
+                <h5>Pesan Janji Temu</h5>
+                <p>Buat janji temu dengan dokter umum atau spesialis</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+            <button class="menu-item" onclick="openLabResultsModal()">
+              <span class="menu-ico">📄</span>
+              <div class="menu-text">
+                <h5>Riwayat Medis & Lab</h5>
+                <p>Lihat hasil lab, rontgen, dan catatan rekam medis</p>
+              </div>
+              <span class="menu-arrow">❯</span>
+            </button>
+          </div>
         </div>
 
-        <div class="quick-stats">
-          <div class="stat-card" onclick="alert('Anda memiliki 1 janji temu aktif.')">
-            <span class="stat-icon">📅</span>
-            <h4>Janji Temu</h4>
-            <p id="p-appointments">1 Aktif</p>
+        <!-- P - FASE 2: GENOMIC & BIOSENSORS -->
+        <div id="p-fase2-panel" class="phase-panel">
+          <div class="section-title">🧬 Profil DNA & Risiko Genomik</div>
+          <div class="glass-card dna-card" style="margin-bottom:24px;">
+            <div class="dna-helix-container">
+              <!-- Visual CSS DNA Helix -->
+              <div class="dna-bar"></div>
+              <div class="dna-bar"></div>
+              <div class="dna-bar"></div>
+              <div class="dna-bar"></div>
+            </div>
+            <div class="dna-details">
+              <div class="dna-risk-row">
+                <span>Kanker Payudara/Prostat (BRCA1)</span>
+                <span class="badge badge-fit">NORMAL RISK</span>
+              </div>
+              <div class="dna-risk-row">
+                <span>Kecenderungan Diabetes (Type 2)</span>
+                <span class="badge badge-pending" style="color:var(--warning);">MODERATE RISK</span>
+              </div>
+              <div class="dna-risk-row">
+                <span>Risiko Kardiovaskular</span>
+                <span class="badge badge-fit">LOW RISK</span>
+              </div>
+            </div>
           </div>
-          <div class="stat-card" onclick="openLabResultsModal()">
-            <span class="stat-icon">🧪</span>
-            <h4>Hasil Lab</h4>
-            <p id="p-labresults">2 Tersedia</p>
+
+          <div class="section-title">📈 Grafik Biosensor Kontinu</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div class="biosensor-row">
+              <div>
+                <h5>Kadar Gula Darah (Mikro-sensor Lensa Kontak)</h5>
+                <strong id="f2-sugar-val">104 mg/dL</strong>
+              </div>
+              <span class="badge badge-fit">STABIL</span>
+            </div>
+            <div class="biosensor-row" style="margin-top:14px;">
+              <div>
+                <h5>Asam Urat (Sub-dermal Patch)</h5>
+                <strong id="f2-uric-val">5.8 mg/dL</strong>
+              </div>
+              <span class="badge badge-fit">STABIL</span>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="simulateBiosensorPulse()" style="width:100%; margin-top:14px;">
+              ⚡ Scan Ulang Sensor Tubuh
+            </button>
           </div>
         </div>
 
-        <div class="section-title">Menu Utama Pasien</div>
-        <div class="menu-list">
-          <button class="menu-item" onclick="openBookingModal()">
-            <span class="menu-ico">📅</span>
-            <div class="menu-text">
-              <h5>Pesan Janji Temu</h5>
-              <p>Buat janji temu dengan dokter umum atau spesialis</p>
+        <!-- P - FASE 3: NANOTECH & BCI -->
+        <div id="p-fase3-panel" class="phase-panel">
+          <div class="section-title">🤖 Aliran Nanobots In-Vivo</div>
+          <div class="glass-card nanobots-card" style="margin-bottom:24px;">
+            <div class="nanobots-stats">
+              <div class="nb-stat">
+                <h5>Status Nanobots</h5>
+                <strong class="glow-cyan">AKTIF (98%)</strong>
+              </div>
+              <div class="nb-stat">
+                <h5>Pembersihan Kolesterol</h5>
+                <strong id="f3-kolesterol-clear">84.2% selesai</strong>
+              </div>
             </div>
-            <span class="menu-arrow">❯</span>
-          </button>
-          <button class="menu-item" onclick="openLabResultsModal()">
-            <span class="menu-ico">📄</span>
-            <div class="menu-text">
-              <h5>Riwayat Medis & Lab</h5>
-              <p>Lihat hasil lab, rontgen, dan catatan rekam medis</p>
+            <div class="progress-bar-bg" style="margin-top:10px;">
+              <div class="progress-bar-fill" id="f3-nanobots-bar" style="width: 84%;"></div>
             </div>
-            <span class="menu-arrow">❯</span>
-          </button>
-          <button class="menu-item" onclick="alert('Layanan Booking Homecare sedang disiapkan')">
-            <span class="menu-ico">🏠</span>
-            <div class="menu-text">
-              <h5>Layanan Homecare</h5>
-              <p>Panggil perawat/dokter untuk tindakan medis di rumah</p>
+          </div>
+
+          <div class="section-title">🖨️ Cetak Organ 3D (Bioprinting)</div>
+          <div class="glass-card organ-print-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+              <h5>Ginjal Kiri Baru (Sel Punca Autolog)</h5>
+              <span class="badge badge-pending">PRINTING</span>
             </div>
-            <span class="menu-arrow">❯</span>
-          </button>
+            <div class="progress-bar-bg" style="margin-bottom:6px;">
+              <div class="progress-bar-fill" style="width: 64%; background:linear-gradient(90deg, var(--teal), var(--primary));"></div>
+            </div>
+            <span style="font-size:11px; color:var(--text-muted);">Progres Cetak: 64% &bull; Estimasi Selesai: 12 Hari</span>
+          </div>
+
+          <div class="section-title">🧠 BCI Neural Link (Saraf & Stres)</div>
+          <div class="glass-card BCI-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h5>Pola Gelombang Otak</h5>
+                <strong>Alpha Waves (Rileks)</strong>
+              </div>
+              <div style="text-align:right;">
+                <h5>Tingkat Stres Saraf</h5>
+                <strong class="glow-teal" id="f3-stress-val">15% (Sangat Rendah)</strong>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- P - FASE 4: QUANTUM & LONGEVITY -->
+        <div id="p-fase4-panel" class="phase-panel">
+          <div class="section-title">⚛️ Pemindai Sel Kuantum (Instant Scanner)</div>
+          <div class="glass-card quantum-card" style="margin-bottom:24px;">
+            <div class="q-row">
+              <span class="q-led led-green"></span>
+              <div>
+                <h5>Integritas Sel Atom</h5>
+                <p>Status: 100% Optimal &bull; Kerusakan tingkat atom: Nihil</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">🧬 Rekayasa Genetika CRISPR & Anti-Aging</div>
+          <div class="glass-card longevity-card" style="margin-bottom:24px;">
+            <div class="longevity-stats">
+              <div class="l-stat">
+                <h5>Umur Kronologis</h5>
+                <strong>90 Tahun</strong>
+              </div>
+              <div class="l-stat">
+                <h5>Umur Biologis</h5>
+                <strong class="glow-gold" id="f4-bio-age">25 Tahun</strong>
+              </div>
+            </div>
+            <div class="longevity-badge-row" style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.05); padding-top:12px;">
+              <span>Terapi Senolitik (Anti-Aging): <strong style="color:var(--teal)">AKTIF</strong></span>
+              <button class="btn btn-sm btn-teal" onclick="simulateAgeReversal()" style="font-size:10px;">Picu Terapi Sel</button>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
       <div id="corporate-view" class="view-panel">
-        <div class="quick-stats">
-          <div class="stat-card">
-            <span class="stat-icon">👥</span>
-            <h4>Total Karyawan</h4>
-            <p id="c-total-staff">150 Orang</p>
+        
+        <!-- C - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
+        <div id="c-fase1-panel" class="phase-panel active">
+          <!-- Progress & Charts inside Fase 1 -->
+          <div class="quick-stats">
+            <div class="stat-card">
+              <span class="stat-icon">👥</span>
+              <h4>Total Karyawan</h4>
+              <p>150 Orang</p>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">✅</span>
+              <h4>Selesai MCU</h4>
+              <p>120 Orang</p>
+            </div>
           </div>
-          <div class="stat-card">
-            <span class="stat-icon">✅</span>
-            <h4>Selesai MCU</h4>
-            <p id="c-done-mcu">120 Orang</p>
+
+          <div class="glass-card progress-card" style="margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
+              <span>Progres Proyek MCU</span>
+              <span>80%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <!-- Wellness Chart (Pure SVG) -->
+          <div class="glass-card chart-card" style="margin-bottom: 24px;">
+            <div class="chart-header">
+              <h4>Analisis Kesehatan Karyawan</h4>
+            </div>
+            <div class="chart-content">
+              <svg width="120" height="120" viewBox="0 0 42 42" class="donut-chart">
+                <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="transparent"></circle>
+                <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="4"></circle>
+                <circle class="donut-segment segment-fit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--teal)" stroke-width="4" stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
+                <circle class="donut-segment segment-unfit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--error)" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="55"></circle>
+                <circle class="donut-segment segment-pending" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--warning)" stroke-width="4" stroke-dasharray="10 90" stroke-dashoffset="35"></circle>
+                <text x="50%" y="55%" class="donut-text" text-anchor="middle" fill="#fff" font-size="8" font-weight="800">70%</text>
+                <text x="50%" y="67%" class="donut-subtext" text-anchor="middle" fill="var(--text-muted)" font-size="3" font-weight="600">FIT</text>
+              </svg>
+              <div class="chart-legend">
+                <div class="legend-item"><span class="legend-dot dot-fit"></span> <span>Fit to Work (70%)</span></div>
+                <div class="legend-item"><span class="legend-dot dot-unfit"></span> <span>Unfit/Review (20%)</span></div>
+                <div class="legend-item"><span class="legend-dot dot-pending"></span> <span>Pending (10%)</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-title">Status Kesehatan Karyawan</div>
+          <div class="quick-stats" style="margin-bottom: 24px;">
+            <div class="mini-stat-card card-fit">
+              <h5>Fit to Work</h5>
+              <span>105</span>
+            </div>
+            <div class="mini-stat-card card-unfit">
+              <h5>Unfit / Review</h5>
+              <span>15</span>
+            </div>
+          </div>
+
+          <div class="section-title">Billing & Invoice Korporat</div>
+          <div class="glass-card invoice-widget" style="margin-bottom: 24px;">
+            <div class="invoice-row">
+              <div class="invoice-info">
+                <h5>INV-202607-001</h5>
+                <p>MCU Tahunan Tahap 1 &bull; 19 Juli 2026</p>
+              </div>
+              <div style="text-align:right;">
+                <span class="invoice-amount">Rp 45.000.000</span>
+                <span class="badge badge-unfit" style="display:block; width:fit-content; margin-left:auto; margin-top:4px;">Belum Bayar</span>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="alert('Pembayaran Invoice via Virtual Account disimulasikan!')" style="width:100%; margin-top:12px;">Bayar Invoice Sekarang</button>
+          </div>
+
+          <div class="section-title">Daftar Peserta MCU</div>
+          <div class="corporate-list" id="corporate-list-container">
+            <!-- Dinamis via JS -->
           </div>
         </div>
 
-        <!-- Progress Bar MCU -->
-        <div class="glass-card progress-card" style="margin-bottom: 20px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
-            <span>Progres Proyek MCU</span>
-            <span id="c-progress-label">80%</span>
+        <!-- C - FASE 2: PREDICTIVE WELLNESS -->
+        <div id="c-fase2-panel" class="phase-panel">
+          <div class="section-title">🔮 Prediksi Kesehatan Absensi Karyawan</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+              <div>
+                <h5>Perkiraan Absen Sakit Bulan Depan</h5>
+                <strong style="font-size:24px; color:var(--teal)">2.4 Hari Kerja / Divisi</strong>
+              </div>
+              <span class="badge badge-fit">TURUN 40%</span>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+              Penurunan absensi diproyeksikan berkat penerapan saran gizi kantor otomatis berbasis AI.
+            </p>
           </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="c-progress-bar" style="width: 80%;"></div>
-          </div>
-        </div>
 
-        <!-- Wellness Chart (Pure SVG) -->
-        <div class="glass-card chart-card" style="margin-bottom: 24px;">
-          <div class="chart-header">
-            <h4>Analisis Kesehatan Karyawan</h4>
-          </div>
-          <div class="chart-content">
-            <svg width="120" height="120" viewBox="0 0 42 42" class="donut-chart">
-              <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="transparent"></circle>
-              <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="rgba(255,255,255,0.05)" stroke-width="4"></circle>
-              <!-- 70% Fit (Teal), 10% Pending (Warning), 20% Unfit (Error) -->
-              <circle class="donut-segment segment-fit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--teal)" stroke-width="4" stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
-              <circle class="donut-segment segment-unfit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--error)" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="55"></circle>
-              <circle class="donut-segment segment-pending" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--warning)" stroke-width="4" stroke-dasharray="10 90" stroke-dashoffset="35"></circle>
-              <text x="50%" y="55%" class="donut-text" text-anchor="middle" fill="#fff" font-size="8" font-weight="800">70%</text>
-              <text x="50%" y="67%" class="donut-subtext" text-anchor="middle" fill="var(--text-muted)" font-size="3" font-weight="600">FIT</text>
-            </svg>
-            <div class="chart-legend">
-              <div class="legend-item"><span class="legend-dot dot-fit"></span> <span>Fit to Work (70%)</span></div>
-              <div class="legend-item"><span class="legend-dot dot-unfit"></span> <span>Unfit/Review (20%)</span></div>
-              <div class="legend-item"><span class="legend-dot dot-pending"></span> <span>Pending (10%)</span></div>
+          <div class="section-title">⚠️ Risiko Penyakit Kronis Cohort</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div class="dna-risk-row">
+              <span>Faktor Risiko Kardiovaskular Perusahaan</span>
+              <strong style="color:var(--warning)">Sedang (12%)</strong>
+            </div>
+            <div class="dna-risk-row">
+              <span>Faktor Risiko Kelelahan/Burnout</span>
+              <strong style="color:var(--success)">Rendah (4%)</strong>
             </div>
           </div>
         </div>
 
-        <div class="section-title">Status Kesehatan Karyawan</div>
-        <div class="quick-stats" style="margin-bottom: 24px;">
-          <div class="mini-stat-card card-fit">
-            <h5>Fit to Work</h5>
-            <span id="c-fit-count">105</span>
+        <!-- C - FASE 3: NANOBOTS INSURANCE & ORGAN -->
+        <div id="c-fase3-panel" class="phase-panel">
+          <div class="section-title">🛡️ Asuransi & Pengisian Nanobots Karyawan</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h5>Pengisian Nanobots Selesai</h5>
+                <strong style="font-size:22px; color:var(--teal);">145 / 150 Karyawan</strong>
+              </div>
+              <span class="badge badge-fit">96% TERISI</span>
+            </div>
           </div>
-          <div class="mini-stat-card card-unfit">
-            <h5>Unfit / Review</h5>
-            <span id="c-unfit-count">15</span>
+
+          <div class="section-title">🧬 Jadwal Penggantian Organ Karyawan</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div class="list-row">
+              <div class="list-row-avatar">🖨️</div>
+              <div class="list-row-details">
+                <h5>Rudi Hermawan (EMP-034)</h5>
+                <p>Tindakan: Penggantian Ginjal Kiri Preventif</p>
+                <p style="font-size:11px; color:var(--text-muted);">Jadwal Transplantasi: Bulan Depan</p>
+              </div>
+              <span class="badge badge-pending">DIJADWALKAN</span>
+            </div>
           </div>
         </div>
 
-        <!-- Corporate Invoices / Billing -->
-        <div class="section-title">Billing & Invoice Korporat</div>
-        <div class="glass-card invoice-widget" style="margin-bottom: 24px;">
-          <div class="invoice-row">
-            <div class="invoice-info">
-              <h5>INV-202607-001</h5>
-              <p>MCU Tahunan Tahap 1 &bull; 19 Juli 2026</p>
+        <!-- C - FASE 4: UNIVERSAL LONGEVITY -->
+        <div id="c-fase4-panel" class="phase-panel">
+          <div class="section-title">📊 Indeks Produktivitas Sel Karyawan</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h5>Rata-rata Usia Biologis Karyawan</h5>
+              <strong class="glow-gold" style="font-size:24px;">26.2 Tahun</strong>
             </div>
-            <div style="text-align:right;">
-              <span class="invoice-amount">Rp 45.000.000</span>
-              <span class="badge badge-unfit" style="display:block; width:fit-content; margin-left:auto; margin-top:4px;">Belum Bayar</span>
-            </div>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+              Meskipun rata-rata umur kronologis karyawan adalah 48 tahun, indeks produktivitas sel menunjukkan usia biologis setara 26 tahun karena efektivitas senolytic therapy.
+            </p>
           </div>
-          <button class="btn btn-sm btn-primary" onclick="alert('Pembayaran Invoice via Virtual Account disimulasikan!')" style="width:100%; margin-top:12px;">Bayar Invoice Sekarang</button>
         </div>
 
-        <div class="section-title">Daftar Peserta MCU</div>
-        <div class="corporate-list" id="corporate-list-container">
-          <!-- Dinamis via JS -->
-        </div>
       </div>
 
       <!-- ──────── VIEW: FASKES REFERRAL ──────── -->
       <div id="referral-view" class="view-panel">
-        <div class="quick-stats">
-          <div class="stat-card">
-            <span class="stat-icon">🔗</span>
-            <h4>Rujukan Dikirim</h4>
-            <p id="r-total-referrals">24 Pasien</p>
+        
+        <!-- R - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
+        <div id="r-fase1-panel" class="phase-panel active">
+          <div class="quick-stats">
+            <div class="stat-card">
+              <span class="stat-icon">🔗</span>
+              <h4>Rujukan Dikirim</h4>
+              <p id="r-total-referrals">24 Pasien</p>
+            </div>
+            <div class="stat-card">
+              <span class="stat-icon">💰</span>
+              <h4>Akumulasi Fee/Poin</h4>
+              <p id="r-commission">Rp 1.200.000</p>
+            </div>
           </div>
-          <div class="stat-card">
-            <span class="stat-icon">💰</span>
-            <h4>Akumulasi Fee/Poin</h4>
-            <p id="r-commission">Rp 1.200.000</p>
+
+          <!-- Chat Konsultasi Dokter -->
+          <div class="section-title">Konsultasi Dokter (Peer-to-Peer)</div>
+          <div class="glass-card chat-widget" style="margin-bottom: 24px;">
+            <div class="chat-header-widget">
+              <div class="chat-avatar-pic">🧪</div>
+              <div>
+                <h6>Dr. Haryanto, Sp.PK</h6>
+                <p>Patologi Klinik Laboratorium</p>
+              </div>
+              <span class="chat-status-dot"></span>
+            </div>
+            <div class="chat-body-widget" id="chat-messages-container">
+              <div class="chat-msg msg-received">
+                <p>Selamat pagi Dokter. Untuk sampel pasien Budi Santoso, kadar Trombositnya terpantau kritis (45.000). Apakah perlu kami lakukan sediaan apus darah tepi ulang?</p>
+                <span class="msg-time">05:15</span>
+              </div>
+              <div class="chat-msg msg-sent">
+                <p>Selamat pagi dr. Haryanto. Ya, mohon lakukan sediaan apus untuk menyingkirkan adanya false thrombocytopenia / platelet clumping. Terima kasih.</p>
+                <span class="msg-time">05:20</span>
+              </div>
+            </div>
+            <form onsubmit="sendConsultMessage(event)" class="chat-input-form">
+              <input type="text" id="chat-input" placeholder="Tulis jawaban dokter..." required autocomplete="off">
+              <button type="submit" class="chat-send-btn">➡️</button>
+            </form>
+          </div>
+
+          <button class="btn btn-primary" onclick="openReferralForm()" style="margin-bottom: 24px;">
+            ➕ Buat Rujukan Baru
+          </button>
+
+          <div class="section-title">Pasien Rujukan Terkini</div>
+          <div class="referral-list" id="referral-list-container">
+            <!-- Dinamis via JS -->
           </div>
         </div>
 
-        <!-- Chat Konsultasi Dokter (Simulator Peer-to-Peer) -->
-        <div class="section-title">Konsultasi Dokter (Peer-to-Peer)</div>
-        <div class="glass-card chat-widget" style="margin-bottom: 24px;">
-          <div class="chat-header-widget">
-            <div class="chat-avatar-pic">🧪</div>
-            <div>
-              <h6>Dr. Haryanto, Sp.PK</h6>
-              <p>Patologi Klinik Laboratorium</p>
-            </div>
-            <span class="chat-status-dot"></span>
+        <!-- R - FASE 2: AI DNA MATCH ROUTING -->
+        <div id="r-fase2-panel" class="phase-panel">
+          <div class="section-title">🧬 Router Rujukan Kecocokan DNA</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px;">
+              <thead>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.08); text-align:left; color:var(--text-muted)">
+                  <th style="padding-bottom:8px;">Dokter Spesialis</th>
+                  <th style="padding-bottom:8px;">Kecocokan Genomik</th>
+                  <th style="padding-bottom:8px; text-align:right;">Rekomendasi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+                  <td style="padding:10px 0;">dr. Budi, Sp.PD</td>
+                  <td style="padding:10px 0; color:var(--teal)">98.4% (Tinggi)</td>
+                  <td style="padding:10px 0; text-align:right;"><span class="badge badge-fit">Rujuk</span></td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 0;">dr. Siska, Sp.PD</td>
+                  <td style="padding:10px 0; color:var(--warning)">76.1% (Sedang)</td>
+                  <td style="padding:10px 0; text-align:right;"><span class="badge badge-pending">Pertimbangkan</span></td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="chat-body-widget" id="chat-messages-container">
-            <div class="chat-msg msg-received">
-              <p>Selamat pagi Dokter. Untuk sampel pasien Budi Santoso, kadar Trombositnya terpantau kritis (45.000). Apakah perlu kami lakukan sediaan apus darah tepi ulang?</p>
-              <span class="msg-time">05:15</span>
-            </div>
-            <div class="chat-msg msg-sent">
-              <p>Selamat pagi dr. Haryanto. Ya, mohon lakukan sediaan apus untuk menyingkirkan adanya false thrombocytopenia / platelet clumping. Terima kasih.</p>
-              <span class="msg-time">05:20</span>
-            </div>
-          </div>
-          <form onsubmit="sendConsultMessage(event)" class="chat-input-form">
-            <input type="text" id="chat-input" placeholder="Tulis jawaban dokter..." required autocomplete="off">
-            <button type="submit" class="chat-send-btn">➡️</button>
-          </form>
         </div>
 
-        <!-- Kirim Rujukan Baru -->
-        <button class="btn btn-primary" onclick="openReferralForm()" style="margin-bottom: 24px;">
-          ➕ Buat Rujukan Baru
-        </button>
-
-        <div class="section-title">Pasien Rujukan Terkini</div>
-        <div class="referral-list" id="referral-list-container">
-          <!-- Dinamis via JS -->
+        <!-- R - FASE 3: MOLECULAR ROUTING -->
+        <div id="r-fase3-panel" class="phase-panel">
+          <div class="section-title">🧪 Pengiriman Terapi Molekuler</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div class="list-row">
+              <div class="list-row-avatar">🔬</div>
+              <div class="list-row-details">
+                <h5>Rujukan Terapi Gen (Pasien: Ny. Linda)</h5>
+                <p>Target: Sel Kanker Payudara Her2-Positive</p>
+                <p style="font-size:11px; color:var(--teal);">Rute: Pengiriman Nanobots Bertarget</p>
+              </div>
+              <span class="badge badge-finished">SELESAI</span>
+            </div>
+          </div>
         </div>
+
+        <!-- R - FASE 4: MOLECULAR ASSEMBLY -->
+        <div id="r-fase4-panel" class="phase-panel">
+          <div class="section-title">⚛️ Status Pabrik Perakitan Molekul (Assembler)</div>
+          <div class="glass-card" style="margin-bottom:24px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <h5>Kapasitas Reaktor Sintesis Molekuler</h5>
+              <strong class="glow-cyan" style="font-size:24px;">92.5% Optimal</strong>
+            </div>
+            <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+              Faskes Referral saat ini bertindak sebagai stasiun penyerahan lokal rekayasa obat molekuler yang dirancang khusus per DNA pasien.
+            </p>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -441,6 +701,6 @@
 
   </div>
 
-  <script src="app.js?v=20260719c"></script>
+  <script src="app.js?v=20260719d"></script>
 </body>
 </html>
