@@ -297,6 +297,194 @@ body {
   cursor: pointer;
 }
 
+/* Premium Gold Member Card */
+.member-card {
+  background: linear-gradient(135deg, #1e1b18, #3b2f1e 50%, #1e1b18);
+  border: 1px solid rgba(229, 184, 88, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.member-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(229, 184, 88, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.member-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.member-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #e5b858, #b58928);
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(229, 184, 88, 0.3);
+}
+
+.member-tier {
+  font-size: 10px;
+  font-weight: 800;
+  color: #e5b858;
+  letter-spacing: 2px;
+  background: rgba(229, 184, 88, 0.1);
+  border: 1px solid rgba(229, 184, 88, 0.2);
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-shadow: 0 0 8px rgba(229, 184, 88, 0.4);
+}
+
+.member-card-body h4 {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.member-id {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.member-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 14px;
+}
+
+.member-points span {
+  display: block;
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.member-points strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: #e5b858;
+}
+
+/* Mock Barcode inside Card */
+.member-barcode {
+  display: flex;
+  height: 28px;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 3px 6px;
+  border-radius: 4px;
+  align-items: stretch;
+}
+
+.barcode-line {
+  background-color: black;
+}
+
+.w-1 { width: 1px; }
+.w-2 { width: 2px; }
+.w-3 { width: 3px; }
+.w-4 { width: 4px; }
+
+/* Wellness Tracker Grid */
+.wellness-container {
+  padding: 16px;
+}
+
+.wellness-grid {
+  display: flex;
+  gap: 12px;
+}
+
+.wellness-metric {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.well-icon {
+  font-size: 20px;
+}
+
+.beating-heart-icon {
+  display: inline-block;
+  animation: heartBeat 1.2s infinite;
+}
+
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.15); }
+  70% { transform: scale(1); }
+}
+
+.well-info h5 {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.well-info strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  color: white;
+}
+
+.well-info strong small {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.well-info span {
+  display: block;
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.mini-progress {
+  width: 100%;
+  height: 4px;
+  margin-top: 6px;
+}
+
 /* Quick Stats */
 .quick-stats {
   display: flex;
@@ -416,26 +604,6 @@ body {
   color: var(--text-muted);
   border-top: 1px dashed rgba(255,255,255,0.08);
   padding-top: 10px;
-}
-
-/* Progress bar MCU */
-.progress-card {
-  padding: 16px 20px;
-}
-
-.progress-bar-bg {
-  width: 100%;
-  height: 8px;
-  background-color: rgba(255,255,255,0.06);
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--teal), var(--primary));
-  border-radius: 4px;
-  transition: width 0.5s ease-in-out;
 }
 
 /* SVG Chart styling */
@@ -648,126 +816,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* Mini stat cards */
-.mini-stat-card {
-  flex: 1;
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.mini-stat-card h5 {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.mini-stat-card span {
-  font-size: 20px;
-  font-weight: 800;
-}
-
-.card-fit {
-  background-color: rgba(34, 197, 94, 0.05);
-  border-color: rgba(34, 197, 94, 0.15);
-}
-
-.card-fit span {
-  color: var(--success);
-}
-
-.card-unfit {
-  background-color: rgba(239, 68, 68, 0.05);
-  border-color: rgba(239, 68, 68, 0.15);
-}
-
-.card-unfit span {
-  color: var(--error);
-}
-
-/* Views */
-.view-panel {
-  display: none;
-  flex-direction: column;
-}
-
-.view-panel.active {
-  display: flex;
-}
-
-.section-title {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  margin-top: 10px;
-}
-
-/* Menu List */
-.menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.menu-item {
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.menu-item:hover {
-  background-color: rgba(255, 255, 255, 0.04);
-}
-
-.menu-ico {
-  font-size: 24px;
-  margin-right: 16px;
-  background-color: rgba(255, 255, 255, 0.02);
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.menu-text {
-  flex: 1;
-}
-
-.menu-text h5 {
-  font-size: 15px;
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-
-.menu-text p {
-  font-size: 12px;
-  color: var(--text-muted);
-  line-height: 1.3;
-}
-
-.menu-arrow {
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-left: 10px;
 }
 
 /* Lab Values & AI Assessor Modal layout */

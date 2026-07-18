@@ -139,11 +139,16 @@ function handleLogin(event) {
   } 
   else {
     // Default: Patient
+    const finalName = usernameInput || 'Budi Santoso';
     avatarEl.textContent = 'P';
     avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)';
-    welcomeEl.textContent = usernameInput || 'Pasien AvaHealth';
+    welcomeEl.textContent = finalName;
     roleBadgeEl.textContent = 'Pasien Terverifikasi';
     roleBadgeEl.style.color = '#38bdf8';
+    
+    // Initialize Member Card Name
+    const memberNameEl = document.getElementById('p-member-name');
+    if (memberNameEl) memberNameEl.textContent = finalName;
     
     document.getElementById('patient-view').classList.add('active');
   }
@@ -339,4 +344,29 @@ function sendConsultMessage(event) {
     container.appendChild(msgReceived);
     container.scrollTop = container.scrollHeight;
   }, 2500);
+}
+
+// --- WEARABLE SENSOR DATA SYNC SIMULATOR ---
+function syncWearableData() {
+  const stepsEl = document.getElementById('w-steps');
+  const stepsBarEl = document.getElementById('w-steps-bar');
+  const heartEl = document.getElementById('w-heart');
+
+  if (!stepsEl || !heartEl) return;
+
+  stepsEl.textContent = 'Syncing...';
+  heartEl.textContent = 'Syncing...';
+
+  setTimeout(() => {
+    // Generate random realistic metrics
+    const randomSteps = Math.floor(Math.random() * (9900 - 7500 + 1)) + 7500;
+    const stepsPercent = Math.min(Math.round((randomSteps / 10000) * 100), 100);
+    const randomHeart = Math.floor(Math.random() * (86 - 66 + 1)) + 66;
+
+    stepsEl.textContent = randomSteps.toLocaleString('id-ID');
+    if (stepsBarEl) stepsBarEl.style.width = `${stepsPercent}%`;
+    heartEl.innerHTML = `${randomHeart} <small>bpm</small>`;
+
+    alert('Data kesehatan dari Smartwatch berhasil disinkronkan!');
+  }, 1200);
 }
