@@ -1,0 +1,124 @@
+# OneLab — Peta Jalan 5 Fase (SIMRS · RIS · LIS · SAP)
+
+Dokumen induk hasil audit fungsional **18 Juli 2026** atas 50 berkas modul / 31.830 baris /
+12 kategori / 72 submenu. Rinciannya dipecah ke `ONELAB_FASE1.md` … `ONELAB_FASE5.md`.
+
+---
+
+## Kondisi saat ini
+
+| Domain | Kematangan | Ringkas |
+|---|---|---|
+| **LIS** — Laboratorium | 80% | Terkuat. Penerimaan berbarcode, penolakan spesimen, worklist & TAT, rentang rujukan, **delta check**, validasi 2 jenjang, QC & master analyzer, parser HL7/ASTM |
+| **SAP · MM** — Logistik | 70% | Baru matang (Fase 1–5 Inventory). PR berjenjang, PO, GR, GI, batch/FEFO, opname, kartu stok, MRP, valuasi & ABC, retur |
+| **CRM & Sales** | 65% | Partner, leads, deals, MOU, surat bernomor, voucher, MCU proyek, OKR |
+| **SAP · HCM** — SDM | 45% | Karyawan, cuti, jadwal, absensi. Penggajian masih **tabel estimasi**, BPJS dipukul rata 4% |
+| **SIMRS** — Klinik | 25% | Pendaftaran sangat rinci (51 fungsi), anamnesa, kasir. Rekam medis **baca-saja** (5 fungsi) |
+| **RIS** — Radiologi | 15% | 393 baris, menumpang tabel `lab_results`, hanya unggah berkas + cetak |
+| **SAP · FI/CO** — Akuntansi | 12% | Hanya faktur penjualan + kasir |
+
+### Yang benar-benar kosong (terverifikasi dari kode)
+
+- Rawat inap — nihil (bed, bangsal, visite, resume pulang)
+- Farmasi / apotek — nihil ("Apotek" hanya muncul sebagai jenis mitra)
+- Klaim BPJS / INA-CBG — BPJS hanya label cara bayar + potongan payroll
+- Satu Sehat / FHIR — nihil (menu bertanda *soon*)
+- Buku besar, jurnal, hutang usaha, pusat biaya, aset tetap — nihil
+- PACS / DICOM, worklist modalitas, alur baca radiolog — nihil
+- SOAP / CPPT — nihil
+
+---
+
+## Lima fase
+
+| Fase | Fokus | Kenapa urutannya begini |
+|---|---|---|
+| **[1](ONELAB_FASE1.md)** | Fondasi, Keamanan & Keselamatan Pasien | Risiko hukum & keselamatan berlaku atas data yang **sudah ada sekarang**. Tidak boleh menambah modul di atas fondasi yang bocor |
+| **[2](ONELAB_FASE2.md)** | Menyambung yang Sudah Ada | Termurah, dampak terbesar. Mesinnya sudah dibangun, tinggal disambungkan antar modul |
+| **[3](ONELAB_FASE3.md)** | Rekam Medis & Alur Klinik | Fondasi SIMRS. Tanpa rekam medis yang bisa ditulis, klaim tak bisa disusun |
+| **[4](ONELAB_FASE4.md)** | Keuangan & SDM (FI/CO/HCM) | Semua modul lain sudah menghasilkan angka yang siap diposting |
+| **[5](ONELAB_FASE5.md)** | Kepatuhan & Ekspansi | Pekerjaan besar yang butuh keputusan bisnis lebih dulu |
+
+---
+
+## Lacak kemajuan
+
+Centang saat selesai. Perbarui berkas ini setiap fase rampung.
+
+### Fase 1 — Fondasi, Keamanan & Keselamatan Pasien
+- [ ] 1.1 RLS aktif + kebijakan berbasis peran
+- [ ] 1.2 Penegakan peran di sisi server (RPC), bukan browser
+- [ ] 1.3 Nilai kritis lab + notifikasi wajib-baca (ISO 15189)
+- [ ] 1.4 Operasi multi-tabel jadi atomik (RPC)
+- [ ] 1.5 Jejak audit terstandar
+
+### Fase 2 — Menyambung yang Sudah Ada
+- [ ] 2.1 Auto goods-issue dari Lab / MCU / Radiologi
+- [ ] 2.2 Home Care → rekam medis pasien
+- [ ] 2.3 Komisi nakes → penggajian
+- [ ] 2.4 Pencocokan tiga arah PO–Penerimaan–Faktur
+- [ ] 2.5 Kontrol anggaran pada PR
+- [ ] 2.6 Multi-gudang & pemindahan antar lokasi
+- [ ] 2.7 Tautan hasil ke lot reagen
+
+### Fase 3 — Rekam Medis & Alur Klinik
+- [ ] 3.1 Rekam medis bisa ditulis (SOAP / CPPT)
+- [ ] 3.2 Daftar masalah, alergi, tanda vital + tren
+- [ ] 3.3 Diagnosis berkode ICD-10 oleh dokter
+- [ ] 3.4 Garis waktu kunjungan pasien
+- [ ] 3.5 Antrian bernomor + layar panggil
+- [ ] 3.6 Perjanjian / booking + pengingat
+
+### Fase 4 — Keuangan & SDM
+- [ ] 4.1 Bagan akun + jurnal + buku besar
+- [ ] 4.2 Posting otomatis dari kasir, faktur, inventory
+- [ ] 4.3 Hutang usaha (AP) + jadwal bayar
+- [ ] 4.4 Pusat biaya → profitabilitas per layanan
+- [ ] 4.5 Aset tetap + penyusutan + jadwal kalibrasi
+- [ ] 4.6 Penggajian sungguhan (PPh21, slip, lembur, saldo cuti)
+- [ ] 4.7 Tutup kas per shift + setoran bank
+
+### Fase 5 — Kepatuhan & Ekspansi
+- [ ] 5.1 Satu Sehat (FHIR) Kemenkes
+- [ ] 5.2 Klaim BPJS / INA-CBG
+- [ ] 5.3 RIS sebagai modul tersendiri
+- [ ] 5.4 Laporan Kemenkes RL 1–5 terisi otomatis
+- [ ] 5.5 LIS lanjutan (autoverifikasi, antarmuka alat, rujukan luar, Westgard)
+- [ ] 5.6 Multi-cabang / unit
+
+---
+
+## Sengaja ditunda
+
+| Modul | Alasan |
+|---|---|
+| **Rawat inap** | Sebesar modul Inventory yang baru selesai. Hanya dikerjakan bila memang ada keputusan membuka layanan rawat inap |
+| **Farmasi / apotek** | Setara besarnya. Butuh master obat, resep elektronik, dispensing, interaksi obat, formularium |
+| **Auto-posting sosial media** | Sudah diputuskan tetap manual (spec Agentic §5.2) |
+
+Mengerjakan keduanya bersamaan dengan lima fase di atas akan membuat semuanya setengah jadi.
+
+---
+
+## Catatan penamaan
+
+Menyebut sistem ini "SIMRS" saat ini belum tepat. Tanpa rawat inap, farmasi, dan klaim BPJS,
+yang ada adalah **sistem klinik rawat jalan + LIS + ERP logistik** — dan dalam kapasitas itu
+cakupannya sudah kuat. Penamaan sebaiknya menyesuaikan sampai Fase 5 selesai.
+
+## Kekuatan yang perlu dijaga
+
+LIS di aplikasi ini lebih lengkap daripada banyak produk komersial: penolakan spesimen,
+delta check, validasi dua jenjang, dan QC alat jarang ditemukan sekaligus. Jangan sampai
+tergerus saat mengejar modul lain.
+
+---
+
+## Arsitektur & aturan main
+
+- **Vanilla JS tanpa proses build.** Ini kekuatan untuk tim kecil — semua fase di atas
+  dikerjakan di dalam struktur yang ada. Tidak ada rencana ganti kerangka kerja.
+- **Migrasi SQL bersifat idempoten** (`IF NOT EXISTS`), dijalankan manual di Supabase SQL Editor.
+- **Urutan rilis:** jalankan SQL fase tersebut **sebelum** hard-refresh, karena kode fase
+  bergantung pada skemanya.
+- **Cache:** naikkan `?v=` pada aset di `index.html` setiap merilis perubahan CSS/modul.
