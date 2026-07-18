@@ -223,16 +223,13 @@ async function saveStockAdj(id, oldQty) {
   const reason = document.getElementById('adj-reason').value.trim();
   const diff = newQty - oldQty;
   if (diff !== 0 && !reason) { toast('Alasan adjustment wajib diisi (audit)','err'); return; }
+  if (diff === 0) { toast('Tidak ada perubahan','info'); closeModalForce(); return; }
   try {
-    await sbPatch('inventory_items', id, { stock_qty:newQty, updated_at:new Date().toISOString() });
-    if (diff !== 0) {
-      await writeStockLedger(id, 'ADJUST', diff, newQty, 'manual', null, null, reason);
-      const it = invItems.find(i=>i.id===id);
-      await logActivity('adjust','inventory_items',id,`Adjust stok ${it?.item_name||''}: ${oldQty}→${newQty} (${reason})`, it?.item_name||'');
-    }
-    toast('✅ Stok diupdate','ok');
+    // Fase 1.4 — stok, kartu stok, dan jejak audit ditulis dalam satu transaksi
+    await sbRpc('adjust_stock', { p_item_id: id, p_new_qty: newQty, p_reason: reason });
+    toast('✅ Stok diperbarui','ok');
     closeModalForce(); await loadInventory();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 async function openItemForm(id=null) {
@@ -764,46 +761,33 @@ function renderApprovalDetailRow(label, status, approver, at, note) {
   </div>`;
 }
 
+// Pesan kesalahan yang membantu bila migrasi RPC belum dijalankan
+function invRpcError(e) {
+  const m = String(e?.message||e);
+  if (/not find the function|does not exist|404/i.test(m))
+    return 'Fungsi server belum tersedia — jalankan supabase_fase1_rpc.sql di Supabase SQL Editor';
+  return m;
+}
+
+// Fase 1.2 — wewenang & urutan jenjang kini diperiksa di basis data.
+// Pemeriksaan di browser hanya untuk menyembunyikan tombol, bukan pengaman.
 async function approvePRStep(id, step) {
-  const note = document.getElementById('approval-note')?.value.trim()||null;
-  const approver = getUserName?getUserName():'User';
-  const now = new Date().toISOString();
-
-  // Ambil state terkini untuk menentukan tier berikutnya (matrix dinamis)
-  const pr = (await sbGet('purchase_requests',`select=*&id=eq.${id}`))?.[0] || {};
-  const st = { spv:pr.spv_status, manager:pr.manager_status, headops:pr.headops_status };
-
-  let payload = {};
-  if (step==='spv')     { payload = { spv_status:'Approved', spv_approver:approver, spv_at:now, spv_note:note }; st.spv='Approved'; }
-  if (step==='manager') { payload = { manager_status:'Approved', manager_approver:approver, manager_at:now, manager_note:note }; st.manager='Approved'; }
-  if (step==='headops') { payload = { headops_status:'Approved', headops_approver:approver, headops_at:now, headops_note:note }; st.headops='Approved'; }
-
-  // Tentukan status header: tier Pending berikutnya, atau 'Approved' bila semua lolos
-  const nextTier = ['spv','manager','headops'].find(t => st[t]==='Pending');
-  payload.status = nextTier ? `Menunggu ${TIER_LABEL[nextTier]}` : 'Approved';
-
+  const note = document.getElementById('approval-note')?.value.trim() || null;
   try {
-    await sbPatch('purchase_requests', id, {...payload, updated_at:now});
-    await logActivity('approve','purchase_requests',id,`Approve PR jenjang ${step.toUpperCase()} → ${payload.status}`, pr.pr_number||'');
-    toast(`✅ PR di-approve di jenjang ${step.toUpperCase()}`,'ok');
+    const res = await sbRpc('approve_pr', { p_pr_id: id, p_tier: step, p_note: note });
+    toast(`✅ PR disetujui di jenjang ${step.toUpperCase()} → ${res?.status||''}`,'ok');
     closeModalForce(); await loadInventory(); renderPRTable();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 async function rejectPRStep(id, step) {
   const note = document.getElementById('approval-note')?.value.trim();
   if (!note) { toast('Catatan alasan penolakan wajib diisi','err'); return; }
-  const approver = getUserName?getUserName():'User';
-  const now = new Date().toISOString();
-  let payload = { status:'Rejected' };
-  if (step==='spv') payload = {...payload, spv_status:'Rejected', spv_approver:approver, spv_at:now, spv_note:note};
-  if (step==='manager') payload = {...payload, manager_status:'Rejected', manager_approver:approver, manager_at:now, manager_note:note};
-  if (step==='headops') payload = {...payload, headops_status:'Rejected', headops_approver:approver, headops_at:now, headops_note:note};
   try {
-    await sbPatch('purchase_requests', id, {...payload, updated_at:now});
-    toast('❌ PR ditolak','info');
+    await sbRpc('reject_pr', { p_pr_id: id, p_tier: step, p_note: note });
+    toast('PR ditolak','info');
     closeModalForce(); await loadInventory(); renderPRTable();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 async function sendPRChat(id) {
@@ -1063,56 +1047,27 @@ async function openReceivePO(id) {
 }
 
 async function saveReceivePO(poId) {
-  const rows = document.querySelectorAll('[data-po-item-id]');
-  let allReceived = true, anyReceived = false;
-  for (const row of rows) {
-    const poItemId = row.getAttribute('data-po-item-id');
-    const itemId   = row.getAttribute('data-item-id');
-    const qtyInput = row.querySelector('.recv-qty');
-    const recvQty  = parseFloat(qtyInput.value)||0;
-    if (recvQty <= 0) continue;
-    anyReceived = true;
-    try {
-      const poItem = await sbGet('po_items',`select=*&id=eq.${poItemId}`);
-      const cur = poItem?.[0]; if (!cur) continue;
-      const newReceived = (cur.qty_received||0) + recvQty;
-      await sbPatch('po_items', poItemId, { qty_received: newReceived });
-      if (newReceived < cur.qty_ordered) allReceived = false;
-
-      if (itemId) {
-        const item = invItems.find(i=>i.id===parseInt(itemId)) || (await sbGet('inventory_items',`select=*&id=eq.${itemId}`))?.[0];
-        if (item) {
-          const newStock = (item.stock_qty||0) + recvQty;
-          await sbPatch('inventory_items', itemId, { stock_qty:newStock, updated_at:new Date().toISOString() });
-          await writeStockLedger(parseInt(itemId), 'IN', recvQty, newStock, 'po', poId, null, `Penerimaan PO`);
-          // Fase 2: catat batch/lot & kedaluwarsa bila barang dilacak batch
-          if (row.getAttribute('data-track')==='1') {
-            const batchNo = row.querySelector('.recv-batch')?.value.trim()||'';
-            const expiry  = row.querySelector('.recv-expiry')?.value||null;
-            if (batchNo || expiry) {
-              await sbPost('inventory_batches', {
-                item_id: parseInt(itemId), item_code: item.item_code, batch_no: batchNo,
-                expiry_date: expiry, qty_received: recvQty, qty_remaining: recvQty,
-                received_date: new Date().toISOString().split('T')[0], po_id: poId,
-                unit_price: item.unit_price||0, updated_at: new Date().toISOString(),
-              }).catch(err=>console.error('[batch]', err));
-            }
-          }
-        }
-      }
-    } catch(e) { console.error('[saveReceivePO]', e); }
-  }
-  if (!anyReceived) { toast('Isi minimal 1 qty penerimaan','warn'); return; }
-  try {
-    const allItems = await sbGet('po_items',`select=*&po_id=eq.${poId}`).catch(()=>[]);
-    const fullyReceived = (allItems||[]).every(it=>it.qty_received >= it.qty_ordered);
-    await sbPatch('purchase_orders', poId, {
-      status: fullyReceived ? 'Diterima Lengkap' : 'Sebagian Diterima',
-      updated_at: new Date().toISOString(),
+  // Fase 1.4 — seluruh penerimaan (po_items, stok, kartu stok, batch, status PO)
+  // dikirim sebagai satu transaksi. Sebelumnya, putus di tengah bisa membuat
+  // stok bertambah tanpa tercatat di kartu stok.
+  const lines = [];
+  document.querySelectorAll('[data-po-item-id]').forEach(row => {
+    const qty = parseFloat(row.querySelector('.recv-qty')?.value) || 0;
+    if (qty <= 0) return;
+    lines.push({
+      po_item_id: parseInt(row.getAttribute('data-po-item-id')),
+      qty,
+      batch_no:    row.querySelector('.recv-batch')?.value.trim() || null,
+      expiry_date: row.querySelector('.recv-expiry')?.value || null,
     });
-    toast('✅ Penerimaan barang dicatat, stok terupdate','ok');
+  });
+  if (!lines.length) { toast('Isi minimal 1 qty penerimaan','warn'); return; }
+
+  try {
+    const res = await sbRpc('receive_po', { p_po_id: poId, p_lines: lines });
+    toast(`✅ Penerimaan dicatat — status PO: ${res?.status||'diperbarui'}`,'ok');
     closeModalForce(); await loadInventory(); renderPOTable();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1256,29 +1211,19 @@ async function saveGoodsIssue() {
   const purpose = document.getElementById('gi-purpose').value;
   const division = document.getElementById('gi-div').value.trim();
   const notes = document.getElementById('gi-notes').value.trim();
-  const totalValue = lines.reduce((s,it)=>{ const item=invItems.find(i=>String(i.id)===String(it.item_id)); return s+((item?.unit_price||0)*(it.qty||0)); },0);
-  const giNumber = `GI/${new Date().getFullYear()}/${Date.now().toString().slice(-5)}`;
-
   try {
-    const created = await sbPost('goods_issues', {
-      gi_number: giNumber, issue_date: document.getElementById('gi-date').value,
-      purpose, division, ref_type:'manual', total_items: lines.length, total_value: totalValue,
-      status:'Selesai', issued_by: getUserName?getUserName():'User', notes,
-      updated_at: new Date().toISOString(),
+    // Fase 1.4 — dokumen, rincian, potong stok, kartu stok, dan batch FEFO
+    // ditulis dalam satu transaksi. Stok kurang membatalkan seluruh dokumen.
+    const res = await sbRpc('post_goods_issue', {
+      p_purpose: purpose,
+      p_division: division,
+      p_issue_date: document.getElementById('gi-date').value || null,
+      p_notes: notes,
+      p_lines: lines.map(it => ({ item_id: it.item_id, qty: it.qty })),
     });
-    const giId = created?.[0]?.id || created?.id;
-    for (const it of lines) {
-      const item = invItems.find(i=>String(i.id)===String(it.item_id));
-      await sbPost('goods_issue_items', {
-        gi_id: giId, item_id: item.id, item_code: item.item_code, description: item.item_name,
-        uom: item.unit, qty: it.qty, unit_price: item.unit_price||0, subtotal: (item.unit_price||0)*it.qty,
-      });
-      await issueStock(item.id, it.qty, 'issue', giId, giNumber, `${purpose}${division?' · '+division:''}`);
-    }
-    await logActivity('issue','goods_issues',giId,`Goods issue ${lines.length} item · ${purpose}`, giNumber);
-    toast('✅ Pengeluaran diproses, stok & ledger terupdate','ok');
+    toast(`✅ ${res?.gi_number||'Pengeluaran'} diproses — stok & kartu stok terbarui`,'ok');
     closeModalForce(); await loadInventory(); await loadGoodsIssues();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1409,35 +1354,24 @@ function recalcOpnameSelisih(opnameItemId) {
 }
 
 async function finishOpname(opnameId) {
-  if (!confirm('Selesaikan opname? Stok sistem akan disesuaikan ke hasil hitung fisik, dan tercatat di Stock Ledger.')) return;
-  const rows = document.querySelectorAll('[data-opname-item-id]');
-  let totalSelisihValue = 0, checked = 0;
-  try {
-    for (const row of rows) {
-      const opnameItemId = row.getAttribute('data-opname-item-id');
-      const itemId = row.getAttribute('data-item-id');
-      const sys = parseFloat(row.children[1].textContent)||0;
-      const physInput = row.querySelector('.opn-physical');
-      const phys = physInput ? parseFloat(physInput.value)||0 : sys;
-      const selisih = phys - sys;
-      checked++;
-      const item = invItems.find(i=>i.id===parseInt(itemId));
-      const selisihValue = selisih * (item?.unit_price||0);
-      totalSelisihValue += selisihValue;
-
-      await sbPatch('stock_opname_items', opnameItemId, { physical_qty:phys, selisih, selisih_value:selisihValue });
-
-      if (selisih !== 0 && itemId) {
-        await sbPatch('inventory_items', itemId, { stock_qty:phys, updated_at:new Date().toISOString() });
-        await writeStockLedger(parseInt(itemId), 'ADJUST', selisih, phys, 'opname', opnameId, null, 'Hasil Stock Opname');
-      }
-    }
-    await sbPatch('stock_opname', opnameId, {
-      status:'Selesai', total_items_checked:checked, total_selisih_value:totalSelisihValue,
+  if (!confirm('Selesaikan opname? Stok sistem akan disesuaikan ke hasil hitung fisik, dan tercatat di Kartu Stok.')) return;
+  // Fase 1.4 — seluruh penyesuaian dikirim sekaligus; selisih dihitung di server
+  // dari system_qty yang tersimpan, bukan dari angka di layar.
+  const lines = [];
+  document.querySelectorAll('[data-opname-item-id]').forEach(row => {
+    const physInput = row.querySelector('.opn-physical');
+    lines.push({
+      opname_item_id: parseInt(row.getAttribute('data-opname-item-id')),
+      physical_qty: physInput ? (parseFloat(physInput.value)||0) : null,
     });
-    toast('✅ Opname selesai, stok sistem sudah disesuaikan','ok');
+  });
+  if (!lines.length) { toast('Tidak ada item untuk diproses','warn'); return; }
+
+  try {
+    const res = await sbRpc('finish_opname', { p_opname_id: opnameId, p_lines: lines });
+    toast(`✅ Opname selesai — ${res?.items||0} item, selisih ${formatCurrency(res?.selisih_value||0)}`,'ok');
     closeModalForce(); await loadInventory(); await loadOpnameList();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 async function printOpnamePDF(opnameId) {

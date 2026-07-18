@@ -47,11 +47,12 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 
 ### Fase 1 — Fondasi, Keamanan & Keselamatan Pasien
 - [x] 1.0 Kirim JWT pengguna + perbarui sesi (prasyarat RLS)
-- [~] 1.1 RLS — SQL siap: 1.1a (tutup akses anon) + 1.1b (per peran), menunggu dijalankan & diuji
-- [ ] 1.2 Penegakan peran di sisi server (RPC), bukan browser
-- [~] 1.3 Nilai kritis lab — pelaporan terstruktur ISO 15189 (SELESAI; deteksi ternyata sudah ada)
-- [ ] 1.4 Operasi multi-tabel jadi atomik (RPC)
-- [ ] 1.5 Jejak audit terstandar
+- [x] 1.1a RLS — akses anon ke data pasien ditutup (terverifikasi; perlu jalankan rls_a_fix.sql untuk patient_ids)
+- [ ] 1.1b RLS — pengetatan per peran (SQL siap, jalankan setelah 1.1a bersih)
+- [x] 1.2 Penegakan peran di sisi server (RPC) — approve_pr, reject_pr, adjust_stock, receive_po, post_goods_issue, finish_opname
+- [x] 1.3 Nilai kritis lab — pelaporan terstruktur ISO 15189 (deteksi ternyata sudah ada)
+- [x] 1.4 Operasi multi-tabel jadi atomik — 6 alur inventory kini satu transaksi
+- [x] 1.5 Jejak audit terstandar — write_audit() + before_data/after_data, ditulis di dalam RPC
 
 ### Fase 2 — Menyambung yang Sudah Ada
 - [ ] 2.1 Auto goods-issue dari Lab / MCU / Radiologi
