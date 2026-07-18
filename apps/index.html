@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AvaHealth Mobile Portal</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+      <div class="brand-header">
+        <div class="brand-logo">AH</div>
+        <h2>AvaHealth Apps</h2>
+        <p>Portal Mobile Pasien & Tenaga Medis</p>
+      </div>
+
+      <div class="glass-card">
+        <form id="login-form" onsubmit="handleLogin(event)">
+          <div class="input-group">
+            <label for="username">Username / Email</label>
+            <input type="text" id="username" placeholder="Masukkan username Anda" required>
+          </div>
+          <div class="input-group">
+            <label for="password">Kata Sandi</label>
+            <input type="password" id="password" placeholder="••••••••" required>
+          </div>
+
+          <div class="role-selector">
+            <span class="role-label">Masuk Sebagai:</span>
+            <div class="role-options">
+              <label class="role-btn">
+                <input type="radio" name="login-role" value="patient" checked>
+                <span>Pasien</span>
+              </label>
+              <label class="role-btn">
+                <input type="radio" name="login-role" value="doctor">
+                <span>Dokter</span>
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Masuk Layanan</button>
+        </form>
+      </div>
+      <div class="screen-footer">
+        <p>Belum punya akun pasien? <a href="#" onclick="showScreen('register-screen')">Daftar Sekarang</a></p>
+      </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="screen">
+      <header class="app-header">
+        <div class="user-profile">
+          <div class="avatar" id="user-avatar">P</div>
+          <div class="user-info">
+            <h3 id="user-welcome">Halo, Pasien</h3>
+            <span id="user-role-badge">Pasien Terverifikasi</span>
+          </div>
+        </div>
+        <button class="logout-btn" onclick="handleLogout()">Keluar</button>
+      </header>
+
+      <!-- Patient View -->
+      <div id="patient-view" class="view-panel active">
+        <div class="quick-stats">
+          <div class="stat-card">
+            <span class="stat-icon">📅</span>
+            <h4>Janji Temu</h4>
+            <p>1 Aktif</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">🧪</span>
+            <h4>Hasil Lab</h4>
+            <p>2 Tersedia</p>
+          </div>
+        </div>
+
+        <div class="section-title">Menu Utama</div>
+        <div class="menu-list">
+          <button class="menu-item" onclick="alert('Fitur Booking Janji Temu')">
+            <span class="menu-ico">📅</span>
+            <div class="menu-text">
+              <h5>Pesan Janji Temu</h5>
+              <p>Buat janji temu dengan dokter umum atau spesialis</p>
+            </div>
+            <span class="menu-arrow">❯</span>
+          </button>
+          <button class="menu-item" onclick="alert('Fitur Riwayat Hasil Pemeriksaan')">
+            <span class="menu-ico">📄</span>
+            <div class="menu-text">
+              <h5>Riwayat Medis & Lab</h5>
+              <p>Lihat hasil lab, rontgen, dan catatan rekam medis</p>
+            </div>
+            <span class="menu-arrow">❯</span>
+          </button>
+          <button class="menu-item" onclick="alert('Fitur Layanan Home Care')">
+            <span class="menu-ico">🏠</span>
+            <div class="menu-text">
+              <h5>Layanan Homecare</h5>
+              <p>Panggil nakes/perawat untuk tindakan medis di rumah</p>
+            </div>
+            <span class="menu-arrow">❯</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Doctor View -->
+      <div id="doctor-view" class="view-panel">
+        <div class="quick-stats">
+          <div class="stat-card">
+            <span class="stat-icon">👥</span>
+            <h4>Antrian Hari Ini</h4>
+            <p>12 Pasien</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">📝</span>
+            <h4>SOAP Selesai</h4>
+            <p>8 / 12</p>
+          </div>
+        </div>
+
+        <div class="section-title">Pasien Menunggu</div>
+        <div class="patient-queue-list">
+          <div class="patient-queue-card">
+            <div class="pq-num">01</div>
+            <div class="pq-details">
+              <h5>Ahmad Subarjo (RM-10293)</h5>
+              <p>Keluhan: Batuk pilek berkepanjangan</p>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="alert('Membuka Rekam Medis Ahmad')">Periksa</button>
+          </div>
+          <div class="patient-queue-card">
+            <div class="pq-num">02</div>
+            <div class="pq-details">
+              <h5>Siti Rahma (RM-10294)</h5>
+              <p>Keluhan: Kontrol pasca operasi minor</p>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="alert('Membuka Rekam Medis Siti')">Periksa</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,5 +1,48 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahealth.sbs"
+        }
+      ],
+      "destination": "/kiosk/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahelath.sbs"
+        }
+      ],
+      "destination": "/kiosk/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahealth.sbs"
+        }
+      ],
+      "destination": "/apps/$1"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahelath.sbs"
+        }
+      ],
+      "destination": "/apps/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
