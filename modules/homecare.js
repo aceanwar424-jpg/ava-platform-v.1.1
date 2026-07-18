@@ -198,7 +198,10 @@ function renderHCList(orders) {
           ${o.status==='Dikonfirmasi'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dijadwalkan')">📅 Jadwalkan</button>`:''}
           ${o.status==='Dijadwalkan'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dalam Perjalanan')">🚗 Berangkat</button>`:''}
           ${o.status==='Dalam Perjalanan'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Sedang Dilayani')">⚕️ Mulai Layanan</button>`:''}
-          ${o.status==='Sedang Dilayani'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Selesai')">🎉 Selesai</button>`:''}
+          ${o.status==='Sedang Dilayani'?`<button class="btn btn-teal btn-sm" onclick="completeHCVisit(${o.id})">🎉 Selesai & Dokumentasi</button>`:''}
+          ${o.status==='Selesai'?`<button class="btn btn-outline btn-sm" onclick="viewHCVisit(${o.id})">📋 Rekam Kunjungan</button>`:''}
+          ${o.status==='Selesai'&&o.billing_status!=='Lunas'?`<button class="btn btn-outline btn-sm" onclick="openHCBillingAction(${o.id})">🧾 ${o.billing_status==='Ditagih'?'Tandai Lunas':'Tagih'}</button>`:''}
+          ${o.status==='Selesai'?`<button class="btn btn-ghost btn-sm" onclick="openHCRating(${o.id})">${o.rating?'⭐'.repeat(o.rating):'⭐ Rating'}</button>`:''}
           ${o.patient_phone?`<button class="btn btn-outline btn-sm" onclick="window.open('https://wa.me/${(o.patient_phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')">💬 WA Pasien</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">✏️ Edit</button>
           ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="cancelHCOrder(${o.id})">Batal</button>`:''}
@@ -211,6 +214,8 @@ function renderHCList(orders) {
 async function updateHCStatus(id, status) {
   try {
     await sbPatch('homecare_orders', id, {status, updated_at: new Date().toISOString()});
+    const o = hcAll.find(x=>x.id===id);
+    await logActivity('status','homecare_orders',id,`Status → ${status}`, o?.patient_name||'');
     toast(`✅ Status → ${status}`,'ok');
     await loadHCOrders();
   } catch(e) { toast('❌ '+e.message,'err'); }
@@ -234,9 +239,263 @@ async function confirmCancelHC(id) {
   if (!reason) { toast('Alasan pembatalan wajib diisi','err'); return; }
   try {
     await sbPatch('homecare_orders', id, { status:'Dibatalkan', cancel_reason:reason, updated_at:new Date().toISOString() });
+    const o = hcAll.find(x=>x.id===id);
+    await logActivity('cancel','homecare_orders',id,`Order dibatalkan: ${reason}`, o?.patient_name||'');
     toast('Order dibatalkan','info');
     closeModalForce();
     await loadHCOrders();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// DOKUMENTASI KUNJUNGAN (homecare_visit_records) — Fase 2
+// ══════════════════════════════════════════════════════════════
+let hcInvItems = [];   // cache barang inventory untuk pemakaian BHP (Fase 3)
+let hcBhpLines = [];   // working state BHP dipakai kunjungan
+
+async function completeHCVisit(id) {
+  const o = hcAll.find(x=>x.id===id) || (await sbGet('homecare_orders',`select=*&id=eq.${id}`))?.[0] || {};
+  // Ambil rekam yang mungkin sudah ada (jika mengulang dokumentasi)
+  const existing = (await sbGet('homecare_visit_records',`select=*&order_id=eq.${id}&order=id.desc&limit=1`).catch(()=>[]))?.[0] || {};
+  // Muat barang aktif untuk pilihan BHP (best-effort)
+  hcInvItems = (await sbGet('inventory_items','select=id,item_code,item_name,unit,unit_price,stock_qty&order=item_name.asc').catch(()=>[]))||[];
+  hcBhpLines = [];
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📋 Dokumentasi Kunjungan — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px">🩺 ${o.service_type||''} · 📅 ${o.scheduled_date?formatDateShort(o.scheduled_date):''} ${o.scheduled_time||''}</div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Tanda Vital</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+      <div class="form-group"><label>Tekanan Darah (mmHg)</label>
+        <div style="display:flex;gap:4px;align-items:center">
+          <input type="number" id="vr-sys" value="${existing.bp_systolic||''}" placeholder="120" style="width:100%">
+          <span>/</span>
+          <input type="number" id="vr-dia" value="${existing.bp_diastolic||''}" placeholder="80" style="width:100%">
+        </div></div>
+      <div class="form-group"><label>Nadi (x/mnt)</label><input type="number" id="vr-pulse" value="${existing.pulse||''}"></div>
+      <div class="form-group"><label>Suhu (°C)</label><input type="number" step="0.1" id="vr-temp" value="${existing.temperature||''}"></div>
+      <div class="form-group"><label>Napas (x/mnt)</label><input type="number" id="vr-resp" value="${existing.resp_rate||''}"></div>
+      <div class="form-group"><label>SpO₂ (%)</label><input type="number" id="vr-spo2" value="${existing.spo2||''}"></div>
+      <div class="form-group"><label>Berat (kg)</label><input type="number" step="0.1" id="vr-weight" value="${existing.weight||''}"></div>
+    </div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Catatan Klinis</div>
+    <div class="form-group"><label>Keluhan</label><textarea id="vr-complaint" rows="2">${existing.complaint||''}</textarea></div>
+    <div class="form-group"><label>Tindakan yang Dilakukan</label><textarea id="vr-actions" rows="2">${existing.actions_done||''}</textarea></div>
+    <div class="form-group"><label>Catatan Asuhan</label><textarea id="vr-notes" rows="2">${existing.nursing_notes||''}</textarea></div>
+
+    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:8px 0;display:flex;justify-content:space-between;align-items:center">
+      <span>Bahan / BHP Dipakai (potong stok otomatis)</span>
+      <button class="btn btn-xs btn-ghost" onclick="addHCBhpRow()" ${hcInvItems.length?'':'disabled'}>+ Item</button>
+    </div>
+    ${hcInvItems.length?'<div id="hc-bhp-table"></div>':'<div class="form-hint" style="color:#F59E0B">Data inventory tidak tersedia — lewati BHP.</div>'}
+
+    <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:8px 0">Persetujuan & Bukti</div>
+    <div class="form-group"><label>URL Foto Bukti Kunjungan (opsional)</label>
+      <input type="text" id="vr-photo" value="${existing.photo_url||''}" placeholder="https://..."></div>
+    <div class="form-group" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="vr-consent" ${existing.consent_given?'checked':''} style="width:auto">
+      <label style="margin:0">Pasien/keluarga menyetujui tindakan (informed consent)</label>
+    </div>
+    <div class="form-group"><label>Nama Penandatangan Consent</label>
+      <input type="text" id="vr-consent-name" value="${existing.consent_name||o.patient_name||''}"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveHCVisit(${id}, ${existing.id||'null'})">🎉 Simpan & Tandai Selesai</button>
+    </div>`, 'wide');
+  if (hcInvItems.length) renderHCBhp();
+}
+
+// ── BHP dipakai (Fase 3) — dinamis, potong stok via issueStock ──
+function addHCBhpRow() { hcBhpLines.push({ item_id:'', qty:1 }); renderHCBhp(); }
+function removeHCBhpRow(idx) { hcBhpLines.splice(idx,1); renderHCBhp(); }
+function updateHCBhp(idx, field, val) { if (hcBhpLines[idx]) { hcBhpLines[idx][field] = field==='qty'?(parseFloat(val)||0):val; } }
+function renderHCBhp() {
+  const el = document.getElementById('hc-bhp-table'); if (!el) return;
+  if (!hcBhpLines.length) { el.innerHTML = `<div style="font-size:11px;color:var(--text3);padding:4px 0">Belum ada BHP. Klik "+ Item".</div>`; return; }
+  el.innerHTML = `<table style="width:100%;font-size:12px"><tbody>${hcBhpLines.map((b,idx)=>{
+    const item = hcInvItems.find(i=>String(i.id)===String(b.item_id));
+    return `<tr>
+      <td style="padding:3px"><select onchange="updateHCBhp(${idx},'item_id',this.value)" style="font-size:11px;padding:4px;width:100%">
+        <option value="">-- Pilih Barang --</option>
+        ${hcInvItems.map(i=>`<option value="${i.id}" ${String(b.item_id)===String(i.id)?'selected':''}>${i.item_name} (stok ${i.stock_qty||0} ${i.unit||''})</option>`).join('')}
+      </select></td>
+      <td style="padding:3px;width:70px"><input type="number" min="0" value="${b.qty||0}" onchange="updateHCBhp(${idx},'qty',this.value)" style="width:60px;font-size:11px;padding:4px"></td>
+      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeHCBhpRow(${idx})">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+}
+
+async function saveHCVisit(orderId, recordId) {
+  const num = v => { const n=parseFloat(document.getElementById(v)?.value); return isNaN(n)?null:n; };
+  const payload = {
+    order_id:     orderId,
+    bp_systolic:  num('vr-sys'),
+    bp_diastolic: num('vr-dia'),
+    pulse:        num('vr-pulse'),
+    temperature:  num('vr-temp'),
+    resp_rate:    num('vr-resp'),
+    spo2:         num('vr-spo2'),
+    weight:       num('vr-weight'),
+    complaint:      document.getElementById('vr-complaint').value.trim(),
+    actions_done:   document.getElementById('vr-actions').value.trim(),
+    nursing_notes:  document.getElementById('vr-notes').value.trim(),
+    photo_url:      document.getElementById('vr-photo').value.trim(),
+    consent_given:  document.getElementById('vr-consent').checked,
+    consent_name:   document.getElementById('vr-consent-name').value.trim(),
+    recorded_by:    getUserName?getUserName():'User',
+    recorded_at:    new Date().toISOString(),
+    updated_at:     new Date().toISOString(),
+  };
+  // Validasi BHP: stok cukup
+  const bhp = hcBhpLines.filter(b=>b.item_id && (b.qty||0)>0);
+  for (const b of bhp) {
+    const item = hcInvItems.find(i=>String(i.id)===String(b.item_id));
+    if (item && b.qty > (item.stock_qty||0)) { toast(`Stok ${item.item_name} tidak cukup (${item.stock_qty})`,'err'); return; }
+  }
+  try {
+    if (recordId) await sbPatch('homecare_visit_records', recordId, payload);
+    else          await sbPost('homecare_visit_records', payload);
+    // Fase 3: potong stok BHP via helper global issueStock (dari inventory.js)
+    let bhpValue = 0;
+    if (bhp.length && typeof window.issueStock==='function') {
+      for (const b of bhp) {
+        const item = hcInvItems.find(i=>String(i.id)===String(b.item_id));
+        bhpValue += (item?.unit_price||0)*b.qty;
+        await window.issueStock(b.item_id, b.qty, 'homecare', orderId, null, `Pemakaian Home Care order #${orderId}`);
+      }
+    }
+    await sbPatch('homecare_orders', orderId, { status:'Selesai', bhp_value:bhpValue, updated_at:new Date().toISOString() });
+    await logActivity('complete','homecare_orders',orderId,`Kunjungan selesai${bhp.length?` · ${bhp.length} BHP dipakai`:''}`, '');
+    toast('✅ Kunjungan terdokumentasi & selesai','ok');
+    closeModalForce();
+    await loadHCOrders();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+async function viewHCVisit(orderId) {
+  const rec = (await sbGet('homecare_visit_records',`select=*&order_id=eq.${orderId}&order=id.desc&limit=1`).catch(()=>[]))?.[0];
+  if (!rec) {
+    openModal(`<div class="modal-header"><div class="modal-title">📋 Rekam Kunjungan</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <div class="empty-state"><div class="ico">📋</div><h3>Belum ada dokumentasi</h3>
+        <button class="btn btn-teal" style="margin-top:10px" onclick="closeModalForce();completeHCVisit(${orderId})">+ Isi Dokumentasi</button></div>`);
+    return;
+  }
+  const row = (l,v)=> v!=null&&v!==''?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px"><span style="color:var(--gray)">${l}</span><strong>${v}</strong></div>`:'';
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📋 Rekam Kunjungan</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Dicatat oleh ${rec.recorded_by||'—'} · ${rec.recorded_at?new Date(rec.recorded_at).toLocaleString('id-ID'):''}</div>
+    ${row('Tekanan Darah', (rec.bp_systolic||rec.bp_diastolic)?`${rec.bp_systolic||'—'}/${rec.bp_diastolic||'—'} mmHg`:'')}
+    ${row('Nadi', rec.pulse?rec.pulse+' x/mnt':'')}
+    ${row('Suhu', rec.temperature?rec.temperature+' °C':'')}
+    ${row('Napas', rec.resp_rate?rec.resp_rate+' x/mnt':'')}
+    ${row('SpO₂', rec.spo2?rec.spo2+' %':'')}
+    ${row('Berat', rec.weight?rec.weight+' kg':'')}
+    ${row('Keluhan', rec.complaint)}
+    ${row('Tindakan', rec.actions_done)}
+    ${row('Catatan Asuhan', rec.nursing_notes)}
+    ${row('Informed Consent', rec.consent_given?`✅ Ya (${rec.consent_name||'—'})`:'❌ Tidak')}
+    ${rec.photo_url?`<div style="margin-top:10px"><a href="${rec.photo_url}" target="_blank" class="btn btn-ghost btn-sm">🖼️ Lihat Foto Bukti</a></div>`:''}
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+      <button class="btn btn-teal" onclick="closeModalForce();completeHCVisit(${orderId})">✏️ Edit Dokumentasi</button>
+    </div>`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// BILLING (Fase 3) — tandai ditagih / lunas, opsional buat invoice
+// ══════════════════════════════════════════════════════════════
+async function openHCBillingAction(id) {
+  const o = hcAll.find(x=>x.id===id) || {};
+  const isDitagih = o.billing_status==='Ditagih';
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🧾 Billing — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;margin-bottom:12px">
+      <div><strong>Layanan:</strong> ${o.service_type||'—'}</div>
+      <div><strong>Tarif:</strong> ${formatCurrency(o.total_amount||0)}</div>
+      <div><strong>Komisi Nakes:</strong> ${formatCurrency(o.commission_amount||0)}</div>
+      <div><strong>Nilai BHP:</strong> ${formatCurrency(o.bhp_value||0)}</div>
+      <div style="grid-column:1/-1"><strong>Status Saat Ini:</strong> ${o.billing_status||'Belum Ditagih'}</div>
+      <div style="grid-column:1/-1;padding-top:6px;border-top:1px solid var(--border)">
+        <strong>Margin Kotor:</strong> ${formatCurrency((o.total_amount||0)-(o.commission_amount||0)-(o.bhp_value||0))}</div>
+    </div>
+    ${!isDitagih&&o.partner_id?`<div class="form-group" style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="hcb-mkinv" style="width:auto" checked>
+      <label style="margin:0">Buat Invoice di modul Finance (partner terkait)</label></div>`:''}
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="setHCBilling(${id},'${isDitagih?'Lunas':'Ditagih'}')">
+        ${isDitagih?'✅ Tandai Lunas':'🧾 Tandai Ditagih'}</button>
+    </div>`);
+}
+
+async function setHCBilling(id, status) {
+  const o = hcAll.find(x=>x.id===id) || {};
+  const mkInv = document.getElementById('hcb-mkinv')?.checked;
+  try {
+    const patch = { billing_status:status, updated_at:new Date().toISOString() };
+    if (status==='Ditagih') patch.billed_at = new Date().toISOString();
+
+    // Opsional: buat invoice di modul Finance bila ada partner terkait
+    if (status==='Ditagih' && mkInv && o.partner_id) {
+      try {
+        const yr=new Date().getFullYear(), mo=String(new Date().getMonth()+1).padStart(2,'0');
+        const inv = await sbPost('invoices', {
+          invoice_number: `INV/${yr}/${mo}/${Date.now().toString().slice(-4)}`,
+          invoice_date: new Date().toISOString().split('T')[0],
+          partner_id: o.partner_id, service_type: 'Home Care',
+          subtotal: o.total_amount||0, discount: 0, ppn_percent: 0,
+          total_amount: o.total_amount||0, status: 'Draft',
+          notes: `Home Care · ${o.service_type||''} · ${o.patient_name||''}`,
+          created_by_name: getUserName?getUserName():'User',
+          updated_at: new Date().toISOString(),
+        });
+        const invId = inv?.[0]?.id || inv?.id;
+        if (invId) patch.invoice_id = invId;
+        toast('🧾 Invoice dibuat di Finance','ok');
+      } catch(err) { toast('⚠️ Invoice gagal dibuat: '+err.message,'warn'); }
+    }
+
+    await sbPatch('homecare_orders', id, patch);
+    await logActivity('billing','homecare_orders',id,`Billing → ${status}`, o.patient_name||'');
+    toast(`✅ Billing → ${status}`,'ok');
+    closeModalForce(); await loadHCOrders();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RATING & FEEDBACK PASIEN (Fase 4)
+// ══════════════════════════════════════════════════════════════
+function openHCRating(id) {
+  const o = hcAll.find(x=>x.id===id) || {};
+  openModal(`
+    <div class="modal-header"><div class="modal-title">⭐ Kepuasan Pasien — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Rating (1–5)</label>
+      <select id="hcr-rating">
+        <option value="">-- Belum dinilai --</option>
+        ${[1,2,3,4,5].map(n=>`<option value="${n}" ${String(o.rating)===String(n)?'selected':''}>${'⭐'.repeat(n)} (${n})</option>`).join('')}
+      </select></div>
+    <div class="form-group"><label>Masukan / Keluhan</label>
+      <textarea id="hcr-feedback" rows="3">${o.feedback||''}</textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveHCRating(${id})">💾 Simpan</button>
+    </div>`);
+}
+
+async function saveHCRating(id) {
+  const rating = parseInt(document.getElementById('hcr-rating').value)||null;
+  const feedback = document.getElementById('hcr-feedback').value.trim();
+  try {
+    await sbPatch('homecare_orders', id, { rating, feedback, updated_at:new Date().toISOString() });
+    toast('✅ Penilaian tersimpan','ok');
+    closeModalForce(); await loadHCOrders();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -615,6 +874,7 @@ async function quickStatusHC(id, currentStatus) {
   const idx  = flow.indexOf(currentStatus);
   const next = flow[idx+1];
   if (!next) return;
+  if (next==='Selesai') { completeHCVisit(id); return; }  // Fase 2: dokumentasi dulu
   await updateHCStatus(id, next);
   await loadHCSchedule();
 }
@@ -736,28 +996,72 @@ async function loadHCReport() {
       `select=*&scheduled_date=gte.${from}&scheduled_date=lte.${to}&order=scheduled_date.desc`);
     const orders = Array.isArray(data)?data:[];
     const done   = orders.filter(o=>o.status==='Selesai');
+    const cancelled = orders.filter(o=>o.status==='Dibatalkan');
     const rev    = done.reduce((s,o)=>s+(o.total_amount||0),0);
     const byService={};
     done.forEach(o=>{ byService[o.service_type||'Lainnya']=(byService[o.service_type||'Lainnya']||0)+1; });
+
+    // Fase 4: analitik SLA, kepuasan, profitabilitas, billing
+    const rated = done.filter(o=>o.rating);
+    const avgRating = rated.length ? (rated.reduce((s,o)=>s+(o.rating||0),0)/rated.length) : 0;
+    const totalComm = done.reduce((s,o)=>s+(o.commission_amount||0),0);
+    const totalBhp  = done.reduce((s,o)=>s+(o.bhp_value||0),0);
+    const margin    = rev - totalComm - totalBhp;
+    const completionRate = orders.length ? Math.round(done.length/orders.length*100) : 0;
+    const unbilled = done.filter(o=>(o.billing_status||'Belum Ditagih')!=='Lunas');
+    const unbilledVal = unbilled.reduce((s,o)=>s+(o.total_amount||0),0);
+    const byNakes={};
+    done.forEach(o=>{ const n=o.assigned_staff||'Tidak Diketahui';
+      if(!byNakes[n]) byNakes[n]={n:0,rev:0,rate:[]};
+      byNakes[n].n++; byNakes[n].rev+=(o.total_amount||0); if(o.rating) byNakes[n].rate.push(o.rating); });
 
     el.innerHTML=`
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px">
         ${[
           {l:'Total Order',v:orders.length,c:'#0A2342'},
           {l:'Selesai',    v:done.length,  c:'#22C55E'},
-          {l:'Dibatalkan', v:orders.filter(o=>o.status==='Dibatalkan').length,c:'#EF4444'},
+          {l:'Dibatalkan', v:cancelled.length,c:'#EF4444'},
+          {l:'Tingkat Penyelesaian', v:completionRate+'%',c:'#0EA5E9'},
           {l:'Revenue',    v:formatCurrency(rev),c:'#8B5CF6'},
+          {l:'Margin Kotor', v:formatCurrency(margin),c:'#00897B'},
+          {l:'Rata Kepuasan', v:avgRating?avgRating.toFixed(1)+'/5':'—',c:'#F59E0B'},
+          {l:'Belum Lunas',  v:formatCurrency(unbilledVal),c:'#DC2626'},
         ].map(k=>`<div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
           <div style="font-size:${String(k.v).length>8?'12px':'16px'};font-weight:800;color:${k.c}">${k.v}</div>
           <div style="font-size:10px;color:var(--gray)">${k.l}</div>
         </div>`).join('')}
       </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">Per Jenis Layanan</div>
+          ${Object.entries(byService).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+              <span>${s}</span><strong>${c} order</strong>
+            </div>`).join('')||'<div style="color:var(--gray)">Belum ada data</div>'}
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:10px">Struktur Biaya</div>
+          ${[
+            {l:'Revenue', v:rev, c:'#8B5CF6'},
+            {l:'– Komisi Nakes', v:totalComm, c:'#F59E0B'},
+            {l:'– Nilai BHP', v:totalBhp, c:'#EF4444'},
+            {l:'= Margin Kotor', v:margin, c:'#00897B'},
+          ].map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+            <span>${r.l}</span><strong style="color:${r.c}">${formatCurrency(r.v)}</strong></div>`).join('')}
+        </div>
+      </div>
+
       <div class="card">
-        <div class="card-title" style="margin-bottom:10px">Per Jenis Layanan</div>
-        ${Object.entries(byService).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span>${s}</span><strong>${c} order</strong>
-          </div>`).join('')||'<div style="color:var(--gray)">Belum ada data</div>'}
+        <div class="card-title" style="margin-bottom:10px">Kinerja per Nakes</div>
+        <div class="table-wrap"><table><thead><tr><th>Nakes</th><th>Kunjungan</th><th>Revenue</th><th>Rata Rating</th></tr></thead>
+          <tbody>${Object.entries(byNakes).sort((a,b)=>b[1].rev-a[1].rev).map(([n,d])=>{
+            const ar = d.rate.length ? (d.rate.reduce((s,x)=>s+x,0)/d.rate.length).toFixed(1) : '—';
+            return `<tr><td style="font-weight:600">${n}</td>
+              <td style="text-align:center">${d.n}</td>
+              <td style="font-weight:600">${formatCurrency(d.rev)}</td>
+              <td style="text-align:center">${ar==='—'?'—':'⭐ '+ar}</td></tr>`;
+          }).join('')||'<tr><td colspan="4" style="color:var(--gray);padding:8px">Belum ada data</td></tr>'}</tbody></table></div>
       </div>`;
   } catch(e) { el.innerHTML=`<div class="status-box status-err">${e.message}</div>`; }
 }

@@ -7,6 +7,8 @@ const INV_CATEGORIES = ['Reagen','BHP Lab','APD','ATK','Consumable Radiologi','C
 const PR_SOURCES     = ['KAS GANTUNG','XENDIT','PR / PO','VENDOR','STOCK INTERNAL'];
 
 let invItems = [], invPRs = [], invPOs = [], invSuppliers = [], invOpnames = [];
+let invBatches = [];  // Fase 2: batch/lot & expiry
+let invMrpPoItems = []; // Fase 3: po_items terbuka untuk hitung in-transit
 let invFilter = { search:'', category:'' };
 
 // ── Approval role helpers (strict 3-tier, independent from broader isSpv/isManager) ──
@@ -40,9 +42,11 @@ async function renderInventory(initialTab='stock') {
       <button class="tab-btn active" onclick="switchInvTab('stock',this)">📦 Stok Barang</button>
       <button class="tab-btn" onclick="switchInvTab('pr',this)">🛒 Purchase Request</button>
       <button class="tab-btn" onclick="switchInvTab('po',this)">📄 Purchase Order</button>
+      <button class="tab-btn" onclick="switchInvTab('issue',this)">📤 Goods Issue</button>
       <button class="tab-btn" onclick="switchInvTab('opname',this)">📋 Stock Opname</button>
       <button class="tab-btn" onclick="switchInvTab('ledger',this)">📜 Stock Ledger</button>
       <button class="tab-btn" onclick="switchInvTab('mrp',this)">📊 MRP</button>
+      <button class="tab-btn" onclick="switchInvTab('report',this)">📈 Laporan</button>
       <button class="tab-btn" onclick="switchInvTab('supplier',this)">🏭 Supplier</button>
     </div>
 
@@ -63,15 +67,17 @@ async function renderInventory(initialTab='stock') {
 
     <div id="inv-pr" style="display:none"></div>
     <div id="inv-po" style="display:none"></div>
+    <div id="inv-issue" style="display:none"></div>
     <div id="inv-opname" style="display:none"></div>
     <div id="inv-ledger" style="display:none"></div>
     <div id="inv-mrp" style="display:none"></div>
+    <div id="inv-report" style="display:none"></div>
     <div id="inv-supplier" style="display:none"></div>
   `;
   await loadInventory();
   // Deep-link ke tab tertentu dari menu flyout (Fase 1)
   if (initialTab && initialTab!=='stock') {
-    const idx = {stock:1, pr:2, po:3, opname:4, ledger:5, mrp:6, supplier:7}[initialTab];
+    const idx = {stock:1, pr:2, po:3, issue:4, opname:5, ledger:6, mrp:7, report:8, supplier:9}[initialTab];
     const btn = document.querySelector(`#inv-tabs .tab-btn:nth-child(${idx})`);
     if (btn) switchInvTab(initialTab, btn);
   }
@@ -80,30 +86,36 @@ async function renderInventory(initialTab='stock') {
 function switchInvTab(tab, btn) {
   document.querySelectorAll('#inv-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  ['stock','pr','po','opname','ledger','mrp','supplier'].forEach(t=>{
+  ['stock','pr','po','issue','opname','ledger','mrp','report','supplier'].forEach(t=>{
     const el = document.getElementById('inv-'+t);
     if (el) el.style.display = t===tab?'block':'none';
   });
   if (tab==='pr')      renderPRList();
   if (tab==='po')      renderPOList();
+  if (tab==='issue')   renderGoodsIssueList();
   if (tab==='opname')  renderOpnameList();
   if (tab==='ledger')  renderStockLedger();
   if (tab==='mrp')     renderMRPDashboard();
+  if (tab==='report')  renderInvReport();
   if (tab==='supplier')renderSupplierList();
 }
 
 async function loadInventory() {
   try {
-    const [items, prs, pos, suppliers] = await Promise.all([
+    const [items, prs, pos, suppliers, batches, poItems] = await Promise.all([
       sbGet('inventory_items','select=*&order=item_name.asc'),
       sbGet('purchase_requests','select=*&order=created_at.desc'),
       sbGet('purchase_orders','select=*&order=created_at.desc'),
       sbGet('suppliers','select=*&order=supplier_name.asc'),
+      sbGet('inventory_batches','select=*&qty_remaining=gt.0&order=expiry_date.asc').catch(()=>[]),
+      sbGet('po_items','select=item_id,qty_ordered,qty_received').catch(()=>[]),
     ]);
     invItems     = Array.isArray(items)?items:[];
     invPRs       = Array.isArray(prs)?prs:[];
     invPOs       = Array.isArray(pos)?pos:[];
     invSuppliers = Array.isArray(suppliers)?suppliers:[];
+    invBatches   = Array.isArray(batches)?batches:[];
+    invMrpPoItems = Array.isArray(poItems)?poItems:[];
     renderStockAlerts();
     filterInvItems();
   } catch(e) {
@@ -115,17 +127,39 @@ async function loadInventory() {
 // STOK BARANG (Master Item)
 // ══════════════════════════════════════════════════════════════
 function renderStockAlerts() {
-  const low = invItems.filter(i => (i.stock_qty||0) <= (i.min_stock||0) && i.is_active!==false);
   const el = document.getElementById('inv-stock-alerts');
   if (!el) return;
-  if (!low.length) { el.innerHTML=''; return; }
-  el.innerHTML = `
-    <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--r);padding:10px 14px;margin-bottom:14px">
+  const low = invItems.filter(i => (i.stock_qty||0) <= (i.min_stock||0) && i.is_active!==false);
+
+  // Fase 2: batch kedaluwarsa / hampir kedaluwarsa (≤60 hari)
+  const today = new Date(); today.setHours(0,0,0,0);
+  const soon = new Date(today.getTime() + 60*86400000);
+  const expired = invBatches.filter(b => b.expiry_date && new Date(b.expiry_date) < today);
+  const nearExp = invBatches.filter(b => b.expiry_date && new Date(b.expiry_date) >= today && new Date(b.expiry_date) <= soon);
+
+  let html = '';
+  if (low.length) html += `
+    <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
       <div style="font-weight:700;color:#C2410C;font-size:12.5px">⚠️ ${low.length} barang di bawah stok minimum</div>
       <div style="font-size:11px;color:#9A3412;margin-top:2px">
         ${low.slice(0,5).map(i=>`${i.item_name} (${i.stock_qty} ${i.unit})`).join(', ')}${low.length>5?` +${low.length-5} lainnya`:''}
       </div>
     </div>`;
+  if (expired.length) html += `
+    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
+      <div style="font-weight:700;color:#B91C1C;font-size:12.5px">⛔ ${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
+      <div style="font-size:11px;color:#991B1B;margin-top:2px">
+        ${expired.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}${expired.length>5?` +${expired.length-5} lainnya`:''}
+      </div>
+    </div>`;
+  if (nearExp.length) html += `
+    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
+      <div style="font-weight:700;color:#B45309;font-size:12.5px">⏳ ${nearExp.length} batch mendekati kedaluwarsa (≤60 hari) — prioritaskan (FEFO)</div>
+      <div style="font-size:11px;color:#92400E;margin-top:2px">
+        ${nearExp.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)})`).join(' · ')}${nearExp.length>5?` +${nearExp.length-5} lainnya`:''}
+      </div>
+    </div>`;
+  el.innerHTML = html;
 }
 
 function filterInvItems() {
@@ -188,9 +222,14 @@ async function saveStockAdj(id, oldQty) {
   if (isNaN(newQty)) { toast('Qty tidak valid','err'); return; }
   const reason = document.getElementById('adj-reason').value.trim();
   const diff = newQty - oldQty;
+  if (diff !== 0 && !reason) { toast('Alasan adjustment wajib diisi (audit)','err'); return; }
   try {
     await sbPatch('inventory_items', id, { stock_qty:newQty, updated_at:new Date().toISOString() });
-    if (diff !== 0) await writeStockLedger(id, 'ADJUST', diff, newQty, 'manual', null, null, reason||'Adjustment manual');
+    if (diff !== 0) {
+      await writeStockLedger(id, 'ADJUST', diff, newQty, 'manual', null, null, reason);
+      const it = invItems.find(i=>i.id===id);
+      await logActivity('adjust','inventory_items',id,`Adjust stok ${it?.item_name||''}: ${oldQty}→${newQty} (${reason})`, it?.item_name||'');
+    }
     toast('✅ Stok diupdate','ok');
     closeModalForce(); await loadInventory();
   } catch(e) { toast('❌ '+e.message,'err'); }
@@ -240,6 +279,10 @@ async function openItemForm(id=null) {
         <input type="number" id="if-avgusage" value="${it.avg_monthly_usage||0}">
         <div class="form-hint">Reorder Point akan dihitung otomatis: (Pemakaian/Bulan ÷ 30 × Lead Time) + Safety Stock</div>
       </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-top:6px">
+        <input type="checkbox" id="if-trackbatch" ${it.track_batch?'checked':''} style="width:auto">
+        <label style="margin:0">Lacak batch/lot &amp; kedaluwarsa (FEFO) — untuk reagen/BHP medis</label>
+      </div>
     </div>
     <div class="form-group"><label>Deskripsi</label>
       <textarea id="if-desc" rows="2">${it.description||''}</textarea></div>
@@ -270,6 +313,7 @@ async function saveItem(id) {
     safety_stock:   safety,
     avg_monthly_usage: avgUsage,
     reorder_point:  reorderPoint,
+    track_batch: document.getElementById('if-trackbatch').checked,
     description: document.getElementById('if-desc').value.trim(),
     updated_at: new Date().toISOString(),
   };
@@ -740,6 +784,7 @@ async function approvePRStep(id, step) {
 
   try {
     await sbPatch('purchase_requests', id, {...payload, updated_at:now});
+    await logActivity('approve','purchase_requests',id,`Approve PR jenjang ${step.toUpperCase()} → ${payload.status}`, pr.pr_number||'');
     toast(`✅ PR di-approve di jenjang ${step.toUpperCase()}`,'ok');
     closeModalForce(); await loadInventory(); renderPRTable();
   } catch(e) { toast('❌ '+e.message,'err'); }
@@ -911,8 +956,72 @@ async function openPODetail(id) {
     ${po.status==='Draft'?`<div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       <button class="btn btn-teal" onclick="markPOSent(${id})">📤 Tandai Dikirim ke Vendor</button>
-    </div>`:`<div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`}
+    </div>`:`<div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+      ${(items||[]).some(it=>(it.qty_received||0)>0)?`<button class="btn btn-danger" onclick="openReturnForm(${id})">↩️ Retur ke Supplier</button>`:''}
+    </div>`}
   `, 'wide');
+}
+
+// ── Purchase Return — retur barang diterima ke supplier (Fase 1 leftover) ──
+let retLineItems = [];
+async function openReturnForm(poId) {
+  const [poData, items] = await Promise.all([
+    sbGet('purchase_orders',`select=*&id=eq.${poId}`),
+    sbGet('po_items',`select=*&po_id=eq.${poId}`).catch(()=>[]),
+  ]);
+  const po = poData?.[0]; if (!po) return;
+  retLineItems = (items||[]).filter(it=>(it.qty_received||0)>0).map(it=>({...it, ret_qty:0}));
+  openModal(`
+    <div class="modal-header"><div class="modal-title">↩️ Retur ke Supplier — ${po.po_number}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Alasan Retur *</label>
+      <select id="ret-reason"><option>Barang Rusak</option><option>Salah Kirim</option><option>Kadaluarsa</option><option>Tidak Sesuai Spesifikasi</option><option>Lainnya</option></select></div>
+    <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
+      <th style="padding:5px;text-align:left">Item</th><th style="padding:5px">Diterima</th><th style="padding:5px">Qty Retur</th>
+    </tr></thead><tbody>${retLineItems.map((it,idx)=>`
+      <tr data-ret-idx="${idx}" style="border-bottom:1px solid var(--border)">
+        <td style="padding:5px">${it.description}</td>
+        <td style="padding:5px;text-align:center">${it.qty_received} ${it.uom}</td>
+        <td style="padding:5px"><input type="number" min="0" max="${it.qty_received}" value="0" class="ret-qty" style="width:70px;font-size:11px;padding:4px"></td>
+      </tr>`).join('')}</tbody></table>
+    <div class="form-group" style="margin-top:8px"><label>Catatan</label><textarea id="ret-notes" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-danger" onclick="saveReturn(${poId})">↩️ Proses Retur</button>
+    </div>`, 'wide');
+}
+
+async function saveReturn(poId) {
+  const po = invPOs.find(p=>p.id===poId) || (await sbGet('purchase_orders',`select=*&id=eq.${poId}`))?.[0];
+  const rows = document.querySelectorAll('[data-ret-idx]');
+  const lines = [];
+  rows.forEach(r=>{ const idx=+r.getAttribute('data-ret-idx'); const q=parseFloat(r.querySelector('.ret-qty').value)||0;
+    if (q>0) lines.push({...retLineItems[idx], ret_qty:Math.min(q, retLineItems[idx].qty_received)}); });
+  if (!lines.length) { toast('Isi minimal 1 qty retur','err'); return; }
+  const reason = document.getElementById('ret-reason').value;
+  const notes = document.getElementById('ret-notes').value.trim();
+  const totalValue = lines.reduce((s,it)=>s+(it.unit_price||0)*it.ret_qty,0);
+  const retNumber = `RTN/${new Date().getFullYear()}/${Date.now().toString().slice(-5)}`;
+  try {
+    const created = await sbPost('purchase_returns', {
+      return_number: retNumber, po_id: poId, supplier_name: po?.supplier_name||'',
+      return_date: new Date().toISOString().split('T')[0], reason,
+      total_items: lines.length, total_value: totalValue, status:'Selesai',
+      created_by: getUserName?getUserName():'User', notes, updated_at:new Date().toISOString(),
+    });
+    const retId = created?.[0]?.id || created?.id;
+    for (const it of lines) {
+      await sbPost('purchase_return_items', {
+        return_id: retId, item_id: it.item_id, item_code: it.item_code, description: it.description,
+        uom: it.uom, qty: it.ret_qty, unit_price: it.unit_price||0, subtotal: (it.unit_price||0)*it.ret_qty,
+      });
+      if (it.item_id) await issueStock(it.item_id, it.ret_qty, 'return', retId, retNumber, `Retur ke supplier: ${reason}`);
+    }
+    await logActivity('return','purchase_returns',retId,`Retur ${lines.length} item ke ${po?.supplier_name||''}`, retNumber);
+    toast('✅ Retur diproses, stok terupdate','ok');
+    closeModalForce(); await loadInventory(); renderPOTable();
+  } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
 async function markPOSent(id) {
@@ -930,16 +1039,23 @@ async function openReceivePO(id) {
     <div class="modal-header"><div class="modal-title">📥 Terima Barang — ${po.po_number}</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button></div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Isi qty yang benar-benar diterima fisik. Stok &amp; ledger akan terupdate otomatis.</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Barang yang dilacak batch akan menampilkan kolom No. Batch &amp; Kedaluwarsa.</div>
     <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
-      <th style="padding:5px;text-align:left">Item</th><th style="padding:5px">Qty Order</th><th style="padding:5px">Sudah Diterima</th><th style="padding:5px">Terima Sekarang</th>
-    </tr></thead><tbody>${(items||[]).map(it=>`
-      <tr style="border-bottom:1px solid var(--border)" data-po-item-id="${it.id}" data-item-id="${it.item_id||''}">
+      <th style="padding:5px;text-align:left">Item</th><th style="padding:5px">Qty Order</th><th style="padding:5px">Sudah Diterima</th><th style="padding:5px">Terima Sekarang</th><th style="padding:5px">No. Batch</th><th style="padding:5px">Kedaluwarsa</th>
+    </tr></thead><tbody>${(items||[]).map(it=>{
+      const itemMaster = invItems.find(i=>i.id===parseInt(it.item_id));
+      const tracks = itemMaster?.track_batch;
+      return `
+      <tr style="border-bottom:1px solid var(--border)" data-po-item-id="${it.id}" data-item-id="${it.item_id||''}" data-track="${tracks?'1':'0'}">
         <td style="padding:5px">${it.description}</td>
         <td style="padding:5px;text-align:center">${it.qty_ordered} ${it.uom}</td>
         <td style="padding:5px;text-align:center">${it.qty_received} ${it.uom}</td>
         <td style="padding:5px"><input type="number" class="recv-qty" min="0" max="${it.qty_ordered-it.qty_received}"
           value="${Math.max(0,it.qty_ordered-it.qty_received)}" style="width:80px;font-size:12px;padding:4px"></td>
-      </tr>`).join('')}</tbody></table>
+        <td style="padding:5px">${tracks?`<input type="text" class="recv-batch" placeholder="Lot..." style="width:90px;font-size:11px;padding:4px">`:'<span style="color:var(--gray)">—</span>'}</td>
+        <td style="padding:5px">${tracks?`<input type="date" class="recv-expiry" style="font-size:11px;padding:4px">`:'<span style="color:var(--gray)">—</span>'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveReceivePO(${id})">📥 Konfirmasi Terima</button>
@@ -969,6 +1085,19 @@ async function saveReceivePO(poId) {
           const newStock = (item.stock_qty||0) + recvQty;
           await sbPatch('inventory_items', itemId, { stock_qty:newStock, updated_at:new Date().toISOString() });
           await writeStockLedger(parseInt(itemId), 'IN', recvQty, newStock, 'po', poId, null, `Penerimaan PO`);
+          // Fase 2: catat batch/lot & kedaluwarsa bila barang dilacak batch
+          if (row.getAttribute('data-track')==='1') {
+            const batchNo = row.querySelector('.recv-batch')?.value.trim()||'';
+            const expiry  = row.querySelector('.recv-expiry')?.value||null;
+            if (batchNo || expiry) {
+              await sbPost('inventory_batches', {
+                item_id: parseInt(itemId), item_code: item.item_code, batch_no: batchNo,
+                expiry_date: expiry, qty_received: recvQty, qty_remaining: recvQty,
+                received_date: new Date().toISOString().split('T')[0], po_id: poId,
+                unit_price: item.unit_price||0, updated_at: new Date().toISOString(),
+              }).catch(err=>console.error('[batch]', err));
+            }
+          }
         }
       }
     } catch(e) { console.error('[saveReceivePO]', e); }
@@ -983,6 +1112,172 @@ async function saveReceivePO(poId) {
     });
     toast('✅ Penerimaan barang dicatat, stok terupdate','ok');
     closeModalForce(); await loadInventory(); renderPOTable();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// GOODS ISSUE — pengeluaran barang (Fase 2)
+// Mengurangi stok + tulis ledger OUT + konsumsi batch FEFO
+// ══════════════════════════════════════════════════════════════
+
+// Helper reusable — bisa dipanggil modul lain (Lab/MCU/Radiology/Homecare)
+// untuk auto goods-issue pemakaian barang. Tersedia global via window.
+async function issueStock(itemId, qty, refType, refId, refNumber, notes) {
+  qty = Math.abs(parseFloat(qty)||0);
+  if (!qty) return null;
+  const item = invItems.find(i=>i.id===parseInt(itemId)) || (await sbGet('inventory_items',`select=*&id=eq.${itemId}`))?.[0];
+  if (!item) throw new Error('Barang tidak ditemukan');
+  const newStock = (item.stock_qty||0) - qty;
+  await sbPatch('inventory_items', itemId, { stock_qty:newStock, updated_at:new Date().toISOString() });
+  await writeStockLedger(parseInt(itemId), 'OUT', -qty, newStock, refType||'issue', refId||null, refNumber||null, notes||'Pengeluaran barang');
+  // FEFO: konsumsi batch dengan expiry terdekat lebih dulu
+  if (item.track_batch) {
+    let remaining = qty;
+    const batches = (await sbGet('inventory_batches',`select=*&item_id=eq.${itemId}&qty_remaining=gt.0&order=expiry_date.asc`).catch(()=>[]))||[];
+    for (const b of batches) {
+      if (remaining<=0) break;
+      const take = Math.min(remaining, b.qty_remaining||0);
+      if (take>0) { await sbPatch('inventory_batches', b.id, { qty_remaining:(b.qty_remaining||0)-take, updated_at:new Date().toISOString() }); remaining -= take; }
+    }
+  }
+  return newStock;
+}
+if (typeof window!=='undefined') window.issueStock = issueStock;
+
+let giLineItems = [];  // working state form goods issue
+
+async function renderGoodsIssueList() {
+  const el = document.getElementById('inv-issue');
+  el.innerHTML = `
+    <div class="page-header" style="margin-bottom:14px">
+      <div><p style="color:var(--text3);font-size:13px">Catat pemakaian/pengeluaran barang ke divisi atau layanan — stok & ledger terupdate otomatis</p></div>
+      <button class="btn btn-teal" onclick="openGoodsIssueForm()">+ Goods Issue</button>
+    </div>
+    <div class="table-wrap"><div id="gi-tbody"><div class="loading-row"><div class="spinner"></div></div></div></div>`;
+  await loadGoodsIssues();
+}
+
+async function loadGoodsIssues() {
+  try {
+    const data = await sbGet('goods_issues','select=*&order=created_at.desc&limit=200');
+    const list = Array.isArray(data)?data:[];
+    const el = document.getElementById('gi-tbody');
+    if (!list.length) { el.innerHTML = `<div class="empty-state"><div class="ico">📤</div><h3>Belum ada Goods Issue</h3><p>Klik "+ Goods Issue" untuk mencatat pemakaian barang.</p></div>`; return; }
+    el.innerHTML = `<table><thead><tr>
+      <th>No. GI</th><th>Tanggal</th><th>Tujuan/Divisi</th><th>Keperluan</th><th>Item</th><th>Nilai</th><th>Oleh</th>
+    </tr></thead><tbody>${list.map(g=>`<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--teal)">${g.gi_number||'—'}</td>
+      <td style="font-size:11px;color:var(--gray)">${g.issue_date?formatDateShort(g.issue_date):'—'}</td>
+      <td style="font-size:12px">${g.division||'—'}</td>
+      <td style="font-size:12px">${g.purpose||'—'}</td>
+      <td style="text-align:center">${g.total_items||0}</td>
+      <td style="font-weight:600">${formatCurrency(g.total_value||0)}</td>
+      <td style="font-size:11px">${g.issued_by||'—'}</td>
+    </tr>`).join('')}</tbody></table>`;
+  } catch(e) { document.getElementById('gi-tbody').innerHTML = `<div class="status-box status-err">❌ ${e.message}</div>`; }
+}
+
+const GI_PURPOSES = ['Pemakaian Lab','Pemakaian MCU','Pemakaian Radiologi','Pemakaian Home Care','Barang Rusak','Kadaluarsa','Lainnya'];
+
+function openGoodsIssueForm() {
+  giLineItems = [];
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📤 Goods Issue — Pengeluaran Barang</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Tanggal</label><input type="date" id="gi-date" value="${new Date().toISOString().split('T')[0]}"></div>
+      <div class="form-group"><label>Keperluan</label>
+        <select id="gi-purpose">${GI_PURPOSES.map(p=>`<option>${p}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>Divisi / Tujuan</label>
+      <input type="text" id="gi-div" placeholder="Laboratorium, Radiologi, dll"></div>
+    <div style="border-top:1px solid var(--border);margin:10px 0;padding-top:10px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase">Item yang Dikeluarkan</div>
+        <button class="btn btn-xs btn-ghost" onclick="addGILineItem()">+ Tambah Item</button>
+      </div>
+      <div id="gi-items-table"></div>
+      <div style="text-align:right;font-weight:700;margin-top:8px;font-size:13px">Total Nilai: <span id="gi-total" style="color:var(--teal)">Rp 0</span></div>
+    </div>
+    <div class="form-group"><label>Catatan</label><textarea id="gi-notes" rows="2"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveGoodsIssue()">📤 Proses Pengeluaran</button>
+    </div>`, 'wide');
+  addGILineItem();
+}
+
+function addGILineItem() { giLineItems.push({ item_id:null, qty:1 }); renderGILineItems(); }
+function removeGILineItem(idx) { giLineItems.splice(idx,1); renderGILineItems(); }
+
+function renderGILineItems() {
+  const el = document.getElementById('gi-items-table'); if (!el) return;
+  el.innerHTML = `<table style="width:100%;font-size:12px"><thead><tr>
+    <th style="text-align:left;padding:4px">Barang</th><th style="padding:4px">Stok</th><th style="padding:4px">Qty Keluar</th><th style="padding:4px">Nilai</th><th></th>
+  </tr></thead><tbody>${giLineItems.map((it,idx)=>{
+    const item = invItems.find(i=>String(i.id)===String(it.item_id));
+    const stock = item?.stock_qty||0;
+    const over = item && (it.qty||0) > stock;
+    return `<tr>
+      <td style="padding:4px">
+        <select onchange="updateGIItem(${idx},'item_id',this.value)" style="font-size:11px;padding:4px;width:100%">
+          <option value="">-- Pilih Barang --</option>
+          ${invItems.filter(i=>i.is_active!==false).map(i=>`<option value="${i.id}" ${String(it.item_id)===String(i.id)?'selected':''}>${i.item_code||''} — ${i.item_name}</option>`).join('')}
+        </select>
+      </td>
+      <td style="padding:4px;text-align:center;color:${over?'#DC2626':'var(--gray)'}">${item?stock+' '+(item.unit||''):'—'}</td>
+      <td style="padding:4px"><input type="number" min="0" value="${it.qty||0}" style="width:70px;font-size:11px;padding:4px;${over?'border-color:#DC2626':''}" oninput="updateGIItem(${idx},'qty',this.value)">${over?'<div style="font-size:9px;color:#DC2626">> stok</div>':''}</td>
+      <td style="padding:4px;font-weight:700">${formatCurrency((item?.unit_price||0)*(it.qty||0))}</td>
+      <td style="padding:4px"><button class="act-btn del" onclick="removeGILineItem(${idx})">✕</button></td>
+    </tr>`;
+  }).join('')}</tbody></table>`;
+  updateGITotal();
+}
+
+function updateGIItem(idx, field, value) {
+  if (!giLineItems[idx]) return;
+  giLineItems[idx][field] = field==='qty' ? (parseFloat(value)||0) : value;
+  renderGILineItems();
+}
+
+function updateGITotal() {
+  const total = giLineItems.reduce((s,it)=>{ const item=invItems.find(i=>String(i.id)===String(it.item_id)); return s+((item?.unit_price||0)*(it.qty||0)); },0);
+  const el = document.getElementById('gi-total'); if (el) el.textContent = formatCurrency(total);
+}
+
+async function saveGoodsIssue() {
+  const lines = giLineItems.filter(it=>it.item_id && (it.qty||0)>0);
+  if (!lines.length) { toast('Tambahkan minimal 1 item dengan qty','err'); return; }
+  // Validasi stok cukup
+  for (const it of lines) {
+    const item = invItems.find(i=>String(i.id)===String(it.item_id));
+    if (item && it.qty > (item.stock_qty||0)) { toast(`Stok ${item.item_name} tidak cukup (${item.stock_qty})`,'err'); return; }
+  }
+  const purpose = document.getElementById('gi-purpose').value;
+  const division = document.getElementById('gi-div').value.trim();
+  const notes = document.getElementById('gi-notes').value.trim();
+  const totalValue = lines.reduce((s,it)=>{ const item=invItems.find(i=>String(i.id)===String(it.item_id)); return s+((item?.unit_price||0)*(it.qty||0)); },0);
+  const giNumber = `GI/${new Date().getFullYear()}/${Date.now().toString().slice(-5)}`;
+
+  try {
+    const created = await sbPost('goods_issues', {
+      gi_number: giNumber, issue_date: document.getElementById('gi-date').value,
+      purpose, division, ref_type:'manual', total_items: lines.length, total_value: totalValue,
+      status:'Selesai', issued_by: getUserName?getUserName():'User', notes,
+      updated_at: new Date().toISOString(),
+    });
+    const giId = created?.[0]?.id || created?.id;
+    for (const it of lines) {
+      const item = invItems.find(i=>String(i.id)===String(it.item_id));
+      await sbPost('goods_issue_items', {
+        gi_id: giId, item_id: item.id, item_code: item.item_code, description: item.item_name,
+        uom: item.unit, qty: it.qty, unit_price: item.unit_price||0, subtotal: (item.unit_price||0)*it.qty,
+      });
+      await issueStock(item.id, it.qty, 'issue', giId, giNumber, `${purpose}${division?' · '+division:''}`);
+    }
+    await logActivity('issue','goods_issues',giId,`Goods issue ${lines.length} item · ${purpose}`, giNumber);
+    toast('✅ Pengeluaran diproses, stok & ledger terupdate','ok');
+    closeModalForce(); await loadInventory(); await loadGoodsIssues();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -1187,23 +1482,32 @@ function renderMRPDashboard() {
   const active = invItems.filter(i=>i.is_active!==false);
   const needReorder = active.filter(i => (i.stock_qty||0) <= (i.reorder_point||i.min_stock||0));
 
+  // Fase 3: qty dalam perjalanan (PO belum diterima penuh)
+  const inTransit = {};
+  invMrpPoItems.forEach(pi=>{ const q=(pi.qty_ordered||0)-(pi.qty_received||0); if(q>0&&pi.item_id) inTransit[pi.item_id]=(inTransit[pi.item_id]||0)+q; });
+
   el.innerHTML = `
-    <div style="font-size:13px;color:var(--text3);margin-bottom:14px">
-      Reorder Point dihitung dari: (Rata-rata Pemakaian/Bulan ÷ 30 × Lead Time) + Safety Stock — diatur per barang di form Tambah/Edit Barang.
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div style="font-size:13px;color:var(--text3);max-width:70%">
+        Reorder Point = (Pemakaian/Bulan ÷ 30 × Lead Time) + Safety Stock. Kolom <b>In-Transit</b> = qty PO yang belum diterima.
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="recomputeUsageFromHistory()">🔄 Hitung Pemakaian dari Histori (90 hari)</button>
     </div>
     <div class="table-wrap">
       <table><thead><tr>
-        <th>Barang</th><th>Stok Saat Ini</th><th>Reorder Point</th><th>Pemakaian/Bulan</th><th>Lead Time</th><th>Estimasi Habis</th><th>Rekomendasi</th>
+        <th>Barang</th><th>Stok</th><th>In-Transit</th><th>Reorder Point</th><th>Pemakaian/Bulan</th><th>Lead Time</th><th>Estimasi Habis</th><th>Rekomendasi</th>
       </tr></thead><tbody>${active.map(i=>{
         const stock = i.stock_qty||0;
         const usage = i.avg_monthly_usage||0;
         const rop   = i.reorder_point || i.min_stock || 0;
+        const transit = inTransit[i.id]||0;
         const daysLeft = usage>0 ? Math.round((stock/usage)*30) : null;
-        const needOrder = stock <= rop;
-        const suggestedQty = needOrder ? Math.max((i.max_stock||0) - stock, Math.ceil(usage)) : 0;
+        const needOrder = (stock + transit) <= rop;  // in-transit mengurangi urgensi
+        const suggestedQty = needOrder ? Math.max((i.max_stock||0) - stock - transit, Math.ceil(usage)) : 0;
         return `<tr style="${needOrder?'background:#FFF7ED':''}">
           <td><div style="font-weight:600">${i.item_name}</div><div style="font-size:10.5px;color:var(--gray)">${i.item_code}</div></td>
           <td style="text-align:center;font-weight:700;color:${needOrder?'#DC2626':'var(--navy)'}">${stock} ${i.unit||''}</td>
+          <td style="text-align:center;font-size:12px;color:${transit?'#0EA5E9':'var(--gray)'}">${transit||'—'}</td>
           <td style="text-align:center;font-size:12px">${rop}</td>
           <td style="text-align:center;font-size:12px">${usage||'—'}</td>
           <td style="text-align:center;font-size:12px">${i.lead_time_days||7} hari</td>
@@ -1216,6 +1520,29 @@ function renderMRPDashboard() {
       <button class="btn btn-teal" onclick="generatePRFromMRP()">🛒 Buat PR Otomatis dari Rekomendasi (${needReorder.length} item)</button>
     </div>`:''}
   `;
+}
+
+// Fase 3: hitung ulang avg_monthly_usage dari histori pemakaian (OUT) 90 hari terakhir
+async function recomputeUsageFromHistory() {
+  if (!confirm('Hitung ulang rata-rata pemakaian/bulan tiap barang dari histori Stock Ledger (OUT) 90 hari terakhir? Reorder Point akan diperbarui.')) return;
+  const since = new Date(Date.now()-90*86400000).toISOString();
+  try {
+    const ledger = await sbGet('stock_ledger', `select=item_id,qty,movement_type&movement_type=eq.OUT&created_at=gte.${since}&limit=5000`).catch(()=>[]);
+    const usageByItem = {};
+    (ledger||[]).forEach(l=>{ if(l.item_id) usageByItem[l.item_id]=(usageByItem[l.item_id]||0)+Math.abs(l.qty||0); });
+    let updated=0;
+    for (const i of invItems.filter(x=>x.is_active!==false)) {
+      const total90 = usageByItem[i.id]||0;
+      const monthly = Math.round(total90/3);
+      const rop = Math.round((monthly/30*(i.lead_time_days||7)) + (i.safety_stock||0));
+      if (monthly !== (i.avg_monthly_usage||0) || rop !== (i.reorder_point||0)) {
+        await sbPatch('inventory_items', i.id, { avg_monthly_usage:monthly, reorder_point:rop, updated_at:new Date().toISOString() });
+        updated++;
+      }
+    }
+    toast(`✅ ${updated} barang diperbarui dari histori pemakaian`,'ok');
+    await loadInventory(); renderMRPDashboard();
+  } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
 async function generatePRFromMRP() {
@@ -1243,6 +1570,126 @@ async function generatePRFromMRP() {
       <button class="btn btn-teal" onclick="savePR(null)">📤 Submit PR</button>
     </div>`, 'wide');
   renderPRLineItemsTable();
+}
+
+// ══════════════════════════════════════════════════════════════
+// LAPORAN INVENTORY — valuation, ABC, aging/expiry, spend (Fase 4)
+// ══════════════════════════════════════════════════════════════
+function invExportCSV(filename, headers, rows) {
+  const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const csv = [headers.map(esc).join(','), ...rows.map(r=>r.map(esc).join(','))].join('\r\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+
+function renderInvReport() {
+  const el = document.getElementById('inv-report');
+  const active = invItems.filter(i=>i.is_active!==false);
+
+  // Valuasi per kategori
+  const byCat = {};
+  active.forEach(i=>{ const v=(i.stock_qty||0)*(i.unit_price||0); byCat[i.category||'Lainnya']=(byCat[i.category||'Lainnya']||0)+v; });
+  const totalVal = Object.values(byCat).reduce((s,v)=>s+v,0);
+
+  // ABC: barang diurut nilai desc, kelas A ≤80% kumulatif, B ≤95%, C sisanya
+  const valued = active.map(i=>({...i, value:(i.stock_qty||0)*(i.unit_price||0)})).sort((a,b)=>b.value-a.value);
+  let cum=0; const abc={A:0,B:0,C:0};
+  valued.forEach(i=>{ cum+=i.value; const p=totalVal?cum/totalVal:1; i.abc = p<=0.8?'A':p<=0.95?'B':'C'; abc[i.abc]++; });
+
+  // Aging/expiry dari batch
+  const today=new Date(); today.setHours(0,0,0,0);
+  const bucket={expired:0, d30:0, d90:0, over90:0, none:0};
+  invBatches.forEach(b=>{
+    if(!b.expiry_date){bucket.none++;return;}
+    const days=Math.round((new Date(b.expiry_date)-today)/86400000);
+    if(days<0)bucket.expired++; else if(days<=30)bucket.d30++; else if(days<=90)bucket.d90++; else bucket.over90++;
+  });
+
+  // Spend per supplier (dari PO)
+  const bySup={};
+  invPOs.forEach(po=>{ const n=po.supplier_name||'—'; bySup[n]=(bySup[n]||0)+(po.total_amount||0); });
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:16px">
+      ${[
+        {l:'Total Nilai Stok', v:formatCurrency(totalVal), c:'#0A2342'},
+        {l:'Jumlah SKU Aktif', v:active.length, c:'#00897B'},
+        {l:'Kelas A / B / C', v:`${abc.A} / ${abc.B} / ${abc.C}`, c:'#8B5CF6'},
+        {l:'Batch Kadaluarsa', v:bucket.expired, c:'#EF4444'},
+      ].map(k=>`<div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
+        <div style="font-size:16px;font-weight:800;color:${k.c}">${k.v}</div>
+        <div style="font-size:11px;color:var(--gray)">${k.l}</div></div>`).join('')}
+    </div>
+
+    <div class="card" style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-title">💰 Valuasi Stok per Kategori</div>
+        <button class="btn btn-ghost btn-sm" onclick="exportInvValuation()">⬇️ CSV</button>
+      </div>
+      ${Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+          <span>${c}</span><strong>${formatCurrency(v)} <span style="color:var(--gray);font-weight:400">(${totalVal?Math.round(v/totalVal*100):0}%)</span></strong>
+        </div>`).join('')||'<div style="color:var(--gray)">Belum ada data</div>'}
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">⏳ Aging Kedaluwarsa (Batch)</div>
+        ${[
+          {l:'Sudah kedaluwarsa', v:bucket.expired, c:'#EF4444'},
+          {l:'≤ 30 hari', v:bucket.d30, c:'#F59E0B'},
+          {l:'31–90 hari', v:bucket.d90, c:'#EAB308'},
+          {l:'> 90 hari', v:bucket.over90, c:'#22C55E'},
+          {l:'Tanpa expiry', v:bucket.none, c:'#94A3B8'},
+        ].map(r=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+          <span>${r.l}</span><strong style="color:${r.c}">${r.v} batch</strong></div>`).join('')}
+      </div>
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="card-title">🏭 Belanja per Supplier (PO)</div>
+          <button class="btn btn-ghost btn-sm" onclick="exportInvSpend()">⬇️ CSV</button>
+        </div>
+        ${Object.entries(bySup).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,v])=>`
+          <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+            <span>${n}</span><strong>${formatCurrency(v)}</strong></div>`).join('')||'<div style="color:var(--gray)">Belum ada PO</div>'}
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div class="card-title">🔤 Analisis ABC (kontribusi nilai)</div>
+        <button class="btn btn-ghost btn-sm" onclick="exportInvABC()">⬇️ CSV</button>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Barang</th><th>Stok</th><th>Nilai</th><th>Kelas</th></tr></thead>
+        <tbody>${valued.slice(0,50).map(i=>{
+          const col=i.abc==='A'?'#EF4444':i.abc==='B'?'#F59E0B':'#22C55E';
+          return `<tr>
+            <td><div style="font-weight:600">${i.item_name}</div><div style="font-size:10.5px;color:var(--gray)">${i.item_code||''}</div></td>
+            <td style="text-align:center">${i.stock_qty||0} ${i.unit||''}</td>
+            <td style="font-weight:600">${formatCurrency(i.value)}</td>
+            <td style="text-align:center"><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-weight:700">${i.abc}</span></td>
+          </tr>`;}).join('')}</tbody></table></div>
+      ${valued.length>50?`<div style="font-size:11px;color:var(--gray);margin-top:6px">Menampilkan 50 teratas dari ${valued.length}. Export CSV untuk lengkap.</div>`:''}
+    </div>`;
+}
+
+function exportInvValuation() {
+  const active = invItems.filter(i=>i.is_active!==false);
+  const rows = active.map(i=>[i.item_code||'', i.item_name, i.category||'', i.stock_qty||0, i.unit_price||0, (i.stock_qty||0)*(i.unit_price||0)]);
+  invExportCSV(`valuasi_stok_${new Date().toISOString().split('T')[0]}.csv`, ['Kode','Nama','Kategori','Stok','Harga','Nilai'], rows);
+}
+function exportInvSpend() {
+  const bySup={}; invPOs.forEach(po=>{ const n=po.supplier_name||'—'; bySup[n]=(bySup[n]||0)+(po.total_amount||0); });
+  invExportCSV(`belanja_supplier_${new Date().toISOString().split('T')[0]}.csv`, ['Supplier','Total Belanja'], Object.entries(bySup).sort((a,b)=>b[1]-a[1]));
+}
+function exportInvABC() {
+  const active = invItems.filter(i=>i.is_active!==false);
+  const totalVal = active.reduce((s,i)=>s+(i.stock_qty||0)*(i.unit_price||0),0);
+  const valued = active.map(i=>({...i,value:(i.stock_qty||0)*(i.unit_price||0)})).sort((a,b)=>b.value-a.value);
+  let cum=0; valued.forEach(i=>{cum+=i.value; const p=totalVal?cum/totalVal:1; i.abc=p<=0.8?'A':p<=0.95?'B':'C';});
+  invExportCSV(`abc_analysis_${new Date().toISOString().split('T')[0]}.csv`, ['Kode','Nama','Nilai','Kelas'], valued.map(i=>[i.item_code||'',i.item_name,i.value,i.abc]));
 }
 
 // ══════════════════════════════════════════════════════════════
