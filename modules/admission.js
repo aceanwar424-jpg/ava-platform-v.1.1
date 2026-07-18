@@ -1170,6 +1170,14 @@ async function saveAdmission(id) {
       } catch(e){ console.error('[saveAdmission] mark voucher used failed:', e); }
     }
 
+    // Fase 3.5 — terbitkan nomor antrian sesuai layanan yang benar-benar dipesan.
+    // Hanya untuk pendaftaran baru, dan kegagalannya tidak menggagalkan pendaftaran.
+    if (!id && admissionId && typeof issueQueueForAdmission === 'function') {
+      const productIds = (admFormState.serviceLines||[])
+        .map(l => l.product_id).filter(Boolean);
+      issueQueueForAdmissionByProducts(admissionId, name, productIds).catch(()=>{});
+    }
+
     closeModalForce();
     await loadAdmissions();
 

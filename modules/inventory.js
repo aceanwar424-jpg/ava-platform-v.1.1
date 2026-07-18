@@ -4,6 +4,9 @@
 // ═══════════════════════════════════════════════════════════════
 
 const INV_CATEGORIES = ['Reagen','BHP Lab','APD','ATK','Consumable Radiologi','Consumable EKG','Obat & Alkes','Lainnya'];
+// Divisi dibuat baku agar cocok dengan pagu anggaran. Sebelumnya berupa teks
+// bebas, sehingga "Laboratory" tidak pernah cocok dengan pagu "Laboratorium".
+const INV_DIVISIONS = ['Laboratorium','Radiologi','Home Care','MCU','Klinik','Kasir & Keuangan','HRD','Umum & Administrasi'];
 const PR_SOURCES     = ['KAS GANTUNG','XENDIT','PR / PO','VENDOR','STOCK INTERNAL'];
 
 let invItems = [], invPRs = [], invPOs = [], invSuppliers = [], invOpnames = [];
@@ -465,7 +468,10 @@ function renderPRList() {
   el.innerHTML = `
     <div class="page-header" style="margin-bottom:14px">
       <div><p style="color:var(--text3);font-size:13px">Permintaan pengadaan barang dengan approval SPV → Manager → Head of Operations</p></div>
-      <button class="btn btn-teal" onclick="openPRForm()">+ Buat PR</button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="openBudgetManager()">💰 Pagu Anggaran</button>
+        <button class="btn btn-teal" onclick="openPRForm()">+ Buat PR</button>
+      </div>
     </div>
     <div class="table-wrap">
       <div id="pr-tbody"><div class="loading-row"><div class="spinner"></div></div></div>
@@ -530,9 +536,11 @@ async function openPRForm(id=null) {
     <div class="form-row">
       <div class="form-group"><label>Tanggal Dibutuhkan</label>
         <input type="date" id="pf-needed" value="${p.needed_date||''}"></div>
-      <div class="form-group"><label>Divisi</label>
-        <input type="text" id="pf-div" value="${p.division||''}" placeholder="Laboratory, Operasional, dll"
-          onchange="checkPRBudget()" onblur="checkPRBudget()">
+      <div class="form-group"><label>Divisi *</label>
+        <select id="pf-div" onchange="checkPRBudget()">
+          <option value="">-- Pilih divisi --</option>
+          ${INV_DIVISIONS.map(d=>`<option${p.division===d?' selected':''}>${d}</option>`).join('')}
+        </select>
         <div class="form-hint" id="pf-budget"></div></div>
     </div>
     <div class="form-group"><label>Alasan / Justifikasi Pengadaan *</label>
@@ -554,6 +562,54 @@ async function openPRForm(id=null) {
       <button class="btn btn-teal" onclick="savePR(${id||'null'})">📤 ${id?'Simpan':'Submit PR'}</button>
     </div>`, 'wide');
   renderPRLineItemsTable();
+}
+
+// ── Pengelolaan pagu anggaran per divisi (Fase 2.5) ────────────
+async function openBudgetManager() {
+  const period = new Date().toISOString().slice(0,7);
+  let rows = [];
+  try { rows = await sbGet('budgets', `select=*&period=eq.${period}&order=division.asc`); }
+  catch(e) { toast('Tabel pagu belum ada — jalankan supabase_fase2.sql','warn'); return; }
+
+  openModal(`
+    <div class="modal-header"><div class="modal-title">💰 Pagu Anggaran — ${period}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
+      Pagu per divisi untuk periode berjalan. PR yang melampaui sisa pagu akan diberi peringatan
+      saat disusun.
+    </div>
+    <table style="width:100%;font-size:12.5px"><thead><tr style="background:var(--bg2)">
+      <th style="padding:6px;text-align:left">Divisi</th>
+      <th style="padding:6px;text-align:right">Pagu (Rp)</th>
+    </tr></thead><tbody>
+      ${INV_DIVISIONS.map(d=>{
+        const b = rows.find(r=>r.division===d);
+        return `<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:6px">${d}</td>
+          <td style="padding:6px"><input type="number" min="0" data-bdg-div="${d}"
+            data-bdg-id="${b?.id||''}" value="${b?.amount||0}"
+            style="width:100%;text-align:right;font-size:12px;padding:5px"></td>
+        </tr>`;
+      }).join('')}
+    </tbody></table>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveBudgets('${period}')">💾 Simpan Pagu</button>
+    </div>`, 'wide');
+}
+
+async function saveBudgets(period) {
+  const rows = document.querySelectorAll('[data-bdg-div]');
+  try {
+    for (const r of rows) {
+      const div = r.getAttribute('data-bdg-div');
+      const id  = r.getAttribute('data-bdg-id');
+      const amt = parseFloat(r.value)||0;
+      if (id) await sbPatch('budgets', id, { amount:amt, updated_at:new Date().toISOString() });
+      else if (amt > 0) await sbPost('budgets', { division:div, period, amount:amt, updated_at:new Date().toISOString() });
+    }
+    toast('✅ Pagu tersimpan','ok'); closeModalForce();
+  } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
 // Fase 2.5 — tampilkan sisa pagu divisi saat PR disusun

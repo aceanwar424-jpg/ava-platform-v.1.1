@@ -1652,3 +1652,77 @@ select { cursor: pointer; }
 @media (max-width: 767px) {
   .rail-label { font-size: 9.5px; max-width: 60px; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   KIOSK ANTRIAN — layar sentuh pasien
+   Mode kiosk menyembunyikan rail, topbar, dan subnav agar pasien
+   tidak bisa masuk ke aplikasi.
+══════════════════════════════════════════════════════════════ */
+body.kiosk-mode .sidebar-rail,
+body.kiosk-mode .topbar,
+body.kiosk-mode .subnav { display: none !important; }
+body.kiosk-mode .main-content { margin: 0 !important; padding: 0 !important; }
+
+.kiosk {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0B1F3A 0%, #123A5C 100%);
+  color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 24px; text-align: center; position: relative;
+}
+.kiosk-exit {
+  position: absolute; top: 16px; right: 18px;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18);
+  color: rgba(255,255,255,.5); font-size: 17px; cursor: pointer;
+}
+.kiosk-exit:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+.kiosk-head { margin-bottom: 40px; }
+.kiosk-logo {
+  width: 62px; height: 62px; margin: 0 auto 18px;
+  background: var(--teal2); border-radius: 16px;
+  display: grid; place-items: center;
+  font-size: 24px; font-weight: 800; color: #fff;
+}
+.kiosk-head h1 { font-size: 40px; font-weight: 800; margin: 0 0 8px; letter-spacing: -.02em; }
+.kiosk-head p  { font-size: 18px; color: rgba(255,255,255,.65); margin: 0; }
+
+.kiosk-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px; width: 100%; max-width: 900px;
+}
+.kiosk-card {
+  background: rgba(255,255,255,.07); border: 1.5px solid rgba(255,255,255,.15);
+  border-radius: 18px; padding: 32px 20px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  color: #fff; font-family: inherit; transition: background .15s, border-color .15s;
+  min-height: 190px; justify-content: center;
+}
+.kiosk-card:hover, .kiosk-card:active {
+  background: rgba(255,255,255,.14); border-color: var(--teal2);
+}
+.kiosk-ico { color: var(--teal2); line-height: 0; }
+.kiosk-label { font-size: 24px; font-weight: 700; }
+.kiosk-desc  { font-size: 14px; color: rgba(255,255,255,.6); line-height: 1.4; }
+.kiosk-foot  { margin-top: 34px; font-size: 15px; color: rgba(255,255,255,.45); }
+
+/* Tampilan nomor setelah pasien menyentuh layanan */
+.kiosk-ticket {
+  position: fixed; inset: 0; background: rgba(11,31,58,.97);
+  display: none; align-items: center; justify-content: center; z-index: 9999;
+}
+.kiosk-ticket.show { display: flex; }
+.kiosk-ticket-inner { text-align: center; color: #fff; padding: 24px; }
+.kt-lbl  { font-size: 18px; letter-spacing: .2em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.kt-no   { font-size: 26vw; font-weight: 800; line-height: 1; color: var(--teal2);
+           font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.kt-svc  { font-size: 30px; font-weight: 700; margin-top: 6px; }
+.kt-wait { font-size: 19px; color: rgba(255,255,255,.7); margin-top: 14px; }
+.kt-hint { font-size: 15px; color: rgba(255,255,255,.45); margin: 6px 0 26px; }
+
+@media (max-width: 640px) {
+  .kiosk-head h1 { font-size: 30px; }
+  .kiosk-label { font-size: 20px; }
+  .kt-no { font-size: 40vw; }
+}

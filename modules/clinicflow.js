@@ -334,3 +334,121 @@ async function markReminded(id) {
   try { await sbPatch('appointments', id, { reminder_sent_at:new Date().toISOString() }); await loadAppointments(); }
   catch(e) { /* pengingat tetap terkirim walau penandaan gagal */ }
 }
+
+// ══════════════════════════════════════════════════════════════
+// KIOSK ANTRIAN — layar sentuh untuk pasien di pintu masuk
+// Dijalankan sebagai halaman di dalam aplikasi supaya ikut memakai sesi login;
+// tablet cukup login sekali lalu dibiarkan pada halaman ini.
+// ══════════════════════════════════════════════════════════════
+const KIOSK_SERVICES = [
+  {svc:'Lab',       icon:'flask',      label:'Laboratorium', desc:'Pemeriksaan darah, urin, dan lainnya'},
+  {svc:'Radiologi', icon:'scan',       label:'Radiologi',    desc:'Rontgen, USG, dan pencitraan'},
+  {svc:'Dokter',    icon:'stethoscope',label:'Dokter',       desc:'Konsultasi & pemeriksaan dokter'},
+  {svc:'Kasir',     icon:'wallet',     label:'Kasir',        desc:'Pembayaran & administrasi'},
+];
+
+function renderQueueKiosk() {
+  document.body.classList.add('kiosk-mode');
+  document.getElementById('main-content').innerHTML = `
+    <div class="kiosk">
+      <button class="kiosk-exit" onclick="exitKiosk()" title="Keluar dari mode kiosk">✕</button>
+      <div class="kiosk-head">
+        <div class="kiosk-logo">OL</div>
+        <h1>Selamat Datang</h1>
+        <p>Silakan pilih layanan untuk mengambil nomor antrian</p>
+      </div>
+      <div class="kiosk-grid">
+        ${KIOSK_SERVICES.map(s=>`
+          <button class="kiosk-card" onclick="kioskTake('${s.svc}')">
+            <span class="kiosk-ico">${typeof icon==='function'?icon(s.icon,44):''}</span>
+            <span class="kiosk-label">${s.label}</span>
+            <span class="kiosk-desc">${s.desc}</span>
+          </button>`).join('')}
+      </div>
+      <div class="kiosk-foot" id="kiosk-foot">Sentuh salah satu layanan di atas</div>
+    </div>
+    <div class="kiosk-ticket" id="kiosk-ticket"></div>`;
+}
+
+function exitKiosk() {
+  document.body.classList.remove('kiosk-mode');
+  navigate('queue');
+}
+
+async function kioskTake(svc) {
+  const foot = document.getElementById('kiosk-foot');
+  if (foot) foot.textContent = 'Menerbitkan nomor…';
+  try {
+    const res = await sbRpc('issue_queue_ticket', { p_service: svc, p_patient: null });
+    kioskShowTicket(res?.queue_number || '—', svc);
+    if (foot) foot.textContent = 'Sentuh salah satu layanan di atas';
+  } catch(e) {
+    if (foot) foot.textContent = 'Maaf, nomor gagal diterbitkan. Silakan hubungi petugas.';
+  }
+}
+
+// Tampilan nomor besar, menutup sendiri agar pasien berikutnya bisa langsung memakai
+function kioskShowTicket(no, svc) {
+  const el = document.getElementById('kiosk-ticket'); if (!el) return;
+  const waiting = qTickets.filter(t=>t.service_type===svc && t.status==='Menunggu').length;
+  el.innerHTML = `
+    <div class="kiosk-ticket-inner">
+      <div class="kt-lbl">Nomor Antrian Anda</div>
+      <div class="kt-no">${no}</div>
+      <div class="kt-svc">${svc}</div>
+      <div class="kt-wait">${waiting>0?`Ada ${waiting} orang menunggu sebelum Anda`:'Anda berikutnya dilayani'}</div>
+      <div class="kt-hint">Silakan menunggu nomor Anda dipanggil</div>
+      <button class="btn btn-teal" onclick="kioskCloseTicket()">Selesai</button>
+    </div>`;
+  el.classList.add('show');
+  clearTimeout(window._kioskTimer);
+  window._kioskTimer = setTimeout(kioskCloseTicket, 12000);
+  loadQueue().catch(()=>{});
+}
+
+function kioskCloseTicket() {
+  clearTimeout(window._kioskTimer);
+  document.getElementById('kiosk-ticket')?.classList.remove('show');
+}
+
+// ══════════════════════════════════════════════════════════════
+// INTEGRASI PENDAFTARAN → ANTRIAN
+// Dipanggil setelah pendaftaran tersimpan: menerbitkan nomor untuk setiap
+// jenis layanan yang benar-benar dipesan, bukan satu nomor untuk semuanya.
+// ══════════════════════════════════════════════════════════════
+function mapCategoryToQueue(kategori) {
+  const k = (kategori||'').toLowerCase();
+  if (k.includes('radiolog') || k.includes('rontgen') || k.includes('usg')) return 'Radiologi';
+  if (k.includes('konsul')   || k.includes('dokter')) return 'Dokter';
+  return 'Lab';   // selebihnya masuk antrian laboratorium
+}
+
+// Varian yang dipakai Admission: kategori diturunkan dari produk yang dipesan,
+// karena baris layanan hanya menyimpan product_id.
+async function issueQueueForAdmissionByProducts(admissionId, patientName, productIds) {
+  if (!productIds || !productIds.length) return [];
+  let categories = [];
+  try {
+    const rows = await sbGet('products', `select=id,kategori&id=in.(${productIds.join(',')})`);
+    categories = (rows||[]).map(r=>r.kategori).filter(Boolean);
+  } catch(e) { categories = ['Lab']; }   // gagal lookup → anggap layanan lab
+  if (!categories.length) categories = ['Lab'];
+  return issueQueueForAdmission(admissionId, patientName, categories);
+}
+
+async function issueQueueForAdmission(admissionId, patientName, categories) {
+  const services = [...new Set((categories||[]).map(mapCategoryToQueue))];
+  if (!services.length) return [];
+  const issued = [];
+  for (const svc of services) {
+    try {
+      const res = await sbRpc('issue_queue_ticket',
+        { p_service: svc, p_patient: patientName || null, p_admission_id: admissionId || null });
+      if (res?.queue_number) issued.push({ svc, no: res.queue_number });
+    } catch(e) { /* antrian gagal tidak boleh menggagalkan pendaftaran */ }
+  }
+  if (issued.length) {
+    toast(`🎫 Nomor antrian: ${issued.map(i=>`${i.no} (${i.svc})`).join(', ')}`, 'ok');
+  }
+  return issued;
+}
