@@ -67,7 +67,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 3.1 Rekam medis bisa ditulis — SOAP/CPPT + tanda tangan mengunci (trigger), koreksi via adendum
 - [x] 3.2 Alergi (banner keselamatan), daftar masalah, tanda vital + tren — menempel di mr_number
 - [~] 3.3 ICD-10 — kolom is_primary + trigger satu diagnosis utama; UI dokter menyusul
-- [ ] 3.4 Garis waktu kunjungan pasien
+- [x] 3.4 Garis waktu pasien — gabungan lintas modul, tahan tabel yang belum ada
 - [x] 3.5 Antrian bernomor + layar ruang tunggu (auto-refresh 15 dtk)
 - [x] 3.6 Perjanjian + pengingat WhatsApp + deteksi bentrok sumber daya
 
@@ -84,7 +84,7 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [~] 5.1 Satu Sehat — DIPARKIR sampai kerja sama tersedia
 - [~] 5.2 Klaim BPJS — DIPARKIR sampai kerja sama tersedia
 - [x] 5.3 RIS modul tersendiri + PACS rancangan sendiri (arsip Storage + penampil kanvas)
-- [ ] 5.4 Laporan Kemenkes RL 1–5 terisi otomatis
+- [x] 5.4 Laporan RL — rekapitulasi otomatis dari data + export CSV & cetak
 - [~] 5.5 LIS lanjutan — autoverifikasi + Westgard multi-run + Levey-Jennings SELESAI; antarmuka alat langsung & rujukan luar menyusul
 - [ ] 5.6 Multi-cabang / unit
 

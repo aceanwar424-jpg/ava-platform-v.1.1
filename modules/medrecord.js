@@ -327,6 +327,7 @@ function paintMRClinical() {
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
         <div class="card-title">🩺 Rekam Klinis</div>
         <div class="btn-row">
+          <button class="btn btn-outline btn-sm" onclick="openMRTimeline()">🕒 Garis Waktu</button>
           <button class="btn btn-ghost btn-sm" onclick="openAllergyForm()">+ Alergi</button>
           <button class="btn btn-ghost btn-sm" onclick="openProblemForm()">+ Masalah</button>
           <button class="btn btn-ghost btn-sm" onclick="openVitalForm()">+ Tanda Vital</button>
