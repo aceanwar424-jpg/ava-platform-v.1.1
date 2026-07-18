@@ -12,11 +12,17 @@ const AG_ORG_ICON = {
   SA_HEAD:'🧪', SA_DOC:'📚', SA_AUDIT:'🔍', SA_REG:'📜', SA_CAPA:'🛠️', QA_MUTU:'✅',
   MKT_HEAD:'✍️', MKT_SEO:'🔑', MKT_COPY:'📝', MKT_DESIGN:'🎨', MKT_SOCIAL:'📣', QA_KONTEN:'✅',
   IT_HEAD:'🖥️', IT_SRE:'🛎️', IT_SEC:'🔐', IT_DATA:'🗄️', IT_DEV:'⚙️',
+  LOGISTIK:'🚚', SCM_STOCK:'📦', SCM_PO:'🧾',
+  HR_HEAD:'👥', HR_CRED:'🪪', HR_ROSTER:'🗓️',
+  LAB_HEAD:'🔬', LAB_QC:'🧫', LAB_TAT:'⏱️', LAB_CRIT:'🚨',
 };
 const AG_DEPT_META = {
+  LAB_OPS:          { icon:'🔬', label:'Lab Operations',    head:'LAB_HEAD', tick:'LAB_TICK', color:'#0891B2' },
   SERVICE_ASSURANCE:{ icon:'🧪', label:'Service Assurance', head:'SA_HEAD',  tick:'SA_TICK',  color:'#0EA5E9' },
   MARKETING:        { icon:'✍️', label:'Marketing',         head:'MKT_HEAD', tick:'MKT_TICK', color:'#8B5CF6' },
   IT:               { icon:'🖥️', label:'IT Profesional',    head:'IT_HEAD',  tick:'IT_CHECK', color:'#0F766E' },
+  SUPPLY_CHAIN:     { icon:'🚚', label:'Supply Chain',      head:'LOGISTIK', tick:'SCM_TICK', color:'#D97706' },
+  PEOPLE:           { icon:'👥', label:'People & Credentialing', head:'HR_HEAD', tick:'HR_TICK', color:'#DB2777' },
 };
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
@@ -84,6 +90,8 @@ async function renderAgOrgTab(el){
           <button class="ag-btn mut" onclick="agOrgKick('MKT_TICK')">${svgIcon('sparkle',13)} Patroli Marketing</button>
           <button class="ag-btn mut" onclick="agOrgKick('IT_CHECK')">${svgIcon('eye',13)} IT Check</button>
           <button class="ag-btn mut" onclick="agItSecAudit()">🔐 Audit Keamanan</button>
+          <button class="ag-btn mut" onclick="agItTask('INTEGRATION_HEALTH','Cek integrasi lab')">🔌 Cek Integrasi</button>
+          <button class="ag-btn mut" onclick="agItTask('BACKUP_VERIFY','Verifikasi backup')">💾 Cek Backup</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>
         </div>
       </div>
@@ -160,6 +168,11 @@ async function renderAgOrgTab(el){
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
+    <div class="ag-detail" style="margin-top:12px" id="ag-creds-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
     <div class="ag-detail" style="margin-top:12px" id="ag-aiconfig-box">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⚙️ Konfigurasi AI (model · API · video)</div>
       <div class="loading-row"><div class="spinner"></div></div>
@@ -171,8 +184,103 @@ async function renderAgOrgTab(el){
     </div>`;
   agRenderCronBox();
   agRenderTemplates();
+  agRenderCreds();
   agRenderAiConfig();
   agRenderPromptHist();
+}
+
+// ── Panel Kredensial Nakes (Fase 7I) ─────────────────────────────
+function agCredDays(exp){ if(!exp) return null; return Math.round((new Date(exp)-Date.now())/86400000); }
+async function agRenderCreds(){
+  const box = document.getElementById('ag-creds-box'); if(!box) return;
+  let rows = null;
+  try{ rows = await sbGet('agentic_credentials_v','select=*&order=expiry_date.asc') || []; }catch(e){ rows = null; }
+  let inner;
+  if(rows===null){
+    inner = `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7i_hr.sql</strong> untuk mengaktifkan pemantauan kredensial.</div>`;
+  } else {
+    const today = rows.map(r=>({...r, d:agCredDays(r.expiry_date)}));
+    inner = `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Isi STR/SIP/sertifikat tiap nakes. Agent <strong>HR_CRED</strong> memantau kedaluwarsa (feed Akreditasi Klinik & ISO 15189 §6.2). Merah = kedaluwarsa, kuning = ≤90 hari.</div>
+      <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Nama</th><th>Profesi</th><th>Jenis</th><th>Nomor</th><th>Kedaluwarsa</th><th>Sisa</th><th></th></tr></thead>
+        <tbody>${today.map(r=>{
+          const c = r.d==null?'#64748b':r.d<0?'#dc2626':r.d<=90?'#b45309':'#16a34a';
+          return `<tr${r.is_active?'':' style="opacity:.5"'}>
+            <td style="font-weight:700">${agEsc(r.staff_name)}</td>
+            <td>${agEsc(r.profession||'—')}</td>
+            <td>${agEsc(r.credential_type)}</td>
+            <td style="white-space:nowrap">${agEsc(r.number||'—')}</td>
+            <td style="white-space:nowrap">${agEsc(r.expiry_date||'—')}</td>
+            <td style="white-space:nowrap;color:${c};font-weight:700">${r.d==null?'—':r.d<0?`kedaluwarsa ${Math.abs(r.d)}h`:`${r.d}h`}</td>
+            <td style="white-space:nowrap"><button class="act-btn" title="Edit" onclick="agCredEdit('${r.id}')">${svgIcon('edit',11)}</button>
+              <button class="act-btn" title="Hapus" onclick="agCredDelete('${r.id}')">🗑</button></td>
+          </tr>`;}).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:14px">Belum ada kredensial — tambah agar HR_CRED bisa memantau.</td></tr>'}</tbody>
+      </table></div>`;
+  }
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
+      <div style="display:flex;gap:6px">
+        <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agCredEdit()">${svgIcon('plus',11)} Tambah</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agOrgKick('HR_TICK')">🪪 Patroli Kredensial</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderCreds()">${svgIcon('refresh',11)} Muat ulang</button>
+      </div>
+    </div>${inner}`;
+}
+let _agCredRows = [];
+async function agCredEdit(id){
+  try{ _agCredRows = await sbGet('agentic_credentials_v','select=*') || []; }catch(e){ _agCredRows = []; }
+  const r = id ? _agCredRows.find(x=>x.id===id) : null;
+  const prof = ['Dokter','Dokter Spesialis','Perawat','ATLM (Analis)','Radiografer','Apoteker','Bidan','Lainnya'];
+  const jenis = ['STR','SIP','SIPB','SIPA','Sertifikat Kompetensi','Lainnya'];
+  openModal(`
+    <div style="max-width:520px">
+      <h3 style="margin:0 0 10px;color:#0A2342">🪪 ${r?'Edit':'Tambah'} Kredensial Nakes</h3>
+      <div style="display:grid;gap:9px">
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Nama nakes
+          <input id="agcr-name" class="form-input" style="width:100%" value="${agEsc(r?r.staff_name:'')}"></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Profesi
+            <select id="agcr-prof" class="form-input" style="width:100%">
+              ${prof.map(p=>`<option ${r&&r.profession===p?'selected':''}>${p}</option>`).join('')}</select></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
+            <select id="agcr-type" class="form-input" style="width:100%">
+              ${jenis.map(p=>`<option ${r&&r.credential_type===p?'selected':''}>${p}</option>`).join('')}</select></label>
+        </div>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Nomor
+          <input id="agcr-num" class="form-input" style="width:100%" value="${agEsc(r?r.number||'':'')}"></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Tanggal terbit
+            <input id="agcr-issued" type="date" class="form-input" style="width:100%" value="${agEsc(r?r.issued_date||'':'')}"></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Kedaluwarsa
+            <input id="agcr-expiry" type="date" class="form-input" style="width:100%" value="${agEsc(r?r.expiry_date||'':'')}"></label>
+        </div>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Penerbit (KKI/KTKI/Organisasi profesi)
+          <input id="agcr-issuer" class="form-input" style="width:100%" value="${agEsc(r?r.issuer||'':'')}"></label>
+        <label style="font-size:11.5px;font-weight:700;color:#334155;display:flex;align-items:center;gap:6px">
+          <input type="checkbox" id="agcr-active" ${!r||r.is_active?'checked':''}> Aktif</label>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="ag-btn mut" onclick="closeModal()">Batal</button>
+        <button class="ag-btn pub" onclick="agCredSave('${r?r.id:''}')">${svgIcon('check',13)} Simpan</button>
+      </div>
+    </div>`);
+}
+async function agCredSave(id){
+  const g = i=>(document.getElementById(i)||{}).value;
+  try{
+    const p = { staff_name:g('agcr-name'), profession:g('agcr-prof'), credential_type:g('agcr-type'),
+      number:g('agcr-num'), issued_date:g('agcr-issued'), expiry_date:g('agcr-expiry'), issuer:g('agcr-issuer'),
+      is_active:String(!!(document.getElementById('agcr-active')||{}).checked) };
+    if(id) p.id = id;
+    if(!p.staff_name){ toast('Nama wajib diisi','warn'); return; }
+    await agRpc('agentic_cred_upsert', { p });
+    closeModal(); toast('Kredensial disimpan','ok'); agRenderCreds();
+  }catch(e){ toast(e.message,'err'); }
+}
+async function agCredDelete(id){
+  if(!confirm('Hapus kredensial ini?')) return;
+  try{ await agRpc('agentic_cred_delete', { p_id:id }); toast('Dihapus','ok'); agRenderCreds(); }
+  catch(e){ toast(e.message,'err'); }
 }
 
 // ── Panel Konfig AI: set model/API/flag langsung dari web (Fase 7B) ──
@@ -533,7 +641,7 @@ async function agOrgKick(type){
   try{
     const r = await agRpc('agentic_org_kick', { p_type: type });
     if(r && r.skipped){ toast('Masih ada yang antri/berjalan — tunggu selesai','info'); return; }
-    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing' };
+    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops' };
     toast(`${_lbl[type]||type} ditugaskan — menjalankan worker…`,'ok');
     await agRunWorker(4);
     await agReload();
@@ -561,5 +669,16 @@ async function agItSecAudit(){
     if(_agTab==='org') agRenderTab();
   }catch(e){
     toast(/IT_SEC_AUDIT|agentic_it_sec_scan/.test(e.message)?'Jalankan supabase_agentic_fase7f_it.sql dulu':e.message,'err');
+  }
+}
+async function agItTask(type, title){
+  try{
+    await agRpc('agentic_create_task', { p_agent:'ORG', p_task_type:type, p_title:title, p_payload:{} });
+    toast(`${title} ditugaskan — menjalankan worker…`,'ok');
+    await agRunWorker(2);
+    await agReload();
+    if(_agTab==='org') agRenderTab();
+  }catch(e){
+    toast(/INTEGRATION_HEALTH|BACKUP_VERIFY|integration_scan|backup_status/.test(e.message)?'Jalankan supabase_agentic_fase7g_it.sql dulu':e.message,'err');
   }
 }

@@ -1074,8 +1074,212 @@ async function handleItSecAudit(t: Task) {
     note: `IT_SEC audit · ${missing} secret kosong · ${posture?.failed_7d ?? 0} gagal/7hr${medicalAuto ? ` · ⚠ ${medicalAuto} medis auto` : ''}` };
 }
 
+// ═══ FASE 7J — DEPARTEMEN SUPPLY CHAIN ═══════════════════════════════
+
+// Ringkas hasil scan stok jadi markdown
+function scmReport(scan: Dict): string {
+  const s = (scan.summary || {}) as Dict;
+  const low = (scan.low_stock || []) as Dict[];
+  const exp = (scan.expiring || []) as Dict[];
+  const dead = (scan.expired || []) as Dict[];
+  return `## Patroli Supply Chain — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `Menipis: ${s.low_count ?? 0} · Habis: ${s.out_of_stock ?? 0} · Akan kedaluwarsa: ${s.expiring_count ?? 0} · Kedaluwarsa: ${s.expired_count ?? 0}\n\n` +
+    (low.length ? `**Menipis (${low.length}):**\n` + low.slice(0, 15).map((i) =>
+      `- ${i.item_name || i.item_code} — stok ${i.stock_qty}/${i.threshold}${Number(i.stock_qty) <= 0 ? ' ⛔ HABIS' : ''} → usul beli ${i.suggested_qty} ${i.unit || ''}${i.supplier ? ` (${i.supplier})` : ''}`).join('\n') + '\n\n' : '') +
+    (dead.length ? `**⛔ Kedaluwarsa masih ada stok (${dead.length}) — tarik:**\n` + dead.slice(0, 10).map((b) =>
+      `- ${b.item_code} batch ${b.batch_no} exp ${b.expiry_date} · sisa ${b.qty_remaining}`).join('\n') + '\n\n' : '') +
+    (exp.length ? `**Mendekati kedaluwarsa (${exp.length}):**\n` + exp.slice(0, 10).map((b) =>
+      `- ${b.item_code} batch ${b.batch_no} · ${b.days_left} hari lagi (${b.expiry_date}) · sisa ${b.qty_remaining}`).join('\n') : '');
+}
+
+// SCM_TICK: patroli — scan, lapor, dan draft PO utk item menipis
+async function handleScmTick(t: Task) {
+  const scan = await rpc('agentic_scm_scan', {}) as Dict;
+  const low = (scan.low_stock || []) as Dict[];
+  const s = (scan.summary || {}) as Dict;
+  const md = scmReport(scan);
+  let extra = '';
+  // Ada item menipis → antre 1 task PO_DRAFT membawa daftarnya
+  if (low.length) {
+    await rpc('agentic_create_task', {
+      p_agent: 'ORG', p_task_type: 'PO_DRAFT',
+      p_title: `Draft PO — ${low.length} item menipis`,
+      p_payload: { items: low.slice(0, 40) },
+    });
+    extra = ` · draft PO diantre (${low.length} item)`;
+  }
+  // Alert CEO bila kritis (habis / kedaluwarsa masih ada stok)
+  if (Number(s.out_of_stock || 0) > 0 || Number(s.expired_count || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'LOGISTIK', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  } else if (low.length || (scan.expiring as Dict[])?.length) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'LOGISTIK', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...scan },
+    note: `SCM: ${s.low_count ?? 0} menipis · ${s.out_of_stock ?? 0} habis · ${s.expired_count ?? 0} kedaluwarsa${extra}` };
+}
+
+// STOCK_WATCH: laporan stok on-demand (detail)
+async function handleStockWatch(t: Task) {
+  const scan = await rpc('agentic_scm_scan', { p_expiry_days: Number(t.payload?.expiry_days ?? 60) }) as Dict;
+  const md = scmReport(scan);
+  const s = (scan.summary || {}) as Dict;
+  return { result: { markdown: md, ...scan }, note: `Stok: ${s.low_count ?? 0} menipis · ${s.expiring_count ?? 0} akan kedaluwarsa` };
+}
+
+// PO_DRAFT: daftar item menipis → draft usulan pembelian per pemasok (LLM)
+async function handlePoDraft(t: Task) {
+  const p = t.payload || {};
+  let items = Array.isArray(p.items) ? (p.items as Dict[]) : [];
+  if (!items.length) { // dipanggil manual tanpa item → scan dulu
+    const scan = await rpc('agentic_scm_scan', {}) as Dict;
+    items = ((scan.low_stock || []) as Dict[]).slice(0, 40);
+  }
+  if (!items.length) return { result: { markdown: '_Tidak ada item menipis — PO tidak diperlukan._' }, note: 'PO: tidak ada item menipis' };
+  const tpl = await getPrompt('PO_DRAFT');
+  const r = await askLLM({
+    taskId: t.id, tier: 'light', temperature: Number(tpl.temperature ?? 0.3), maxTokens: 4000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), { items: JSON.stringify(items), notes: p.notes || '-' }),
+  });
+  const md = String(r.text || '').trim();
+  await rpc('agentic_msg_add', { p: { from_agent: 'SCM_PO', to_agent: 'ACE', kind: 'INFO',
+    body: `## Draft Usulan Pembelian\n${md}` } }).catch(() => null);
+  return { result: { markdown: md, items_count: items.length },
+    note: `Draft PO ${items.length} item — menunggu tinjauan manusia` };
+}
+
+// ═══ FASE 7I — PEOPLE & CREDENTIALING ════════════════════════════════
+function credReport(scan: Dict): string {
+  const s = (scan.summary || {}) as Dict;
+  const expired = (scan.expired || []) as Dict[];
+  const expiring = (scan.expiring || []) as Dict[];
+  const noExp = (scan.no_expiry || []) as Dict[];
+  return `## Patroli Kredensial Nakes — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `Kedaluwarsa: ${s.expired ?? 0} · ≤30 hari: ${s.expiring_30 ?? 0} · ≤90 hari: ${s.expiring_90 ?? 0} · tanpa tanggal: ${s.no_expiry ?? 0} · aktif: ${s.total_active ?? 0}\n\n` +
+    (expired.length ? `**⛔ KEDALUWARSA (${expired.length}) — nakes ini tidak boleh praktik sampai diperbarui:**\n` + expired.slice(0, 20).map((c) =>
+      `- ${c.staff_name} · ${c.credential_type}${c.profession ? ` (${c.profession})` : ''} — exp ${c.expiry_date} (${Math.abs(Number(c.days))} hari lalu)`).join('\n') + '\n\n' : '') +
+    (expiring.length ? `**⚠ Segera kedaluwarsa (${expiring.length}):**\n` + expiring.slice(0, 20).map((c) =>
+      `- ${c.staff_name} · ${c.credential_type} — ${c.days} hari lagi (${c.expiry_date})`).join('\n') + '\n\n' : '') +
+    (noExp.length ? `**Lengkapi tanggal kedaluwarsa (${noExp.length}):** ` + noExp.slice(0, 15).map((c) => `${c.staff_name}/${c.credential_type}`).join(', ') : '');
+}
+async function handleHrTick(t: Task) {
+  const scan = await rpc('agentic_hr_cred_scan', {}) as Dict;
+  const s = (scan.summary || {}) as Dict;
+  const md = credReport(scan);
+  if (Number(s.expired || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'HR_CRED', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  } else if (Number(s.expiring_90 || 0) > 0 || Number(s.no_expiry || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'HR_CRED', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...scan },
+    note: `HR: ${s.expired ?? 0} kedaluwarsa · ${s.expiring_90 ?? 0} ≤90hr · ${s.total_active ?? 0} aktif` };
+}
+async function handleCredWatch(t: Task) {
+  const scan = await rpc('agentic_hr_cred_scan', { p_days: Number(t.payload?.days ?? 90) }) as Dict;
+  const s = (scan.summary || {}) as Dict;
+  return { result: { markdown: credReport(scan), ...scan },
+    note: `Kredensial: ${s.expired ?? 0} kedaluwarsa · ${s.expiring_90 ?? 0} ≤90hr` };
+}
+
+// ═══ FASE 7G — IT: Integration Health + Backup Verify ════════════════
+async function handleIntegrationHealth(t: Task) {
+  const scan = await rpc('agentic_integration_scan', {
+    p_stuck_hours: Number(t.payload?.stuck_hours ?? 6), p_silent_hours: Number(t.payload?.silent_hours ?? 24) }) as Dict;
+  const s = (scan.summary || {}) as Dict;
+  const stuck = (scan.stuck_samples || []) as Dict[];
+  const silent = (scan.silent_analyzers || []) as Dict[];
+  const down = (scan.down_analyzers || []) as Dict[];
+  const md = `## Kesehatan Integrasi Lab — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `Sampel tertahan: ${s.stuck ?? 0} · Hasil auto 24j: ${s.auto_results_24h ?? 0} · Analyzer terintegrasi: ${s.integrated_analyzers ?? 0}\n\n` +
+    (silent.length ? `**⚠ Analyzer diam (tak ada hasil auto — integrasi mungkin putus):**\n` + silent.map((a) =>
+      `- ${a.nama_alat}${a.kategori ? ` (${a.kategori})` : ''}${a.protocol ? ` · ${a.protocol}` : ''} — terakhir: ${a.last_auto_result || 'tidak pernah'}`).join('\n') + '\n\n' : '') +
+    (stuck.length ? `**Sampel tertahan In Process (${stuck.length}):**\n` + stuck.slice(0, 15).map((x) =>
+      `- ${x.barcode || '—'} · ${x.patient_name || ''}${x.analyzer_name ? ` @ ${x.analyzer_name}` : ''} — ${x.hours} jam`).join('\n') + '\n\n' : '') +
+    (down.length ? `**Alat non-operasional:** ` + down.map((a) => `${a.nama_alat} (${a.status})`).join(', ') : '');
+  if (silent.length || Number(s.stuck || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'IT_DATA', to_agent: 'ACE',
+      kind: silent.length ? 'ALERT' : 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...scan },
+    note: `Integrasi: ${s.stuck ?? 0} tertahan · ${silent.length} analyzer diam · ${s.auto_results_24h ?? 0} hasil auto/24j` };
+}
+
+async function handleBackupVerify(t: Task) {
+  const st = await rpc('agentic_backup_status', { p_max_hours: Number(t.payload?.max_hours ?? 26) }) as Dict;
+  const stale = st.stale === true;
+  const hasAny = st.has_any === true;
+  const hrs = st.hours_since_ok;
+  const last = (st.last || null) as Dict | null;
+  const md = `## Verifikasi Backup — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    (!hasAny
+      ? `⛔ **TIDAK ADA catatan backup sama sekali.** Pastikan cron pg_dump Anda mencatat ke \`agentic_backup_log_add\` setelah tiap dump (lihat §CRON di supabase_agentic_fase7g_it.sql). Tanpa ini, kesegaran backup tak bisa diverifikasi.`
+      : `Backup OK terakhir: **${hrs ?? '—'} jam lalu** (ambang ${st.max_hours} jam) · status: ${stale ? '⛔ BASI' : '✅ segar'}\n` +
+        `Terakhir tercatat: ${last?.status || '—'} · ${last?.method || ''} ${last?.location ? '· ' + last.location : ''} (${last?.run_at || '—'})\n` +
+        `Gagal 7 hari: ${st.failed_7d ?? 0}`);
+  if (!hasAny || stale || Number(st.failed_7d || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'IT_DATA', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...st },
+    note: `Backup: ${!hasAny ? 'TIDAK ADA' : stale ? 'BASI' : 'segar'} (${hrs ?? '—'} jam)` };
+}
+
+// ═══ FASE 7H — LAB OPERATIONS ASSURANCE ══════════════════════════════
+function labReport(scan: Dict, focus: string): string {
+  const s = (scan.summary || {}) as Dict;
+  const qc = (scan.qc_alerts || []) as Dict[];
+  const crit = (scan.critical_open || []) as Dict[];
+  const tat = (scan.tat_breach || []) as Dict[];
+  const head = `## Patroli Lab Ops — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n` +
+    `QC REJECT: ${s.qc_reject ?? 0} · QC Warning: ${s.qc_warning ?? 0} · Nilai kritis belum rilis: ${s.critical_open ?? 0} · TAT lewat: ${s.tat_breach ?? 0} · Dirilis 24j: ${s.released_24h ?? 0}\n\n`;
+  const secCrit = crit.length ? `**🚨 NILAI KRITIS BELUM DIRILIS (${crit.length}) — verifikasi & komunikasi ke dokter oleh MANUSIA segera:**\n` +
+    crit.slice(0, 15).map((c) => `- ${c.patient_name || '—'} · ${c.product_name || ''} = ${c.result_value || ''} (${c.interpretation}) · status ${c.status} · ${c.hours} jam`).join('\n') + '\n\n' : '';
+  const secQc = qc.length ? `**🧫 QC menyimpang (${qc.length}) — REJECT = tahan rilis & ulang QC:**\n` +
+    qc.slice(0, 15).map((q) => `- ${q.test_name} @ ${q.analyzer_name || '—'} L${q.qc_level || '?'} · ${q.verdict} (z=${q.z_score ?? '—'}) · ${q.run_at}`).join('\n') + '\n\n' : '';
+  const secTat = tat.length ? `**⏱️ Sampel lewat TAT (${tat.length}):**\n` +
+    tat.slice(0, 15).map((x) => `- ${x.barcode || '—'} · ${x.patient_name || ''} · ${x.product_name || ''} · ${x.status} · ${x.hours} jam`).join('\n') : '';
+  if (focus === 'qc') return head + secQc;
+  if (focus === 'tat') return head + secTat;
+  if (focus === 'critical') return head + secCrit;
+  return head + secCrit + secQc + secTat;
+}
+async function handleLabScan(t: Task, focus: string) {
+  const scan = await rpc('agentic_lab_scan', {
+    p_tat_hours: Number(t.payload?.tat_hours ?? 24), p_qc_hours: Number(t.payload?.qc_hours ?? 48) }) as Dict;
+  const s = (scan.summary || {}) as Dict;
+  const md = labReport(scan, focus);
+  // ALERT bila ada QC REJECT atau nilai kritis belum dirilis (keselamatan pasien)
+  const critical = Number(s.qc_reject || 0) > 0 || Number(s.critical_open || 0) > 0;
+  if (focus === 'all' && (critical || Number(s.tat_breach || 0) > 0)) {
+    await rpc('agentic_msg_add', { p: { from_agent: Number(s.critical_open || 0) > 0 ? 'LAB_CRIT' : 'LAB_QC',
+      to_agent: 'ACE', kind: critical ? 'ALERT' : 'INFO', body: md } }).catch(() => null);
+  } else if (focus === 'critical' && Number(s.critical_open || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'LAB_CRIT', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...scan },
+    note: `Lab: ${s.qc_reject ?? 0} QC-reject · ${s.critical_open ?? 0} kritis · ${s.tat_breach ?? 0} TAT` };
+}
+const handleLabTick = (t: Task) => handleLabScan(t, 'all');
+const handleQcWatch = (t: Task) => handleLabScan(t, 'qc');
+const handleTatMonitor = (t: Task) => handleLabScan(t, 'tat');
+const handleCriticalWatch = (t: Task) => handleLabScan(t, 'critical');
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 7H — Lab Operations Assurance:
+  LAB_TICK: handleLabTick,
+  QC_WATCH: handleQcWatch,
+  TAT_MONITOR: handleTatMonitor,
+  CRITICAL_WATCH: handleCriticalWatch,
+  // Fase 7G — IT expansion:
+  INTEGRATION_HEALTH: handleIntegrationHealth,
+  BACKUP_VERIFY: handleBackupVerify,
+  // Fase 7I — People & Credentialing:
+  HR_TICK: handleHrTick,
+  CRED_WATCH: handleCredWatch,
+  // Fase 7J — Supply Chain:
+  SCM_TICK: handleScmTick,
+  STOCK_WATCH: handleStockWatch,
+  PO_DRAFT: handlePoDraft,
   // Fase 7F — Departemen IT:
   IT_SEC_AUDIT: handleItSecAudit,
   // Fase 7C — Audit & CAPA:
