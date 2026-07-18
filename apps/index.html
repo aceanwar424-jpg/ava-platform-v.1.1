@@ -12,19 +12,20 @@
 </head>
 <body>
   <div class="app-container">
-    <!-- Login Screen -->
+    
+    <!-- ════════════════════════ LOGIN SCREEN ════════════════════════ -->
     <div id="login-screen" class="screen active">
       <div class="brand-header">
         <div class="brand-logo">AH</div>
-        <h2>AvaHealth Apps</h2>
-        <p>Portal Mobile Pasien & Tenaga Medis</p>
+        <h2>AvaHealth Portal</h2>
+        <p>Akses Layanan Pasien & Mitra Korporasi</p>
       </div>
 
       <div class="glass-card">
         <form id="login-form" onsubmit="handleLogin(event)">
           <div class="input-group">
-            <label for="username">Username / Email</label>
-            <input type="text" id="username" placeholder="Masukkan username Anda" required>
+            <label for="username">Nama Pengguna / Email</label>
+            <input type="text" id="username" placeholder="Masukkan nama atau email Anda" required>
           </div>
           <div class="input-group">
             <label for="password">Kata Sandi</label>
@@ -39,8 +40,12 @@
                 <span>Pasien</span>
               </label>
               <label class="role-btn">
-                <input type="radio" name="login-role" value="doctor">
-                <span>Dokter</span>
+                <input type="radio" name="login-role" value="corporate">
+                <span>Corporate MCU</span>
+              </label>
+              <label class="role-btn">
+                <input type="radio" name="login-role" value="referral">
+                <span>Faskes Referral</span>
               </label>
             </div>
           </div>
@@ -49,11 +54,11 @@
         </form>
       </div>
       <div class="screen-footer">
-        <p>Belum punya akun pasien? <a href="#" onclick="showScreen('register-screen')">Daftar Sekarang</a></p>
+        <p>Butuh bantuan masuk? Hubungi <a href="#">Customer Service</a></p>
       </div>
     </div>
 
-    <!-- Dashboard Screen -->
+    <!-- ════════════════════════ DASHBOARD SCREEN ════════════════════════ -->
     <div id="dashboard-screen" class="screen">
       <header class="app-header">
         <div class="user-profile">
@@ -66,24 +71,24 @@
         <button class="logout-btn" onclick="handleLogout()">Keluar</button>
       </header>
 
-      <!-- Patient View -->
-      <div id="patient-view" class="view-panel active">
+      <!-- ──────── VIEW: PASIEN ──────── -->
+      <div id="patient-view" class="view-panel">
         <div class="quick-stats">
           <div class="stat-card">
             <span class="stat-icon">📅</span>
             <h4>Janji Temu</h4>
-            <p>1 Aktif</p>
+            <p id="p-appointments">1 Aktif</p>
           </div>
           <div class="stat-card">
             <span class="stat-icon">🧪</span>
             <h4>Hasil Lab</h4>
-            <p>2 Tersedia</p>
+            <p id="p-labresults">2 Tersedia</p>
           </div>
         </div>
 
-        <div class="section-title">Menu Utama</div>
+        <div class="section-title">Menu Utama Pasien</div>
         <div class="menu-list">
-          <button class="menu-item" onclick="alert('Fitur Booking Janji Temu')">
+          <button class="menu-item" onclick="alert('Layanan Booking Janji Temu sedang disiapkan')">
             <span class="menu-ico">📅</span>
             <div class="menu-text">
               <h5>Pesan Janji Temu</h5>
@@ -91,7 +96,7 @@
             </div>
             <span class="menu-arrow">❯</span>
           </button>
-          <button class="menu-item" onclick="alert('Fitur Riwayat Hasil Pemeriksaan')">
+          <button class="menu-item" onclick="alert('Layanan Riwayat Rekam Medis sedang disiapkan')">
             <span class="menu-ico">📄</span>
             <div class="menu-text">
               <h5>Riwayat Medis & Lab</h5>
@@ -99,53 +104,117 @@
             </div>
             <span class="menu-arrow">❯</span>
           </button>
-          <button class="menu-item" onclick="alert('Fitur Layanan Home Care')">
+          <button class="menu-item" onclick="alert('Layanan Booking Homecare sedang disiapkan')">
             <span class="menu-ico">🏠</span>
             <div class="menu-text">
               <h5>Layanan Homecare</h5>
-              <p>Panggil nakes/perawat untuk tindakan medis di rumah</p>
+              <p>Panggil perawat/dokter untuk tindakan medis di rumah</p>
             </div>
             <span class="menu-arrow">❯</span>
           </button>
         </div>
       </div>
 
-      <!-- Doctor View -->
-      <div id="doctor-view" class="view-panel">
+      <!-- ──────── VIEW: CORPORATE MCU ──────── -->
+      <div id="corporate-view" class="view-panel">
         <div class="quick-stats">
           <div class="stat-card">
             <span class="stat-icon">👥</span>
-            <h4>Antrian Hari Ini</h4>
-            <p>12 Pasien</p>
+            <h4>Total Karyawan</h4>
+            <p id="c-total-staff">150 Orang</p>
           </div>
           <div class="stat-card">
-            <span class="stat-icon">📝</span>
-            <h4>SOAP Selesai</h4>
-            <p>8 / 12</p>
+            <span class="stat-icon">✅</span>
+            <h4>Selesai MCU</h4>
+            <p id="c-done-mcu">120 Orang</p>
           </div>
         </div>
 
-        <div class="section-title">Pasien Menunggu</div>
-        <div class="patient-queue-list">
-          <div class="patient-queue-card">
-            <div class="pq-num">01</div>
-            <div class="pq-details">
-              <h5>Ahmad Subarjo (RM-10293)</h5>
-              <p>Keluhan: Batuk pilek berkepanjangan</p>
-            </div>
-            <button class="btn btn-sm btn-teal" onclick="alert('Membuka Rekam Medis Ahmad')">Periksa</button>
+        <!-- Progress Bar MCU -->
+        <div class="glass-card progress-card" style="margin-bottom: 24px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
+            <span>Progres Proyek MCU</span>
+            <span id="c-progress-label">80%</span>
           </div>
-          <div class="patient-queue-card">
-            <div class="pq-num">02</div>
-            <div class="pq-details">
-              <h5>Siti Rahma (RM-10294)</h5>
-              <p>Keluhan: Kontrol pasca operasi minor</p>
-            </div>
-            <button class="btn btn-sm btn-teal" onclick="alert('Membuka Rekam Medis Siti')">Periksa</button>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="c-progress-bar" style="width: 80%;"></div>
           </div>
         </div>
+
+        <div class="section-title">Status Kesehatan Karyawan</div>
+        <div class="quick-stats" style="margin-bottom: 24px;">
+          <div class="mini-stat-card card-fit">
+            <h5>Fit to Work</h5>
+            <span id="c-fit-count">105</span>
+          </div>
+          <div class="mini-stat-card card-unfit">
+            <h5>Unfit / Review</h5>
+            <span id="c-unfit-count">15</span>
+          </div>
+        </div>
+
+        <div class="section-title">Daftar Peserta MCU</div>
+        <div class="corporate-list" id="corporate-list-container">
+          <!-- Dinamis via JS -->
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: FASKES REFERRAL ──────── -->
+      <div id="referral-view" class="view-panel">
+        <div class="quick-stats">
+          <div class="stat-card">
+            <span class="stat-icon">🔗</span>
+            <h4>Rujukan Dikirim</h4>
+            <p id="r-total-referrals">24 Pasien</p>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">💰</span>
+            <h4>Akumulasi Fee/Poin</h4>
+            <p id="r-commission">Rp 1.200.000</p>
+          </div>
+        </div>
+
+        <!-- Kirim Rujukan Baru -->
+        <button class="btn btn-primary" onclick="openReferralForm()" style="margin-bottom: 24px;">
+          ➕ Buat Rujukan Baru
+        </button>
+
+        <div class="section-title">Pasien Rujukan Terkini</div>
+        <div class="referral-list" id="referral-list-container">
+          <!-- Dinamis via JS -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ════════════════════════ MODAL: BUAT RUJUKAN ════════════════════════ -->
+    <div id="referral-modal" class="modal-overlay">
+      <div class="modal-box">
+        <h3>Form Rujukan Pasien</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Kirim rujukan pasien baru ke laboratorium/klinik kami</p>
+        
+        <form onsubmit="submitReferralForm(event)">
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-patient-name">Nama Lengkap Pasien</label>
+            <input type="text" id="ref-patient-name" placeholder="Nama lengkap pasien" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-patient-phone">No. Handphone Pasien</label>
+            <input type="tel" id="ref-patient-phone" placeholder="08xxxxxxxxxx" required>
+          </div>
+          <div class="input-group" style="text-align:left;">
+            <label for="ref-lab-test">Rujukan Pemeriksaan</label>
+            <input type="text" id="ref-lab-test" placeholder="Contoh: Darah Lengkap, MCU Paket A" required>
+          </div>
+          
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeReferralForm()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Kirim Rujukan</button>
+          </div>
+        </form>
       </div>
     </div>
+
   </div>
 
   <script src="app.js"></script>

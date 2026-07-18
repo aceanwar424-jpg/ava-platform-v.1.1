@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   APPS STYLE SHEET - Mobile Portal Optimized
+   APPS STYLE SHEET - Mobile Portal Premium
    ═══════════════════════════════════════════ */
 
 :root {
@@ -11,10 +11,14 @@
   --primary: #0ea5e9; /* Sky Blue */
   --primary-hover: #38bdf8;
   --teal: #14b8a6;
+  --teal-hover: #0d9488;
   --border: rgba(255, 255, 255, 0.06);
   --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
   --radius-lg: 20px;
   --radius-md: 12px;
+  --success: #22c55e;
+  --error: #ef4444;
+  --warning: #f59e0b;
 }
 
 * {
@@ -133,7 +137,7 @@ body {
   box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
 }
 
-/* Role Selector */
+/* Role Selector (3 options optimized for mobile screen) */
 .role-selector {
   margin-bottom: 24px;
 }
@@ -143,12 +147,12 @@ body {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .role-options {
   display: flex;
-  gap: 12px;
+  gap: 8px;
 }
 
 .role-btn {
@@ -163,16 +167,19 @@ body {
 }
 
 .role-btn span {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 12px;
+  padding: 10px 4px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background-color: rgba(15, 23, 42, 0.4);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 11px;
   color: var(--text-muted);
   transition: all 0.2s;
+  min-height: 48px;
 }
 
 .role-btn input:checked + span {
@@ -192,11 +199,11 @@ body {
   cursor: pointer;
   width: 100%;
   transition: all 0.2s;
+  text-align: center;
 }
 
 .btn-primary {
-  background-gradient: linear-gradient(135deg, var(--primary), #0284c7);
-  background-color: var(--primary);
+  background: linear-gradient(135deg, var(--primary), #0284c7);
   color: white;
   box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
 }
@@ -215,6 +222,12 @@ body {
 .btn-teal {
   background-color: var(--teal);
   color: white;
+}
+
+.btn-close {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border);
 }
 
 .screen-footer {
@@ -288,7 +301,7 @@ body {
 .quick-stats {
   display: flex;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
@@ -318,6 +331,67 @@ body {
   font-weight: 700;
 }
 
+/* Progress bar MCU */
+.progress-card {
+  padding: 16px 20px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  height: 8px;
+  background-color: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--teal), var(--primary));
+  border-radius: 4px;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Mini stat cards */
+.mini-stat-card {
+  flex: 1;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-stat-card h5 {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.mini-stat-card span {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.card-fit {
+  background-color: rgba(34, 197, 94, 0.05);
+  border-color: rgba(34, 197, 94, 0.15);
+}
+
+.card-fit span {
+  color: var(--success);
+}
+
+.card-unfit {
+  background-color: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.15);
+}
+
+.card-unfit span {
+  color: var(--error);
+}
+
 /* Views */
 .view-panel {
   display: none;
@@ -329,12 +403,13 @@ body {
 }
 
 .section-title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
   margin-bottom: 12px;
+  margin-top: 10px;
 }
 
 /* Menu List */
@@ -396,54 +471,131 @@ body {
   margin-left: 10px;
 }
 
-/* Patient Queue List for Doctors */
-.patient-queue-list {
+/* Corporate & Referral Custom Lists */
+.corporate-list, .referral-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.patient-queue-card {
+.list-row {
   display: flex;
   align-items: center;
   background-color: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 16px;
-  gap: 14px;
+  gap: 12px;
 }
 
-.pq-num {
-  font-size: 18px;
-  font-weight: 800;
-  color: var(--teal);
-  background-color: rgba(20, 184, 166, 0.1);
-  width: 36px;
-  height: 36px;
+.list-row-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
+  background-color: rgba(255,255,255,0.03);
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-main);
+  border: 1px solid rgba(255,255,255,0.05);
 }
 
-.pq-details {
+.list-row-details {
   flex: 1;
   min-width: 0;
 }
 
-.pq-details h5 {
+.list-row-details h5 {
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 2px;
 }
 
-.pq-details p {
+.list-row-details p {
   font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Status Badges */
+.badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.badge-fit {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--success);
+}
+
+.badge-unfit {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+}
+
+.badge-pending {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--warning);
+}
+
+.badge-finished {
+  background-color: rgba(20, 184, 166, 0.1);
+  color: var(--teal);
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 100;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-box {
+  background-color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 32px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-overlay.open .modal-box {
+  transform: translateY(0);
+}
+
+.modal-box h3 {
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
 }
