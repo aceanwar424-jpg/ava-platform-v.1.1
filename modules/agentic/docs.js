@@ -100,6 +100,11 @@ function renderAgDocsTab(el){
       <div id="ag-ingest-log" style="font-size:12px;margin-top:6px"></div>
     </div>
 
+    <div class="ag-detail" style="margin-bottom:12px" id="ag-templates-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
     ${missing.length ? `
     <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
       <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Dokumen Wajib yang Belum Ada (${missing.length})</div>
@@ -137,6 +142,8 @@ function renderAgDocsTab(el){
     ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over');}));
     drop.addEventListener('drop', e=>agIngestFiles(e.dataTransfer.files));
   }
+  // Panel template dokumen (fungsi global dari org.js) — tempat unggah master .docx
+  if(typeof agRenderTemplates==='function') agRenderTemplates();
 }
 
 // Proses banyak file → buat task DOC_INGEST per file (file terakhir bawa enqueue_gap)
