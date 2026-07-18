@@ -58,6 +58,61 @@ function switchTimelinePhase(phaseId) {
   }
 }
 
+// Update Login Form UI dynamically based on role selection
+function updateLoginFormUI(role) {
+  const formTitleEl = document.getElementById('login-form-title');
+  const labelEl = document.getElementById('username-label');
+  const inputEl = document.getElementById('username');
+  const footerEl = document.getElementById('login-footer-desc');
+
+  if (!formTitleEl || !labelEl || !inputEl || !footerEl) return;
+
+  // Clear inputs on role change
+  inputEl.value = '';
+  document.getElementById('password').value = '';
+
+  if (role === 'corporate') {
+    formTitleEl.textContent = 'Portal Kemitraan Corporate';
+    labelEl.textContent = 'ID Kemitraan / Email Perusahaan';
+    inputEl.placeholder = 'Contoh: MITRA-0293 atau email kantor';
+    footerEl.innerHTML = 'Pengajuan mitra baru? Hubungi <a href="#">Tim Marketing</a>';
+  } else if (role === 'referral') {
+    formTitleEl.textContent = 'Portal Faskes Referral';
+    labelEl.textContent = 'NPA ID / Email Faskes';
+    inputEl.placeholder = 'Contoh: NPA-12948 atau email klinik';
+    footerEl.innerHTML = 'Pengajuan dokter perujuk? Hubungi <a href="#">Layanan Medis</a>';
+  } else {
+    // Patient
+    formTitleEl.textContent = 'Portal Pasien';
+    labelEl.textContent = 'No. Rekam Medis / Email';
+    inputEl.placeholder = 'Contoh: RM-12948 atau email Anda';
+    footerEl.innerHTML = 'Belum memiliki akun? <a href="#" onclick="openRegisterModal()">Daftar Pasien Baru</a>';
+  }
+}
+
+// Open/Close Registration Modal
+function openRegisterModal() {
+  const modal = document.getElementById('register-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeRegisterModal() {
+  const modal = document.getElementById('register-modal');
+  if (modal) modal.classList.remove('open');
+}
+
+function handleRegistrationSubmit(event) {
+  event.preventDefault();
+  const name = document.getElementById('reg-name').value.trim();
+  
+  closeRegisterModal();
+  alert(`Registrasi Akun Mandiri berhasil! No. Rekam Medis (RM) Anda adalah RM-12948. Silakan gunakan untuk masuk.`);
+  
+  // Fill the login form with the mock RM number
+  const inputEl = document.getElementById('username');
+  if (inputEl) inputEl.value = 'RM-12948';
+}
+
 // Render Corporate List
 function renderCorporateList() {
   const container = document.getElementById('corporate-list-container');
@@ -141,11 +196,15 @@ function handleLogin(event) {
     el.classList.remove('active');
   });
 
+  // Check if credentials match the super admin
+  const isSuperAdmin = (usernameInput === 'aceanwar424@gmail.com');
+  const adminRealName = 'Ace Darojatun Anwar';
+
   if (selectedRole === 'corporate') {
     avatarEl.textContent = 'C';
     avatarEl.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
-    welcomeEl.textContent = usernameInput || 'PT. Sukses Mandiri';
-    roleBadgeEl.textContent = 'Mitra Korporasi';
+    welcomeEl.textContent = isSuperAdmin ? `PT. AvaHealth (${adminRealName})` : (usernameInput || 'PT. Sukses Mandiri');
+    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Korporasi' : 'Mitra Korporasi';
     roleBadgeEl.style.color = '#f59e0b';
     
     // Render Corporate List
@@ -155,8 +214,8 @@ function handleLogin(event) {
   else if (selectedRole === 'referral') {
     avatarEl.textContent = 'R';
     avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
-    welcomeEl.textContent = usernameInput || 'Klinik Medika Pratama';
-    roleBadgeEl.textContent = 'Faskes / Dokter Perujuk';
+    welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (usernameInput || 'Klinik Medika Pratama');
+    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Referral' : 'Faskes / Dokter Perujuk';
     roleBadgeEl.style.color = '#14b8a6';
     
     // Render Referral List
@@ -165,11 +224,11 @@ function handleLogin(event) {
   } 
   else {
     // Default: Patient
-    const finalName = usernameInput || 'Budi Santoso';
+    const finalName = isSuperAdmin ? adminRealName : (usernameInput || 'Budi Santoso');
     avatarEl.textContent = 'P';
     avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)';
-    welcomeEl.textContent = finalName;
-    roleBadgeEl.textContent = 'Pasien Terverifikasi';
+    welcomeEl.textContent = isSuperAdmin ? `Halo, ${finalName}` : finalName;
+    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Pasien' : 'Pasien Terverifikasi';
     roleBadgeEl.style.color = '#38bdf8';
     
     // Initialize Member Card Name

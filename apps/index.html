@@ -22,10 +22,11 @@
       </div>
 
       <div class="glass-card">
+        <h3 id="login-form-title" style="font-size:18px; font-weight:800; margin-bottom:20px; color:white; text-align:center;">Portal Pasien</h3>
         <form id="login-form" onsubmit="handleLogin(event)">
           <div class="input-group">
-            <label for="username">Nama Pengguna / Email</label>
-            <input type="text" id="username" placeholder="Masukkan nama atau email Anda" required>
+            <label for="username" id="username-label">No. Rekam Medis / Email</label>
+            <input type="text" id="username" placeholder="Contoh: RM-12948 atau email Anda" required>
           </div>
           <div class="input-group">
             <label for="password">Kata Sandi</label>
@@ -36,15 +37,15 @@
             <span class="role-label">Masuk Sebagai:</span>
             <div class="role-options">
               <label class="role-btn">
-                <input type="radio" name="login-role" value="patient" checked>
+                <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
                 <span>Pasien</span>
               </label>
               <label class="role-btn">
-                <input type="radio" name="login-role" value="corporate">
+                <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
                 <span>Corporate MCU</span>
               </label>
               <label class="role-btn">
-                <input type="radio" name="login-role" value="referral">
+                <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
                 <span>Faskes Referral</span>
               </label>
             </div>
@@ -54,7 +55,7 @@
         </form>
       </div>
       <div class="screen-footer">
-        <p>Butuh bantuan masuk? Hubungi <a href="#">Customer Service</a></p>
+        <p id="login-footer-desc">Belum memiliki akun? <a href="#" onclick="openRegisterModal()">Daftar Pasien Baru</a></p>
       </div>
     </div>
 
@@ -208,7 +209,6 @@
           <div class="section-title">🧬 Profil DNA & Risiko Genomik</div>
           <div class="glass-card dna-card" style="margin-bottom:24px;">
             <div class="dna-helix-container">
-              <!-- Visual CSS DNA Helix -->
               <div class="dna-bar"></div>
               <div class="dna-bar"></div>
               <div class="dna-bar"></div>
@@ -335,9 +335,8 @@
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
       <div id="corporate-view" class="view-panel">
         
-        <!-- C - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
+        <!-- C - FASE 1: DIGITAL HOSPITAL -->
         <div id="c-fase1-panel" class="phase-panel active">
-          <!-- Progress & Charts inside Fase 1 -->
           <div class="quick-stats">
             <div class="stat-card">
               <span class="stat-icon">👥</span>
@@ -492,7 +491,7 @@
       <!-- ──────── VIEW: FASKES REFERRAL ──────── -->
       <div id="referral-view" class="view-panel">
         
-        <!-- R - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
+        <!-- R - FASE 1: DIGITAL HOSPITAL -->
         <div id="r-fase1-panel" class="phase-panel active">
           <div class="quick-stats">
             <div class="stat-card">
@@ -606,96 +605,29 @@
 
     </div>
 
-    <!-- ════════════════════════ MODAL: BUAT RUJUKAN ════════════════════════ -->
-    <div id="referral-modal" class="modal-overlay">
+    <!-- ════════════════════════ MODAL: DAFTAR PASIEN MANDIRI ════════════════════════ -->
+    <div id="register-modal" class="modal-overlay">
       <div class="modal-box">
-        <h3>Form Rujukan Pasien</h3>
-        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Kirim rujukan pasien baru ke laboratorium/klinik kami</p>
-        
-        <form onsubmit="submitReferralForm(event)">
+        <h3>Daftar Pasien Baru</h3>
+        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Isi data Anda untuk membuat akun Rekam Medis mandiri</p>
+        <form onsubmit="handleRegistrationSubmit(event)">
           <div class="input-group" style="text-align:left;">
-            <label for="ref-patient-name">Nama Lengkap Pasien</label>
-            <input type="text" id="ref-patient-name" placeholder="Nama lengkap pasien" required>
+            <label for="reg-name">Nama Lengkap</label>
+            <input type="text" id="reg-name" placeholder="Nama lengkap sesuai KTP" required>
           </div>
           <div class="input-group" style="text-align:left;">
-            <label for="ref-patient-phone">No. Handphone Pasien</label>
-            <input type="tel" id="ref-patient-phone" placeholder="08xxxxxxxxxx" required>
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" placeholder="nama@email.com" required>
           </div>
           <div class="input-group" style="text-align:left;">
-            <label for="ref-lab-test">Rujukan Pemeriksaan</label>
-            <input type="text" id="ref-lab-test" placeholder="Contoh: Darah Lengkap, MCU Paket A" required>
+            <label for="reg-phone">No. Handphone</label>
+            <input type="tel" id="reg-phone" placeholder="08xxxxxxxxxx" required>
           </div>
-          
           <div style="display:flex; gap:12px; margin-top:24px;">
-            <button type="button" class="btn btn-close" onclick="closeReferralForm()">Batal</button>
-            <button type="submit" class="btn btn-primary" style="margin-top:0;">Kirim Rujukan</button>
+            <button type="button" class="btn btn-close" onclick="closeRegisterModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0;">Daftar Akun</button>
           </div>
         </form>
-      </div>
-    </div>
-
-    <!-- ════════════════════════ MODAL: BOOKING ANTRIAN ════════════════════════ -->
-    <div id="booking-modal" class="modal-overlay">
-      <div class="modal-box">
-        <h3>Pesan Janji Temu</h3>
-        <p style="color: var(--text-muted); font-size:13px; margin-bottom: 20px;">Pilih tipe pemeriksaan dan jadwal kedatangan Anda</p>
-        
-        <form onsubmit="submitBookingForm(event)">
-          <div class="input-group" style="text-align:left;">
-            <label for="book-service">Jenis Layanan</label>
-            <input type="text" id="book-service" placeholder="Klinik Umum, Spesialis Anak, Laboratorium, dll" required>
-          </div>
-          <div class="input-group" style="text-align:left;">
-            <label for="book-date">Tanggal Kedatangan</label>
-            <input type="date" id="book-date" required>
-          </div>
-          
-          <div style="display:flex; gap:12px; margin-top:24px;">
-            <button type="button" class="btn btn-close" onclick="closeBookingModal()">Batal</button>
-            <button type="submit" class="btn btn-primary" style="margin-top:0;">Konfirmasi & Ambil Antrean</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- ════════════════════════ MODAL: LAB RESULTS (AI ASSESSOR) ════════════════════════ -->
-    <div id="lab-results-modal" class="modal-overlay">
-      <div class="modal-box" style="max-width: 440px; text-align:left;">
-        <h3 style="text-align:center;">Hasil Pemeriksaan Lab</h3>
-        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px; text-align:center;">Pasien: <strong id="lab-patient-name">Budi Santoso</strong> &bull; RM-12948</p>
-        
-        <!-- Lab Value Table -->
-        <div class="lab-values-container" style="margin-bottom:20px;">
-          <div class="lab-row">
-            <span class="lab-label">Hemoglobin (Hb)</span>
-            <span class="lab-val val-normal">14.5 g/dL</span>
-          </div>
-          <div class="lab-row">
-            <span class="lab-label">Kolesterol Total</span>
-            <span class="lab-val val-high">245 mg/dL ⚠️</span>
-          </div>
-          <div class="lab-row">
-            <span class="lab-label">Asam Urat</span>
-            <span class="lab-val val-normal">5.8 mg/dL</span>
-          </div>
-          <div class="lab-row">
-            <span class="lab-label">Glukosa Puasa</span>
-            <span class="lab-val val-high">126 mg/dL ⚠️</span>
-          </div>
-        </div>
-
-        <!-- AI Health Assessor Section -->
-        <div class="ai-assessor-box">
-          <div class="ai-assessor-header">
-            <span>✨ Analisis AI AvaHealth</span>
-            <span class="ai-badge">V1.0</span>
-          </div>
-          <div class="ai-assessor-body" id="ai-assessment-text">
-            Menganalisis hasil pemeriksaan Anda...
-          </div>
-        </div>
-
-        <button class="btn btn-close" onclick="closeLabResultsModal()" style="margin-top:20px;">Tutup Hasil</button>
       </div>
     </div>
 
