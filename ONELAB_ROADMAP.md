@@ -64,12 +64,12 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 2.7 Telusur lot — lab_result_consumption mencatat batch per hasil (dua arah)
 
 ### Fase 3 — Rekam Medis & Alur Klinik
-- [ ] 3.1 Rekam medis bisa ditulis (SOAP / CPPT)
-- [ ] 3.2 Daftar masalah, alergi, tanda vital + tren
-- [ ] 3.3 Diagnosis berkode ICD-10 oleh dokter
+- [x] 3.1 Rekam medis bisa ditulis — SOAP/CPPT + tanda tangan mengunci (trigger), koreksi via adendum
+- [x] 3.2 Alergi (banner keselamatan), daftar masalah, tanda vital + tren — menempel di mr_number
+- [~] 3.3 ICD-10 — kolom is_primary + trigger satu diagnosis utama; UI dokter menyusul
 - [ ] 3.4 Garis waktu kunjungan pasien
-- [ ] 3.5 Antrian bernomor + layar panggil
-- [ ] 3.6 Perjanjian / booking + pengingat
+- [~] 3.5 Antrian — tabel + issue_queue_ticket() anti-bentrok siap; UI loket menyusul
+- [~] 3.6 Perjanjian — tabel appointments siap; UI menyusul
 
 ### Fase 4 — Keuangan & SDM
 - [ ] 4.1 Bagan akun + jurnal + buku besar

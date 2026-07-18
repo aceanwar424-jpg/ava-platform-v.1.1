@@ -257,6 +257,308 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
         }
       </div>`;
     }).join('')}`;
+
+  // Fase 3 — panel klinis yang bisa DITULIS, disisipkan di atas riwayat kunjungan
+  const mr = latest.mr_number || null;
+  const panel = document.createElement('div');
+  panel.id = 'mr-clinical';
+  el.insertBefore(panel, el.firstChild?.nextSibling || null);
+  renderMRClinical(mr, patientName, latest.id);
+}
+
+// ══════════════════════════════════════════════════════════════
+// FASE 3 — Catatan klinis, alergi, masalah, tanda vital
+// Semua menempel di mr_number agar bertahan lintas kunjungan.
+// ══════════════════════════════════════════════════════════════
+let mrClinical = { mr:null, name:'', admId:null, allergies:[], problems:[], vitals:[], notes:[] };
+
+async function renderMRClinical(mrNumber, patientName, admissionId) {
+  const el = document.getElementById('mr-clinical'); if (!el) return;
+  mrClinical = { mr:mrNumber, name:patientName, admId:admissionId, allergies:[], problems:[], vitals:[], notes:[] };
+
+  if (!mrNumber) {
+    el.innerHTML = `<div class="status-box status-warn" style="margin-bottom:14px">
+      Pasien ini belum memiliki nomor rekam medis (MR). Catatan klinis memerlukan nomor MR —
+      lengkapi lewat Admission terlebih dulu.</div>`;
+    return;
+  }
+
+  el.innerHTML = `<div class="loading-row"><div class="spinner"></div></div>`;
+  const q = `mr_number=eq.${encodeURIComponent(mrNumber)}`;
+  try {
+    const [alg, prb, vit, nts] = await Promise.all([
+      sbGet('patient_allergies', `select=*&${q}&is_active=eq.true&order=created_at.desc`).catch(()=>null),
+      sbGet('patient_problems',  `select=*&${q}&order=created_at.desc`).catch(()=>null),
+      sbGet('vital_signs',       `select=*&${q}&order=recorded_at.desc&limit=30`).catch(()=>null),
+      sbGet('clinical_notes',    `select=*&${q}&order=created_at.desc&limit=50`).catch(()=>null),
+    ]);
+    if (alg === null && prb === null) {
+      el.innerHTML = `<div class="status-box status-warn" style="margin-bottom:14px">
+        Tabel rekam medis klinis belum ada — jalankan <code>supabase_fase3.sql</code> di Supabase SQL Editor.</div>`;
+      return;
+    }
+    mrClinical.allergies = alg||[]; mrClinical.problems = prb||[];
+    mrClinical.vitals = vit||[];    mrClinical.notes = nts||[];
+    paintMRClinical();
+  } catch(e) {
+    el.innerHTML = `<div class="status-box status-err">${e.message}</div>`;
+  }
+}
+
+function paintMRClinical() {
+  const el = document.getElementById('mr-clinical'); if (!el) return;
+  const { allergies:alg, problems:prb, vitals:vit, notes:nts } = mrClinical;
+  const aktif = prb.filter(p=>p.status==='Aktif');
+  const sevCol = { Berat:'#B91C1C', Sedang:'#B45309', Ringan:'#6B7A8B' };
+
+  el.innerHTML = `
+    ${alg.length ? `
+    <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;
+      border-radius:10px;padding:11px 15px;margin-bottom:14px">
+      <div style="font-weight:800;color:#B91C1C;font-size:12.5px;margin-bottom:5px">⚠️ ALERGI</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        ${alg.map(a=>`<span style="background:#fff;border:1px solid #FCA5A5;border-radius:6px;
+          padding:3px 9px;font-size:12px"><b>${a.allergen}</b>${a.reaction?` — ${a.reaction}`:''}
+          <span style="color:${sevCol[a.severity]||'#6B7A8B'};font-weight:700">· ${a.severity||''}</span></span>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="card-title">🩺 Rekam Klinis</div>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm" onclick="openAllergyForm()">+ Alergi</button>
+          <button class="btn btn-ghost btn-sm" onclick="openProblemForm()">+ Masalah</button>
+          <button class="btn btn-ghost btn-sm" onclick="openVitalForm()">+ Tanda Vital</button>
+          <button class="btn btn-teal btn-sm" onclick="openNoteForm()">+ Catatan SOAP</button>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Daftar Masalah Aktif</div>
+          ${aktif.length ? aktif.map(p=>`
+            <div style="display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px">
+              <span>${p.icd_code?`<code style="font-size:11px">${p.icd_code}</code> `:''}${p.diagnosis}</span>
+              <button class="btn btn-ghost btn-xs" onclick="resolveProblem(${p.id})">Teratasi</button>
+            </div>`).join('') : '<div style="color:var(--gray);font-size:12px">Tidak ada masalah aktif</div>'}
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Tanda Vital Terakhir</div>
+          ${vit.length ? (()=>{ const v=vit[0]; return `
+            <div style="font-size:12.5px;line-height:1.7">
+              ${v.bp_systolic?`TD <b>${v.bp_systolic}/${v.bp_diastolic||'—'}</b> mmHg · `:''}
+              ${v.pulse?`Nadi <b>${v.pulse}</b> · `:''}
+              ${v.temperature?`Suhu <b>${v.temperature}</b>°C · `:''}
+              ${v.spo2?`SpO₂ <b>${v.spo2}</b>% · `:''}
+              ${v.weight?`BB <b>${v.weight}</b> kg`:''}
+              <div style="color:var(--gray);font-size:11px">${v.recorded_at?new Date(v.recorded_at).toLocaleString('id-ID'):''} · ${v.recorded_by||''}</div>
+            </div>
+            ${vit.length>1?`<button class="btn btn-ghost btn-xs" style="margin-top:6px" onclick="showVitalTrend()">📈 Lihat tren (${vit.length} data)</button>`:''}`;
+          })() : '<div style="color:var(--gray);font-size:12px">Belum ada tanda vital tercatat</div>'}
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">
+          Catatan Klinis (${nts.length})</div>
+        ${nts.length ? nts.slice(0,8).map(n=>`
+          <div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;
+            ${n.locked?'background:var(--bg2)':''}">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+              <div style="font-size:12px;font-weight:700">
+                ${n.locked?'🔒':'✏️'} ${n.note_type}
+                <span style="font-weight:400;color:var(--gray)">· ${n.author_name||'—'}${n.author_role?` (${n.author_role})`:''}
+                · ${new Date(n.created_at).toLocaleString('id-ID')}</span>
+              </div>
+              ${!n.locked?`<button class="btn btn-teal btn-xs" onclick="signNote(${n.id})">Tanda tangani</button>`:''}
+            </div>
+            ${n.subjective?`<div style="font-size:12.5px;margin-top:5px"><b>S:</b> ${n.subjective}</div>`:''}
+            ${n.objective ?`<div style="font-size:12.5px"><b>O:</b> ${n.objective}</div>`:''}
+            ${n.assessment?`<div style="font-size:12.5px"><b>A:</b> ${n.assessment}</div>`:''}
+            ${n.plan      ?`<div style="font-size:12.5px"><b>P:</b> ${n.plan}</div>`:''}
+          </div>`).join('') : '<div style="color:var(--gray);font-size:12px">Belum ada catatan klinis</div>'}
+      </div>
+    </div>`;
+}
+
+function openNoteForm() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">✏️ Catatan Klinis — ${mrClinical.name}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Jenis</label>
+        <select id="cn-type">${['SOAP','CPPT'].map(x=>`<option>${x}</option>`).join('')}</select></div>
+      <div class="form-group"><label>Peran Penulis</label>
+        <select id="cn-role">${['Dokter','Perawat','Analis','Gizi','Fisioterapis'].map(x=>`<option>${x}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label>S — Subjective (keluhan pasien)</label><textarea id="cn-s" rows="2"></textarea></div>
+    <div class="form-group"><label>O — Objective (temuan pemeriksaan)</label><textarea id="cn-o" rows="2"></textarea></div>
+    <div class="form-group"><label>A — Assessment (penilaian / diagnosis kerja)</label><textarea id="cn-a" rows="2"></textarea></div>
+    <div class="form-group"><label>P — Plan (rencana tindakan)</label><textarea id="cn-p" rows="2"></textarea></div>
+    <div class="form-hint">Setelah ditandatangani, catatan terkunci. Koreksi dibuat sebagai adendum.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveNote()">💾 Simpan Draft</button>
+    </div>`, 'wide');
+}
+
+async function saveNote() {
+  const s = document.getElementById('cn-s').value.trim();
+  const o = document.getElementById('cn-o').value.trim();
+  const a = document.getElementById('cn-a').value.trim();
+  const p = document.getElementById('cn-p').value.trim();
+  if (!s && !o && !a && !p) { toast('Isi minimal satu bagian catatan','err'); return; }
+  try {
+    await sbPost('clinical_notes', {
+      admission_id: mrClinical.admId, mr_number: mrClinical.mr, patient_name: mrClinical.name,
+      note_type: document.getElementById('cn-type').value,
+      subjective:s, objective:o, assessment:a, plan:p,
+      author_name: getUserName?getUserName():'User',
+      author_role: document.getElementById('cn-role').value,
+      locked:false, updated_at:new Date().toISOString(),
+    });
+    await logActivity('note','clinical_notes',mrClinical.mr,`Catatan klinis ${mrClinical.name}`,mrClinical.name);
+    toast('✅ Catatan tersimpan sebagai draft','ok');
+    closeModalForce(); await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+async function signNote(id) {
+  if (!confirm('Tanda tangani catatan ini? Setelah ditandatangani tidak bisa diubah — koreksi hanya lewat adendum.')) return;
+  try {
+    await sbRpc('sign_clinical_note', { p_note_id: id });
+    toast('✅ Catatan ditandatangani & terkunci','ok');
+    await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) {
+    toast('❌ '+(/not find the function/i.test(e.message)?'Jalankan supabase_fase3.sql dulu':e.message),'err');
+  }
+}
+
+function openAllergyForm() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">⚠️ Tambah Alergi</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Alergen *</label><input type="text" id="al-agent" placeholder="Penisilin, seafood, debu..."></div>
+    <div class="form-group"><label>Reaksi</label><input type="text" id="al-react" placeholder="Ruam, sesak, bengkak..."></div>
+    <div class="form-group"><label>Tingkat</label>
+      <select id="al-sev">${['Ringan','Sedang','Berat'].map(x=>`<option${x==='Sedang'?' selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveAllergy()">💾 Simpan</button>
+    </div>`);
+}
+
+async function saveAllergy() {
+  const agent = document.getElementById('al-agent').value.trim();
+  if (!agent) { toast('Alergen wajib diisi','err'); return; }
+  try {
+    await sbPost('patient_allergies', {
+      mr_number: mrClinical.mr, allergen: agent,
+      reaction: document.getElementById('al-react').value.trim(),
+      severity: document.getElementById('al-sev').value,
+      noted_by: getUserName?getUserName():'User', is_active:true,
+      updated_at:new Date().toISOString(),
+    });
+    toast('✅ Alergi dicatat','ok'); closeModalForce();
+    await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+function openProblemForm() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📋 Tambah Masalah / Diagnosis Kronis</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-row">
+      <div class="form-group"><label>Kode ICD-10</label><input type="text" id="pb-icd" placeholder="E11.9"></div>
+      <div class="form-group"><label>Sejak</label><input type="date" id="pb-onset"></div>
+    </div>
+    <div class="form-group"><label>Diagnosis *</label><input type="text" id="pb-dx" placeholder="Diabetes Melitus Tipe 2"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveProblem()">💾 Simpan</button>
+    </div>`);
+}
+
+async function saveProblem() {
+  const dx = document.getElementById('pb-dx').value.trim();
+  if (!dx) { toast('Diagnosis wajib diisi','err'); return; }
+  try {
+    await sbPost('patient_problems', {
+      mr_number: mrClinical.mr, diagnosis: dx,
+      icd_code: document.getElementById('pb-icd').value.trim()||null,
+      onset_date: document.getElementById('pb-onset').value||null,
+      status:'Aktif', noted_by: getUserName?getUserName():'User',
+      updated_at:new Date().toISOString(),
+    });
+    toast('✅ Masalah dicatat','ok'); closeModalForce();
+    await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+async function resolveProblem(id) {
+  if (!confirm('Tandai masalah ini sebagai teratasi?')) return;
+  try {
+    await sbPatch('patient_problems', id, { status:'Teratasi', resolved_at:new Date().toISOString().split('T')[0], updated_at:new Date().toISOString() });
+    toast('✅ Ditandai teratasi','ok');
+    await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+function openVitalForm() {
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🩺 Catat Tanda Vital</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div class="form-group"><label>Sistolik</label><input type="number" id="vt-sys" placeholder="120"></div>
+      <div class="form-group"><label>Diastolik</label><input type="number" id="vt-dia" placeholder="80"></div>
+      <div class="form-group"><label>Nadi</label><input type="number" id="vt-pulse"></div>
+      <div class="form-group"><label>Suhu (°C)</label><input type="number" step="0.1" id="vt-temp"></div>
+      <div class="form-group"><label>Napas</label><input type="number" id="vt-resp"></div>
+      <div class="form-group"><label>SpO₂ (%)</label><input type="number" id="vt-spo2"></div>
+      <div class="form-group"><label>Berat (kg)</label><input type="number" step="0.1" id="vt-weight"></div>
+      <div class="form-group"><label>Tinggi (cm)</label><input type="number" step="0.1" id="vt-height"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveVital()">💾 Simpan</button>
+    </div>`, 'wide');
+}
+
+async function saveVital() {
+  const num = id => { const n = parseFloat(document.getElementById(id)?.value); return isNaN(n)?null:n; };
+  const w = num('vt-weight'), h = num('vt-height');
+  const payload = {
+    admission_id: mrClinical.admId, mr_number: mrClinical.mr,
+    bp_systolic:num('vt-sys'), bp_diastolic:num('vt-dia'), pulse:num('vt-pulse'),
+    temperature:num('vt-temp'), resp_rate:num('vt-resp'), spo2:num('vt-spo2'),
+    weight:w, height:h,
+    bmi: (w && h) ? Math.round((w/Math.pow(h/100,2))*10)/10 : null,
+    recorded_by: getUserName?getUserName():'User', recorded_at:new Date().toISOString(),
+  };
+  if (Object.values(payload).every(v=>v===null||typeof v!=='number')) { toast('Isi minimal satu nilai','err'); return; }
+  try {
+    await sbPost('vital_signs', payload);
+    toast('✅ Tanda vital tercatat','ok'); closeModalForce();
+    await renderMRClinical(mrClinical.mr, mrClinical.name, mrClinical.admId);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// Tren sederhana — tabel berurut waktu; grafik menyusul bila diperlukan
+function showVitalTrend() {
+  const v = mrClinical.vitals;
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📈 Tren Tanda Vital — ${mrClinical.name}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="table-wrap"><table><thead><tr>
+      <th>Waktu</th><th>TD</th><th>Nadi</th><th>Suhu</th><th>SpO₂</th><th>BB</th><th>IMT</th>
+    </tr></thead><tbody>${v.map(x=>`<tr>
+      <td style="font-size:11.5px;color:var(--gray)">${x.recorded_at?new Date(x.recorded_at).toLocaleString('id-ID'):'—'}</td>
+      <td>${x.bp_systolic?`${x.bp_systolic}/${x.bp_diastolic||'—'}`:'—'}</td>
+      <td>${x.pulse||'—'}</td><td>${x.temperature||'—'}</td>
+      <td>${x.spo2||'—'}</td><td>${x.weight||'—'}</td><td>${x.bmi||'—'}</td>
+    </tr>`).join('')}</tbody></table></div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`, 'wide');
 }
 
 async function printFullMedRecord(patientName) {
