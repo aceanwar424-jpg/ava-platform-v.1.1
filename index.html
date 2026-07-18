@@ -15,41 +15,41 @@
   </div>
 
   <nav class="rail-nav" id="rail-nav">
-    <button class="rail-item active" data-cat="utama" onclick="openFlyout('utama')" data-tooltip="Utama">
+    <button class="rail-item active" data-cat="utama" onclick="openCategory('utama')" data-tooltip="Utama">
       <span class="rail-icon">🏠</span>
     </button>
-    <button class="rail-item" data-cat="marketing" onclick="openFlyout('marketing')" data-tooltip="Marketing & Sales">
+    <button class="rail-item" data-cat="marketing" onclick="openCategory('marketing')" data-tooltip="Marketing & Sales">
       <span class="rail-icon">🤝</span>
       <span class="rail-badge" id="badge-partners-rail" style="display:none">0</span>
     </button>
-    <button class="rail-item" data-cat="lab" onclick="openFlyout('lab')" data-tooltip="Operasional Lab">
+    <button class="rail-item" data-cat="lab" onclick="openCategory('lab')" data-tooltip="Operasional Lab">
       <span class="rail-icon">🧪</span>
     </button>
-    <button class="rail-item" data-cat="klinik" onclick="openFlyout('klinik')" data-tooltip="Layanan Klinik">
+    <button class="rail-item" data-cat="klinik" onclick="openCategory('klinik')" data-tooltip="Layanan Klinik">
       <span class="rail-icon">🏨</span>
     </button>
-    <button class="rail-item" data-cat="homecare" onclick="openFlyout('homecare')" data-tooltip="Home Care">
+    <button class="rail-item" data-cat="homecare" onclick="openCategory('homecare')" data-tooltip="Home Care">
       <span class="rail-icon">🏡</span>
     </button>
-    <button class="rail-item" data-cat="finance" onclick="openFlyout('finance')" data-tooltip="Finance & Billing">
+    <button class="rail-item" data-cat="finance" onclick="openCategory('finance')" data-tooltip="Finance & Billing">
       <span class="rail-icon">💰</span>
     </button>
-    <button class="rail-item" data-cat="inventory" onclick="openFlyout('inventory')" data-tooltip="Inventory & Logistik">
+    <button class="rail-item" data-cat="inventory" onclick="openCategory('inventory')" data-tooltip="Inventory & Logistik">
       <span class="rail-icon">📦</span>
     </button>
-    <button class="rail-item" data-cat="hrd" onclick="openFlyout('hrd')" data-tooltip="HRD & SDM">
+    <button class="rail-item" data-cat="hrd" onclick="openCategory('hrd')" data-tooltip="HRD & SDM">
       <span class="rail-icon">👥</span>
     </button>
-    <button class="rail-item" data-cat="produktivitas" onclick="openFlyout('produktivitas')" data-tooltip="Produktivitas">
+    <button class="rail-item" data-cat="produktivitas" onclick="openCategory('produktivitas')" data-tooltip="Produktivitas">
       <span class="rail-icon">📋</span>
     </button>
-    <button class="rail-item" data-cat="wiki" onclick="openFlyout('wiki')" data-tooltip="Wiki OneLab">
+    <button class="rail-item" data-cat="wiki" onclick="openCategory('wiki')" data-tooltip="Wiki OneLab">
       <span class="rail-icon">📖</span>
     </button>
-    <button class="rail-item" data-cat="agentic" onclick="openFlyout('agentic')" data-tooltip="Agentic AI">
+    <button class="rail-item" data-cat="agentic" onclick="openCategory('agentic')" data-tooltip="Agentic AI">
       <span class="rail-icon">✨</span>
     </button>
-    <button class="rail-item" data-cat="konfigurasi" onclick="openFlyout('konfigurasi')" data-tooltip="Konfigurasi">
+    <button class="rail-item" data-cat="konfigurasi" onclick="openCategory('konfigurasi')" data-tooltip="Konfigurasi">
       <span class="rail-icon">⚙️</span>
     </button>
   </nav>
@@ -160,6 +160,9 @@
     </div>
   </div>
 </div>
+
+<!-- ═══ SUBNAV — pintasan submenu kategori aktif ═══ -->
+<nav class="subnav" id="subnav" aria-label="Pintasan menu kategori"></nav>
 
 <!-- ═══ MAIN ═══ -->
 <main class="main-content" id="main-content">
@@ -608,12 +611,12 @@ const FLYOUT_MENUS = {
   homecare: {
     label: 'Home Care',
     items: [
-      {page:'homecare', icon:'🏠', label:'Order Home Care', action:"navigate('homecare')"},
-      {page:'hc-schedule', icon:'📅', label:'Jadwal Kunjungan', action:"renderHCSchedule()"},
-      {page:'hc-billing', icon:'💵', label:'Billing Fee Nakes', action:"renderHCBilling()"},
-      {page:'hc-staff', icon:'👥', label:'Master Nakes', action:"renderHCStaff()"},
-      {page:'hc-tariff', icon:'🏷️', label:'Master Tarif', action:"renderHCTariff()"},
-      {page:'hc-report', icon:'📊', label:'Report', action:"renderHCFullReport()"},
+      {page:'homecare', icon:'🏠', label:'Order Kunjungan', group:'Operasional', desc:'Buat & pantau order layanan ke rumah pasien', action:"navigate('homecare')"},
+      {page:'hc-schedule', icon:'📅', label:'Jadwal & Penugasan', group:'Operasional', desc:'Kalender harian dan pembagian tugas nakes', action:"renderHCSchedule()"},
+      {page:'hc-billing', icon:'💵', label:'Penagihan & Komisi', group:'Keuangan', desc:'Rekap fee nakes dan status penagihan', action:"renderHCBilling()"},
+      {page:'hc-staff', icon:'👥', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"renderHCStaff()"},
+      {page:'hc-tariff', icon:'🏷️', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"renderHCTariff()"},
+      {page:'hc-report', icon:'📊', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"renderHCFullReport()"},
     ]
   },
   finance: {
@@ -629,13 +632,15 @@ const FLYOUT_MENUS = {
   inventory: {
     label: 'Inventory & Logistik',
     items: [
-      {page:'inventory', icon:'📦', label:'Stock & Reagen', action:"navigate('inventory',{tab:'stock'})"},
-      {page:'inventory-pr', icon:'🛒', label:'Purchase Request', action:"navigate('inventory',{tab:'pr'})"},
-      {page:'inventory-po', icon:'📄', label:'Purchase Order', action:"navigate('inventory',{tab:'po'})"},
-      {page:'inventory-issue', icon:'📤', label:'Goods Issue', action:"navigate('inventory',{tab:'issue'})"},
-      {page:'inventory-opname', icon:'📋', label:'Stock Opname', action:"navigate('inventory',{tab:'opname'})"},
-      {page:'inventory-mrp', icon:'📊', label:'MRP', action:"navigate('inventory',{tab:'mrp'})"},
-      {page:'inventory-supplier', icon:'🏭', label:'Supplier', action:"navigate('inventory',{tab:'supplier'})"},
+      {page:'inventory', icon:'📦', label:'Stok Barang', group:'Persediaan', desc:'Master barang, level stok, dan batas minimum', action:"navigate('inventory',{tab:'stock'})"},
+      {page:'inventory-issue', icon:'📤', label:'Pengeluaran Barang', group:'Persediaan', desc:'Catat pemakaian barang ke divisi atau layanan', action:"navigate('inventory',{tab:'issue'})"},
+      {page:'inventory-opname', icon:'📋', label:'Stock Opname', group:'Persediaan', desc:'Hitung fisik dan sesuaikan selisih stok', action:"navigate('inventory',{tab:'opname'})"},
+      {page:'inventory-ledger', icon:'📜', label:'Kartu Stok', group:'Persediaan', desc:'Riwayat seluruh pergerakan stok masuk & keluar', action:"navigate('inventory',{tab:'ledger'})"},
+      {page:'inventory-pr', icon:'🛒', label:'Permintaan Pembelian', group:'Pengadaan', desc:'Ajukan pengadaan dengan persetujuan berjenjang', action:"navigate('inventory',{tab:'pr'})"},
+      {page:'inventory-po', icon:'📄', label:'Pesanan Pembelian', group:'Pengadaan', desc:'Pesanan ke supplier, penerimaan, dan retur', action:"navigate('inventory',{tab:'po'})"},
+      {page:'inventory-supplier', icon:'🏭', label:'Supplier', group:'Pengadaan', desc:'Data pemasok dan kategori barang yang disuplai', action:"navigate('inventory',{tab:'supplier'})"},
+      {page:'inventory-mrp', icon:'📊', label:'Perencanaan MRP', group:'Perencanaan & Analitik', desc:'Titik pemesanan ulang dan rekomendasi pembelian', action:"navigate('inventory',{tab:'mrp'})"},
+      {page:'inventory-report', icon:'📈', label:'Laporan', group:'Perencanaan & Analitik', desc:'Valuasi stok, analisis ABC, dan belanja supplier', action:"navigate('inventory',{tab:'report'})"},
     ]
   },
   hrd: {
@@ -744,21 +749,142 @@ function setActiveFlyoutItem(page) {
   window.currentPage = page;
   document.querySelectorAll('.flyout-item').forEach(b => b.classList.remove('active'));
   document.querySelector(`.flyout-item[data-page="${page}"]`)?.classList.add('active');
+  // Tandai pintasan atas yang sedang dibuka
+  document.querySelectorAll('#subnav .subnav-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#subnav .subnav-item[data-page="${page}"]`)?.classList.add('active');
+  document.querySelector('#subnav .subnav-home')?.classList.remove('active');
   // Selalu tutup flyout setelah pilih menu — overlay full-screen memblokir klik konten
   closeFlyout();
 }
 
 // Auto-open category based on current page (called from navigate())
 function syncFlyoutToPage(page) {
+  let found = false;
   for (const [cat, menu] of Object.entries(FLYOUT_MENUS)) {
     if (menu.items.some(i => i.page === page)) {
       document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
       document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
       activeFlyoutCat = cat;
       window.currentPage = page;
+      renderSubnav(cat, page);   // pintasan atas tetap tampil di dalam kategori
+      found = true;
       break;
     }
   }
+  // Halaman di luar kategori manapun — sembunyikan pintasan
+  if (!found) {
+    const el = document.getElementById('subnav');
+    if (el) { el.classList.remove('show'); el.innerHTML = ''; }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// KATEGORI: halaman indeks + pintasan atas (pengganti flyout)
+// ══════════════════════════════════════════════════════════════
+
+// Item yang boleh dilihat user berdasarkan role
+function visibleCategoryItems(cat) {
+  const menu = FLYOUT_MENUS[cat];
+  if (!menu) return [];
+  const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
+  const allowedPages = window.roleConfig?.pages || null;
+  const isSuperAdmin = role === 'super_admin';
+  return menu.items.filter(item => {
+    if (item.adminOnly && !['super_admin','manager','direktur'].includes(role)) return false;
+    if (!isSuperAdmin && allowedPages && !allowedPages.includes(item.page) && !item.soon) return false;
+    return true;
+  });
+}
+
+// Pintasan horizontal di bawah topbar
+function renderSubnav(cat, activePage) {
+  const el = document.getElementById('subnav');
+  if (!el) return;
+  const menu = FLYOUT_MENUS[cat];
+  const items = visibleCategoryItems(cat);
+  if (!menu || !items.length) { el.classList.remove('show'); el.innerHTML = ''; return; }
+
+  el.innerHTML = `
+    <button class="subnav-home ${!activePage?'active':''}" onclick="openCategory('${cat}')" title="Ringkasan ${menu.label}">
+      <span class="subnav-home-ico">${menu.items[0]?.icon||'▪'}</span>
+      <span>${menu.label}</span>
+    </button>
+    <span class="subnav-sep"></span>
+    <div class="subnav-items">
+      ${items.map(it => it.soon
+        ? `<span class="subnav-item disabled" title="Segera hadir">${it.label}<span class="subnav-soon">soon</span></span>`
+        : `<button class="subnav-item ${activePage===it.page?'active':''}" data-page="${it.page}"
+             onclick="${it.action};setActiveFlyoutItem('${it.page}')">${it.label}</button>`
+      ).join('')}
+    </div>`;
+  el.classList.add('show');
+}
+
+// Halaman indeks kategori — daftar submenu dikelompokkan
+function openCategory(cat) {
+  const menu = FLYOUT_MENUS[cat];
+  if (!menu) return;
+  activeFlyoutCat = cat;
+  window.currentPage = '';
+  closeFlyout();
+
+  document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
+
+  const titleEl = document.getElementById('topbar-title');
+  if (titleEl) titleEl.textContent = menu.label;
+
+  if (window.innerWidth < 768) document.getElementById('sidebar-rail')?.classList.remove('open');
+
+  const items = visibleCategoryItems(cat);
+  renderSubnav(cat, null);
+
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  if (!items.length) {
+    main.innerHTML = `<div class="empty-state" style="min-height:60vh"><div class="ico">🔒</div>
+      <h3>Tidak ada menu yang tersedia</h3><p>Role Anda belum memiliki akses ke kategori ini.</p></div>`;
+    return;
+  }
+
+  // Kelompokkan berdasarkan properti group; tanpa group → satu daftar
+  const groups = {};
+  items.forEach(it => { const g = it.group || 'Menu'; (groups[g] = groups[g] || []).push(it); });
+
+  main.innerHTML = `
+    <div class="cat-page">
+      <header class="cat-head">
+        <p class="cat-eyebrow">Kategori</p>
+        <h1 class="cat-title">${menu.label}</h1>
+        <p class="cat-sub">${items.length} menu tersedia${Object.keys(groups).length>1?` dalam ${Object.keys(groups).length} kelompok`:''}</p>
+      </header>
+      ${Object.entries(groups).map(([gname, gitems]) => `
+        <section class="cat-group">
+          ${Object.keys(groups).length>1?`<h2 class="cat-group-name">${gname}</h2>`:''}
+          <div class="cat-grid">
+            ${gitems.map(it => it.soon
+              ? `<div class="cat-card disabled">
+                   <span class="cat-card-ico">${it.icon||'▪'}</span>
+                   <div class="cat-card-body">
+                     <div class="cat-card-label">${it.label}<span class="cat-card-soon">segera</span></div>
+                     ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
+                   </div>
+                 </div>`
+              : `<button class="cat-card" onclick="${it.action};setActiveFlyoutItem('${it.page}')">
+                   <span class="cat-card-ico">${it.icon||'▪'}</span>
+                   <div class="cat-card-body">
+                     <div class="cat-card-label">${it.label}</div>
+                     ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
+                   </div>
+                   <span class="cat-card-go" aria-hidden="true">
+                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
+                       stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                   </span>
+                 </button>`
+            ).join('')}
+          </div>
+        </section>`).join('')}
+    </div>`;
 }
 
 </script>

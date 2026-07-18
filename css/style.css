@@ -1468,3 +1468,130 @@ select { cursor: pointer; }
 /* docx-preview renders pages as divs with class .docx; style them as A4 pages */
 #docx-preview-container .docx-wrapper { background: #e8e8e8; padding: 20px; }
 #docx-preview-container .docx { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); margin: 0 auto 16px; }
+
+/* ══════════════════════════════════════════════════════════════
+   SUBNAV — pintasan submenu kategori (di bawah topbar)
+══════════════════════════════════════════════════════════════ */
+:root { --subnav-h: 46px; }
+
+.subnav {
+  position: fixed;
+  top: var(--topbar-h);
+  left: var(--rail-w);
+  right: 0;
+  height: var(--subnav-h);
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 0 24px;
+  z-index: 99;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+.subnav.show { display: flex; }
+.subnav::-webkit-scrollbar { height: 3px; }
+.subnav::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* Konten turun saat subnav tampil */
+.subnav.show ~ .main-content { margin-top: calc(var(--topbar-h) + var(--subnav-h)); }
+
+.subnav-home {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 11px; border: 1px solid var(--border); border-radius: var(--r-sm);
+  background: var(--bg2); color: var(--text2);
+  font-family: inherit; font-size: 12.5px; font-weight: 650;
+  white-space: nowrap; cursor: pointer; flex: none;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.subnav-home:hover { background: var(--white); border-color: var(--border2); color: var(--text); }
+.subnav-home.active { background: var(--teal-light); border-color: var(--teal); color: var(--teal); }
+.subnav-home-ico { font-size: 13px; line-height: 1; }
+
+.subnav-sep { width: 1px; height: 20px; background: var(--border); flex: none; }
+
+.subnav-items { display: flex; align-items: center; gap: 2px; min-width: 0; }
+
+.subnav-item {
+  position: relative;
+  padding: 12px 12px 13px;
+  border: 0; background: transparent;
+  color: var(--text3); font-family: inherit; font-size: 12.5px; font-weight: 550;
+  white-space: nowrap; cursor: pointer; flex: none;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s, background .15s;
+  border-radius: var(--r-sm) var(--r-sm) 0 0;
+}
+.subnav-item:hover { color: var(--text); background: var(--bg2); }
+.subnav-item.active { color: var(--text); font-weight: 680; border-bottom-color: var(--teal); }
+.subnav-item.disabled { color: var(--border2); cursor: default; }
+.subnav-item:focus-visible,
+.subnav-home:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.subnav-soon {
+  margin-left: 6px; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--bg2); color: var(--text3); padding: 1px 5px; border-radius: 3px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   HALAMAN INDEKS KATEGORI
+══════════════════════════════════════════════════════════════ */
+.cat-page { max-width: 1080px; }
+
+.cat-head { padding-bottom: 18px; margin-bottom: 26px; border-bottom: 1px solid var(--border); }
+.cat-eyebrow {
+  margin: 0 0 6px; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text3); font-weight: 600;
+}
+.cat-title { margin: 0 0 4px; font-size: 26px; font-weight: 720; letter-spacing: -.02em; color: var(--text); }
+.cat-sub { margin: 0; font-size: 13px; color: var(--text3); }
+
+.cat-group { margin-bottom: 30px; }
+.cat-group-name {
+  margin: 0 0 12px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--teal); font-weight: 700;
+}
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); gap: 10px; }
+
+.cat-card {
+  display: flex; align-items: flex-start; gap: 13px; width: 100%;
+  padding: 14px 15px; text-align: left;
+  background: var(--white); border: 1px solid var(--border); border-radius: var(--r-sm);
+  font-family: inherit; color: var(--text); cursor: pointer;
+  transition: background .15s, border-color .15s;
+}
+.cat-card:hover { background: var(--bg2); border-color: var(--border2); }
+.cat-card:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.cat-card.disabled { opacity: .55; cursor: default; }
+.cat-card.disabled:hover { background: var(--white); border-color: var(--border); }
+
+.cat-card-ico {
+  width: 34px; height: 34px; flex: none;
+  display: grid; place-items: center;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--r-sm); font-size: 15px; line-height: 1;
+}
+.cat-card:hover .cat-card-ico { background: var(--white); }
+
+.cat-card-body { flex: 1; min-width: 0; }
+.cat-card-label { font-size: 13.5px; font-weight: 650; color: var(--text); line-height: 1.35; }
+.cat-card-desc { font-size: 12px; color: var(--text3); line-height: 1.45; margin-top: 2px; }
+.cat-card-soon {
+  margin-left: 7px; font-size: 9.5px; letter-spacing: .06em; text-transform: uppercase;
+  background: var(--bg2); color: var(--text3); padding: 1px 5px; border-radius: 3px; font-weight: 600;
+}
+
+.cat-card-go { flex: none; color: var(--border2); margin-top: 7px; transition: color .15s, transform .15s; }
+.cat-card-go svg { width: 16px; height: 16px; display: block; }
+.cat-card:hover .cat-card-go { color: var(--teal); transform: translateX(2px); }
+
+@media (max-width: 767px) {
+  .subnav { left: 0; padding: 0 14px; }
+  .cat-grid { grid-template-columns: 1fr; }
+  .cat-title { font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cat-card, .cat-card-go, .subnav-item, .subnav-home { transition: none; }
+  .cat-card:hover .cat-card-go { transform: none; }
+}
