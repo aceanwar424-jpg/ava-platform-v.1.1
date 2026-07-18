@@ -148,11 +148,6 @@ function copyReferralCode() {
   });
 }
 
-function seeReferralPackages() {
-  closeMemberModal();
-  openBookingModal();
-}
-
 // --- BOOK HOME CARE MODAL TRIGGERS ---
 function openHomeCareModal() {
   const modal = document.getElementById('homecare-modal');
@@ -221,6 +216,11 @@ function openProfileModal() {
 function closeProfileModal() {
   const modal = document.getElementById('profile-modal');
   if (modal) modal.classList.remove('open');
+}
+
+function seeReferralPackages() {
+  closeMemberModal();
+  openBookingModal();
 }
 
 // Render Corporate List
@@ -349,6 +349,12 @@ function handleLogin(event) {
     document.getElementById('patient-view').classList.add('active');
   }
   
+  // Hide timeline tabs for corporate and referral, only show for patient
+  const timelineNav = document.getElementById('timeline-tabs-nav');
+  if (timelineNav) {
+    timelineNav.style.display = (selectedRole === 'patient') ? 'block' : 'none';
+  }
+
   // Always reset timeline phase to Fase 1 on login
   switchTimelinePhase('fase1');
   showScreen('dashboard-screen');
