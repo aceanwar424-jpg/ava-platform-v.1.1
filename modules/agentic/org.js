@@ -8,13 +8,15 @@
 let agOrgAgents = [], agOrgRights = [], agOrgMsgs = [];
 
 const AG_ORG_ICON = {
-  HEAD:'👔', IT_HEAD:'🖥️', TEAM_OPS:'📋', LOGISTIK:'🚚',
+  HEAD:'👔', TEAM_OPS:'📋', LOGISTIK:'🚚',
   SA_HEAD:'🧪', SA_DOC:'📚', SA_AUDIT:'🔍', SA_REG:'📜', SA_CAPA:'🛠️', QA_MUTU:'✅',
   MKT_HEAD:'✍️', MKT_SEO:'🔑', MKT_COPY:'📝', MKT_DESIGN:'🎨', MKT_SOCIAL:'📣', QA_KONTEN:'✅',
+  IT_HEAD:'🖥️', IT_SRE:'🛎️', IT_SEC:'🔐', IT_DATA:'🗄️', IT_DEV:'⚙️',
 };
 const AG_DEPT_META = {
-  SERVICE_ASSURANCE:{ icon:'🧪', label:'Service Assurance', head:'SA_HEAD', color:'#0EA5E9' },
-  MARKETING:        { icon:'✍️', label:'Marketing',         head:'MKT_HEAD', color:'#8B5CF6' },
+  SERVICE_ASSURANCE:{ icon:'🧪', label:'Service Assurance', head:'SA_HEAD',  tick:'SA_TICK',  color:'#0EA5E9' },
+  MARKETING:        { icon:'✍️', label:'Marketing',         head:'MKT_HEAD', tick:'MKT_TICK', color:'#8B5CF6' },
+  IT:               { icon:'🖥️', label:'IT Profesional',    head:'IT_HEAD',  tick:'IT_CHECK', color:'#0F766E' },
 };
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
@@ -51,7 +53,7 @@ async function renderAgOrgTab(el){
     return `<div class="ag-detail" style="border-top:3px solid ${m.color};padding:10px 12px;min-width:250px;flex:1">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div style="font-size:12.5px;font-weight:800;color:#0A2342">${m.icon} ${agEsc(m.label)}</div>
-        <button class="ag-btn mut" style="padding:3px 8px;font-size:10.5px" onclick="agOrgKick('${m.head==='SA_HEAD'?'SA_TICK':'MKT_TICK'}')">${svgIcon('sparkle',10)} Patroli</button>
+        <button class="ag-btn mut" style="padding:3px 8px;font-size:10.5px" onclick="agOrgKick('${m.tick}')">${svgIcon('sparkle',10)} Patroli</button>
       </div>
       <div class="ag-detail" style="border:1px solid ${m.color};padding:7px 10px;margin-top:8px;text-align:center;position:relative;${dh.active?'':'opacity:.45'}">
         <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${dh.code}')">${svgIcon('edit',10)}</button>
@@ -81,6 +83,7 @@ async function renderAgOrgTab(el){
           <button class="ag-btn mut" onclick="agOrgKick('SA_TICK')">🧪 Patroli Mutu</button>
           <button class="ag-btn mut" onclick="agOrgKick('MKT_TICK')">${svgIcon('sparkle',13)} Patroli Marketing</button>
           <button class="ag-btn mut" onclick="agOrgKick('IT_CHECK')">${svgIcon('eye',13)} IT Check</button>
+          <button class="ag-btn mut" onclick="agItSecAudit()">🔐 Audit Keamanan</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>
         </div>
       </div>
@@ -547,4 +550,16 @@ async function agOrgStandup(){
     await agRunWorker(4);
     if(_agTab==='org') agRenderTab();
   }catch(e){ toast(e.message,'err'); }
+}
+async function agItSecAudit(){
+  try{
+    await agRpc('agentic_create_task', { p_agent:'ORG', p_task_type:'IT_SEC_AUDIT',
+      p_title:'Audit postur keamanan IT', p_payload:{} });
+    toast('Audit keamanan ditugaskan — menjalankan worker…','ok');
+    await agRunWorker(2);
+    await agReload();
+    if(_agTab==='org') agRenderTab();
+  }catch(e){
+    toast(/IT_SEC_AUDIT|agentic_it_sec_scan/.test(e.message)?'Jalankan supabase_agentic_fase7f_it.sql dulu':e.message,'err');
+  }
 }

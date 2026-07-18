@@ -28,7 +28,12 @@ dalam departemennya.
     │     ├── 🎨 MKT_DESIGN  Designer / Creative
     │     ├── 📣 MKT_SOCIAL  Social & Community
     │     └── ✅ QA_KONTEN   Gerbang Konten (penilai konten)
-    └── 🖥️ IT_HEAD · 📋 TEAM_OPS · 🚚 LOGISTIK (lintas-fungsi, lapor ke HEAD)
+    ├── 🖥️ IT PROFESIONAL — IT_HEAD (Manajer IT)
+    │     ├── 🛎️ IT_SRE    Site Reliability / Ops
+    │     ├── 🔐 IT_SEC    Keamanan Informasi
+    │     ├── 🗄️ IT_DATA   Data & LIS / Integrasi
+    │     └── ⚙️ IT_DEV    Pengembangan & Otomasi (self-heal prompt)
+    └── 📋 TEAM_OPS · 🚚 LOGISTIK (lintas-fungsi, lapor ke HEAD)
 ```
 
 Tambahan besar lain:
@@ -59,6 +64,7 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 2 | `supabase_agentic_fase7b.sql` | Tabel `ai_config` + RPC konfig (map = service_role saja) |
 | 3 | `supabase_agentic_fase7c.sql` | Tabel `audit_findings` + `capa` + RPC + prompt audit/CAPA |
 | 4 | `supabase_agentic_frameworks.sql` | Seed checklist **Akreditasi Klinik** (fokus lab) + **ISO 9001:2015** (melengkapi ISO 15189 yang sudah ada) |
+| 5 | `supabase_agentic_fase7f_it.sql` | **Departemen IT Profesional** (IT_SRE·IT_SEC·IT_DATA·IT_DEV) + task `IT_SEC_AUDIT` + RPC postur keamanan |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.
@@ -149,6 +155,18 @@ CONTENT_ANALYSIS  →  MAKE_CAROUSEL / MAKE_BLOG_SEO
 - **MAKE_DESIGN_BRIEF** — konten → brief kreatif; opsi auto-antre carousel.
 - **MKT_TICK** (tombol *Patroli Marketing*/cron) — jaga kalender 14 hari terisi;
   bila tipis → buat `PLAN_WEEKLY`.
+
+### 4.2b Departemen IT Profesional
+
+Kepala IT (`IT_HEAD`) memimpin: **IT_SRE** (keandalan), **IT_SEC** (keamanan),
+**IT_DATA** (data & LIS), **IT_DEV** (otomasi & self-heal prompt). Tugas otomatis:
+- **IT_CHECK** (tombol *IT Check* / kartu dept IT → *Patroli*, atau cron 6 jam) — diag
+  jalur AI, bebaskan task macet, dan **self-heal prompt** (Fase 6C, bisa di-rollback).
+- **IT_SEC_AUDIT** (tombol **🔐 Audit Keamanan**) — audit postur keamanan berbasis data
+  nyata: kunci/secret belum diset, task auto-publish tanpa QA, task macet, kegagalan 7 hari,
+  dan **konten medis yang ter-auto** (harus 0 — kalau >0 ditandai KRITIS + ALERT ke CEO).
+  **Nilai secret tidak pernah ditampilkan** — hanya status terisi/kosong.
+- `IT_BACKUP_CHECK` (IT_DATA) masih *reserved* — verifikasi backup butuh hook eksternal.
 
 ### 4.3 Konfig AI (tab Organisasi → ⚙️ Konfigurasi AI)
 
@@ -258,6 +276,9 @@ Jika ya → master Anda valid dan siap dipakai generator.
 | `MAKE_BLOG_SEO` | MKT | R2 · QA_KONTEN 80 | ✅ |
 | `MAKE_DESIGN_BRIEF` | MKT | R1 log | ✅ |
 | `PLAN_CAMPAIGN` | MKT | R2 · QA_KONTEN 70 | ⏳ reserved |
+| `IT_CHECK` | IT | R1 log | ✅ (diag + reaper + self-heal) |
+| `IT_SEC_AUDIT` | IT | R1 log | ✅ (audit postur keamanan) |
+| `IT_BACKUP_CHECK` | IT | R2 | ⏳ reserved (butuh hook eksternal) |
 
 > "⏳ reserved" = sudah ada di Matriks Mandat (terlihat di UI) tapi **belum ada handler**;
 > jangan dibuat manual dulu — akan `FAILED` "handler belum diimplementasikan". Tidak ada
