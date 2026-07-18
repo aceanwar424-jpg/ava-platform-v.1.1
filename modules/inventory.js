@@ -60,6 +60,7 @@ async function renderInventory(initialTab='stock') {
             <option value="">Semua Kategori</option>
             ${INV_CATEGORIES.map(c=>`<option>${c}</option>`).join('')}
           </select>
+          <button class="btn btn-ghost" onclick="openTransferForm()">⇄ Pindah Barang</button>
           <button class="btn btn-teal" onclick="openItemForm()">+ Tambah Barang</button>
         </div>
         <div id="inv-tbody"><div class="loading-row"><div class="spinner"></div></div></div>
@@ -530,7 +531,9 @@ async function openPRForm(id=null) {
       <div class="form-group"><label>Tanggal Dibutuhkan</label>
         <input type="date" id="pf-needed" value="${p.needed_date||''}"></div>
       <div class="form-group"><label>Divisi</label>
-        <input type="text" id="pf-div" value="${p.division||''}" placeholder="Laboratory, Operasional, dll"></div>
+        <input type="text" id="pf-div" value="${p.division||''}" placeholder="Laboratory, Operasional, dll"
+          onchange="checkPRBudget()" onblur="checkPRBudget()">
+        <div class="form-hint" id="pf-budget"></div></div>
     </div>
     <div class="form-group"><label>Alasan / Justifikasi Pengadaan *</label>
       <textarea id="pf-reason" rows="2" placeholder="Alasan pengadaan...">${p.reason||''}</textarea></div>
@@ -551,6 +554,27 @@ async function openPRForm(id=null) {
       <button class="btn btn-teal" onclick="savePR(${id||'null'})">📤 ${id?'Simpan':'Submit PR'}</button>
     </div>`, 'wide');
   renderPRLineItemsTable();
+}
+
+// Fase 2.5 — tampilkan sisa pagu divisi saat PR disusun
+let _prBudget = null;
+async function checkPRBudget() {
+  const el = document.getElementById('pf-budget'); if (!el) return;
+  const div = document.getElementById('pf-div')?.value.trim();
+  if (!div) { el.textContent = ''; _prBudget = null; return; }
+  const period = new Date().toISOString().slice(0,7);   // YYYY-MM
+  try {
+    const b = await sbRpc('budget_remaining', { p_division: div, p_period: period });
+    _prBudget = b;
+    if (!b || !b.budget) {
+      el.innerHTML = `<span style="color:var(--text3)">Belum ada pagu anggaran untuk divisi ini</span>`;
+      return;
+    }
+    const sisa = b.remaining||0;
+    el.innerHTML = `Pagu ${formatCurrency(b.budget)} · terpakai ${formatCurrency(b.used)} ·
+      <b style="color:${sisa<0?'#B91C1C':'var(--teal)'}">sisa ${formatCurrency(sisa)}</b>`;
+    updatePRTotal();
+  } catch(e) { el.textContent = ''; _prBudget = null; }
 }
 
 function addPRLineItem() {
@@ -626,6 +650,15 @@ function updatePRTotal() {
   const total = prLineItems.reduce((s,it)=>s+((it.unit_price||0)*(it.qty||0)),0);
   const el = document.getElementById('pr-items-total');
   if (el) el.textContent = formatCurrency(total);
+  // Peringatan bila melampaui sisa pagu divisi (Fase 2.5)
+  const bEl = document.getElementById('pf-budget');
+  if (bEl && _prBudget && _prBudget.budget) {
+    const sisa = _prBudget.remaining||0;
+    if (total > sisa) {
+      bEl.innerHTML = `<span style="color:#B91C1C;font-weight:600">⚠️ Melampaui sisa pagu
+        ${formatCurrency(sisa)} sebesar ${formatCurrency(total - sisa)}</span> — perlu persetujuan jenjang lebih tinggi`;
+    }
+  }
 }
 
 async function savePR(id) {
@@ -1627,6 +1660,77 @@ function exportInvABC() {
   const valued = active.map(i=>({...i,value:(i.stock_qty||0)*(i.unit_price||0)})).sort((a,b)=>b.value-a.value);
   let cum=0; valued.forEach(i=>{cum+=i.value; const p=totalVal?cum/totalVal:1; i.abc=p<=0.8?'A':p<=0.95?'B':'C';});
   invExportCSV(`abc_analysis_${new Date().toISOString().split('T')[0]}.csv`, ['Kode','Nama','Nilai','Kelas'], valued.map(i=>[i.item_code||'',i.item_name,i.value,i.abc]));
+}
+
+// ══════════════════════════════════════════════════════════════
+// PEMINDAHAN ANTAR GUDANG (Fase 2.6)
+// Total stok tidak berubah — yang berpindah hanya sebarannya.
+// ══════════════════════════════════════════════════════════════
+let invWarehouses = [];
+
+async function openTransferForm() {
+  if (!invWarehouses.length) {
+    invWarehouses = await sbGet('warehouses','select=*&is_active=eq.true&order=name.asc').catch(()=>[]);
+  }
+  if (!invWarehouses.length) {
+    toast('Data gudang belum ada — jalankan supabase_fase2.sql & supabase_fase2b.sql','warn'); return;
+  }
+  openModal(`
+    <div class="modal-header"><div class="modal-title">⇄ Pindah Barang Antar Lokasi</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Barang *</label>
+      <select id="tf-item" onchange="loadTransferStock()">
+        <option value="">-- Pilih barang --</option>
+        ${invItems.filter(i=>i.is_active!==false).map(i=>`<option value="${i.id}">${i.item_code||''} — ${i.item_name}</option>`).join('')}
+      </select></div>
+    <div id="tf-avail" style="font-size:12px;color:var(--text3);margin-bottom:10px"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Dari *</label>
+        <select id="tf-from" onchange="loadTransferStock()">
+          ${invWarehouses.map(w=>`<option value="${w.id}">${w.name}</option>`).join('')}
+        </select></div>
+      <div class="form-group"><label>Ke *</label>
+        <select id="tf-to">
+          ${invWarehouses.map((w,i)=>`<option value="${w.id}"${i===1?' selected':''}>${w.name}</option>`).join('')}
+        </select></div>
+    </div>
+    <div class="form-group"><label>Jumlah *</label><input type="number" min="0" step="0.01" id="tf-qty"></div>
+    <div class="form-group"><label>Catatan</label><input type="text" id="tf-notes" placeholder="Alasan pemindahan"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveTransfer()">⇄ Pindahkan</button>
+    </div>`);
+}
+
+async function loadTransferStock() {
+  const itemId = document.getElementById('tf-item')?.value;
+  const whId   = document.getElementById('tf-from')?.value;
+  const el = document.getElementById('tf-avail'); if (!el) return;
+  if (!itemId || !whId) { el.textContent = ''; return; }
+  try {
+    const rows = await sbGet('stock_by_location', `select=qty&item_id=eq.${itemId}&warehouse_id=eq.${whId}`);
+    const qty = rows?.[0]?.qty ?? 0;
+    const wh = invWarehouses.find(w=>String(w.id)===String(whId));
+    el.innerHTML = `Tersedia di <b>${wh?.name||''}</b>: <b style="color:${qty>0?'var(--teal)':'#B91C1C'}">${qty}</b>`;
+  } catch(e) { el.textContent = ''; }
+}
+
+async function saveTransfer() {
+  const itemId = parseInt(document.getElementById('tf-item').value);
+  const from   = parseInt(document.getElementById('tf-from').value);
+  const to     = parseInt(document.getElementById('tf-to').value);
+  const qty    = parseFloat(document.getElementById('tf-qty').value)||0;
+  if (!itemId) { toast('Pilih barang dulu','err'); return; }
+  if (from === to) { toast('Lokasi asal dan tujuan tidak boleh sama','err'); return; }
+  if (qty <= 0) { toast('Jumlah harus lebih dari nol','err'); return; }
+  try {
+    const res = await sbRpc('transfer_stock', {
+      p_item_id:itemId, p_from_wh:from, p_to_wh:to, p_qty:qty,
+      p_notes: document.getElementById('tf-notes').value.trim()||null,
+    });
+    toast(`✅ ${res?.transfer_number||'Pemindahan'} tercatat`,'ok');
+    closeModalForce(); await loadInventory();
+  } catch(e) { toast('❌ '+invRpcError(e),'err'); }
 }
 
 // ══════════════════════════════════════════════════════════════

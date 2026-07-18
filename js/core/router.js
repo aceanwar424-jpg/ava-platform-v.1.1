@@ -68,7 +68,7 @@ function navigate(page, params={}) {
     case 'supportive':  renderSupportive();             break;
     case 'spirometry':  renderSupportive();             break;
     case 'medrecord':   renderMedRecord();              break;
-    case 'queue':       renderQueue();                  break;
+    case 'queue':       renderQueuePage();                  break;
     case 'appointments':renderAppointments();           break;
     case 'cashier':     renderCashier();                break;
     case 'package':     renderConfigPackage();          break;

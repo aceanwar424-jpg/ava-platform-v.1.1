@@ -18,7 +18,7 @@ let qTickets = [], qService = '';
 // ══════════════════════════════════════════════════════════════
 // ANTRIAN
 // ══════════════════════════════════════════════════════════════
-async function renderQueue() {
+async function renderQueuePage() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>Antrian</h1><p>Nomor antrian harian per layanan, panggil, dan lewati</p></div>

@@ -28,10 +28,13 @@ async function renderCashier() {
       <div><h1>Kasir</h1>
         <p>Pembayaran, refund, dan tagihan korporat</p></div>
       <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="openShiftPanel()">🔐 Shift Kas</button>
         <button class="btn btn-ghost btn-sm" onclick="openCashierReport()">📊 Laporan</button>
         <button class="btn btn-teal" onclick="openPaymentForm()">+ Transaksi Baru</button>
       </div>
     </div>
+
+    <div id="shift-banner"></div>
 
     <!-- KPI -->
     <div id="cashier-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px">
@@ -561,4 +564,108 @@ async function openCashierReport() {
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       <button class="btn btn-teal btn-sm" onclick="window.print()">🖨 Print</button>
     </div>`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// SHIFT KAS — buka & tutup dengan berita acara selisih (Fase 4.7)
+// Total sistem dihitung dari transaksi, bukan diketik petugas, supaya
+// selisih benar-benar berarti.
+// ══════════════════════════════════════════════════════════════
+let activeShift = null;
+
+async function loadActiveShift() {
+  try {
+    const rows = await sbGet('cashier_shifts','select=*&status=eq.Buka&order=opened_at.desc&limit=1');
+    activeShift = rows?.[0] || null;
+  } catch(e) { activeShift = undefined; }   // undefined = tabel belum ada
+  paintShiftBanner();
+}
+
+function paintShiftBanner() {
+  const el = document.getElementById('shift-banner'); if (!el) return;
+  if (activeShift === undefined) { el.innerHTML = ''; return; }
+  if (!activeShift) {
+    el.innerHTML = `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;
+      padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-size:12.5px;color:var(--text3)">Belum ada shift kas yang dibuka hari ini.</span>
+      <button class="btn btn-teal btn-sm" onclick="openShiftPanel()">Buka Shift</button></div>`;
+    return;
+  }
+  const since = activeShift.opened_at ? new Date(activeShift.opened_at).toLocaleString('id-ID') : '—';
+  el.innerHTML = `<div style="background:#E6F2F3;border:1px solid #0E7C86;border-radius:8px;
+    padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="font-size:12.5px"><b>Shift terbuka</b> — ${activeShift.cashier_name||''} sejak ${since}
+      · saldo awal ${formatCurrency(activeShift.opening_balance||0)}</span>
+    <button class="btn btn-teal btn-sm" onclick="openCloseShiftForm()">Tutup Shift</button></div>`;
+}
+
+async function openShiftPanel() {
+  await loadActiveShift();
+  if (activeShift === undefined) {
+    toast('Tabel shift belum ada — jalankan supabase_fase2b.sql','warn'); return;
+  }
+  if (activeShift) { openCloseShiftForm(); return; }
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔐 Buka Shift Kas</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="form-group"><label>Kasir</label>
+      <input type="text" id="sh-name" value="${getUserName?getUserName():''}"></div>
+    <div class="form-group"><label>Saldo Awal Laci (Rp)</label>
+      <input type="number" id="sh-open" value="0">
+      <div class="form-hint">Uang tunai yang sudah ada di laci sebelum shift dimulai.</div></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="openShift()">Buka Shift</button>
+    </div>`);
+}
+
+async function openShift() {
+  try {
+    await sbPost('cashier_shifts', {
+      cashier_name: document.getElementById('sh-name').value.trim() || (getUserName?getUserName():'Kasir'),
+      cashier_id: window.currentUser?.id || null,
+      opened_at: new Date().toISOString(),
+      opening_balance: parseFloat(document.getElementById('sh-open').value)||0,
+      status:'Buka', updated_at: new Date().toISOString(),
+    });
+    toast('✅ Shift dibuka','ok'); closeModalForce(); await loadActiveShift();
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+function openCloseShiftForm() {
+  if (!activeShift) { toast('Tidak ada shift terbuka','warn'); return; }
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔐 Tutup Shift — ${activeShift.cashier_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
+      Dibuka ${activeShift.opened_at?new Date(activeShift.opened_at).toLocaleString('id-ID'):''}
+      · saldo awal ${formatCurrency(activeShift.opening_balance||0)}
+    </div>
+    <div class="form-group"><label>Uang Tunai Hasil Hitung Fisik (Rp) *</label>
+      <input type="number" id="sh-count" placeholder="0">
+      <div class="form-hint">Total sistem dihitung otomatis dari transaksi tunai selama shift.
+        Bila berbeda, penjelasan wajib diisi.</div></div>
+    <div class="form-group"><label>Penjelasan Selisih</label>
+      <textarea id="sh-note" rows="2" placeholder="Wajib bila ada selisih"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="closeShift()">Tutup Shift</button>
+    </div>`);
+}
+
+async function closeShift() {
+  const counted = parseFloat(document.getElementById('sh-count').value);
+  if (isNaN(counted)) { toast('Isi hasil hitung fisik','err'); return; }
+  try {
+    const res = await sbRpc('close_cashier_shift', {
+      p_shift_id: activeShift.id, p_counted: counted,
+      p_note: document.getElementById('sh-note').value.trim() || null,
+    });
+    const v = res?.variance||0;
+    toast(v===0 ? '✅ Shift ditutup — kas cocok'
+                : `⚠️ Shift ditutup dengan selisih ${formatCurrency(v)}`, v===0?'ok':'warn');
+    closeModalForce(); await loadActiveShift();
+  } catch(e) {
+    toast('❌ '+(/not find the function/i.test(e.message)?'Jalankan supabase_fase2b.sql dulu':e.message),'err');
+  }
 }

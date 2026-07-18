@@ -59,8 +59,8 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [x] 2.2 Home Care → rekam medis — pencarian pasien + tautan mr_number
 - [ ] 2.3 Komisi nakes → penggajian
 - [x] 2.4 Pencocokan tiga arah — vendor_invoices + match_vendor_invoice()
-- [~] 2.5 Anggaran — tabel budgets + budget_remaining() siap, UI PR menyusul
-- [~] 2.6 Multi-gudang — tabel warehouses + stock_transfers siap, UI menyusul
+- [x] 2.5 Kontrol anggaran — sisa pagu tampil saat menyusun PR + peringatan bila melampaui
+- [x] 2.6 Multi-gudang — stok per lokasi + pemindahan atomik (total tidak berubah)
 - [x] 2.7 Telusur lot — lab_result_consumption mencatat batch per hasil (dua arah)
 
 ### Fase 3 — Rekam Medis & Alur Klinik
@@ -76,9 +76,9 @@ Centang saat selesai. Perbarui berkas ini setiap fase rampung.
 - [ ] 4.2 Posting otomatis dari kasir, faktur, inventory
 - [ ] 4.3 Hutang usaha (AP) + jadwal bayar
 - [ ] 4.4 Pusat biaya → profitabilitas per layanan
-- [ ] 4.5 Aset tetap + penyusutan + jadwal kalibrasi
+- [~] 4.5 Jadwal kalibrasi alat SELESAI; penyusutan menunggu bagan akun
 - [ ] 4.6 Penggajian sungguhan (PPh21, slip, lembur, saldo cuti)
-- [ ] 4.7 Tutup kas per shift + setoran bank
+- [x] 4.7 Tutup kas per shift — total sistem dihitung dari transaksi, selisih wajib dijelaskan
 
 ### Fase 5 — Kepatuhan & Ekspansi
 - [ ] 5.1 Satu Sehat (FHIR) Kemenkes
