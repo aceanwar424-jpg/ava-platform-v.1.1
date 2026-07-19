@@ -15,7 +15,13 @@
 // ═══════════════════════════════════════════════════════════════════════════════
 
 let _valNotes={};
-let _conclusionEngine=null, _auditLogger=null, _pkiService=null;
+
+// Catatan: modul ConclusionEngine/AuditLogger/PKIService di js/core dibangun untuk
+// klien supabase-js (this.db.from().select()) yang TIDAK ada di aplikasi ini —
+// aplikasi memakai REST helper (sbGet/sbPost). Karena itu ketiganya tidak pernah
+// berfungsi di sini, dan mereferensikannya justru melempar "supabase is not defined"
+// sehingga tombol Validasi/Approve gagal. Jejak audit di sini memakai logActivity()
+// milik aplikasi, yang menulis ke activity_logs (dibaca oleh layar Jejak Audit).
 
 // ── Pemisahan tab Validasi dan Approval ───────────────────────────────────────
 // Kedua tab hidup bersamaan di DOM (disembunyikan display:none, bukan dihapus).
@@ -270,15 +276,11 @@ function selectValResult(rid, mode='validate'){
 // ── Validasi seluruh hasil satu pasien ────────────────────────
 // Yang ada hasilnya divalidasi; yang kosong / kritis-belum-dilapor tertahan.
 async function validatePatientResults(admId){
-  if(!_conclusionEngine){
-    if(typeof ConclusionEngine !== 'undefined') _conclusionEngine=new ConclusionEngine(supabase);
-    if(typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
-  }
   const drafts=labResults.filter(r=>r.status==='Draft' && r.result_value && r.admission_id==admId);
   if(!drafts.length){ toast('Tidak ada hasil untuk divalidasi','warn'); return; }
 
   const now=new Date().toISOString();
-  let ok=0, held=0, generated=0;
+  let ok=0, held=0;
 
   for(const r of drafts){
     if(isCriticalResult(r) && !r.critical_ack_at){ held++; continue; }   // kritis ditahan
@@ -287,16 +289,8 @@ async function validatePatientResults(admId){
     if(note) payload.validation_notes=note;
     try{
       await sbPatch('lab_results',r.id,payload); ok++;
-
-      if(_conclusionEngine){
-        const prev=labResults.find(x=>x.patient_name===r.patient_name && x.product_id===r.product_id && x.id!==r.id && x.status==='Approved');
-        const refRange=_rrCache[r.product_id]?.[0];
-        const c=await _conclusionEngine.generateConclusion(r, prev, refRange);
-        await sbPatch('lab_results',r.id,{ai_conclusion:c.conclusion,conclusion_generated_at:new Date().toISOString(),conclusion_generated_by:'system/ai'}).catch(()=>{});
-        generated++;
-        if(_auditLogger) await _auditLogger.logConclusionGenerated(r.id,'system/ai',c.conclusion,c.pattern_used,'127.0.0.1');
-      }
-      if(_auditLogger) await _auditLogger.logResultValidated(r.id,labUser(),{status:'Draft'},{status:'Validated'},note,'127.0.0.1');
+      if(typeof logActivity==='function')
+        logActivity('validated','lab_results',r.id,`Hasil ${r.item_name||r.product_name||''} divalidasi`,r.patient_name);
     }catch(e){ console.error('Validation error:',e); }
   }
 
@@ -322,56 +316,38 @@ async function validateAllResults(){
 
 // ── Approve & rilis seluruh hasil satu pasien ─────────────────
 async function approvePatientResults(admId){
-  if(!_auditLogger && typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
-  if(!_pkiService && typeof PKIService !== 'undefined') _pkiService=new PKIService(supabase);
-
   const rows=labResults.filter(r=>r.status==='Validated' && r.admission_id==admId);
   if(!rows.length){ toast('Tidak ada hasil untuk diapprove','warn'); return; }
 
   const now=new Date().toISOString();
-  let ok=0, signedAny=false;
+  let ok=0;
 
   for(const r of rows){
     const payload={status:'Approved',approved_by:labUser(),approved_at:now,released_by:labUser(),released_at:now,updated_at:now};
-    let signature=null;
-    if(_pkiService && window.userPrivateKey){
-      try{
-        signature=await _pkiService.sign(`APPROVAL|${r.id}|${labUser()}|${now}|${r.ai_conclusion||''}`, window.userPrivateKey);
-        payload.digital_signature=signature; payload.signature_timestamp=now; signedAny=true;
-      }catch(e){ console.warn('Signature failed:',e); }
-    }
     try{
       await sbPatch('lab_results',r.id,payload); ok++;
-      if(_auditLogger) await _auditLogger.logResultApproved(r.id,labUser(),signature,{status:'Validated'},{status:'Approved'},'Approval per pasien','127.0.0.1');
+      if(typeof logActivity==='function')
+        logActivity('approved','lab_results',r.id,`Hasil ${r.item_name||r.product_name||''} disetujui & dirilis`,r.patient_name);
     }catch(e){ console.error('Approval error:',e); }
   }
 
-  toast(`✅ ${ok} hasil approved & rilis${signedAny?' (ditandatangani)':''}`,'ok');
+  toast(`✅ ${ok} hasil approved & rilis`,'ok');
   await loadLabResults();
   renderApprovalTab(); renderLabKPI();
 }
 
 // Approve lintas SEMUA pasien.
 async function approveAllResults(){
-  if(!_auditLogger && typeof AuditLogger !== 'undefined') _auditLogger=new AuditLogger(supabase);
-  if(!_pkiService && typeof PKIService !== 'undefined') _pkiService=new PKIService(supabase);
-
   const toApprove=labResults.filter(r=>r.status==='Validated');
   if(!toApprove.length){ toast('Tidak ada hasil untuk diapprove','warn'); return; }
   const now=new Date().toISOString();
   let ok=0;
   for(const r of toApprove){
     const payload={status:'Approved',approved_by:labUser(),approved_at:now,released_by:labUser(),released_at:now,updated_at:now};
-    let signature=null;
-    if(_pkiService && window.userPrivateKey){
-      try{
-        signature=await _pkiService.sign(`APPROVAL|${r.id}|${labUser()}|${now}|${r.ai_conclusion||''}`, window.userPrivateKey);
-        payload.digital_signature=signature; payload.signature_timestamp=now;
-      }catch(e){ console.warn('Signature failed:',e); }
-    }
     try{
       await sbPatch('lab_results',r.id,payload); ok++;
-      if(_auditLogger) await _auditLogger.logResultApproved(r.id,labUser(),signature,{status:'Validated'},{status:'Approved'},'Bulk approval','127.0.0.1');
+      if(typeof logActivity==='function')
+        logActivity('approved','lab_results',r.id,`Hasil ${r.item_name||r.product_name||''} disetujui & dirilis`,r.patient_name);
     }catch(e){}
   }
   toast(`✅ ${ok} hasil approved & rilis`,'ok');
@@ -399,7 +375,6 @@ async function saveConclusionEdit(rid, mode='approve') {
 
   const r=labResults.find(x=>x.id==rid);
   if(!r) return;
-  const originalConclusion=r.ai_conclusion;
 
   try {
     await sbPatch('lab_results',rid,{
@@ -408,13 +383,12 @@ async function saveConclusionEdit(rid, mode='approve') {
       conclusion_modified_at:new Date().toISOString(),
       conclusion_modified_by:labUser()
     });
-    if(_auditLogger) {
-      await _auditLogger.logConclusionEdited(rid, labUser(), originalConclusion, editedConclusion, 'Doctor revision', '127.0.0.1');
-    }
-    toast('✅ Conclusion saved','ok');
+    if(typeof logActivity==='function')
+      logActivity('conclusion_edit','lab_results',rid,`Kesimpulan ${r.item_name||r.product_name||''} disunting`,r.patient_name);
+    toast('✅ Kesimpulan tersimpan','ok');
     await loadLabResults();
     selectValResult(rid, mode);
   } catch(e) {
-    toast('❌ Save failed: '+e.message,'error');
+    toast('❌ Gagal menyimpan: '+e.message,'err');
   }
 }
