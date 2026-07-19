@@ -64,7 +64,7 @@ async function loadRL() {
 
     const admIds = (adms || []).map(a => a.id);
     const dxs = admIds.length
-      ? await q('icd_diagnostics', `select=icd_code,diagnose_name,is_primary,admission_id&admission_id=in.(${admIds.join(',')})&limit=5000`)
+      ? await q('icd_diagnostics', `select=icd_code,diagnose_name,is_primary,diagnose_type,admission_id&admission_id=in.(${admIds.join(',')})&limit=5000`)
       : [];
 
     rlData = { from, to, adms: adms || [], emps: emps || [], labs: labs || [],

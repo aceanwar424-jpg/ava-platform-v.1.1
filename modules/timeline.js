@@ -105,9 +105,14 @@ async function loadMRTimeline(mr, nama) {
     h.service_type || 'Kunjungan Home Care',
     `${h.status || ''}${h.assigned_staff ? ' · ' + h.assigned_staff : ''}`, ''));
 
+  // Penanda diagnosis utama ada dua bentuk: `diagnose_type` yang diisi modul
+  // Anamnesa, dan `is_primary` turunannya. Dibaca keduanya supaya tetap benar
+  // walau penyelarasan di basis data belum dijalankan.
+  const utama = d => d.is_primary === true ||
+    String(d.diagnose_type || '').toUpperCase() === 'PRIMARY';
   (dxs || []).forEach(d => push('diagnosis', d.created_at,
     `${d.icd_code || ''} ${d.diagnose_name || d.diagnosis || ''}`.trim(),
-    d.is_primary ? 'Diagnosis utama' : 'Diagnosis sekunder', ''));
+    utama(d) ? 'Diagnosis utama' : 'Diagnosis sekunder', ''));
 
   tlEvents = ev.sort((a, b) => new Date(b.at) - new Date(a.at));
   paintTimelineFilter();
