@@ -13,7 +13,7 @@ const PAGE_TITLES = {
   config:'Configuration', product:'Master Produk & Tes', refrange:'Reference Range', labreport:'Setting Hasil PDF', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
-  queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes',
+  queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes', inpatient:'Rawat Inap', pharmacy:'Farmasi', 'crm-pipeline':'Pipeline & Pendapatan',
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
 };
@@ -70,6 +70,9 @@ function navigate(page, params={}) {
     case 'supportive':  renderSupportive();             break;
     case 'spirometry':  renderSupportive();             break;
     case 'medrecord':   renderMedRecord();              break;
+    case 'inpatient':   renderInpatient();              break;
+    case 'pharmacy':    renderPharmacy();               break;
+    case 'crm-pipeline':renderCrmPipeline();            break;
     case 'queue':       renderQueuePage();                  break;
     case 'queue-kiosk': renderQueueKiosk();                 break;
     case 'appointments':renderAppointments();           break;
