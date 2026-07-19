@@ -321,8 +321,8 @@ function switchProfileSubTab(tabName) {
   // Toggle buttons
   document.querySelectorAll('[id^="prof-subtab-"]').forEach(btn => {
     btn.classList.remove('active', 'btn-teal');
-    btn.style.background = 'rgba(255, 255, 255, 0.03)';
-    btn.style.color = 'white';
+    btn.style.background = '#f1f5f9';
+    btn.style.color = 'var(--text-main)';
   });
 
   const activeBtn = document.getElementById(`prof-subtab-${tabName}`);
@@ -401,6 +401,7 @@ async function loadPatientEHR(patientName) {
   let presItems = [];
   let radOrders = [];
   let radReports = [];
+  let medrecs = [];
 
   try {
     labs = await sbGet('lab_results', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
@@ -413,6 +414,10 @@ async function loadPatientEHR(patientName) {
   try {
     radOrders = await sbGet('radiology_orders', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
   } catch(e) { console.warn("Gagal mengambil radiology_orders:", e); }
+
+  try {
+    medrecs = await sbGet('medical_records', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+  } catch(e) { console.warn("Gagal mengambil medical_records:", e); }
 
   if (pres.length > 0) {
     try {
@@ -496,8 +501,59 @@ async function loadPatientEHR(patientName) {
     }
   }
 
+  // ── SEED DATA MEDICAL RECORD PASIEN KE DB JIKA BELUM ADA ──
+  if (medrecs.length === 0) {
+    console.log("Profile medical record kosong di DB. Mengisi data awal...");
+    try {
+      await sbPost('medical_records', {
+        patient_name: patientName,
+        patient_dob: '1996-09-07',
+        patient_gender: 'LAKI-LAKI',
+        patient_phone: currentUserProfile?.phone || '+6282120071009',
+        patient_id_number: '3207140709960002',
+        notes: '22A3.000047', // Medical Record No
+        chronic_conditions: 'Prediabetes, Hiperkolesterolemia',
+        allergies: 'Tidak ada',
+        blood_type: 'O'
+      });
+      medrecs = await sbGet('medical_records', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    } catch(err) {
+      console.warn("Gagal seeding medical_record:", err);
+    }
+  }
+
+  // Render profile
+  const isSuperAdmin = (patientName === 'Ace Darojatun Anwar' || patientName === 'aceanwar424@gmail.com');
+  const email = isSuperAdmin ? 'aceanwar424@gmail.com' : `${patientName.toLowerCase().replace(/\s+/g, '')}@email.com`;
+  renderPatientProfile(medrecs[0], email);
+
   // Render data ke DOM
   renderEHRData(labs, pres, presItems, radOrders, radReports);
+}
+
+function renderPatientProfile(medrec, email) {
+  if (!medrec) return;
+  const pfName = document.getElementById('pf-fullname');
+  const pfIdcard = document.getElementById('pf-idcard');
+  const pfMrno = document.getElementById('pf-mrno');
+  const pfGender = document.getElementById('pf-gender');
+  const pfMarital = document.getElementById('pf-marital');
+  const pfPhone = document.getElementById('pf-phone');
+  const pfReligion = document.getElementById('pf-religion');
+  const pfEmail = document.getElementById('pf-email');
+  const pfEthnic = document.getElementById('pf-ethnic');
+  const pfCurrency = document.getElementById('pf-currency');
+
+  if (pfName) pfName.textContent = (medrec.patient_name || '').toUpperCase();
+  if (pfIdcard) pfIdcard.textContent = medrec.patient_id_number || '3207140709960002';
+  if (pfMrno) pfMrno.textContent = medrec.notes || '22A3.000047'; // Notes field holds MR No.
+  if (pfGender) pfGender.textContent = (medrec.patient_gender || 'LAKI-LAKI').toUpperCase();
+  if (pfMarital) pfMarital.textContent = 'UNMARRIED';
+  if (pfPhone) pfPhone.textContent = medrec.patient_phone || '+6282120071009';
+  if (pfReligion) pfReligion.textContent = 'ISLAM';
+  if (pfEmail) pfEmail.textContent = email || 'aceanwar424@gmail.com';
+  if (pfEthnic) pfEthnic.textContent = 'INDONESIAN';
+  if (pfCurrency) pfCurrency.textContent = 'IDR';
 }
 
 function renderEHRData(labs, pres, presItems, radOrders, radReports) {
@@ -1461,11 +1517,7 @@ async function handleLogin(event) {
     await loadDataFromSupabase();
     await loadPatientEHR(currentUsername);
 
-    // Personalize Profile fields
-    const pfName = document.getElementById('pf-fullname');
-    const pfEmail = document.getElementById('pf-email');
-    if (pfName) pfName.textContent = finalName.toUpperCase();
-    if (pfEmail) pfEmail.textContent = isSuperAdmin ? 'aceanwar424@gmail.com' : `${finalName.toLowerCase().replace(/\s+/g, '')}@email.com`;
+    // Personalize Profile fields will be loaded from DB via loadPatientEHR
   }
   
   // Hide timeline tabs for corporate and referral, only show for patient

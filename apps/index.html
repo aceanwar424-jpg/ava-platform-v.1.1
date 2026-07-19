@@ -1072,58 +1072,58 @@
         
         <div class="glass-card" style="padding:20px; margin-bottom:20px;">
           <!-- Profile sub headers tabs -->
-          <div style="display:flex; gap:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; margin-bottom:20px; flex-wrap:wrap;">
+          <div style="display:flex; gap:8px; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:20px; flex-wrap:wrap;">
             <button class="btn btn-sm btn-teal active" style="margin:0; font-size:11px;" id="prof-subtab-sum" onclick="switchProfileSubTab('sum')">Summary</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-mr" onclick="switchProfileSubTab('mr')">Medical Record</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-fam" onclick="switchProfileSubTab('fam')">Family Member</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-pay" onclick="switchProfileSubTab('pay')">Payment Info</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-book" onclick="switchProfileSubTab('book')">My Booking</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-sub" onclick="switchProfileSubTab('sub')">My Subscription</button>
-            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-set" onclick="switchProfileSubTab('set')">Setting</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-mr" onclick="switchProfileSubTab('mr')">Medical Record</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-fam" onclick="switchProfileSubTab('fam')">Family Member</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-pay" onclick="switchProfileSubTab('pay')">Payment Info</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-book" onclick="switchProfileSubTab('book')">My Booking</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-sub" onclick="switchProfileSubTab('sub')">My Subscription</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:#f1f5f9; color:var(--text-main); border:1px solid var(--border);" id="prof-subtab-set" onclick="switchProfileSubTab('set')">Setting</button>
           </div>
 
           <!-- Summary sub panel -->
           <div class="profile-sub-panel active" id="prof-panel-sum">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px 24px; font-size:13px;">
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Nama Lengkap</span>
-                <strong style="color:white; font-size:14px;" id="pf-fullname">ACE DAROJATUN ANWAR</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-fullname">ACE DAROJATUN ANWAR</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">ID Card (NIK)</span>
-                <strong style="color:white; font-size:14px;">3207140709960002</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-idcard">3207140709960002</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Medical Record No.</span>
-                <strong style="color:white; font-size:14px; font-family:monospace;">22A3.000047</strong>
+                <strong style="color:var(--text-main); font-size:14px; font-family:monospace;" id="pf-mrno">22A3.000047</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Gender</span>
-                <strong style="color:white; font-size:14px;">MALE</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-gender">MALE</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Marital Status</span>
-                <strong style="color:white; font-size:14px;">UNMARRIED</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-marital">UNMARRIED</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">No. Handphone</span>
-                <strong style="color:white; font-size:14px;">+6282120071009</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-phone">+6282120071009</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Agama</span>
-                <strong style="color:white; font-size:14px;">MUSLIM</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-religion">MUSLIM</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Email</span>
-                <strong style="color:white; font-size:14px;" id="pf-email">aceanwar424@gmail.com</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-email">aceanwar424@gmail.com</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Suku / Ethnic</span>
-                <strong style="color:white; font-size:14px;">INDONESIAN</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-ethnic">INDONESIAN</strong>
               </div>
-              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+              <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
                 <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Currency</span>
-                <strong style="color:white; font-size:14px;">IDR</strong>
+                <strong style="color:var(--text-main); font-size:14px;" id="pf-currency">IDR</strong>
               </div>
             </div>
           </div>
