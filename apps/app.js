@@ -98,19 +98,19 @@ function updateUIWithDBData() {
       nearMeContainer.innerHTML = branchesFromDB.map((b, index) => {
         const dist = 12 + index * 4;
         return `
-          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
-            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border); background:#ffffff;">
+            <div style="width:220px; background:rgba(0,0,0,0.02); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-right:1px solid var(--border);">
               <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
-                <rect width="100" height="100" fill="#0f172a" />
-                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
-                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
-                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
-                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">ONELAB</text>
+                <rect width="100" height="100" fill="#f8fafc" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#f1f5f9" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0f2963" opacity="0.1" />
+                <circle cx="50" cy="30" r="10" fill="#14b8a6" opacity="0.2" />
+                <text x="50" y="85" fill="#0f2963" font-size="8" text-anchor="middle" font-weight="800">ONELAB</text>
               </svg>
             </div>
             <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div>
-                <h5 style="font-size:15px; font-weight:700; color:white;">${b.name.toUpperCase()}</h5>
+                <h5 style="font-size:15px; font-weight:700; color:#0f2963;">${b.name.toUpperCase()}</h5>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">${b.address || 'JL. RAYA UTAMA NO. 1'}</p>
                 <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
                   <span style="font-size:12px; font-weight:700; color:var(--teal);">± ${dist} KM <small style="color:var(--text-muted);">From Destination</small></span>
@@ -118,7 +118,7 @@ function updateUIWithDBData() {
                 </div>
               </div>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm" style="margin:0; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px;">📍 Direction</button>
                 <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
               </div>
             </div>
@@ -141,12 +141,12 @@ function updateUIWithDBData() {
       const cleanCatId = cat.toLowerCase().replace(/\s+/g, '-');
       return `
         <div id="pkg-sec-${cleanCatId}">
-          <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">${cat.toUpperCase()}</div>
+          <div style="font-size:11px; font-weight:800; background:#f0f6fc; padding:6px 12px; border-radius:6px; width:fit-content; color:#0f2963; border:1px solid #cbd5e1; margin-bottom:12px;">${cat.toUpperCase()}</div>
           <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
             ${pkgs.map(p => `
-              <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+              <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
                 <div>
-                  <h6 style="font-size:13px; font-weight:700; color:white;">${p.nama_paket}</h6>
+                  <h6 style="font-size:13px; font-weight:700; color:var(--text-main);">${p.nama_paket}</h6>
                   <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">${p.deskripsi || '-'}</p>
                   <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR ${p.harga_normal ? p.harga_normal.toLocaleString('en-US') : '0.00'}</strong>
                 </div>
