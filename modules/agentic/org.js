@@ -848,7 +848,7 @@ window.agSendChatMsg = async function() {
     });
 
     await agRpc('agentic_create_task', {
-      p_agent: 'PLATFORM',
+      p_agent: 'ORG',
       p_task_type: 'CHAT_RESPONSE',
       p_title: `Tanggapan Chat: ${_agSelectedChatAgent}`,
       p_payload: { agent_code: _agSelectedChatAgent, message: val }
