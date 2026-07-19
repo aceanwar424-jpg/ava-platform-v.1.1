@@ -263,6 +263,7 @@ th {
   flex: 1;
   background: transparent;
   border: none;
+  outline: none;
   color: var(--text-muted);
   padding: 8px 6px;
   font-family: inherit;
@@ -272,6 +273,10 @@ th {
   transition: all 0.25s;
   text-align: center;
   position: relative;
+}
+
+.t-tab:focus {
+  outline: none;
 }
 
 .t-tab small {
@@ -526,19 +531,28 @@ th {
 
 .wellness-metric {
   flex: 1;
-  background: rgba(15, 23, 42, 0.45);
+  background: #f8fafc;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 12px 10px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
 .well-icon {
-  font-size: 20px;
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 41, 99, 0.06);
+  color: #0f2963;
 }
 
 .beating-heart-icon {
@@ -566,7 +580,7 @@ th {
   display: block;
   font-size: 14px;
   font-weight: 800;
-  color: white;
+  color: var(--text-main);
 }
 
 .well-info strong small {
@@ -1836,9 +1850,9 @@ th {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 24px;
+  padding: 12px 24px;
   border-bottom: 1px solid var(--border);
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(8px);
   flex-shrink: 0;
 }
@@ -1853,7 +1867,7 @@ th {
   display: none;
   background: none;
   border: none;
-  color: white;
+  color: #0f2963;
   font-size: 20px;
   cursor: pointer;
 }
@@ -1875,7 +1889,7 @@ th {
 
 #breadcrumb-active-view {
   font-weight: 700;
-  color: white;
+  color: #0f2963;
 }
 
 .view-panels-wrapper {
