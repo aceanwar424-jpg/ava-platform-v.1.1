@@ -16,6 +16,7 @@ const PAGE_TITLES = {
   queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payables:'Hutang Usaha', assets:'Aset & Kalibrasi', referral:'Rujukan Lab Luar', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes', inpatient:'Rawat Inap', pharmacy:'Farmasi', 'crm-pipeline':'Pipeline & Pendapatan',
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
+  audit:'Jejak Audit',
 };
 
 let currentPage = '';
@@ -53,6 +54,7 @@ function navigate(page, params={}) {
     case 'tasks':       renderTaskManagement();          break;
     case 'wiki':        renderWiki(params.tab||'docs');   break;
     case 'agentic':     renderAgentic(params.tab||'inbox'); break;
+    case 'audit':       renderAuditTrail();              break;
     case 'attendance':   renderAttendance();               break;
     case 'org-structure':renderOrgStructure();             break;
     case 'regulatory':   renderRegulatoryReports();        break;

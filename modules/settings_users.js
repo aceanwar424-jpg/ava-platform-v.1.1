@@ -59,6 +59,7 @@ const ALL_PAGES = {
   'import':           ['Konfigurasi',      'Import Excel',       '📥'],
   'settings':         ['Konfigurasi',      'Pengaturan',         '⚙️'],
   'users':            ['Konfigurasi',      'User Management',    '👤'],
+  'audit':            ['Konfigurasi',      'Jejak Audit',        '📜'],
 };
 
 // ── Default pages per role (page keys) ────
