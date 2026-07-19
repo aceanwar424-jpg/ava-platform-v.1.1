@@ -142,6 +142,10 @@ function getRoleLabel(role) {
   return map[role] || role || 'User';
 }
 
+// getUserRole() menormalkan 'admin' menjadi 'super_admin', sehingga
+// perbandingan lama terhadap 'admin' tidak pernah bisa benar — isAdmin()
+// selalu mengembalikan false. Belum ada pemanggilnya saat ini, tapi dibetulkan
+// supaya tidak menjadi jebakan bagi kode yang memakainya nanti.
 function isAdmin() {
-  return getUserRole() === 'admin';
+  return getUserRole() === 'super_admin';
 }

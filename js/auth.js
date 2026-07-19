@@ -247,20 +247,9 @@ async function doLogout(){
   location.reload();
 }
 
-function getUserName(){
-  return window.currentUser?.profile?.full_name || window.currentUser?.email?.split('@')[0] || 'User';
-}
-
-function getUserRole(){
-  let role = window.currentUser?.profile?.role 
-      || window.currentUser?.user_metadata?.role
-      || window.currentUser?.role
-      || 'sales';
-  role = String(role).trim().toLowerCase();
-  const map = { admin:'super_admin', head:'super_admin', superadmin:'super_admin' };
-  return map[role] || role;
-}
-
-function isAdmin(){
-  return getUserRole() === 'admin';
-}
+// getUserName(), getUserRole(), dan isAdmin() TIDAK didefinisikan di sini.
+// Ketiganya dulu ada rangkap: satu di js/core/utils.js, satu lagi di berkas ini.
+// Karena auth.js dimuat SETELAH utils.js, salinan di sinilah yang menang —
+// dan salinan ini kehilangan fallback `user_metadata.full_name`, sehingga nama
+// pengguna yang hanya tersimpan di metadata tampil sebagai potongan email.
+// Sumber tunggalnya sekarang js/core/utils.js.
