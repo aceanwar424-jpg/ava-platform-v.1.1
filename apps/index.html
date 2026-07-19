@@ -122,161 +122,219 @@
         
         <!-- P - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
         <div id="p-fase1-panel" class="phase-panel active">
-          <!-- Premium Digital Member Card -->
-          <div class="member-card" id="p-member-card">
-            <div class="member-card-header">
-              <div class="member-logo">AH</div>
-              <span class="member-tier">GOLD MEMBER</span>
-            </div>
-            <div class="member-card-body">
-              <h4 id="p-member-name">Budi Santoso</h4>
-              <p class="member-id">ID: AH-9902-12948</p>
-            </div>
-            <div class="member-card-footer">
-              <div class="member-points">
-                <span>Loyalty Points</span>
-                <strong id="p-member-points">1.250 pts</strong>
-              </div>
-              <div class="member-barcode">
-                <div class="barcode-line w-2"></div>
-                <div class="barcode-line w-1"></div>
-                <div class="barcode-line w-3"></div>
-                <div class="barcode-line w-1"></div>
-                <div class="barcode-line w-2"></div>
-                <div class="barcode-line w-4"></div>
-                <div class="barcode-line w-1"></div>
-                <div class="barcode-line w-2"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Active Ticket Box -->
-          <div id="p-active-ticket-box" class="ticket-widget" style="display:none;">
-            <div class="ticket-widget-header">
-              <span>🎟️ Tiket Antrean Aktif</span>
-              <span class="pulse-dot"></span>
-            </div>
-            <div class="ticket-widget-body">
-              <div class="ticket-widget-num" id="p-ticket-number">A-045</div>
-              <div class="ticket-widget-info">
-                <p>Layanan: <strong id="p-ticket-service">Klinik Umum</strong></p>
-                <p>Estimasi Panggilan: <span id="p-ticket-time">10 Menit lagi</span></p>
-              </div>
-            </div>
-            <div class="ticket-widget-footer">
-              <span>Antrean Sekarang di Counter: <strong id="p-ticket-current">A-042</strong></span>
-            </div>
-          </div>
-
-          <!-- Wellness Tracker -->
-          <div class="section-title">Status Wellness Anda</div>
-          <div class="glass-card wellness-container" style="margin-bottom: 24px;">
-            <div class="wellness-grid">
-              <div class="wellness-metric">
-                <span class="well-icon">👟</span>
-                <div class="well-info">
-                  <h5>Langkah</h5>
-                  <strong id="w-steps">7.420</strong>
-                  <span>/ 10k target</span>
+          
+          <div class="dashboard-grid-two-col">
+            
+            <!-- Left Column: User Card, Active Tickets, Smartwatch Sync -->
+            <div class="dash-col-left" style="display:flex; flex-direction:column; gap:20px;">
+              <!-- Premium Digital Member Card -->
+              <div class="member-card" id="p-member-card" style="margin-bottom:0;">
+                <div class="member-card-header">
+                  <div class="member-logo">AH</div>
+                  <span class="member-tier">GOLD MEMBER</span>
                 </div>
-                <div class="progress-bar-bg mini-progress">
-                  <div class="progress-bar-fill" id="w-steps-bar" style="width: 74%;"></div>
+                <div class="member-card-body">
+                  <h4 id="p-member-name">Ace Darojatun Anwar</h4>
+                  <p class="member-id">ID: AH-9902-12948</p>
+                </div>
+                <div class="member-card-footer">
+                  <div class="member-points">
+                    <span>Loyalty Points</span>
+                    <strong id="p-member-points">1.250 pts</strong>
+                  </div>
+                  <div class="member-barcode">
+                    <div class="barcode-line w-2"></div>
+                    <div class="barcode-line w-1"></div>
+                    <div class="barcode-line w-3"></div>
+                    <div class="barcode-line w-1"></div>
+                    <div class="barcode-line w-2"></div>
+                    <div class="barcode-line w-4"></div>
+                    <div class="barcode-line w-1"></div>
+                    <div class="barcode-line w-2"></div>
+                  </div>
                 </div>
               </div>
-              <div class="wellness-metric">
-                <span class="well-icon beating-heart-icon">❤️</span>
-                <div class="well-info">
-                  <h5>Jantung</h5>
-                  <strong id="w-heart">72 <small>bpm</small></strong>
-                  <span>Rileks</span>
+
+              <!-- Active Ticket Box -->
+              <div id="p-active-ticket-box" class="ticket-widget" style="display:none; margin-bottom:0;">
+                <div class="ticket-widget-header">
+                  <span>🎟️ Tiket Antrean Aktif</span>
+                  <span class="pulse-dot"></span>
+                </div>
+                <div class="ticket-widget-body">
+                  <div class="ticket-widget-num" id="p-ticket-number">A-045</div>
+                  <div class="ticket-widget-info">
+                    <p>Layanan: <strong id="p-ticket-service">Klinik Umum</strong></p>
+                    <p>Estimasi: <span id="p-ticket-time">10 Menit lagi</span></p>
+                  </div>
+                </div>
+                <div class="ticket-widget-footer">
+                  <span>Counter Sekarang: <strong id="p-ticket-current">A-042</strong></span>
                 </div>
               </div>
-              <div class="wellness-metric">
-                <span class="well-icon">🌙</span>
-                <div class="well-info">
-                  <h5>Tidur</h5>
-                  <strong id="w-sleep">7.5 <small>jam</small></strong>
-                  <span>Kualitas: 85%</span>
+
+              <!-- Wellness Tracker -->
+              <div class="glass-card wellness-container" style="padding:16px; margin-bottom:0;">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:12px;">📊 IoT Wellness Sync</h5>
+                <div class="wellness-grid" style="display:flex; flex-direction:column; gap:12px;">
+                  <div class="wellness-metric" style="padding:8px 12px;">
+                    <span class="well-icon">👟</span>
+                    <div class="well-info">
+                      <h5>Langkah</h5>
+                      <strong id="w-steps" style="font-size:15px;">7.420</strong>
+                      <span style="font-size:9px;">/ 10k target</span>
+                    </div>
+                    <div class="progress-bar-bg mini-progress" style="margin-top:6px;">
+                      <div class="progress-bar-fill" id="w-steps-bar" style="width: 74%;"></div>
+                    </div>
+                  </div>
+                  <div class="wellness-metric" style="padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="well-icon beating-heart-icon">❤️</span>
+                      <div class="well-info">
+                        <h5>Detak Jantung</h5>
+                        <strong id="w-heart" style="font-size:15px;">72 <small style="font-size:10px;">bpm</small></strong>
+                      </div>
+                    </div>
+                    <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">Rileks</span>
+                  </div>
+                  <div class="wellness-metric" style="padding:8px 12px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <span class="well-icon">🌙</span>
+                      <div class="well-info">
+                        <h5>Tidur Semalam</h5>
+                        <strong id="w-sleep" style="font-size:15px;">7.5 <small style="font-size:10px;">jam</small></strong>
+                      </div>
+                    </div>
+                    <span class="badge badge-fit" style="font-size:9px; padding:2px 6px; background:rgba(99,102,241,0.15); color:#a5b4fc;">85% Kualitas</span>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-teal" onclick="syncWearableData()" style="width:100%; margin-top:14px; font-size:11px; padding:8px;">
+                  🔄 Sinkronkan Wearables
+                </button>
+              </div>
+            </div>
+
+            <!-- Right Column: Graphs, Medical History, Schedules -->
+            <div class="dash-col-right" style="display:flex; flex-direction:column; gap:20px;">
+              
+              <!-- Historical Lab Trend Graph (SVG) -->
+              <div class="glass-card" style="padding:16px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+                  <h5 style="font-size:13px; font-weight:700; color:white;">📈 Tren Glukosa Puasa &amp; Kolesterol</h5>
+                  <div style="display:flex; gap:12px; font-size:10px;">
+                    <span style="color:#0ea5e9; display:flex; align-items:center; gap:4px;">● Kolesterol</span>
+                    <span style="color:#14b8a6; display:flex; align-items:center; gap:4px;">● Gula Darah</span>
+                  </div>
+                </div>
+                
+                <!-- SVG Line Chart -->
+                <div style="width:100%; position:relative; overflow:hidden;">
+                  <svg viewBox="0 0 500 170" style="width:100%; height:auto; overflow:visible;">
+                    <!-- Grid Lines -->
+                    <line x1="40" y1="20" x2="480" y2="20" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <line x1="40" y1="55" x2="480" y2="55" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <line x1="40" y1="90" x2="480" y2="90" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <line x1="40" y1="125" x2="480" y2="125" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                    <line x1="40" y1="150" x2="480" y2="150" stroke="rgba(255,255,255,0.1)" stroke-width="1" />
+                    
+                    <!-- Axis Labels -->
+                    <text x="35" y="23" fill="#64748b" font-size="9" text-anchor="end">300</text>
+                    <text x="35" y="58" fill="#64748b" font-size="9" text-anchor="end">200</text>
+                    <text x="35" y="93" fill="#64748b" font-size="9" text-anchor="end">150</text>
+                    <text x="35" y="128" fill="#64748b" font-size="9" text-anchor="end">100</text>
+                    <text x="35" y="153" fill="#64748b" font-size="9" text-anchor="end">0</text>
+                    
+                    <text x="80" y="165" fill="#64748b" font-size="9" text-anchor="middle">Des '24</text>
+                    <text x="180" y="165" fill="#64748b" font-size="9" text-anchor="middle">Jun '25</text>
+                    <text x="280" y="165" fill="#64748b" font-size="9" text-anchor="middle">Des '25</text>
+                    <text x="380" y="165" fill="#64748b" font-size="9" text-anchor="middle">Mar '26</text>
+                    <text x="460" y="165" fill="#64748b" font-size="9" text-anchor="middle">Jul '26</text>
+                    
+                    <!-- Cholesterol Line (Blue) -->
+                    <path d="M 80 50 L 180 55 L 280 52 L 380 60 L 460 63" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" />
+                    
+                    <!-- Gula Darah Line (Teal) -->
+                    <path d="M 80 110 L 180 112 L 280 113 L 380 115 L 460 115" fill="none" stroke="#14b8a6" stroke-width="3" stroke-linecap="round" />
+
+                    <!-- Dots Cholesterol -->
+                    <circle cx="80" cy="50" r="4" fill="#0b0f19" stroke="#0ea5e9" stroke-width="2" />
+                    <circle cx="180" cy="55" r="4" fill="#0b0f19" stroke="#0ea5e9" stroke-width="2" />
+                    <circle cx="280" cy="52" r="4" fill="#0b0f19" stroke="#0ea5e9" stroke-width="2" />
+                    <circle cx="380" cy="60" r="4" fill="#0b0f19" stroke="#0ea5e9" stroke-width="2" />
+                    <circle cx="460" cy="63" r="4" fill="#0ea5e9" />
+
+                    <!-- Dots Gula Darah -->
+                    <circle cx="80" cy="110" r="4" fill="#0b0f19" stroke="#14b8a6" stroke-width="2" />
+                    <circle cx="180" cy="112" r="4" fill="#0b0f19" stroke="#14b8a6" stroke-width="2" />
+                    <circle cx="280" cy="113" r="4" fill="#0b0f19" stroke="#14b8a6" stroke-width="2" />
+                    <circle cx="380" cy="115" r="4" fill="#0b0f19" stroke="#14b8a6" stroke-width="2" />
+                    <circle cx="460" cy="115" r="4" fill="#14b8a6" />
+                    
+                    <!-- Values -->
+                    <text x="460" y="48" fill="#38bdf8" font-size="9" font-weight="700" text-anchor="middle">245</text>
+                    <text x="460" y="105" fill="#2dd4bf" font-size="9" font-weight="700" text-anchor="middle">126</text>
+                  </svg>
                 </div>
               </div>
+
+              <!-- Riwayat Pemeriksaan & Aktivitas -->
+              <div class="glass-card" style="padding:16px;">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:12px;">🗂️ Riwayat Pemeriksaan &amp; Aktivitas</h5>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:10px;">
+                    <div>
+                      <h6 style="font-size:13px; font-weight:700; color:white;">Paket MCU Eksekutif A</h6>
+                      <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Klinik AvaHealth Sudirman &bull; Dr. Ace Darojatun</p>
+                    </div>
+                    <div style="text-align:right;">
+                      <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">Selesai</span>
+                      <p style="font-size:10px; color:var(--text-muted); margin-top:4px;">19 Juli 2026</p>
+                    </div>
+                  </div>
+                  
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:10px;">
+                    <div>
+                      <h6 style="font-size:13px; font-weight:700; color:white;">Profil Lipid &amp; Asam Urat</h6>
+                      <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Layanan Home Care AvaHealth &bull; Perawat Siti</p>
+                    </div>
+                    <div style="text-align:right;">
+                      <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">Selesai</span>
+                      <p style="font-size:10px; color:var(--text-muted); margin-top:4px;">24 Juni 2026</p>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                      <h6 style="font-size:13px; font-weight:700; color:white;">Pemeriksaan Glukosa Puasa &amp; HbA1c</h6>
+                      <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Klinik AvaHealth Diponegoro &bull; Dr. Ahmad</p>
+                    </div>
+                    <div style="text-align:right;">
+                      <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">Selesai</span>
+                      <p style="font-size:10px; color:var(--text-muted); margin-top:4px;">12 April 2026</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upcoming Schedule -->
+              <div class="glass-card" style="padding:16px;">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:12px;">📅 Janji Temu Mendatang</h5>
+                <div style="display:flex; align-items:center; gap:12px; background:rgba(14,165,233,0.03); border:1px solid rgba(14,165,233,0.1); border-radius:10px; padding:12px;">
+                  <span style="font-size:20px;">📅</span>
+                  <div style="flex:1;">
+                    <h6 style="font-size:13px; font-weight:700; color:white;">Konsultasi Penyakit Dalam</h6>
+                    <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Dr. Ace Darojatun, Sp.PD</p>
+                    <p style="font-size:11px; color:var(--primary-hover); margin-top:4px; font-weight:600;">Sabtu, 25 Juli 2026 &bull; 09:00 WIB</p>
+                  </div>
+                  <span class="badge badge-fit" style="background:rgba(14,165,233,0.15); color:var(--primary-hover); font-size:9px; padding:2px 6px;">Aktif</span>
+                </div>
+              </div>
+
             </div>
-            <button class="btn btn-sm btn-close" onclick="syncWearableData()" style="width:100%; margin-top:14px; font-size:11px;">
-              🔄 Sinkronkan Wearables / Smartwatch
-            </button>
+
           </div>
 
-          <div class="quick-stats">
-            <div class="stat-card" onclick="alert('Anda memiliki 1 janji temu aktif.')">
-              <span class="stat-icon">📅</span>
-              <h4>Janji Temu</h4>
-              <p>1 Aktif</p>
-            </div>
-            <div class="stat-card" onclick="openLabResultsModal()">
-              <span class="stat-icon">🧪</span>
-              <h4>Hasil Lab</h4>
-              <p>2 Tersedia</p>
-            </div>
-          </div>
-
-          <div class="section-title">Menu Utama Pasien</div>
-          <div class="menu-list">
-            <button class="menu-item" onclick="openBookingModal()">
-              <span class="menu-ico">🩺</span>
-              <div class="menu-text">
-                <h5>Book Lab Test</h5>
-                <p>Pesan pemeriksaan tes laboratorium mandiri</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="openHomeCareModal()">
-              <span class="menu-ico">🏠</span>
-              <div class="menu-text">
-                <h5>Book Home Care</h5>
-                <p>Panggil tenaga medis AvaHealth ke rumah Anda</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="openPackageModal()">
-              <span class="menu-ico">📦</span>
-              <div class="menu-text">
-                <h5>Buy Package</h5>
-                <p>Beli paket MCU dan medical check-up lengkap</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="openNearMeModal()">
-              <span class="menu-ico">📍</span>
-              <div class="menu-text">
-                <h5>AvaHealth Near Me</h5>
-                <p>Temukan cabang klinik & laboratorium terdekat</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="openProfileModal()">
-              <span class="menu-ico">👤</span>
-              <div class="menu-text">
-                <h5>My Profile</h5>
-                <p>Detail profil pribadi dan status verifikasi Akun</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="openMemberModal()">
-              <span class="menu-ico">👑</span>
-              <div class="menu-text">
-                <h5>Program Member & Afiliasi</h5>
-                <p>Dapatkan komisi rujukan teman & keluarga</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-            <button class="menu-item" onclick="handleLogout()" style="border-color: rgba(239, 68, 68, 0.15)">
-              <span class="menu-ico">🚪</span>
-              <div class="menu-text">
-                <h5 style="color: var(--error)">Sign Out</h5>
-                <p>Keluar dari sesi portal saat ini</p>
-              </div>
-              <span class="menu-arrow">❯</span>
-            </button>
-          </div>
         </div>
 
         <!-- P - FASE 2: GENOMIC & BIOSENSORS -->
