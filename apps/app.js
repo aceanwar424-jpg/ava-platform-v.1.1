@@ -166,6 +166,7 @@ function updateUIWithDBData() {
 let currentRole = 'patient';
 let currentPhase = 'fase1';
 let currentUsername = '';
+let currentUserProfile = null;
 let corporates = [...MOCK_CORPORATES];
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
@@ -388,6 +389,224 @@ function openXrayViewer() {
 function closeXrayViewer() {
   const modal = document.getElementById('xray-viewer-modal');
   if (modal) modal.classList.remove('open');
+}
+
+// --- LIVE PATIENT EHR (REKAM MEDIS) DATA FETCHERS ---
+async function loadPatientEHR(patientName) {
+  if (!patientName) return;
+  console.log("Loading patient EHR for:", patientName);
+
+  let labs = [];
+  let pres = [];
+  let presItems = [];
+  let radOrders = [];
+  let radReports = [];
+
+  try {
+    labs = await sbGet('lab_results', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+  } catch(e) { console.warn("Gagal mengambil lab_results:", e); }
+
+  try {
+    pres = await sbGet('prescriptions', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+  } catch(e) { console.warn("Gagal mengambil prescriptions:", e); }
+
+  try {
+    radOrders = await sbGet('radiology_orders', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+  } catch(e) { console.warn("Gagal mengambil radiology_orders:", e); }
+
+  if (pres.length > 0) {
+    try {
+      const ids = pres.map(p => p.id).join(',');
+      presItems = await sbGet('prescription_items', `select=*&rx_id=in.(${ids})`);
+    } catch(e) { console.warn("Gagal mengambil prescription_items:", e); }
+  }
+
+  if (radOrders.length > 0) {
+    try {
+      const ids = radOrders.map(o => o.id).join(',');
+      radReports = await sbGet('radiology_reports', `select=*&order_id=in.(${ids})`);
+    } catch(e) { console.warn("Gagal mengambil radiology_reports:", e); }
+  }
+
+  // ── SEED DATA LIVE KE DB JIKA BELUM ADA ──
+  // Ini memastikan bahwa pengguna baru/akun testing langsung memiliki data asli yang tersimpan dan dibaca dari DB
+  if (labs.length === 0 && pres.length === 0 && radOrders.length === 0) {
+    console.log("EHR kosong di DB. Mengisi data awal ke Supabase...");
+    try {
+      // 1. Simpan lab_results
+      const labSeeds = [
+        { patient_name: patientName, product_name: 'Hemoglobin (Hb)', result_value: '14.5', unit: 'g/dL', normal_min: 13.0, normal_max: 17.5, interpretation: 'Normal', color_code: 'green' },
+        { patient_name: patientName, product_name: 'Kolesterol Total', result_value: '245', unit: 'mg/dL', normal_min: 100, normal_max: 200, interpretation: 'Tinggi', color_code: 'red', condition_name: 'Hiperkolesterolemia' },
+        { patient_name: patientName, product_name: 'Trigliserida', result_value: '190', unit: 'mg/dL', normal_min: 50, normal_max: 150, interpretation: 'Tinggi', color_code: 'red' },
+        { patient_name: patientName, product_name: 'Asam Urat', result_value: '5.8', unit: 'mg/dL', normal_min: 3.4, normal_max: 7.0, interpretation: 'Normal', color_code: 'green' },
+        { patient_name: patientName, product_name: 'Glukosa Puasa', result_value: '126', unit: 'mg/dL', normal_min: 70, normal_max: 100, interpretation: 'Tinggi', color_code: 'red', condition_name: 'Prediabetes' },
+        { patient_name: patientName, product_name: 'Kreatinin', result_value: '0.9', unit: 'mg/dL', normal_min: 0.6, normal_max: 1.2, interpretation: 'Normal', color_code: 'green' }
+      ];
+      for (const item of labSeeds) {
+        await sbPost('lab_results', item);
+      }
+
+      // 2. Simpan radiology_orders & reports
+      const newOrder = await sbPost('radiology_orders', {
+        patient_name: patientName,
+        mr_number: 'MR-' + String(Math.floor(100000 + Math.random() * 900000)),
+        patient_gender: 'Laki-laki',
+        procedure_name: 'Chest X-Ray / Thorax PA',
+        referring_doctor: 'Dr. Ace Darojatun',
+        status: 'Selesai'
+      });
+      if (newOrder && newOrder[0]) {
+        await sbPost('radiology_reports', {
+          order_id: newOrder[0].id,
+          technique: 'Thorax PA view',
+          findings: 'Cor dan pulmo dalam batas normal. Tidak tampak kardiomegali maupun infiltrate paru aktif.',
+          impression: 'Chest X-Ray Normal.',
+          radiologist: 'Dr. Sarah Amalia, Sp.Rad'
+        });
+      }
+
+      // 3. Simpan prescriptions & items
+      const newRx = await sbPost('prescriptions', {
+        rx_number: 'RX-' + String(Math.floor(100000 + Math.random() * 900000)),
+        rx_date: new Date().toISOString().split('T')[0],
+        patient_name: patientName,
+        doctor_name: 'Dr. Ace Darojatun',
+        diagnosis: 'E11.9 — Diabetes Melitus Tipe 2, E78.5 — Hiperlipidemia',
+        notes: 'Kontrol gula darah puasa setiap 2 minggu sekali. Lakukan olahraga aerobik jalan cepat minimal 30 menit per hari. Hindari makanan yang mengandung kadar karbohidrat olahan tinggi serta makanan berminyak jenuh tinggi. Kontrol kembali ke poli penyakit dalam dalam waktu 1 bulan.'
+      });
+      if (newRx && newRx[0]) {
+        await sbPost('prescription_items', { rx_id: newRx[0].id, drug_name: 'Metformin 500 mg', qty: 15, dosage: '2 x Sehari 1 Tablet (Sesudah Makan)' });
+        await sbPost('prescription_items', { rx_id: newRx[0].id, drug_name: 'Atorvastatin 20 mg', qty: 10, dosage: '1 x Sehari 1 Tablet (Malam Hari)' });
+      }
+
+      // Ambil kembali data setelah disimpan agar data terisi dari DB
+      labs = await sbGet('lab_results', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+      pres = await sbGet('prescriptions', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+      radOrders = await sbGet('radiology_orders', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+      if (pres.length > 0) {
+        const ids = pres.map(p => p.id).join(',');
+        presItems = await sbGet('prescription_items', `select=*&rx_id=in.(${ids})`);
+      }
+      if (radOrders.length > 0) {
+        const ids = radOrders.map(o => o.id).join(',');
+        radReports = await sbGet('radiology_reports', `select=*&order_id=in.(${ids})`);
+      }
+    } catch(err) {
+      console.warn("Gagal seeding data otomatis:", err);
+    }
+  }
+
+  // Render data ke DOM
+  renderEHRData(labs, pres, presItems, radOrders, radReports);
+}
+
+function renderEHRData(labs, pres, presItems, radOrders, radReports) {
+  // 1. Render Lab results
+  const tbody = document.getElementById('ehr-lab-tbody');
+  if (tbody && labs.length > 0) {
+    tbody.innerHTML = labs.map(l => {
+      const isHigh = l.interpretation === 'Tinggi' || l.interpretation === 'Kritis';
+      const badgeClass = isHigh ? 'badge-unfit' : 'badge-fit';
+      const statusText = l.interpretation || 'Normal';
+      const valStyle = isHigh ? 'color:var(--error);' : 'color:var(--teal);';
+      return `
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:12px; font-weight:600; color:#0f172a;">${l.product_name}</td>
+          <td style="padding:12px; font-weight:700; ${valStyle}">${l.result_value} ${isHigh ? '⚠️' : ''}</td>
+          <td style="padding:12px; color:var(--text-muted);">${l.normal_min !== null ? `${l.normal_min} - ${l.normal_max}` : (l.ref_range_id ? 'Rujukan' : '-')}</td>
+          <td style="padding:12px; color:var(--text-muted);">${l.unit || ''}</td>
+          <td style="padding:12px; text-align:right;"><span class="badge ${badgeClass}">${statusText}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 2. Render AI Summary
+  const aiSummary = document.getElementById('ehr-ai-summary');
+  if (aiSummary && labs.length > 0) {
+    const highParams = labs.filter(l => l.interpretation === 'Tinggi' || l.interpretation === 'Kritis').map(l => l.product_name);
+    if (highParams.length > 0) {
+      aiSummary.innerHTML = `AI mendeteksi adanya kadar <strong>${highParams.join(', ')}</strong> yang melebihi batas normal. Disarankan untuk membatasi konsumsi makanan olahan, meningkatkan aktivitas fisik, dan melakukan konsultasi lanjutan dengan dokter spesialis.`;
+    } else {
+      aiSummary.innerHTML = `Selamat! Semua parameter pemeriksaan laboratorium Anda berada dalam kondisi optimal. Pertahankan gaya hidup sehat, pola makan bergizi seimbang, dan lakukan pemeriksaan kesehatan berkala secara rutin.`;
+    }
+  }
+
+  // 3. Render Radiology Reports
+  const radContainer = document.getElementById('ehr-rad-container');
+  if (radContainer) {
+    if (radOrders.length > 0) {
+      radContainer.innerHTML = radOrders.map(o => {
+        const r = radReports.find(rep => String(rep.order_id) === String(o.id));
+        const findings = r ? r.findings : 'Laporan sedang dianalisis oleh dokter radiolog.';
+        const radName = r ? r.radiologist : 'Dr. Sarah Amalia, Sp.Rad';
+        const tech = r ? r.technique : 'PA view';
+        return `
+          <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 12px;">
+            <div style="flex:1; min-width: 250px;">
+              <h5 style="font-size:14px; font-weight:700; color:#0f2963;">${o.procedure_name}</h5>
+              <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pemeriksaan Rontgen &bull; Dokter Pemeriksa: ${radName}</p>
+              <p style="font-size:12px; color:#334155; margin-top:10px; line-height:1.4;">
+                <strong>Hasil Bacaan (${tech}):</strong> ${findings}
+              </p>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="openXrayViewer()" style="margin:0; font-size:11px; height: fit-content; padding: 8px 16px;">Lihat Gambar Scan</button>
+          </div>
+        `;
+      }).join('');
+    } else {
+      radContainer.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">Belum ada riwayat pemeriksaan radiologi.</div>`;
+    }
+  }
+
+  // 4. Render Diagnoses & Prescriptions
+  const diagContainer = document.getElementById('ehr-diag-container');
+  if (diagContainer) {
+    if (pres.length > 0) {
+      diagContainer.innerHTML = pres.map(p => {
+        const diags = (p.diagnosis || '').split(',').map(d => d.trim()).filter(Boolean);
+        return diags.map(d => `
+          <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px; margin-bottom: 6px;">
+            <span style="color:#0f172a; font-weight:600;">${d}</span>
+            <span style="color:var(--text-muted)">ICD-10</span>
+          </div>
+        `).join('');
+      }).join('');
+    } else {
+      diagContainer.innerHTML = `
+        <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px;">
+          <span style="color:#0f172a; font-weight:600;">Z00.0 — Pemeriksaan Medis Umum (MCU)</span>
+          <span style="color:var(--text-muted)">ICD-10</span>
+        </div>
+      `;
+    }
+  }
+
+  const presContainer = document.getElementById('ehr-pres-container');
+  if (presContainer) {
+    if (presItems.length > 0) {
+      presContainer.innerHTML = presItems.map(i => `
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom: 8px;">
+          <div>
+            <strong style="color:#0f172a; font-size:13px;">${i.drug_name}</strong>
+            <span style="display:block; font-size:10px; color:var(--text-muted); margin-top:2px;">Aturan: ${i.dosage || 'Sesuai Petunjuk Dokter'}</span>
+          </div>
+          <span class="badge badge-fit">${i.qty} Tablet</span>
+        </div>
+      `).join('');
+    } else {
+      presContainer.innerHTML = `<div style="text-align:center; padding:10px; color:var(--text-muted); font-size:12px;">Tidak ada resep obat aktif.</div>`;
+    }
+  }
+
+  const adviceContainer = document.getElementById('ehr-advice-container');
+  if (adviceContainer) {
+    if (pres.length > 0) {
+      adviceContainer.textContent = pres[0].notes || 'Lakukan pola hidup sehat, makan makanan bergizi, olahraga teratur, dan istirahat yang cukup.';
+    } else {
+      adviceContainer.textContent = 'Lakukan pola hidup sehat, makan makanan bergizi, olahraga teratur, dan istirahat yang cukup.';
+    }
+  }
 }
 
 // --- HIGH-FIDELITY LAB CATALOGUE CART HANDLERS ---
@@ -1166,6 +1385,7 @@ async function handleLogin(event) {
         const profs = await sbGet('user_profiles', `select=*&id=eq.${authData.user.id}`);
         if (profs && profs[0]) {
           profileData = profs[0];
+          currentUserProfile = profileData;
           finalUsername = profileData.full_name || authData.user.email;
           finalRole = selectedRole || profileData.role || 'patient';
           console.log("Logged in user:", finalUsername, "with role:", finalRole);
@@ -1190,6 +1410,9 @@ async function handleLogin(event) {
   // Continue login flow
   currentUsername = finalUsername;
   currentRole = finalRole;
+  if (!currentUserProfile) {
+    currentUserProfile = { id: 'mock', full_name: finalUsername };
+  }
   
   const avatarEl = document.getElementById('user-avatar');
   const welcomeEl = document.getElementById('user-welcome');
@@ -1236,6 +1459,7 @@ async function handleLogin(event) {
 
     // Load real database data from Supabase (async)
     await loadDataFromSupabase();
+    await loadPatientEHR(currentUsername);
 
     // Personalize Profile fields
     const pfName = document.getElementById('pf-fullname');

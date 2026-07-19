@@ -606,7 +606,7 @@
                     <th style="padding:12px; text-align:right;">Status</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody id="ehr-lab-tbody">
                   <tr style="border-bottom:1px solid var(--border);">
                     <td style="padding:12px; font-weight:600; color:#0f172a;">Hemoglobin (Hb)</td>
                     <td style="padding:12px; font-weight:700; color:var(--teal);">14.5</td>
@@ -656,7 +656,7 @@
             <!-- AI Diagnosis Summary -->
             <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:16px;">
               <h5 style="font-size:13px; font-weight:700; color:#0369a1; display:flex; align-items:center; gap:6px; margin-bottom:8px;">✨ Interpretasi Medis AI AvaHealth</h5>
-              <p style="font-size:12px; color:#0c4a6e; line-height:1.5;">
+              <p id="ehr-ai-summary" style="font-size:12px; color:#0c4a6e; line-height:1.5;">
                 AI mendeteksi adanya <strong>Hiperkolesterolemia Ringan</strong> dan indikasi <strong>Prediabetes</strong> (Gula darah puasa &gt; 100 mg/dL). Disarankan melakukan konsultasi lanjutan dengan dokter spesialis penyakit dalam untuk verifikasi HbA1c dan perbaikan pola makan rendah lemak.
               </p>
             </div>
@@ -666,7 +666,7 @@
           <div class="medrec-sub-panel" id="mr-panel-rad" style="display:none;">
             <h4 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:12px;">Laporan Interpretasi Radiologi</h4>
             
-            <div style="display:flex; flex-direction:column; gap:16px;">
+            <div id="ehr-rad-container" style="display:flex; flex-direction:column; gap:16px;">
               <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div style="flex:1; min-width: 250px;">
                   <h5 style="font-size:14px; font-weight:700; color:#0f2963;">Chest X-Ray / Thorax PA</h5>
@@ -696,7 +696,7 @@
               <!-- Diagnoses -->
               <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
                 <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:8px;">Diagnosis Utama (ICD-10)</h5>
-                <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+                <div id="ehr-diag-container" style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
                   <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px;">
                     <span style="color:#0f172a; font-weight:600;">E11.9 — Diabetes Melitus Tipe 2 Tanpa Komplikasi</span>
                     <span style="color:var(--text-muted)">ICD-10</span>
@@ -711,7 +711,7 @@
               <!-- Prescription -->
               <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
                 <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:10px;">Resep E-Prescribing Aktif</h5>
-                <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+                <div id="ehr-pres-container" style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
                   <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
                     <div>
                       <strong style="color:#0f172a; font-size:13px;">Metformin 500 mg</strong>
@@ -732,7 +732,7 @@
               <!-- Advice -->
               <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
                 <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:6px;">Instruksi Dokter Pengasuh</h5>
-                <p style="font-size:12px; line-height:1.5; color:#334155;">
+                <p id="ehr-advice-container" style="font-size:12px; line-height:1.5; color:#334155;">
                   Kontrol gula darah puasa setiap 2 minggu sekali. Lakukan olahraga aerobik jalan cepat minimal 30 menit per hari. Hindari makanan yang mengandung kadar karbohidrat olahan tinggi serta makanan berminyak jenuh tinggi. Kontrol kembali ke poli penyakit dalam dalam waktu 1 bulan.
                 </p>
               </div>
