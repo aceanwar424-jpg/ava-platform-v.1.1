@@ -29,6 +29,139 @@ const LAB_TEST_ITEMS = [
   { code: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', name: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', price: 99000, desc: 'HDL cholesterol examination measures the concentration of good cholesterol protective for heart.' }
 ];
 
+// --- LIVE SUPABASE INTEGRATION STATES ---
+let labTestsFromDB = [];
+let packagesFromDB = [];
+let branchesFromDB = [];
+
+async function loadDataFromSupabase() {
+  console.log("Loading live data from Supabase...");
+  if (typeof sbGet !== 'function') {
+    console.warn("sbGet is not loaded. Using fallback mocks.");
+    return;
+  }
+  
+  try {
+    const prods = await sbGet('products', 'select=*&is_active=eq.true&order=kategori.asc,nama_tes.asc');
+    if (Array.isArray(prods) && prods.length > 0) {
+      labTestsFromDB = prods.map(p => ({
+        code: p.kode_tes || p.nama_tes,
+        name: p.nama_tes,
+        price: p.harga_normal || 0,
+        desc: p.deskripsi || 'Pemeriksaan laboratorium berkualitas tinggi.',
+        category: p.kategori || 'Lainnya'
+      }));
+      console.log(`Loaded ${labTestsFromDB.length} lab tests from Supabase.`);
+    }
+  } catch (e) {
+    console.warn("Gagal mengambil data produk dari Supabase:", e.message);
+  }
+
+  try {
+    const pkgs = await sbGet('packages', 'select=*&is_active=eq.true&order=kategori_paket.asc,nama_paket.asc');
+    if (Array.isArray(pkgs) && pkgs.length > 0) {
+      packagesFromDB = pkgs;
+      console.log(`Loaded ${packagesFromDB.length} packages from Supabase.`);
+    }
+  } catch (e) {
+    console.warn("Gagal mengambil data paket dari Supabase:", e.message);
+  }
+
+  try {
+    const brs = await sbGet('branches', 'select=*&is_active=eq.true&order=name.asc');
+    if (Array.isArray(brs) && brs.length > 0) {
+      branchesFromDB = brs;
+      console.log(`Loaded ${branchesFromDB.length} branches from Supabase.`);
+    }
+  } catch (e) {
+    console.warn("Gagal mengambil data cabang dari Supabase:", e.message);
+  }
+
+  updateUIWithDBData();
+}
+
+function updateUIWithDBData() {
+  const btBranchSelect = document.getElementById('bt-branch-select');
+  const hcBranch = document.getElementById('hc-branch');
+  const nmRegion = document.getElementById('nm-branch-region');
+
+  if (branchesFromDB.length > 0) {
+    const optionsHtml = branchesFromDB.map(b => `<option value="${b.name}">${b.name.toUpperCase()}</option>`).join('');
+    if (btBranchSelect) btBranchSelect.innerHTML = optionsHtml;
+    if (hcBranch) hcBranch.innerHTML = optionsHtml;
+    if (nmRegion) {
+      nmRegion.innerHTML = branchesFromDB.map(b => `<option value="${b.name}">${b.name.toUpperCase()}</option>`).join('');
+    }
+
+    const nearMeContainer = document.querySelector('#nearme-view div[style="display:flex; flex-direction:column; gap:16px;"]');
+    if (nearMeContainer) {
+      nearMeContainer.innerHTML = branchesFromDB.map((b, index) => {
+        const dist = 12 + index * 4;
+        return `
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
+            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
+                <rect width="100" height="100" fill="#0f172a" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
+                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
+                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">VIRTU DIGILAB</text>
+              </svg>
+            </div>
+            <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h5 style="font-size:15px; font-weight:700; color:white;">${b.name.toUpperCase()}</h5>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">${b.address || 'JL. RAYA UTAMA NO. 1'}</p>
+                <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
+                  <span style="font-size:12px; font-weight:700; color:var(--teal);">± ${dist} KM <small style="color:var(--text-muted);">From Destination</small></span>
+                  <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">${b.is_active ? 'No Queue' : 'Offline'}</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  const packagesContainer = document.querySelector('#buy-package-view div[style="display:flex; flex-direction:column; gap:20px;"]');
+  if (packagesContainer && packagesFromDB.length > 0) {
+    const grouped = {};
+    packagesFromDB.forEach(p => {
+      const cat = p.kategori_paket || 'INDIVIDUAL';
+      grouped[cat] = grouped[cat] || [];
+      grouped[cat].push(p);
+    });
+
+    packagesContainer.innerHTML = Object.entries(grouped).map(([cat, pkgs]) => {
+      const cleanCatId = cat.toLowerCase().replace(/\s+/g, '-');
+      return `
+        <div id="pkg-sec-${cleanCatId}">
+          <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">${cat.toUpperCase()}</div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
+            ${pkgs.map(p => `
+              <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <h6 style="font-size:13px; font-weight:700; color:white;">${p.nama_paket}</h6>
+                  <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">${p.deskripsi || '-'}</p>
+                  <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR ${p.harga_normal ? p.harga_normal.toLocaleString('en-US') : '0.00'}</strong>
+                </div>
+                <button class="btn btn-sm btn-teal" onclick="buyPackage('${p.nama_paket}')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  renderLabCatalogue();
+}
+
 // --- APP RUNTIME STATE ---
 let currentRole = 'patient';
 let currentPhase = 'fase1';
@@ -265,8 +398,9 @@ function renderLabCatalogue(filterText = '') {
   const container = document.getElementById('bt-catalogue-grid');
   if (!container) return;
 
+  const itemsList = labTestsFromDB.length > 0 ? labTestsFromDB : LAB_TEST_ITEMS;
   const query = filterText.toLowerCase();
-  const filtered = LAB_TEST_ITEMS.filter(item => 
+  const filtered = itemsList.filter(item => 
     item.code.toLowerCase().includes(query) || 
     item.name.toLowerCase().includes(query)
   );
@@ -303,7 +437,8 @@ function searchLabTest() {
 }
 
 function toggleCartItem(code) {
-  const item = LAB_TEST_ITEMS.find(i => i.code === code);
+  const itemsList = labTestsFromDB.length > 0 ? labTestsFromDB : LAB_TEST_ITEMS;
+  const item = itemsList.find(i => i.code === code);
   if (!item) return;
 
   const idx = bookingCart.findIndex(i => i.code === code);
@@ -1000,68 +1135,110 @@ function renderReferralList() {
 }
 
 // Handle Login Submission
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
   
   const usernameInput = document.getElementById('username').value.trim();
+  const passwordInput = document.getElementById('password').value;
   const selectedRole = document.querySelector('input[name="login-role"]:checked').value;
   
-  currentUsername = usernameInput;
-  currentRole = selectedRole;
+  let finalUsername = usernameInput;
+  let finalRole = selectedRole;
+  let profileData = null;
+
+  // Try real Supabase auth if password is provided
+  if (passwordInput && typeof sbAccessToken === 'function') {
+    const btn = document.querySelector('#login-screen button[type="submit"]');
+    const oldText = btn ? btn.textContent : 'Masuk';
+    if (btn) {
+      btn.textContent = '⏳ Memproses Auth...';
+      btn.disabled = true;
+    }
+    try {
+      const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+        body: JSON.stringify({ email: usernameInput, password: passwordInput })
+      });
+      const authData = await authRes.json();
+      if (authData.access_token) {
+        localStorage.setItem('ol_token', authData.access_token);
+        if (authData.refresh_token) localStorage.setItem('ol_refresh', authData.refresh_token);
+        
+        // Fetch user profile
+        const profs = await sbGet('user_profiles', `select=*&id=eq.${authData.user.id}`);
+        if (profs && profs[0]) {
+          profileData = profs[0];
+          finalUsername = profileData.full_name || authData.user.email;
+          finalRole = profileData.role || 'patient';
+          console.log("Logged in user:", finalUsername, "with role:", finalRole);
+        }
+      } else {
+        alert(`Gagal Login Supabase: ${authData.error_description || authData.msg || 'Cek kembali email & password Anda.'}`);
+        if (btn) {
+          btn.textContent = oldText;
+          btn.disabled = false;
+        }
+        return;
+      }
+    } catch (e) {
+      console.warn("Gagal menyambungkan ke auth Supabase, falling back to mock login:", e.message);
+    }
+    if (btn) {
+      btn.textContent = oldText;
+      btn.disabled = false;
+    }
+  }
+
+  // Continue login flow
+  currentUsername = finalUsername;
+  currentRole = finalRole;
   
   const avatarEl = document.getElementById('user-avatar');
   const welcomeEl = document.getElementById('user-welcome');
   const roleBadgeEl = document.getElementById('user-role-badge');
   
-  // Check if credentials match the super admin
   const isSuperAdmin = (usernameInput === 'aceanwar424@gmail.com');
   const adminRealName = 'Ace Darojatun Anwar';
 
-  // Render Left Sidebar navigation dynamically based on role
   renderSidebarMenu();
 
-  if (selectedRole === 'corporate') {
+  if (currentRole === 'corporate') {
     avatarEl.textContent = 'C';
     avatarEl.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
-    welcomeEl.textContent = isSuperAdmin ? `${adminRealName}` : (usernameInput || 'PT. Sukses Mandiri');
+    welcomeEl.textContent = isSuperAdmin ? `${adminRealName}` : (finalUsername || 'PT. Sukses Mandiri');
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Korporasi' : 'Mitra Korporasi';
     
-    // Update Wallet Cashback
     const cbEl = document.getElementById('c-cashback-balance');
     if (cbEl) cbEl.textContent = `Rp ${corporateCashback.toLocaleString('id-ID')}`;
 
-    // Render Corporate List & Invoices
     renderCorporateList();
     renderInvoices();
   } 
-  else if (selectedRole === 'referral') {
+  else if (currentRole === 'referral') {
     avatarEl.textContent = 'R';
     avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
-    welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (usernameInput || 'Klinik Medika Pratama');
+    welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (finalUsername || 'Klinik Medika Pratama');
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Referral' : 'Faskes / Dokter Perujuk';
     
-    // Update Referral Wallet balance
     const feeEl = document.getElementById('r-fee-balance');
     if (feeEl) feeEl.textContent = `Rp ${referralWallet.toLocaleString('id-ID')}`;
 
-    // Render Referral List
     renderReferralList();
   } 
   else {
     // Default: Patient
-    const finalName = isSuperAdmin ? adminRealName : (usernameInput || 'Budi Santoso');
+    const finalName = isSuperAdmin ? adminRealName : (finalUsername || 'Budi Santoso');
     avatarEl.textContent = 'P';
     avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)';
     welcomeEl.textContent = finalName;
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Pasien' : 'Pasien Terverifikasi';
     
-    // Initialize Member Card Name
     const memberNameEl = document.getElementById('p-member-name');
     if (memberNameEl) memberNameEl.textContent = finalName;
 
-    // Render catalog items & prices
-    renderLabCatalogue();
-    updateCartUIs();
+    // Load real database data from Supabase (async)
+    await loadDataFromSupabase();
 
     // Personalize Profile fields
     const pfName = document.getElementById('pf-fullname');
