@@ -234,6 +234,7 @@ function _labPrintRow(r, indent, cfg){
   const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
             :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
   const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}</span>`:`<strong>${r.product_name||'—'}</strong>`;
+  const span=cfg.show_loinc?7:6;
   return `<tr>
     <td>${name}${cfg.show_method&&r.method?`<div style="font-size:9px;color:#94A3B8">${r.method}</div>`:''}</td>
     <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit">🚨</span>':''}</td>
@@ -242,7 +243,7 @@ function _labPrintRow(r, indent, cfg){
     <td style="color:#546E7A">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
     <td><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
     ${cfg.show_loinc?`<td style="color:#94A3B8;font-family:monospace;font-size:10px">${r.loinc_code||'—'}</td>`:''}
-  </tr>`;
+  </tr>${r.validation_notes?`<tr><td colspan="${span}" style="padding:2px 10px 6px ${indent?'26px':'10px'};font-size:10.5px;color:#7A5B00;font-style:italic">Catatan: ${r.validation_notes}</td></tr>`:''}`;
 }
 // Kelompokkan hasil dalam 1 kategori per tes; panel diberi sub-header + analit terindent
 function _labPrintCatRows(rows, cfg){

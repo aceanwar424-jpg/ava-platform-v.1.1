@@ -33,6 +33,23 @@ const VAL_MODES = {
 };
 let _valSelBy = { validate:null, approve:null };
 
+// Master catatan validator — pilihan cepat yang lazim dipakai, tapi kolomnya
+// tetap bisa diketik bebas (datalist = pilih dari daftar ATAU tulis sendiri).
+const LAB_NOTE_PRESETS = [
+  'Duplo — pemeriksaan diulang dua kali',
+  'Triplo — pemeriksaan diulang tiga kali',
+  'Sampel hemolisis',
+  'Sampel lipemik',
+  'Sampel ikterik',
+  'Sampel kurang (QNS)',
+  'Sampel bekuan (clotted)',
+  'Sampel diencerkan (diluted)',
+  'Diperiksa ulang — hasil konsisten',
+  'Hasil dikonfirmasi dengan sampel ulang',
+  'Perlu sampel ulang',
+  'Nilai kritis sudah dilaporkan ke DPJP',
+];
+
 function valEl(mode, suffix){
   return document.getElementById(`${VAL_MODES[mode].prefix}-${suffix}`);
 }
@@ -150,18 +167,54 @@ async function selectValidationPatient(admId, mode='validate'){
     ? labResults.filter(r=>r.status==='Validated' && r.admission_id==admId)
     : labResults.filter(r=>r.status==='Draft' && r.admission_id==admId);
 
-  const admD=await sbGet('admissions',`select=patient_name,patient_gender,patient_age,visit_number,patient_blood_type,mr_number&id=eq.${admId}`).catch(()=>[]);
+  // Konteks klinis membantu analis menetapkan hasil: identitas + keluhan (anamnesa)
+  // + diagnosis. Tiap sumber dibungkus catch sendiri agar tabel yang belum ada
+  // (fase yang belum dijalankan) tidak menggagalkan seluruh header.
+  const [admD, anamD, dxD, vitD] = await Promise.all([
+    sbGet('admissions',`select=patient_name,patient_gender,patient_age,patient_dob,visit_number,patient_blood_type,mr_number&id=eq.${admId}`).catch(()=>[]),
+    sbGet('anamnesas',`select=keluhan_utama,chief_complaint,riwayat_penyakit,notes&admission_id=eq.${admId}&order=created_at.desc&limit=1`).catch(()=>[]),
+    sbGet('icd_diagnostics',`select=icd_code,diagnose_name,diagnosis,diagnose_type,is_primary&admission_id=eq.${admId}&order=created_at.desc`).catch(()=>[]),
+    sbGet('vital_signs',`select=bp_systolic,bp_diastolic,pulse,temperature,spo2,weight&admission_id=eq.${admId}&order=recorded_at.desc&limit=1`).catch(()=>[]),
+  ]);
   const admInfo=admD?.[0]||{};
+  const anam=anamD?.[0]||null;
+  const dxs=dxD||[];
+  const vit=vitD?.[0]||null;
+
+  const keluhan = anam ? (anam.keluhan_utama||anam.chief_complaint||anam.notes||'') : '';
+  const dxUtama = d => d.is_primary===true || String(d.diagnose_type||'').toUpperCase()==='PRIMARY';
+  const dxChips = dxs.map(d=>{
+    const txt = `${d.icd_code||''} ${d.diagnose_name||d.diagnosis||''}`.trim();
+    const utama = dxUtama(d);
+    return `<span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;
+      background:${utama?'#FEE2E2':'#EEF2FF'};color:${utama?'#B91C1C':'#3730A3'}">${txt||'—'}${utama?' •utama':''}</span>`;
+  }).join(' ');
+  const vitStr = vit ? [
+    (vit.bp_systolic)&&`TD ${vit.bp_systolic}/${vit.bp_diastolic||'—'}`,
+    vit.pulse&&`Nadi ${vit.pulse}`, vit.temperature&&`Suhu ${vit.temperature}°`,
+    vit.spo2&&`SpO₂ ${vit.spo2}%`,
+  ].filter(Boolean).join(' · ') : '';
+
+  const umur = admInfo.patient_age!=null ? `${admInfo.patient_age} th` : '';
+  const jk = admInfo.patient_gender ? (String(admInfo.patient_gender).toLowerCase().startsWith('f')?'P':'L') : '';
 
   const pbar=valEl(mode,'pbar');
   if(pbar) pbar.innerHTML=`
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
       <div>
         <span style="font-size:15px;font-weight:800;color:var(--navy)">${admInfo.patient_name||''}</span>
-        ${admInfo.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${admInfo.patient_blood_type}</span>`:''}
-        <div style="font-size:11px;color:var(--gray);font-family:monospace">${admInfo.mr_number||''} · ${admInfo.visit_number||''}</div>
+        ${[jk,umur].filter(Boolean).length?`<span style="font-size:11px;color:var(--gray);margin-left:8px">${[jk,umur].filter(Boolean).join(' · ')}</span>`:''}
+        ${admInfo.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">Gol. ${admInfo.patient_blood_type}</span>`:''}
       </div>
-    </div>`;
+      <div style="font-size:11px;color:var(--gray);font-family:monospace">${admInfo.mr_number||''} · ${admInfo.visit_number||''}</div>
+    </div>
+    ${(keluhan||dxs.length||vitStr)?`
+      <div style="margin-top:7px;padding-top:7px;border-top:1px dashed var(--border);display:flex;flex-direction:column;gap:4px">
+        ${keluhan?`<div style="font-size:11.5px"><span style="color:var(--gray);font-weight:700">Keluhan:</span> ${keluhan}</div>`:''}
+        ${dxs.length?`<div style="font-size:11.5px;display:flex;align-items:center;gap:5px;flex-wrap:wrap"><span style="color:var(--gray);font-weight:700">Diagnosis:</span> ${dxChips}</div>`:''}
+        ${vitStr?`<div style="font-size:11px;color:var(--text2)"><span style="color:var(--gray);font-weight:700">Vital:</span> ${vitStr}</div>`:''}
+      </div>`
+    :`<div style="margin-top:5px;font-size:10.5px;color:var(--gray);font-style:italic">Belum ada anamnesa/diagnosis untuk kunjungan ini</div>`}`;
 
   const grid=valEl(mode,'grid');
   if(grid) grid.innerHTML=`
@@ -270,7 +323,34 @@ function selectValResult(rid, mode='validate'){
     </div>
     ${conclusionSection}
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>
-    <textarea id="${VAL_MODES[mode].prefix}-note-input" rows="4" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:6px;margin-top:4px" placeholder="Catatan validasi..." onchange="_valNotes[${rid}]=this.value">${_valNotes[rid]||''}</textarea>`;
+    <div style="font-size:10px;color:var(--gray);margin:2px 0 4px">Pilih dari daftar atau ketik sendiri</div>
+    <input list="${VAL_MODES[mode].prefix}-note-presets" id="${VAL_MODES[mode].prefix}-note-input"
+      value="${(_valNotes[rid] ?? r.validation_notes ?? '').replace(/"/g,'&quot;')}"
+      placeholder="mis. Duplo, sampel lipemik…"
+      style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:6px"
+      oninput="_valNotes[${rid}]=this.value">
+    <datalist id="${VAL_MODES[mode].prefix}-note-presets">
+      ${LAB_NOTE_PRESETS.map(p=>`<option value="${p.replace(/"/g,'&quot;')}">`).join('')}
+    </datalist>
+    <button class="btn btn-teal btn-sm" style="margin-top:6px;width:100%" onclick="saveResultNote(${rid},'${mode}')">💾 Simpan Catatan</button>
+    <div style="font-size:10px;color:var(--gray);margin-top:4px">Catatan tersimpan ikut tampil di hasil cetak.</div>`;
+}
+
+// Simpan catatan validator ke DB (kolom validation_notes) langsung, tanpa harus
+// menunggu validasi — supaya catatan seperti "duplo" tidak hilang dan muncul di
+// hasil cetak.
+async function saveResultNote(rid, mode='validate'){
+  const inp = valEl(mode,'note-input'); if(!inp) return;
+  const note = inp.value.trim();
+  try{
+    await sbPatch('lab_results',rid,{validation_notes: note||null, updated_at:new Date().toISOString()});
+    const r = labResults.find(x=>x.id==rid); if(r) r.validation_notes = note||null;   // segarkan salinan memori
+    _valNotes[rid]=note;
+    const p=labResults.find(x=>x.id==rid)||{};
+    if(typeof logActivity==='function')
+      logActivity('note','lab_results',rid,`Catatan hasil: ${note||'(dikosongkan)'}`,p.patient_name);
+    toast('💾 Catatan tersimpan','ok');
+  }catch(e){ toast('❌ Gagal menyimpan catatan: '+e.message,'err'); }
 }
 
 // ── Validasi seluruh hasil satu pasien ────────────────────────
