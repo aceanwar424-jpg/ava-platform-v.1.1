@@ -207,67 +207,99 @@ function injectLisStyle(){
 
 // ═══════════════════════════════════════════════════════════════
 // SHELL HALAMAN
+//
+// Tab bar & band KPI DIPINDAH keluar: navigasi antar sub-menu kini lewat kartu
+// di halaman indeks kategori (openCategory), dan ringkasan angka tampil di sana
+// (labCategorySummary). Tiap sub-menu jadi halamannya sendiri — di sini hanya
+// dirender SATU tab yang diminta, dengan judul & tautan kembali ke indeks.
 // ═══════════════════════════════════════════════════════════════
+const LAB_TAB_META = {
+  checkin:    { label:'Penerimaan Sampel', ico:'🧪' },
+  worklist:   { label:'Worklist & TAT',    ico:'🔬' },
+  result:     { label:'Input Hasil',       ico:'📝' },
+  validation: { label:'Validasi',          ico:'✅' },
+  approval:   { label:'Approval',          ico:'🔏' },
+  report:     { label:'Rekam Medis Lab',   ico:'📁' },
+  qc:         { label:'QC & Analyzer',     ico:'🎛️' },
+};
+
 async function renderLab(tab='checkin'){
   if(!LAB_TABS.includes(tab)) tab='checkin';
   injectLisStyle();
+  const meta = LAB_TAB_META[tab] || { label:'LIS', ico:'🔬' };
   document.getElementById('main-content').innerHTML = `
     <div id="lab-shell" class="lis">
-    <div class="lis-header">
-      <div><h1>🔬 Laboratory Information System</h1>
-        <span class="lis-sub">Penerimaan · Worklist &amp; TAT · Input hasil · Validasi · Nilai kritis · QC</span></div>
-      <span id="lab-date-badge" class="lis-date"></span>
-    </div>
+      <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-ghost btn-sm" onclick="openCategory('lab')" title="Kembali ke daftar menu LIS">← Menu LIS</button>
+          <div><h1 style="margin:0">${meta.ico} ${meta.label}</h1>
+            <span class="lis-sub">Laboratory Information System</span></div>
+        </div>
+        <span id="lab-date-badge" class="lis-date"></span>
+      </div>
 
-    <div id="lab-critical-banner"></div>
-
-    <div id="lab-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-bottom:16px">
-      <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
-    </div>
-
-    <div class="tabs" id="lab-tabs">
-      <button class="tab-btn ${tab==='checkin'?'active':''}"    onclick="switchLabTab('checkin',this)">🧪 Penerimaan Sampel</button>
-      <button class="tab-btn ${tab==='worklist'?'active':''}"   onclick="switchLabTab('worklist',this)">🔬 Worklist &amp; TAT</button>
-      <button class="tab-btn ${tab==='result'?'active':''}"     onclick="switchLabTab('result',this)">📝 Input Hasil</button>
-      <button class="tab-btn ${tab==='validation'?'active':''}" onclick="switchLabTab('validation',this)">✅ Validasi</button>
-      <button class="tab-btn ${tab==='approval'?'active':''}"   onclick="switchLabTab('approval',this)">🔏 Approval</button>
-      <button class="tab-btn ${tab==='report'?'active':''}"     onclick="switchLabTab('report',this)">📁 Rekam Medis</button>
-      <button class="tab-btn ${tab==='qc'?'active':''}"         onclick="switchLabTab('qc',this)">🎛️ QC &amp; Alat</button>
-    </div>
-
-    <div id="lab-checkin"    ${tab!=='checkin'?'style="display:none"':''}></div>
-    <div id="lab-worklist"   ${tab!=='worklist'?'style="display:none"':''}></div>
-    <div id="lab-result"     ${tab!=='result'?'style="display:none"':''}></div>
-    <div id="lab-validation" ${tab!=='validation'?'style="display:none"':''}></div>
-    <div id="lab-approval"   ${tab!=='approval'?'style="display:none"':''}></div>
-    <div id="lab-report"     ${tab!=='report'?'style="display:none"':''}></div>
-    <div id="lab-qc"         ${tab!=='qc'?'style="display:none"':''}></div>
+      <div id="lab-critical-banner"></div>
+      <div id="lab-${tab}"></div>
     </div>`;
 
   const badge = document.getElementById('lab-date-badge');
   if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   await Promise.all([loadLabProducts(), loadLabSamples(), loadLabResults()]);
-  renderLabKPI();
   renderCriticalBanner();
-  renderCheckinTab();
-  renderWorklistTab();
-  renderResultTab();
-  renderValidationTab();
-  renderApprovalTab();
-  renderReportTab();
-  renderQCTab();
+
+  // Render HANYA tab yang diminta.
+  ({
+    checkin:renderCheckinTab, worklist:renderWorklistTab, result:renderResultTab,
+    validation:renderValidationTab, approval:renderApprovalTab, report:renderReportTab, qc:renderQCTab,
+  }[tab] || renderCheckinTab)();
 }
 
-function switchLabTab(tab, btn){
-  document.querySelectorAll('#lab-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  LAB_TABS.forEach(t=>{
-    const el=document.getElementById(`lab-${t}`);
-    if(el) el.style.display = (t===tab)?'block':'none';
-  });
-  if (tab==='qc') renderQCTab();
+// ── Ringkasan angka untuk halaman indeks kategori (halaman depan) ──
+// Dipanggil openCategory('lab'). Memuat data lalu menaruh kartu KPI elegan di
+// containerId. Klik kartu langsung membuka sub-menu terkait.
+async function labCategorySummary(containerId){
+  const el=document.getElementById(containerId); if(!el) return;
+  el.innerHTML=`<div class="loading-row"><div class="spinner"></div></div>`;
+  try{ await Promise.all([loadLabSamples(), loadLabResults()]); }catch(e){ el.innerHTML=''; return; }
+
+  const pending   = labSamples.filter(s=>s.status==='Pending').length;
+  const inProc    = labSamples.filter(s=>s.status==='In Process').length;
+  const overdue   = labSamples.filter(s=>['Pending','In Process'].includes(s.status) && tatStatus(s).overdue).length;
+  const draftRes  = labResults.filter(r=>r.status==='Draft' && r.result_value).length;
+  const validated = labResults.filter(r=>r.status==='Validated').length;
+  const critical  = labResults.filter(r=>isCriticalResult(r) && !isReleased(r)).length;
+  const released  = labResults.filter(r=>isReleased(r)).length;
+
+  const cards=[
+    {icon:'🧪',val:pending,   label:'Sampel Pending',color:'#F59E0B',tab:'checkin'},
+    {icon:'⚗️',val:inProc,    label:'Diproses',      color:'#0EA5E9',tab:'worklist'},
+    {icon:'⏰',val:overdue,   label:'TAT Terlambat', color:'#EF4444',tab:'worklist'},
+    {icon:'📝',val:draftRes,  label:'Draft Hasil',   color:'#8B5CF6',tab:'result'},
+    {icon:'🚨',val:critical,  label:'Nilai Kritis',  color:'#DC2626',tab:'validation'},
+    {icon:'✅',val:validated, label:'Tervalidasi',   color:'#22C55E',tab:'approval'},
+    {icon:'📤',val:released,  label:'Released',       color:'#0A2342',tab:'report'},
+  ];
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px">
+    ${cards.map(k=>`
+      <button onclick="navigate('lab',{tab:'${k.tab}'})"
+        style="text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid ${k.color};
+        border-radius:12px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s,transform .15s"
+        onmouseover="this.style.boxShadow='var(--shadow-md)';this.style.transform='translateY(-1px)'"
+        onmouseout="this.style.boxShadow='';this.style.transform=''">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:22px;font-weight:800;color:${k.color};font-variant-numeric:tabular-nums">${k.val}</span>
+          <span style="font-size:16px;opacity:.7">${k.icon}</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-top:2px">${k.label}</div>
+      </button>`).join('')}
+  </div>`;
 }
+
+// Tab bar sudah dipindah ke halaman indeks kategori. switchLabTab dipertahankan
+// sebagai shim agar pemanggil lama (mis. checkin.js yang melompat ke Input Hasil)
+// tetap berpindah — kini lewat navigasi halaman, bukan menyembunyikan div.
+function switchLabTab(tab){ if(typeof navigate==='function') navigate('lab',{tab}); }
 
 // Reload penuh + re-render semua tab (dipanggil sub-modul setelah mutasi)
 async function labRefresh(){
