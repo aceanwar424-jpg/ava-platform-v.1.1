@@ -15,6 +15,9 @@ const AG_ORG_ICON = {
   LOGISTIK:'🚚', SCM_STOCK:'📦', SCM_PO:'🧾',
   HR_HEAD:'👥', HR_CRED:'🪪', HR_ROSTER:'🗓️',
   LAB_HEAD:'🔬', LAB_QC:'🧫', LAB_TAT:'⏱️', LAB_CRIT:'🚨',
+  FIN_HEAD:'💰', FIN_AR:'📄', FIN_LEAK:'🕳️', FIN_RECON:'⚖️',
+  GROWTH_HEAD:'🤝', CRM_LEAD:'🎯', CRM_DEAL:'📈', CRM_MOU:'📜',
+  CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐', TEAM_OPS:'📊',
 };
 const AG_DEPT_META = {
   LAB_OPS:          { icon:'🔬', label:'Lab Operations',    head:'LAB_HEAD', tick:'LAB_TICK', color:'#0891B2' },
@@ -23,6 +26,9 @@ const AG_DEPT_META = {
   IT:               { icon:'🖥️', label:'IT Profesional',    head:'IT_HEAD',  tick:'IT_CHECK', color:'#0F766E' },
   SUPPLY_CHAIN:     { icon:'🚚', label:'Supply Chain',      head:'LOGISTIK', tick:'SCM_TICK', color:'#D97706' },
   PEOPLE:           { icon:'👥', label:'People & Credentialing', head:'HR_HEAD', tick:'HR_TICK', color:'#DB2777' },
+  FINANCE:          { icon:'💰', label:'Finance Intelligence', head:'FIN_HEAD', tick:'FIN_TICK', color:'#16A34A' },
+  GROWTH:           { icon:'🤝', label:'Growth & CRM',      head:'GROWTH_HEAD', tick:'GROWTH_TICK', color:'#2563EB' },
+  CX:               { icon:'💬', label:'Customer Experience', head:'CX_HEAD', tick:'CX_TICK', color:'#E11D48' },
 };
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
@@ -94,6 +100,7 @@ async function renderAgOrgTab(el){
           <button class="ag-btn mut" onclick="agItTask('BACKUP_VERIFY','Verifikasi backup')">💾 Cek Backup</button>
           <button class="ag-btn mut" onclick="agItTask('MASTER_LIST','Daftar induk dokumen')">📋 Daftar Induk</button>
           <button class="ag-btn mut" onclick="agPlanCampaign()">📣 Rencana Kampanye</button>
+          <button class="ag-btn pub" onclick="agOrgKick('EXEC_DIGEST')">📊 Digest Eksekutif</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>
         </div>
       </div>
@@ -175,6 +182,11 @@ async function renderAgOrgTab(el){
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
+    <div class="ag-detail" style="margin-top:12px" id="ag-complaints-box">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
+      <div class="loading-row"><div class="spinner"></div></div>
+    </div>
+
     <div class="ag-detail" style="margin-top:12px" id="ag-aiconfig-box">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⚙️ Konfigurasi AI (model · API · video)</div>
       <div class="loading-row"><div class="spinner"></div></div>
@@ -187,8 +199,96 @@ async function renderAgOrgTab(el){
   agRenderCronBox();
   agRenderTemplates();
   agRenderCreds();
+  agRenderComplaints();
   agRenderAiConfig();
   agRenderPromptHist();
+}
+
+// ── Panel Keluhan Pelanggan (CX, Fase 7L) ────────────────────────
+const AG_CX_SEV = { Tinggi:'#dc2626', Sedang:'#b45309', Rendah:'#16a34a' };
+async function agRenderComplaints(){
+  const box = document.getElementById('ag-complaints-box'); if(!box) return;
+  let rows = null;
+  try{ rows = await sbGet('agentic_complaints_v','select=*&order=received_at.desc&limit=100') || []; }catch(e){ rows = null; }
+  let inner;
+  if(rows===null){
+    inner = `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7l_bizops.sql</strong> untuk mengaktifkan penanganan keluhan.</div>`;
+  } else {
+    const open = rows.filter(r=>r.status!=='Closed');
+    inner = `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Catat keluhan pelanggan. Agent <strong>CX_COMPLAINT</strong> mentriase & draft respons; keluhan hasil/klinis ditandai perlu verifikasi manusia. Terbuka: ${open.length}.</div>
+      <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
+        <thead><tr><th>Diterima</th><th>Pelanggan</th><th>Kanal</th><th>Kategori</th><th>Tingkat</th><th>Status</th><th></th></tr></thead>
+        <tbody>${rows.slice(0,30).map(r=>{
+          const sc = AG_CX_SEV[r.severity]||'#64748b';
+          return `<tr${r.status==='Closed'?' style="opacity:.55"':''}>
+            <td style="white-space:nowrap">${agEsc((r.received_at||'').slice(0,10))}</td>
+            <td>${agEsc(r.customer_name||'—')}</td>
+            <td>${agEsc(r.channel||'—')}</td>
+            <td>${agEsc(r.category||'—')}</td>
+            <td><span class="ag-badge" style="background:${sc}22;color:${sc};border:1px solid ${sc}">${agEsc(r.severity)}</span></td>
+            <td><select class="form-input" style="padding:2px 4px;font-size:10.5px" onchange="agComplaintStatus('${r.id}',this.value)">
+              ${['Open','InProgress','Closed'].map(st=>`<option ${r.status===st?'selected':''}>${st}</option>`).join('')}</select></td>
+            <td><button class="act-btn" title="Edit" onclick="agComplaintEdit('${r.id}')">${svgIcon('edit',11)}</button></td>
+          </tr>`;}).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:14px">Belum ada keluhan tercatat.</td></tr>'}</tbody>
+      </table></div>`;
+  }
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
+      <div style="display:flex;gap:6px">
+        <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agComplaintEdit()">${svgIcon('plus',11)} Tambah Keluhan</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agOrgKick('CX_TICK')">💬 Patroli CX</button>
+        <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderComplaints()">${svgIcon('refresh',11)} Muat ulang</button>
+      </div>
+    </div>${inner}`;
+}
+let _agCxRows = [];
+async function agComplaintEdit(id){
+  try{ _agCxRows = await sbGet('agentic_complaints_v','select=*') || []; }catch(e){ _agCxRows = []; }
+  const r = id ? _agCxRows.find(x=>x.id===id) : null;
+  const kanal = ['WA','Telepon','Email','Langsung','Google','Lainnya'];
+  const kat = ['Hasil','Layanan','Waktu Tunggu','Billing','Fasilitas','Lainnya'];
+  openModal(`
+    <div style="max-width:520px">
+      <h3 style="margin:0 0 10px;color:#0A2342">💬 ${r?'Edit':'Tambah'} Keluhan</h3>
+      <div style="display:grid;gap:9px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Pelanggan
+            <input id="agcx-name" class="form-input" style="width:100%" value="${agEsc(r?r.customer_name||'':'')}"></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Kanal
+            <select id="agcx-chan" class="form-input" style="width:100%">${kanal.map(k=>`<option ${r&&r.channel===k?'selected':''}>${k}</option>`).join('')}</select></label>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Kategori
+            <select id="agcx-cat" class="form-input" style="width:100%">${kat.map(k=>`<option ${r&&r.category===k?'selected':''}>${k}</option>`).join('')}</select></label>
+          <label style="font-size:11.5px;font-weight:700;color:#334155">Tingkat
+            <select id="agcx-sev" class="form-input" style="width:100%">${['Rendah','Sedang','Tinggi'].map(k=>`<option ${r&&r.severity===k?'selected':(!r&&k==='Sedang'?'selected':'')}>${k}</option>`).join('')}</select></label>
+        </div>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Uraian keluhan
+          <textarea id="agcx-desc" class="form-input" style="width:100%;font-size:12px" rows="3">${agEsc(r?r.description||'':'')}</textarea></label>
+        <label style="font-size:11.5px;font-weight:700;color:#334155">Ditangani oleh
+          <input id="agcx-assign" class="form-input" style="width:100%" value="${agEsc(r?r.assigned_name||'':'')}"></label>
+        ${r?`<label style="font-size:11.5px;font-weight:700;color:#334155">Resolusi
+          <textarea id="agcx-res" class="form-input" style="width:100%;font-size:12px" rows="2">${agEsc(r.resolution||'')}</textarea></label>`:''}
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button class="ag-btn mut" onclick="closeModal()">Batal</button>
+        <button class="ag-btn pub" onclick="agComplaintSave('${r?r.id:''}')">${svgIcon('check',13)} Simpan</button>
+      </div>
+    </div>`);
+}
+async function agComplaintSave(id){
+  const g = i=>(document.getElementById(i)||{}).value;
+  try{
+    const p = { customer_name:g('agcx-name'), channel:g('agcx-chan'), category:g('agcx-cat'),
+      severity:g('agcx-sev'), description:g('agcx-desc'), assigned_name:g('agcx-assign') };
+    if(id){ p.id=id; if(document.getElementById('agcx-res')) p.resolution=g('agcx-res'); }
+    await agRpc('agentic_complaint_upsert', { p });
+    closeModal(); toast('Keluhan disimpan','ok'); agRenderComplaints();
+  }catch(e){ toast(e.message,'err'); }
+}
+async function agComplaintStatus(id, status){
+  try{ await agRpc('agentic_complaint_upsert', { p:{ id, status } }); toast(`Keluhan → ${status}`,'ok'); agRenderComplaints(); }
+  catch(e){ toast(e.message,'err'); }
 }
 
 // ── Panel Kredensial Nakes (Fase 7I) ─────────────────────────────
@@ -643,7 +743,7 @@ async function agOrgKick(type){
   try{
     const r = await agRpc('agentic_org_kick', { p_type: type });
     if(r && r.skipped){ toast('Masih ada yang antri/berjalan — tunggu selesai','info'); return; }
-    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops' };
+    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops', FIN_TICK:'Finance', GROWTH_TICK:'Growth', CX_TICK:'CX', EXEC_DIGEST:'Executive Digest' };
     toast(`${_lbl[type]||type} ditugaskan — menjalankan worker…`,'ok');
     await agRunWorker(4);
     await agReload();

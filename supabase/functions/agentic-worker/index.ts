@@ -1283,6 +1283,116 @@ const handleQcWatch = (t: Task) => handleLabScan(t, 'qc');
 const handleTatMonitor = (t: Task) => handleLabScan(t, 'tat');
 const handleCriticalWatch = (t: Task) => handleLabScan(t, 'critical');
 
+// ═══ FASE 7L — BIZ-OPS: Finance · Growth/CRM · CX · Exec ═════════════
+const rp = (v: unknown) => 'Rp ' + Number(v || 0).toLocaleString('id-ID');
+// ── Finance ──
+function finReport(s: Dict, focus: string): string {
+  const sm = (s.summary || {}) as Dict; const ab = (s.ar_buckets || {}) as Dict;
+  const ov = (s.overdue_list || []) as Dict[]; const dr = (s.draft_stale || []) as Dict[]; const cv = (s.cashier_variance || []) as Dict[];
+  const head = `## Patroli Finance — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Piutang menunggak: ${sm.overdue_count ?? 0} (${rp(sm.overdue_amount)}) · Draft mengendap: ${sm.draft_stale ?? 0} · Selisih kas: ${sm.variance_count ?? 0} · Belum setor: ${sm.undeposited ?? 0}\n\n`;
+  const secAr = `**Aging piutang:** 0-30 ${rp(ab.b_0_30)} · 31-60 ${rp(ab.b_31_60)} · 61-90 ${rp(ab.b_61_90)} · >90 ${rp(ab.b_90plus)}\n` +
+    (ov.length ? ov.slice(0, 12).map((x) => `- ${x.invoice_number || '—'} · ${x.partner_name || ''} · ${rp(x.total_amount)} · telat ${x.days_overdue} hari`).join('\n') + '\n' : '');
+  const secLeak = dr.length ? `**Invoice Draft mengendap (potensi bocor):**\n` + dr.slice(0, 12).map((x) => `- ${x.invoice_number || '—'} · ${x.partner_name || ''} · ${rp(x.total_amount)} · ${x.invoice_date}`).join('\n') + '\n' : '';
+  const secRecon = cv.length ? `**Selisih kas kasir:**\n` + cv.slice(0, 12).map((x) => `- ${x.cashier_name || '—'} · selisih ${rp(x.variance)}${x.variance_note ? ` (${x.variance_note})` : ''}`).join('\n') : '';
+  if (focus === 'ar') return head + secAr;
+  if (focus === 'leak') return head + secLeak;
+  if (focus === 'recon') return head + secRecon;
+  return head + secAr + '\n' + secLeak + '\n' + secRecon;
+}
+async function handleFinScan(t: Task, focus: string) {
+  const s = await rpc('agentic_fin_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const md = finReport(s, focus);
+  if (focus === 'all' && (Number(sm.overdue_count || 0) > 0 || Number(sm.variance_count || 0) > 0)) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'FIN_HEAD', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `Finance: ${sm.overdue_count ?? 0} menunggak (${rp(sm.overdue_amount)}) · ${sm.variance_count ?? 0} selisih kas` };
+}
+// ── Growth / CRM ──
+function crmReport(s: Dict, focus: string): string {
+  const sm = (s.summary || {}) as Dict;
+  const fu = (s.overdue_followup || []) as Dict[]; const idl = (s.idle_deals || []) as Dict[]; const mo = (s.expiring_mou || []) as Dict[];
+  const head = `## Patroli Growth & CRM — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Follow-up lewat tempo: ${sm.overdue_followup ?? 0} · Deal mandek: ${sm.idle_deals ?? 0} · MOU akan berakhir: ${sm.expiring_mou ?? 0} · Pipeline: ${rp(sm.pipeline_value)}\n\n`;
+  const secLead = fu.length ? `**Follow-up lewat tempo (prioritas nilai):**\n` + fu.slice(0, 12).map((x) => `- ${x.lead_name || x.company || '—'} · ${x.status} · ${rp(x.estimated_value)} · jadwal ${x.followup_date}`).join('\n') + '\n' : '';
+  const secDeal = idl.length ? `**Deal mandek (lewat ambang idle tahap):**\n` + idl.slice(0, 12).map((x) => `- ${x.lead_name || x.company || '—'} · ${x.status} · diam ${x.stale_days} hari (ambang ${x.idle_days})`).join('\n') + '\n' : '';
+  const secMou = mo.length ? `**MOU akan berakhir ≤60 hari:**\n` + mo.slice(0, 12).map((x) => `- ${x.mou_number || '—'} · ${x.title || ''} · ${x.partner_name || ''} · ${x.days_left} hari (${x.end_date})`).join('\n') : '';
+  if (focus === 'lead') return head + secLead;
+  if (focus === 'deal') return head + secDeal;
+  if (focus === 'mou') return head + secMou;
+  return head + secLead + '\n' + secDeal + '\n' + secMou;
+}
+async function handleCrmScan(t: Task, focus: string) {
+  const s = await rpc('agentic_crm_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const md = crmReport(s, focus);
+  if (focus === 'all' && (Number(sm.expiring_mou || 0) > 0 || Number(sm.overdue_followup || 0) > 0)) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'GROWTH_HEAD', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `Growth: ${sm.overdue_followup ?? 0} follow-up · ${sm.idle_deals ?? 0} mandek · ${sm.expiring_mou ?? 0} MOU tempo` };
+}
+// ── CX ──
+async function handleCxTick(t: Task) {
+  const s = await rpc('agentic_cx_scan', {}) as Dict; const sm = (s.summary || {}) as Dict; const fb = (s.feedback || {}) as Dict;
+  const md = `## Patroli CX — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Keluhan terbuka: ${sm.open ?? 0} · Lewat SLA: ${sm.overdue ?? 0} · Tinggi: ${sm.high ?? 0} · NPS 30h: rata ${fb.avg_score ?? '—'} (promoter ${fb.promoters ?? 0}/detraktor ${fb.detractors ?? 0})`;
+  // Ada keluhan terbuka → antre triase (dedup)
+  if (Number(sm.open || 0) > 0 && !(await rpc('agentic_queued_exists', { p_type: 'COMPLAINT_TRIAGE' }))) {
+    await rpc('agentic_create_task', { p_agent: 'ORG', p_task_type: 'COMPLAINT_TRIAGE', p_title: 'Triase keluhan terbuka' });
+  }
+  if (Number(sm.overdue || 0) > 0 || Number(sm.high || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'CX_HEAD', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `CX: ${sm.open ?? 0} keluhan · ${sm.overdue ?? 0} lewat SLA` };
+}
+async function handleComplaintTriage(t: Task) {
+  const s = await rpc('agentic_cx_scan', {}) as Dict;
+  const open = (s.open_complaints || []) as Dict[];
+  if (!open.length) return { result: { markdown: '_Tidak ada keluhan terbuka._' }, note: 'CX: tidak ada keluhan terbuka' };
+  const tpl = await getPrompt('COMPLAINT_TRIAGE');
+  const r = await askLLM({
+    taskId: t.id, tier: 'main', temperature: Number(tpl.temperature ?? 0.4), maxTokens: 4000,
+    system: String(tpl.system_prompt || ''),
+    prompt: fillTemplate(String(tpl.user_prompt_template || ''), { complaints: JSON.stringify(open.slice(0, 15)) }),
+  });
+  const md = String(r.text || '').trim();
+  await rpc('agentic_msg_add', { p: { from_agent: 'CX_COMPLAINT', to_agent: 'ACE', kind: 'INFO', body: `## Triase & Draft Respons Keluhan\n${md}` } }).catch(() => null);
+  return { result: { markdown: md, count: open.length }, note: `Triase ${open.length} keluhan · draft respons (kirim=manusia)` };
+}
+async function handleFeedbackSummary(t: Task) {
+  const s = await rpc('agentic_cx_scan', {}) as Dict; const fb = (s.feedback || {}) as Dict;
+  const md = `## Ringkasan Umpan Balik (30 hari)\nJumlah: ${fb.count ?? 0} · Rata skor: ${fb.avg_score ?? '—'} · Promoter (≥9): ${fb.promoters ?? 0} · Detraktor (≤6): ${fb.detractors ?? 0}`;
+  return { result: { markdown: md, feedback: fb }, note: `Feedback: ${fb.count ?? 0} · rata ${fb.avg_score ?? '—'}` };
+}
+// ── Executive digest (agregasi lintas-domain) ──
+async function handleExecDigest(t: Task) {
+  const g = async (fn: string, args: Dict = {}) => { try { return await rpc(fn, args) as Dict; } catch { return {}; } };
+  const [sa, scm, hr, lab, fin, crm, cx, bk] = await Promise.all([
+    g('agentic_sa_scan'), g('agentic_scm_scan'), g('agentic_hr_cred_scan'), g('agentic_lab_scan'),
+    g('agentic_fin_scan'), g('agentic_crm_scan'), g('agentic_cx_scan'), g('agentic_backup_status'),
+  ]);
+  const labS = (lab.summary || {}) as Dict, scmS = (scm.summary || {}) as Dict, hrS = (hr.summary || {}) as Dict,
+    finS = (fin.summary || {}) as Dict, crmS = (crm.summary || {}) as Dict, cxS = (cx.summary || {}) as Dict;
+  const md = `## 📊 Digest Eksekutif — ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n` +
+    `**Mutu & Dokumen:** gap klausul wajib ${((sa.missing || []) as Dict[]).length} · jatuh tempo review ${((sa.due_review || []) as Dict[]).length}\n` +
+    `**Lab:** QC REJECT ${labS.qc_reject ?? 0} · nilai kritis belum rilis ${labS.critical_open ?? 0} · TAT lewat ${labS.tat_breach ?? 0}\n` +
+    `**Supply:** stok menipis ${scmS.low_count ?? 0} · habis ${scmS.out_of_stock ?? 0} · kedaluwarsa ${scmS.expired_count ?? 0}\n` +
+    `**SDM:** kredensial kedaluwarsa ${hrS.expired ?? 0} · ≤90 hari ${hrS.expiring_90 ?? 0}\n` +
+    `**Keuangan:** piutang menunggak ${finS.overdue_count ?? 0} (${rp(finS.overdue_amount)}) · selisih kas ${finS.variance_count ?? 0}\n` +
+    `**Growth:** follow-up lewat tempo ${crmS.overdue_followup ?? 0} · MOU akan berakhir ${crmS.expiring_mou ?? 0}\n` +
+    `**CX:** keluhan terbuka ${cxS.open ?? 0} · lewat SLA ${cxS.overdue ?? 0}\n` +
+    `**Backup:** ${bk.has_any ? (bk.stale ? '⛔ BASI' : '✅ segar') : '⛔ tak ada catatan'}\n`;
+  await rpc('agentic_msg_add', { p: { from_agent: 'TEAM_OPS', to_agent: 'ACE', kind: 'STANDUP', body: md } }).catch(() => null);
+  return { result: { markdown: md }, note: `Digest eksekutif dikirim ke CEO` };
+}
+const handleFinTick = (t: Task) => handleFinScan(t, 'all');
+const handleArAging = (t: Task) => handleFinScan(t, 'ar');
+const handleRevLeak = (t: Task) => handleFinScan(t, 'leak');
+const handleRecon = (t: Task) => handleFinScan(t, 'recon');
+const handleGrowthTick = (t: Task) => handleCrmScan(t, 'all');
+const handleLeadScore = (t: Task) => handleCrmScan(t, 'lead');
+const handleDealHygiene = (t: Task) => handleCrmScan(t, 'deal');
+const handleMouWatch = (t: Task) => handleCrmScan(t, 'mou');
+
 // ═══ POINT C — video wiring ══════════════════════════════════════════
 // makeVideo: gateway mode:'video' → simpan .mp4 ke storage (bila base64) atau URL.
 // Non-fatal: gagal/nonaktif → null (script tetap jadi DRAFT).
@@ -1390,6 +1500,11 @@ async function handlePlanCampaign(t: Task) {
 
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 7L — Biz-Ops (Finance · Growth/CRM · CX · Exec):
+  FIN_TICK: handleFinTick, AR_AGING: handleArAging, REV_LEAK: handleRevLeak, RECON: handleRecon,
+  GROWTH_TICK: handleGrowthTick, LEAD_SCORE: handleLeadScore, DEAL_HYGIENE: handleDealHygiene, MOU_WATCH: handleMouWatch,
+  CX_TICK: handleCxTick, COMPLAINT_TRIAGE: handleComplaintTriage, FEEDBACK_SUMMARY: handleFeedbackSummary,
+  EXEC_DIGEST: handleExecDigest,
   // Fase 7K — task reserved diaktifkan + video wiring:
   MASTER_LIST: handleMasterList,
   DOC_DISTRIBUTE: handleDocDistribute,

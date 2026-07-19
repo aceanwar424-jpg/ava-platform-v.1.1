@@ -70,6 +70,7 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 8 | `supabase_agentic_fase7g_it.sql` | **Perluasan IT** — `INTEGRATION_HEALTH` (sampel tertahan + analyzer diam) & `BACKUP_VERIFY` (tabel `agentic.backup_log` + kesegaran pg_dump) |
 | 9 | `supabase_agentic_fase7h_lab.sql` | **Departemen Lab Operations Assurance** (LAB_QC·LAB_TAT·LAB_CRIT) + RPC `agentic_lab_scan` + task LAB_TICK/QC_WATCH/TAT_MONITOR/CRITICAL_WATCH |
 | 10 | `supabase_agentic_fase7k_cleanup.sql` | **Clear-up** — aktifkan task reserved (MASTER_LIST/DOC_DISTRIBUTE/DOC_OBSOLETE/PLAN_CAMPAIGN/ROSTER_CHECK), hapus IT_BACKUP_CHECK usang, **wire video** (MAKE_VIDEO) |
+| 11 | `supabase_agentic_fase7l_bizops.sql` | **4 departemen Biz-Ops** — Finance (AR/leak/recon), Growth/CRM (lead/deal/MOU), CX (keluhan+feedback, buat tabel `complaints`/`customer_feedback`), Executive Digest |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.
@@ -224,6 +225,21 @@ Departemen **PEOPLE** (HR_HEAD → HR_CRED, HR_ROSTER). Membuat tabel `public.st
 - Guardrail: agent hanya memantau & mengingatkan; keputusan SDM = manusia.
 - (HR_ROSTER: reserved — deteksi anomali absensi menyusul.)
 - Cron opsional: `select cron.schedule('agentic-hr-tick','0 8 * * *', $$ select public.agentic_org_kick('HR_TICK'); $$);`
+
+### 4.2e Biz-Ops: Finance · Growth/CRM · CX · Executive (Fase 7L)
+
+Empat departemen advisory (semua **flag/draft — tanpa transaksi/kirim oleh agent**).
+- 💰 **Finance** (`FIN_TICK`): aging piutang (0-30/31-60/61-90/>90) dari `invoices`, invoice
+  Draft mengendap (bocor), selisih kas `cashier_shifts`. Sub: `AR_AGING`·`REV_LEAK`·`RECON`.
+- 🤝 **Growth & CRM** (`GROWTH_TICK`): follow-up lewat tempo & skoring (`leads`), deal mandek
+  (ambang `idle_days` per tahap `crm_pipeline_stages`), **MOU akan berakhir ≤60 hari** (`mous`).
+- 💬 **Customer Experience** (`CX_TICK`): panel **💬 Keluhan Pelanggan** (tab Organisasi) untuk
+  input keluhan; `COMPLAINT_TRIAGE` mengklasifikasi + **draft respons** (keluhan hasil/klinis →
+  tandai perlu verifikasi manusia); `FEEDBACK_SUMMARY` ringkas NPS. Membuat tabel
+  `complaints` & `customer_feedback`. ISO 15189 §7.7.
+- 📊 **Executive Digest** (tombol **📊 Digest Eksekutif**): satu ringkasan lintas-domain untuk
+  CEO — mutu, lab, stok, kredensial, piutang, keluhan, kontrak, backup. (TEAM_OPS diaktifkan.)
+- Cron opsional: `FIN_TICK`/`GROWTH_TICK`/`CX_TICK` tiap 4-6 jam; `EXEC_DIGEST` pagi hari.
 
 ### 4.3 Konfig AI (tab Organisasi → ⚙️ Konfigurasi AI)
 
