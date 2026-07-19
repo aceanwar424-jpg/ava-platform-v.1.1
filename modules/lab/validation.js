@@ -226,8 +226,8 @@ function selectValResult(rid, mode='validate'){
       <div style="font-weight:700;color:#0369A1;margin-bottom:4px">✅ AI Conclusion</div>
       <div style="color:var(--navy);line-height:1.4;margin-bottom:6px">${r.ai_conclusion}</div>
       ${isApprovalTab?`
-        <textarea id="val-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:#fff;color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
-        <button onclick="saveConclusionEdit(${rid})" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">📝 Save Edit</button>
+        <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:#fff;color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
+        <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">📝 Save Edit</button>
       `:''}
     </div>
   `:'';
@@ -243,7 +243,7 @@ function selectValResult(rid, mode='validate'){
     </div>
     ${conclusionSection}
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>
-    <textarea id="val-note-input" rows="4" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:6px;margin-top:4px" placeholder="Catatan validasi...">${_valNotes[rid]||''}</textarea>`;
+    <textarea id="${VAL_MODES[mode].prefix}-note-input" rows="4" style="width:100%;font-size:11px;padding:6px;border:1px solid var(--border);border-radius:6px;margin-top:4px" placeholder="Catatan validasi...">${_valNotes[rid]||''}</textarea>`;
 }
 
 async function validateSelectedResults(){
@@ -436,8 +436,9 @@ async function approveAllResults(){
 }
 
 // ⭐ NEW: Save edited conclusion
-async function saveConclusionEdit(rid) {
-  const textarea=document.getElementById('val-conclusion-edit');
+async function saveConclusionEdit(rid, mode='approve') {
+  if(!VAL_MODES[mode]) mode='approve';
+  const textarea=valEl(mode,'conclusion-edit');
   if(!textarea) return;
   const editedConclusion=textarea.value.trim();
   
@@ -462,7 +463,7 @@ async function saveConclusionEdit(rid) {
     
     toast('✅ Conclusion saved','ok');
     await loadLabResults();
-    selectValResult(rid);
+    selectValResult(rid, mode);
   } catch(e) {
     toast('❌ Save failed: '+e.message,'error');
   }
