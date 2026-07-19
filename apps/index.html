@@ -381,22 +381,34 @@
             <div class="stat-card">
               <span class="stat-icon">👥</span>
               <h4>Total Karyawan</h4>
-              <p>150 Orang</p>
+              <p id="c-stat-total">150 Orang</p>
             </div>
             <div class="stat-card">
               <span class="stat-icon">✅</span>
               <h4>Selesai MCU</h4>
-              <p>120 Orang</p>
+              <p id="c-stat-mcu">120 Orang</p>
             </div>
           </div>
 
           <div class="glass-card progress-card" style="margin-bottom: 20px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
               <span>Progres Proyek MCU</span>
-              <span>80%</span>
+              <span id="c-progress-txt">80%</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill" style="width: 80%;"></div>
+              <div class="progress-bar-fill" id="c-progress-bar" style="width: 80%;"></div>
+            </div>
+          </div>
+
+          <!-- Kemitraan & Benefit Perusahaan -->
+          <div class="section-title">Kemitraan & Benefit Cashback</div>
+          <div class="glass-card wallet-card" style="margin-bottom:24px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(13, 148, 136, 0.1) 100%); border: 1px solid rgba(20, 184, 166, 0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Akumulasi Reward Cashback</p>
+                <strong id="c-cashback-balance" style="font-size:22px; color:var(--teal); font-weight:800;">Rp 4.500.000</strong>
+              </div>
+              <button class="btn btn-sm btn-teal" onclick="openClaimCashbackModal()" style="margin:0; font-size:11px;">Klaim Cashback</button>
             </div>
           </div>
 
@@ -427,30 +439,26 @@
           <div class="quick-stats" style="margin-bottom: 24px;">
             <div class="mini-stat-card card-fit">
               <h5>Fit to Work</h5>
-              <span>105</span>
+              <span id="c-stat-fit">105</span>
             </div>
             <div class="mini-stat-card card-unfit">
               <h5>Unfit / Review</h5>
-              <span>15</span>
+              <span id="c-stat-unfit">15</span>
             </div>
           </div>
 
           <div class="section-title">Billing & Invoice Korporat</div>
           <div class="glass-card invoice-widget" style="margin-bottom: 24px;">
-            <div class="invoice-row">
-              <div class="invoice-info">
-                <h5>INV-202607-001</h5>
-                <p>MCU Tahunan Tahap 1 &bull; 19 Juli 2026</p>
-              </div>
-              <div style="text-align:right;">
-                <span class="invoice-amount">Rp 45.000.000</span>
-                <span class="badge badge-unfit" style="display:block; width:fit-content; margin-left:auto; margin-top:4px;">Belum Bayar</span>
-              </div>
+            <div class="invoice-list-mini" id="corp-invoice-list-mini">
+              <!-- Rendered dynamically -->
             </div>
-            <button class="btn btn-sm btn-primary" onclick="alert('Pembayaran Invoice via Virtual Account disimulasikan!')" style="width:100%; margin-top:12px;">Bayar Invoice Sekarang</button>
+            <button class="btn btn-sm btn-primary" onclick="openCorpBillingModal()" style="width:100%; margin-top:12px;">Kelola &amp; Bayar Invoice</button>
           </div>
 
-          <div class="section-title">Daftar Peserta MCU</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div class="section-title" style="margin-bottom:0;">Daftar Peserta MCU</div>
+            <button class="btn btn-sm btn-teal" onclick="openAddEmployeeModal()" style="margin:0; font-size:11px;">➕ Tambah Karyawan</button>
+          </div>
           <div class="corporate-list" id="corporate-list-container">
             <!-- Dinamis via JS -->
           </div>
@@ -543,6 +551,18 @@
               <span class="stat-icon">💰</span>
               <h4>Akumulasi Fee/Poin</h4>
               <p id="r-commission">Rp 1.200.000</p>
+            </div>
+          </div>
+
+          <!-- Dompet Referral / Pencairan Dana -->
+          <div class="section-title">Dompet Kemitraan & Saldo Fee</div>
+          <div class="glass-card wallet-card" style="margin-bottom:24px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(79, 70, 229, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Saldo Komisi Rujukan</p>
+                <strong id="r-fee-balance" style="font-size:22px; color:#a5b4fc; font-weight:800;">Rp 330.000</strong>
+              </div>
+              <button class="btn btn-sm btn-indigo" onclick="openWithdrawFeeModal()" style="margin:0; font-size:11px; background:#6366f1; border-color:#6366f1; color:white;">Tarik Komisi</button>
             </div>
           </div>
 
@@ -896,9 +916,51 @@
             <label for="ref-patient-phone">No. Handphone Pasien</label>
             <input type="tel" id="ref-patient-phone" placeholder="08xxxxxxxxxx" required>
           </div>
+
           <div class="input-group" style="text-align:left;">
-            <label for="ref-lab-test">Rujukan Pemeriksaan</label>
-            <input type="text" id="ref-lab-test" placeholder="Contoh: Darah Lengkap, MCU Paket A" required>
+            <label style="margin-bottom:8px; display:block;">Formulir Permintaan Pemeriksaan (FPP)</label>
+            <div class="fpp-container" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(15,23,42,0.4); display: flex; flex-direction: column; gap: 12px;">
+              
+              <!-- Hematologi -->
+              <div class="fpp-group">
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--teal); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">💉 Hematologi</span>
+                <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Darah Lengkap"> Darah Lengkap</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Laju Endap Darah"> Laju Endap Darah</label>
+                </div>
+              </div>
+
+              <!-- Kimia Klinik -->
+              <div class="fpp-group">
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--primary-hover); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">🧪 Kimia Klinik</span>
+                <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Glukosa Puasa"> Glukosa Puasa</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Kolesterol Total"> Kolesterol Total</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Asam Urat"> Asam Urat</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Hati (SGOT/SGPT)"> Fungsi Hati (SGOT/SGPT)</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Ginjal (Ureum/Kreatinin)"> Fungsi Ginjal</label>
+                </div>
+              </div>
+
+              <!-- Imunologi / Serologi -->
+              <div class="fpp-group">
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--warning); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">🛡️ Imunologi &amp; Serologi</span>
+                <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="HBsAg"> HBsAg</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Anti-HBs"> Anti-HBs</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Tes HIV"> Tes HIV</label>
+                </div>
+              </div>
+
+              <!-- Urinalisis -->
+              <div class="fpp-group">
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: #f472b6; font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">💧 Urinalisis</span>
+                <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Urine Lengkap"> Urine Lengkap</label>
+                </div>
+              </div>
+
+            </div>
           </div>
           
           <div style="display:flex; gap:12px; margin-top:24px;">
@@ -971,6 +1033,138 @@
         </div>
 
         <button class="btn btn-close" onclick="closeLabResultsModal()" style="margin-top:20px;">Tutup Hasil</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: TAMBAH KARYAWAN ════════════════════════ -->
+    <div id="add-employee-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px; text-align:left;">
+        <h3>Tambah Karyawan MCU</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px;">Daftarkan karyawan baru untuk mengikuti pengetesan MCU</p>
+        
+        <form onsubmit="submitAddEmployeeForm(event)">
+          <div class="input-group">
+            <label for="corp-emp-name">Nama Karyawan</label>
+            <input type="text" id="corp-emp-name" placeholder="Nama Lengkap Karyawan" required>
+          </div>
+          <div class="input-group">
+            <label for="corp-emp-id">Nomor Karyawan (ID)</label>
+            <input type="text" id="corp-emp-id" placeholder="Contoh: EMP-006" required>
+          </div>
+          <div class="input-group">
+            <label for="corp-emp-package">Paket Pemeriksaan MCU</label>
+            <select id="corp-emp-package" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+              <option value="Paket MCU Dasar">Paket MCU Dasar</option>
+              <option value="Paket MCU Eksekutif A">Paket MCU Eksekutif A</option>
+              <option value="Paket MCU Eksekutif B">Paket MCU Eksekutif B</option>
+              <option value="Paket MCU Driver">Paket MCU Driver</option>
+            </select>
+          </div>
+          
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeAddEmployeeModal()">Batal</button>
+            <button type="submit" class="btn btn-teal" style="margin-top:0;">Daftarkan</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: DETAIL REKAM MEDIS KARYAWAN ════════════════════════ -->
+    <div id="emp-medrec-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 440px; text-align:left;">
+        <h3 id="medrec-title" style="text-align:center; margin-bottom:4px;">Rekam Medis Karyawan</h3>
+        <p id="medrec-sub" style="color: var(--text-muted); font-size:12px; text-align:center; margin-bottom:20px;"></p>
+        
+        <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;" id="medrec-content">
+          <!-- Loaded dynamically -->
+        </div>
+
+        <button class="btn btn-close" onclick="closeEmpMedrecModal()" style="width:100%;">Tutup</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: BILLING & BAYAR INVOICE ════════════════════════ -->
+    <div id="corp-billing-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 460px; text-align:left;">
+        <h3 style="text-align:center; margin-bottom:4px;">Billing &amp; Invoice Perusahaan</h3>
+        <p style="color: var(--text-muted); font-size:12px; text-align:center; margin-bottom:20px;">Kelola tagihan proyek pemeriksaan MCU karyawan</p>
+        
+        <div class="invoice-list-container" id="corp-invoice-list-full" style="display:flex; flex-direction:column; gap:12px; margin-bottom:20px;">
+          <!-- Loaded dynamically -->
+        </div>
+
+        <!-- Simulated Payment Method Screen (Hidden initially) -->
+        <div id="payment-panel" style="display:none; border-top:1px solid rgba(255,255,255,0.06); padding-top:16px;">
+          <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:10px;">Pilih Metode Pembayaran</h5>
+          <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+            <label style="border:1px solid var(--border); padding:10px; border-radius:8px; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.02);">
+              <input type="radio" name="pay-method" value="BCA Virtual Account" checked>
+              <span>BCA Virtual Account</span>
+            </label>
+            <label style="border:1px solid var(--border); padding:10px; border-radius:8px; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.02);">
+              <input type="radio" name="pay-method" value="Mandiri Virtual Account">
+              <span>Mandiri Virtual Account</span>
+            </label>
+            <label style="border:1px solid var(--border); padding:10px; border-radius:8px; display:flex; align-items:center; gap:10px; cursor:pointer; background:rgba(255,255,255,0.02);">
+              <input type="radio" name="pay-method" value="Corporate Account Balance">
+              <span>Deposit Kemitraan</span>
+            </label>
+          </div>
+          <button class="btn btn-teal" onclick="processInvoicePayment()" style="width:100%;">Konfirmasi Pembayaran</button>
+        </div>
+
+        <button class="btn btn-close" onclick="closeCorpBillingModal()" style="width:100%;">Tutup</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: KLAIM CASHBACK ════════════════════════ -->
+    <div id="claim-cashback-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px; text-align:left;">
+        <h3>Klaim Cashback Kemitraan</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px;">Cairkan reward cashback kemitraan perusahaan Anda menjadi saldo saldo deposit/rekening operasional.</p>
+        
+        <div style="background:rgba(20,184,166,0.1); border:1px solid var(--teal); border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
+          <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Jumlah Cashback Dapat Diklaim</span>
+          <h2 id="cashback-modal-amt" style="font-size:26px; color:var(--teal); font-weight:800; margin-top:4px;">Rp 4.500.000</h2>
+        </div>
+
+        <div style="display:flex; gap:12px;">
+          <button type="button" class="btn btn-close" onclick="closeClaimCashbackModal()">Batal</button>
+          <button type="button" class="btn btn-teal" onclick="processClaimCashback()" style="margin-top:0; width:100%;">Konfirmasi Pencairan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: TARIK KOMISI REFERRAL ════════════════════════ -->
+    <div id="withdraw-fee-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 400px; text-align:left;">
+        <h3>Tarik Komisi Rujukan</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px;">Cairkan saldo fee rujukan klinik/dokter Anda langsung ke rekening bank terdaftar.</p>
+        
+        <div style="background:rgba(99,102,241,0.1); border:1px solid #6366f1; border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
+          <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Saldo Tersedia</span>
+          <h2 id="withdraw-modal-amt" style="font-size:26px; color:#a5b4fc; font-weight:800; margin-top:4px;">Rp 330.000</h2>
+        </div>
+
+        <form onsubmit="processWithdrawFee(event)">
+          <div class="input-group">
+            <label for="w-bank-name">Bank Tujuan</label>
+            <select id="w-bank-name" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+              <option value="BCA">Bank Central Asia (BCA) - 4920******</option>
+              <option value="Mandiri">Bank Mandiri - 13100******</option>
+              <option value="BNI">Bank Negara Indonesia (BNI) - 0984******</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="w-amount">Jumlah Penarikan (Rp)</label>
+            <input type="number" id="w-amount" min="50000" max="330000" value="330000" required>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:24px;">
+            <button type="button" class="btn btn-close" onclick="closeWithdrawFeeModal()">Batal</button>
+            <button type="submit" class="btn btn-primary" style="margin-top:0; background:#6366f1; border-color:#6366f1; color:white; width:100%;">Proses Penarikan</button>
+          </div>
+        </form>
       </div>
     </div>
 

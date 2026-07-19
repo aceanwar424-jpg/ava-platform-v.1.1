@@ -1537,3 +1537,84 @@ body {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+
+/* FPP Form & B2B Styles */
+.fpp-container::-webkit-scrollbar {
+  width: 4px;
+}
+.fpp-container::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+.fpp-grid label {
+  transition: all 0.2s ease;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+}
+.fpp-grid label:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+.fpp-grid input[type="checkbox"] {
+  accent-color: var(--teal);
+  width: 14px;
+  height: 14px;
+}
+
+/* Invoice Cards & Lists */
+.invoice-list-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.invoice-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  background: rgba(15, 23, 42, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+.invoice-card:hover {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.invoice-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.invoice-card-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid rgba(255,255,255,0.03);
+  padding-top: 8px;
+}
+
+/* Medical Record Parameters */
+.medrec-param-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  font-size: 12px;
+}
+.medrec-param-label {
+  color: var(--text-muted);
+}
+.medrec-param-value {
+  font-weight: 700;
+  color: white;
+}
+.medrec-param-value.normal {
+  color: var(--teal);
+}
+.medrec-param-value.abnormal {
+  color: var(--error);
+}
+
