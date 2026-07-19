@@ -3,11 +3,18 @@
 // Menggantikan modules/radiology.js yang hanya mengunggah berkas dan mencetak,
 // serta menumpang tabel lab_results.
 //
-// Alur: Dijadwalkan → Dikerjakan → Menunggu Baca → Dibaca → Selesai
+// Alur: Dijadwalkan → Antrian Alat → Dikerjakan → Menunggu Baca → Dibaca → Selesai
+//
+// "Antrian Alat" mewakili langkah lapangan yang sebelumnya hilang: order dikirim
+// ke antrian modalitas (di PACS/RIS sungguhan lewat DICOM Modality Worklist),
+// radiografer memanggilnya di mesin, memotret, lalu citra masuk konsol penerimaan
+// PACS. Web app ini tidak berbicara DICOM langsung ke alat — langkah ini merekam
+// prosesnya; unggah citra tetap manual sampai gateway DICOM dipasang.
 // ═══════════════════════════════════════════════════════════════
 
 const RIS_STATUS = {
   'Dijadwalkan':   { c: '#B45309', bg: '#FBF1E4' },
+  'Antrian Alat':  { c: '#9333EA', bg: '#F3E8FF' },
   'Dikerjakan':    { c: '#0E7C86', bg: '#E6F2F3' },
   'Menunggu Baca': { c: '#7C3AED', bg: '#F1EAFB' },
   'Dibaca':        { c: '#123A5C', bg: '#EAF0F6' },
@@ -100,8 +107,10 @@ function paintRIS() {
       <td><span style="background:${st.bg};color:${st.c};padding:3px 9px;border-radius:5px;
         font-size:11px;font-weight:700">${o.status}</span></td>
       <td><div class="act-row" style="flex-wrap:wrap">
-        ${o.status === 'Dijadwalkan' ? `<button class="btn btn-teal btn-xs" onclick="risSetStatus(${o.id},'Dikerjakan')">▶ Mulai</button>` : ''}
-        ${o.status === 'Dikerjakan' ? `<button class="btn btn-ghost btn-xs" onclick="openPacsUpload(${o.id},'${o.accession_no}')">🖼️ Unggah</button>
+        ${o.status === 'Dijadwalkan' ? `<button class="btn btn-teal btn-xs" onclick="risOpenSendDevice(${o.id})">📡 Kirim ke Alat</button>` : ''}
+        ${o.status === 'Antrian Alat' ? `<button class="btn btn-ghost btn-xs" onclick="risOpenSendDevice(${o.id})" title="Ubah alat/radiografer">✎</button>
+          <button class="btn btn-teal btn-xs" onclick="risStartAcquisition(${o.id})">▶ Mulai Akuisisi</button>` : ''}
+        ${o.status === 'Dikerjakan' ? `<button class="btn btn-ghost btn-xs" onclick="openPacsUpload(${o.id},'${o.accession_no}')">🖼️ Terima Citra</button>
           <button class="btn btn-teal btn-xs" onclick="risSetStatus(${o.id},'Menunggu Baca')">✓ Selesai Foto</button>` : ''}
         ${['Menunggu Baca', 'Dibaca', 'Selesai'].includes(o.status)
           ? `<button class="btn btn-ghost btn-xs" onclick="openPacsViewer(${o.id},'${o.accession_no}')">🖼️ Citra</button>
@@ -223,6 +232,70 @@ async function risSetStatus(id, status) {
   if (status === 'Dikerjakan') { patch.performed_at = new Date().toISOString(); patch.performed_by = getUserName ? getUserName() : 'User'; }
   try { await sbPatch('radiology_orders', id, patch); await loadRISOrders(); }
   catch (e) { toast('❌ ' + e.message, 'err'); }
+}
+
+// ── Kirim ke Alat (antrian modalitas) ──────────────────────────
+// Langkah yang mewakili "push order ke antrian mesin". Di PACS/RIS sungguhan
+// ini adalah DICOM Modality Worklist; di sini kita merekam alat tujuan dan
+// radiografernya lalu memindahkan order ke status "Antrian Alat".
+function risOpenSendDevice(id) {
+  const o = risOrders.find(x => x.id === id) || {};
+  openModal(`
+    <div class="modal-header"><div class="modal-title">📡 Kirim ke Alat — ${o.accession_no || ''}</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
+      <b>${o.patient_name || ''}</b> · ${o.procedure_name || ''} (${o.modality_code || ''})<br>
+      Kirim order ke antrian alat agar radiografer dapat memanggilnya di mesin.
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Alat / Modalitas *</label>
+        <input type="text" id="rd-device" value="${o.device_name || o.modality_code || ''}" placeholder="mis. CT-01, DR-Ruang 2"></div>
+      <div class="form-group"><label>Ruang</label>
+        <input type="text" id="rd-room" value="${o.device_room || ''}" placeholder="Ruang pemeriksaan"></div>
+    </div>
+    <div class="form-group"><label>Radiografer</label>
+      <input type="text" id="rd-rad" value="${o.radiographer || ''}" placeholder="Nama petugas yang memotret"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="risSendDevice(${id})">📡 Kirim ke Antrian Alat</button>
+    </div>`);
+}
+
+async function risSendDevice(id) {
+  const device = document.getElementById('rd-device')?.value.trim();
+  if (!device) { toast('Isi alat/modalitas tujuan', 'warn'); return; }
+  const patch = {
+    status: 'Antrian Alat',
+    device_name: device,
+    device_room: document.getElementById('rd-room')?.value.trim() || null,
+    radiographer: document.getElementById('rd-rad')?.value.trim() || null,
+    queued_to_device_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  try {
+    await sbPatch('radiology_orders', id, patch);
+    const o = risOrders.find(x => x.id === id) || {};
+    if (typeof logActivity === 'function')
+      logActivity('ris_send_device', 'radiology_orders', o.accession_no || id,
+        `Order dikirim ke alat ${device}`, o.patient_name);
+    toast(`📡 Terkirim ke antrian ${device}`, 'ok');
+    closeModalForce(); await loadRISOrders();
+  } catch (e) {
+    toast('❌ ' + (/column .* does not exist/i.test(e.message)
+      ? 'Jalankan supabase_ris_modality_worklist.sql dulu' : e.message), 'err');
+  }
+}
+
+// Radiografer mulai memotret di alat.
+async function risStartAcquisition(id) {
+  const now = new Date().toISOString();
+  try {
+    await sbPatch('radiology_orders', id, {
+      status: 'Dikerjakan', acquisition_started_at: now,
+      performed_at: now, performed_by: getUserName ? getUserName() : 'User', updated_at: now,
+    });
+    await loadRISOrders();
+  } catch (e) { toast('❌ ' + e.message, 'err'); }
 }
 
 // ── Laporan radiolog ───────────────────────────────────────────

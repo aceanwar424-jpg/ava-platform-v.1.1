@@ -24,14 +24,15 @@ let pacsView = { zoom: 1, x: 0, y: 0, brightness: 100, contrast: 100, invert: fa
 let pacsMeasure = null;   // {x1,y1,x2,y2} dalam koordinat kanvas
 let _pacsImgEl = null, _pacsDragging = false, _pacsLast = null, _pacsMeasuring = false;
 
-// ── Unggah citra ke arsip ──────────────────────────────────────
+// ── Konsol Penerimaan PACS — citra dari alat masuk ke sini ─────
 async function openPacsUpload(orderId, accession) {
   openModal(`
-    <div class="modal-header"><div class="modal-title">🖼️ Unggah Citra — ${accession}</div>
+    <div class="modal-header"><div class="modal-title">🖼️ Konsol Penerimaan PACS — ${accession}</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
-      Unggah gambar hasil ekspor dari modalitas (JPG/PNG). Berkas DICOM asli boleh
-      disertakan agar dapat diunduh ke workstation.
+      Terima citra hasil ekspor dari alat (JPG/PNG). Berkas DICOM asli boleh
+      disertakan agar dapat diunduh ke workstation. Setelah diterima, citra dapat
+      ditinjau & disunting (zoom, window level, ukur) di penampil.
     </div>
     <div class="form-row">
       <div class="form-group"><label>Seri</label><input type="number" id="pu-series" value="1" min="1"></div>
@@ -85,9 +86,16 @@ async function savePacsUpload(orderId, accession) {
       });
     }
 
-    await logActivity('pacs_upload', 'radiology_images', orderId,
-      `${files.length} citra diunggah untuk ${accession}`, accession);
-    toast(`✅ ${files.length} citra tersimpan di arsip`, 'ok');
+    // Tandai waktu citra pertama diterima di konsol PACS (tidak menimpa bila sudah ada).
+    const o = (typeof risOrders !== 'undefined') ? risOrders.find(x => x.id === orderId) : null;
+    if (o && !o.received_from_device_at) {
+      await sbPatch('radiology_orders', orderId,
+        { received_from_device_at: new Date().toISOString(), updated_at: new Date().toISOString() }).catch(() => {});
+    }
+
+    await logActivity('pacs_receive', 'radiology_images', orderId,
+      `${files.length} citra diterima di konsol PACS untuk ${accession}`, accession);
+    toast(`✅ ${files.length} citra diterima di arsip`, 'ok');
     closeModalForce();
     if (typeof loadRISOrders === 'function') await loadRISOrders();
   } catch (e) {
