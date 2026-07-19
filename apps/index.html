@@ -160,7 +160,26 @@
       </aside>
 
       <!-- Main Layout Content Area -->
-      <main class="app-main-content">
+      <main class="app-main-content" style="position:relative; background:#f8fafc; overflow-y:auto;">
+        
+        <!-- Abstract Background Ornaments matching Company Profile -->
+        <svg style="position:absolute; bottom:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.65;" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Soft Blue wave -->
+          <path d="M-100 850 C300 700, 500 800, 800 650 C1100 500, 1200 600, 1600 550 L1600 900 L-100 900 Z" fill="url(#blueGrad)" opacity="0.12" />
+          <!-- Accent Coral/Orange wave -->
+          <path d="M-100 900 C200 780, 450 850, 750 720 C1050 590, 1300 650, 1600 600 L1600 900 L-100 900 Z" fill="url(#coralGrad)" opacity="0.08" />
+          
+          <defs>
+            <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3b82f6" />
+              <stop offset="100%" stop-color="#0f2963" />
+            </linearGradient>
+            <linearGradient id="coralGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff7c5c" />
+              <stop offset="100%" stop-color="#ef7a4a" />
+            </linearGradient>
+          </defs>
+        </svg>
         
         <!-- Breadcrumb / Header Row (Desktop) -->
         <header class="app-content-header">
