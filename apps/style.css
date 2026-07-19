@@ -91,22 +91,26 @@ th {
   display: flex !important;
 }
 
+#login-screen:not(.active),
+#dashboard-screen:not(.active) {
+  display: none !important;
+}
+
+#login-screen.active {
+  display: flex !important;
+}
+
+#dashboard-screen.active {
+  display: flex !important;
+}
+
 #login-screen {
   max-width: 100vw;
   width: 100vw;
   height: 100vh;
   margin: 0;
   padding: 0;
-  display: none !important;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, rgba(11, 15, 25, 0.8) 0%, #0b0f19 100%), 
-              url('https://images.unsplash.com/photo-1579154261294-a101a55f016d?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
-  background-size: cover;
-}
-
-#login-screen.active {
-  display: flex !important;
+  overflow: hidden;
 }
 
 /* Brand Header */
@@ -1973,6 +1977,24 @@ th {
 .test-catalog-card:hover {
   border-color: rgba(14, 165, 233, 0.2);
   transform: translateY(-2px);
+}
+
+/* Split Login Screen Responsive Styles */
+@media (max-width: 900px) {
+  #login-screen {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+  .login-left-panel {
+    display: none !important;
+  }
+  .login-right-panel {
+    width: 100% !important;
+    height: 100vh !important;
+    background: radial-gradient(circle at center, rgba(11, 15, 25, 0.9) 0%, #05070f 100%), 
+                url('https://images.unsplash.com/photo-1579154261294-a101a55f016d?auto=format&fit=crop&w=1920&q=80') no-repeat center center !important;
+    background-size: cover !important;
+  }
 }
 
 

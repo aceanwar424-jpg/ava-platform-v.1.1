@@ -14,47 +14,105 @@
   <div class="app-container">
     
     <!-- ════════════════════════ LOGIN SCREEN ════════════════════════ -->
-    <div id="login-screen" class="screen active">
-      <div class="login-box">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <div style="display: inline-flex; width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--teal)); color: white; font-weight: 800; font-size: 18px; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);">AH</div>
-          <h4 style="font-size: 16px; font-weight: 700; color: white; margin: 0; letter-spacing: -0.02em;">AvaHealth Portal</h4>
-          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Akses Layanan Pasien &amp; Mitra Korporasi</p>
+    <div id="login-screen" class="screen active" style="display:flex; flex-direction:row; width:100vw; height:100vh; overflow:hidden; background:#0b0f19;">
+      <!-- Left Panel: Brand info, Lab images showcase, and Health News -->
+      <div class="login-left-panel" style="flex:1; display:flex; flex-direction:column; padding:40px; background:linear-gradient(135deg, rgba(15,23,42,0.85), rgba(11,15,25,0.98)), url('https://images.unsplash.com/photo-1579154261294-a101a55f016d?auto=format&fit=crop&w=1920&q=80') no-repeat center center; background-size:cover; border-right:1px solid rgba(255,255,255,0.05); justify-content:space-between; overflow-y:auto;">
+        
+        <!-- Header Info -->
+        <div>
+          <div style="display:inline-flex; align-items:center; gap:10px; margin-bottom:20px;">
+            <div style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--primary), var(--teal)); color:white; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);">AH</div>
+            <span style="font-size:16px; font-weight:800; color:white; letter-spacing:-0.5px;">AvaHealth Diagnostic Portal</span>
+          </div>
+          <h2 style="font-size:24px; font-weight:800; color:white; line-height:1.2; letter-spacing:-0.02em;">Teknologi Diagnostik &amp; Layanan Kesehatan Terpadu</h2>
+          <p style="font-size:12.5px; color:var(--text-muted); margin-top:8px; max-width:560px; line-height:1.5;">Akses hasil laboratorium kuantitatif, MCU korporasi, penjadwalan pemeriksaan home care, dan rujukan klinik secara terintegrasi.</p>
         </div>
 
-        <form id="login-form" onsubmit="handleLogin(event)">
-          <div class="input-group" style="margin-bottom: 14px;">
-            <label for="username" id="username-label" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email</label>
-            <input type="text" id="username" placeholder="Contoh: RM-12948 atau email Anda" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
-          </div>
-          <div class="input-group" style="margin-bottom: 14px;">
-            <label for="password" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
-            <input type="password" id="password" placeholder="••••••••" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
-          </div>
-
-          <div class="role-selector" style="margin-bottom: 16px;">
-            <span class="role-label" style="font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Masuk Sebagai:</span>
-            <div class="role-options" style="display:flex; gap:6px;">
-              <label class="role-btn" style="flex:1; cursor:pointer;">
-                <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
-                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Pasien</span>
-              </label>
-              <label class="role-btn" style="flex:1; cursor:pointer;">
-                <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
-                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Corporate</span>
-              </label>
-              <label class="role-btn" style="flex:1; cursor:pointer;">
-                <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
-                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Referral</span>
-              </label>
+        <!-- Middle: Beautiful Lab/Clinic Showcase Gallery -->
+        <div style="margin:24px 0;">
+          <span style="font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:12px;">Galeri Laboratorium &amp; Layanan Klinik</span>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); height:110px; position:relative;">
+              <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80" style="width:100%; height:100%; object-fit:cover;" alt="Lab Equipment">
+              <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding:6px 8px; font-size:10px; font-weight:700; color:white;">OneLab Diagnostic Lab</div>
+            </div>
+            <div style="border-radius:10px; overflow:hidden; border:1px solid rgba(255,255,255,0.06); height:110px; position:relative;">
+              <img src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&w=600&q=80" style="width:100%; height:100%; object-fit:cover;" alt="Modern Clinic">
+              <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.8), transparent); padding:6px 8px; font-size:10px; font-weight:700; color:white;">Klinik Medias Healthcare</div>
             </div>
           </div>
+        </div>
 
-          <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; font-size:12.5px; font-weight:700; margin-top:6px; background:linear-gradient(135deg, var(--primary), var(--teal)); border:none; border-radius:8px; color:white; cursor:pointer;">Masuk Layanan</button>
-        </form>
+        <!-- Bottom: Latest Health News (matched to Google News style) -->
+        <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:11px; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.05em; display:block;">📰 Info Kesehatan Terkini</span>
+            <a href="https://news.google.com/search?q=kesehatan" target="_blank" style="font-size:10px; color:var(--primary); text-decoration:none; font-weight:700;">Buka Google News &rarr;</a>
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div class="news-item" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:8px; padding:8px 12px; display:flex; gap:10px; align-items:center;">
+              <span style="font-size:14px;">🧬</span>
+              <div style="flex:1;">
+                <h6 style="font-size:11.5px; font-weight:700; color:white; margin:0; line-height:1.3;">Teknologi Genomik Terbaru untuk Deteksi Dini Penyakit Kronis</h6>
+                <p style="font-size:10px; color:var(--text-muted); margin:2px 0 0 0;">Kemenkes memperluas implementasi skrining DNA di klinik utama.</p>
+              </div>
+            </div>
+            <div class="news-item" style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:8px; padding:8px 12px; display:flex; gap:10px; align-items:center;">
+              <span style="font-size:14px;">🥦</span>
+              <div style="flex:1;">
+                <h6 style="font-size:11.5px; font-weight:700; color:white; margin:0; line-height:1.3;">Panduan Pola Makan Rendah Lemak untuk Pengendalian Kolesterol</h6>
+                <p style="font-size:10px; color:var(--text-muted); margin:2px 0 0 0;">Tips medis terbaru mengelola batas trigliserida dalam pemeriksaan rutin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <div class="screen-footer" style="margin-top: 16px; text-align: center;">
-          <p id="login-footer-desc" style="font-size: 11px; color: var(--text-muted); margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:var(--primary); font-weight:700; text-decoration:none;">Daftar Pasien Baru</a></p>
+      </div>
+
+      <!-- Right Panel: Login Card -->
+      <div class="login-right-panel" style="width:420px; display:flex; align-items:center; justify-content:center; padding:30px; background:#070a13; border-left:1px solid rgba(255,255,255,0.03); flex-shrink:0;">
+        <div class="login-box" style="width:100%; border:none; background:transparent; padding:0; backdrop-filter:none;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="display: inline-flex; width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--teal)); color: white; font-weight: 800; font-size: 18px; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);">AH</div>
+            <h4 style="font-size: 18px; font-weight: 700; color: white; margin: 0; letter-spacing: -0.02em;">AvaHealth Portal</h4>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Akses Layanan Pasien &amp; Mitra Korporasi</p>
+          </div>
+
+          <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="input-group" style="margin-bottom: 14px;">
+              <label for="username" id="username-label" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email</label>
+              <input type="text" id="username" placeholder="Contoh: RM-12948 atau email Anda" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
+            </div>
+            <div class="input-group" style="margin-bottom: 14px;">
+              <label for="password" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
+              <input type="password" id="password" placeholder="••••••••" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
+            </div>
+
+            <div class="role-selector" style="margin-bottom: 16px;">
+              <span class="role-label" style="font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Masuk Sebagai:</span>
+              <div class="role-options" style="display:flex; gap:6px;">
+                <label class="role-btn" style="flex:1; cursor:pointer;">
+                  <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
+                  <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Pasien</span>
+                </label>
+                <label class="role-btn" style="flex:1; cursor:pointer;">
+                  <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
+                  <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Corporate</span>
+                </label>
+                <label class="role-btn" style="flex:1; cursor:pointer;">
+                  <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
+                  <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Referral</span>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; font-size:12.5px; font-weight:700; margin-top:6px; background:linear-gradient(135deg, var(--primary), var(--teal)); border:none; border-radius:8px; color:white; cursor:pointer;">Masuk Layanan</button>
+          </form>
+
+          <div class="screen-footer" style="margin-top: 20px; text-align: center;">
+            <p id="login-footer-desc" style="font-size: 11px; color: var(--text-muted); margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:var(--primary); font-weight:700; text-decoration:none;">Daftar Pasien Baru</a></p>
+          </div>
         </div>
       </div>
     </div>
