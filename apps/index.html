@@ -742,33 +742,33 @@
 
       <!-- ──────── VIEW: BOOK LAB TEST (VIRTU STYLE) ──────── -->
       <div id="book-test-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px;">Pesan Pemeriksaan Laboratorium</div>
+        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">Pesan Pemeriksaan Laboratorium</div>
         <div class="dashboard-grid-two-col" style="grid-template-columns: 260px 1fr 280px; align-items: stretch;">
           
           <!-- Left Filter Panel -->
-          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content; background:#ffffff;">
             <div class="input-group" style="margin-bottom:0;">
-              <label>Cabang Mandiri</label>
-              <select id="bt-branch-select" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+              <label style="color:#64748b;">Cabang Mandiri</label>
+              <select id="bt-branch-select" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
                 <option value="ONELAB_DIAGNOSTIC">Klinik Utama OneLab Diagnostic</option>
                 <option value="MEDIAS_HEALTHCARE">Klinik Utama MEDIAS Healthcare</option>
                 <option value="PRATAMA_MEDICA">Klinik Pratama Medica</option>
               </select>
             </div>
             <div class="input-group" style="margin-bottom:0;">
-              <label>Tanggal Booking</label>
-              <input type="date" id="bt-date" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+              <label style="color:#64748b;">Tanggal Booking</label>
+              <input type="date" id="bt-date" value="2026-07-20" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
             </div>
             <div class="input-group" style="margin-bottom:0;">
-              <label>Nama Layanan</label>
-              <input type="text" id="bt-search" placeholder="Cari nama pemeriksaan..." onkeyup="searchLabTest()" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+              <label style="color:#64748b;">Nama Layanan</label>
+              <input type="text" id="bt-search" placeholder="Cari nama pemeriksaan..." onkeyup="searchLabTest()" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
             </div>
 
-            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:14px;">
+            <div style="border-top:1px solid #e2e8f0; padding-top:14px;">
               <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Gender</span>
-              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="ALL" checked> Semua</label>
-              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="FEMALE"> Perempuan</label>
-              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="MALE"> Laki-laki</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="bt-gender" value="ALL" checked> Semua</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="bt-gender" value="FEMALE"> Perempuan</label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="bt-gender" value="MALE"> Laki-laki</label>
             </div>
           </div>
 
@@ -778,16 +778,16 @@
           </div>
 
           <!-- Right Booking Cart & Billing Summary -->
-          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
-            <h5 style="font-size:13px; font-weight:700; color:white; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Order Review</h5>
+          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content; background:#ffffff;">
+            <h5 style="font-size:13px; font-weight:700; color:#0f2963; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Order Review</h5>
             <div id="bt-cart-items" style="display:flex; flex-direction:column; gap:10px; min-height:80px; max-height:220px; overflow-y:auto;">
               <span style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px 0;">Belum ada pemeriksaan terpilih.</span>
             </div>
 
-            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
-              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="bt-subtotal" style="color:white;">IDR 0.00</strong></div>
-              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong style="color:white;">IDR 15,000.00</strong></div>
-              <div style="display:flex; justify-content:space-between; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px; font-size:13px; color:white;"><span style="font-weight:700;">Grand Total:</span><strong id="bt-grand-total" style="color:var(--teal)">IDR 15,000.00</strong></div>
+            <div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="bt-subtotal" style="color:#0f172a;">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong style="color:#0f172a;">IDR 15,000.00</strong></div>
+              <div style="display:flex; justify-content:space-between; border-top:1px dashed #e2e8f0; padding-top:6px; font-size:13px; color:#0f172a;"><span style="font-weight:700;">Grand Total:</span><strong id="bt-grand-total" style="color:var(--teal)">IDR 15,000.00</strong></div>
             </div>
             
             <label style="font-size:10px; color:var(--text-muted); display:flex; gap:6px; cursor:pointer;">
@@ -803,69 +803,69 @@
 
       <!-- ──────── VIEW: BOOK HOME CARE (VIRTU STYLE) ──────── -->
       <div id="book-homecare-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px;">Booking Layanan Home Care</div>
+        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">Booking Layanan Home Care</div>
         <div class="dashboard-grid-two-col" style="grid-template-columns: 1fr 300px;">
           
           <!-- Left Details Area -->
           <div style="display:flex; flex-direction:column; gap:20px;">
             <!-- Branch & Appointment -->
-            <div class="glass-card" style="padding:20px;">
-              <h5 style="font-size:14px; font-weight:700; color:white; margin-bottom:16px;">Branch &amp; Appointment</h5>
+            <div class="glass-card" style="padding:20px; background:#ffffff;">
+              <h5 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:16px;">Branch &amp; Appointment</h5>
               
-              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:16px; color:#f8fafc; cursor:pointer;">
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:16px; color:#0f172a; cursor:pointer;">
                 <input type="checkbox" id="hc-join-session" style="accent-color:var(--teal)">
                 <span>Join in a session homecare</span>
               </label>
 
               <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
                 <div class="input-group" style="margin-bottom:0;">
-                  <label>Branch</label>
-                  <select id="hc-branch" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+                  <label style="color:#64748b;">Branch</label>
+                  <select id="hc-branch" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
                     <option value="Klinik Utama OneLab Diagnostic">Klinik Utama OneLab Diagnostic</option>
                     <option value="Klinik Utama MEDIAS Healthcare">Klinik Utama MEDIAS Healthcare</option>
                     <option value="Klinik Pratama Medica">Klinik Pratama Medica</option>
                   </select>
                 </div>
                 <div class="input-group" style="margin-bottom:0;">
-                  <label>Book Date</label>
-                  <input type="date" id="hc-date-field" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+                  <label style="color:#64748b;">Book Date</label>
+                  <input type="date" id="hc-date-field" value="2026-07-20" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
                 </div>
               </div>
 
               <div class="input-group" style="margin-bottom:16px;">
-                <label>Address Detail</label>
-                <input type="text" id="hc-addr-detail" placeholder="Contoh: Perumahan Indah Blok A No. 12" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+                <label style="color:#64748b;">Address Detail</label>
+                <input type="text" id="hc-addr-detail" placeholder="Contoh: Perumahan Indah Blok A No. 12" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
               </div>
 
               <div class="input-group" style="margin-bottom:0;">
-                <label>Your Address</label>
-                <input type="text" id="hc-addr-full" placeholder="Masukkan alamat lengkap penjemputan" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+                <label style="color:#64748b;">Your Address</label>
+                <input type="text" id="hc-addr-full" placeholder="Masukkan alamat lengkap penjemputan" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
               </div>
             </div>
 
             <!-- Customer Information -->
-            <div class="glass-card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+            <div class="glass-card" style="padding:20px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
               <div>
-                <h5 style="font-size:14px; font-weight:700; color:white; margin-bottom:4px;">Customer Information</h5>
+                <h5 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:4px;">Customer Information</h5>
                 <p style="font-size:12px; color:var(--text-muted);" id="hc-cust-desc">Ace Darojatun Anwar &bull; Laki-laki &bull; +6282120071009</p>
               </div>
-              <button class="btn btn-sm" style="margin:0; width:auto; padding:6px 12px; background:rgba(255,255,255,0.05); color:white; border:1px solid var(--border);">+ Tambah Pasien</button>
+              <button class="btn btn-sm" style="margin:0; width:auto; padding:6px 12px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;">+ Tambah Pasien</button>
             </div>
           </div>
 
           <!-- Right Bill summary & Cart -->
-          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
-            <h5 style="font-size:13px; font-weight:700; color:white; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Order review</h5>
+          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content; background:#ffffff;">
+            <h5 style="font-size:13px; font-weight:700; color:#0f2963; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Order review</h5>
             <div id="hc-cart-items" style="display:flex; flex-direction:column; gap:8px;">
               <!-- Tied to checkout selections -->
               <span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>
             </div>
 
-            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
-              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="hc-subtotal" style="color:white;">IDR 0.00</strong></div>
-              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong id="hc-service-fee" style="color:white;">IDR 0.00</strong></div>
+            <div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="hc-subtotal" style="color:#0f172a;">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong id="hc-service-fee" style="color:#0f172a;">IDR 0.00</strong></div>
               <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Voucher:</span><strong style="color:var(--error);">- IDR 0.00</strong></div>
-              <div style="display:flex; justify-content:space-between; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px; font-size:13px; color:white;"><span style="font-weight:700;">Grand total:</span><strong id="hc-grand-total" style="color:var(--teal)">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; border-top:1px dashed #e2e8f0; padding-top:6px; font-size:13px; color:#0f172a;"><span style="font-weight:700;">Grand total:</span><strong id="hc-grand-total" style="color:var(--teal)">IDR 0.00</strong></div>
             </div>
 
             <label style="font-size:10px; color:var(--text-muted); display:flex; gap:6px; cursor:pointer;">
@@ -881,35 +881,35 @@
 
       <!-- ──────── VIEW: BUY PACKAGE (VIRTU STYLE) ──────── -->
       <div id="buy-package-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px;">Beli Paket Pemeriksaan (MCU)</div>
+        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">Beli Paket Pemeriksaan (MCU)</div>
         <div class="dashboard-grid-two-col" style="grid-template-columns: 260px 1fr;">
           
           <!-- Left Sidebar Filter -->
-          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content; background:#ffffff;">
             <div class="input-group" style="margin-bottom:0;">
-              <label>Cabang Mandiri</label>
-              <select style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+              <label style="color:#64748b;">Cabang Mandiri</label>
+              <select style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
                 <option>Klinik Utama OneLab Diagnostic</option>
                 <option>Klinik Utama MEDIAS Healthcare</option>
                 <option>Klinik Pratama Medica</option>
               </select>
             </div>
             
-            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px;">
+            <div style="border-top:1px solid #e2e8f0; padding-top:12px;">
               <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Kategori Paket</span>
               <div style="display:flex; flex-direction:column; gap:6px;">
                 <button class="btn btn-sm btn-teal active" style="margin:0; text-align:left; font-size:11px;" id="pkg-cat-all" onclick="filterPackageCategory('ALL')">ALL CATEGORY</button>
-                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-corp" onclick="filterPackageCategory('CORP')">MCU CORPORATE</button>
-                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-ind" onclick="filterPackageCategory('IND')">INDIVIDUAL</button>
-                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-sub" onclick="filterPackageCategory('SUB')">SUBSCRIPTION</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;" id="pkg-cat-corp" onclick="filterPackageCategory('CORP')">MCU CORPORATE</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;" id="pkg-cat-ind" onclick="filterPackageCategory('IND')">INDIVIDUAL</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1;" id="pkg-cat-sub" onclick="filterPackageCategory('SUB')">SUBSCRIPTION</button>
               </div>
             </div>
 
-            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:14px;">
+            <div style="border-top:1px solid #e2e8f0; padding-top:14px;">
               <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Gender</span>
-              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="ALL" checked> Semua</label>
-              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="FEMALE"> Perempuan</label>
-              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="MALE"> Laki-laki</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="pkg-gender" value="ALL" checked> Semua</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="pkg-gender" value="FEMALE"> Perempuan</label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer; color:#0f172a;"><input type="radio" name="pkg-gender" value="MALE"> Laki-laki</label>
             </div>
           </div>
 
@@ -917,11 +917,11 @@
           <div style="display:flex; flex-direction:column; gap:20px;">
             <!-- Category: MCU CORPORATE -->
             <div id="pkg-sec-corp">
-              <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">MCU CORPORATE</div>
+              <div style="font-size:11px; font-weight:800; background:#f0f6fc; padding:6px 12px; border-radius:6px; width:fit-content; color:#0f2963; border:1px solid #cbd5e1; margin-bottom:12px;">MCU CORPORATE</div>
               <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
-                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
                   <div>
-                    <h6 style="font-size:13px; font-weight:700; color:white;">MCU BIZNET HOME 1</h6>
+                    <h6 style="font-size:13px; font-weight:700; color:#0f172a;">MCU BIZNET HOME 1</h6>
                     <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 224,500.00</strong>
                   </div>
                   <button class="btn btn-sm btn-teal" onclick="buyPackage('MCU BIZNET HOME 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
@@ -931,25 +931,25 @@
 
             <!-- Category: INDIVIDUAL -->
             <div id="pkg-sec-ind">
-              <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">INDIVIDUAL</div>
+              <div style="font-size:11px; font-weight:800; background:#f0f6fc; padding:6px 12px; border-radius:6px; width:fit-content; color:#0f2963; border:1px solid #cbd5e1; margin-bottom:12px;">INDIVIDUAL</div>
               <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
-                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
                   <div>
-                    <h6 style="font-size:13px; font-weight:700; color:white;">DEMO - MCU PACKAGE VOLUNTEER 1</h6>
+                    <h6 style="font-size:13px; font-weight:700; color:#0f172a;">DEMO - MCU PACKAGE VOLUNTEER 1</h6>
                     <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 10,040.00</strong>
                   </div>
                   <button class="btn btn-sm btn-teal" onclick="buyPackage('MCU PACKAGE VOLUNTEER 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
                 </div>
-                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
                   <div>
-                    <h6 style="font-size:13px; font-weight:700; color:white;">MEDICAL CHECK UP 1</h6>
+                    <h6 style="font-size:13px; font-weight:700; color:#0f172a;">MEDICAL CHECK UP 1</h6>
                     <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 549,000.00</strong>
                   </div>
                   <button class="btn btn-sm btn-teal" onclick="buyPackage('MEDICAL CHECK UP 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
                 </div>
-                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center; background:#ffffff;">
                   <div>
-                    <h6 style="font-size:13px; font-weight:700; color:white;">PANEL INTIMATE CARE FOR HIM</h6>
+                    <h6 style="font-size:13px; font-weight:700; color:#0f172a;">PANEL INTIMATE CARE FOR HIM</h6>
                     <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 599,000.00</strong>
                   </div>
                   <button class="btn btn-sm btn-teal" onclick="buyPackage('PANEL INTIMATE CARE FOR HIM')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
@@ -963,16 +963,16 @@
 
       <!-- ──────── VIEW: NEAR ME (VIRTU STYLE) ──────── -->
       <div id="nearme-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px;">Cabang Lab Terdekat</div>
+        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">Cabang Lab Terdekat</div>
         
         <!-- Header Filters -->
-        <div class="glass-card" style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+        <div class="glass-card" style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:20px; background:#ffffff;">
           <div style="display:flex; gap:12px; flex:1; min-width:280px;">
-            <select id="nm-branch-region" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; font-size:13px; flex:1;">
+            <select id="nm-branch-region" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; font-size:13px; flex:1;">
               <option value="BALI">BALI</option>
               <option value="JAKARTA">DKI JAKARTA</option>
             </select>
-            <input type="date" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; font-size:13px; width:150px;">
+            <input type="date" value="2026-07-20" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; font-size:13px; width:150px;">
           </div>
           <button class="btn btn-teal" style="margin:0; width:auto; padding:10px 24px;">Search</button>
         </div>
@@ -981,19 +981,19 @@
         <div style="display:flex; flex-direction:column; gap:16px;">
           
           <!-- Klinik Utama OneLab Diagnostic -->
-          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
-            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border); background:#ffffff;">
+            <div style="width:220px; background:rgba(0,0,0,0.04); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-right:1px solid var(--border);">
               <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
-                <rect width="100" height="100" fill="#0f172a" />
-                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
-                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
-                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
-                <text x="50" y="85" fill="#f8fafc" font-size="7" font-weight="800" text-anchor="middle">ONELAB DIAGNOSTIC</text>
+                <rect width="100" height="100" fill="#f8fafc" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#f1f5f9" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0f2963" opacity="0.1" />
+                <circle cx="50" cy="30" r="10" fill="#14b8a6" opacity="0.2" />
+                <text x="50" y="85" fill="#0f2963" font-size="7" font-weight="800" text-anchor="middle">ONELAB DIAGNOSTIC</text>
               </svg>
             </div>
             <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div>
-                <h5 style="font-size:15px; font-weight:700; color:white;">KLINIK UTAMA ONELAB DIAGNOSTIC</h5>
+                <h5 style="font-size:15px; font-weight:700; color:#0f2963;">KLINIK UTAMA ONELAB DIAGNOSTIC</h5>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Jl. Biznet Technovillage No. 1, Jakarta</p>
                 <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
                   <span style="font-size:12px; font-weight:700; color:var(--teal);">± 13 KM <small style="color:var(--text-muted);">From Destination</small></span>
@@ -1001,26 +1001,26 @@
                 </div>
               </div>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm" style="margin:0; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px;">📍 Direction</button>
                 <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
               </div>
             </div>
           </div>
 
           <!-- Klinik Utama MEDIAS Healthcare -->
-          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
-            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border); background:#ffffff;">
+            <div style="width:220px; background:rgba(0,0,0,0.04); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-right:1px solid var(--border);">
               <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
-                <rect width="100" height="100" fill="#0f172a" />
-                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
-                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
-                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
-                <text x="50" y="85" fill="#f8fafc" font-size="7" font-weight="800" text-anchor="middle">MEDIAS HEALTHCARE</text>
+                <rect width="100" height="100" fill="#f8fafc" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#f1f5f9" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0f2963" opacity="0.1" />
+                <circle cx="50" cy="30" r="10" fill="#14b8a6" opacity="0.2" />
+                <text x="50" y="85" fill="#0f2963" font-size="7" font-weight="800" text-anchor="middle">MEDIAS HEALTHCARE</text>
               </svg>
             </div>
             <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div>
-                <h5 style="font-size:15px; font-weight:700; color:white;">KLINIK UTAMA MEDIAS HEALTHCARE</h5>
+                <h5 style="font-size:15px; font-weight:700; color:#0f2963;">KLINIK UTAMA MEDIAS HEALTHCARE</h5>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Jl. RS Fatmawati Raya No. 12, Jakarta</p>
                 <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
                   <span style="font-size:12px; font-weight:700; color:var(--teal);">± 30 KM <small style="color:var(--text-muted);">From Destination</small></span>
@@ -1028,26 +1028,26 @@
                 </div>
               </div>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm" style="margin:0; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px;">📍 Direction</button>
                 <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
               </div>
             </div>
           </div>
 
           <!-- Klinik Pratama Medica -->
-          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
-            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border); background:#ffffff;">
+            <div style="width:220px; background:rgba(0,0,0,0.04); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0; border-right:1px solid var(--border);">
               <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
-                <rect width="100" height="100" fill="#0f172a" />
-                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
-                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
-                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
-                <text x="50" y="85" fill="#f8fafc" font-size="7" font-weight="800" text-anchor="middle">PRATAMA MEDICA</text>
+                <rect width="100" height="100" fill="#f8fafc" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#f1f5f9" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0f2963" opacity="0.1" />
+                <circle cx="50" cy="30" r="10" fill="#14b8a6" opacity="0.2" />
+                <text x="50" y="85" fill="#0f2963" font-size="7" font-weight="800" text-anchor="middle">PRATAMA MEDICA</text>
               </svg>
             </div>
             <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
               <div>
-                <h5 style="font-size:15px; font-weight:700; color:white;">KLINIK PRATAMA MEDICA</h5>
+                <h5 style="font-size:15px; font-weight:700; color:#0f2963;">KLINIK PRATAMA MEDICA</h5>
                 <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Jl. Sudirman Kav. 21, Jakarta</p>
                 <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
                   <span style="font-size:12px; font-weight:700; color:var(--teal);">± 45 KM <small style="color:var(--text-muted);">From Destination</small></span>
@@ -1055,7 +1055,7 @@
                 </div>
               </div>
               <div style="display:flex; gap:10px;">
-                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm" style="margin:0; background:#f1f5f9; color:#0f172a; border:1px solid #cbd5e1; padding:8px 16px;">📍 Direction</button>
                 <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
               </div>
             </div>

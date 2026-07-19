@@ -419,10 +419,10 @@ function renderLabCatalogue(filterText = '') {
       <div class="test-catalog-card">
         <div>
           <span style="font-family:monospace; font-size:10px; color:var(--primary); font-weight:700;">${item.code}</span>
-          <h6 style="font-size:13px; font-weight:700; color:white; margin-top:4px; line-height:1.3;">${item.name}</h6>
+          <h6 style="font-size:13px; font-weight:700; color:var(--text-main); margin-top:4px; line-height:1.3;">${item.name}</h6>
           <p style="font-size:11px; color:var(--text-muted); margin-top:6px; line-height:1.4;">${item.desc}</p>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.03); padding-top:10px; margin-top:6px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:10px; margin-top:6px;">
           <strong style="color:var(--teal); font-size:13px;">IDR ${item.price.toLocaleString('en-US')}</strong>
           <button class="btn btn-sm ${btnClass}" onclick="toggleCartItem('${item.code}')" style="margin:0; width:auto; padding:6px 12px; font-size:11px;">${btnText}</button>
         </div>
@@ -469,10 +469,10 @@ function updateCartUIs() {
       btCartContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px 0;">Belum ada pemeriksaan terpilih.</span>`;
     } else {
       btCartContainer.innerHTML = bookingCart.map(item => `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:11px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:11px;">
           <div style="overflow:hidden; flex:1; margin-right:8px;">
-            <h6 style="color:white; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</h6>
-            <span style="color:var(--text-muted); font-size:9px;">IDR ${item.price.toLocaleString('en-US')}</span>
+            <h6 style="color:var(--text-main); font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">${item.name}</h6>
+            <span style="color:var(--text-muted); font-size:9.5px; display:block; margin-top:2px;">IDR ${item.price.toLocaleString('en-US')}</span>
           </div>
           <button onclick="toggleCartItem('${item.code}')" style="background:none; border:none; color:var(--error); cursor:pointer; font-size:12px;">❌</button>
         </div>
@@ -486,7 +486,7 @@ function updateCartUIs() {
       hcCartContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>`;
     } else {
       hcCartContainer.innerHTML = bookingCart.map(item => `
-        <div style="display:flex; justify-content:space-between; font-size:11px; color:white;">
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-main);">
           <span>${item.name}</span>
           <strong>IDR ${item.price.toLocaleString('en-US')}</strong>
         </div>
