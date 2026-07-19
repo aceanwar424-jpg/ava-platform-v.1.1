@@ -32,7 +32,11 @@ diskon registrasi, manajemen tugas, wiki.
 ### 4. `03_agentic/` — modul Agentic AI
 `supabase_agentic` → `fase12` → `fase34` → `fase5` → `fase6` → `fase6b` → `fase6c` →
 `fase7` → `fase7b` → `fase7c` → `fase7f_it` → `fase7g_it` → `fase7h_lab` →
-`fase7i_hr` → `fase7j_scm` → `fase7k_cleanup` → `fase7l_bizops` → `frameworks`
+`fase7i_hr` → `fase7j_scm` → `fase7k_cleanup` → `fase7l_bizops` → `fase7m_clinical` →
+`frameworks`
+
+> `fase7m_clinical` menambah organ Pharmacy & Inpatient. Sifatnya menaikkan
+> penanda saja — keputusan klinis tetap di tangan manusia.
 
 ### 5. `04_roadmap_fase/` — hasil audit fungsional (18–19 Juli 2026)
 
@@ -60,10 +64,16 @@ Urutan ini **wajib dipatuhi** karena fase berikutnya memakai fungsi dari fase se
 | 18 | `supabase_fase4b.sql` | Penggajian, PPh 21, saldo cuti |
 | 19 | `supabase_fase5_ris.sql` | RIS & arsip citra PACS |
 | 20 | `supabase_fase5_cabang.sql` | Fondasi multi-cabang |
+| 21 | `supabase_icd_selaras.sql` | Perbaikan: `is_primary` dijadikan turunan `diagnose_type` |
+
+> Berkas 21 membetulkan kekeliruan fase 3, yang menambahkan `is_primary` padahal
+> antarmuka Anamnesa sudah memakai `diagnose_type`. Kolom yang tidak pernah terisi
+> itu membuat garis waktu pasien selalu menulis "Diagnosis sekunder".
 
 ### 6. `05_modul_baru/` — modul yang sebelumnya kosong
 `supabase_inpatient.sql` (rawat inap) · `supabase_pharmacy.sql` (farmasi) ·
-`supabase_crm.sql` (pipeline & pendapatan)
+`supabase_crm.sql` (pipeline & pendapatan) ·
+`supabase_assets.sql` (aset tetap, penyusutan & jadwal kalibrasi)
 
 ---
 
