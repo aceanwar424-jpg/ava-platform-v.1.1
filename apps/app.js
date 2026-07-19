@@ -35,16 +35,54 @@ let invoices = [
   { id: 'INV-202606-024', name: 'MCU Karyawan Baru', date: '24 Juni 2026', amount: 12500000, status: 'paid' }
 ];
 
-// Switch Screens
+// Switch Screens (General routing: Login vs Dashboard)
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(el => {
     el.classList.remove('active');
   });
   const target = document.getElementById(screenId);
   if (target) target.classList.add('active');
+
+  // If dashboard is loaded, default to the right view
+  if (screenId === 'dashboard-screen') {
+    if (currentRole === 'patient') {
+      showView('patient-view', 'Dashboard');
+    } else if (currentRole === 'corporate') {
+      showView('corporate-view', 'Corporate MCU');
+    } else if (currentRole === 'referral') {
+      showView('referral-view', 'Faskes Referral');
+    }
+  }
 }
 
-// Switch Timeline Phase
+// Sub-view Routing (Sidebar clicks)
+function showView(viewId, viewTitle) {
+  // Hide all view panels
+  document.querySelectorAll('.view-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+
+  // Display active panel
+  const target = document.getElementById(viewId);
+  if (target) target.classList.add('active');
+
+  // Update Breadcrumb
+  const breadcrumbActive = document.getElementById('breadcrumb-active-view');
+  if (breadcrumbActive) breadcrumbActive.textContent = viewTitle;
+
+  // Sync Active Sidebar Link
+  document.querySelectorAll('.sidebar-link').forEach(link => {
+    const isTarget = link.getAttribute('onclick').includes(viewId) || 
+                     (viewId === 'patient-view' && link.getAttribute('onclick').includes('patient-view'));
+    link.classList.toggle('active', isTarget);
+  });
+
+  // Close sidebar drawer on mobile
+  const sidebar = document.getElementById('app-sidebar');
+  if (sidebar) sidebar.classList.remove('open');
+}
+
+// Switch Timeline Phase (Only applicable for Patient view)
 function switchTimelinePhase(phaseId) {
   currentPhase = phaseId;
 
@@ -67,6 +105,82 @@ function switchTimelinePhase(phaseId) {
   if (targetPanel) {
     targetPanel.classList.add('active');
   }
+}
+
+// Toggle Sidebar on mobile
+function toggleSidebar() {
+  const sidebar = document.getElementById('app-sidebar');
+  if (sidebar) sidebar.classList.toggle('open');
+}
+
+// Render dynamic menus inside sidebar based on logged-in role
+function renderSidebarMenu() {
+  const navContainer = document.getElementById('sidebar-nav');
+  if (!navContainer) return;
+
+  if (currentRole === 'patient') {
+    navContainer.innerHTML = `
+      <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard')">📊 Dashboard Utama</a>
+      <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">🗂️ Rekam Medis (EHR)</a>
+      <a class="sidebar-link" onclick="openBookingModal()">🗓️ Pesan Tes Lab</a>
+      <a class="sidebar-link" onclick="openHomeCareModal()">🏠 Pesan Home Care</a>
+      <a class="sidebar-link" onclick="openPackageModal()">🎁 Beli Paket MCU</a>
+      <a class="sidebar-link" onclick="openNearMeModal()">📍 Cabang Terdekat</a>
+      <a class="sidebar-link" onclick="openMemberModal()">💎 Member &amp; Afiliasi</a>
+    `;
+  } else if (currentRole === 'corporate') {
+    navContainer.innerHTML = `
+      <a class="sidebar-link active" onclick="showView('corporate-view', 'Corporate MCU')">📊 Ringkasan Proyek</a>
+      <a class="sidebar-link" onclick="openAddEmployeeModal()">➕ Tambah Karyawan</a>
+      <a class="sidebar-link" onclick="openCorpBillingModal()">💳 Kelola Invoice</a>
+      <a class="sidebar-link" onclick="openClaimCashbackModal()">💰 Klaim Cashback</a>
+    `;
+  } else if (currentRole === 'referral') {
+    navContainer.innerHTML = `
+      <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">📊 Riwayat Rujukan</a>
+      <a class="sidebar-link" onclick="openReferralForm()">📋 Buat Rujukan Baru</a>
+      <a class="sidebar-link" onclick="openWithdrawFeeModal()">💰 Tarik Komisi</a>
+    `;
+  }
+}
+
+// Switch EHR sub tabs (Lab, Radiology, Resume Medis)
+function switchMedrecSubTab(tabName) {
+  // Toggle active tab buttons
+  document.querySelectorAll('.tab-btn-medrec').forEach(btn => {
+    btn.classList.remove('active', 'btn-teal');
+    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+    btn.style.color = 'white';
+  });
+
+  const activeBtn = document.getElementById(`tab-mr-${tabName}`);
+  if (activeBtn) {
+    activeBtn.classList.add('active', 'btn-teal');
+    activeBtn.style.background = '';
+  }
+
+  // Toggle sub panels
+  document.querySelectorAll('.medrec-sub-panel').forEach(panel => {
+    panel.classList.remove('active');
+    panel.style.display = 'none';
+  });
+
+  const activePanel = document.getElementById(`mr-panel-${tabName}`);
+  if (activePanel) {
+    activePanel.classList.add('active');
+    activePanel.style.display = 'block';
+  }
+}
+
+// Radiology X-ray viewer overlay triggers
+function openXrayViewer() {
+  const modal = document.getElementById('xray-viewer-modal');
+  if (modal) modal.classList.add('open');
+}
+
+function closeXrayViewer() {
+  const modal = document.getElementById('xray-viewer-modal');
+  if (modal) modal.classList.remove('open');
 }
 
 // Update Login Form UI dynamically based on role selection
@@ -630,21 +744,18 @@ function handleLogin(event) {
   const welcomeEl = document.getElementById('user-welcome');
   const roleBadgeEl = document.getElementById('user-role-badge');
   
-  // Hide all panels first
-  document.querySelectorAll('.view-panel').forEach(el => {
-    el.classList.remove('active');
-  });
-
   // Check if credentials match the super admin
   const isSuperAdmin = (usernameInput === 'aceanwar424@gmail.com');
   const adminRealName = 'Ace Darojatun Anwar';
 
+  // Render Left Sidebar navigation dynamically based on role
+  renderSidebarMenu();
+
   if (selectedRole === 'corporate') {
     avatarEl.textContent = 'C';
     avatarEl.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
-    welcomeEl.textContent = isSuperAdmin ? `PT. AvaHealth (${adminRealName})` : (usernameInput || 'PT. Sukses Mandiri');
+    welcomeEl.textContent = isSuperAdmin ? `${adminRealName}` : (usernameInput || 'PT. Sukses Mandiri');
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Korporasi' : 'Mitra Korporasi';
-    roleBadgeEl.style.color = '#f59e0b';
     
     // Update Wallet Cashback
     const cbEl = document.getElementById('c-cashback-balance');
@@ -653,14 +764,12 @@ function handleLogin(event) {
     // Render Corporate List & Invoices
     renderCorporateList();
     renderInvoices();
-    document.getElementById('corporate-view').classList.add('active');
   } 
   else if (selectedRole === 'referral') {
     avatarEl.textContent = 'R';
     avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
     welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (usernameInput || 'Klinik Medika Pratama');
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Referral' : 'Faskes / Dokter Perujuk';
-    roleBadgeEl.style.color = '#14b8a6';
     
     // Update Referral Wallet balance
     const feeEl = document.getElementById('r-fee-balance');
@@ -668,22 +777,18 @@ function handleLogin(event) {
 
     // Render Referral List
     renderReferralList();
-    document.getElementById('referral-view').classList.add('active');
   } 
   else {
     // Default: Patient
     const finalName = isSuperAdmin ? adminRealName : (usernameInput || 'Budi Santoso');
     avatarEl.textContent = 'P';
     avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)';
-    welcomeEl.textContent = isSuperAdmin ? `Halo, ${finalName}` : finalName;
+    welcomeEl.textContent = finalName;
     roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Pasien' : 'Pasien Terverifikasi';
-    roleBadgeEl.style.color = '#38bdf8';
     
     // Initialize Member Card Name
     const memberNameEl = document.getElementById('p-member-name');
     if (memberNameEl) memberNameEl.textContent = finalName;
-    
-    document.getElementById('patient-view').classList.add('active');
   }
   
   // Hide timeline tabs for corporate and referral, only show for patient

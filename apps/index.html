@@ -60,30 +60,65 @@
     </div>
 
     <!-- ════════════════════════ DASHBOARD SCREEN ════════════════════════ -->
-    <div id="dashboard-screen" class="screen">
-      <header class="app-header" style="margin-bottom:12px;">
-        <div class="user-profile">
-          <div class="avatar" id="user-avatar">P</div>
-          <div class="user-info">
-            <h3 id="user-welcome">Halo, Pasien</h3>
+    <div id="dashboard-screen" class="screen full-layout">
+      
+      <!-- Responsive Left Sidebar -->
+      <aside class="app-sidebar" id="app-sidebar">
+        <!-- Sidebar Brand/Logo -->
+        <div class="sidebar-brand">
+          <div class="logo-mark">AH</div>
+          <span>AvaHealth</span>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="sidebar-user-card">
+          <div class="sidebar-user-avatar" id="user-avatar">P</div>
+          <div class="sidebar-user-details">
+            <h5 id="user-welcome">Ace Darojatun Anwar</h5>
             <span id="user-role-badge">Pasien Terverifikasi</span>
           </div>
         </div>
-        <button class="logout-btn" onclick="handleLogout()">Keluar</button>
-      </header>
 
-      <!-- Timeline Tabs Navigation -->
-      <div class="timeline-tabs-container" id="timeline-tabs-nav">
-        <div class="timeline-tabs">
-          <button class="t-tab active" id="btn-fase1" onclick="switchTimelinePhase('fase1')">Fase 1<br><small>2026-2031</small></button>
-          <button class="t-tab" id="btn-fase2" onclick="switchTimelinePhase('fase2')">Fase 2<br><small>2031-2046</small></button>
-          <button class="t-tab" id="btn-fase3" onclick="switchTimelinePhase('fase3')">Fase 3<br><small>2046-2076</small></button>
-          <button class="t-tab" id="btn-fase4" onclick="switchTimelinePhase('fase4')">Fase 4<br><small>2076-2126</small></button>
+        <!-- Navigation Links (Dynamic by Role) -->
+        <nav class="sidebar-nav" id="sidebar-nav">
+          <!-- Rendered dynamically by app.js -->
+        </nav>
+
+        <div class="sidebar-footer">
+          <button class="btn btn-sm btn-logout" onclick="handleLogout()">🚪 Keluar</button>
         </div>
-      </div>
+      </aside>
 
-      <!-- ──────── VIEW: PASIEN ──────── -->
-      <div id="patient-view" class="view-panel">
+      <!-- Main Layout Content Area -->
+      <main class="app-main-content">
+        
+        <!-- Breadcrumb / Header Row (Desktop) -->
+        <header class="app-content-header">
+          <div class="header-left-row">
+            <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+            <div class="breadcrumb">
+              <span class="bc-parent">AvaHealth</span>
+              <span class="bc-sep">/</span>
+              <span id="breadcrumb-active-view">Dashboard</span>
+            </div>
+          </div>
+          
+          <!-- Phase Switcher (Only visible for Patient role) -->
+          <div class="timeline-tabs-container" id="timeline-tabs-nav">
+            <div class="timeline-tabs">
+              <button class="t-tab active" id="btn-fase1" onclick="switchTimelinePhase('fase1')">Fase 1<br><small>2026-2031</small></button>
+              <button class="t-tab" id="btn-fase2" onclick="switchTimelinePhase('fase2')">Fase 2<br><small>2031-2046</small></button>
+              <button class="t-tab" id="btn-fase3" onclick="switchTimelinePhase('fase3')">Fase 3<br><small>2046-2076</small></button>
+              <button class="t-tab" id="btn-fase4" onclick="switchTimelinePhase('fase4')">Fase 4<br><small>2076-2126</small></button>
+            </div>
+          </div>
+        </header>
+
+        <!-- View Panels Wrapper -->
+        <div class="view-panels-wrapper">
+          
+          <!-- ──────── VIEW: PASIEN ──────── -->
+          <div id="patient-view" class="view-panel active">
         
         <!-- P - FASE 1: DIGITAL HOSPITAL (CURRENT) -->
         <div id="p-fase1-panel" class="phase-panel active">
@@ -372,6 +407,169 @@
 
       </div>
 
+      <!-- ──────── VIEW: MEDREC (EHR PORTAL) ──────── -->
+      <div id="medrec-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Portal Rekam Medis Elektronik (EHR)</div>
+        
+        <!-- EHR Tabs Header -->
+        <div class="glass-card" style="margin-bottom:24px; padding:16px;">
+          <div style="display:flex; gap:10px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; margin-bottom:16px; flex-wrap:wrap;">
+            <button class="btn btn-sm btn-teal tab-btn-medrec active" onclick="switchMedrecSubTab('lab')" id="tab-mr-lab" style="margin:0;">🧪 Hasil Laboratorium</button>
+            <button class="btn btn-sm tab-btn-medrec" onclick="switchMedrecSubTab('rad')" id="tab-mr-rad" style="margin:0; background:rgba(255,255,255,0.05); color:white;">🩻 Radiologi &amp; Penunjang</button>
+            <button class="btn btn-sm tab-btn-medrec" onclick="switchMedrecSubTab('res')" id="tab-mr-res" style="margin:0; background:rgba(255,255,255,0.05); color:white;">📄 Resume Medis &amp; Resep</button>
+          </div>
+
+          <!-- SubTab: Laboratorium -->
+          <div class="medrec-sub-panel active" id="mr-panel-lab">
+            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Laporan Hasil Laboratorium Kuantitatif</h4>
+            
+            <div style="border:1px solid var(--border); border-radius:12px; overflow-x:auto; background:rgba(15,23,42,0.4); margin-bottom:16px;">
+              <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left; min-width: 480px;">
+                <thead>
+                  <tr style="background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); color:var(--text-muted);">
+                    <th style="padding:12px;">Parameter Pemeriksaan</th>
+                    <th style="padding:12px;">Hasil</th>
+                    <th style="padding:12px;">Rujukan Normal</th>
+                    <th style="padding:12px;">Satuan</th>
+                    <th style="padding:12px; text-align:right;">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <td style="padding:12px; font-weight:600; color:white;">Hemoglobin (Hb)</td>
+                    <td style="padding:12px; font-weight:700; color:var(--teal);">14.5</td>
+                    <td style="padding:12px; color:var(--text-muted);">13.0 - 17.5</td>
+                    <td style="padding:12px; color:var(--text-muted);">g/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-fit">Normal</span></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <td style="padding:12px; font-weight:600; color:white;">Kolesterol Total</td>
+                    <td style="padding:12px; font-weight:700; color:var(--error);">245 ⚠️</td>
+                    <td style="padding:12px; color:var(--text-muted);">&lt; 200</td>
+                    <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <td style="padding:12px; font-weight:600; color:white;">Trigliserida</td>
+                    <td style="padding:12px; font-weight:700; color:var(--error);">190 ⚠️</td>
+                    <td style="padding:12px; color:var(--text-muted);">&lt; 150</td>
+                    <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <td style="padding:12px; font-weight:600; color:white;">Asam Urat</td>
+                    <td style="padding:12px; font-weight:700; color:var(--teal);">5.8</td>
+                    <td style="padding:12px; color:var(--text-muted);">3.4 - 7.0</td>
+                    <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-fit">Normal</span></td>
+                  </tr>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+                    <td style="padding:12px; font-weight:600; color:white;">Glukosa Puasa</td>
+                    <td style="padding:12px; font-weight:700; color:var(--error);">126 ⚠️</td>
+                    <td style="padding:12px; color:var(--text-muted);">70 - 100</td>
+                    <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:12px; font-weight:600; color:white;">Kreatinin</td>
+                    <td style="padding:12px; font-weight:700; color:var(--teal);">0.9</td>
+                    <td style="padding:12px; color:var(--text-muted);">0.6 - 1.2</td>
+                    <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
+                    <td style="padding:12px; text-align:right;"><span class="badge badge-fit">Normal</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- AI Diagnosis Summary -->
+            <div style="background:rgba(14,165,233,0.05); border:1px solid rgba(14,165,233,0.15); border-radius:10px; padding:16px;">
+              <h5 style="font-size:13px; font-weight:700; color:white; display:flex; align-items:center; gap:6px; margin-bottom:8px;">✨ Interpretasi Medis AI AvaHealth</h5>
+              <p style="font-size:12px; color:var(--text-main); line-height:1.5;">
+                AI mendeteksi adanya <strong>Hiperkolesterolemia Ringan</strong> dan indikasi <strong>Prediabetes</strong> (Gula darah puasa &gt; 100 mg/dL). Disarankan melakukan konsultasi lanjutan dengan dokter spesialis penyakit dalam untuk verifikasi HbA1c dan perbaikan pola makan rendah lemak.
+              </p>
+            </div>
+          </div>
+
+          <!-- SubTab: Radiologi -->
+          <div class="medrec-sub-panel" id="mr-panel-rad" style="display:none;">
+            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Laporan Interpretasi Radiologi</h4>
+            
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                <div style="flex:1; min-width: 250px;">
+                  <h5 style="font-size:14px; font-weight:700; color:white;">Chest X-Ray / Thorax PA</h5>
+                  <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pemeriksaan Rontgen Dada &bull; Dokter Pengirim: Dr. Ace Darojatun</p>
+                  <p style="font-size:12px; color:#e2e8f0; margin-top:10px; line-height:1.4;">
+                    <strong>Hasil Bacaan:</strong> Cor dan pulmo dalam batas normal. Tidak tampak kardiomegali maupun infiltrate paru aktif.
+                  </p>
+                </div>
+                <button class="btn btn-sm btn-teal" onclick="openXrayViewer()" style="margin:0; font-size:11px; height: fit-content; padding: 8px 16px;">Lihat Gambar Scan</button>
+              </div>
+
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
+                <h5 style="font-size:14px; font-weight:700; color:white;">USG Abdomen Upper-Lower</h5>
+                <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pemeriksaan USG Organ Dalam &bull; 19 Juli 2026</p>
+                <p style="font-size:12px; color:#e2e8f0; margin-top:10px; line-height:1.4;">
+                  <strong>Hasil Bacaan:</strong> Kolelitiasis negatif. Hepar normal, pankreas, lien, ren dextra et sinistra dalam batas normal. Tidak tampak cairan bebas di rongga abdomen.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SubTab: Resume Medis -->
+          <div class="medrec-sub-panel" id="mr-panel-res" style="display:none;">
+            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Resume Medis &amp; Terapi Resep</h4>
+            
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <!-- Diagnoses -->
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:8px;">Diagnosis Utama (ICD-10)</h5>
+                <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
+                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:6px;">
+                    <span style="color:white; font-weight:600;">E11.9 — Diabetes Melitus Tipe 2 Tanpa Komplikasi</span>
+                    <span style="color:var(--text-muted)">ICD-10</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; padding-top:2px;">
+                    <span style="color:white; font-weight:600;">E78.5 — Hiperlipidemia Non-Spesifik</span>
+                    <span style="color:var(--text-muted)">ICD-10</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Prescription -->
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:10px;">Resep E-Prescribing Aktif</h5>
+                <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                    <div>
+                      <strong style="color:white; font-size:13px;">Metformin 500 mg</strong>
+                      <span style="display:block; font-size:10px; color:var(--text-muted); margin-top:2px;">Aturan: 2 x Sehari 1 Tablet (Sesudah Makan)</span>
+                    </div>
+                    <span class="badge badge-fit">15 Tablet</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; padding-top:2px;">
+                    <div>
+                      <strong style="color:white; font-size:13px;">Atorvastatin 20 mg</strong>
+                      <span style="display:block; font-size:10px; color:var(--text-muted); margin-top:2px;">Aturan: 1 x Sehari 1 Tablet (Malam Hari)</span>
+                    </div>
+                    <span class="badge badge-fit">10 Tablet</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Advice -->
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
+                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:6px;">Instruksi Dokter Pengasuh</h5>
+                <p style="font-size:12px; line-height:1.5; color:#e2e8f0;">
+                  Kontrol gula darah puasa setiap 2 minggu sekali. Lakukan olahraga aerobik jalan cepat minimal 30 menit per hari. Hindari makanan yang mengandung kadar karbohidrat olahan tinggi serta makanan berminyak jenuh tinggi. Kontrol kembali ke poli penyakit dalam dalam waktu 1 bulan.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
       <div id="corporate-view" class="view-panel">
         
@@ -751,7 +949,8 @@
         </div>
 
       </div>
-    </div>
+    </main>
+  </div>
 
     <!-- ════════════════════════ MODAL: DAFTAR PASIEN MANDIRI ════════════════════════ -->
     <div id="register-modal" class="modal-overlay">
@@ -1132,7 +1331,7 @@
           <button type="button" class="btn btn-close" onclick="closeClaimCashbackModal()">Batal</button>
           <button type="button" class="btn btn-teal" onclick="processClaimCashback()" style="margin-top:0; width:100%;">Konfirmasi Pencairan</button>
         </div>
-      </div>
+      </main>
     </div>
 
     <!-- ════════════════════════ MODAL: TARIK KOMISI REFERRAL ════════════════════════ -->
@@ -1165,6 +1364,19 @@
             <button type="submit" class="btn btn-primary" style="margin-top:0; background:#6366f1; border-color:#6366f1; color:white; width:100%;">Proses Penarikan</button>
           </div>
         </form>
+      </div>
+    <!-- ════════════════════════ MODAL: RADIOLOGY X-RAY VIEWERS ════════════════════════ -->
+    <div id="xray-viewer-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 500px; padding: 20px; text-align:center;">
+        <h3 style="margin-bottom:4px; color:white;">Diagnostic Chest X-Ray PA</h3>
+        <p style="color:var(--text-muted); font-size:11px; margin-bottom:16px;">Ny. Linda &bull; Tanggal Pemeriksaan: 19 Juli 2026</p>
+        
+        <!-- X-ray Image Frame -->
+        <div style="border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden; background:black; display:flex; justify-content:center; align-items:center; margin-bottom:16px;">
+          <img src="xray.jpg" alt="Thorax Scan" style="max-width:100%; max-height:360px; object-fit:contain;">
+        </div>
+
+        <button class="btn btn-close" onclick="closeXrayViewer()" style="width:100%;">Tutup Gambar</button>
       </div>
     </div>
 
