@@ -627,7 +627,395 @@
 
         </div>
       </div>
-      
+
+      <!-- ──────── VIEW: BOOK LAB TEST (VIRTU STYLE) ──────── -->
+      <div id="book-test-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Pesan Pemeriksaan Laboratorium</div>
+        <div class="dashboard-grid-two-col" style="grid-template-columns: 260px 1fr 280px; align-items: stretch;">
+          
+          <!-- Left Filter Panel -->
+          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+            <div class="input-group" style="margin-bottom:0;">
+              <label>Cabang Mandiri</label>
+              <select id="bt-branch-select" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+                <option value="BALI">VIRTU DIGILAB NATIONAL RESEARCH CENTER</option>
+                <option value="JAKARTA">VIRTU DIGILAB BRANCH JAKARTA FATMAWATI</option>
+              </select>
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+              <label>Tanggal Booking</label>
+              <input type="date" id="bt-date" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+              <label>Nama Layanan</label>
+              <input type="text" id="bt-search" placeholder="Cari nama pemeriksaan..." onkeyup="searchLabTest()" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:14px;">
+              <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Gender</span>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="ALL" checked> Semua</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="FEMALE"> Perempuan</label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;"><input type="radio" name="bt-gender" value="MALE"> Laki-laki</label>
+            </div>
+          </div>
+
+          <!-- Middle Test Catalogue Grid -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:14px; content-visibility: auto;" id="bt-catalogue-grid">
+            <!-- Rendered dynamically by app.js: Calcium, Creatinine, etc. -->
+          </div>
+
+          <!-- Right Booking Cart & Billing Summary -->
+          <div class="glass-card" style="padding: 16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+            <h5 style="font-size:13px; font-weight:700; color:white; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Order Review</h5>
+            <div id="bt-cart-items" style="display:flex; flex-direction:column; gap:10px; min-height:80px; max-height:220px; overflow-y:auto;">
+              <span style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px 0;">Belum ada pemeriksaan terpilih.</span>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="bt-subtotal" style="color:white;">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong style="color:white;">IDR 15,000.00</strong></div>
+              <div style="display:flex; justify-content:space-between; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px; font-size:13px; color:white;"><span style="font-weight:700;">Grand Total:</span><strong id="bt-grand-total" style="color:var(--teal)">IDR 15,000.00</strong></div>
+            </div>
+            
+            <label style="font-size:10px; color:var(--text-muted); display:flex; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="bt-terms" checked>
+              <span>By clicking pay, you agree to our Terms &amp; Conditions</span>
+            </label>
+
+            <button class="btn btn-teal" onclick="checkoutLabBooking()" style="margin-top:4px; font-size:12px; padding:10px;">Bayar &amp; Dapatkan Antrean</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: BOOK HOME CARE (VIRTU STYLE) ──────── -->
+      <div id="book-homecare-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Booking Layanan Home Care</div>
+        <div class="dashboard-grid-two-col" style="grid-template-columns: 1fr 300px;">
+          
+          <!-- Left Details Area -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Branch & Appointment -->
+            <div class="glass-card" style="padding:20px;">
+              <h5 style="font-size:14px; font-weight:700; color:white; margin-bottom:16px;">Branch &amp; Appointment</h5>
+              
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-bottom:16px; color:#f8fafc; cursor:pointer;">
+                <input type="checkbox" id="hc-join-session" style="accent-color:var(--teal)">
+                <span>Join in a session homecare</span>
+              </label>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:16px;">
+                <div class="input-group" style="margin-bottom:0;">
+                  <label>Branch</label>
+                  <select id="hc-branch" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+                    <option value="Virtu DigiLab National Research Center">Virtu DigiLab National Research Center</option>
+                    <option value="Virtu DigiLab Jakarta Fatmawati">Virtu DigiLab Jakarta Fatmawati</option>
+                  </select>
+                </div>
+                <div class="input-group" style="margin-bottom:0;">
+                  <label>Book Date</label>
+                  <input type="date" id="hc-date-field" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+                </div>
+              </div>
+
+              <div class="input-group" style="margin-bottom:16px;">
+                <label>Address Detail</label>
+                <input type="text" id="hc-addr-detail" placeholder="Contoh: Perumahan Indah Blok A No. 12" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+              </div>
+
+              <div class="input-group" style="margin-bottom:0;">
+                <label>Your Address</label>
+                <input type="text" id="hc-addr-full" placeholder="Masukkan alamat lengkap penjemputan" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; width:100%;">
+              </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="glass-card" style="padding:20px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h5 style="font-size:14px; font-weight:700; color:white; margin-bottom:4px;">Customer Information</h5>
+                <p style="font-size:12px; color:var(--text-muted);" id="hc-cust-desc">Ace Darojatun Anwar &bull; Laki-laki &bull; +6282120071009</p>
+              </div>
+              <button class="btn btn-sm" style="margin:0; width:auto; padding:6px 12px; background:rgba(255,255,255,0.05); color:white; border:1px solid var(--border);">+ Tambah Pasien</button>
+            </div>
+          </div>
+
+          <!-- Right Bill summary & Cart -->
+          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+            <h5 style="font-size:13px; font-weight:700; color:white; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px;">Order review</h5>
+            <div id="hc-cart-items" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Tied to checkout selections -->
+              <span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Subtotal:</span><strong id="hc-subtotal" style="color:white;">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Service Fee:</span><strong id="hc-service-fee" style="color:white;">IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; color:var(--text-muted);"><span>Voucher:</span><strong style="color:var(--error);">- IDR 0.00</strong></div>
+              <div style="display:flex; justify-content:space-between; border-top:1px dashed rgba(255,255,255,0.05); padding-top:6px; font-size:13px; color:white;"><span style="font-weight:700;">Grand total:</span><strong id="hc-grand-total" style="color:var(--teal)">IDR 0.00</strong></div>
+            </div>
+
+            <label style="font-size:10px; color:var(--text-muted); display:flex; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="hc-terms" checked>
+              <span>By clicking pay, you agree to our Terms &amp; Conditions</span>
+            </label>
+
+            <button class="btn btn-teal" onclick="checkoutHomeCare()" style="margin-top:4px; font-size:12px; padding:10px;" id="hc-pay-btn">Pay IDR 0.00</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: BUY PACKAGE (VIRTU STYLE) ──────── -->
+      <div id="buy-package-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Beli Paket Pemeriksaan (MCU)</div>
+        <div class="dashboard-grid-two-col" style="grid-template-columns: 260px 1fr;">
+          
+          <!-- Left Sidebar Filter -->
+          <div class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:16px; height: fit-content;">
+            <div class="input-group" style="margin-bottom:0;">
+              <label>Cabang Mandiri</label>
+              <select style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+                <option>VIRTU DIGILAB NATIONAL RESEARCH CENTER</option>
+              </select>
+            </div>
+            
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:12px;">
+              <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Kategori Paket</span>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <button class="btn btn-sm btn-teal active" style="margin:0; text-align:left; font-size:11px;" id="pkg-cat-all" onclick="filterPackageCategory('ALL')">ALL CATEGORY</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-corp" onclick="filterPackageCategory('CORP')">MCU CORPORATE</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-ind" onclick="filterPackageCategory('IND')">INDIVIDUAL</button>
+                <button class="btn btn-sm" style="margin:0; text-align:left; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="pkg-cat-sub" onclick="filterPackageCategory('SUB')">SUBSCRIPTION</button>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:14px;">
+              <span style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase; display:block; margin-bottom:8px;">Gender</span>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="ALL" checked> Semua</label>
+              <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="FEMALE"> Perempuan</label>
+              <label style="display:flex; align-items:center; gap:8px; font-size:12px; cursor:pointer;"><input type="radio" name="pkg-gender" value="MALE"> Laki-laki</label>
+            </div>
+          </div>
+
+          <!-- Packages Content List -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Category: MCU CORPORATE -->
+            <div id="pkg-sec-corp">
+              <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">MCU CORPORATE</div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h6 style="font-size:13px; font-weight:700; color:white;">MCU BIZNET HOME 1</h6>
+                    <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 224,500.00</strong>
+                  </div>
+                  <button class="btn btn-sm btn-teal" onclick="buyPackage('MCU BIZNET HOME 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category: INDIVIDUAL -->
+            <div id="pkg-sec-ind">
+              <div style="font-size:11px; font-weight:800; background:rgba(15,23,42,0.6); padding:6px 12px; border-radius:6px; width:fit-content; color:white; border:1px solid var(--border); margin-bottom:12px;">INDIVIDUAL</div>
+              <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:14px;">
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h6 style="font-size:13px; font-weight:700; color:white;">DEMO - MCU PACKAGE VOLUNTEER 1</h6>
+                    <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 10,040.00</strong>
+                  </div>
+                  <button class="btn btn-sm btn-teal" onclick="buyPackage('MCU PACKAGE VOLUNTEER 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
+                </div>
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h6 style="font-size:13px; font-weight:700; color:white;">MEDICAL CHECK UP 1</h6>
+                    <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 549,000.00</strong>
+                  </div>
+                  <button class="btn btn-sm btn-teal" onclick="buyPackage('MEDICAL CHECK UP 1')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
+                </div>
+                <div class="glass-card" style="padding:16px; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h6 style="font-size:13px; font-weight:700; color:white;">PANEL INTIMATE CARE FOR HIM</h6>
+                    <strong style="color:var(--teal); font-size:13px; display:block; margin-top:6px;">IDR 599,000.00</strong>
+                  </div>
+                  <button class="btn btn-sm btn-teal" onclick="buyPackage('PANEL INTIMATE CARE FOR HIM')" style="margin:0; width:auto; padding:8px 12px;">🛒</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: NEAR ME (VIRTU STYLE) ──────── -->
+      <div id="nearme-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Cabang Lab Terdekat</div>
+        
+        <!-- Header Filters -->
+        <div class="glass-card" style="padding:14px 20px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:20px;">
+          <div style="display:flex; gap:12px; flex:1; min-width:280px;">
+            <select id="nm-branch-region" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; font-size:13px; flex:1;">
+              <option value="BALI">BALI</option>
+              <option value="JAKARTA">DKI JAKARTA</option>
+            </select>
+            <input type="date" value="2026-07-20" style="background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white; font-size:13px; width:150px;">
+          </div>
+          <button class="btn btn-teal" style="margin:0; width:auto; padding:10px 24px;">Search</button>
+        </div>
+
+        <!-- Branch list -->
+        <div style="display:flex; flex-direction:column; gap:16px;">
+          
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
+            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <!-- Elegant visual SVG representation of Virtu lobby desk -->
+              <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
+                <rect width="100" height="100" fill="#0f172a" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
+                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
+                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">VIRTU DIGILAB</text>
+              </svg>
+            </div>
+            <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h5 style="font-size:15px; font-weight:700; color:white;">VIRTU DIGILAB NATIONAL RESEARCH CENTER</h5>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">JL BIZNET TECHNOVILLAGE NO 1</p>
+                <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
+                  <span style="font-size:12px; font-weight:700; color:var(--teal);">± 13 KM <small style="color:var(--text-muted);">From Destination</small></span>
+                  <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">No Queue</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="glass-card" style="padding:0; overflow:hidden; display:flex; flex-direction:row; align-items:stretch; border:1px solid var(--border);">
+            <div style="width:220px; background:rgba(0,0,0,0.2); position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg viewBox="0 0 100 100" style="width:100%; height:100%; object-fit:cover;">
+                <rect width="100" height="100" fill="#0f172a" />
+                <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
+                <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
+                <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
+                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">VIRTU DIGILAB</text>
+              </svg>
+            </div>
+            <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div>
+                <h5 style="font-size:15px; font-weight:700; color:white;">VIRTU DIGILAB BRANCH JAKARTA FATMAWATI</h5>
+                <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">JL RS FATMAWATI RAYA</p>
+                <div style="display:flex; gap:12px; margin-top:12px; align-items:center;">
+                  <span style="font-size:12px; font-weight:700; color:var(--teal);">± 30 KM <small style="color:var(--text-muted);">From Destination</small></span>
+                  <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">No Queue</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-sm" style="margin:0; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border); padding:8px 16px;">📍 Direction</button>
+                <button class="btn btn-sm btn-teal" onclick="showView('book-test-view', 'Pesan Lab')" style="margin:0; padding:8px 16px;">Book Lab Test</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: MY PROFILE (VIRTU STYLE) ──────── -->
+      <div id="profile-view" class="view-panel">
+        <div class="section-title" style="margin-bottom: 16px;">Profil Saya &bull; Akun Terverifikasi</div>
+        
+        <div class="glass-card" style="padding:20px; margin-bottom:20px;">
+          <!-- Profile sub headers tabs -->
+          <div style="display:flex; gap:8px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; margin-bottom:20px; flex-wrap:wrap;">
+            <button class="btn btn-sm btn-teal active" style="margin:0; font-size:11px;" id="prof-subtab-sum" onclick="switchProfileSubTab('sum')">Summary</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-mr" onclick="switchProfileSubTab('mr')">Medical Record</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-fam" onclick="switchProfileSubTab('fam')">Family Member</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-pay" onclick="switchProfileSubTab('pay')">Payment Info</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-book" onclick="switchProfileSubTab('book')">My Booking</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-sub" onclick="switchProfileSubTab('sub')">My Subscription</button>
+            <button class="btn btn-sm" style="margin:0; font-size:11px; background:rgba(255,255,255,0.03); color:white;" id="prof-subtab-set" onclick="switchProfileSubTab('set')">Setting</button>
+          </div>
+
+          <!-- Summary sub panel -->
+          <div class="profile-sub-panel active" id="prof-panel-sum">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px 24px; font-size:13px;">
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Nama Lengkap</span>
+                <strong style="color:white; font-size:14px;" id="pf-fullname">ACE DAROJATUN ANWAR</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">ID Card (NIK)</span>
+                <strong style="color:white; font-size:14px;">3207140709960002</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Medical Record No.</span>
+                <strong style="color:white; font-size:14px; font-family:monospace;">22A3.000047</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Gender</span>
+                <strong style="color:white; font-size:14px;">MALE</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Marital Status</span>
+                <strong style="color:white; font-size:14px;">UNMARRIED</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">No. Handphone</span>
+                <strong style="color:white; font-size:14px;">+6282120071009</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Agama</span>
+                <strong style="color:white; font-size:14px;">MUSLIM</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Email</span>
+                <strong style="color:white; font-size:14px;" id="pf-email">aceanwar424@gmail.com</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Suku / Ethnic</span>
+                <strong style="color:white; font-size:14px;">INDONESIAN</strong>
+              </div>
+              <div style="border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                <span style="color:var(--text-muted); display:block; font-size:10px; text-transform:uppercase; margin-bottom:2px;">Currency</span>
+                <strong style="color:white; font-size:14px;">IDR</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dummy placeholders for other sub tabs to maintain fidelity -->
+          <div class="profile-sub-panel" id="prof-panel-mr" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Riwayat Rekam Medis lengkap tersinkronisasi di modul EHR utama.</div>
+          <div class="profile-sub-panel" id="prof-panel-fam" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Belum ada anggota keluarga terdaftar.</div>
+          <div class="profile-sub-panel" id="prof-panel-pay" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Metode Pembayaran tersimpan kosong.</div>
+          <div class="profile-sub-panel" id="prof-panel-book" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Tidak ada booking aktif saat ini.</div>
+          <div class="profile-sub-panel" id="prof-panel-sub" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Anda belum berlangganan Paket Wellness Tahunan.</div>
+          <div class="profile-sub-panel" id="prof-panel-set" style="display:none; font-size:12px; color:var(--text-muted); text-align:center; padding:30px;">Konfigurasi Akun &amp; Keamanan.</div>
+
+        </div>
+
+        <!-- Bottom Last Medical Record box (matching screenshot 5) -->
+        <div class="glass-card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:8px; margin-bottom:16px;">
+            <h5 style="font-size:13px; font-weight:700; color:white; display:flex; align-items:center; gap:6px;">Last Medical Record || <span style="font-family:monospace; color:var(--teal);">22A3.20250307.00001</span></h5>
+            <button class="btn btn-sm" style="margin:0; width:auto; padding:6px 10px; background:rgba(255,255,255,0.03); color:white; border:1px solid var(--border);">📥 Unduh PDF</button>
+          </div>
+          
+          <div style="background:rgba(255,255,255,0.01); border:1px solid var(--border); border-radius:10px; padding:16px; display:flex; gap:20px; align-items:start; flex-wrap:wrap;">
+            <div style="width:200px; display:flex; flex-direction:column; gap:8px;">
+              <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Pemeriksaan</span>
+              <strong style="color:white; font-size:14px;">FECAL OCCULT BLOOD</strong>
+              <span style="font-size:10px; background:rgba(34,197,94,0.15); color:var(--success); padding:3px 8px; border-radius:12px; font-weight:700; width:fit-content; margin-top:6px;">NEGATIF (NORMAL)</span>
+            </div>
+            <div style="flex:1; min-width:250px;">
+              <h6 style="font-size:12px; font-weight:700; color:white; margin-bottom:4px;">Apa itu Fecal Occult Blood?</h6>
+              <p style="font-size:12px; color:var(--text-muted); line-height:1.4;">
+                Fecal occult blood test (FOBT) digunakan untuk mendeteksi adanya darah tersembunyi dalam sampel feses yang tidak terlihat secara kasat mata. Tes ini merupakan alat skrining awal yang penting untuk mendeteksi gangguan gastrointestinal atau tanda perdarahan usus secara dini.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
       <div id="corporate-view" class="view-panel">
         

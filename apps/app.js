@@ -17,6 +17,18 @@ const MOCK_REFERRALS = [
   { name: 'Citra Kirana', phone: '08789012345', test: 'HBsAg + Anti-HBs', status: 'finished', fee: 80000, date: '18/07/2026' }
 ];
 
+// --- VIRTU STYLE LAB TEST ITEMS ---
+const LAB_TEST_ITEMS = [
+  { code: 'CHEM - CALCIUM', name: 'CHEM - CALCIUM', price: 149000, desc: 'Calcium blood is used to help screening, diagnosis, and monitor a state related to bone health.' },
+  { code: 'CHEM - CREATININE', name: 'CHEM - CREATININE', price: 79000, desc: 'Creatinine is a garbage product from solving muscle cells during activities. A healthy kidney filters it.' },
+  { code: 'CHEM - GLUCOSE FASTING', name: 'CHEM - GLUCOSE FASTING', price: 49000, desc: 'Glucose fasting checks can be done both for screening, DM diagnosis, or monitoring of treatment.' },
+  { code: 'CHEM - HEMOGLOBIN A1C (HBA1C)', name: 'CHEM - HEMOGLOBIN A1C (HBA1C)', price: 209000, desc: 'The HBA1C examination measures the average number of Glucose bound to Hemoglobin over 3 months.' },
+  { code: 'CHEM - CHOLESTEROL TOTAL', name: 'CHEM - CHOLESTEROL TOTAL', price: 79000, desc: 'Total cholesterol examination measures the concentration of all cholesterol fractions in blood.' },
+  { code: 'CHEM - GAMMA-GLUTAMYL TRANSFERASE', name: 'CHEM - GAMMA-GLUTAMYL TRANSFERASE (GGT)', price: 139000, desc: 'Gamma Glutamyl Transferase (GGT) is the most sensitive marker for hepatobiliary diseases.' },
+  { code: 'CHEM - GLUCOSE RANDOM', name: 'CHEM - GLUCOSE RANDOM', price: 49000, desc: 'Glucose random measures blood sugar level at any point of time without fasting constraint.' },
+  { code: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', name: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', price: 99000, desc: 'HDL cholesterol examination measures the concentration of good cholesterol protective for heart.' }
+];
+
 // --- APP RUNTIME STATE ---
 let currentRole = 'patient';
 let currentPhase = 'fase1';
@@ -25,6 +37,7 @@ let corporates = [...MOCK_CORPORATES];
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
 let currentCalledQueue = 40; // Counter queue starts at A-040
+let bookingCart = []; // List of selected items
 
 // Financial and Corporate Billing States
 let corporateCashback = 4500000; // Rp 4.500.000
@@ -120,13 +133,13 @@ function renderSidebarMenu() {
 
   if (currentRole === 'patient') {
     navContainer.innerHTML = `
-      <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard')">📊 Dashboard Utama</a>
+      <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">📊 Dashboard Utama</a>
       <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">🗂️ Rekam Medis (EHR)</a>
-      <a class="sidebar-link" onclick="openBookingModal()">🗓️ Pesan Tes Lab</a>
-      <a class="sidebar-link" onclick="openHomeCareModal()">🏠 Pesan Home Care</a>
-      <a class="sidebar-link" onclick="openPackageModal()">🎁 Beli Paket MCU</a>
-      <a class="sidebar-link" onclick="openNearMeModal()">📍 Cabang Terdekat</a>
-      <a class="sidebar-link" onclick="openMemberModal()">💎 Member &amp; Afiliasi</a>
+      <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab')">🧪 Book Lab Test</a>
+      <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Care')">🏠 Book Home Care</a>
+      <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">📦 Buy Package</a>
+      <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">📍 Virtu Near Me</a>
+      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">👤 My Profile</a>
     `;
   } else if (currentRole === 'corporate') {
     navContainer.innerHTML = `
@@ -172,6 +185,70 @@ function switchMedrecSubTab(tabName) {
   }
 }
 
+// Switch Profile sub tabs
+function switchProfileSubTab(tabName) {
+  // Toggle buttons
+  document.querySelectorAll('[id^="prof-subtab-"]').forEach(btn => {
+    btn.classList.remove('active', 'btn-teal');
+    btn.style.background = 'rgba(255, 255, 255, 0.03)';
+    btn.style.color = 'white';
+  });
+
+  const activeBtn = document.getElementById(`prof-subtab-${tabName}`);
+  if (activeBtn) {
+    activeBtn.classList.add('active', 'btn-teal');
+    activeBtn.style.background = '';
+  }
+
+  // Toggle panels
+  document.querySelectorAll('.profile-sub-panel').forEach(panel => {
+    panel.classList.remove('active');
+    panel.style.display = 'none';
+  });
+
+  const activePanel = document.getElementById(`prof-panel-${tabName}`);
+  if (activePanel) {
+    activePanel.classList.add('active');
+    activePanel.style.display = 'block';
+  }
+}
+
+// Filter Packages Category
+function filterPackageCategory(cat) {
+  // Toggle active btn
+  document.querySelectorAll('[id^="pkg-cat-"]').forEach(btn => {
+    btn.classList.remove('active', 'btn-teal');
+    btn.style.background = 'rgba(255, 255, 255, 0.03)';
+    btn.style.color = 'white';
+  });
+
+  const btnId = cat === 'ALL' ? 'pkg-cat-all' : cat === 'CORP' ? 'pkg-cat-corp' : cat === 'IND' ? 'pkg-cat-ind' : 'pkg-cat-sub';
+  const activeBtn = document.getElementById(btnId);
+  if (activeBtn) {
+    activeBtn.classList.add('active', 'btn-teal');
+    activeBtn.style.background = '';
+  }
+
+  // Show sections
+  const corpSec = document.getElementById('pkg-sec-corp');
+  const indSec = document.getElementById('pkg-sec-ind');
+
+  if (cat === 'ALL') {
+    if (corpSec) corpSec.style.display = 'block';
+    if (indSec) indSec.style.display = 'block';
+  } else if (cat === 'CORP') {
+    if (corpSec) corpSec.style.display = 'block';
+    if (indSec) indSec.style.display = 'none';
+  } else if (cat === 'IND') {
+    if (corpSec) corpSec.style.display = 'none';
+    if (indSec) indSec.style.display = 'block';
+  } else {
+    // SUB
+    if (corpSec) corpSec.style.display = 'none';
+    if (indSec) indSec.style.display = 'none';
+  }
+}
+
 // Radiology X-ray viewer overlay triggers
 function openXrayViewer() {
   const modal = document.getElementById('xray-viewer-modal');
@@ -181,6 +258,199 @@ function openXrayViewer() {
 function closeXrayViewer() {
   const modal = document.getElementById('xray-viewer-modal');
   if (modal) modal.classList.remove('open');
+}
+
+// --- HIGH-FIDELITY LAB CATALOGUE CART HANDLERS ---
+function renderLabCatalogue(filterText = '') {
+  const container = document.getElementById('bt-catalogue-grid');
+  if (!container) return;
+
+  const query = filterText.toLowerCase();
+  const filtered = LAB_TEST_ITEMS.filter(item => 
+    item.code.toLowerCase().includes(query) || 
+    item.name.toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">Tidak menemukan hasil pemeriksaan "${filterText}"</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => {
+    const inCart = bookingCart.some(i => i.code === item.code);
+    const btnText = inCart ? '✓ Selected' : '🛒 Add to Order';
+    const btnClass = inCart ? 'btn-teal' : '';
+
+    return `
+      <div class="test-catalog-card">
+        <div>
+          <span style="font-family:monospace; font-size:10px; color:var(--primary); font-weight:700;">${item.code}</span>
+          <h6 style="font-size:13px; font-weight:700; color:white; margin-top:4px; line-height:1.3;">${item.name}</h6>
+          <p style="font-size:11px; color:var(--text-muted); margin-top:6px; line-height:1.4;">${item.desc}</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.03); padding-top:10px; margin-top:6px;">
+          <strong style="color:var(--teal); font-size:13px;">IDR ${item.price.toLocaleString('en-US')}</strong>
+          <button class="btn btn-sm ${btnClass}" onclick="toggleCartItem('${item.code}')" style="margin:0; width:auto; padding:6px 12px; font-size:11px;">${btnText}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function searchLabTest() {
+  const query = document.getElementById('bt-search').value;
+  renderLabCatalogue(query);
+}
+
+function toggleCartItem(code) {
+  const item = LAB_TEST_ITEMS.find(i => i.code === code);
+  if (!item) return;
+
+  const idx = bookingCart.findIndex(i => i.code === code);
+  if (idx > -1) {
+    bookingCart.splice(idx, 1);
+  } else {
+    bookingCart.push(item);
+  }
+
+  // Sync catalog buttons
+  renderLabCatalogue(document.getElementById('bt-search').value);
+  
+  // Re-calculate & update cart UIs
+  updateCartUIs();
+}
+
+function updateCartUIs() {
+  const btCartContainer = document.getElementById('bt-cart-items');
+  const hcCartContainer = document.getElementById('hc-cart-items');
+
+  const subtotalVal = bookingCart.reduce((sum, item) => sum + item.price, 0);
+  const serviceFeeVal = bookingCart.length > 0 ? 15000 : 0;
+  const grandTotalVal = subtotalVal + serviceFeeVal;
+
+  // 1. Update Booking Lab Test Cart
+  if (btCartContainer) {
+    if (bookingCart.length === 0) {
+      btCartContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px 0;">Belum ada pemeriksaan terpilih.</span>`;
+    } else {
+      btCartContainer.innerHTML = bookingCart.map(item => `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:11px;">
+          <div style="overflow:hidden; flex:1; margin-right:8px;">
+            <h6 style="color:white; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</h6>
+            <span style="color:var(--text-muted); font-size:9px;">IDR ${item.price.toLocaleString('en-US')}</span>
+          </div>
+          <button onclick="toggleCartItem('${item.code}')" style="background:none; border:none; color:var(--error); cursor:pointer; font-size:12px;">❌</button>
+        </div>
+      `).join('');
+    }
+  }
+
+  // 2. Update Booking Home Care Cart
+  if (hcCartContainer) {
+    if (bookingCart.length === 0) {
+      hcCartContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>`;
+    } else {
+      hcCartContainer.innerHTML = bookingCart.map(item => `
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:white;">
+          <span>${item.name}</span>
+          <strong>IDR ${item.price.toLocaleString('en-US')}</strong>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Update prices labels in both views
+  const btSub = document.getElementById('bt-subtotal');
+  const btGrand = document.getElementById('bt-grand-total');
+  if (btSub) btSub.textContent = `IDR ${subtotalVal.toLocaleString('en-US')}.00`;
+  if (btGrand) btGrand.textContent = `IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
+
+  const hcSub = document.getElementById('hc-subtotal');
+  const hcFee = document.getElementById('hc-service-fee');
+  const hcGrand = document.getElementById('hc-grand-total');
+  const hcPayBtn = document.getElementById('hc-pay-btn');
+
+  if (hcSub) hcSub.textContent = `IDR ${subtotalVal.toLocaleString('en-US')}.00`;
+  if (hcFee) hcFee.textContent = `IDR ${serviceFeeVal.toLocaleString('en-US')}.00`;
+  if (hcGrand) hcGrand.textContent = `IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
+  if (hcPayBtn) hcPayBtn.textContent = `Pay IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
+}
+
+function checkoutLabBooking() {
+  if (bookingCart.length === 0) {
+    alert('Keranjang belanja kosong. Pilih minimal 1 pemeriksaan!');
+    return;
+  }
+
+  const branch = document.getElementById('bt-branch-select').value;
+  const date = document.getElementById('bt-date').value;
+
+  // Show antrean ticket on dashboard
+  const ticketBox = document.getElementById('p-active-ticket-box');
+  const ticketNumEl = document.getElementById('p-ticket-number');
+  const ticketServiceEl = document.getElementById('p-ticket-service');
+  const ticketTimeEl = document.getElementById('p-ticket-time');
+  const ticketCurrentEl = document.getElementById('p-ticket-current');
+
+  const myQueueNum = 45; 
+  currentCalledQueue = 40; 
+
+  if (ticketNumEl) ticketNumEl.textContent = `A-0${myQueueNum}`;
+  if (ticketServiceEl) ticketServiceEl.textContent = `${bookingCart[0].name} +${bookingCart.length - 1} lainnya`;
+  if (ticketTimeEl) ticketTimeEl.textContent = '12 Menit lagi';
+  if (ticketCurrentEl) ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
+  if (ticketBox) ticketBox.style.display = 'block';
+
+  alert(`Pemesanan Berhasil!\nCabang: ${branch}\nTanggal: ${date}\nTiket antrean Anda A-045 telah dibuat.`);
+
+  // Reset cart
+  bookingCart = [];
+  updateCartUIs();
+  renderLabCatalogue();
+
+  // Go to main dashboard view
+  showView('patient-view', 'Dashboard');
+
+  // Start live simulator
+  if (queueSimulatorInterval) clearInterval(queueSimulatorInterval);
+  queueSimulatorInterval = setInterval(() => {
+    if (currentCalledQueue < myQueueNum) {
+      currentCalledQueue += 1;
+      if (ticketCurrentEl) ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
+      const minutesLeft = (myQueueNum - currentCalledQueue) * 2.5;
+      if (minutesLeft > 0) {
+        if (ticketTimeEl) ticketTimeEl.textContent = `${Math.ceil(minutesLeft)} Menit lagi`;
+      } else {
+        if (ticketTimeEl) {
+          ticketTimeEl.textContent = 'Silakan menuju Counter!';
+          ticketTimeEl.style.color = 'var(--success)';
+        }
+        clearInterval(queueSimulatorInterval);
+      }
+    }
+  }, 10000);
+}
+
+function checkoutHomeCare() {
+  if (bookingCart.length === 0) {
+    alert('Anda belum memilih pemeriksaan apapun di menu lab test.');
+    return;
+  }
+
+  const addr = document.getElementById('hc-addr-full').value.trim();
+  if (!addr) {
+    alert('Masukkan alamat lengkap penjemputan!');
+    return;
+  }
+
+  alert(`Pemesanan Home Care sukses!\nPetugas medis akan melakukan kunjungan untuk melakukan pengambilan sampel di alamat: ${addr}`);
+  
+  // Reset cart
+  bookingCart = [];
+  updateCartUIs();
+  renderLabCatalogue();
+
+  showView('patient-view', 'Dashboard');
 }
 
 // Update Login Form UI dynamically based on role selection
@@ -304,8 +574,7 @@ function closePackageModal() {
 }
 
 function buyPackage(packageName) {
-  closePackageModal();
-  alert(`Pembelian paket "${packageName}" berhasil diproses! Silakan periksa email/invoice Anda untuk detail pembayaran.`);
+  alert(`Pemesanan paket "${packageName}" berhasil ditambahkan ke keranjang belanja Anda.`);
 }
 
 // --- NEAR ME MODAL TRIGGERS ---
@@ -344,7 +613,7 @@ function closeProfileModal() {
 
 function seeReferralPackages() {
   closeMemberModal();
-  openBookingModal();
+  showView('book-test-view', 'Pesan Lab');
 }
 
 // --- CORPORATE EMPLOYEE CRUD & STATS UPDATES ---
@@ -789,6 +1058,16 @@ function handleLogin(event) {
     // Initialize Member Card Name
     const memberNameEl = document.getElementById('p-member-name');
     if (memberNameEl) memberNameEl.textContent = finalName;
+
+    // Render catalog items & prices
+    renderLabCatalogue();
+    updateCartUIs();
+
+    // Personalize Profile fields
+    const pfName = document.getElementById('pf-fullname');
+    const pfEmail = document.getElementById('pf-email');
+    if (pfName) pfName.textContent = finalName.toUpperCase();
+    if (pfEmail) pfEmail.textContent = isSuperAdmin ? 'aceanwar424@gmail.com' : `${finalName.toLowerCase().replace(/\s+/g, '')}@email.com`;
   }
   
   // Hide timeline tabs for corporate and referral, only show for patient
@@ -807,6 +1086,7 @@ function handleLogout() {
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
   currentUsername = '';
+  bookingCart = [];
   if (queueSimulatorInterval) {
     clearInterval(queueSimulatorInterval);
     queueSimulatorInterval = null;
@@ -814,88 +1094,6 @@ function handleLogout() {
   // Hide active queue ticket on logout
   document.getElementById('p-active-ticket-box').style.display = 'none';
   showScreen('login-screen');
-}
-
-// --- BOOKING MODAL & QUEUE SIMULATOR ---
-function openBookingModal() {
-  const modal = document.getElementById('booking-modal');
-  if (modal) modal.classList.add('open');
-}
-
-function closeBookingModal() {
-  const modal = document.getElementById('booking-modal');
-  if (modal) modal.classList.remove('open');
-}
-
-function submitBookingForm(event) {
-  event.preventDefault();
-  
-  const serviceName = document.getElementById('book-service').value.trim();
-  if (!serviceName) return;
-
-  // Show ticket widget
-  const ticketBox = document.getElementById('p-active-ticket-box');
-  const ticketNumEl = document.getElementById('p-ticket-number');
-  const ticketServiceEl = document.getElementById('p-ticket-service');
-  const ticketTimeEl = document.getElementById('p-ticket-time');
-  const ticketCurrentEl = document.getElementById('p-ticket-current');
-
-  const myQueueNum = 45; // Fixed queue ticket: A-045
-  currentCalledQueue = 40; // Reset simulator
-
-  ticketNumEl.textContent = `A-0${myQueueNum}`;
-  ticketServiceEl.textContent = serviceName;
-  ticketTimeEl.textContent = '12 Menit lagi';
-  ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
-  ticketBox.style.display = 'block';
-
-  closeBookingModal();
-  alert('Booking berhasil! Tiket antrean aktif Anda telah dibuat.');
-
-  // Start live simulator
-  if (queueSimulatorInterval) clearInterval(queueSimulatorInterval);
-  
-  queueSimulatorInterval = setInterval(() => {
-    if (currentCalledQueue < myQueueNum) {
-      currentCalledQueue += 1;
-      ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
-      
-      const minutesLeft = (myQueueNum - currentCalledQueue) * 2.5;
-      if (minutesLeft > 0) {
-        ticketTimeEl.textContent = `${Math.ceil(minutesLeft)} Menit lagi`;
-      } else {
-        ticketTimeEl.textContent = 'Silakan menuju Counter!';
-        ticketTimeEl.style.color = 'var(--success)';
-        clearInterval(queueSimulatorInterval);
-      }
-    }
-  }, 10000); // Progress queue counter every 10 seconds
-}
-
-// --- LAB RESULTS & AI ASSESSOR ---
-function openLabResultsModal() {
-  const modal = document.getElementById('lab-results-modal');
-  if (!modal) return;
-
-  const aiTextEl = document.getElementById('ai-assessment-text');
-  aiTextEl.innerHTML = '<span style="color: var(--text-muted);">🤖 Membaca hasil lab dan memproses analisis medis...</span>';
-  
-  modal.classList.add('open');
-
-  // Simulate AI typing after 1.8 seconds
-  setTimeout(() => {
-    aiTextEl.innerHTML = `
-      <p style="margin-bottom:8px; font-weight: 600; color:var(--error);">⚠️ Temuan Utama:</p>
-      <ul style="margin-left: 16px; margin-bottom: 12px; display:flex; flex-direction:column; gap:4px;">
-        <li><strong>Hiperkolesterolemia Ringan:</strong> Kolesterol Total Anda (245 mg/dL) berada di atas batas normal (&lt;200).</li>
-        <li><strong>Batas Glukosa Puasa Tinggi:</strong> Gula darah puasa Anda (126 mg/dL) mengindikasikan kondisi Prediabetes.</li>
-      </ul>
-      <p style="margin-bottom:8px; font-weight: 600; color:var(--teal);">💡 Rekomendasi AvaHealth:</p>
-      <p style="color: var(--text-muted); font-size:12px; line-height:1.4;">
-        Kurangi asupan lemak jenuh dan karbohidrat sederhana. Lakukan aktivitas fisik sedang (jalan cepat) minimal 150 menit per minggu. Jadwalkan konsultasi dengan dokter untuk memverifikasi kondisi gula darah puasa Anda.
-      </p>
-    `;
-  }, 1800);
 }
 
 // --- REFERRAL MODAL FORM (FPP Parameter Checklist) ---
