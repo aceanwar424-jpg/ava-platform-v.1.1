@@ -294,15 +294,12 @@ function renderSidebarMenu() {
 function switchMedrecSubTab(tabName) {
   // Toggle active tab buttons
   document.querySelectorAll('.tab-btn-medrec').forEach(btn => {
-    btn.classList.remove('active', 'btn-teal');
-    btn.style.background = 'rgba(255, 255, 255, 0.05)';
-    btn.style.color = 'white';
+    btn.classList.remove('active');
   });
 
   const activeBtn = document.getElementById(`tab-mr-${tabName}`);
   if (activeBtn) {
-    activeBtn.classList.add('active', 'btn-teal');
-    activeBtn.style.background = '';
+    activeBtn.classList.add('active');
   }
 
   // Toggle sub panels
@@ -1170,7 +1167,7 @@ async function handleLogin(event) {
         if (profs && profs[0]) {
           profileData = profs[0];
           finalUsername = profileData.full_name || authData.user.email;
-          finalRole = profileData.role || 'patient';
+          finalRole = selectedRole || profileData.role || 'patient';
           console.log("Logged in user:", finalUsername, "with role:", finalRole);
         }
       } else {

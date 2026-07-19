@@ -98,9 +98,11 @@
           </div>
         </div>
 
-        <!-- Doctors Illustration matching bottom of sample design -->
-        <div style="margin-top:auto; display:flex; justify-content:center; width:100%; z-index:1; pointer-events:none;">
-          <img src="doctors.jpg" style="max-width:440px; width:100%; height:auto; object-fit:contain; display:block;" alt="OneLab Medical Team">
+        <!-- Doctors Illustration with premium clinical integration -->
+        <div style="margin-top:auto; position:relative; display:flex; justify-content:center; align-items:center; width:100%; z-index:1; padding-bottom:10px;">
+          <!-- Glowing backdrop -->
+          <div style="position:absolute; width:280px; height:280px; background:radial-gradient(circle, rgba(20,184,166,0.12) 0%, rgba(15,41,99,0) 70%); filter:blur(40px); bottom:-40px; pointer-events:none; z-index:0;"></div>
+          <img src="doctors.jpg" style="max-width:400px; width:90%; height:auto; object-fit:contain; display:block; border-radius:24px; box-shadow: 0 20px 40px rgba(15,41,99,0.08); border: 1px solid rgba(20,184,166,0.15); filter: hue-rotate(15deg) brightness(0.95) saturate(1.1) contrast(1.05); -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%); mask-image: linear-gradient(to bottom, black 75%, transparent 100%); position:relative; z-index:1;" alt="OneLab Medical Team">
         </div>
 
       </div>
@@ -579,24 +581,24 @@
 
       <!-- ──────── VIEW: MEDREC (EHR PORTAL) ──────── -->
       <div id="medrec-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px;">Portal Rekam Medis Elektronik (EHR)</div>
+        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">Portal Rekam Medis Elektronik (EHR)</div>
         
         <!-- EHR Tabs Header -->
-        <div class="glass-card" style="margin-bottom:24px; padding:16px;">
-          <div style="display:flex; gap:10px; border-bottom:1px solid rgba(255,255,255,0.06); padding-bottom:8px; margin-bottom:16px; flex-wrap:wrap;">
-            <button class="btn btn-sm btn-teal tab-btn-medrec active" onclick="switchMedrecSubTab('lab')" id="tab-mr-lab" style="margin:0;">🧪 Hasil Laboratorium</button>
-            <button class="btn btn-sm tab-btn-medrec" onclick="switchMedrecSubTab('rad')" id="tab-mr-rad" style="margin:0; background:rgba(255,255,255,0.05); color:white;">🩻 Radiologi &amp; Penunjang</button>
-            <button class="btn btn-sm tab-btn-medrec" onclick="switchMedrecSubTab('res')" id="tab-mr-res" style="margin:0; background:rgba(255,255,255,0.05); color:white;">📄 Resume Medis &amp; Resep</button>
+        <div class="glass-card" style="margin-bottom:24px; padding:16px; background:#ffffff;">
+          <div style="display:flex; gap:10px; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:16px; flex-wrap:wrap;">
+            <button class="tab-btn-medrec active" onclick="switchMedrecSubTab('lab')" id="tab-mr-lab">🧪 Hasil Laboratorium</button>
+            <button class="tab-btn-medrec" onclick="switchMedrecSubTab('rad')" id="tab-mr-rad">🩻 Radiologi &amp; Penunjang</button>
+            <button class="tab-btn-medrec" onclick="switchMedrecSubTab('res')" id="tab-mr-res">📄 Resume Medis &amp; Resep</button>
           </div>
 
           <!-- SubTab: Laboratorium -->
           <div class="medrec-sub-panel active" id="mr-panel-lab">
-            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Laporan Hasil Laboratorium Kuantitatif</h4>
+            <h4 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:12px;">Laporan Hasil Laboratorium Kuantitatif</h4>
             
-            <div style="border:1px solid var(--border); border-radius:12px; overflow-x:auto; background:rgba(15,23,42,0.4); margin-bottom:16px;">
+            <div style="border:1px solid var(--border); border-radius:12px; overflow-x:auto; background:#ffffff; margin-bottom:16px;">
               <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left; min-width: 480px;">
                 <thead>
-                  <tr style="background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); color:var(--text-muted);">
+                  <tr style="background:#f8fafc; border-bottom:1px solid var(--border); color:var(--text-muted);">
                     <th style="padding:12px;">Parameter Pemeriksaan</th>
                     <th style="padding:12px;">Hasil</th>
                     <th style="padding:12px;">Rujukan Normal</th>
@@ -605,43 +607,43 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:12px; font-weight:600; color:white;">Hemoglobin (Hb)</td>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Hemoglobin (Hb)</td>
                     <td style="padding:12px; font-weight:700; color:var(--teal);">14.5</td>
                     <td style="padding:12px; color:var(--text-muted);">13.0 - 17.5</td>
                     <td style="padding:12px; color:var(--text-muted);">g/dL</td>
                     <td style="padding:12px; text-align:right;"><span class="badge badge-fit">Normal</span></td>
                   </tr>
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:12px; font-weight:600; color:white;">Kolesterol Total</td>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Kolesterol Total</td>
                     <td style="padding:12px; font-weight:700; color:var(--error);">245 ⚠️</td>
                     <td style="padding:12px; color:var(--text-muted);">&lt; 200</td>
                     <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
                     <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
                   </tr>
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:12px; font-weight:600; color:white;">Trigliserida</td>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Trigliserida</td>
                     <td style="padding:12px; font-weight:700; color:var(--error);">190 ⚠️</td>
                     <td style="padding:12px; color:var(--text-muted);">&lt; 150</td>
                     <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
                     <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
                   </tr>
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:12px; font-weight:600; color:white;">Asam Urat</td>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Asam Urat</td>
                     <td style="padding:12px; font-weight:700; color:var(--teal);">5.8</td>
                     <td style="padding:12px; color:var(--text-muted);">3.4 - 7.0</td>
                     <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
                     <td style="padding:12px; text-align:right;"><span class="badge badge-fit">Normal</span></td>
                   </tr>
-                  <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
-                    <td style="padding:12px; font-weight:600; color:white;">Glukosa Puasa</td>
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Glukosa Puasa</td>
                     <td style="padding:12px; font-weight:700; color:var(--error);">126 ⚠️</td>
                     <td style="padding:12px; color:var(--text-muted);">70 - 100</td>
                     <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
                     <td style="padding:12px; text-align:right;"><span class="badge badge-unfit">Tinggi</span></td>
                   </tr>
                   <tr>
-                    <td style="padding:12px; font-weight:600; color:white;">Kreatinin</td>
+                    <td style="padding:12px; font-weight:600; color:#0f172a;">Kreatinin</td>
                     <td style="padding:12px; font-weight:700; color:var(--teal);">0.9</td>
                     <td style="padding:12px; color:var(--text-muted);">0.6 - 1.2</td>
                     <td style="padding:12px; color:var(--text-muted);">mg/dL</td>
@@ -652,9 +654,9 @@
             </div>
 
             <!-- AI Diagnosis Summary -->
-            <div style="background:rgba(14,165,233,0.05); border:1px solid rgba(14,165,233,0.15); border-radius:10px; padding:16px;">
-              <h5 style="font-size:13px; font-weight:700; color:white; display:flex; align-items:center; gap:6px; margin-bottom:8px;">✨ Interpretasi Medis AI AvaHealth</h5>
-              <p style="font-size:12px; color:var(--text-main); line-height:1.5;">
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:16px;">
+              <h5 style="font-size:13px; font-weight:700; color:#0369a1; display:flex; align-items:center; gap:6px; margin-bottom:8px;">✨ Interpretasi Medis AI AvaHealth</h5>
+              <p style="font-size:12px; color:#0c4a6e; line-height:1.5;">
                 AI mendeteksi adanya <strong>Hiperkolesterolemia Ringan</strong> dan indikasi <strong>Prediabetes</strong> (Gula darah puasa &gt; 100 mg/dL). Disarankan melakukan konsultasi lanjutan dengan dokter spesialis penyakit dalam untuk verifikasi HbA1c dan perbaikan pola makan rendah lemak.
               </p>
             </div>
@@ -662,24 +664,24 @@
 
           <!-- SubTab: Radiologi -->
           <div class="medrec-sub-panel" id="mr-panel-rad" style="display:none;">
-            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Laporan Interpretasi Radiologi</h4>
+            <h4 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:12px;">Laporan Interpretasi Radiologi</h4>
             
             <div style="display:flex; flex-direction:column; gap:16px;">
-              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                 <div style="flex:1; min-width: 250px;">
-                  <h5 style="font-size:14px; font-weight:700; color:white;">Chest X-Ray / Thorax PA</h5>
+                  <h5 style="font-size:14px; font-weight:700; color:#0f2963;">Chest X-Ray / Thorax PA</h5>
                   <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pemeriksaan Rontgen Dada &bull; Dokter Pengirim: Dr. Ace Darojatun</p>
-                  <p style="font-size:12px; color:#e2e8f0; margin-top:10px; line-height:1.4;">
+                  <p style="font-size:12px; color:#334155; margin-top:10px; line-height:1.4;">
                     <strong>Hasil Bacaan:</strong> Cor dan pulmo dalam batas normal. Tidak tampak kardiomegali maupun infiltrate paru aktif.
                   </p>
                 </div>
                 <button class="btn btn-sm btn-teal" onclick="openXrayViewer()" style="margin:0; font-size:11px; height: fit-content; padding: 8px 16px;">Lihat Gambar Scan</button>
               </div>
 
-              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
-                <h5 style="font-size:14px; font-weight:700; color:white;">USG Abdomen Upper-Lower</h5>
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
+                <h5 style="font-size:14px; font-weight:700; color:#0f2963;">USG Abdomen Upper-Lower</h5>
                 <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pemeriksaan USG Organ Dalam &bull; 19 Juli 2026</p>
-                <p style="font-size:12px; color:#e2e8f0; margin-top:10px; line-height:1.4;">
+                <p style="font-size:12px; color:#334155; margin-top:10px; line-height:1.4;">
                   <strong>Hasil Bacaan:</strong> Kolelitiasis negatif. Hepar normal, pankreas, lien, ren dextra et sinistra dalam batas normal. Tidak tampak cairan bebas di rongga abdomen.
                 </p>
               </div>
@@ -688,38 +690,38 @@
 
           <!-- SubTab: Resume Medis -->
           <div class="medrec-sub-panel" id="mr-panel-res" style="display:none;">
-            <h4 style="font-size:14px; font-weight:700; color:white; margin-bottom:12px;">Resume Medis &amp; Terapi Resep</h4>
+            <h4 style="font-size:14px; font-weight:700; color:#0f2963; margin-bottom:12px;">Resume Medis &amp; Terapi Resep</h4>
             
             <div style="display:flex; flex-direction:column; gap:16px;">
               <!-- Diagnoses -->
-              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
-                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:8px;">Diagnosis Utama (ICD-10)</h5>
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
+                <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:8px;">Diagnosis Utama (ICD-10)</h5>
                 <div style="display:flex; flex-direction:column; gap:6px; font-size:12px;">
-                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:6px;">
-                    <span style="color:white; font-weight:600;">E11.9 — Diabetes Melitus Tipe 2 Tanpa Komplikasi</span>
+                  <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px;">
+                    <span style="color:#0f172a; font-weight:600;">E11.9 — Diabetes Melitus Tipe 2 Tanpa Komplikasi</span>
                     <span style="color:var(--text-muted)">ICD-10</span>
                   </div>
                   <div style="display:flex; justify-content:space-between; padding-top:2px;">
-                    <span style="color:white; font-weight:600;">E78.5 — Hiperlipidemia Non-Spesifik</span>
+                    <span style="color:#0f172a; font-weight:600;">E78.5 — Hiperlipidemia Non-Spesifik</span>
                     <span style="color:var(--text-muted)">ICD-10</span>
                   </div>
                 </div>
               </div>
 
               <!-- Prescription -->
-              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
-                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:10px;">Resep E-Prescribing Aktif</h5>
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
+                <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:10px;">Resep E-Prescribing Aktif</h5>
                 <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:8px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
                     <div>
-                      <strong style="color:white; font-size:13px;">Metformin 500 mg</strong>
+                      <strong style="color:#0f172a; font-size:13px;">Metformin 500 mg</strong>
                       <span style="display:block; font-size:10px; color:var(--text-muted); margin-top:2px;">Aturan: 2 x Sehari 1 Tablet (Sesudah Makan)</span>
                     </div>
                     <span class="badge badge-fit">15 Tablet</span>
                   </div>
                   <div style="display:flex; justify-content:space-between; align-items:center; padding-top:2px;">
                     <div>
-                      <strong style="color:white; font-size:13px;">Atorvastatin 20 mg</strong>
+                      <strong style="color:#0f172a; font-size:13px;">Atorvastatin 20 mg</strong>
                       <span style="display:block; font-size:10px; color:var(--text-muted); margin-top:2px;">Aturan: 1 x Sehari 1 Tablet (Malam Hari)</span>
                     </div>
                     <span class="badge badge-fit">10 Tablet</span>
@@ -728,9 +730,9 @@
               </div>
 
               <!-- Advice -->
-              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:rgba(15,23,42,0.4);">
-                <h5 style="font-size:13px; font-weight:700; color:white; margin-bottom:6px;">Instruksi Dokter Pengasuh</h5>
-                <p style="font-size:12px; line-height:1.5; color:#e2e8f0;">
+              <div style="border:1px solid var(--border); border-radius:12px; padding:16px; background:#ffffff;">
+                <h5 style="font-size:13px; font-weight:700; color:#0f2963; margin-bottom:6px;">Instruksi Dokter Pengasuh</h5>
+                <p style="font-size:12px; line-height:1.5; color:#334155;">
                   Kontrol gula darah puasa setiap 2 minggu sekali. Lakukan olahraga aerobik jalan cepat minimal 30 menit per hari. Hindari makanan yang mengandung kadar karbohidrat olahan tinggi serta makanan berminyak jenuh tinggi. Kontrol kembali ke poli penyakit dalam dalam waktu 1 bulan.
                 </p>
               </div>
@@ -1513,7 +1515,7 @@
           </div>
 
           <div class="workflow-steps">
-            <h5 style="font-size:12px; font-weight:700; margin-bottom:8px; color:white;">Cara Kerja</h5>
+            <h5 style="font-size:12px; font-weight:700; margin-bottom:8px; color:#0f2963;">Cara Kerja</h5>
             <div class="w-step-item">
               <span class="step-num">1</span>
               <p><strong>Bagikan QR Code / Kode</strong><br>Tunjukkan atau kirim ke teman/keluarga</p>
@@ -1530,7 +1532,7 @@
         </div>
 
         <!-- Aktivitas Terbaru -->
-        <h5 style="font-size:12px; font-weight:700; margin-top:20px; margin-bottom:10px; color:white;">Aktivitas Terbaru <a href="#" style="float:right; font-size:10px; color:var(--primary);">Lihat Semua ❯</a></h5>
+        <h5 style="font-size:12px; font-weight:700; margin-top:20px; margin-bottom:10px; color:#0f2963;">Aktivitas Terbaru <a href="#" style="float:right; font-size:10px; color:var(--primary);">Lihat Semua ❯</a></h5>
         <div class="empty-activity-card">
           <div class="empty-icon">👥</div>
           <h6>Mulai Dapatkan Komisi!</h6>
@@ -1625,28 +1627,28 @@
 
     <!-- ════════════════════════ MODAL: AVAHEALTH NEAR ME ════════════════════════ -->
     <div id="nearme-modal" class="modal-overlay">
-      <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px;">
-        <h3 style="text-align:center; margin-bottom:4px;">AvaHealth Near Me</h3>
+      <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px; background:#ffffff;">
+        <h3 style="text-align:center; margin-bottom:4px; color:#0f2963;">AvaHealth Near Me</h3>
         <p style="color: var(--text-muted); font-size:12px; text-align:center; margin-bottom:20px;">Temukan outlet lab & klinik cabang terdekat</p>
 
-        <div class="map-mock-container" style="height:180px; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:12px; margin-bottom:16px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
-          <div style="position:absolute; width:100%; height:1px; background:rgba(255,255,255,0.05); top:30%;"></div>
-          <div style="position:absolute; width:100%; height:1px; background:rgba(255,255,255,0.05); top:70%;"></div>
-          <div style="position:absolute; width:1px; height:100%; background:rgba(255,255,255,0.05); left:30%;"></div>
-          <div style="position:absolute; width:1px; height:100%; background:rgba(255,255,255,0.05); left:70%;"></div>
+        <div class="map-mock-container" style="height:180px; background:#f1f5f9; border:1px solid var(--border); border-radius:12px; margin-bottom:16px; position:relative; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+          <div style="position:absolute; width:100%; height:1px; background:#cbd5e1; top:30%;"></div>
+          <div style="position:absolute; width:100%; height:1px; background:#cbd5e1; top:70%;"></div>
+          <div style="position:absolute; width:1px; height:100%; background:#cbd5e1; left:30%;"></div>
+          <div style="position:absolute; width:1px; height:100%; background:#cbd5e1; left:70%;"></div>
           <span style="position:absolute; top:40%; left:45%; font-size:24px; animation:bounce 2s infinite;">📍</span>
-          <span style="position:absolute; top:48%; left:48%; background:rgba(14,165,233,0.2); border:1px solid var(--primary); padding:2px 6px; border-radius:4px; font-size:8px; font-weight:700; color:white;">Cabang Utama</span>
+          <span style="position:absolute; top:48%; left:48%; background:rgba(20, 184, 166, 0.15); border:1px solid var(--teal); padding:2px 6px; border-radius:4px; font-size:8px; font-weight:700; color:var(--teal);">Cabang Utama</span>
           <span style="position:absolute; top:20%; left:75%; font-size:18px;">📍</span>
           <span style="position:absolute; top:75%; left:20%; font-size:18px;">📍</span>
         </div>
 
         <div style="display:flex; flex-direction:column; gap:10px;">
-          <div style="border-bottom:1px solid rgba(255,255,255,0.04); padding-bottom:8px;">
-            <h6 style="font-size:13px; font-weight:700; color:white;">1. Cabang Utama AvaHealth SIMRS</h6>
+          <div style="border-bottom:1px solid var(--border); padding-bottom:8px;">
+            <h6 style="font-size:13px; font-weight:700; color:#0f2963;">1. Cabang Utama AvaHealth SIMRS</h6>
             <p style="font-size:11px; color:var(--text-muted);">Jl. Kesehatan Raya No. 42 (0.4 km) &bull; Buka 24 Jam</p>
           </div>
           <div>
-            <h6 style="font-size:13px; font-weight:700; color:white;">2. AvaHealth Express Diponegoro</h6>
+            <h6 style="font-size:13px; font-weight:700; color:#0f2963;">2. AvaHealth Express Diponegoro</h6>
             <p style="font-size:11px; color:var(--text-muted);">Jl. Diponegoro No. 89 (1.8 km) &bull; Buka s/d 22:00</p>
           </div>
         </div>
@@ -1657,32 +1659,32 @@
 
     <!-- ════════════════════════ MODAL: MY PROFILE ════════════════════════ -->
     <div id="profile-modal" class="modal-overlay">
-      <div class="modal-box" style="max-width: 400px; text-align:left; padding: 24px;">
+      <div class="modal-box" style="max-width: 400px; text-align:left; padding: 24px; background:#ffffff;">
         <div style="text-align:center; margin-bottom:20px;">
           <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--teal)); color:white; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; margin: 0 auto 12px auto;">P</div>
-          <h4 id="prof-fullname" style="font-size:18px; font-weight:800; color:white; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <h4 id="prof-fullname" style="font-size:18px; font-weight:800; color:#0f2963; display:flex; align-items:center; justify-content:center; gap:6px;">
             Ace Darojatun Anwar
             <span class="verified-badge-blue" title="Verified Account">✓</span>
           </h4>
-          <span style="font-size:11px; background:rgba(14,165,233,0.15); color:var(--primary-hover); padding:2px 8px; border-radius:12px; font-weight:700; text-transform:uppercase;">Verified Patient</span>
+          <span style="font-size:11px; background:rgba(20, 184, 166, 0.15); color:var(--teal); padding:2px 8px; border-radius:12px; font-weight:700; text-transform:uppercase;">Verified Patient</span>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid rgba(255,255,255,0.06); padding-top:16px;">
+        <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid var(--border); padding-top:16px;">
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Email</span>
-            <strong id="prof-email" style="font-size:13px; color:white;">aceanwar424@gmail.com</strong>
+            <strong id="prof-email" style="font-size:13px; color:#0f172a;">aceanwar424@gmail.com</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Rekam Medis (RM)</span>
-            <strong style="font-size:13px; color:white; font-family:monospace;">RM-12948</strong>
+            <strong style="font-size:13px; color:#0f172a; font-family:monospace;">RM-12948</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Handphone</span>
-            <strong style="font-size:13px; color:white;">0812-3456-7890</strong>
+            <strong style="font-size:13px; color:#0f172a;">0812-3456-7890</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Alamat KTP</span>
-            <strong style="font-size:13px; color:white;">Komp. Graha Indah Blok C-4, Bandung</strong>
+            <strong style="font-size:13px; color:#0f172a;">Komp. Graha Indah Blok C-4, Bandung</strong>
           </div>
         </div>
 
@@ -1708,44 +1710,44 @@
 
           <div class="input-group" style="text-align:left;">
             <label style="margin-bottom:8px; display:block;">Formulir Permintaan Pemeriksaan (FPP)</label>
-            <div class="fpp-container" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: rgba(15,23,42,0.4); display: flex; flex-direction: column; gap: 12px;">
+            <div class="fpp-container" style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #ffffff; display: flex; flex-direction: column; gap: 12px;">
               
               <!-- Hematologi -->
               <div class="fpp-group">
-                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--teal); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">💉 Hematologi</span>
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--teal); font-weight: 700; display: block; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px;">💉 Hematologi</span>
                 <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Darah Lengkap"> Darah Lengkap</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Laju Endap Darah"> Laju Endap Darah</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Darah Lengkap"> Darah Lengkap</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Laju Endap Darah"> Laju Endap Darah</label>
                 </div>
               </div>
 
               <!-- Kimia Klinik -->
               <div class="fpp-group">
-                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--primary-hover); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">🧪 Kimia Klinik</span>
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--primary-hover); font-weight: 700; display: block; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px;">🧪 Kimia Klinik</span>
                 <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Glukosa Puasa"> Glukosa Puasa</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Kolesterol Total"> Kolesterol Total</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Asam Urat"> Asam Urat</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Hati (SGOT/SGPT)"> Fungsi Hati (SGOT/SGPT)</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Ginjal (Ureum/Kreatinin)"> Fungsi Ginjal</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Glukosa Puasa"> Glukosa Puasa</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Kolesterol Total"> Kolesterol Total</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Asam Urat"> Asam Urat</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Hati (SGOT/SGPT)"> Fungsi Hati (SGOT/SGPT)</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Fungsi Ginjal (Ureum/Kreatinin)"> Fungsi Ginjal</label>
                 </div>
               </div>
 
               <!-- Imunologi / Serologi -->
               <div class="fpp-group">
-                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: var(--warning); font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">🛡️ Imunologi &amp; Serologi</span>
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: #ea580c; font-weight: 700; display: block; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px;">🛡️ Imunologi &amp; Serologi</span>
                 <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="HBsAg"> HBsAg</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Anti-HBs"> Anti-HBs</label>
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Tes HIV"> Tes HIV</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="HBsAg"> HBsAg</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Anti-HBs"> Anti-HBs</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Tes HIV"> Tes HIV</label>
                 </div>
               </div>
 
               <!-- Urinalisis -->
               <div class="fpp-group">
-                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: #f472b6; font-weight: 700; display: block; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 4px; margin-bottom: 6px;">💧 Urinalisis</span>
+                <span class="fpp-group-title" style="font-size: 11px; text-transform: uppercase; color: #db2777; font-weight: 700; display: block; border-bottom: 1px solid var(--border); padding-bottom: 4px; margin-bottom: 6px;">💧 Urinalisis</span>
                 <div class="fpp-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
-                  <label style="display:flex; align-items:center; gap:6px; color:#e2e8f0; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Urine Lengkap"> Urine Lengkap</label>
+                  <label style="display:flex; align-items:center; gap:6px; color:#0f172a; cursor:pointer;"><input type="checkbox" name="ref-test-param" value="Urine Lengkap"> Urine Lengkap</label>
                 </div>
               </div>
 
@@ -1842,7 +1844,7 @@
           </div>
           <div class="input-group">
             <label for="corp-emp-package">Paket Pemeriksaan MCU</label>
-            <select id="corp-emp-package" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+            <select id="corp-emp-package" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
               <option value="Paket MCU Dasar">Paket MCU Dasar</option>
               <option value="Paket MCU Eksekutif A">Paket MCU Eksekutif A</option>
               <option value="Paket MCU Eksekutif B">Paket MCU Eksekutif B</option>
@@ -1930,15 +1932,15 @@
         <h3>Tarik Komisi Rujukan</h3>
         <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px;">Cairkan saldo fee rujukan klinik/dokter Anda langsung ke rekening bank terdaftar.</p>
         
-        <div style="background:rgba(99,102,241,0.1); border:1px solid #6366f1; border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
+        <div style="background:rgba(99,102,241,0.05); border:1px solid #c7d2fe; border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
           <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Saldo Tersedia</span>
-          <h2 id="withdraw-modal-amt" style="font-size:26px; color:#a5b4fc; font-weight:800; margin-top:4px;">Rp 330.000</h2>
+          <h2 id="withdraw-modal-amt" style="font-size:26px; color:#4f46e5; font-weight:800; margin-top:4px;">Rp 330.000</h2>
         </div>
 
         <form onsubmit="processWithdrawFee(event)">
           <div class="input-group">
             <label for="w-bank-name">Bank Tujuan</label>
-            <select id="w-bank-name" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid var(--border); border-radius:8px; padding:10px; color:white;">
+            <select id="w-bank-name" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
               <option value="BCA">Bank Central Asia (BCA) - 4920******</option>
               <option value="Mandiri">Bank Mandiri - 13100******</option>
               <option value="BNI">Bank Negara Indonesia (BNI) - 0984******</option>
