@@ -29,16 +29,20 @@ function renderReportTab(){
     ${groups.length ? groups.map(pt=>{
       const critCount=pt.results.filter(isCriticalResult).length;
       return `
-      <div class="card report-card" data-search="${(pt.name+' '+(pt.visit||'')).toLowerCase()}" style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)">
-          <div>
-            <div style="font-size:15px;font-weight:700;color:var(--navy)">${pt.name}
-              ${critCount?`<span style="background:#FEF2F2;color:#DC2626;padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">🚨 ${critCount} kritis</span>`:''}</div>
-            <div style="font-size:11px;color:var(--gray)">${pt.visit||'—'} · ${pt.results.length} pemeriksaan · ${pt.released_at?new Date(pt.released_at).toLocaleString('id-ID'):''}</div>
+      <div class="card report-card" data-search="${(pt.name+' '+(pt.visit||'')).toLowerCase()}" style="margin-bottom:10px;padding:0;overflow:hidden">
+        <div onclick="toggleReportCard(this)" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;cursor:pointer" title="Klik untuk lihat detail hasil">
+          <div style="display:flex;align-items:center;gap:11px;min-width:0">
+            <span class="rc-chev" style="color:var(--gray);transition:transform .15s;font-size:12px">▶</span>
+            <div style="min-width:0">
+              <div style="font-size:14.5px;font-weight:700;color:var(--navy)">${pt.name}
+                ${critCount?`<span style="background:#FEF2F2;color:#DC2626;padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">🚨 ${critCount} kritis</span>`:''}</div>
+              <div style="font-size:11px;color:var(--gray)">${pt.visit||'—'} · ${pt.results.length} pemeriksaan · ${pt.released_at?new Date(pt.released_at).toLocaleString('id-ID'):''}</div>
+            </div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="printLabReport('${(pt.name||'').replace(/'/g,'')}','${pt.visit||''}')">🖨 Cetak Hasil</button>
+          <button class="btn btn-outline btn-sm" style="flex-shrink:0" onclick="event.stopPropagation();printLabReport('${(pt.name||'').replace(/'/g,'')}','${pt.visit||''}')">🖨 Cetak Hasil</button>
         </div>
-        <table style="width:100%;font-size:12px;border-collapse:collapse">
+        <div class="rc-detail" style="display:none;padding:0 16px 14px;border-top:1px solid var(--border)">
+        <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:10px">
           <thead><tr style="background:var(--lgray)">
             <th style="padding:6px 10px;text-align:left">Pemeriksaan</th>
             <th style="padding:6px 10px;text-align:left">Hasil</th>
@@ -66,9 +70,20 @@ function renderReportTab(){
           }).join('')}
           </tbody>
         </table>
+        </div>
       </div>`;
     }).join('') : `<div class="empty-state"><div class="ico">📁</div><h3>Belum ada hasil yang diapprove</h3></div>`}
     </div>`;
+}
+
+// Buka/tutup detail satu kartu rekam medis. Kartu ringkas (nama saja) sampai diklik.
+function toggleReportCard(head){
+  const detail=head.parentElement.querySelector('.rc-detail');
+  const chev=head.querySelector('.rc-chev');
+  if(!detail) return;
+  const open=detail.style.display==='none';
+  detail.style.display=open?'block':'none';
+  if(chev) chev.style.transform=open?'rotate(90deg)':'';
 }
 
 function filterReportCards(q){
