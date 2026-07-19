@@ -58,6 +58,7 @@ function valPaneHtml(mode){
       <div style="display:flex;flex-direction:column;min-width:0">
         <div id="${p}-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC"></div>
         <div id="${p}-grid" style="overflow:auto;max-height:600px"></div>
+        ${mode==='approve' ? `<div id="${p}-concl"></div>` : ''}
       </div>
       <div id="${p}-notes" style="border-left:1px solid var(--border);background:var(--lgray);padding:14px;overflow-y:auto;max-height:640px"></div>
     </div>`;
@@ -195,6 +196,10 @@ async function selectValidationPatient(admId, mode='validate'){
 
   const notes=valEl(mode,'notes');
   if(notes) notes.innerHTML=`<div style="font-size:11px;color:var(--gray);text-align:center;padding:24px 8px">Klik sebuah test untuk lihat detail.</div>`;
+
+  // Kesimpulan panel menyeluruh — hanya di tab Approval (dokter).
+  if(mode==='approve' && typeof lpiRenderPanel==='function')
+    lpiRenderPanel(`${VAL_MODES[mode].prefix}-concl`, admId);
 }
 
 function toggleValCheck(cb, mode='validate'){
