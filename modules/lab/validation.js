@@ -319,6 +319,11 @@ async function approvePatientResults(admId){
   const rows=labResults.filter(r=>r.status==='Validated' && r.admission_id==admId);
   if(!rows.length){ toast('Tidak ada hasil untuk diapprove','warn'); return; }
 
+  // Simpan & konfirmasi kesimpulan panel (bila dokter mengisinya) SEBELUM reload,
+  // selagi textarea masih ada di DOM. Approval oleh dokter = konfirmasi kesimpulan.
+  let conclSaved=false;
+  if(typeof lpiSaveConclusion==='function') conclSaved=await lpiSaveConclusion(admId,{confirm:true});
+
   const now=new Date().toISOString();
   let ok=0;
 
@@ -331,7 +336,7 @@ async function approvePatientResults(admId){
     }catch(e){ console.error('Approval error:',e); }
   }
 
-  toast(`✅ ${ok} hasil approved & rilis`,'ok');
+  toast(`✅ ${ok} hasil approved & rilis${conclSaved?' · kesimpulan dikonfirmasi':''}`,'ok');
   await loadLabResults();
   renderApprovalTab(); renderLabKPI();
 }

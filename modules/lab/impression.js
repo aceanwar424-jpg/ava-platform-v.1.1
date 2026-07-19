@@ -192,18 +192,10 @@ async function lpiRenderPanel(containerId, admId){
           font-family:inherit;line-height:1.5;resize:vertical"
           placeholder="Klik 'Buat Otomatis' untuk menyusun kesan dari pola hasil, atau ketik manual…">${lpiEsc(text)}</textarea>
 
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <div style="font-size:11px;color:var(--gray)">
-            ${confirmed
-              ? `✅ Dikonfirmasi oleh <b>${lpiEsc(confirmed)}</b>${existing.confirmed_at?` · ${new Date(existing.confirmed_at).toLocaleString('id-ID')}`:''}`
-              : existing?.impression
-                ? '📝 Draf tersimpan — belum dikonfirmasi dokter'
-                : 'Belum ada kesimpulan'}
-          </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost btn-sm" onclick="lpiSave(${admId},false)">💾 Simpan Draf</button>
-            <button class="btn btn-teal btn-sm" onclick="lpiSave(${admId},true)">✔️ Konfirmasi Dokter</button>
-          </div>
+        <div style="font-size:11px;color:var(--gray);margin-top:8px">
+          ${confirmed
+            ? `✅ Dikonfirmasi oleh <b>${lpiEsc(confirmed)}</b>${existing.confirmed_at?` · ${new Date(existing.confirmed_at).toLocaleString('id-ID')}`:''}`
+            : `ℹ️ Kesimpulan ini akan <b>tersimpan & dikonfirmasi otomatis</b> saat Anda menekan <b>Approve &amp; Rilis</b> di bawah.`}
         </div>
       </div>
     </div>`;
@@ -217,17 +209,21 @@ function lpiGenerate(admId){
   const { impression, findings, critAny } = lpiDetect(rows);
   const ta = document.getElementById(`lpi-text-${admId}`);
   if (ta) ta.value = impression;
-  // Simpan findings sementara di elemen agar ikut tersimpan saat Simpan/Konfirmasi.
+  // Simpan findings sementara di elemen agar ikut tersimpan saat Approve & Rilis.
   if (ta) ta.dataset.findings = JSON.stringify(findings);
   toast(critAny ? '⚠️ Kesan dibuat — ADA nilai kritis, tinjau saksama' : '✨ Kesan dibuat — silakan tinjau & sunting', critAny?'warn':'ok');
 }
 
-// Simpan (draf) atau konfirmasi (final). Upsert per admission_id.
-async function lpiSave(admId, confirm){
+// Simpan + konfirmasi kesimpulan panel. Dipanggil OTOMATIS oleh Approve & Rilis
+// (approvePatientResults) — tidak ada lagi tombol konfirmasi terpisah, karena
+// approval oleh dokter itulah konfirmasinya. Membaca textarea SEBELUM tab dimuat
+// ulang. Mengembalikan true bila ada yang disimpan. Senyap: tidak menampilkan
+// toast/redraw sendiri (approve yang mengurus notifikasi & render).
+async function lpiSaveConclusion(admId, { confirm = true } = {}){
+  if (_lpiTableOk === false) return false;                 // tabel belum dibuat → lewati
   const ta = document.getElementById(`lpi-text-${admId}`);
-  if (!ta) return;
-  const impression = ta.value.trim();
-  if (!impression){ toast('Kesimpulan masih kosong','warn'); return; }
+  const impression = ta ? ta.value.trim() : '';
+  if (!impression) return false;                            // dokter tidak mengisi → tidak apa-apa
 
   const rows = labResults.filter(r => r.admission_id == admId);
   const sample = rows[0] || {};
@@ -246,21 +242,16 @@ async function lpiSave(admId, confirm){
 
   try {
     const existing = _lpiCache[admId] || await lpiLoad(admId);
-    if (existing?.id){
-      await sbPatch('lab_panel_conclusions', existing.id, body);
-    } else {
-      body.created_at = now;
-      await sbPost('lab_panel_conclusions', body);
-    }
+    if (existing?.id) await sbPatch('lab_panel_conclusions', existing.id, body);
+    else { body.created_at = now; await sbPost('lab_panel_conclusions', body); }
     if (typeof logActivity==='function')
-      logActivity(confirm?'panel_conclusion_confirm':'panel_conclusion_draft',
-        'lab_panel_conclusions', admId,
-        confirm?`Kesimpulan panel dikonfirmasi`:`Kesimpulan panel disimpan (draf)`, sample.patient_name);
-
-    toast(confirm?'✔️ Kesimpulan dikonfirmasi':'💾 Draf tersimpan','ok');
-    _lpiCache[admId] = null;                    // paksa muat ulang
-    await lpiRenderPanel(`app-concl`, admId);   // panel ini hanya ada di mode approve
+      logActivity('panel_conclusion_confirm','lab_panel_conclusions', admId,
+        'Kesimpulan panel dikonfirmasi saat approval', sample.patient_name);
+    _lpiCache[admId] = null;
+    return true;
   } catch(e){
-    toast('❌ Gagal menyimpan: '+e.message,'err');
+    // Tidak menggagalkan approval hanya karena kesimpulan gagal tersimpan.
+    console.warn('Gagal menyimpan kesimpulan panel:', e.message);
+    return false;
   }
 }
