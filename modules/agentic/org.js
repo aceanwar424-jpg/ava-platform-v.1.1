@@ -18,6 +18,8 @@ const AG_ORG_ICON = {
   FIN_HEAD:'💰', FIN_AR:'📄', FIN_LEAK:'🕳️', FIN_RECON:'⚖️',
   GROWTH_HEAD:'🤝', CRM_LEAD:'🎯', CRM_DEAL:'📈', CRM_MOU:'📜',
   CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐', TEAM_OPS:'📊',
+  PHARMA_HEAD:'💊', PHARMA_STOCK:'📦', PHARMA_SAFETY:'⚠️', PHARMA_NARCO:'🔒',
+  WARD_HEAD:'🏥', WARD_BED:'🛏️', WARD_LOS:'📆', WARD_REV:'🧾',
 };
 const AG_DEPT_META = {
   LAB_OPS:          { icon:'🔬', label:'Lab Operations',    head:'LAB_HEAD', tick:'LAB_TICK', color:'#0891B2' },
@@ -29,6 +31,8 @@ const AG_DEPT_META = {
   FINANCE:          { icon:'💰', label:'Finance Intelligence', head:'FIN_HEAD', tick:'FIN_TICK', color:'#16A34A' },
   GROWTH:           { icon:'🤝', label:'Growth & CRM',      head:'GROWTH_HEAD', tick:'GROWTH_TICK', color:'#2563EB' },
   CX:               { icon:'💬', label:'Customer Experience', head:'CX_HEAD', tick:'CX_TICK', color:'#E11D48' },
+  PHARMACY:         { icon:'💊', label:'Pharmacy',           head:'PHARMA_HEAD', tick:'PHARMA_TICK', color:'#7C3AED' },
+  INPATIENT:        { icon:'🏥', label:'Rawat Inap',         head:'WARD_HEAD', tick:'WARD_TICK', color:'#0D9488' },
 };
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
@@ -743,7 +747,7 @@ async function agOrgKick(type){
   try{
     const r = await agRpc('agentic_org_kick', { p_type: type });
     if(r && r.skipped){ toast('Masih ada yang antri/berjalan — tunggu selesai','info'); return; }
-    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops', FIN_TICK:'Finance', GROWTH_TICK:'Growth', CX_TICK:'CX', EXEC_DIGEST:'Executive Digest' };
+    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops', FIN_TICK:'Finance', GROWTH_TICK:'Growth', CX_TICK:'CX', EXEC_DIGEST:'Executive Digest', PHARMA_TICK:'Pharmacy', WARD_TICK:'Rawat Inap' };
     toast(`${_lbl[type]||type} ditugaskan — menjalankan worker…`,'ok');
     await agRunWorker(4);
     await agReload();

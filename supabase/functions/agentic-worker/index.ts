@@ -1498,8 +1498,70 @@ async function handlePlanCampaign(t: Task) {
     note: `Rencana kampanye "${p.goal || p.topic || ''}" · ${md.length} char` };
 }
 
+// ═══ FASE 7M — PHARMACY & INPATIENT (flag-only; klinis=manusia) ══════
+function pharmaReport(s: Dict, focus: string): string {
+  const sm = (s.summary || {}) as Dict;
+  const exp = (s.expired || []) as Dict[]; const exg = (s.expiring || []) as Dict[]; const low = (s.low_stock || []) as Dict[];
+  const ov = (s.override_rx || []) as Dict[]; const ctl = (s.controlled_no_id || []) as Dict[];
+  const head = `## Patroli Farmasi — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Kedaluwarsa: ${sm.expired ?? 0} · akan kedaluwarsa: ${sm.expiring ?? 0} · stok menipis: ${sm.low_stock ?? 0} · warning di-override: ${sm.override_rx ?? 0} · terkontrol tanpa ID: ${sm.controlled_no_id ?? 0}\n\n`;
+  const secExp = (exp.length ? `**⛔ Obat KEDALUWARSA masih ada stok — tarik:**\n` + exp.slice(0, 12).map((b) => `- ${b.drug_code} batch ${b.batch_no} exp ${b.expiry_date} · sisa ${b.qty_remaining}`).join('\n') + '\n' : '') +
+    (exg.length ? `**Akan kedaluwarsa:**\n` + exg.slice(0, 10).map((b) => `- ${b.drug_code} batch ${b.batch_no} · ${b.days_left} hari (${b.expiry_date})`).join('\n') + '\n' : '') +
+    (low.length ? `**Stok menipis:** ` + low.slice(0, 15).map((d) => `${d.generic_name || d.drug_code} (${d.stock_qty}/${d.min_stock})`).join(', ') : '');
+  const secSafety = (ov.length ? `**⚠ Warning keselamatan di-OVERRIDE (butuh tinjauan apoteker):**\n` + ov.slice(0, 12).map((r) => `- ${r.rx_number || '—'} · ${r.patient_name || ''} · dr ${r.doctor_name || '—'} · ${r.kind}`).join('\n') + '\n' : '') +
+    (ctl.length ? `**Obat terkontrol diserahkan tanpa identitas penerima:**\n` + ctl.slice(0, 10).map((d) => `- ${d.dispense_number || '—'} · ${d.patient_name || ''}`).join('\n') : '');
+  const secNarco = `**Register narkotika/psikotropika:** ${sm.narco_moves_30d ?? 0} pergerakan (30 hari)` +
+    (ctl.length ? `\n⚠ ${ctl.length} penyerahan terkontrol tanpa identitas penerima — lengkapi register.` : '');
+  if (focus === 'expiry') return head + secExp;
+  if (focus === 'safety') return head + secSafety;
+  if (focus === 'narco') return head + secNarco;
+  return head + secExp + '\n\n' + secSafety + '\n\n' + secNarco;
+}
+async function handlePharmaScan(t: Task, focus: string) {
+  const s = await rpc('agentic_pharma_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const md = pharmaReport(s, focus);
+  const critical = Number(sm.expired || 0) > 0 || Number(sm.override_rx || 0) > 0 || Number(sm.controlled_no_id || 0) > 0;
+  if ((focus === 'all' && critical) || (focus === 'safety' && Number(sm.override_rx || 0) > 0) || (focus === 'narco' && Number(sm.controlled_no_id || 0) > 0)) {
+    await rpc('agentic_msg_add', { p: { from_agent: focus === 'narco' ? 'PHARMA_NARCO' : focus === 'safety' ? 'PHARMA_SAFETY' : 'PHARMA_HEAD',
+      to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `Farmasi: ${sm.expired ?? 0} kedaluwarsa · ${sm.override_rx ?? 0} override · ${sm.controlled_no_id ?? 0} tanpa ID` };
+}
+function wardReport(s: Dict, focus: string): string {
+  const sm = (s.summary || {}) as Dict; const oc = (s.occupancy || {}) as Dict;
+  const ls = (s.long_stay || []) as Dict[]; const zc = (s.zero_charge || []) as Dict[];
+  const head = `## Patroli Rawat Inap — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Okupansi: ${sm.occupancy_pct ?? 0}% (${oc.terisi ?? 0}/${oc.total ?? 0} bed) · dirawat: ${sm.admitted_now ?? 0} · LOS panjang: ${sm.long_stay ?? 0} · charge nol: ${sm.zero_charge ?? 0}\n\n`;
+  const secBed = `**Bed:** terisi ${oc.terisi ?? 0} · kosong ${oc.kosong ?? 0} · total ${oc.total ?? 0}`;
+  const secLos = ls.length ? `**Pasien LOS panjang (tinjau klinis):**\n` + ls.slice(0, 12).map((x) => `- ${x.patient_name || '—'} · bed ${x.bed_no || '—'} · ${x.days} hari · ${x.admit_diagnosis || ''}`).join('\n') : '';
+  const secCharge = zc.length ? `**⚠ Pulang dengan charge nol (kemungkinan belum ditagih):**\n` + zc.slice(0, 12).map((x) => `- ${x.patient_name || '—'} · bed ${x.bed_no || '—'} · pulang ${String(x.discharged_at || '').slice(0, 10)}`).join('\n') : '';
+  if (focus === 'bed') return head + secBed;
+  if (focus === 'los') return head + secLos;
+  if (focus === 'charge') return head + secCharge;
+  return head + secBed + '\n\n' + secLos + '\n\n' + secCharge;
+}
+async function handleWardScan(t: Task, focus: string) {
+  const s = await rpc('agentic_inpatient_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const md = wardReport(s, focus);
+  if ((focus === 'all' && (Number(sm.long_stay || 0) > 0 || Number(sm.zero_charge || 0) > 0)) || (focus === 'charge' && Number(sm.zero_charge || 0) > 0)) {
+    await rpc('agentic_msg_add', { p: { from_agent: focus === 'charge' ? 'WARD_REV' : 'WARD_HEAD', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `Rawat inap: okupansi ${sm.occupancy_pct ?? 0}% · ${sm.long_stay ?? 0} LOS panjang · ${sm.zero_charge ?? 0} charge nol` };
+}
+const handlePharmaTick = (t: Task) => handlePharmaScan(t, 'all');
+const handleDrugExpiry = (t: Task) => handlePharmaScan(t, 'expiry');
+const handleRxSafety = (t: Task) => handlePharmaScan(t, 'safety');
+const handleNarcoAudit = (t: Task) => handlePharmaScan(t, 'narco');
+const handleWardTick = (t: Task) => handleWardScan(t, 'all');
+const handleBedWatch = (t: Task) => handleWardScan(t, 'bed');
+const handleLosWatch = (t: Task) => handleWardScan(t, 'los');
+const handleChargeAudit = (t: Task) => handleWardScan(t, 'charge');
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  // Fase 7M — Pharmacy & Inpatient:
+  PHARMA_TICK: handlePharmaTick, DRUG_EXPIRY: handleDrugExpiry, RX_SAFETY: handleRxSafety, NARCO_AUDIT: handleNarcoAudit,
+  WARD_TICK: handleWardTick, BED_WATCH: handleBedWatch, LOS_WATCH: handleLosWatch, CHARGE_AUDIT: handleChargeAudit,
   // Fase 7L — Biz-Ops (Finance · Growth/CRM · CX · Exec):
   FIN_TICK: handleFinTick, AR_AGING: handleArAging, REV_LEAK: handleRevLeak, RECON: handleRecon,
   GROWTH_TICK: handleGrowthTick, LEAD_SCORE: handleLeadScore, DEAL_HYGIENE: handleDealHygiene, MOU_WATCH: handleMouWatch,

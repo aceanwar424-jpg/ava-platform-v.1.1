@@ -128,7 +128,7 @@ Digest lintas-domain harian/mingguan: mutu, TAT lab, kas, stok kritis, kredensia
 | **7G** | Perluasan IT (integrasi + backup pg_dump) | Tinggi | Rendah | Rendah | ✅ **SELESAI** (Integration Health + Backup Verify) |
 | **7H** | Lab Operations Assurance | Tinggi | Sedang | Sedang (klinis→R3) | ✅ **SELESAI** (QC Westgard · TAT · nilai kritis) |
 | **7L** | Finance · Growth/CRM · CX · Exec BI (§4 D–G) | Sedang | Sedang | Rendah | ✅ **SELESAI** (advisory; tanpa transaksi) |
-| 7M+ | Pharmacy · Inpatient (domain baru) | Tinggi | Sedang | Sedang (klinis/narkotika) | — (skema sudah ada) |
+| **7M** | Pharmacy · Inpatient (domain baru) | Tinggi | Sedang | Sedang (klinis/narkotika) | ✅ **SELESAI** (flag-only; klinis=manusia) |
 
 **Keputusan CEO (18 Jul 2026):** build 7G–7J disetujui.
 **Build 7J SELESAI (18 Jul 2026):** `supabase_agentic_fase7j_scm.sql` + handler worker + org UI.
