@@ -6,18 +6,20 @@
 // ═══════════════════════════════════════════════════════════════
 
 let agOrgAgents = [], agOrgRights = [], agOrgMsgs = [];
+let _agSelectedChatAgent = 'HEAD';
+let _agChatHistory = [];
 
 const AG_ORG_ICON = {
   HEAD:'👔', TEAM_OPS:'📋', LOGISTIK:'🚚',
   SA_HEAD:'🧪', SA_DOC:'📚', SA_AUDIT:'🔍', SA_REG:'📜', SA_CAPA:'🛠️', QA_MUTU:'✅',
   MKT_HEAD:'✍️', MKT_SEO:'🔑', MKT_COPY:'📝', MKT_DESIGN:'🎨', MKT_SOCIAL:'📣', QA_KONTEN:'✅',
   IT_HEAD:'🖥️', IT_SRE:'🛎️', IT_SEC:'🔐', IT_DATA:'🗄️', IT_DEV:'⚙️',
-  LOGISTIK:'🚚', SCM_STOCK:'📦', SCM_PO:'🧾',
+  SCM_STOCK:'📦', SCM_PO:'🧾',
   HR_HEAD:'👥', HR_CRED:'🪪', HR_ROSTER:'🗓️',
   LAB_HEAD:'🔬', LAB_QC:'🧫', LAB_TAT:'⏱️', LAB_CRIT:'🚨',
   FIN_HEAD:'💰', FIN_AR:'📄', FIN_LEAK:'🕳️', FIN_RECON:'⚖️',
   GROWTH_HEAD:'🤝', CRM_LEAD:'🎯', CRM_DEAL:'📈', CRM_MOU:'📜',
-  CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐', TEAM_OPS:'📊',
+  CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐',
   PHARMA_HEAD:'💊', PHARMA_STOCK:'📦', PHARMA_SAFETY:'⚠️', PHARMA_NARCO:'🔒',
   WARD_HEAD:'🏥', WARD_BED:'🛏️', WARD_LOS:'📆', WARD_REV:'🧾',
 };
@@ -44,6 +46,7 @@ async function agLoadOrg(){
   try{ agOrgAgents = await sbGet('agentic_agents_v','select=*&order=code.asc') || []; }catch(e){ agOrgAgents = []; }
   try{ agOrgRights = await sbGet('agentic_rights_v','select=*&active=eq.true&order=risk_class.asc,task_type.asc') || []; }catch(e){ agOrgRights = []; }
   try{ agOrgMsgs   = await sbGet('agentic_msgs_v','to_agent=eq.ACE&select=*&order=created_at.desc&limit=30') || []; }catch(e){ agOrgMsgs = []; }
+  try{ _agChatHistory = await sbGet('agentic_msgs_v','or=(from_agent.eq.ACE,to_agent.eq.ACE)&order=created_at.asc') || []; }catch(e){ _agChatHistory = []; }
 }
 
 async function renderAgOrgTab(el){
@@ -137,22 +140,8 @@ async function renderAgOrgTab(el){
     </div>
 
     <div class="pro-grid" style="grid-template-columns:1fr 1fr;gap:12px;align-items:start">
-      <div class="ag-detail">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📨 Pesan untuk Anda (eskalasi · standup · alert)</div>
-        <div style="max-height:56vh;overflow-y:auto">
-        ${agOrgMsgs.length ? agOrgMsgs.map(m=>{
-          const kc = m.kind==='ESCALATION'?'#EF4444':m.kind==='ALERT'?'#F59E0B':m.kind==='STANDUP'?'#0EA5E9':'#64748B';
-          return `<div style="border:1px solid var(--border);border-left:4px solid ${kc};border-radius:8px;padding:9px 12px;margin-bottom:8px">
-            <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--gray)">
-              <span><strong style="color:${kc}">${agEsc(m.kind)}</strong> · dari ${AG_ORG_ICON[m.from_agent]||''} ${agEsc(m.from_agent)}</span>
-              <span>${agAgo(m.created_at)}</span>
-            </div>
-            <div style="font-size:12px;margin-top:4px;white-space:pre-wrap">${agMd(agEsc(m.body))}</div>
-            ${m.task_id?`<button class="ag-btn mut" style="padding:3px 9px;margin-top:6px;font-size:11px"
-              onclick="_agSelTask='${m.task_id}';switchAgenticTab('inbox')">${svgIcon('eye',11)} Buka task</button>`:''}
-          </div>`;}).join('')
-        : '<div style="font-size:12px;color:var(--gray)">Belum ada pesan — HEAD akan mengirim eskalasi R3, standup harian, dan alert IT ke sini.</div>'}
-        </div>
+      <div class="ag-detail" id="ag-left-panel" style="padding:16px">
+        <!-- Dynamic content via agRenderLeftPanel -->
       </div>
 
       <div class="ag-detail">
@@ -200,6 +189,7 @@ async function renderAgOrgTab(el){
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔧 Perbaikan Prompt oleh Kepala IT</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
+  agRenderLeftPanel();
   agRenderCronBox();
   agRenderTemplates();
   agRenderCreds();
@@ -804,3 +794,176 @@ async function agPlanCampaign(){
     toast(/PLAN_CAMPAIGN/.test(e.message)?'Jalankan supabase_agentic_fase7k_cleanup.sql dulu':e.message,'err');
   }
 }
+
+// ── Obrolan Agen & Monitor Keaktifan Interaktif ─────────────────────────
+let _agChatTab = 'chat';
+let _agChatPollTimer = null;
+
+window.switchAgChatTab = function(tab) {
+  _agChatTab = tab;
+  window.agRenderLeftPanel();
+};
+
+window.agSelectChatAgent = function(code) {
+  _agSelectedChatAgent = code;
+  window.agRenderLeftPanel();
+};
+
+window.getAgentStatus = function(agent) {
+  if (!agent.active) return '<span style="color:#ef4444">🔴 Nonaktif</span>';
+  const activeTask = agTasks.find(t => 
+    (t.status === 'PROCESSING' || t.status === 'QUEUED') && 
+    (t.payload?.agent_code === agent.code || t.task_type.startsWith(agent.code.split('_')[0]))
+  );
+  if (activeTask) {
+    const actionText = activeTask.status === 'PROCESSING' ? 'Memproses' : 'Antri';
+    return `<span style="color:#0ea5e9;font-weight:700">⚡ ${actionText} ("${activeTask.title}")</span>`;
+  }
+  return '<span style="color:#22c55e;font-weight:700">🟢 Menganggur (IDLE)</span>';
+};
+
+window.agSendChatMsg = async function() {
+  const input = document.getElementById('ag-chat-input');
+  if (!input) return;
+  const val = input.value.trim();
+  if (!val) return;
+
+  const newMsg = {
+    from_agent: 'ACE',
+    to_agent: _agSelectedChatAgent,
+    kind: 'CHAT',
+    body: val,
+    created_at: new Date().toISOString()
+  };
+  _agChatHistory.push(newMsg);
+  window.agRenderLeftPanel();
+  input.value = '';
+
+  try {
+    await sbPost('agentic_msgs_v', {
+      from_agent: 'ACE',
+      to_agent: _agSelectedChatAgent,
+      kind: 'CHAT',
+      body: val
+    });
+
+    await agRpc('agentic_create_task', {
+      p_agent: 'IT',
+      p_type: 'CHAT_RESPONSE',
+      p_title: `Tanggapan Chat: ${_agSelectedChatAgent}`,
+      p_payload: { agent_code: _agSelectedChatAgent, message: val }
+    });
+
+    agRunWorker(1).catch(() => null);
+    window.startChatPolling();
+  } catch (err) {
+    console.error("Gagal mengirim pesan chat:", err);
+  }
+};
+
+window.startChatPolling = function() {
+  if (_agChatPollTimer) clearInterval(_agChatPollTimer);
+  let ticks = 0;
+  _agChatPollTimer = setInterval(async () => {
+    ticks++;
+    if (ticks > 12) {
+      clearInterval(_agChatPollTimer);
+      return;
+    }
+    try {
+      _agChatHistory = await sbGet('agentic_msgs_v','or=(from_agent.eq.ACE,to_agent.eq.ACE)&order=created_at.asc') || [];
+      window.agRenderLeftPanel();
+      
+      const lastMsg = _agChatHistory[_agChatHistory.length - 1];
+      if (lastMsg && lastMsg.from_agent === _agSelectedChatAgent) {
+        clearInterval(_agChatPollTimer);
+      }
+    } catch(e) {}
+  }, 2000);
+};
+
+window.agRenderLeftPanel = function() {
+  const panel = document.getElementById('ag-left-panel');
+  if (!panel) return;
+
+  const tabHeader = `
+    <div style="display:flex;gap:8px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:6px;">
+      <button class="btn btn-sm ${_agChatTab==='chat'?'btn-teal':'btn-light'}" onclick="window.switchAgChatTab('chat')" style="margin:0;font-size:11px;padding:4px 8px">${agIco('users',12)} Hubungi Agen</button>
+      <button class="btn btn-sm ${_agChatTab==='inbox'?'btn-teal':'btn-light'}" onclick="window.switchAgChatTab('inbox')" style="margin:0;font-size:11px;padding:4px 8px">${agIco('list',12)} Inbox Pesan (${agOrgMsgs.length})</button>
+    </div>
+  `;
+
+  if (_agChatTab === 'chat') {
+    const activeAgent = agOrgAgents.find(a => a.code === _agSelectedChatAgent);
+    const agentStatus = activeAgent ? window.getAgentStatus(activeAgent) : '';
+    const chatMsgs = _agChatHistory.filter(m => 
+      (m.from_agent === _agSelectedChatAgent && m.to_agent === 'ACE') ||
+      (m.from_agent === 'ACE' && m.to_agent === _agSelectedChatAgent)
+    );
+
+    let chatHtml = `
+      <div style="margin-bottom:8px">
+        <label style="font-size:10px;color:var(--text-muted);display:block;margin-bottom:3px;font-weight:700">Pilih Agen untuk Dihubungi:</label>
+        <select id="ag-chat-select" class="form-select" onchange="window.agSelectChatAgent(this.value)" style="font-size:12px;padding:6px;width:100%;border-radius:6px;border:1px solid var(--border)">
+          ${agOrgAgents.map(a => `<option value="${a.code}" ${a.code===_agSelectedChatAgent?'selected':''}>${AG_ORG_ICON[a.code]||'🤖'} ${a.name} (${a.role_title})</option>`).join('')}
+        </select>
+      </div>
+      
+      <div class="ag-detail" style="padding:10px;margin-bottom:8px;background:#f8fafc;border-left:4px solid var(--primary);border-radius:6px">
+        <div style="font-size:12px;font-weight:800;color:#0A2342">${activeAgent ? activeAgent.name : ''}</div>
+        <div style="font-size:10px;color:var(--gray);margin-bottom:4px">${activeAgent ? activeAgent.role_title : ''}</div>
+        <div style="font-size:11px;display:flex;align-items:center;gap:4px">
+          <span>Status Kerja:</span>
+          <strong>${agentStatus}</strong>
+        </div>
+      </div>
+
+      <div id="ag-chat-history-container" style="height:32vh;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:#ffffff;margin-bottom:8px;display:flex;flex-direction:column;gap:8px">
+        ${chatMsgs.length ? chatMsgs.map(m => {
+          const isMe = m.from_agent === 'ACE';
+          const bubbleBg = isMe ? '#0f2963' : '#f1f5f9';
+          const bubbleColor = isMe ? '#ffffff' : 'var(--text-main)';
+          const align = isMe ? 'align-self:flex-end;border-bottom-right-radius:2px;' : 'align-self:flex-start;border-bottom-left-radius:2px;';
+          return `
+            <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:11.5px;${align}background:${bubbleBg};color:${bubbleColor};box-shadow: 0 1px 2px rgba(0,0,0,0.05)">
+              <div style="font-size:8px;color:${isMe?'rgba(255,255,255,0.7)':'var(--text-muted)'};margin-bottom:2px;font-weight:700">
+                ${isMe ? 'Anda (CEO)' : `${AG_ORG_ICON[m.from_agent]||''} ${activeAgent.name}`}
+              </div>
+              <div style="white-space:pre-wrap;line-height:1.4">${agEsc(m.body)}</div>
+              <div style="font-size:8px;text-align:right;margin-top:4px;color:${isMe?'rgba(255,255,255,0.6)':'var(--text-muted)'}">${new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})}</div>
+            </div>
+          `;
+        }).join('') : `<div style="text-align:center;color:var(--text-muted);font-size:11.5px;margin:auto">Kirim pesan pertama Anda ke ${activeAgent ? activeAgent.name : 'agen'} di bawah!</div>`}
+      </div>
+
+      <div style="display:flex;gap:6px">
+        <input type="text" id="ag-chat-input" placeholder="Ketik instruksi/pertanyaan Anda..." style="flex:1;font-size:12px;padding:8px;border-radius:6px;border:1px solid var(--border)" onkeydown="if(event.key==='Enter') window.agSendChatMsg()">
+        <button class="ag-btn pub" onclick="window.agSendChatMsg()" style="margin:0;padding:6px 14px;font-size:12px">Kirim</button>
+      </div>
+    `;
+    panel.innerHTML = tabHeader + chatHtml;
+
+    const chatContainer = document.getElementById('ag-chat-history-container');
+    if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
+  } else {
+    let inboxHtml = `
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📨 Pesan untuk Anda (eskalasi · standup · alert)</div>
+      <div style="max-height:50vh;overflow-y:auto">
+      ${agOrgMsgs.length ? agOrgMsgs.map(m=>{
+        const kc = m.kind==='ESCALATION'?'#EF4444':m.kind==='ALERT'?'#F59E0B':m.kind==='STANDUP'?'#0EA5E9':'#64748B';
+        return `<div style="border:1px solid var(--border);border-left:4px solid ${kc};border-radius:8px;padding:9px 12px;margin-bottom:8px;background:#ffffff">
+          <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--gray)">
+            <span><strong style="color:${kc}">${agEsc(m.kind)}</strong> · dari ${AG_ORG_ICON[m.from_agent]||''} ${agEsc(m.from_agent)}</span>
+            <span>${agAgo(m.created_at)}</span>
+          </div>
+          <div style="font-size:12px;margin-top:4px;white-space:pre-wrap">${agMd(agEsc(m.body))}</div>
+          ${m.task_id?`<button class="ag-btn mut" style="padding:3px 9px;margin-top:6px;font-size:11px"
+            onclick="_agSelTask='${m.task_id}';switchAgenticTab('inbox')">${svgIcon('eye',11)} Buka task</button>`:''}
+        </div>`;}).join('')
+      : '<div style="font-size:12px;color:var(--gray);text-align:center;padding:20px">Belum ada pesan — HEAD akan mengirim eskalasi R3, standup harian, dan alert IT ke sini.</div>'}
+      </div>
+    `;
+    panel.innerHTML = tabHeader + inboxHtml;
+  }
+};
+
