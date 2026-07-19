@@ -1696,5 +1696,21 @@ Deno.serve(async (req) => {
   }
 
   await notifyDrafts(results);
+
+  // Jika jumlah task yang diproses mencapai batas maksimal (max),
+  // kemungkinan masih ada antrean tersisa. Picu kembali worker secara asinkron.
+  if (results.length === max) {
+    console.log(`[Worker] Batas maksimal batch ${max} tercapai. Memicu kembali worker di background...`);
+    const triggerUrl = `${SB_URL}/functions/v1/agentic-worker`;
+    const triggerOpts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SB_KEY}` },
+      body: JSON.stringify({ max, agent })
+    };
+    try {
+      fetch(triggerUrl, triggerOpts).catch(() => null);
+    } catch { /* abaikan error */ }
+  }
+
   return json({ worker: WORKER_ID, processed: results.length, results });
 });
