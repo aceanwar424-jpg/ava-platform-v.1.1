@@ -325,7 +325,7 @@ function selectValResult(rid, mode='validate'){
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>
     <div style="font-size:10px;color:var(--gray);margin:2px 0 4px">Pilih dari daftar atau ketik sendiri</div>
     <input list="${VAL_MODES[mode].prefix}-note-presets" id="${VAL_MODES[mode].prefix}-note-input"
-      value="${(_valNotes[rid] ?? r.validation_notes ?? '').replace(/"/g,'&quot;')}"
+      value="${(_valNotes[rid] ?? r.notes ?? '').replace(/"/g,'&quot;')}"
       placeholder="mis. Duplo, sampel lipemik…"
       style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:6px"
       oninput="_valNotes[${rid}]=this.value">
@@ -336,15 +336,15 @@ function selectValResult(rid, mode='validate'){
     <div style="font-size:10px;color:var(--gray);margin-top:4px">Catatan tersimpan ikut tampil di hasil cetak.</div>`;
 }
 
-// Simpan catatan validator ke DB (kolom validation_notes) langsung, tanpa harus
+// Simpan catatan validator ke DB (kolom notes) langsung, tanpa harus
 // menunggu validasi — supaya catatan seperti "duplo" tidak hilang dan muncul di
 // hasil cetak.
 async function saveResultNote(rid, mode='validate'){
   const inp = valEl(mode,'note-input'); if(!inp) return;
   const note = inp.value.trim();
   try{
-    await sbPatch('lab_results',rid,{validation_notes: note||null, updated_at:new Date().toISOString()});
-    const r = labResults.find(x=>x.id==rid); if(r) r.validation_notes = note||null;   // segarkan salinan memori
+    await sbPatch('lab_results',rid,{notes: note||null, updated_at:new Date().toISOString()});
+    const r = labResults.find(x=>x.id==rid); if(r) r.notes = note||null;   // segarkan salinan memori
     _valNotes[rid]=note;
     const p=labResults.find(x=>x.id==rid)||{};
     if(typeof logActivity==='function')
@@ -366,7 +366,7 @@ async function validatePatientResults(admId){
     if(isCriticalResult(r) && !r.critical_ack_at){ held++; continue; }   // kritis ditahan
     const note=_valNotes[r.id];
     const payload={status:'Validated',validated_by:labUser(),validated_at:now,updated_at:now};
-    if(note) payload.validation_notes=note;
+    if(note) payload.notes=note;
     try{
       await sbPatch('lab_results',r.id,payload); ok++;
       if(typeof logActivity==='function')

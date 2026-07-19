@@ -243,7 +243,7 @@ function _labPrintRow(r, indent, cfg){
     <td style="color:#546E7A">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
     <td><span style="background:${col}20;color:${col};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.interpretation||'—'}</span></td>
     ${cfg.show_loinc?`<td style="color:#94A3B8;font-family:monospace;font-size:10px">${r.loinc_code||'—'}</td>`:''}
-  </tr>${r.validation_notes?`<tr><td colspan="${span}" style="padding:2px 10px 6px ${indent?'26px':'10px'};font-size:10.5px;color:#7A5B00;font-style:italic">Catatan: ${r.validation_notes}</td></tr>`:''}`;
+  </tr>${r.notes?`<tr><td colspan="${span}" style="padding:2px 10px 6px ${indent?'26px':'10px'};font-size:10.5px;color:#7A5B00;font-style:italic">Catatan: ${r.notes}</td></tr>`:''}`;
 }
 // Kelompokkan hasil dalam 1 kategori per tes; panel diberi sub-header + analit terindent
 function _labPrintCatRows(rows, cfg){
