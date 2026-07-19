@@ -105,7 +105,7 @@ function updateUIWithDBData() {
                 <path d="M 0 50 L 100 50 L 100 100 L 0 100 Z" fill="#1e293b" />
                 <rect x="25" y="45" width="50" height="30" rx="3" fill="#0ea5e9" opacity="0.3" />
                 <circle cx="50" cy="30" r="10" fill="#0d9488" opacity="0.4" />
-                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">VIRTU DIGILAB</text>
+                <text x="50" y="85" fill="#f8fafc" font-size="8" text-anchor="middle" font-weight="800">ONELAB</text>
               </svg>
             </div>
             <div style="padding:20px; flex:1; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
@@ -271,7 +271,7 @@ function renderSidebarMenu() {
       <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab')">🧪 Book Lab Test</a>
       <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Care')">🏠 Book Home Care</a>
       <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">📦 Buy Package</a>
-      <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">📍 Virtu Near Me</a>
+      <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">📍 Cabang Terdekat</a>
       <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">👤 My Profile</a>
     `;
   } else if (currentRole === 'corporate') {
