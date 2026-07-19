@@ -15,47 +15,47 @@
     
     <!-- ════════════════════════ LOGIN SCREEN ════════════════════════ -->
     <div id="login-screen" class="screen active">
-      <div class="brand-header">
-        <div class="brand-logo">AH</div>
-        <h2>AvaHealth Portal</h2>
-        <p>Akses Layanan Pasien & Mitra Korporasi</p>
-      </div>
+      <div class="login-box">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <div style="display: inline-flex; width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--teal)); color: white; font-weight: 800; font-size: 18px; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25);">AH</div>
+          <h4 style="font-size: 16px; font-weight: 700; color: white; margin: 0; letter-spacing: -0.02em;">AvaHealth Portal</h4>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Akses Layanan Pasien &amp; Mitra Korporasi</p>
+        </div>
 
-      <div class="glass-card">
-        <h3 id="login-form-title" style="font-size:18px; font-weight:800; margin-bottom:20px; color:white; text-align:center;">Portal Pasien</h3>
         <form id="login-form" onsubmit="handleLogin(event)">
-          <div class="input-group">
-            <label for="username" id="username-label">No. Rekam Medis / Email</label>
-            <input type="text" id="username" placeholder="Contoh: RM-12948 atau email Anda" required>
+          <div class="input-group" style="margin-bottom: 14px;">
+            <label for="username" id="username-label" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email</label>
+            <input type="text" id="username" placeholder="Contoh: RM-12948 atau email Anda" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
           </div>
-          <div class="input-group">
-            <label for="password">Kata Sandi</label>
-            <input type="password" id="password" placeholder="••••••••" required>
+          <div class="input-group" style="margin-bottom: 14px;">
+            <label for="password" style="font-size:10.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
+            <input type="password" id="password" placeholder="••••••••" required style="width:100%; background:rgba(15,23,42,0.6); border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:white; font-size:12.5px;">
           </div>
 
-          <div class="role-selector">
-            <span class="role-label">Masuk Sebagai:</span>
-            <div class="role-options">
-              <label class="role-btn">
+          <div class="role-selector" style="margin-bottom: 16px;">
+            <span class="role-label" style="font-size:10px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Masuk Sebagai:</span>
+            <div class="role-options" style="display:flex; gap:6px;">
+              <label class="role-btn" style="flex:1; cursor:pointer;">
                 <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
-                <span>Pasien</span>
+                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Pasien</span>
               </label>
-              <label class="role-btn">
+              <label class="role-btn" style="flex:1; cursor:pointer;">
                 <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
-                <span>Corporate MCU</span>
+                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Corporate</span>
               </label>
-              <label class="role-btn">
+              <label class="role-btn" style="flex:1; cursor:pointer;">
                 <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
-                <span>Faskes Referral</span>
+                <span style="display:block; text-align:center; padding:6px 0; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid var(--border); background:rgba(255,255,255,0.02); color:var(--text-muted); transition:all 0.2s;">Referral</span>
               </label>
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary">Masuk Layanan</button>
+          <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; font-size:12.5px; font-weight:700; margin-top:6px; background:linear-gradient(135deg, var(--primary), var(--teal)); border:none; border-radius:8px; color:white; cursor:pointer;">Masuk Layanan</button>
         </form>
-      </div>
-      <div class="screen-footer">
-        <p id="login-footer-desc">Belum memiliki akun? <a href="#" onclick="openRegisterModal()">Daftar Pasien Baru</a></p>
+
+        <div class="screen-footer" style="margin-top: 16px; text-align: center;">
+          <p id="login-footer-desc" style="font-size: 11px; color: var(--text-muted); margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:var(--primary); font-weight:700; text-decoration:none;">Daftar Pasien Baru</a></p>
+        </div>
       </div>
     </div>
 

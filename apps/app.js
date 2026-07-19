@@ -1436,3 +1436,9 @@ function simulateAgeReversal() {
     alert('Usia biologis Anda telah mencapai performa puncak seluler (21 tahun). Terapi optimal tercapai!');
   }
 }
+
+// Page load initialization
+document.addEventListener('DOMContentLoaded', () => {
+  renderSidebarMenu();
+  showScreen('login-screen');
+});
