@@ -33,22 +33,11 @@ const VAL_MODES = {
 };
 let _valSelBy = { validate:null, approve:null };
 
-// Master catatan validator — pilihan cepat yang lazim dipakai, tapi kolomnya
-// tetap bisa diketik bebas (datalist = pilih dari daftar ATAU tulis sendiri).
-const LAB_NOTE_PRESETS = [
-  'Duplo — pemeriksaan diulang dua kali',
-  'Triplo — pemeriksaan diulang tiga kali',
-  'Sampel hemolisis',
-  'Sampel lipemik',
-  'Sampel ikterik',
-  'Sampel kurang (QNS)',
-  'Sampel bekuan (clotted)',
-  'Sampel diencerkan (diluted)',
-  'Diperiksa ulang — hasil konsisten',
-  'Hasil dikonfirmasi dengan sampel ulang',
-  'Perlu sampel ulang',
-  'Nilai kritis sudah dilaporkan ke DPJP',
-];
+// LAB_NOTE_PRESETS dan saveResultNote TIDAK didefinisikan di sini — keduanya
+// hidup di lab/index.js supaya dapat dipakai juga oleh tab Input Hasil. Menyalin
+// ulang `const` yang sama di dua berkas global membuat deklarasi kedua melempar
+// "already been declared", dan itu mematikan SELURUH berkas ini (tab Validasi &
+// Approval ikut mati). Cukup satu sumber di index.js.
 
 function valEl(mode, suffix){
   return document.getElementById(`${VAL_MODES[mode].prefix}-${suffix}`);
@@ -99,7 +88,7 @@ function renderValidationTab(){
     <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span class="badge badge-gold">${toValidate.length} hasil siap divalidasi</span>
-        ${unackCrit?`<span class="badge" style="background:#FEF2F2;color:#DC2626;margin-left:6px">🚨 ${unackCrit} kritis belum di-ack</span>`:''}
+        ${unackCrit?`<span class="badge" style="background:#FEF2F2;color:#DC2626;margin-left:6px">${unackCrit} Kritis Belum Dilapor</span>`:''}
       </div>
       ${toValidate.length?`<button class="btn btn-ghost btn-sm" onclick="validateAllResults()">⚡ Validasi Semua Pasien (non-kritis)</button>`:''}
     </div>
@@ -146,7 +135,7 @@ function renderValWorklist(patients, mode){
     const crit=p.rows.some(isCriticalResult);
     return `<div onclick="selectValidationPatient(${p.admission_id},'${mode}')"
       style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;${sel?'background:var(--mint);border-left:3px solid var(--teal)':'border-left:3px solid transparent'}">
-      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' 🚨':''}</div>
+      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' <span style="font-size:10px;color:#DC2626;background:#FEF2F2;padding:1px 4px;border-radius:4px">KRITIS</span>':''}</div>
       <div style="font-size:10.5px;color:var(--gray);font-family:monospace">${p.mr_number||''} ${p.visit_number||''}</div>
       <div style="font-size:10px;color:#0EA5E9;font-weight:700;margin-top:2px">${filled} test(s) dgn hasil</div>
     </div>`;
@@ -237,7 +226,7 @@ async function selectValidationPatient(admId, mode='validate'){
           <td style="padding:5px 10px;font-weight:600;cursor:pointer" onclick="selectValResult(${r.id},'${mode}')">${r.item_name||r.product_name||'—'}${r.item_code?` <span style="font-size:9px;color:var(--gray);font-family:monospace">${r.item_code}</span>`:''}
             ${held?`<span style="font-size:9px;font-weight:700;color:#B45309;background:#FEF3C7;padding:1px 6px;border-radius:10px;margin-left:6px">${kosong?'menunggu hasil':'kritis belum dilapor'} · tertahan</span>`:''}</td>
           <td style="padding:5px 8px;font-weight:800;color:${col};cursor:pointer" onclick="selectValResult(${r.id},'${mode}')">${r.result_value||'—'}</td>
-          <td style="padding:5px 4px;text-align:center">${crit?'<span style="color:#DC2626;font-weight:800">🚨</span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800">${flag}</span>`:''}</td>
+          <td style="padding:5px 4px;text-align:center">${crit?'<span style="color:#DC2626;font-weight:800;font-size:10px">KRITIS </span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800">${flag}</span>`:''}</td>
           <td style="padding:5px 8px;color:var(--gray)">${r.unit||''}</td>
           <td style="padding:5px 8px;color:var(--gray);font-size:11px">${r.normal_min!=null?`${r.normal_min}–${r.normal_max}`:r.interpretation||'—'}</td>
         </tr>`;
@@ -319,7 +308,7 @@ function selectValResult(rid, mode='validate'){
       <div><strong>Hasil:</strong> ${r.result_value||'—'} ${r.unit||''}</div>
       <div><strong>Interpretasi:</strong> <span style="color:${labColor(r.color_code)};font-weight:700">${r.interpretation||'—'}</span></div>
       ${r.normal_min!=null?`<div><strong>Rujukan:</strong> ${r.normal_min}–${r.normal_max}</div>`:''}
-      ${isCriticalResult(r)?`<div><strong style="color:#DC2626">🚨 NILAI KRITIS</strong></div>`:''}
+      ${isCriticalResult(r)?`<div><strong style="color:#DC2626">NILAI KRITIS</strong></div>`:''}
     </div>
     ${conclusionSection}
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>
@@ -339,20 +328,6 @@ function selectValResult(rid, mode='validate'){
 // Simpan catatan validator ke DB (kolom notes) langsung, tanpa harus
 // menunggu validasi — supaya catatan seperti "duplo" tidak hilang dan muncul di
 // hasil cetak.
-async function saveResultNote(rid, mode='validate'){
-  const inp = valEl(mode,'note-input'); if(!inp) return;
-  const note = inp.value.trim();
-  try{
-    await sbPatch('lab_results',rid,{notes: note||null, updated_at:new Date().toISOString()});
-    const r = labResults.find(x=>x.id==rid); if(r) r.notes = note||null;   // segarkan salinan memori
-    _valNotes[rid]=note;
-    const p=labResults.find(x=>x.id==rid)||{};
-    if(typeof logActivity==='function')
-      logActivity('note','lab_results',rid,`Catatan hasil: ${note||'(dikosongkan)'}`,p.patient_name);
-    toast('💾 Catatan tersimpan','ok');
-  }catch(e){ toast('❌ Gagal menyimpan catatan: '+e.message,'err'); }
-}
-
 // ── Validasi seluruh hasil satu pasien ────────────────────────
 // Yang ada hasilnya divalidasi; yang kosong / kritis-belum-dilapor tertahan.
 async function validatePatientResults(admId){
