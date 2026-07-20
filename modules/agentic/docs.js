@@ -796,7 +796,9 @@ async function agOpenFinalReview(docId){
     }
 
     _agFinal = { docId, buf, phs, map, tpl, doc: d, gagal, contentLen: String(content).trim().length };
+    _agFinalView = 'preview';
     agRenderFinalReview();
+    agRenderDocPreview();
   }catch(e){
     const el = document.getElementById('ag-final-body');
     if(el) el.innerHTML = `<div class="status-box status-warn">Gagal menyiapkan review: ${agEsc(e.message)}</div>`;
@@ -837,6 +839,20 @@ function agRenderFinalReview(){
     </div>
     ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
     ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
+    <div style="display:flex;gap:6px;margin-bottom:10px">
+      <button class="ag-btn ${_agFinalView==='preview'?'':'mut'}" style="padding:5px 12px"
+        onclick="agSetFinalView('preview')">📄 Pratinjau Dokumen</button>
+      <button class="ag-btn ${_agFinalView==='map'?'':'mut'}" style="padding:5px 12px"
+        onclick="agSetFinalView('map')">📝 Pemetaan Kolom (${terisi}/${st.phs.length})</button>
+    </div>
+
+    <div id="ag-final-preview" style="${_agFinalView==='preview'?'':'display:none'};max-height:52vh;overflow-y:auto;background:#F1F5F9;padding:14px;border-radius:8px"></div>
+    ${_agFinalView==='preview' ? `<div style="font-size:10.5px;color:var(--gray);margin-top:6px">
+      Pratinjau memperlihatkan isi &amp; urutan dokumen. Tata letak cetak (margin, header/footer per halaman,
+      pemenggalan halaman) hanya persis pada berkas .docx yang diunduh — peramban tidak dapat meniru Word sepenuhnya.
+      Bagian bertanda kuning berarti kolom masih kosong.</div>` : ''}
+
+    <div style="${_agFinalView==='map'?'':'display:none'}">
     <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
       Periksa tiap kolom di bawah. Nilai dapat disunting — yang Anda sunting itulah yang masuk ke dokumen final.
       Kolom kosong akan dibiarkan kosong, bukan dikarang.
@@ -859,6 +875,7 @@ function agRenderFinalReview(){
             </td></tr>`;
         }).join('')}</tbody>
       </table>
+    </div>
     </div>`;
 
   if(foot) foot.innerHTML = `
@@ -909,4 +926,138 @@ async function agFinalApprove(){
     await agReload();
     agOpenSignModal(st.docId);
   }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRATINJAU DOKUMEN — bentuk template beserta isinya
+//
+// Merender word/document.xml hasil pengisian menjadi HTML: seluruh teks tetap
+// template (judul, tabel, keterangan) DITAMBAH nilai yang sudah diisi, dalam
+// urutan aslinya, lengkap dengan tabel dan penekanan tebal.
+//
+// ── Batas yang jujur ──────────────────────────────────────────
+// Ini BUKAN penampil Word. Peramban tidak dapat meniru tata letak Word secara
+// persis (font ukuran halaman, margin, header/footer per halaman, pemenggalan
+// halaman) tanpa mesin render OOXML penuh. Yang dijamin identik master adalah
+// BERKAS .docx yang diunduh — pratinjau ini untuk memeriksa ISI dan URUTAN,
+// bukan untuk menilai tata letak cetak. Dinyatakan terbuka di layarnya.
+// ═══════════════════════════════════════════════════════════════
+
+let _agFinalView = 'preview';   // 'preview' | 'map' — dibuka langsung ke pratinjau
+
+function agSetFinalView(v){
+  _agFinalView = v;
+  agRenderFinalReview();
+  if(v === 'preview') agRenderDocPreview();
+}
+
+// OOXML → HTML sederhana. Memakai DOMParser (bukan regex) supaya struktur
+// paragraf/tabel terbaca benar, termasuk sel yang berisi banyak paragraf.
+// Cadangan bila penguraian DOM gagal: buang tag, pertahankan batas paragraf.
+// Lebih baik menampilkan isi apa adanya daripada layar kosong tanpa penjelasan.
+function agDocxXmlToText(xml){
+  const teks = String(xml)
+    .replace(/<w:br[^>]*\/>/g, '\n')
+    .replace(/<w:tab[^>]*\/>/g, '\t')
+    .replace(/<\/w:p>/g, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/\n{3,}/g, '\n\n').trim();
+  if(!teks) return '<div style="color:var(--gray)">Dokumen kosong.</div>';
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+  return `<div style="font-size:11px;color:#B45309;margin-bottom:8px">Struktur tabel tidak dapat diuraikan — menampilkan isi sebagai teks.</div>`
+    + teks.split('\n').map(b => b.trim() ? `<p style="margin:0 0 6px;white-space:pre-wrap">${esc(b)}</p>` : '<div style="height:8px"></div>').join('');
+}
+
+function agDocxXmlToHtml(xml){
+  let doc;
+  try { doc = new DOMParser().parseFromString(xml, 'application/xml'); }
+  catch(e){ return agDocxXmlToText(xml); }
+  if(!doc || !doc.documentElement || doc.getElementsByTagName('parsererror').length)
+    return agDocxXmlToText(xml);
+
+  const body = [...doc.documentElement.children].find(n => n.localName === 'body');
+  if(!body) return agDocxXmlToText(xml);
+
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
+
+  // Teks satu paragraf, run demi run; run tebal dibungkus <strong>.
+  function paraHtml(p){
+    let out = '', align = '', style = '';
+    for(const kid of p.children){
+      if(kid.localName === 'pPr'){
+        for(const pr of kid.children){
+          if(pr.localName === 'jc')     align = pr.getAttribute('w:val') || pr.getAttribute('val') || '';
+          if(pr.localName === 'pStyle') style = pr.getAttribute('w:val') || pr.getAttribute('val') || '';
+        }
+        continue;
+      }
+      if(kid.localName === 'r'){
+        let txt = '', bold = false;
+        for(const rk of kid.children){
+          if(rk.localName === 'rPr') bold = [...rk.children].some(x => x.localName === 'b');
+          if(rk.localName === 't')   txt += rk.textContent;
+          if(rk.localName === 'br')  txt += '\n';
+          if(rk.localName === 'tab') txt += '\t';
+        }
+        if(txt) out += bold ? `<strong>${esc(txt)}</strong>` : esc(txt);
+      }
+      if(kid.localName === 'hyperlink'){
+        for(const r of kid.children) if(r.localName === 'r')
+          for(const rk of r.children) if(rk.localName === 't') out += esc(rk.textContent);
+      }
+    }
+    const heading = /^Heading(\d)/i.exec(style);
+    const ta = align === 'center' ? 'center' : align === 'right' ? 'right' : align === 'both' ? 'justify' : 'left';
+    if(!out.trim()) return '<div style="height:8px"></div>';
+    if(heading){
+      const lv = Math.min(4, parseInt(heading[1], 10) || 1);
+      const size = [0, 17, 15, 13.5, 12.5][lv];
+      return `<div style="font-size:${size}px;font-weight:800;color:#0A2342;margin:12px 0 5px;text-align:${ta}">${out}</div>`;
+    }
+    return `<p style="margin:0 0 6px;text-align:${ta};white-space:pre-wrap">${out}</p>`;
+  }
+
+  function tableHtml(tbl){
+    const rows = [...tbl.children].filter(n => n.localName === 'tr');
+    return `<table style="width:100%;border-collapse:collapse;margin:10px 0;font-size:12px">
+      ${rows.map(tr => `<tr>${[...tr.children].filter(n => n.localName === 'tc').map(tc => {
+        const inner = [...tc.children].map(n =>
+          n.localName === 'p' ? paraHtml(n) : n.localName === 'tbl' ? tableHtml(n) : '').join('');
+        return `<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top">${inner}</td>`;
+      }).join('')}</tr>`).join('')}
+    </table>`;
+  }
+
+  let html = '';
+  try {
+    for(const n of body.children){
+      if(n.localName === 'p')   html += paraHtml(n);
+      if(n.localName === 'tbl') html += tableHtml(n);
+    }
+  } catch(e){ return agDocxXmlToText(xml); }
+  // Bila hasilnya hanya spasi/kosong, isi tetap ditampilkan lewat jalur teks.
+  return html.replace(/<div style="height:8px"><\/div>/g, '').trim()
+    ? html : agDocxXmlToText(xml);
+}
+
+// Render pratinjau dari nilai yang SEDANG ditinjau (termasuk suntingan manusia).
+async function agRenderDocPreview(){
+  const el = document.getElementById('ag-final-preview'); if(!el) return;
+  const st = _agFinal; if(!st) return;
+  el.innerHTML = `<div class="loading-row"><div class="spinner"></div></div>`;
+  try{
+    const xml = await agDocxDocumentXml(st.buf);
+    const filled = agFillPlaceholders(xml, st.map);
+    const html = agDocxXmlToHtml(filled);
+    // Tandai placeholder yang masih tersisa (belum diisi) agar mudah terlihat.
+    const sisa = html.replace(/\{\{([^{}]+)\}\}/g,
+      '<mark style="background:#FEF3C7;color:#92400E;padding:0 3px;border-radius:3px">{{$1}}</mark>');
+    el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
+      padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:#1A2B3C">
+      ${sisa}</div>`;
+  }catch(e){
+    el.innerHTML = `<div class="status-box status-warn">Gagal membuat pratinjau: ${agEsc(e.message)}</div>`;
+  }
 }

@@ -133,6 +133,20 @@ function agFillPlaceholders(xml, repl) {
 // Entri XML yang boleh diisi (body + header + footer)
 const AG_DOCX_TARGET = /^word\/(document\.xml|header\d*\.xml|footer\d*\.xml)$/i;
 
+// Ambil word/document.xml mentah dari sebuah .docx — dipakai pratinjau agar
+// tidak perlu merakit ulang seluruh ZIP hanya untuk melihat isinya.
+async function agDocxDocumentXml(arrayBuffer) {
+  const src = new Uint8Array(arrayBuffer);
+  for (const e of agZipRead(src)) {
+    if (!/^word\/document\.xml$/i.test(e.name)) continue;
+    let bytes = e.compData;
+    if (e.method === 8) bytes = await agInflateRaw(e.compData);
+    else if (e.method !== 0) throw new Error('Metode kompresi ZIP tak didukung: ' + e.method);
+    return new TextDecoder().decode(bytes);
+  }
+  throw new Error('word/document.xml tidak ditemukan');
+}
+
 // UTAMA: isi master .docx dengan replacements → Uint8Array .docx baru
 async function agDocxFill(arrayBuffer, replacements) {
   const src = new Uint8Array(arrayBuffer);
