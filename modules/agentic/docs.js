@@ -584,3 +584,132 @@ async function agExportMasterSOP(){
   a.click(); URL.revokeObjectURL(a.href);
   toast(`✅ ${rows.length} dokumen diekspor`, 'ok');
 }
+
+// ═══════════════════════════════════════════════════════════════
+// TAB REVIEW & PENGESAHAN
+//
+// Menjawab tiga pertanyaan yang sebelumnya tersebar dan sulit dijawab:
+//   1. Dokumen mana yang jatuh tempo review (atau sudah lewat)?
+//   2. Dokumen mana yang terbit tapi pengesahannya belum lengkap?
+//   3. Siapa mengesahkan apa, kapan?
+//
+// Semuanya diambil dalam SATU panggilan (agentic_doc_review_data) — bukan satu
+// kueri per dokumen. Basis data ada di Sydney (~100 ms per kueri), jadi N kueri
+// akan terasa lambat sekali untuk registry yang panjang.
+//
+// Butuh supabase_agentic_doc_sign.sql sudah dijalankan.
+// ═══════════════════════════════════════════════════════════════
+
+// Peran minimum yang dianggap sah untuk sebuah SOP. Dipakai hanya untuk
+// MENANDAI kelengkapan, bukan memaksa — tiap organisasi bisa berbeda.
+const AG_REVIEW_REQUIRED_ROLES = ['Disusun oleh', 'Diperiksa oleh', 'Disetujui oleh'];
+
+async function renderAgReviewTab(el){
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <div style="font-size:12px;color:var(--gray)">
+        Jatuh tempo review, kelengkapan pengesahan, dan jejak siapa mengesahkan apa.
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="ag-btn mut" style="padding:5px 11px" title="Tandai dokumen jatuh tempo & buat task perbaikan" onclick="agRunReviewCycle()">🔄 Jalankan Siklus Review</button>
+        <button class="ag-btn mut" style="padding:5px 11px" onclick="agRenderReviewBody()">↻ Muat Ulang</button>
+      </div>
+    </div>
+    <div id="ag-review-body"><div class="loading-row"><div class="spinner"></div></div></div>`;
+  await agRenderReviewBody();
+}
+
+async function agRenderReviewBody(){
+  const el = document.getElementById('ag-review-body'); if(!el) return;
+  el.innerHTML = `<div class="loading-row"><div class="spinner"></div></div>`;
+
+  let data;
+  try { data = await agRpc('agentic_doc_review_data', { p_horizon_days: 30 }); }
+  catch(e){
+    el.innerHTML = `<div class="status-box status-warn">
+      Tab Review belum aktif — jalankan <code>supabase_agentic_doc_sign.sql</code> di Supabase SQL Editor.
+      <div style="font-size:11px;margin-top:4px;color:var(--gray)">${agEsc(e.message)}</div></div>`;
+    return;
+  }
+
+  const due    = (data && data.due) || [];
+  const unsign = (data && data.unsigned) || [];
+  const recent = (data && data.recent_signatures) || [];
+
+  // Yang belum lengkap saja yang perlu ditampilkan sebagai pekerjaan.
+  const belum = unsign.filter(d => {
+    const roles = d.roles || [];
+    return AG_REVIEW_REQUIRED_ROLES.some(r => !roles.includes(r));
+  });
+  const telat = due.filter(d => (d.days_left ?? 0) < 0);
+
+  el.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px">
+      ${[
+        { v: telat.length,  l: 'Lewat Jatuh Tempo', c: '#B91C1C' },
+        { v: due.length,    l: 'Jatuh Tempo ≤30 hari', c: '#B45309' },
+        { v: belum.length,  l: 'Pengesahan Belum Lengkap', c: '#7C3AED' },
+        { v: recent.length, l: 'Pengesahan 90 Hari', c: '#15803D' },
+      ].map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};border-radius:10px;padding:11px 13px">
+        <div style="font-size:20px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
+        <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('')}
+    </div>
+
+    <div class="ag-detail" style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⏰ Jatuh Tempo Review (${due.length})</div>
+      ${due.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
+        <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Dept</th><th>Status</th><th>Tgl Review</th><th>Sisa</th><th></th></tr></thead>
+        <tbody>${due.map(d => {
+          const sisa = d.days_left;
+          const lewat = sisa < 0;
+          return `<tr>
+            <td style="white-space:nowrap">${agEsc(d.doc_number || '—')}</td>
+            <td>${agEsc(d.title)}</td>
+            <td>${agEsc(d.department || '')}</td>
+            <td>${agDocChip(d.status)}</td>
+            <td style="white-space:nowrap">${agEsc(d.next_review_date || '—')}</td>
+            <td style="white-space:nowrap;font-weight:700;color:${lewat ? '#B91C1C' : sisa <= 7 ? '#B45309' : 'var(--gray)'}">
+              ${lewat ? `lewat ${Math.abs(sisa)} hari` : `${sisa} hari`}</td>
+            <td style="white-space:nowrap">
+              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
+          </tr>`;
+        }).join('')}</tbody></table></div>`
+      : `<div style="font-size:12px;color:var(--gray);font-style:italic">Tidak ada dokumen jatuh tempo dalam 30 hari.</div>`}
+    </div>
+
+    <div class="ag-detail" style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:4px">✍️ Pengesahan Belum Lengkap (${belum.length})</div>
+      <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">
+        Acuan kelengkapan: ${AG_REVIEW_REQUIRED_ROLES.join(' · ')}</div>
+      ${belum.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
+        <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Dept</th><th>Rev</th><th>Sudah TTD</th><th>Kurang</th><th></th></tr></thead>
+        <tbody>${belum.map(d => {
+          const roles = d.roles || [];
+          const kurang = AG_REVIEW_REQUIRED_ROLES.filter(r => !roles.includes(r));
+          return `<tr>
+            <td style="white-space:nowrap">${agEsc(d.doc_number || '—')}</td>
+            <td>${agEsc(d.title)}</td>
+            <td>${agEsc(d.department || '')}</td>
+            <td>${d.revision || 0}</td>
+            <td style="font-size:11px">${roles.length ? roles.map(r => agEsc(r)).join(', ') : '<i style="color:var(--gray)">belum ada</i>'}</td>
+            <td style="font-size:11px;color:#B45309;font-weight:600">${kurang.map(r => agEsc(r)).join(', ')}</td>
+            <td style="white-space:nowrap">
+              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
+          </tr>`;
+        }).join('')}</tbody></table></div>`
+      : `<div style="font-size:12px;color:var(--gray);font-style:italic">Semua dokumen terbit sudah lengkap pengesahannya.</div>`}
+    </div>
+
+    <div class="ag-detail">
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🧾 Jejak Pengesahan 90 Hari Terakhir (${recent.length})</div>
+      ${recent.length ? `<div style="max-height:320px;overflow-y:auto">
+        ${recent.map(s => `<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap">
+          <div style="min-width:0">
+            <b>${agEsc(s.signer_role)}</b> — ${agEsc(s.signer_name)}
+            <div style="font-size:11px;color:var(--gray)">${agEsc(s.doc_number || '')} ${agEsc(s.title || '')} · Rev ${s.revision == null ? 0 : s.revision}</div>
+          </div>
+          <div style="font-size:11px;color:var(--gray);white-space:nowrap">${new Date(s.signed_at).toLocaleString('id-ID')}</div>
+        </div>`).join('')}</div>`
+      : `<div style="font-size:12px;color:var(--gray);font-style:italic">Belum ada pengesahan tercatat.</div>`}
+    </div>`;
+}

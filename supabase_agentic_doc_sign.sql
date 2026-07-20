@@ -114,6 +114,52 @@ GRANT EXECUTE ON FUNCTION public.agentic_doc_sign(UUID,TEXT,TEXT,TEXT,TEXT)  TO 
 GRANT EXECUTE ON FUNCTION public.agentic_doc_signatures(UUID)                TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.agentic_doc_set_number(UUID,TEXT)           TO anon, authenticated, service_role;
 
+
+-- ── 5. Data untuk tab Review ───────────────────────────────────
+-- Satu panggilan mengembalikan semua yang dibutuhkan layar Review, supaya tidak
+-- perlu N kueri terpisah per dokumen (Supabase di Sydney; tiap kueri ~100 ms).
+CREATE OR REPLACE FUNCTION public.agentic_doc_review_data(p_horizon_days INT DEFAULT 30)
+RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT jsonb_build_object(
+    -- Dokumen yang jatuh tempo review (atau sudah lewat)
+    'due', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'id', d.id, 'doc_number', d.doc_number, 'title', d.title,
+        'department', d.department, 'status', d.status,
+        'revision', d.current_revision, 'next_review_date', d.next_review_date,
+        'days_left', (d.next_review_date - CURRENT_DATE))
+      ORDER BY d.next_review_date)
+      FROM agentic.document_registry d
+      WHERE d.next_review_date IS NOT NULL
+        AND d.next_review_date <= CURRENT_DATE + COALESCE(p_horizon_days,30)
+        AND d.status <> 'OBSOLETE'), '[]'::jsonb),
+
+    -- Dokumen terbit yang belum lengkap pengesahannya
+    'unsigned', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'id', d.id, 'doc_number', d.doc_number, 'title', d.title,
+        'department', d.department, 'revision', d.current_revision,
+        'sign_count', (SELECT count(*) FROM agentic.document_signatures g
+                        WHERE g.document_id = d.id AND COALESCE(g.revision,0) = COALESCE(d.current_revision,0)),
+        'roles', COALESCE((SELECT jsonb_agg(g.signer_role ORDER BY g.signed_at)
+                            FROM agentic.document_signatures g
+                            WHERE g.document_id = d.id AND COALESCE(g.revision,0) = COALESCE(d.current_revision,0)), '[]'::jsonb))
+      ORDER BY d.department, d.doc_number)
+      FROM agentic.document_registry d
+      WHERE d.status IN ('PUBLISHED','DRAFT','DUE_FOR_REVIEW')), '[]'::jsonb),
+
+    -- Pengesahan terakhir (jejak siapa mengesahkan apa)
+    'recent_signatures', COALESCE((SELECT jsonb_agg(jsonb_build_object(
+        'document_id', g.document_id, 'doc_number', d.doc_number, 'title', d.title,
+        'signer_name', g.signer_name, 'signer_role', g.signer_role,
+        'revision', g.revision, 'signed_at', g.signed_at)
+      ORDER BY g.signed_at DESC)
+      FROM agentic.document_signatures g
+      JOIN agentic.document_registry d ON d.id = g.document_id
+      WHERE g.signed_at >= now() - interval '90 days'), '[]'::jsonb)
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_doc_review_data(INT) TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;

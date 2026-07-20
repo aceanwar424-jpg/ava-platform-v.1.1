@@ -8,7 +8,7 @@
 // Schema: supabase_agentic.sql (Fase 0) + supabase_agentic_fase12.sql
 // ═══════════════════════════════════════════════════════════════
 
-const AG_TABS = ['inbox','org','docs','compliance','studio','monitor'];
+const AG_TABS = ['inbox','org','docs','review','compliance','studio','monitor'];
 let _agTab = 'inbox';
 let agTasks = [], agRegistry = [], agChecklist = [], agLlmLogs = [];
 
@@ -110,7 +110,8 @@ async function agReload(){
 // ═══════════════════════════════════════════════════════════════
 const AG_TAB_META = [
   ['inbox','Approval Inbox','check'],['org','Organisasi','users'],
-  ['docs','Dokumen QMS','layers'],['compliance','Compliance','shield'],
+  ['docs','Dokumen QMS','layers'],['review','Review & Pengesahan','check'],
+  ['compliance','Compliance','shield'],
   ['studio','Content Studio','image'],['monitor','Monitor','eye'],
 ];
 async function renderAgentic(tab){
@@ -158,6 +159,7 @@ function agRenderTab(){
   if(_agTab==='inbox')            renderAgInboxTab(el);
   else if(_agTab==='org')         renderAgOrgTab(el);
   else if(_agTab==='docs')        renderAgDocsTab(el);
+  else if(_agTab==='review')      renderAgReviewTab(el);
   else if(_agTab==='compliance')  renderAgComplianceTab(el);
   else if(_agTab==='studio')      renderAgStudioTab(el);
   else if(_agTab==='monitor')     renderAgMonitorTab(el);
