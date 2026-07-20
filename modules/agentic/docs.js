@@ -114,13 +114,15 @@ function renderAgDocsTab(el){
     </div>` : ''}
 
     <div class="ag-detail">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap">
         <div style="font-size:12px;font-weight:800;color:#0A2342">${svgIcon('book',14)} Registry Dokumen (${docs.length})</div>
+        <button class="ag-btn mut" style="padding:5px 11px" title="Unduh daftar master SOP terbit (CSV)" onclick="agExportMasterSOP()">⬇️ Daftar Master SOP</button>
       </div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
         <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Jenis</th><th>Dept</th><th>Status</th><th>Rev</th><th>Review Berikut</th><th></th></tr></thead>
         <tbody>${docs.map(d=>`<tr>
-          <td style="white-space:nowrap">${agEsc(d.doc_number||'—')}</td>
+          <td style="white-space:nowrap">${agEsc(d.doc_number||'—')}
+            <button class="ag-btn mut" style="padding:1px 6px;font-size:10px;margin-left:4px" title="Tetapkan/ubah nomor dokumen" onclick="agEditDocNumber('${d.id}')">✎</button></td>
           <td>${agEsc(d.title)}</td>
           <td>${agEsc(d.doc_type)} L${d.doc_level}</td>
           <td>${agEsc(d.department)}</td>
@@ -132,6 +134,7 @@ function renderAgDocsTab(el){
               `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">🧩 .docx</button>` : ''}
+            <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button>
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
@@ -187,7 +190,19 @@ async function agIngestFiles(fileList){
   _agUploadBusy = false;
   if(created){
     toast(`${created} task ingest dibuat — menjalankan worker…`,'ok');
-    try{ await agRunWorker(5); }catch(e){ toast(e.message,'err'); }
+    // Worker memproses maksimal N task per panggilan. Untuk unggahan banyak
+    // berkas sekaligus, panggil berulang sampai antrian habis — kalau tidak,
+    // sisa berkas menggantung dan pengguna harus menekan "Jalankan Worker"
+    // berkali-kali tanpa tahu berapa kali. Dibatasi 20 putaran agar tidak
+    // berputar tanpa akhir bila ada task yang selalu gagal.
+    try{
+      for(let putaran=0; putaran<20; putaran++){
+        const d = await agRunWorker(5);
+        const diproses = (d && d.processed) || 0;
+        put(`⚙️ worker: ${diproses} task diproses`);
+        if(diproses < 5) break;            // antrian sudah habis
+      }
+    }catch(e){ toast(e.message,'err'); }
     await agReload();
   }
 }
@@ -411,4 +426,161 @@ async function agRunReviewCycle(){
     toast(`Review cycle: ${r&&r.due_for_review||0} dokumen jatuh tempo → task repair dibuat`,'ok');
     await agReload();
   }catch(e){ toast(e.message,'err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TANDA TANGAN ELEKTRONIK · NOMOR DOKUMEN · DAFTAR MASTER SOP
+// (butuh supabase_agentic_doc_sign.sql sudah dijalankan)
+//
+// Bentuk tanda tangan: nama + jabatan + WAKTU SERVER + SIDIK (SHA-256) isi
+// dokumen saat ditandatangani. Bukan gambar. Gunanya: bila isi berubah setelah
+// disahkan, sidik yang dihitung ulang tidak cocok → perubahan diam-diam
+// ketahuan. Itulah yang membuatnya berguna untuk audit, bukan sekadar hiasan.
+// ═══════════════════════════════════════════════════════════════
+
+const AG_SIGN_ROLES = ['Disusun oleh', 'Diperiksa oleh', 'Disetujui oleh', 'Diketahui oleh'];
+
+// Isi kanonik yang di-hash. Memakai teks penuh hasil ekstraksi; bila belum ada,
+// pakai gabungan metadata inti agar tetap ada yang bisa disidik.
+function agDocCanonical(d){
+  const t = d && d.extracted_meta && d.extracted_meta.full_text;
+  if (t && String(t).trim()) return String(t);
+  return [d.doc_number, d.title, d.doc_type, d.department, d.current_revision].join('|');
+}
+
+async function agDocHash(text){
+  if (!(window.crypto && crypto.subtle)) throw new Error('Peramban tidak mendukung SHA-256 (butuh HTTPS)');
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function agOpenSignModal(docId){
+  const d = agRegistry.find(x => x.id === docId); if(!d) return;
+  const namaKini = (typeof getUserName === 'function') ? getUserName() : '';
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">✍️ Tanda Tangan Elektronik</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+    <div style="font-size:12.5px;margin-bottom:10px">
+      <b>${agEsc(d.title)}</b>
+      <div style="color:var(--gray);font-size:11.5px">${agEsc(d.doc_number || '(belum bernomor)')} · Rev ${d.current_revision || 0} · ${agEsc(d.department || '')}</div>
+    </div>
+    <div id="ag-sign-list"><div class="loading-row"><div class="spinner"></div></div></div>
+    <div style="border-top:1px solid var(--border);margin-top:12px;padding-top:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Bubuhkan Tanda Tangan</div>
+      <div class="form-row">
+        <div class="form-group"><label>Peran *</label>
+          <input list="ag-sign-roles" id="ag-sign-role" placeholder="Disetujui oleh">
+          <datalist id="ag-sign-roles">${AG_SIGN_ROLES.map(r => `<option value="${r}">`).join('')}</datalist>
+        </div>
+        <div class="form-group"><label>Nama</label>
+          <input id="ag-sign-name" value="${agEsc(namaKini)}">
+        </div>
+      </div>
+      <div class="form-group"><label>Catatan (opsional)</label><input id="ag-sign-note" placeholder="mis. disahkan pada rapat mutu"></div>
+      <div style="font-size:10.5px;color:var(--gray)">Waktu diambil dari server, bukan jam komputer ini. Sidik isi dokumen dihitung otomatis.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+      <button class="btn btn-teal" onclick="agSignDoc('${docId}')">✍️ Tandatangani</button>
+    </div>`, 'wide');
+  await agRenderSignList(docId);
+}
+
+async function agRenderSignList(docId){
+  const el = document.getElementById('ag-sign-list'); if(!el) return;
+  const d = agRegistry.find(x => x.id === docId) || {};
+  let rows = [];
+  try { rows = await agRpc('agentic_doc_signatures', { p_doc_id: docId }) || []; }
+  catch(e){
+    el.innerHTML = `<div class="status-box status-warn">Fitur tanda tangan belum aktif — jalankan <code>supabase_agentic_doc_sign.sql</code> di Supabase SQL Editor.</div>`;
+    return;
+  }
+  if(!rows.length){
+    el.innerHTML = `<div style="font-size:12px;color:var(--gray);font-style:italic">Belum ada tanda tangan.</div>`;
+    return;
+  }
+
+  let nowHash = '';
+  try { nowHash = await agDocHash(agDocCanonical(d)); } catch(e){}
+
+  el.innerHTML = rows.map(s => {
+    const cocok = nowHash && s.content_hash === nowHash;
+    const warna = cocok ? '#15803D' : '#B45309';
+    return `<div style="border:1px solid var(--border);border-left:3px solid ${warna};border-radius:8px;padding:9px 11px;margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div><b style="font-size:12.5px">${agEsc(s.signer_role)}</b>
+          <div style="font-size:12px">${agEsc(s.signer_name)}</div></div>
+        <div style="font-size:11px;color:var(--gray);text-align:right">
+          ${new Date(s.signed_at).toLocaleString('id-ID')}<div>Rev ${s.revision == null ? 0 : s.revision}</div></div>
+      </div>
+      ${s.note ? `<div style="font-size:11.5px;color:var(--text2);margin-top:3px">${agEsc(s.note)}</div>` : ''}
+      <div style="font-size:10.5px;font-family:ui-monospace,monospace;color:var(--gray);margin-top:5px">
+        sidik ${agEsc(String(s.content_hash).slice(0, 16))}…</div>
+      <div style="font-size:11px;font-weight:700;margin-top:3px;color:${warna}">
+        ${nowHash ? (cocok ? '✅ Isi dokumen tidak berubah sejak ditandatangani'
+                           : '⚠️ Isi dokumen BERUBAH setelah ditandatangani — perlu tanda tangan ulang')
+                  : 'ℹ️ Sidik saat ini tidak dapat dihitung'}</div>
+    </div>`;
+  }).join('');
+}
+
+async function agSignDoc(docId){
+  const d = agRegistry.find(x => x.id === docId); if(!d) return;
+  const gv = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+  const role = gv('ag-sign-role'), name = gv('ag-sign-name'), note = gv('ag-sign-note');
+  if(!role){ toast('Isi peran/jabatan','warn'); return; }
+  if(!name){ toast('Isi nama penanda tangan','warn'); return; }
+  try{
+    const hash = await agDocHash(agDocCanonical(d));
+    await agRpc('agentic_doc_sign', { p_doc_id: docId, p_signer: name, p_role: role, p_hash: hash, p_note: note || null });
+    if(typeof logActivity === 'function')
+      logActivity('doc_sign', 'document_registry', docId, `${role}: ${name} menandatangani ${d.doc_number || d.title}`, d.title);
+    toast('✍️ Tanda tangan tersimpan','ok');
+    const r = document.getElementById('ag-sign-role'); if(r) r.value = '';
+    const n = document.getElementById('ag-sign-note'); if(n) n.value = '';
+    await agRenderSignList(docId);
+  }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// ── Nomor dokumen manual ───────────────────────────────────────
+async function agEditDocNumber(docId){
+  const d = agRegistry.find(x => x.id === docId); if(!d) return;
+  const val = prompt(`Nomor dokumen untuk:\n${d.title}\n\n(Nomor tidak dapat diubah setelah dokumen ditandatangani)`, d.doc_number || '');
+  if(val === null) return;
+  const num = val.trim();
+  if(!num){ toast('Nomor tidak boleh kosong','warn'); return; }
+  try{
+    await agRpc('agentic_doc_set_number', { p_doc_id: docId, p_number: num });
+    if(typeof logActivity === 'function')
+      logActivity('doc_number', 'document_registry', docId, `Nomor dokumen diset: ${num}`, d.title);
+    toast('✅ Nomor dokumen tersimpan','ok');
+    await agReload();
+  }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// ── Daftar master SOP terbaru (CSV) ────────────────────────────
+// Datanya sudah disediakan RPC agentic_doc_admin (dokumen berstatus PUBLISHED).
+async function agExportMasterSOP(){
+  toast('Menyiapkan daftar master…','info');
+  let data;
+  try { data = await agRpc('agentic_doc_admin', { p_recent_days: 30 }); }
+  catch(e){ toast('❌ ' + e.message, 'err'); return; }
+  const rows = (data && data.published) || [];
+  if(!rows.length){ toast('Belum ada dokumen berstatus PUBLISHED','warn'); return; }
+
+  const q = v => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
+  const head = ['No. Dokumen','Judul','Jenis','Level','Departemen','Revisi','Tanggal Berlaku','Review Berikutnya'];
+  const csv = [head.join(',')].concat(rows.map(r => [
+    r.doc_number, r.title, r.doc_type, r.doc_level, r.department,
+    r.revision, r.effective_date, r.next_review_date,
+  ].map(q).join(','))).join('\r\n');
+
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `daftar-master-sop-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click(); URL.revokeObjectURL(a.href);
+  toast(`✅ ${rows.length} dokumen diekspor`, 'ok');
 }
