@@ -160,6 +160,69 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.agentic_doc_review_data(INT) TO anon, authenticated, service_role;
 
+
+-- ── 6. PERBAIKAN: pencarian template bertingkat ────────────────
+-- MASALAH
+--   agentic_template_get menuntut kecocokan PERSIS pada doc_level + doc_type +
+--   department sekaligus. Akibatnya template yang sudah diunggah dianggap
+--   "belum ada" hanya karena departemennya beda (mis. master diunggah untuk
+--   MUTU, tetapi dokumennya milik LAB). Pengguna melihat "Belum ada master
+--   .docx" terus-menerus padahal templatenya jelas sudah ada.
+--
+-- PERBAIKAN
+--   Cari bertingkat, dari paling tepat ke paling umum:
+--     1  level + jenis + departemen sama          (paling tepat)
+--     2  level + jenis, departemen MUTU           (template umum organisasi)
+--     3  level + jenis, departemen mana pun
+--     4  jenis + departemen sama, level berbeda
+--     5  jenis sama saja                          (paling longgar)
+--   Template tanpa master .docx terunggah (storage_path NULL) dilewati karena
+--   tidak bisa dipakai merakit apa pun.
+--
+--   Hasilnya membawa 'match_level' agar antarmuka dapat berterus terang bahwa
+--   yang dipakai adalah template cadangan, bukan yang persis — supaya pengguna
+--   tahu dan bisa memperbaiki pemetaannya bila perlu.
+CREATE OR REPLACE FUNCTION public.agentic_template_get(
+  p_level SMALLINT, p_type TEXT, p_dept TEXT DEFAULT 'MUTU'
+) RETURNS JSONB
+LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT (to_jsonb(t) - 'prio') || jsonb_build_object('match_level', t.prio)
+  FROM (
+    SELECT d.*,
+      CASE
+        WHEN d.doc_level = p_level AND d.doc_type = p_type
+             AND d.department = COALESCE(p_dept,'MUTU')                 THEN 1
+        WHEN d.doc_level = p_level AND d.doc_type = p_type
+             AND d.department = 'MUTU'                                  THEN 2
+        WHEN d.doc_level = p_level AND d.doc_type = p_type              THEN 3
+        WHEN d.doc_type  = p_type
+             AND d.department = COALESCE(p_dept,'MUTU')                 THEN 4
+        WHEN d.doc_type  = p_type                                       THEN 5
+        ELSE 99
+      END AS prio
+    FROM agentic.doc_templates d
+    WHERE d.active AND d.storage_path IS NOT NULL
+  ) t
+  WHERE t.prio < 99
+  ORDER BY t.prio, t.updated_at DESC
+  LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_template_get(SMALLINT,TEXT,TEXT) TO anon, authenticated, service_role;
+
+-- Daftar template yang benar-benar siap pakai (untuk pesan bantuan di UI).
+CREATE OR REPLACE FUNCTION public.agentic_template_list()
+RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT COALESCE(jsonb_agg(jsonb_build_object(
+    'id', id, 'doc_level', doc_level, 'doc_type', doc_type,
+    'department', department, 'name', name,
+    'has_master', (storage_path IS NOT NULL)
+  ) ORDER BY doc_level, doc_type, department), '[]'::jsonb)
+  FROM agentic.doc_templates WHERE active;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_template_list() TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;

@@ -134,6 +134,8 @@ function renderAgDocsTab(el){
               `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">🧩 .docx</button>` : ''}
+            ${(d.extracted_meta&&d.extracted_meta.full_text) ?
+              `<button class="ag-btn mut" style="padding:4px 9px" title="Tinjau isi yang dipetakan ke template sebelum dokumen final dibuat" onclick="agOpenFinalReview('${d.id}')">📄 Review Final</button>` : ''}
             <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button>
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
@@ -671,6 +673,7 @@ async function agRenderReviewBody(){
             <td style="white-space:nowrap;font-weight:700;color:${lewat ? '#B91C1C' : sisa <= 7 ? '#B45309' : 'var(--gray)'}">
               ${lewat ? `lewat ${Math.abs(sisa)} hari` : `${sisa} hari`}</td>
             <td style="white-space:nowrap">
+              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">📄 Review</button>
               <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
           </tr>`;
         }).join('')}</tbody></table></div>`
@@ -694,6 +697,7 @@ async function agRenderReviewBody(){
             <td style="font-size:11px">${roles.length ? roles.map(r => agEsc(r)).join(', ') : '<i style="color:var(--gray)">belum ada</i>'}</td>
             <td style="font-size:11px;color:#B45309;font-weight:600">${kurang.map(r => agEsc(r)).join(', ')}</td>
             <td style="white-space:nowrap">
+              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">📄 Review</button>
               <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
           </tr>`;
         }).join('')}</tbody></table></div>`
@@ -712,4 +716,180 @@ async function agRenderReviewBody(){
         </div>`).join('')}</div>`
       : `<div style="font-size:12px;color:var(--gray);font-style:italic">Belum ada pengesahan tercatat.</div>`}
     </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REVIEW DOKUMEN FINAL (sudah disesuaikan template)
+//
+// Sebelumnya tombol "🧩 .docx" langsung mengunduh berkas jadi — tidak ada
+// kesempatan melihat APA yang diisikan AI ke tiap kolom template sebelum
+// dokumen resmi terbentuk. Untuk dokumen mutu itu berbahaya: salah petakan
+// satu kolom bisa lolos begitu saja ke dokumen bertanda tangan.
+//
+// Layar ini menyisipkan langkah tinjauan: pemetaan {{PLACEHOLDER}} → nilai
+// ditampilkan dan DAPAT DISUNTING manusia, baru kemudian .docx dirakit dari
+// nilai yang sudah ditinjau. Format tetap identik master (mesin agDocxFill).
+// ═══════════════════════════════════════════════════════════════
+
+let _agFinal = null;   // { docId, buf, phs, map, tpl, doc }
+
+const AG_TPL_MATCH_NOTE = {
+  1: null,
+  2: 'Memakai template umum departemen MUTU (bukan template khusus departemen dokumen ini).',
+  3: 'Memakai template dengan level & jenis sama, tetapi departemen berbeda.',
+  4: 'Memakai template jenis sama dengan level berbeda — periksa kesesuaiannya.',
+  5: 'Memakai template jenis sama saja (level & departemen berbeda) — periksa saksama.',
+};
+
+async function agOpenFinalReview(docId){
+  const d = agRegistry.find(x => x.id === docId);
+  if(!d){ toast('Dokumen tak ditemukan','err'); return; }
+  const content = d.extracted_meta && d.extracted_meta.full_text;
+  if(!content){ toast('Dokumen belum punya isi — jalankan Repair/generate dulu','warn'); return; }
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">📄 Review Dokumen Final</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button>
+    </div>
+    <div style="font-size:12.5px;margin-bottom:8px">
+      <b>${agEsc(d.title)}</b>
+      <div style="color:var(--gray);font-size:11.5px">${agEsc(d.doc_number || '(belum bernomor)')} · ${agEsc(d.doc_type)} L${d.doc_level} · ${agEsc(d.department || '')} · Rev ${d.current_revision || 0}</div>
+    </div>
+    <div id="ag-final-body"><div class="loading-row"><div class="spinner"></div></div>
+      <div style="text-align:center;font-size:11.5px;color:var(--gray)">Mengambil template & memetakan isi…</div></div>
+    <div class="modal-footer" id="ag-final-foot"></div>`, 'wide');
+
+  try{
+    const tpl = await agRpc('agentic_template_get', { p_level: d.doc_level, p_type: d.doc_type, p_dept: d.department });
+    if(!tpl || !tpl.storage_path){ agFinalNoTemplate(d); return; }
+
+    const buf = await agDownloadStorage(tpl.storage_path);
+    let phs = Array.isArray(tpl.placeholders) ? tpl.placeholders.slice() : [];
+    try { (await agDocxScanPlaceholders(buf)).forEach(k => { if(!phs.includes(k)) phs.push(k); }); } catch(e){}
+    if(!phs.length){
+      document.getElementById('ag-final-body').innerHTML =
+        `<div class="status-box status-warn">Master template ini tidak memiliki <code>{{placeholder}}</code> — tidak ada kolom yang bisa diisi.
+         Sisipkan penanda seperti <code>{{JUDUL}}</code>, <code>{{TUJUAN}}</code> pada master .docx Anda.</div>`;
+      return;
+    }
+
+    const sys = 'Anda mengisi template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Untuk tiap placeholder pada DAFTAR, ambil/ringkas nilai yang relevan dari ISI DOKUMEN. Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang nilai operasional/angka/nama.';
+    const raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(phs)}\n\nISI DOKUMEN:\n${String(content).slice(0, 12000)}`, 'main');
+    let map = {};
+    try { map = JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()); } catch(e){ map = {}; }
+    phs.forEach(k => { if(typeof map[k] !== 'string') map[k] = map[k] == null ? '' : String(map[k]); });
+
+    _agFinal = { docId, buf, phs, map, tpl, doc: d };
+    agRenderFinalReview();
+  }catch(e){
+    const el = document.getElementById('ag-final-body');
+    if(el) el.innerHTML = `<div class="status-box status-warn">Gagal menyiapkan review: ${agEsc(e.message)}</div>`;
+  }
+}
+
+// Pesan yang menuntun, bukan sekadar "belum ada".
+async function agFinalNoTemplate(d){
+  let list = [];
+  try { list = await agRpc('agentic_template_list', {}) || []; } catch(e){}
+  const siap = list.filter(t => t.has_master);
+  document.getElementById('ag-final-body').innerHTML = `
+    <div class="status-box status-warn">
+      Belum ada master <code>.docx</code> yang cocok untuk dokumen ini
+      (<b>${agEsc(d.doc_type)} L${d.doc_level} · ${agEsc(d.department || '')}</b>).
+    </div>
+    <div style="font-size:12px;margin-top:10px">
+      <div style="font-weight:700;margin-bottom:5px">Template yang sudah terpasang master:</div>
+      ${siap.length ? `<ul style="margin:0;padding-left:18px">${siap.map(t =>
+        `<li>${agEsc(t.doc_type)} L${t.doc_level} · ${agEsc(t.department)} — ${agEsc(t.name)}</li>`).join('')}</ul>
+        <div style="color:var(--gray);margin-top:8px">Unggah master untuk kombinasi dokumen ini, atau samakan jenis/level/departemen dokumen dengan salah satu di atas.</div>`
+      : `<div style="color:var(--gray)">Belum ada satu pun template dengan master .docx terunggah. Unggah di <b>Dokumen QMS → 📐 Template Dokumen Resmi</b>.</div>`}
+      ${list.length && !siap.length ? `<div style="color:var(--gray);margin-top:6px">(${list.length} template terdaftar tetapi belum ada berkas master yang diunggah.)</div>` : ''}
+    </div>`;
+}
+
+function agRenderFinalReview(){
+  const st = _agFinal; if(!st) return;
+  const body = document.getElementById('ag-final-body');
+  const foot = document.getElementById('ag-final-foot');
+  const terisi = st.phs.filter(k => (st.map[k] || '').trim()).length;
+  const catatan = AG_TPL_MATCH_NOTE[st.tpl.match_level];
+
+  if(body) body.innerHTML = `
+    <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
+      Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi
+    </div>
+    ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
+    <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
+      Periksa tiap kolom di bawah. Nilai dapat disunting — yang Anda sunting itulah yang masuk ke dokumen final.
+      Kolom kosong akan dibiarkan kosong, bukan dikarang.
+    </div>
+    <div style="max-height:46vh;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:var(--lgray);position:sticky;top:0">
+          <th style="padding:6px 10px;text-align:left;width:34%">Kolom Template</th>
+          <th style="padding:6px 10px;text-align:left">Nilai yang akan diisi</th>
+        </tr></thead>
+        <tbody>${st.phs.map((k, i) => {
+          const v = st.map[k] || '';
+          const kosong = !v.trim();
+          return `<tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:6px 10px;font-family:ui-monospace,monospace;font-size:11px;vertical-align:top;color:${kosong ? '#B45309' : 'var(--navy)'}">
+              {{${agEsc(k)}}}${kosong ? '<div style="font-size:10px;font-style:italic">kosong</div>' : ''}</td>
+            <td style="padding:4px 8px">
+              <textarea data-ph="${agEsc(k)}" rows="${v.length > 90 ? 3 : 1}" oninput="agFinalEdit(this)"
+                style="width:100%;font-size:11.5px;padding:5px;border:1px solid ${kosong ? '#FCD34D' : 'var(--border)'};border-radius:5px;resize:vertical;font-family:inherit">${agEsc(v)}</textarea>
+            </td></tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+
+  if(foot) foot.innerHTML = `
+    <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+    <button class="btn btn-ghost" onclick="agFinalDownload()">⬇️ Unduh .docx Final</button>
+    <button class="btn btn-teal" onclick="agFinalApprove()">✅ Setujui &amp; Tandatangani</button>`;
+}
+
+function agFinalEdit(ta){
+  if(!_agFinal) return;
+  _agFinal.map[ta.dataset.ph] = ta.value;
+}
+
+async function agFinalDownload(){
+  const st = _agFinal; if(!st){ toast('Sesi review hilang — buka ulang','warn'); return; }
+  try{
+    const out = await agDocxFill(st.buf, st.map);
+    const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${String(st.doc.doc_number || st.doc.title || 'dokumen').replace(/[^\w.\-]+/g, '_')}.docx`;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+    const terisi = st.phs.filter(k => (st.map[k] || '').trim()).length;
+    toast(`.docx final diunduh — ${terisi}/${st.phs.length} kolom terisi, format identik master`, 'ok');
+  }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// Setujui: catat hasil tinjauan ke registry, lalu buka layar tanda tangan.
+async function agFinalApprove(){
+  const st = _agFinal; if(!st) return;
+  const terisi = st.phs.filter(k => (st.map[k] || '').trim()).length;
+  if(terisi < st.phs.length){
+    if(!confirm(`${st.phs.length - terisi} kolom masih kosong.\nLanjutkan menyetujui dokumen final ini?`)) return;
+  }
+  try{
+    // Simpan nilai final yang SUDAH ditinjau manusia, supaya perakitan ulang
+    // memakai hasil tinjauan — bukan menebak ulang lewat AI.
+    await agRpc('agentic_doc_update', {
+      p_id: st.docId,
+      p: { extracted_meta: { template_fill: st.map, template_id: st.tpl.id,
+                             reviewed_by: (typeof getUserName === 'function' ? getUserName() : ''),
+                             reviewed_at: new Date().toISOString() } },
+    });
+    if(typeof logActivity === 'function')
+      logActivity('doc_final_review', 'document_registry', st.docId,
+        `Dokumen final ditinjau (${terisi}/${st.phs.length} kolom terisi)`, st.doc.title);
+    toast('✅ Hasil tinjauan tersimpan — lanjut tanda tangan', 'ok');
+    await agReload();
+    agOpenSignModal(st.docId);
+  }catch(e){ toast('❌ ' + e.message, 'err'); }
 }
