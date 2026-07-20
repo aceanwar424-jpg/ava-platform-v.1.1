@@ -101,7 +101,7 @@ function renderAgDocsTab(el){
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px" id="ag-templates-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('layers',14)} Template Dokumen Resmi (fidelity 100%)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
@@ -334,7 +334,7 @@ async function renderAgComplianceTab(el){
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-audit-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔍 Audit Internal & CAPA</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('shield-check',14)} Audit Internal & CAPA</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
   agRenderAuditPanel();
@@ -385,7 +385,7 @@ async function agRenderAuditPanel(){
         </tr>`).join('')}</tbody></table></div>`:'<div style="font-size:11.5px;color:var(--gray)">Belum ada CAPA berjalan.</div>'}`;
   }
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">🔍 Audit Internal & CAPA</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342">${icon('shield-check',14)} Audit Internal & CAPA</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agRunAudit()">${svgIcon('sparkle',12)} Jalankan Audit Internal</button>
         <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderAuditPanel()">${svgIcon('refresh',11)} Muat ulang</button>
@@ -464,7 +464,7 @@ async function agOpenSignModal(docId){
   const namaKini = (typeof getUserName === 'function') ? getUserName() : '';
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">✍️ Tanda Tangan Elektronik</div>
+      <div class="modal-title">${icon('pen-tool',16)} Tanda Tangan Elektronik</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
     <div style="font-size:12.5px;margin-bottom:10px">
@@ -661,7 +661,7 @@ async function agRenderReviewBody(){
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⏰ Jatuh Tempo Review (${due.length})</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('clock',14)} Jatuh Tempo Review (${due.length})</div>
       ${due.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
         <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Dept</th><th>Status</th><th>Tgl Review</th><th>Sisa</th><th></th></tr></thead>
         <tbody>${due.map(d => {
@@ -684,7 +684,7 @@ async function agRenderReviewBody(){
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:4px">✍️ Pengesahan Belum Lengkap (${belum.length})</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:4px">${icon('pen-tool',14)} Pengesahan Belum Lengkap (${belum.length})</div>
       <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">
         Acuan kelengkapan: ${AG_REVIEW_REQUIRED_ROLES.join(' · ')}</div>
       ${belum.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
@@ -708,7 +708,7 @@ async function agRenderReviewBody(){
     </div>
 
     <div class="ag-detail">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🧾 Jejak Pengesahan 90 Hari Terakhir (${recent.length})</div>
+      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('scroll',14)} Jejak Pengesahan 90 Hari Terakhir (${recent.length})</div>
       ${recent.length ? `<div style="max-height:320px;overflow-y:auto">
         ${recent.map(s => `<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap">
           <div style="min-width:0">
@@ -752,7 +752,7 @@ async function agOpenFinalReview(docId){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📄 Review Dokumen Final</div>
+      <div class="modal-title">${icon('file-text',16)} Review Dokumen Final</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
     <div style="font-size:12.5px;margin-bottom:8px">
@@ -837,7 +837,7 @@ async function agFinalNoTemplate(d){
       ${siap.length ? `<ul style="margin:0;padding-left:18px">${siap.map(t =>
         `<li>${agEsc(t.doc_type)} L${t.doc_level} · ${agEsc(t.department)} — ${agEsc(t.name)}</li>`).join('')}</ul>
         <div style="color:var(--gray);margin-top:8px">Unggah master untuk kombinasi dokumen ini, atau samakan jenis/level/departemen dokumen dengan salah satu di atas.</div>`
-      : `<div style="color:var(--gray)">Belum ada satu pun template dengan master .docx terunggah. Unggah di <b>Dokumen QMS → 📐 Template Dokumen Resmi</b>.</div>`}
+      : `<div style="color:var(--gray)">Belum ada satu pun template dengan master .docx terunggah. Unggah di <b>Dokumen QMS → Template Dokumen Resmi</b>.</div>`}
       ${list.length && !siap.length ? `<div style="color:var(--gray);margin-top:6px">(${list.length} template terdaftar tetapi belum ada berkas master yang diunggah.)</div>` : ''}
     </div>`;
 }
