@@ -116,13 +116,13 @@ function renderAgDocsTab(el){
     <div class="ag-detail">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap">
         <div style="font-size:12px;font-weight:800;color:#0A2342">${svgIcon('book',14)} Registry Dokumen (${docs.length})</div>
-        <button class="ag-btn mut" style="padding:5px 11px" title="Unduh daftar master SOP terbit (CSV)" onclick="agExportMasterSOP()">⬇️ Daftar Master SOP</button>
+        <button class="ag-btn mut" style="padding:5px 11px" title="Unduh daftar master SOP terbit (CSV)" onclick="agExportMasterSOP()">${icon('download',13)} Daftar Master SOP</button>
       </div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
         <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Jenis</th><th>Dept</th><th>Status</th><th>Rev</th><th>Review Berikut</th><th></th></tr></thead>
         <tbody>${docs.map(d=>`<tr>
           <td style="white-space:nowrap">${agEsc(d.doc_number||'—')}
-            <button class="ag-btn mut" style="padding:1px 6px;font-size:10px;margin-left:4px" title="Tetapkan/ubah nomor dokumen" onclick="agEditDocNumber('${d.id}')">✎</button></td>
+            <button class="ag-btn mut" style="padding:1px 6px;font-size:10px;margin-left:4px" title="Tetapkan/ubah nomor dokumen" onclick="agEditDocNumber('${d.id}')">${icon('edit',11)}</button></td>
           <td>${agEsc(d.title)}</td>
           <td>${agEsc(d.doc_type)} L${d.doc_level}</td>
           <td>${agEsc(d.department)}</td>
@@ -133,10 +133,10 @@ function renderAgDocsTab(el){
             ${d.status!=='PUBLISHED' && (d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
-              `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">🧩 .docx</button>` : ''}
+              `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">${icon('file-check',12)} .docx</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
-              `<button class="ag-btn mut" style="padding:4px 9px" title="Tinjau isi yang dipetakan ke template sebelum dokumen final dibuat" onclick="agOpenFinalReview('${d.id}')">📄 Review Final</button>` : ''}
-            <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button>
+              `<button class="ag-btn mut" style="padding:4px 9px" title="Tinjau isi yang dipetakan ke template sebelum dokumen final dibuat" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review Final</button>` : ''}
+            <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button>
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
@@ -488,7 +488,7 @@ async function agOpenSignModal(docId){
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-teal" onclick="agSignDoc('${docId}')">✍️ Tandatangani</button>
+      <button class="btn btn-teal" onclick="agSignDoc('${docId}')">${icon('pen-tool',13)} Tandatangani</button>
     </div>`, 'wide');
   await agRenderSignList(docId);
 }
@@ -616,8 +616,8 @@ async function renderAgReviewTab(el){
         Jatuh tempo review, kelengkapan pengesahan, dan jejak siapa mengesahkan apa.
       </div>
       <div style="display:flex;gap:6px">
-        <button class="ag-btn mut" style="padding:5px 11px" title="Tandai dokumen jatuh tempo & buat task perbaikan" onclick="agRunReviewCycle()">🔄 Jalankan Siklus Review</button>
-        <button class="ag-btn mut" style="padding:5px 11px" onclick="agRenderReviewBody()">↻ Muat Ulang</button>
+        <button class="ag-btn mut" style="padding:5px 11px" title="Tandai dokumen jatuh tempo & buat task perbaikan" onclick="agRunReviewCycle()">${icon('refresh',13)} Jalankan Siklus Review</button>
+        <button class="ag-btn mut" style="padding:5px 11px" onclick="agRenderReviewBody()">${icon('refresh',13)} Muat Ulang</button>
       </div>
     </div>
     <div id="ag-review-body"><div class="loading-row"><div class="spinner"></div></div></div>`;
@@ -676,8 +676,8 @@ async function agRenderReviewBody(){
             <td style="white-space:nowrap;font-weight:700;color:${lewat ? '#B91C1C' : sisa <= 7 ? '#B45309' : 'var(--gray)'}">
               ${lewat ? `lewat ${Math.abs(sisa)} hari` : `${sisa} hari`}</td>
             <td style="white-space:nowrap">
-              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">📄 Review</button>
-              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
+              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review</button>
+              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button></td>
           </tr>`;
         }).join('')}</tbody></table></div>`
       : `<div style="font-size:12px;color:var(--gray);font-style:italic">Tidak ada dokumen jatuh tempo dalam 30 hari.</div>`}
@@ -700,8 +700,8 @@ async function agRenderReviewBody(){
             <td style="font-size:11px">${roles.length ? roles.map(r => agEsc(r)).join(', ') : '<i style="color:var(--gray)">belum ada</i>'}</td>
             <td style="font-size:11px;color:#B45309;font-weight:600">${kurang.map(r => agEsc(r)).join(', ')}</td>
             <td style="white-space:nowrap">
-              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">📄 Review</button>
-              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">✍️ TTD</button></td>
+              <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review</button>
+              <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button></td>
           </tr>`;
         }).join('')}</tbody></table></div>`
       : `<div style="font-size:12px;color:var(--gray);font-style:italic">Semua dokumen terbit sudah lengkap pengesahannya.</div>`}
@@ -872,9 +872,9 @@ function agRenderFinalReview(){
       </div>` : ''}
     <div style="display:flex;gap:6px;margin-bottom:10px">
       <button class="ag-btn ${_agFinalView==='preview'?'':'mut'}" style="padding:5px 12px"
-        onclick="agSetFinalView('preview')">📄 Pratinjau Dokumen</button>
+        onclick="agSetFinalView('preview')">${icon('file-text',13)} Pratinjau Dokumen</button>
       <button class="ag-btn ${_agFinalView==='map'?'':'mut'}" style="padding:5px 12px"
-        onclick="agSetFinalView('map')">📝 Pemetaan Kolom (${terisi}/${st.phs.length})</button>
+        onclick="agSetFinalView('map')">${icon('list',13)} Pemetaan Kolom (${terisi}/${st.phs.length})</button>
     </div>
 
     <div id="ag-final-preview" style="${_agFinalView==='preview'?'':'display:none'};max-height:52vh;overflow-y:auto;background:#F1F5F9;padding:14px;border-radius:8px"></div>
@@ -911,8 +911,8 @@ function agRenderFinalReview(){
 
   if(foot) foot.innerHTML = `
     <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-    <button class="btn btn-ghost" onclick="agFinalDownload()">⬇️ Unduh .docx Final</button>
-    <button class="btn btn-teal" onclick="agFinalApprove()">✅ Setujui &amp; Tandatangani</button>`;
+    <button class="btn btn-ghost" onclick="agFinalDownload()">${icon('download',13)} Unduh .docx Final</button>
+    <button class="btn btn-teal" onclick="agFinalApprove()">${icon('check-circle',13)} Setujui &amp; Tandatangani</button>`;
 }
 
 function agFinalEdit(ta){

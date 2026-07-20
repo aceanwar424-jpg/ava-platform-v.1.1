@@ -53,6 +53,8 @@ const ICON_PATHS = {
   'shield-check':'<path d="M12 3 5 6v6c0 4.2 2.9 7.7 7 9 4.1-1.3 7-4.8 7-9V6Z"/><path d="m9 12 2 2 4-4"/>',
   inbox:       '<path d="M3 12h5l1.5 3h5L16 12h5"/><path d="M4.5 6h15l1.5 6v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6Z"/>',
   upload:      '<path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M3 16v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/>',
+  download:    '<path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M3 16v3a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/>',
+  refresh:     '<path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/>',
   wrench:      '<path d="M15 6a4 4 0 0 0 5.2 5.2L11 20.4a2.5 2.5 0 0 1-3.5-3.5L16.8 7.6A4 4 0 0 0 15 6Z"/><path d="m15 6 3-3 3 3-3 3"/>',
   clock:       '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
   calendar:    '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4"/>',
