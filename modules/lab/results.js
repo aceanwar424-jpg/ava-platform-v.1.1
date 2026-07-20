@@ -159,15 +159,24 @@ async function resPickRow(rid){
     <div style="font-size:12.5px;font-weight:800;color:var(--navy)">${r.item_name||r.product_name||''}</div>
     <div style="font-size:10.5px;color:var(--gray);margin-bottom:10px">${r.product_name||''}${r.loinc_code?' · LOINC '+r.loinc_code:''}${r.host_code?' · Host '+r.host_code:''}</div>
     <div id="res-prevbox" style="font-size:11px;color:var(--gray);margin-bottom:12px">memuat riwayat…</div>
-    <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan / Komentar</label>
-    <textarea id="res-note-input" rows="6" style="width:100%;margin-top:4px;font-size:12px" oninput="_resNotes[${rid}]=this.value" placeholder="Catatan analis, kondisi sampel, dll...">${noteVal}</textarea>
-    <div style="font-size:10px;color:var(--gray);margin-top:6px">Catatan ikut tersimpan saat "Simpan Hasil".</div>`;
+    <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Per Test</label>
+    <div style="font-size:10px;color:var(--gray);margin:2px 0 4px">Pilih dari daftar atau ketik sendiri:</div>
+    <input list="res-note-presets" id="res-note-input"
+      value="${noteVal.replace(/"/g,'&quot;')}"
+      placeholder="mis. Duplo, sampel lipemik…"
+      style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:6px"
+      oninput="_resNotes[${rid}]=this.value">
+    <datalist id="res-note-presets">
+      ${LAB_NOTE_PRESETS.map(p=>`<option value="${p.replace(/"/g,'&quot;')}">`).join('')}
+    </datalist>
+    <button class="btn btn-teal btn-sm" style="margin-top:6px;width:100%" onclick="saveResultNote(${rid},'result')">Simpan Catatan</button>
+    <div style="font-size:10px;color:var(--gray);margin-top:6px">Catatan tersimpan akan tampil pada lembar hasil cetak.</div>`;
   try {
     const prev=await sbGet('lab_results',
       `select=result_value,unit,created_at&patient_name=eq.${encodeURIComponent(r.patient_name||'')}&product_id=eq.${r.product_id}${r.product_item_id?`&product_item_id=eq.${r.product_item_id}`:''}&result_value=not.is.null&status=in.(Approved,Released,Validated)&order=created_at.desc&limit=1`).catch(()=>[]);
     const p=prev?.[0];
     const box=document.getElementById('res-prevbox');
-    if(box) box.innerHTML= p?`📊 Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:#94A3B8">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
+    if(box) box.innerHTML= p?`Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:#94A3B8">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
     const prevCell=tr.querySelector('.res-prev'); if(prevCell&&p) prevCell.textContent=p.result_value;
   } catch(e){}
 }

@@ -25,6 +25,46 @@ const LAB_COLORS = { green:'#22C55E', yellow:'#F59E0B', orange:'#F97316', red:'#
 function labColor(code){ return LAB_COLORS[code] || LAB_COLORS.gray; }
 function labUser(){ return (typeof getUserName==='function') ? getUserName() : 'User'; }
 
+// Master catatan validator / analis
+const LAB_NOTE_PRESETS = [
+  'Duplo — pemeriksaan diulang dua kali',
+  'Triplo — pemeriksaan diulang tiga kali',
+  'Sampel hemolisis',
+  'Sampel lipemik',
+  'Sampel ikterik',
+  'Sampel kurang (QNS)',
+  'Sampel bekuan (clotted)',
+  'Sampel diencerkan (diluted)',
+  'Diperiksa ulang — hasil konsisten',
+  'Hasil dikonfirmasi dengan sampel ulang',
+  'Perlu sampel ulang',
+  'Nilai kritis sudah dilaporkan ke DPJP',
+];
+
+// Simpan catatan per test (digunakan oleh Input Hasil, Validasi, dan Approval)
+async function saveResultNote(rid, mode='validate'){
+  let inp = null;
+  if(mode === 'result'){
+    inp = document.getElementById('res-note-input');
+  } else if (typeof VAL_MODES !== 'undefined' && VAL_MODES[mode]) {
+    inp = typeof valEl === 'function' ? valEl(mode, 'note-input') : document.getElementById(`${VAL_MODES[mode].prefix}-note-input`);
+  } else {
+    inp = document.getElementById(`${mode}-note-input`);
+  }
+  if(!inp) return;
+  const note = inp.value.trim();
+  try{
+    await sbPatch('lab_results', rid, {notes: note||null, updated_at: new Date().toISOString()});
+    const r = labResults.find(x=>x.id==rid); if(r) r.notes = note||null;
+    if(typeof _valNotes !== 'undefined') _valNotes[rid] = note;
+    if(typeof _resNotes !== 'undefined') _resNotes[rid] = note;
+    const p = labResults.find(x=>x.id==rid)||{};
+    if(typeof logActivity==='function')
+      logActivity('note','lab_results',rid,`Catatan hasil: ${note||'(dikosongkan)'}`,p.patient_name);
+    toast('Catatan tersimpan','ok');
+  } catch(e){ toast('Gagal menyimpan catatan: '+e.message,'err'); }
+}
+
 // ── Master produk (dipakai untuk target TAT & interpretasi) ──────
 async function loadLabProducts(){
   if (_prodCache) return _prodCache;
@@ -60,10 +100,9 @@ function tatStatus(row){
 function tatBadge(row){
   const t = tatStatus(row);
   const color = t.overdue ? '#EF4444' : (t.pct>75 ? '#F59E0B' : '#22C55E');
-  const icon  = t.overdue ? '⏰' : '⏱';
   return `<span title="Target ${tatTargetHours(row)} jam" style="display:inline-flex;align-items:center;gap:4px;
-    background:${color}15;color:${color};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">
-    ${icon} ${t.label}${t.overdue?' · TELAT':''}</span>`;
+    background:${color}15;color:${color};padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700">
+    ${t.label}${t.overdue?' · OVERDUE':''}</span>`;
 }
 
 // ── Deteksi nilai kritis ─────────────────────────────────────────
