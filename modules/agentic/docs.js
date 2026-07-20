@@ -242,8 +242,11 @@ async function agBuildDocFromTemplate(docId){
     const tpl = await agRpc('agentic_template_get', { p_level:d.doc_level, p_type:d.doc_type, p_dept:d.department });
     if(!tpl || !tpl.storage_path){ toast(`Belum ada master .docx untuk ${d.doc_type} L${d.doc_level}/${d.department} — unggah di tab Organisasi → Template`,'warn'); return; }
     const buf = await agDownloadStorage(tpl.storage_path);
-    let phs = Array.isArray(tpl.placeholders)?tpl.placeholders.slice():[];
-    try{ const scan = await agDocxScanPlaceholders(buf); scan.forEach(k=>{ if(!phs.includes(k)) phs.push(k); }); }catch(e){}
+    // Sama seperti layar Review: pindai LANGSUNG dari master. Daftar tersimpan di
+    // registry bisa berisi nama rusak dari pemindai lama yang tak akan pernah cocok.
+    let phs = [];
+    try{ phs = await agDocxScanPlaceholders(buf); }catch(e){ phs = []; }
+    if(!phs.length && Array.isArray(tpl.placeholders)) phs = tpl.placeholders.slice();
     if(!phs.length){ toast('Master tidak punya {{placeholder}} — tak ada yang diisi','warn'); return; }
     // Map isi dokumen → nilai per placeholder via LLM
     const sys = 'Anda mengisi template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Untuk tiap placeholder pada DAFTAR, ambil/ringkas nilai yang relevan dari ISI DOKUMEN. Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang nilai operasional/angka/nama.';
@@ -765,8 +768,14 @@ async function agOpenFinalReview(docId){
     if(!tpl || !tpl.storage_path){ agFinalNoTemplate(d); return; }
 
     const buf = await agDownloadStorage(tpl.storage_path);
-    let phs = Array.isArray(tpl.placeholders) ? tpl.placeholders.slice() : [];
-    try { (await agDocxScanPlaceholders(buf)).forEach(k => { if(!phs.includes(k)) phs.push(k); }); } catch(e){}
+    // Daftar placeholder yang TERSIMPAN di registry template bisa berasal dari
+    // pemindaian lama yang rusak (nama ikut menelan teks penjelas, mis.
+    // "{{JUDUL_SOP}} — judul SOP"). Nama seperti itu tidak akan pernah cocok saat
+    // pengisian. Karena itu pemindaian LANGSUNG dari berkas master dijadikan
+    // sumber utama; daftar tersimpan hanya dipakai bila pemindaian gagal total.
+    let phs = [];
+    try { phs = await agDocxScanPlaceholders(buf); } catch(e){ phs = []; }
+    if(!phs.length && Array.isArray(tpl.placeholders)) phs = tpl.placeholders.slice();
     if(!phs.length){
       document.getElementById('ag-final-body').innerHTML =
         `<div class="status-box status-warn">Master template ini tidak memiliki <code>{{placeholder}}</code> — tidak ada kolom yang bisa diisi.
@@ -795,7 +804,15 @@ async function agOpenFinalReview(docId){
         : 'AI tidak menemukan satu pun nilai yang cocok. Periksa apakah nama kolom template sesuai isi dokumen, atau isi manual di bawah.';
     }
 
-    _agFinal = { docId, buf, phs, map, tpl, doc: d, gagal, contentLen: String(content).trim().length };
+    // Template yang hanya berisi placeholder METADATA (judul, nomor, tanggal,
+    // penyetuju) tidak punya tempat untuk menampung ISI dokumen. Akibatnya bagian
+    // Prosedur/Tujuan pada hasil akhir tetap teks bawaan template — bukan isi
+    // dokumen yang sedang dikerjakan. Ini perlu dikatakan terus terang, karena
+    // dari layar saja gejalanya mudah disalahartikan sebagai AI yang keliru.
+    const adaIsi = phs.some(k => /(^|_)(ISI|KONTEN|BODY|PROSEDUR|LANGKAH|TUJUAN|LINGKUP|TANGGUNG|REFERENSI|DEFINISI|URAIAN)/i.test(k));
+
+    _agFinal = { docId, buf, phs, map, tpl, doc: d, gagal, adaIsi,
+                 contentLen: String(content).trim().length };
     _agFinalView = 'preview';
     agRenderFinalReview();
     agRenderDocPreview();
@@ -839,6 +856,20 @@ function agRenderFinalReview(){
     </div>
     ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
     ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
+    ${st.adaIsi === false ? `
+      <div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px;border-left:4px solid #B91C1C">
+        <b>Template ini tidak punya kolom untuk ISI dokumen.</b>
+        Semua ${st.phs.length} kolomnya berupa metadata (judul, nomor, tanggal, penyetuju).
+        Akibatnya bagian <b>Tujuan / Ruang Lingkup / Prosedur</b> pada hasil akhir tetap memakai
+        teks bawaan template — <u>bukan isi dokumen ini</u>, meski isinya sudah tersedia
+        (${(st.contentLen || 0).toLocaleString('id-ID')} karakter).
+        <div style="margin-top:6px">
+          Perbaikannya di berkas master <code>.docx</code>, bukan di sini: sisipkan penanda pada
+          badan dokumen, misalnya <code>{{TUJUAN}}</code>, <code>{{RUANG_LINGKUP}}</code>,
+          <code>{{PROSEDUR}}</code> — atau satu penanda besar <code>{{ISI_DOKUMEN}}</code> untuk
+          seluruh badan. Unggah ulang master, lalu buka layar ini lagi.
+        </div>
+      </div>` : ''}
     <div style="display:flex;gap:6px;margin-bottom:10px">
       <button class="ag-btn ${_agFinalView==='preview'?'':'mut'}" style="padding:5px 12px"
         onclick="agSetFinalView('preview')">📄 Pratinjau Dokumen</button>
