@@ -110,8 +110,18 @@ function agXmlEscape(s) {
 }
 // Ganti {{KEY}} → nilai. Nama placeholder yang terpecah antar-run tetap terbaca
 // (tag XML di dalamnya dibuang). Newline → <w:br/>. Placeholder tak dikenal dibiarkan.
+// Word memecah teks ke banyak <w:r>/<w:t>, dan tag XML dapat jatuh DI TENGAH
+// pasangan kurung — termasuk di antara dua "}" penutup. Pola lama menuntut "}}"
+// berdampingan, sehingga penutup yang benar terlewat dan cocokan lari ke "}}"
+// berikutnya: nama placeholder jadi rusak (ikut menelan teks penjelas di
+// belakangnya) dan penggantian tidak pernah cocok. Pola ini mengizinkan tag di
+// antara kedua "{" maupun kedua "}".
+// Dibuat sebagai fungsi, bukan konstanta, agar lastIndex regex global tidak
+// terbawa antar pemakaian.
+function agPhRegex() { return /\{(?:<[^>]+>)*\{([\s\S]*?)\}(?:<[^>]+>)*\}/g; }
+
 function agFillPlaceholders(xml, repl) {
-  return xml.replace(/\{\{([\s\S]*?)\}\}/g, (m, inner) => {
+  return xml.replace(agPhRegex(), (m, inner) => {
     const key = inner.replace(/<[^>]+>/g, '').trim();
     if (Object.prototype.hasOwnProperty.call(repl, key)) {
       return agXmlEscape(repl[key]).replace(/\r?\n/g, '</w:t><w:br/><w:t>');
@@ -153,8 +163,13 @@ async function agDocxScanPlaceholders(arrayBuffer) {
     if (e.method === 8) bytes = await agInflateRaw(e.compData);
     else if (e.method !== 0) continue;
     const xml = new TextDecoder().decode(bytes);
-    const re = /\{\{([\s\S]*?)\}\}/g; let mm;
-    while ((mm = re.exec(xml)) !== null) found.add(mm[1].replace(/<[^>]+>/g, '').trim());
+    // Pola yang SAMA dengan mesin pengisi, supaya apa yang terpindai pasti dapat
+    // diganti — kalau berbeda, pengguna melihat kolom yang ternyata tak pernah terisi.
+    const re = agPhRegex(); let mm;
+    while ((mm = re.exec(xml)) !== null) {
+      const key = mm[1].replace(/<[^>]+>/g, '').trim();
+      if (key) found.add(key);
+    }
   }
   return [...found];
 }

@@ -775,12 +775,27 @@ async function agOpenFinalReview(docId){
     }
 
     const sys = 'Anda mengisi template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Untuk tiap placeholder pada DAFTAR, ambil/ringkas nilai yang relevan dari ISI DOKUMEN. Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang nilai operasional/angka/nama.';
-    const raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(phs)}\n\nISI DOKUMEN:\n${String(content).slice(0, 12000)}`, 'main');
-    let map = {};
-    try { map = JSON.parse(raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()); } catch(e){ map = {}; }
+    let raw = '', map = {}, gagal = null;
+    try {
+      raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(phs)}\n\nISI DOKUMEN:\n${String(content).slice(0, 12000)}`, 'main');
+    } catch(e){ gagal = 'Panggilan AI gagal: ' + e.message; }
+
+    if(!gagal){
+      try { map = JSON.parse(String(raw).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()); }
+      catch(e){ gagal = 'Jawaban AI bukan JSON yang dapat dibaca — pemetaan tidak dapat dibuat otomatis.'; map = {}; }
+    }
     phs.forEach(k => { if(typeof map[k] !== 'string') map[k] = map[k] == null ? '' : String(map[k]); });
 
-    _agFinal = { docId, buf, phs, map, tpl, doc: d };
+    // Bila semua kosong, sebutkan kemungkinan sebabnya — jangan biarkan pengguna
+    // menebak-nebak melihat "0/31 kolom terisi" tanpa keterangan apa pun.
+    const terisi = phs.filter(k => (map[k] || '').trim()).length;
+    if(!gagal && terisi === 0){
+      gagal = String(content).trim().length < 200
+        ? `Isi dokumen sumber sangat pendek (${String(content).trim().length} karakter) — belum ada yang bisa dipetakan. Jalankan Repair/generate isi dokumen dulu.`
+        : 'AI tidak menemukan satu pun nilai yang cocok. Periksa apakah nama kolom template sesuai isi dokumen, atau isi manual di bawah.';
+    }
+
+    _agFinal = { docId, buf, phs, map, tpl, doc: d, gagal, contentLen: String(content).trim().length };
     agRenderFinalReview();
   }catch(e){
     const el = document.getElementById('ag-final-body');
@@ -818,7 +833,9 @@ function agRenderFinalReview(){
   if(body) body.innerHTML = `
     <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
       Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi
+      ${st.contentLen != null ? ` · isi sumber ${st.contentLen.toLocaleString('id-ID')} karakter` : ''}
     </div>
+    ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
     ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
     <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
       Periksa tiap kolom di bawah. Nilai dapat disunting — yang Anda sunting itulah yang masuk ke dokumen final.
