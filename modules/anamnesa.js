@@ -12,20 +12,32 @@ async function renderAnamnesa() {
   if(typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
-    <div class="pro-header">
-      <div><h1>🩺 Anamnesa</h1>
-        <span class="pro-sub">Pemeriksaan awal wajib · TTV &amp; antropometri · cetak barcode · rujuk ke Lab</span></div>
-      <input type="date" class="table-filter" id="anam-date" onchange="loadAnamnesaQueue()"
-        value="${new Date().toISOString().split('T')[0]}" style="max-width:170px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('anamnesa')" title="Kembali ke daftar menu Anamnesa">← Menu Anamnesa</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Anamnesa &amp; Skrining Awal</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pemeriksaan awal wajib · TTV &amp; antropometri · cetak barcode · rujuk ke Lab</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="anam-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <input type="date" class="table-filter" id="anam-date" onchange="loadAnamnesaQueue()"
+          value="${new Date().toISOString().split('T')[0]}" style="max-width:170px;background:#fff;color:var(--navy)">
+      </div>
     </div>
     <div id="anam-kpi" class="pro-kpi"></div>
     <div class="pro-toolbar">
-      <input class="table-search" id="anam-q" placeholder="🔍 Cari nama / no. kunjungan / MR..."
+      <input class="table-search" id="anam-q" placeholder="Cari nama / no. kunjungan / MR..."
         oninput="anamSearch=this.value;renderAnamnesaList()" style="flex:1;min-width:220px">
     </div>
     <div id="anam-list"><div class="loading-row"><div class="spinner"></div></div></div>
     <div id="anam-exam"></div>
     </div>`;
+
+  const badge = document.getElementById('anam-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   await loadAnamnesaQueue();
 }
 

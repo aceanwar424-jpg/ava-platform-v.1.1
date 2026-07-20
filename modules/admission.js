@@ -85,11 +85,17 @@ async function renderAdmission() {
   injectProShell();
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
-    <div class="pro-header">
-      <div><h1>🏨 Admission / Registrasi</h1>
-        <span class="pro-sub">Walk-in · Booking · Rujukan · Project MCU</span></div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderAdmissionReport()">📊 Laporan</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('admission')" title="Kembali ke daftar menu Admission">← Menu Admission</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Admission / Registrasi Pasien</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Walk-in · Booking · Rujukan · Project MCU</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="adm-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderAdmissionReport()">Laporan</button>
         <button class="btn btn-teal btn-sm" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
       </div>
     </div>
@@ -98,11 +104,11 @@ async function renderAdmission() {
 
     <div class="pro-toolbar" id="adm-status-tabs">
       <button class="pro-chip active" onclick="setAdmFilter('','',this)">Semua</button>
-      ${Object.entries(ADM_STATUS).map(([s,v])=>`<button class="pro-chip" onclick="setAdmFilter('status','${s}',this)">${v.icon} ${s}</button>`).join('')}
+      ${Object.entries(ADM_STATUS).map(([s,v])=>`<button class="pro-chip" onclick="setAdmFilter('status','${s}',this)">${s}</button>`).join('')}
     </div>
 
     <div class="pro-toolbar">
-      <input class="table-search" id="adm-q" placeholder="🔍 Cari nama pasien, no. kunjungan..."
+      <input class="table-search" id="adm-q" placeholder="Cari nama pasien, no. kunjungan..."
         oninput="admFilter.search=this.value;applyAdmFilter()" style="flex:1;min-width:220px">
       <select class="table-filter" id="adm-type" onchange="admFilter.type=this.value;applyAdmFilter()">
         <option value="">Semua Tipe</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option>
@@ -112,6 +118,9 @@ async function renderAdmission() {
 
     <div id="adm-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
+
+  const badge = document.getElementById('adm-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   await loadAdmissions();
 }

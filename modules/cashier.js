@@ -24,13 +24,19 @@ let cashierAll = [], cashierQueue = [];
 
 async function renderCashier() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Kasir</h1>
-        <p>Pembayaran, refund, dan tagihan korporat</p></div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="openShiftPanel()">🔐 Shift Kas</button>
-        <button class="btn btn-ghost btn-sm" onclick="openCashierReport()">📊 Laporan</button>
-        <button class="btn btn-teal" onclick="openPaymentForm()">+ Transaksi Baru</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('cashier')" title="Kembali ke daftar menu Kasir">← Menu Kasir</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Kasir &amp; Pembayaran</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pembayaran, refund, dan tagihan korporat</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="cash-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openShiftPanel()">Shift Kas</button>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCashierReport()">Laporan</button>
+        <button class="btn btn-teal btn-sm" onclick="openPaymentForm()">+ Transaksi Baru</button>
       </div>
     </div>
 

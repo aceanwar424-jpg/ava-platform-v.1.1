@@ -26,10 +26,18 @@ let risOrders = [], risModalities = [], risFilter = '';
 
 async function renderRIS() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Radiologi</h1>
-        <p>Order, penjadwalan modalitas, arsip citra, dan alur baca radiolog</p></div>
-      <button class="btn btn-teal" onclick="openRISOrderForm()">+ Order Pemeriksaan</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('radiology')" title="Kembali ke daftar menu Radiologi">← Menu Radiologi</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Radiologi (RIS &amp; PACS)</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Radiology Information System</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="ris-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-teal btn-sm" onclick="openRISOrderForm()">+ Order Pemeriksaan</button>
+      </div>
     </div>
     <div id="ris-warn"></div>
     <div class="tabs" id="ris-tabs" style="margin-bottom:14px">
@@ -39,6 +47,10 @@ async function renderRIS() {
     </div>
     <div id="ris-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px"></div>
     <div id="ris-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
+
+  const badge = document.getElementById('ris-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   await loadRISOrders();
 }
 
@@ -86,38 +98,50 @@ function paintRIS() {
 
   const el = document.getElementById('ris-content'); if (!el) return;
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🫁</div>
+    el.innerHTML = `<div class="empty-state">
       <h3>${risOrders.length ? 'Tidak ada pemeriksaan pada status ini' : 'Belum ada order radiologi'}</h3>
       <button class="btn btn-teal" style="margin-top:10px" onclick="openRISOrderForm()">+ Order Pemeriksaan</button></div>`;
     return;
   }
 
-  el.innerHTML = `<div class="table-wrap"><table><thead><tr>
-    <th>No. Akses</th><th>Pasien</th><th>Pemeriksaan</th><th>Jadwal</th><th>Status</th><th>Aksi</th>
-  </tr></thead><tbody>${list.map(o => {
-    const st = RIS_STATUS[o.status] || RIS_STATUS['Dijadwalkan'];
-    return `<tr>
-      <td><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:var(--teal)">${o.accession_no || '—'}</span>
-        ${o.priority === 'Cito' ? '<div style="font-size:10px;color:#B91C1C;font-weight:700">⚡ CITO</div>' : ''}</td>
-      <td><div style="font-weight:600">${o.patient_name || '—'}</div>
-        <div style="font-size:11px;color:var(--gray)">${o.mr_number || ''}</div></td>
-      <td><div style="font-size:12.5px">${o.procedure_name || '—'}</div>
-        <div style="font-size:11px;color:var(--gray)">${o.modality_code || ''}</div></td>
-      <td style="font-size:11.5px;color:var(--gray)">${o.scheduled_at ? new Date(o.scheduled_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-      <td><span style="background:${st.bg};color:${st.c};padding:3px 9px;border-radius:5px;
-        font-size:11px;font-weight:700">${o.status}</span></td>
-      <td><div class="act-row" style="flex-wrap:wrap">
-        ${o.status === 'Dijadwalkan' ? `<button class="btn btn-teal btn-xs" onclick="risOpenSendDevice(${o.id})">📡 Kirim ke Alat</button>` : ''}
-        ${o.status === 'Antrian Alat' ? `<button class="btn btn-ghost btn-xs" onclick="risOpenSendDevice(${o.id})" title="Ubah alat/radiografer">✎</button>
-          <button class="btn btn-teal btn-xs" onclick="risStartAcquisition(${o.id})">▶ Mulai Akuisisi</button>` : ''}
-        ${o.status === 'Dikerjakan' ? `<button class="btn btn-ghost btn-xs" onclick="openPacsUpload(${o.id},'${o.accession_no}')">🖼️ Terima Citra</button>
-          <button class="btn btn-teal btn-xs" onclick="risSetStatus(${o.id},'Menunggu Baca')">✓ Selesai Foto</button>` : ''}
-        ${['Menunggu Baca', 'Dibaca', 'Selesai'].includes(o.status)
-          ? `<button class="btn btn-ghost btn-xs" onclick="openPacsViewer(${o.id},'${o.accession_no}')">🖼️ Citra</button>
-             <button class="btn btn-teal btn-xs" onclick="openRISReport(${o.id})">📝 Laporan</button>` : ''}
-      </div></td>
-    </tr>`;
-  }).join('')}</tbody></table></div>`;
+  el.innerHTML = `<div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:auto">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
+          <th style="padding:7px 10px;text-align:left">No. Akses</th>
+          <th style="padding:7px 10px;text-align:left">Pasien</th>
+          <th style="padding:7px 10px;text-align:left">Pemeriksaan</th>
+          <th style="padding:7px 10px;text-align:left">Jadwal</th>
+          <th style="padding:7px 10px;text-align:left">Status</th>
+          <th style="padding:7px 10px;text-align:center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>${list.map(o => {
+        const st = RIS_STATUS[o.status] || RIS_STATUS['Dijadwalkan'];
+        return `<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${o.accession_no || '—'}</span>
+            ${o.priority === 'Cito' ? '<div style="font-size:10px;color:#B91C1C;font-weight:700">CITO</div>' : ''}</td>
+          <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${o.patient_name || '—'}</div>
+            <div style="font-size:11px;color:var(--gray)">${o.mr_number || ''}</div></td>
+          <td style="padding:8px 10px"><div style="font-size:12.5px;font-weight:600">${o.procedure_name || '—'}</div>
+            <div style="font-size:11px;color:var(--gray)">${o.modality_code || ''}</div></td>
+          <td style="padding:8px 10px;font-size:11.5px;color:var(--gray)">${o.scheduled_at ? new Date(o.scheduled_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
+          <td style="padding:8px 10px"><span style="background:${st.bg};color:${st.c};padding:3px 9px;border-radius:4px;
+            font-size:11px;font-weight:700">${o.status}</span></td>
+          <td style="padding:8px 10px;text-align:center"><div class="act-row" style="justify-content:center;flex-wrap:wrap">
+            ${o.status === 'Dijadwalkan' ? `<button class="btn btn-teal btn-xs" onclick="risOpenSendDevice(${o.id})">Kirim ke Alat</button>` : ''}
+            ${o.status === 'Antrian Alat' ? `<button class="btn btn-ghost btn-xs" onclick="risOpenSendDevice(${o.id})" title="Ubah alat/radiografer">Edit</button>
+              <button class="btn btn-teal btn-xs" onclick="risStartAcquisition(${o.id})">Mulai Akuisisi</button>` : ''}
+            ${o.status === 'Dikerjakan' ? `<button class="btn btn-ghost btn-xs" onclick="openPacsUpload(${o.id},'${o.accession_no}')">Terima Citra</button>
+              <button class="btn btn-teal btn-xs" onclick="risSetStatus(${o.id},'Menunggu Baca')">Selesai Foto</button>` : ''}
+            ${['Menunggu Baca', 'Dibaca', 'Selesai'].includes(o.status)
+              ? `<button class="btn btn-ghost btn-xs" onclick="openPacsViewer(${o.id},'${o.accession_no}')">Citra</button>
+                 <button class="btn btn-teal btn-xs" onclick="openRISReport(${o.id})">Laporan</button>` : ''}
+          </div></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
 }
 
 async function openRISOrderForm() {

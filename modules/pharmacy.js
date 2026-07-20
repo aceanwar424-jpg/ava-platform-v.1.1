@@ -30,20 +30,32 @@ let rxWarnAllergy = null, rxWarnInteraction = null;
 
 async function renderPharmacy() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Farmasi</h1>
-        <p>Resep elektronik, penyerahan obat, stok per batch, dan pencatatan narkotika</p></div>
-      <button class="btn btn-teal" onclick="rxOpenPrescriptionForm()">+ Resep Baru</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('pharmacy')" title="Kembali ke daftar menu Farmasi">← Menu Farmasi</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Farmasi &amp; Apotek</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pharmacy Information System</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="rx-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-teal btn-sm" onclick="rxOpenPrescriptionForm()">+ Resep Baru</button>
+      </div>
     </div>
     <div id="rx-warn"></div>
     <div class="tabs" id="rx-tabs" style="margin-bottom:14px">
-      <button class="tab-btn active" onclick="rxSwitchTab('resep',this)">📋 Resep</button>
-      <button class="tab-btn" onclick="rxSwitchTab('obat',this)">💊 Master Obat</button>
-      <button class="tab-btn" onclick="rxSwitchTab('stok',this)">📦 Stok &amp; Kedaluwarsa</button>
-      <button class="tab-btn" onclick="rxSwitchTab('narkotika',this)">🔒 Narkotika</button>
-      <button class="tab-btn" onclick="rxSwitchTab('laporan',this)">📈 Laporan</button>
+      <button class="tab-btn active" onclick="rxSwitchTab('resep',this)">Resep Elektronik</button>
+      <button class="tab-btn" onclick="rxSwitchTab('obat',this)">Master Obat</button>
+      <button class="tab-btn" onclick="rxSwitchTab('stok',this)">Stok &amp; Kedaluwarsa</button>
+      <button class="tab-btn" onclick="rxSwitchTab('narkotika',this)">Pencatatan Narkotika</button>
+      <button class="tab-btn" onclick="rxSwitchTab('laporan',this)">Laporan Farmasi</button>
     </div>
     <div id="rx-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
+
+  const badge = document.getElementById('rx-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   await rxLoadAll();
 }
 

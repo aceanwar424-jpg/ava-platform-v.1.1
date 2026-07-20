@@ -98,15 +98,23 @@ function inpClassRate(code) {
 async function renderInpatient(tab) {
   inpTab = tab || inpTab || 'board';
   const tabs = [
-    { k: 'board',  l: '🛏 Papan Tempat Tidur' },
-    { k: 'stays',  l: '🧑‍⚕️ Pasien Dirawat' },
-    { k: 'master', l: '⚙️ Ruang & Tarif' },
+    { k: 'board',  l: 'Papan Tempat Tidur' },
+    { k: 'stays',  l: 'Pasien Dirawat' },
+    { k: 'master', l: 'Ruang & Tarif' },
   ];
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Rawat Inap</h1>
-        <p>Papan tempat tidur, admisi, visite, billing harian, dan resume pulang</p></div>
-      <button class="btn btn-teal" onclick="inpOpenAdmitForm()">+ Admisi Rawat Inap</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('inpatient')" title="Kembali ke daftar menu Rawat Inap">← Menu Rawat Inap</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rawat Inap (Inpatient Management)</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Papan tempat tidur, admisi, visite, billing harian, dan resume pulang</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="inp-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-teal btn-sm" onclick="inpOpenAdmitForm()">+ Admisi Rawat Inap</button>
+      </div>
     </div>
     <div id="inp-warn"></div>
     <div class="tabs" id="inp-tabs" style="margin-bottom:14px">
@@ -115,6 +123,10 @@ async function renderInpatient(tab) {
     </div>
     <div id="inp-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px"></div>
     <div id="inp-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
+
+  const badge = document.getElementById('inp-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   await inpLoadAll();
 }
 
