@@ -1557,8 +1557,60 @@ const handleBedWatch = (t: Task) => handleWardScan(t, 'bed');
 const handleLosWatch = (t: Task) => handleWardScan(t, 'los');
 const handleChargeAudit = (t: Task) => handleWardScan(t, 'charge');
 
+async function handleChatResponse(t: Task) {
+  const agentCode = String(t.payload.agent_code || '');
+  const message = String(t.payload.message || '');
+  if (!agentCode || !message) {
+    throw new Error('agent_code atau message tidak boleh kosong di payload');
+  }
+
+  const res = await fetch(`${SB_URL}/rest/v1/agentic_agents_v?code=eq.${agentCode}&select=name,role_title,charter`, {
+    headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+  });
+  if (!res.ok) throw new Error(`Gagal mengambil data agen ${agentCode} dari database`);
+  const agents = await res.json();
+  const agentData = Array.isArray(agents) ? agents[0] : null;
+  if (!agentData) throw new Error(`Agen dengan kode '${agentCode}' tidak ditemukan`);
+
+  const sysPrompt = `Anda adalah ${agentData.name}, dengan peran sebagai ${agentData.role_title} di OneLab.
+Piagam/Charter tugas Anda:
+${agentData.charter}
+
+Sekarang Anda sedang berbicara langsung dalam obrolan chat dengan CEO Anda (Bapak Ace).
+Jawablah pesan dari CEO dengan santun, profesional, sangat relevan dengan piagam/tugas Anda, dalam Bahasa Indonesia yang alami, singkat, padat, dan jelas (maksimal 2-3 paragraf). Jangan pernah mengarang data di luar piagam Anda.`;
+
+  const r = await askLLM({
+    taskId: t.id,
+    tier: 'main',
+    temperature: 0.7,
+    system: sysPrompt,
+    prompt: message
+  });
+
+  const responseText = String(r.text || r.result || '').trim();
+
+  const msgRes = await fetch(`${SB_URL}/rest/v1/agentic_msgs_v`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      from_agent: agentCode,
+      to_agent: 'ACE',
+      kind: 'CHAT',
+      body: responseText
+    })
+  });
+  if (!msgRes.ok) throw new Error(`Gagal menyimpan pesan balasan dari agen ${agentCode}`);
+
+  return { result: { reply: responseText }, note: `Tanggapan dari ${agentData.name} berhasil dikirim.` };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
+  CHAT_RESPONSE: handleChatResponse,
   // Fase 7M — Pharmacy & Inpatient:
   PHARMA_TICK: handlePharmaTick, DRUG_EXPIRY: handleDrugExpiry, RX_SAFETY: handleRxSafety, NARCO_AUDIT: handleNarcoAudit,
   WARD_TICK: handleWardTick, BED_WATCH: handleBedWatch, LOS_WATCH: handleLosWatch, CHARGE_AUDIT: handleChargeAudit,
@@ -1657,42 +1709,49 @@ Deno.serve(async (req) => {
   // Setelah 1 task selesai & waktu terpakai >100 dtk, berhenti klaim baru.
   const tickDeadline = Date.now() + 100_000;
 
+  const tasks: Task[] = [];
   for (let i = 0; i < max; i++) {
-    if (i > 0 && Date.now() > tickDeadline) break;
-    let task: Task | null = null;
     try {
       const rows = await rpc('agentic_claim_task', { p_worker: WORKER_ID, p_agent: agent });
-      task = Array.isArray(rows) ? rows[0] ?? null : rows ?? null;
+      const task = Array.isArray(rows) ? rows[0] ?? null : rows ?? null;
+      if (!task) break;
+      tasks.push(task);
     } catch (e) {
       return json({ error: `Gagal klaim task: ${e instanceof Error ? e.message : String(e)}` }, 500);
     }
-    if (!task) break; // queue kosong
+  }
 
-    const handler = HANDLERS[task.task_type];
-    if (!handler) {
-      await rpc('agentic_transition', {
-        p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER',
-        p_error: `Handler '${task.task_type}' belum diimplementasikan (lihat Fase 2/3)`,
-        p_note: 'handler tidak ditemukan',
-      }).catch(() => null);
-      results.push({ taskId: task.id, status: 'FAILED', note: `handler ${task.task_type} belum ada` });
-      continue;
-    }
+  if (tasks.length > 0) {
+    console.log(`[Worker] Memproses ${tasks.length} task secara PARALEL...`);
+    const promises = tasks.map(async (task) => {
+      const handler = HANDLERS[task.task_type];
+      if (!handler) {
+        await rpc('agentic_transition', {
+          p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER',
+          p_error: `Handler '${task.task_type}' belum diimplementasikan (lihat Fase 2/3)`,
+          p_note: 'handler tidak ditemukan',
+        }).catch(() => null);
+        return { taskId: task.id, status: 'FAILED', note: `handler ${task.task_type} belum ada` };
+      }
 
-    try {
-      const { result, note } = await handler(task);
-      await rpc('agentic_transition', {
-        p_task_id: task.id, p_to: 'DRAFT', p_actor_type: 'WORKER',
-        p_result: result, p_note: note,
-      });
-      results.push({ taskId: task.id, status: 'DRAFT', note });
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      await rpc('agentic_transition', {
-        p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER', p_error: msg, p_note: 'handler error',
-      }).catch(() => null);
-      results.push({ taskId: task.id, status: 'FAILED', note: msg });
-    }
+      try {
+        const { result, note } = await handler(task);
+        await rpc('agentic_transition', {
+          p_task_id: task.id, p_to: 'DRAFT', p_actor_type: 'WORKER',
+          p_result: result, p_note: note,
+        });
+        return { taskId: task.id, status: 'DRAFT', note };
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        await rpc('agentic_transition', {
+          p_task_id: task.id, p_to: 'FAILED', p_actor_type: 'WORKER', p_error: msg, p_note: 'handler error',
+        }).catch(() => null);
+        return { taskId: task.id, status: 'FAILED', note: msg };
+      }
+    });
+
+    const batchResults = await Promise.all(promises);
+    results.push(...batchResults);
   }
 
   await notifyDrafts(results);
