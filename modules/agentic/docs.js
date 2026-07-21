@@ -94,6 +94,19 @@ function renderAgDocsTab(el){
           DOCX/TXT/MD diekstrak di browser · PDF dibaca AI dari Storage · metadata otomatis oleh LLM</div>
       </div>
       <input type="file" id="ag-file-input" multiple accept=".docx,.pdf,.txt,.md" style="display:none" onchange="agIngestFiles(this.files)">
+      <div style="display:flex;align-items:center;gap:8px;margin-top:9px;flex-wrap:wrap">
+        <label style="font-size:12px;font-weight:700;color:#334155;display:flex;align-items:center;gap:6px">
+          Departemen batch ini
+          <input list="ag-dept-list" id="ag-ingest-dept" placeholder="(otomatis — deteksi AI)"
+            style="width:220px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px">
+          <datalist id="ag-dept-list">
+            ${[...new Set([...(agRegistry||[]).map(d=>d.department).filter(Boolean),
+              'MUTU','LABORATORIUM','RADIOLOGI','ADMINISTRASI','KEUANGAN','SDM','FARMASI','KEPERAWATAN','IT'])]
+              .sort().map(x=>`<option value="${agEsc(x)}">`).join('')}
+          </datalist>
+        </label>
+        <span style="font-size:10.5px;color:var(--gray)">Semua file di unggahan ini diberi departemen tersebut. Kosongkan = biarkan AI menebak.</span>
+      </div>
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#334155;margin-top:8px">
         <input type="checkbox" id="ag-auto-gap" checked> Jalankan gap analysis ISO 15189 otomatis setelah semua file ter-ingest
       </label>
@@ -125,7 +138,8 @@ function renderAgDocsTab(el){
             <button class="ag-btn mut" style="padding:1px 6px;font-size:10px;margin-left:4px" title="Tetapkan/ubah nomor dokumen" onclick="agEditDocNumber('${d.id}')">${icon('edit',11)}</button></td>
           <td>${agEsc(d.title)}</td>
           <td>${agEsc(d.doc_type)} L${d.doc_level}</td>
-          <td>${agEsc(d.department)}</td>
+          <td>${agEsc(d.department||'—')}
+            <button class="ag-btn mut" style="padding:1px 6px;font-size:10px;margin-left:2px" title="Ubah departemen" onclick="agEditDocDept('${d.id}')">${icon('edit',11)}</button></td>
           <td>${agDocChip(d.status)}</td>
           <td>${d.current_revision||0}</td>
           <td>${d.next_review_date||'—'}</td>
@@ -161,9 +175,15 @@ async function agIngestFiles(fileList){
   _agUploadBusy = true;
   const log = document.getElementById('ag-ingest-log');
   const autoGap = !!(document.getElementById('ag-auto-gap')||{}).checked;
+  // Departemen batch (opsional). Worker menebak departemen lewat AI; bila diisi,
+  // di sini kita PAKSA departemen batch pada dokumen yang baru diingest — sesudah
+  // worker selesai — berdasarkan source_file_path (jalur yang andal tanpa
+  // mengubah worker).
+  const batchDept = ((document.getElementById('ag-ingest-dept')||{}).value||'').trim();
   const put = (m,c)=>{ if(log) log.innerHTML += `<div style="color:${c||'#334155'}">${m}</div>`; };
 
   let created = 0;
+  const batchPaths = [];
   for(let i=0;i<files.length;i++){
     const f = files[i]; const last = i===files.length-1;
     try{
@@ -179,6 +199,8 @@ async function agIngestFiles(fileList){
         put(`⏳ ${agEsc(f.name)} — upload ke Storage…`);
         payload.storage_path = await agUploadStorage(f);
       }
+      if(batchDept) payload.department = batchDept;   // dibawa juga di payload (bila worker kelak memakainya)
+      if(payload.storage_path) batchPaths.push(payload.storage_path);
       await agRpc('agentic_create_task', {
         p_agent:'DOCUMENT', p_task_type:'DOC_INGEST',
         p_title:`Ingest: ${f.name}`, p_payload: payload,
@@ -205,6 +227,17 @@ async function agIngestFiles(fileList){
         if(diproses < 5) break;            // antrian sudah habis
       }
     }catch(e){ toast(e.message,'err'); }
+
+    // Paksa departemen batch pada dokumen yang baru diingest (bila dipilih).
+    if(batchDept && batchPaths.length){
+      try{
+        const r = await agRpc('agentic_doc_set_dept_by_paths', { p_paths: batchPaths, p_dept: batchDept });
+        const n = (r && r.updated) || 0;
+        put(`🏷️ ${n} dokumen diset departemen "${agEsc(batchDept)}"`, '#15803D');
+        if(typeof logActivity==='function')
+          logActivity('doc_batch_dept','document_registry','batch',`${n} dokumen diset departemen ${batchDept}`,'');
+      }catch(e){ put(`⚠️ Gagal set departemen batch: ${agEsc(e.message)} — jalankan supabase_agentic_doc_sign.sql`, '#B45309'); }
+    }
     await agReload();
   }
 }
@@ -561,6 +594,22 @@ async function agEditDocNumber(docId){
     if(typeof logActivity === 'function')
       logActivity('doc_number', 'document_registry', docId, `Nomor dokumen diset: ${num}`, d.title);
     toast('✅ Nomor dokumen tersimpan','ok');
+    await agReload();
+  }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// Ubah departemen satu dokumen (koreksi manual).
+async function agEditDocDept(docId){
+  const d = agRegistry.find(x => x.id === docId); if(!d) return;
+  const val = prompt(`Departemen untuk:\n${d.title}`, d.department || '');
+  if(val === null) return;
+  const dept = val.trim();
+  if(!dept){ toast('Departemen tidak boleh kosong','warn'); return; }
+  try{
+    await agRpc('agentic_doc_set_dept', { p_doc_id: docId, p_dept: dept });
+    if(typeof logActivity === 'function')
+      logActivity('doc_dept', 'document_registry', docId, `Departemen diset: ${dept}`, d.title);
+    toast('✅ Departemen tersimpan','ok');
     await agReload();
   }catch(e){ toast('❌ ' + e.message, 'err'); }
 }

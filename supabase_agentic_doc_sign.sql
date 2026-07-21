@@ -228,6 +228,40 @@ $$;
 
 GRANT EXECUTE ON FUNCTION public.agentic_template_list() TO anon, authenticated, service_role;
 
+-- ── 7. Departemen batch saat ingest ───────────────────────────
+-- Worker menebak departemen lewat AI (meta.department). Bila pengguna memilih
+-- departemen untuk satu batch unggahan, fungsi ini MEMAKSAKANNYA pada dokumen
+-- yang baru diingest — dicocokkan lewat source_file_path (jalur berkas yang
+-- disimpan worker), tanpa perlu mengubah worker.
+CREATE OR REPLACE FUNCTION public.agentic_doc_set_dept_by_paths(p_paths JSONB, p_dept TEXT)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v_n INT;
+BEGIN
+  IF coalesce(trim(p_dept),'') = '' THEN RAISE EXCEPTION 'Departemen tidak boleh kosong'; END IF;
+  UPDATE agentic.document_registry
+     SET department = trim(p_dept), updated_at = now()
+   WHERE source_file_path IN (
+     SELECT jsonb_array_elements_text(COALESCE(p_paths,'[]'::jsonb))
+   );
+  GET DIAGNOSTICS v_n = ROW_COUNT;
+  RETURN jsonb_build_object('updated', v_n);
+END $$;
+
+-- Set departemen satu dokumen (untuk koreksi manual dari tabel registry).
+CREATE OR REPLACE FUNCTION public.agentic_doc_set_dept(p_doc_id UUID, p_dept TEXT)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v_row agentic.document_registry;
+BEGIN
+  IF coalesce(trim(p_dept),'') = '' THEN RAISE EXCEPTION 'Departemen tidak boleh kosong'; END IF;
+  UPDATE agentic.document_registry SET department = trim(p_dept), updated_at = now()
+   WHERE id = p_doc_id RETURNING * INTO v_row;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Dokumen tidak ditemukan'; END IF;
+  RETURN to_jsonb(v_row);
+END $$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_doc_set_dept_by_paths(JSONB,TEXT) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.agentic_doc_set_dept(UUID,TEXT)           TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;
