@@ -502,7 +502,15 @@ async function agTemplateEdit(id){
           <input type="file" id="agt-sample" class="form-input" style="width:100%" accept=".docx,.pdf">
           <span style="font-size:10.5px;color:var(--gray)">Unggah contoh dokumen asli Anda di sini. Dipakai sebagai acuan format & isi saat menyusun master.${r&&r.sample_path?' <span style="color:#15803D">contoh terpasang</span>':''}</span></label>
         <label style="font-size:11.5px;font-weight:700;color:#334155">Daftar placeholder di master (satu per baris, tanpa kurung)
-          <span style="font-weight:400;color:var(--gray)">— mis. JUDUL, NO_DOKUMEN, TUJUAN. Di file .docx tulis <code>{{JUDUL}}</code>.</span>
+          <span style="font-weight:400;color:var(--gray)">— di file .docx tulis <code>{{NAMA}}</code>.</span>
+          <div style="font-weight:400;font-size:10.5px;color:var(--gray);background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin:3px 0">
+            <b>Penanda ISI yang diisi otomatis dari struktur dokumen (verbatim):</b>
+            <code>{{TUJUAN}}</code> <code>{{RUANG_LINGKUP}}</code> <code>{{REFERENSI}}</code>
+            <code>{{DEFINISI}}</code> <code>{{TANGGUNG_JAWAB}}</code> <code>{{PROSEDUR}}</code>
+            <code>{{DOKUMEN_TERKAIT}}</code> — atau <code>{{ISI_DOKUMEN}}</code> untuk seluruh badan.<br>
+            <b>Penanda METADATA (diisi AI/manual):</b> JUDUL_SOP, NAMA_ENTITAS, NOMOR_DOKUMEN,
+            VERSI_DOKUMEN, TANGGAL_EFEKTIF, NAMA_PENYETUJU, dst.
+          </div>
           <textarea id="agt-ph" class="form-input" style="width:100%;font-size:12px" rows="3" placeholder="JUDUL&#10;NO_DOKUMEN&#10;TANGGAL_TERBIT">${agEsc(r&&Array.isArray(r.placeholders)?r.placeholders.join('\n'):'')}</textarea></label>
         <label style="font-size:11.5px;font-weight:700;color:#334155">Catatan (header/footer, penomoran, dll)
           <textarea id="agt-notes" class="form-input" style="width:100%;font-size:12px" rows="3">${agEsc(r?r.notes||'':'')}</textarea></label>

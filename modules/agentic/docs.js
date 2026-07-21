@@ -802,6 +802,73 @@ const AG_TPL_MATCH_NOTE = {
   6: 'Memakai template jenis sama saja (level & departemen berbeda) — periksa saksama.',
 };
 
+// ── Pemecah bagian dokumen → placeholder isi (verbatim, tanpa AI) ──────────────
+// SOP mengikuti susunan bagian baku (Tujuan, Ruang Lingkup, Prosedur, dst).
+// Bagian-bagian ini dipetakan LANGSUNG dari teks dokumen ke placeholder isinya,
+// APA ADANYA — bukan diringkas AI. Untuk dokumen mutu, isi harus persis.
+// Kata kunci judul bagian → nama placeholder kanonik.
+const AG_SECTION_KEYS = {
+  TUJUAN:          ['tujuan','maksud'],
+  RUANG_LINGKUP:   ['ruang lingkup','lingkup','cakupan'],
+  REFERENSI:       ['referensi','acuan','rujukan','dokumen acuan'],
+  DEFINISI:        ['definisi','istilah','pengertian'],
+  KEBIJAKAN:       ['kebijakan'],
+  TANGGUNG_JAWAB:  ['tanggung jawab','wewenang','tugas dan tanggung jawab'],
+  ALAT_BAHAN:      ['alat dan bahan','alat & bahan','perlengkapan','peralatan dan bahan'],
+  PROSEDUR:        ['prosedur','langkah','uraian prosedur','cara kerja','pelaksanaan','tahapan'],
+  DOKUMEN_TERKAIT: ['dokumen terkait','rekaman mutu','rekaman','lampiran','arsip'],
+  RIWAYAT_REVISI:  ['riwayat revisi','riwayat perubahan','riwayat dokumen'],
+};
+
+// Nama placeholder → kunci bagian. ISI/KONTEN/BODY = seluruh badan dokumen.
+function agSectionForPlaceholder(name){
+  const n = String(name||'').toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');
+  if(/^(ISI|ISI_DOKUMEN|KONTEN|BODY|URAIAN|BADAN_DOKUMEN)$/.test(n)) return '__FULL__';
+  // padanan langsung & alias
+  const alias = { MAKSUD:'TUJUAN', LINGKUP:'RUANG_LINGKUP', CAKUPAN:'RUANG_LINGKUP',
+    ACUAN:'REFERENSI', RUJUKAN:'REFERENSI', ISTILAH:'DEFINISI', PENGERTIAN:'DEFINISI',
+    WEWENANG:'TANGGUNG_JAWAB', LANGKAH:'PROSEDUR', URAIAN_PROSEDUR:'PROSEDUR',
+    CARA_KERJA:'PROSEDUR', PELAKSANAAN:'PROSEDUR', TAHAPAN:'PROSEDUR',
+    REKAMAN:'DOKUMEN_TERKAIT', REKAMAN_MUTU:'DOKUMEN_TERKAIT', LAMPIRAN:'DOKUMEN_TERKAIT',
+    ALAT_DAN_BAHAN:'ALAT_BAHAN', PERLENGKAPAN:'ALAT_BAHAN' };
+  if(AG_SECTION_KEYS[n]) return n;
+  if(alias[n]) return alias[n];
+  return null;
+}
+
+// Pecah full_text menjadi { KUNCI_BAGIAN: teks-verbatim, __FULL__: seluruh badan }.
+function agDocSectionize(text){
+  const lines = String(text||'').split(/\r?\n/);
+  // Deteksi baris judul-bagian: punya penanda (## atau angka) DAN judulnya cocok
+  // salah satu kata kunci. Sub-bagian (6.1 Identifikasi) tak cocok kata kunci →
+  // tetap jadi ISI bagian induknya. Kalimat biasa tak punya penanda → bukan judul.
+  const heads = [];   // {i, key}
+  for(let i=0;i<lines.length;i++){
+    // Judul bagian: baris berpenanda (## dan/atau angka). Boleh keduanya sekaligus,
+    // mis. "## 1. Tujuan" — penomoran dibuang dari judulnya sebelum dicocokkan.
+    const m = lines[i].match(/^\s*(?:#{1,6}\s*)?(?:\d+(?:\.\d+)*[.\)]?\s+)?(.{2,60}?)\s*$/);
+    if(!m) continue;
+    if(!/^(?:\s*#|\s*\d)/.test(lines[i])) continue;   // wajib ada penanda (# atau angka) di awal
+    const t = m[1].toLowerCase().replace(/^\s*\d+(?:\.\d+)*[.\)]?\s*/,'').replace(/[:.]+$/,'').trim();
+    let hitKey = null;
+    for(const key in AG_SECTION_KEYS){
+      if(AG_SECTION_KEYS[key].some(kw => t === kw || t.startsWith(kw+' ') || t.startsWith(kw+' –') || t.startsWith(kw+' -'))){ hitKey = key; break; }
+    }
+    if(hitKey) heads.push({ i, key: hitKey });
+  }
+  const out = {};
+  for(let h=0; h<heads.length; h++){
+    const start = heads[h].i + 1;
+    const end = (h+1<heads.length) ? heads[h+1].i : lines.length;
+    const body = lines.slice(start, end).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+    if(body && !out[heads[h].key]) out[heads[h].key] = body;   // bagian pertama menang bila ganda
+  }
+  // __FULL__ = seluruh badan, dari judul-bagian pertama (buang kop/judul dokumen di atasnya).
+  const from = heads.length ? Math.max(0, heads[0].i) : 0;
+  out.__FULL__ = lines.slice(from).join('\n').replace(/\n{3,}/g,'\n\n').trim();
+  return out;
+}
+
 async function agOpenFinalReview(docId){
   const d = agRegistry.find(x => x.id === docId);
   if(!d){ toast('Dokumen tak ditemukan','err'); return; }
@@ -841,17 +908,39 @@ async function agOpenFinalReview(docId){
       return;
     }
 
-    const sys = 'Anda mengisi template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Untuk tiap placeholder pada DAFTAR, ambil/ringkas nilai yang relevan dari ISI DOKUMEN. Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang nilai operasional/angka/nama.';
-    let raw = '', map = {}, gagal = null;
-    try {
-      raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(phs)}\n\nISI DOKUMEN:\n${String(content).slice(0, 12000)}`, 'main');
-    } catch(e){ gagal = 'Panggilan AI gagal: ' + e.message; }
+    const map = {}, source = {};
 
-    if(!gagal){
-      try { map = JSON.parse(String(raw).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()); }
-      catch(e){ gagal = 'Jawaban AI bukan JSON yang dapat dibaca — pemetaan tidak dapat dibuat otomatis.'; map = {}; }
+    // TAHAP 1 — isi bagian dari STRUKTUR dokumen, verbatim (tanpa AI).
+    const sections = agDocSectionize(content);
+    const sisaPh = [];
+    for(const k of phs){
+      const canon = agSectionForPlaceholder(k);
+      if(canon && sections[canon] && sections[canon].trim()){
+        map[k] = sections[canon]; source[k] = 'struktur';
+      } else {
+        sisaPh.push(k);
+      }
     }
-    phs.forEach(k => { if(typeof map[k] !== 'string') map[k] = map[k] == null ? '' : String(map[k]); });
+
+    // TAHAP 2 — AI hanya untuk placeholder METADATA yang tersisa (judul entitas,
+    // nomor, tanggal, penyetuju, dll) — bukan isi. Isi tak boleh diringkas AI.
+    let gagal = null;
+    if(sisaPh.length){
+      const sys = 'Anda mengisi METADATA template dokumen resmi. Balas HANYA JSON objek {placeholder: nilai}. Ambil nilai dari ISI DOKUMEN apa adanya (jangan meringkas isi/prosedur). Placeholder tanpa data yang cocok = string kosong. JANGAN mengarang angka/nama/tanggal.';
+      let raw = '';
+      try { raw = await agLLMText(sys, `DAFTAR PLACEHOLDER: ${JSON.stringify(sisaPh)}\n\nISI DOKUMEN:\n${String(content).slice(0, 12000)}`, 'main'); }
+      catch(e){ gagal = 'Panggilan AI gagal (kolom metadata): ' + e.message; }
+      let aiMap = {};
+      if(!gagal){
+        try { aiMap = JSON.parse(String(raw).replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim()); }
+        catch(e){ gagal = 'Jawaban AI bukan JSON yang dapat dibaca — kolom metadata perlu diisi manual.'; aiMap = {}; }
+      }
+      for(const k of sisaPh){
+        map[k] = (typeof aiMap[k] === 'string') ? aiMap[k] : (aiMap[k] == null ? '' : String(aiMap[k]));
+        source[k] = map[k].trim() ? 'ai' : 'kosong';
+      }
+    }
+    phs.forEach(k => { if(typeof map[k] !== 'string') map[k] = ''; if(!source[k]) source[k] = map[k].trim()?'ai':'kosong'; });
 
     // Bila semua kosong, sebutkan kemungkinan sebabnya — jangan biarkan pengguna
     // menebak-nebak melihat "0/31 kolom terisi" tanpa keterangan apa pun.
@@ -869,7 +958,10 @@ async function agOpenFinalReview(docId){
     // dari layar saja gejalanya mudah disalahartikan sebagai AI yang keliru.
     const adaIsi = phs.some(k => /(^|_)(ISI|KONTEN|BODY|PROSEDUR|LANGKAH|TUJUAN|LINGKUP|TANGGUNG|REFERENSI|DEFINISI|URAIAN)/i.test(k));
 
-    _agFinal = { docId, buf, phs, map, tpl, doc: d, gagal, adaIsi,
+    // Berapa kolom isi terisi langsung dari struktur dokumen (bukan AI).
+    const dariStruktur = phs.filter(k => source[k] === 'struktur').length;
+
+    _agFinal = { docId, buf, phs, map, source, tpl, doc: d, gagal, adaIsi, dariStruktur,
                  contentLen: String(content).trim().length };
     _agFinalView = 'preview';
     agRenderFinalReview();
@@ -909,7 +1001,7 @@ function agRenderFinalReview(){
 
   if(body) body.innerHTML = `
     <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
-      Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi
+      Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi${st.dariStruktur ? ` (${st.dariStruktur} isi verbatim dari struktur dokumen)` : ''}
       ${st.contentLen != null ? ` · isi sumber ${st.contentLen.toLocaleString('id-ID')} karakter` : ''}
     </div>
     ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
@@ -955,9 +1047,13 @@ function agRenderFinalReview(){
         <tbody>${st.phs.map((k, i) => {
           const v = st.map[k] || '';
           const kosong = !v.trim();
+          const src = (st.source && st.source[k]) || (kosong?'kosong':'ai');
+          const srcBadge = src==='struktur'
+            ? '<span style="font-size:9px;font-weight:700;color:#15803D;background:#DCFCE7;padding:1px 5px;border-radius:8px">dari struktur</span>'
+            : src==='ai' ? '<span style="font-size:9px;font-weight:700;color:#3730A3;background:#EEF2FF;padding:1px 5px;border-radius:8px">AI</span>' : '';
           return `<tr style="border-bottom:1px solid var(--border)">
             <td style="padding:6px 10px;font-family:ui-monospace,monospace;font-size:11px;vertical-align:top;color:${kosong ? '#B45309' : 'var(--navy)'}">
-              {{${agEsc(k)}}}${kosong ? '<div style="font-size:10px;font-style:italic">kosong</div>' : ''}</td>
+              {{${agEsc(k)}}}<div style="margin-top:2px">${kosong ? '<span style="font-size:10px;font-style:italic">kosong</span>' : srcBadge}</div></td>
             <td style="padding:4px 8px">
               <textarea data-ph="${agEsc(k)}" rows="${v.length > 90 ? 3 : 1}" oninput="agFinalEdit(this)"
                 style="width:100%;font-size:11.5px;padding:5px;border:1px solid ${kosong ? '#FCD34D' : 'var(--border)'};border-radius:5px;resize:vertical;font-family:inherit">${agEsc(v)}</textarea>
