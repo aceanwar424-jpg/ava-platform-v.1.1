@@ -718,7 +718,12 @@ async function agRenderReviewBody(){
           <div style="font-size:11px;color:var(--gray);white-space:nowrap">${new Date(s.signed_at).toLocaleString('id-ID')}</div>
         </div>`).join('')}</div>`
       : `<div style="font-size:12px;color:var(--gray);font-style:italic">Belum ada pengesahan tercatat.</div>`}
-    </div>`;
+    </div>
+
+    <div id="ag-overlap-sec" style="margin-top:12px"></div>`;
+
+  // Deteksi tumpang tindih antar dokumen (Fase 1) — dimuat setelah badan Review.
+  if (typeof agOverlapRenderSection === 'function') agOverlapRenderSection('ag-overlap-sec');
 }
 
 // ═══════════════════════════════════════════════════════════════
