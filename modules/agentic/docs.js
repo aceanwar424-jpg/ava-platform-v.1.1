@@ -87,19 +87,32 @@ function renderAgDocsTab(el){
 
   el.innerHTML = `
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Alur Dokumen</div>
-      <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;font-size:11px">
-        ${[
-          ['upload','1. Upload','tarik file — worker proses otomatis'],
-          ['layers','2. Registry','muncul di daftar bawah'],
-          ['sparkles','3. Editor AI','lengkapi/tarik isi (terutama PDF kosong)'],
-          ['file-text','4. Review Final','petakan isi → template .docx'],
-          ['pen-tool','5. TTD','tanda tangan & terbit'],
-        ].map((s,i,a)=>`
-          <div style="flex:1;min-width:120px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:8px 10px">
-            <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0A2342">${icon(s[0],13)} ${s[1]}</div>
-            <div style="color:var(--gray);margin-top:2px;line-height:1.3">${s[2]}</div>
-          </div>${i<a.length-1?'<div style="align-self:center;color:var(--gray)">→</div>':''}`).join('')}
+      <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Alur Dokumen — pilih sesuai keadaan dokumen Anda</div>
+
+      <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:9px 11px;margin-bottom:8px">
+        <div style="font-size:11.5px;font-weight:800;color:#065F46;margin-bottom:3px">A · Dokumen SUDAH FINAL (sudah ditinjau &amp; sesuai template)</div>
+        <div style="font-size:11px;color:#065F46;line-height:1.45">
+          Upload → <b>selesai</b>. Ingest hanya <b>mendaftarkan</b> dokumen (untuk registry, gap analysis,
+          deteksi tumpang tindih, tanda tangan). Berkas asli Anda <b>disimpan utuh</b> — ambil lagi lewat tombol
+          <b>${icon('download',11)} Asli</b>. <u>Jangan pakai Review Final</u> — itu merakit ulang dari teks dan
+          akan merusak format dokumen final Anda. Cukup lanjut ke <b>${icon('pen-tool',11)} TTD</b>.
+        </div>
+      </div>
+
+      <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:9px 11px">
+        <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin-bottom:5px">B · Dokumen masih DRAF / perlu dibuat-dirapikan</div>
+        <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;font-size:11px">
+          ${[
+            ['upload','1. Upload','atau mulai dari dokumen kosong'],
+            ['sparkles','2. Editor AI','chat susun/lengkapi isi'],
+            ['file-text','3. Review Final','petakan isi → template .docx'],
+            ['pen-tool','4. TTD','tanda tangan & terbit'],
+          ].map((s,i,a)=>`
+            <div style="flex:1;min-width:118px;background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 9px">
+              <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0A2342">${icon(s[0],13)} ${s[1]}</div>
+              <div style="color:var(--gray);margin-top:2px;line-height:1.3">${s[2]}</div>
+            </div>${i<a.length-1?'<div style="align-self:center;color:var(--gray)">→</div>':''}`).join('')}
+        </div>
       </div>
     </div>
 
@@ -161,6 +174,8 @@ function renderAgDocsTab(el){
           <td>${d.current_revision||0}</td>
           <td>${d.next_review_date||'—'}</td>
           <td style="white-space:nowrap">
+            ${d.source_file_path ? `<button class="ag-btn mut" style="padding:4px 9px" title="Unduh berkas ASLI yang Anda unggah — utuh, tanpa diproses ulang"
+              onclick="agDownloadSource('${d.id}')">${icon('download',12)} Asli</button>` : ''}
             <button class="ag-btn mut" style="padding:4px 9px" title="Editor dokumen AI interaktif — susun/lengkapi/tarik teks PDF, lalu review"
               onclick="agAiEditorOpen('${d.id}')">${icon('sparkles',12)} Editor AI</button>
             ${d.status!=='PUBLISHED' && (d.extracted_meta&&d.extracted_meta.full_text) ?
@@ -627,6 +642,31 @@ async function agEditDocNumber(docId){
   }catch(e){ toast('❌ ' + e.message, 'err'); }
 }
 
+// Unduh berkas ASLI yang diunggah — utuh, tanpa diproses ulang.
+// Penting: bagi dokumen yang SUDAH final (sudah ditinjau & sesuai template),
+// inilah berkas yang sah. Ingest hanya MENDAFTARKAN dokumen (untuk registry,
+// gap analysis, deteksi tumpang tindih, tanda tangan) — ia mengekstrak teks
+// yang otomatis kehilangan format. Jangan merakit ulang dokumen yang sudah final.
+async function agDownloadSource(docId){
+  const d = agRegistry.find(x => x.id === docId);
+  if(!d || !d.source_file_path){ toast('Berkas asli tidak tersedia','warn'); return; }
+  try{
+    toast('Mengunduh berkas asli…','info');
+    const buf = await agDownloadStorage(d.source_file_path);
+    const nama = (d.extracted_meta && d.extracted_meta.file_name)
+      || (d.source_file_path.split('/').pop() || 'dokumen').replace(/^\d+_/,'');
+    const ext = (nama.match(/\.[a-z0-9]+$/i) || [''])[0].toLowerCase();
+    const mime = ext === '.pdf' ? 'application/pdf'
+      : ext === '.docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      : 'application/octet-stream';
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([buf], { type: mime }));
+    a.download = nama;
+    document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+    toast('✅ Berkas asli diunduh','ok');
+  }catch(e){ toast('❌ '+e.message,'err'); }
+}
+
 // Ubah departemen satu dokumen (koreksi manual).
 async function agEditDocDept(docId){
   const d = agRegistry.find(x => x.id === docId); if(!d) return;
@@ -1049,6 +1089,11 @@ function agRenderFinalReview(){
     <div style="font-size:11.5px;color:var(--gray);margin-bottom:8px">
       Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi${st.dariStruktur ? ` (${st.dariStruktur} isi verbatim dari struktur dokumen)` : ''}
       ${st.contentLen != null ? ` · isi sumber ${st.contentLen.toLocaleString('id-ID')} karakter` : ''}
+    </div>
+    <div class="status-box" style="margin-bottom:10px;font-size:11px;background:#ECFDF5;border-color:#A7F3D0;color:#065F46">
+      Layar ini <b>merakit ulang</b> dokumen dari teks + template. Kalau dokumen Anda <b>sudah final</b>
+      (sudah ditinjau &amp; sesuai template), tidak perlu dirakit ulang — tutup layar ini dan pakai tombol
+      <b>Asli</b> di registry untuk mengambil berkas Anda yang utuh.
     </div>
     ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
     ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
