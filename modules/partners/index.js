@@ -322,6 +322,13 @@ function togglePView() {
 }
 
 // ── Map View ──────────────────────────────────────
+async function loadMapsApiKey() {
+  try {
+    const d = await sbGet('settings','select=value&key=eq.maps_api_key');
+    return d?.[0]?.value || localStorage.getItem('ol_maps_key') || '';
+  } catch(e) { return localStorage.getItem('ol_maps_key') || ''; }
+}
+
 async function renderPMap() {
   const mapCanvas = document.getElementById('partner-map-canvas');
   if (!mapCanvas) return;
@@ -443,7 +450,7 @@ async function renderPMap() {
   const unmappedInfo = document.getElementById('pmap-unmapped-info');
   if (unmappedInfo) {
     if (unmappedList.length > 0) {
-      unmappedInfo.innerHTML = `⚠️ ${unmappedList.length} mitra belum punya koordinat · <button class="btn btn-ghost btn-xs" onclick="autoGeocodeUnmappedPartners()">📍 Auto-Geocode (${unmappedList.length})</button>`;
+      unmappedInfo.innerHTML = `⚠️ ${unmappedList.length} belum ada koordinat · <button class="btn btn-teal btn-xs" onclick="autoGeocodeUnmappedPartners()">📍 Auto-Geocode (${unmappedList.length})</button>`;
     } else {
       unmappedInfo.innerHTML = `✅ Semuanya terpetakan dengan sempurna`;
     }
@@ -452,6 +459,28 @@ async function renderPMap() {
   if (mappedCount > 0) {
     PS.mapInstance.fitBounds(bounds);
     if (mappedCount === 1) PS.mapInstance.setZoom(14);
+  }
+
+  // Auto trigger geocode if unmapped partners exist
+  if (unmappedList.length > 0 && window.google && window.google.maps && google.maps.Geocoder) {
+    setTimeout(() => autoGeocodeUnmappedPartners(), 800);
+  }
+}
+
+function focusPartnerOnMap(id) {
+  const p = PS.filtered.find(x => x.id === id);
+  if (!p) return;
+  const lat = parseFloat(p.latitude);
+  const lng = parseFloat(p.longitude);
+  if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0 && PS.mapInstance) {
+    PS.mapInstance.setCenter({ lat, lng });
+    PS.mapInstance.setZoom(15);
+    const marker = PS.markers.find(m => m.getTitle() === p.partner_name);
+    if (marker) {
+      google.maps.event.trigger(marker, 'click');
+    }
+  } else {
+    toast(`📍 ${p.partner_name} belum memiliki koordinat`, 'warn');
   }
 }
 
