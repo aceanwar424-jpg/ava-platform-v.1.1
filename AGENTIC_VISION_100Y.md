@@ -83,7 +83,7 @@ in-vivo, BCI/neuro-data, regenerative/organ printing, lab robotik otonom, keseha
 | **8A** | 🔮 Predictive Intelligence | ✅ **SELESAI** — INSIGHT (stockout/demand/collection-risk) |
 | **8B** | 🔌 Interoperability & Claims (SATUSEHAT/BPJS) | perlu kredensial API dari user |
 | **8C** | 🛡️ Data Governance & Privacy (UU PDP) | perlu model consent |
-| **8D** | 🩺 Clinical Decision Support (R3, advisory) | data ada; kehati-hatian klinis |
+| **8D** | 🩺 Clinical Decision Support (advisory) | ✅ **SELESAI** — LAB_CDS (delta check + konsistensi data; flag, klinis=manusia) |
 | 9+ | Horizon 2 (genomics · wearables · AMR · digital twin) | perlu skema data baru |
 | 10+ | Horizon 3 (autonomous lab · advanced therapy · governance) | riset & regulasi |
 

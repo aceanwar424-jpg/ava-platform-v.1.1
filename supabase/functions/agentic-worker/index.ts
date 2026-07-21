@@ -1645,12 +1645,30 @@ const handleForecastStockout = (t: Task) => handleInsightScan(t, 'stock');
 const handleForecastDemand = (t: Task) => handleInsightScan(t, 'demand');
 const handleCollectionRisk = (t: Task) => handleInsightScan(t, 'risk');
 
+// ═══ FASE 8D — Clinical Decision Support (mutu data; klinis=manusia) ══
+async function handleCdsReview(t: Task) {
+  const s = await rpc('agentic_cds_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const delta = (s.delta || []) as Dict[]; const inc = (s.inconsistent || []) as Dict[];
+  const md = `## CDS — Pemeriksaan Mutu Data Hasil — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Delta besar: ${sm.delta ?? 0} · Inkonsistensi: ${sm.inconsistent ?? 0} · Diperiksa: ${sm.checked ?? 0}\n` +
+    `_Pemeriksaan MUTU DATA, bukan penilaian klinis — verifikasi oleh analis/DPJP._\n\n` +
+    (delta.length ? `**🩺 Delta check — menyimpang jauh dari hasil sebelumnya (cek sampel/entri):**\n` + delta.slice(0, 12).map((x) =>
+      `- ${x.patient_name || '—'} · ${x.product_name || ''} · ${x.now} (sebelumnya ${x.prior}, ${x.change_pct}%)`).join('\n') + '\n\n' : '') +
+    (inc.length ? `**⚠ Inkonsistensi numerik vs interpretasi (kemungkinan salah entri):**\n` + inc.slice(0, 12).map((x) =>
+      `- ${x.patient_name || '—'} · ${x.product_name || ''} · ${x.result_numeric} (rentang ${x.normal_min}–${x.normal_max}) ditandai "${x.interpretation}"`).join('\n') : '');
+  if (delta.length || inc.length) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'LAB_CDS', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `CDS: ${sm.delta ?? 0} delta · ${sm.inconsistent ?? 0} inkonsistensi (verifikasi manusia)` };
+}
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
   CHAT_RESPONSE: handleChatResponse,
-  // Fase 8A — Predictive Intelligence:
+  // Fase 8A/8D — Predictive Intelligence + CDS:
   INSIGHT_TICK: handleInsightTick, FORECAST_STOCKOUT: handleForecastStockout,
   FORECAST_DEMAND: handleForecastDemand, COLLECTION_RISK: handleCollectionRisk,
+  CDS_REVIEW: handleCdsReview,
   // Fase 7M — Pharmacy & Inpatient:
   PHARMA_TICK: handlePharmaTick, DRUG_EXPIRY: handleDrugExpiry, RX_SAFETY: handleRxSafety, NARCO_AUDIT: handleNarcoAudit,
   WARD_TICK: handleWardTick, BED_WATCH: handleBedWatch, LOS_WATCH: handleLosWatch, CHARGE_AUDIT: handleChargeAudit,

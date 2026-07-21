@@ -16,7 +16,7 @@ const AG_ORG_ICON = {
   IT_HEAD:'🖥️', IT_SRE:'🛎️', IT_SEC:'🔐', IT_DATA:'🗄️', IT_DEV:'⚙️',
   SCM_STOCK:'📦', SCM_PO:'🧾',
   HR_HEAD:'👥', HR_CRED:'🪪', HR_ROSTER:'🗓️',
-  LAB_HEAD:'🔬', LAB_QC:'🧫', LAB_TAT:'⏱️', LAB_CRIT:'🚨',
+  LAB_HEAD:'🔬', LAB_QC:'🧫', LAB_TAT:'⏱️', LAB_CRIT:'🚨', LAB_CDS:'🩺',
   FIN_HEAD:'💰', FIN_AR:'📄', FIN_LEAK:'🕳️', FIN_RECON:'⚖️',
   GROWTH_HEAD:'🤝', CRM_LEAD:'🎯', CRM_DEAL:'📈', CRM_MOU:'📜',
   CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐',
@@ -108,6 +108,7 @@ async function renderAgOrgTab(el){
           <button class="ag-btn mut" onclick="agItTask('INTEGRATION_HEALTH','Cek integrasi lab')">🔌 Cek Integrasi</button>
           <button class="ag-btn mut" onclick="agItTask('BACKUP_VERIFY','Verifikasi backup')">💾 Cek Backup</button>
           <button class="ag-btn mut" onclick="agItTask('MASTER_LIST','Daftar induk dokumen')">📋 Daftar Induk</button>
+          <button class="ag-btn mut" onclick="agItTask('CDS_REVIEW','CDS: cek mutu data hasil')">🩺 Cek Hasil (CDS)</button>
           <button class="ag-btn mut" onclick="agPlanCampaign()">📣 Rencana Kampanye</button>
           <button class="ag-btn pub" onclick="agOrgKick('EXEC_DIGEST')">📊 Digest Eksekutif</button>
           <button class="ag-btn mut" onclick="agOrgStandup()">${svgIcon('note',13)} Minta Standup</button>

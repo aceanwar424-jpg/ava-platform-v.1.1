@@ -73,6 +73,7 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 11 | `supabase_agentic_fase7l_bizops.sql` | **4 departemen Biz-Ops** — Finance (AR/leak/recon), Growth/CRM (lead/deal/MOU), CX (keluhan+feedback, buat tabel `complaints`/`customer_feedback`), Executive Digest |
 | 12 | `supabase_agentic_fase7m_clinical.sql` | **Pharmacy** (kedaluwarsa FEFO · warning di-override · register narkotika) + **Inpatient** (okupansi · LOS · charge nol) — flag-only, klinis=manusia |
 | 13 | `supabase_agentic_fase8a_insight.sql` | **Horizon 1: Predictive Intelligence** (INSIGHT) — prediksi stockout (stok/laju vs lead time), tren kunjungan/pendapatan, risiko penagihan. Advisory (R1). |
+| 14 | `supabase_agentic_fase8d_cds.sql` | **Horizon 1: Clinical Decision Support** (LAB_CDS di dept Lab Ops) — delta check hasil vs sebelumnya + konsistensi numerik/interpretasi. FLAG mutu data; klinis/verifikasi=manusia. Tombol 🩺 Cek Hasil (CDS). |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.
