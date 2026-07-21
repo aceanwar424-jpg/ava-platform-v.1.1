@@ -80,7 +80,7 @@ in-vivo, BCI/neuro-data, regenerative/organ printing, lab robotik otonom, keseha
 
 | Fase | Bangun | Kesiapan |
 |---|---|---|
-| **8A** | 🔮 Predictive Intelligence | ✅ data siap — mulai sekarang |
+| **8A** | 🔮 Predictive Intelligence | ✅ **SELESAI** — INSIGHT (stockout/demand/collection-risk) |
 | **8B** | 🔌 Interoperability & Claims (SATUSEHAT/BPJS) | perlu kredensial API dari user |
 | **8C** | 🛡️ Data Governance & Privacy (UU PDP) | perlu model consent |
 | **8D** | 🩺 Clinical Decision Support (R3, advisory) | data ada; kehati-hatian klinis |

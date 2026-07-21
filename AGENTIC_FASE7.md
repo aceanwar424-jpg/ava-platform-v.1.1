@@ -72,6 +72,7 @@ Jalankan **berurutan**. Jangan lewati langkah.
 | 10 | `supabase_agentic_fase7k_cleanup.sql` | **Clear-up** — aktifkan task reserved (MASTER_LIST/DOC_DISTRIBUTE/DOC_OBSOLETE/PLAN_CAMPAIGN/ROSTER_CHECK), hapus IT_BACKUP_CHECK usang, **wire video** (MAKE_VIDEO) |
 | 11 | `supabase_agentic_fase7l_bizops.sql` | **4 departemen Biz-Ops** — Finance (AR/leak/recon), Growth/CRM (lead/deal/MOU), CX (keluhan+feedback, buat tabel `complaints`/`customer_feedback`), Executive Digest |
 | 12 | `supabase_agentic_fase7m_clinical.sql` | **Pharmacy** (kedaluwarsa FEFO · warning di-override · register narkotika) + **Inpatient** (okupansi · LOS · charge nol) — flag-only, klinis=manusia |
+| 13 | `supabase_agentic_fase8a_insight.sql` | **Horizon 1: Predictive Intelligence** (INSIGHT) — prediksi stockout (stok/laju vs lead time), tren kunjungan/pendapatan, risiko penagihan. Advisory (R1). |
 
 Setiap file harus berakhir dengan pesan `... siap ...`. Bila error, hentikan dan
 perbaiki sebelum lanjut file berikutnya.

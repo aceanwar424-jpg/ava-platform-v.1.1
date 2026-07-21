@@ -22,6 +22,7 @@ const AG_ORG_ICON = {
   CX_HEAD:'💬', CX_COMPLAINT:'📣', CX_FEEDBACK:'⭐',
   PHARMA_HEAD:'💊', PHARMA_STOCK:'📦', PHARMA_SAFETY:'⚠️', PHARMA_NARCO:'🔒',
   WARD_HEAD:'🏥', WARD_BED:'🛏️', WARD_LOS:'📆', WARD_REV:'🧾',
+  INSIGHT_HEAD:'🔮', INSIGHT_STOCK:'📉', INSIGHT_DEMAND:'📈', INSIGHT_RISK:'🎲',
 };
 const AG_DEPT_META = {
   LAB_OPS:          { icon:'🔬', label:'Lab Operations',    head:'LAB_HEAD', tick:'LAB_TICK', color:'#0891B2' },
@@ -35,6 +36,7 @@ const AG_DEPT_META = {
   CX:               { icon:'💬', label:'Customer Experience', head:'CX_HEAD', tick:'CX_TICK', color:'#E11D48' },
   PHARMACY:         { icon:'💊', label:'Pharmacy',           head:'PHARMA_HEAD', tick:'PHARMA_TICK', color:'#7C3AED' },
   INPATIENT:        { icon:'🏥', label:'Rawat Inap',         head:'WARD_HEAD', tick:'WARD_TICK', color:'#0D9488' },
+  INSIGHT:          { icon:'🔮', label:'Predictive Intelligence', head:'INSIGHT_HEAD', tick:'INSIGHT_TICK', color:'#4F46E5' },
 };
 const AG_RISK_META = {
   R1:{c:'#22C55E', l:'R1 — HEAD putuskan & terbitkan sendiri'},
@@ -780,7 +782,7 @@ async function agOrgKick(type){
   try{
     const r = await agRpc('agentic_org_kick', { p_type: type });
     if(r && r.skipped){ toast('Masih ada yang antri/berjalan — tunggu selesai','info'); return; }
-    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops', FIN_TICK:'Finance', GROWTH_TICK:'Growth', CX_TICK:'CX', EXEC_DIGEST:'Executive Digest', PHARMA_TICK:'Pharmacy', WARD_TICK:'Rawat Inap' };
+    const _lbl = { HEAD_TICK:'HEAD', IT_CHECK:'Kepala IT', SA_TICK:'Service Assurance', MKT_TICK:'Marketing', SCM_TICK:'Supply Chain', HR_TICK:'People', LAB_TICK:'Lab Ops', FIN_TICK:'Finance', GROWTH_TICK:'Growth', CX_TICK:'CX', EXEC_DIGEST:'Executive Digest', PHARMA_TICK:'Pharmacy', WARD_TICK:'Rawat Inap', INSIGHT_TICK:'Predictive' };
     toast(`${_lbl[type]||type} ditugaskan — menjalankan worker…`,'ok');
     await agRunWorker(4);
     await agReload();

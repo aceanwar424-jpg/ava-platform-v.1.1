@@ -1608,9 +1608,49 @@ Jawablah pesan dari CEO dengan santun, profesional, sangat relevan dengan piagam
   return { result: { reply: responseText }, note: `Tanggapan dari ${agentData.name} berhasil dikirim.` };
 }
 
+// ═══ FASE 8A — HORIZON 1: PREDICTIVE INTELLIGENCE (INSIGHT) ══════════
+const pctTrend = (now: number, prev: number) => {
+  now = Number(now || 0); prev = Number(prev || 0);
+  if (prev === 0) return now > 0 ? '▲ +100%' : '—';
+  const p = Math.round(((now - prev) / prev) * 100);
+  return `${p >= 0 ? '▲ +' : '▼ '}${p}%`;
+};
+function insightReport(s: Dict, focus: string): string {
+  const sm = (s.summary || {}) as Dict; const so = (s.stockout_soon || []) as Dict[];
+  const dm = (s.demand || {}) as Dict; const ar = (s.ar_risk || {}) as Dict;
+  const head = `## Proyeksi Prediktif — ${new Date().toLocaleDateString('id-ID')}\n` +
+    `Akan habis ≤ lead time+7hr: ${sm.stockout_soon ?? 0} (mendesak ${sm.stockout_urgent ?? 0}) · piutang berisiko: ${rp(ar.at_risk_amount)}\n\n`;
+  const secStock = so.length ? `**🔮 Prediksi kehabisan stok (pesan lebih dini):**\n` + so.slice(0, 15).map((x) =>
+    `- ${x.item_name || '—'} · stok ${x.stock_qty} · habis ~${x.days_to_stockout} hari (lead ${x.lead_time_days})${x.urgent ? ' ⛔ PESAN SEKARANG' : ''}`).join('\n') + '\n' : '';
+  const secDemand = `**Tren kunjungan:** 7 hari ${dm.visits_7d ?? 0} vs sebelumnya ${dm.visits_prev_7d ?? 0} (${pctTrend(Number(dm.visits_7d), Number(dm.visits_prev_7d))}) · 30 hari ${dm.visits_30d ?? 0}\n` +
+    `**Tren pendapatan (30 hari):** ${rp(dm.revenue_30d)} vs ${rp(dm.revenue_prev_30d)} (${pctTrend(Number(dm.revenue_30d), Number(dm.revenue_prev_30d))})\n`;
+  const secRisk = `**Risiko penagihan:** berisiko (>60 hari) ${rp(ar.at_risk_amount)} dari ${ar.at_risk_count ?? 0} invoice · total menunggak ${rp(ar.overdue_amount)}`;
+  if (focus === 'stock') return head + secStock;
+  if (focus === 'demand') return head + secDemand;
+  if (focus === 'risk') return head + secRisk;
+  return head + secStock + '\n' + secDemand + '\n' + secRisk;
+}
+async function handleInsightScan(t: Task, focus: string) {
+  const s = await rpc('agentic_insight_scan', {}) as Dict; const sm = (s.summary || {}) as Dict;
+  const md = insightReport(s, focus);
+  if (focus === 'all' && Number(sm.stockout_urgent || 0) > 0) {
+    await rpc('agentic_msg_add', { p: { from_agent: 'INSIGHT_STOCK', to_agent: 'ACE', kind: 'ALERT', body: md } }).catch(() => null);
+  } else if (focus === 'all') {
+    await rpc('agentic_msg_add', { p: { from_agent: 'INSIGHT_HEAD', to_agent: 'ACE', kind: 'INFO', body: md } }).catch(() => null);
+  }
+  return { result: { markdown: md, ...s }, note: `Prediktif: ${sm.stockout_soon ?? 0} akan habis (${sm.stockout_urgent ?? 0} mendesak)` };
+}
+const handleInsightTick = (t: Task) => handleInsightScan(t, 'all');
+const handleForecastStockout = (t: Task) => handleInsightScan(t, 'stock');
+const handleForecastDemand = (t: Task) => handleInsightScan(t, 'demand');
+const handleCollectionRisk = (t: Task) => handleInsightScan(t, 'risk');
+
 const HANDLERS: Record<string, (t: Task) => Promise<{ result: unknown; note: string }>> = {
   SMOKE_TEST: handleSmokeTest,
   CHAT_RESPONSE: handleChatResponse,
+  // Fase 8A — Predictive Intelligence:
+  INSIGHT_TICK: handleInsightTick, FORECAST_STOCKOUT: handleForecastStockout,
+  FORECAST_DEMAND: handleForecastDemand, COLLECTION_RISK: handleCollectionRisk,
   // Fase 7M — Pharmacy & Inpatient:
   PHARMA_TICK: handlePharmaTick, DRUG_EXPIRY: handleDrugExpiry, RX_SAFETY: handleRxSafety, NARCO_AUDIT: handleNarcoAudit,
   WARD_TICK: handleWardTick, BED_WATCH: handleBedWatch, LOS_WATCH: handleLosWatch, CHARGE_AUDIT: handleChargeAudit,
