@@ -1,137 +1,224 @@
 // ═══════════════════════════════════════════════════════════════
-// AGENTIC — EDITOR DOKUMEN AI (interaktif, ala Claude/ChatGPT)
+// AGENTIC — EDITOR DOKUMEN AI (halaman menetap, bukan modal)
 //
-// Menjawab dua hal:
-//   1. Banyak dokumen isinya kurang — terutama PDF, yang saat ingest hanya
-//      diambil METADATA-nya (teks badan tidak tersimpan). Editor ini bisa
-//      MENARIK teks penuh dari PDF sumber lewat AI.
-//   2. Perbaikan (repair) selama ini satu-tembak di latar. Di sini prosesnya
-//      INTERAKTIF: Anda beri instruksi, lihat hasilnya, ulangi, baru simpan —
-//      sekalian meninjau.
+// Sebelumnya editor ini modal — ditutup, progres hilang. Kini:
+//   · HALAMAN penuh (di main-content), tidak hilang saat berpindah.
+//   · Kiri: PRATINJAU dokumen jadi (Markdown ter-render) + tombol pengaturan.
+//   · Kanan: CHAT dengan AI untuk perbaikan — riwayatnya TERSIMPAN per dokumen
+//     (agentic.document_ai_chat), jadi saat dokumen dibuka lagi, percakapan &
+//     progres masih ada. Buka dokumen lain → dokumen ini sudah tersimpan.
+//   · Isi dokumen disimpan ke registry (full_text) tiap perubahan.
 //
-// ── Pagar yang wajib disadari ─────────────────────────────────
-// AI di sini MENYUSUN & MERAPIKAN, bukan sumber kebenaran. Untuk SOP mutu, isi
-// prosedur yang sebenarnya (alat, ambang nilai, penanggung jawab, nomor)
-// datang dari praktik lab Anda — BUKAN karangan AI. Bila AI tidak punya dasar,
-// ia diminta menandai [ISI: …] agar diisi manusia, bukan mengarang. Setiap
-// keluaran adalah DRAF yang harus diverifikasi orang yang kompeten.
+// ── Pagar kejujuran ───────────────────────────────────────────
+// AI menyusun & merapikan, BUKAN sumber kebenaran. Nilai nyata (alat, ambang,
+// penanggung jawab, nomor) dari praktik lab. Bagian [ISI: …] wajib dilengkapi
+// manusia. Tiap keluaran draf yang harus diverifikasi orang kompeten.
+// Butuh: supabase_agentic_doc_sign.sql (tabel chat) sudah dijalankan.
 // ═══════════════════════════════════════════════════════════════
 
-let _agAiEd = null;   // { docId, doc, content, prev, log:[] }
+let _agAiEd = null;   // { docId, doc, content, prev, mode:'preview'|'edit', chat:[] }
 
 const AG_AI_SYS = 'Anda asisten penyunting dokumen SOP mutu laboratorium (ISO 15189). ' +
   'Diberi ISI DOKUMEN saat ini dan sebuah INSTRUKSI. Kembalikan SELURUH dokumen versi baru ' +
-  'dalam Markdown, mempertahankan struktur baku: Judul, lalu bagian bernomor ## 1. Tujuan, ' +
-  '## 2. Ruang Lingkup, ## 3. Referensi, ## 4. Definisi, ## 5. Tanggung Jawab, ## 6. Prosedur, ' +
-  '## 7. Dokumen Terkait (sesuaikan bila dokumen memang berbeda jenis). ' +
-  'ATURAN KERAS: JANGAN mengarang nilai spesifik (nama alat, ambang, nomor, nama orang, tanggal) ' +
-  'yang tidak ada dalam isi. Bila sebuah bagian butuh data nyata dari lab, tulis penanda ' +
-  '[ISI: keterangan singkat] agar diisi manusia. Balas HANYA isi dokumen Markdown, tanpa basa-basi, ' +
-  'tanpa blok kode.';
+  'dalam Markdown, mempertahankan struktur baku: Judul, lalu ## 1. Tujuan, ## 2. Ruang Lingkup, ' +
+  '## 3. Referensi, ## 4. Definisi, ## 5. Tanggung Jawab, ## 6. Prosedur, ## 7. Dokumen Terkait ' +
+  '(sesuaikan bila dokumen memang jenis lain). ATURAN KERAS: JANGAN mengarang nilai spesifik ' +
+  '(nama alat, ambang, nomor, nama orang, tanggal) yang tidak ada dalam isi. Bila sebuah bagian ' +
+  'butuh data nyata dari lab, tulis penanda [ISI: keterangan singkat] agar diisi manusia. ' +
+  'Balas HANYA isi dokumen Markdown, tanpa basa-basi, tanpa blok kode.';
 
 async function agAiEditorOpen(docId){
   const d = agRegistry.find(x => x.id === docId);
   if(!d){ toast('Dokumen tak ditemukan','err'); return; }
   const content = (d.extracted_meta && d.extracted_meta.full_text) || '';
-  _agAiEd = { docId, doc:d, content, prev:null, log:[] };
+  _agAiEd = { docId, doc:d, content, prev:null, mode:'preview', chat:[] };
+  window.currentPage = 'agentic';
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${typeof icon==='function'?icon('sparkles',16):''} Editor Dokumen AI</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="font-size:12px;margin-bottom:6px"><b>${agEsc(d.title)}</b>
-      <span style="color:var(--gray)"> · ${agEsc(d.doc_type)} L${d.doc_level} · ${agEsc(d.department||'')}</span></div>
-    <div class="status-box status-warn" style="font-size:11px;margin-bottom:8px">
-      AI menyusun & merapikan — <b>bukan sumber kebenaran</b>. Isi prosedur nyata (alat, ambang, penanggung jawab)
-      harus dari praktik lab Anda. Bagian bertanda <code>[ISI: …]</code> wajib Anda lengkapi. Draf ini perlu diverifikasi.
-    </div>
-    <div id="ag-ai-body"></div>
-    <div class="modal-footer" id="ag-ai-foot"></div>`, 'wide');
+  // Muat riwayat chat tersimpan (bila tabelnya ada).
+  try { _agAiEd.chat = await agRpc('agentic_doc_chat_list', { p_doc: docId }) || []; }
+  catch(e){ _agAiEd.chat = []; _agAiEd.noChatTable = true; }
+
   agAiEditorRender();
 }
 
 function agAiEditorRender(){
   const st = _agAiEd; if(!st) return;
-  const body = document.getElementById('ag-ai-body');
-  const foot = document.getElementById('ag-ai-foot');
+  const host = document.getElementById('main-content'); if(!host) return;
   const isPdf = /\.pdf$/i.test(st.doc.source_file_path || '');
   const kosong = (st.content||'').trim().length < 200;
 
-  if(body) body.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 300px;gap:12px">
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <label style="font-size:11px;font-weight:700;color:var(--gray)">ISI DOKUMEN (Markdown) — ${(st.content||'').length.toLocaleString('id-ID')} karakter</label>
-          ${st.prev!=null?`<button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorUndo()">↶ Batalkan perubahan terakhir</button>`:''}
+  host.innerHTML = `
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0b1526,#0f2038);color:#fff;border-radius:10px;padding:9px 14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:12px;min-width:0">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,.2)" onclick="agAiEditorBack()">← Dokumen QMS</button>
+        <div style="min-width:0">
+          <h1 style="margin:0;font-size:14px;color:#fff;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw">${agEsc(st.doc.title)}</h1>
+          <span style="font-size:11px;color:#9db4d0">${agEsc(st.doc.doc_type)} L${st.doc.doc_level} · ${agEsc(st.doc.department||'')} · Editor Dokumen AI</span>
         </div>
-        <textarea id="ag-ai-content" rows="18" oninput="_agAiEd.content=this.value"
-          style="width:100%;font-family:ui-monospace,monospace;font-size:11.5px;line-height:1.5;padding:9px;border:1px solid var(--border);border-radius:8px;resize:vertical"
-          placeholder="Isi dokumen kosong. Tarik dari PDF, atau susun otomatis, atau ketik sendiri.">${agEsc(st.content||'')}</textarea>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font-size:11px;font-weight:800;color:#0A2342">Perintah ke AI</div>
-        ${isPdf && kosong ? `<button class="ag-btn pub" onclick="agAiEditorRun('pdftext')">${typeof icon==='function'?icon('file-text',13):''} Tarik teks penuh dari PDF</button>` : ''}
-        <button class="ag-btn ${kosong?'pub':'mut'}" onclick="agAiEditorRun('autofill')">${typeof icon==='function'?icon('sparkles',13):''} Susun/Lengkapi ke struktur SOP</button>
-        <textarea id="ag-ai-instruct" rows="3" placeholder="mis. Lengkapi bagian Prosedur jadi langkah bernomor yang rinci; tambah bagian Keselamatan Kerja."
-          style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:7px;resize:vertical"></textarea>
-        <button class="ag-btn pub" onclick="agAiEditorRun('instruct')">${typeof icon==='function'?icon('refresh',13):''} Terapkan Instruksi</button>
-        <div id="ag-ai-status" style="font-size:11px;color:var(--gray);min-height:16px"></div>
-        ${st.log.length?`<div style="font-size:10.5px;color:var(--gray);border-top:1px solid var(--border);padding-top:6px">
-          <b>Riwayat:</b><br>${st.log.slice(-6).map(l=>`· ${agEsc(l)}`).join('<br>')}</div>`:''}
+      <span style="font-size:11px;color:#cfe0f2" id="ag-ed-saved">tersimpan otomatis</span>
+    </div>
+
+    <div class="status-box status-warn" style="font-size:11px;margin-bottom:10px">
+      AI menyusun & merapikan — <b>bukan sumber kebenaran</b>. Nilai nyata (alat, ambang, penanggung jawab)
+      dari praktik lab Anda. Bagian <code>[ISI: …]</code> wajib dilengkapi. Draf ini perlu diverifikasi.
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:12px;align-items:start">
+      <!-- KIRI: dokumen + pengaturan -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px">
+            ${st.mode==='preview'?'Pratinjau Dokumen':'Sunting Teks (Markdown)'} · ${(st.content||'').length.toLocaleString('id-ID')} karakter</div>
+          <div style="display:flex;gap:6px">
+            ${st.prev!=null?`<button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorUndo()">↶ Batalkan</button>`:''}
+            <button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorToggle()">${st.mode==='preview'?'✏️ Sunting teks':'👁 Pratinjau'}</button>
+          </div>
+        </div>
+
+        <div style="border:1px solid var(--border);border-radius:10px;background:#fff;min-height:52vh;max-height:64vh;overflow:auto">
+          ${st.mode==='preview'
+            ? `<div style="padding:22px 26px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6;color:#1a2b3c" class="ag-ed-doc">
+                 ${kosong ? `<div style="color:var(--gray);font-style:italic;text-align:center;padding:40px">Dokumen masih kosong. ${isPdf?'Tekan "Tarik teks dari PDF" di kanan, atau ':''}minta AI menyusun, atau "Sunting teks".</div>` : agMd(st.content)}
+               </div>`
+            : `<textarea id="ag-ed-textarea" oninput="_agAiEd.content=this.value" style="width:100%;min-height:52vh;border:0;outline:0;padding:16px 18px;font-family:ui-monospace,monospace;font-size:11.5px;line-height:1.55;resize:vertical">${agEsc(st.content||'')}</textarea>`}
+        </div>
+
+        <!-- PENGATURAN di bawah dokumen -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          ${isPdf ? `<button class="ag-btn pub" onclick="agAiEditorRun('pdftext')">${icon('file-text',13)} Tarik teks dari PDF</button>` : ''}
+          <button class="ag-btn ${kosong?'pub':'mut'}" onclick="agAiEditorRun('autofill')">${icon('sparkles',13)} Susun/Lengkapi ke struktur SOP</button>
+          <span style="flex:1"></span>
+          <button class="ag-btn mut" onclick="agAiEditorSave(false)">💾 Simpan</button>
+          <button class="ag-btn pub" onclick="agAiEditorSave(true)">${icon('file-text',13)} Review Final →</button>
+        </div>
+      </div>
+
+      <!-- KANAN: chat -->
+      <div style="border:1px solid var(--border);border-radius:10px;background:#fff;display:flex;flex-direction:column;height:calc(64vh + 92px)">
+        <div style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:800;color:#0A2342">
+          ${icon('sparkles',13)} Perbaikan dengan AI
+          ${st.noChatTable?`<div style="font-size:10px;font-weight:400;color:#B45309">Riwayat belum aktif — jalankan supabase_agentic_doc_sign.sql</div>`:''}
+        </div>
+        <div id="ag-ed-chat" style="flex:1;overflow-y:auto;padding:10px 12px"></div>
+        <div style="border-top:1px solid var(--border);padding:9px 10px">
+          <textarea id="ag-ed-instruct" rows="3" placeholder="mis. Lengkapi bagian Prosedur jadi langkah bernomor yang rinci; tambah bagian Keselamatan Kerja."
+            style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:7px;resize:none"></textarea>
+          <button class="ag-btn pub" style="width:100%;margin-top:6px" onclick="agAiEditorRun('instruct')">${icon('refresh',13)} Terapkan Instruksi</button>
+          <div id="ag-ed-status" style="font-size:11px;color:var(--gray);min-height:15px;margin-top:4px"></div>
+        </div>
       </div>
     </div>`;
+  agAiEditorPaintChat();
+}
 
-  if(foot) foot.innerHTML = `
-    <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-    <button class="btn btn-ghost" onclick="agAiEditorSave(false)">💾 Simpan Isi</button>
-    <button class="btn btn-teal" onclick="agAiEditorSave(true)">Simpan &amp; Review Final →</button>`;
+function agAiEditorPaintChat(){
+  const el = document.getElementById('ag-ed-chat'); if(!el) return;
+  const st = _agAiEd;
+  if(!st.chat.length){
+    el.innerHTML = `<div style="font-size:11.5px;color:var(--gray);font-style:italic">Belum ada percakapan. Beri instruksi di bawah, atau tekan "Susun/Lengkapi".</div>`;
+    return;
+  }
+  el.innerHTML = st.chat.map(m=>{
+    const me = m.role==='user';
+    return `<div style="display:flex;justify-content:${me?'flex-end':'flex-start'};margin-bottom:7px">
+      <div style="max-width:88%;font-size:11.5px;line-height:1.4;padding:7px 10px;border-radius:10px;
+        ${me?'background:#0f766e;color:#fff':'background:#F1F5F9;color:#1a2b3c'}">
+        ${agEsc(m.content||'')}
+        <div style="font-size:9px;opacity:.6;margin-top:3px">${m.created_at?new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>
+      </div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function agAiEditorToggle(){
+  const st = _agAiEd; if(!st) return;
+  if(st.mode==='edit'){
+    const ta = document.getElementById('ag-ed-textarea'); if(ta) st.content = ta.value;
+  }
+  st.mode = st.mode==='preview' ? 'edit' : 'preview';
+  agAiEditorRender();
 }
 
 function agAiEditorUndo(){
   const st = _agAiEd; if(!st || st.prev==null) return;
   st.content = st.prev; st.prev = null;
-  st.log.push('dibatalkan');
   agAiEditorRender();
+  agAiEditorPersist('save');   // simpan hasil undo
+}
+
+async function agAiEditorBack(){
+  await agAiEditorPersist('save');   // pastikan tersimpan sebelum keluar
+  if(typeof renderAgentic==='function') renderAgentic('docs');
+}
+
+// Simpan isi ke registry (dan segarkan salinan memori).
+async function agAiEditorPersist(kind){
+  const st = _agAiEd; if(!st) return false;
+  if(st.mode==='edit'){ const ta=document.getElementById('ag-ed-textarea'); if(ta) st.content=ta.value; }
+  try{
+    await agRpc('agentic_doc_update', { p_id: st.docId, p: { extracted_meta: { full_text: st.content } } });
+    const d = agRegistry.find(x=>x.id===st.docId);
+    if(d) d.extracted_meta = Object.assign({}, d.extracted_meta, { full_text: st.content });
+    const badge = document.getElementById('ag-ed-saved'); if(badge) badge.textContent = 'tersimpan ✓';
+    return true;
+  }catch(e){ toast('Gagal menyimpan: '+e.message,'err'); return false; }
+}
+
+async function agAiEditorChatAdd(role, text, kind){
+  const st = _agAiEd;
+  st.chat.push({ role, content:text, kind, created_at:new Date().toISOString() });
+  agAiEditorPaintChat();
+  try{ await agRpc('agentic_doc_chat_add', { p_doc: st.docId, p_role: role, p_content: text, p_kind: kind||null }); }catch(e){}
 }
 
 async function agAiEditorRun(kind){
   const st = _agAiEd; if(!st) return;
-  const status = document.getElementById('ag-ai-status');
+  const status = document.getElementById('ag-ed-status');
   const say = m => { if(status) status.textContent = m; };
-  const setBusy = b => { document.querySelectorAll('#ag-ai-body button, #ag-ai-foot button').forEach(x=>x.disabled=b); };
+  const busy = b => document.querySelectorAll('#main-content .ag-btn').forEach(x=>x.disabled=b);
+
+  let instr = '';
+  if(kind==='instruct'){
+    instr = (document.getElementById('ag-ed-instruct')||{}).value?.trim();
+    if(!instr){ say('Tulis instruksi dulu.'); return; }
+  }
+  if(st.mode==='edit'){ const ta=document.getElementById('ag-ed-textarea'); if(ta) st.content=ta.value; }
 
   try{
-    setBusy(true);
+    busy(true);
     let out = '';
-    if(kind === 'pdftext'){
+    if(kind==='pdftext'){
       say('Mengambil PDF & menarik teks (AI)…');
+      await agAiEditorChatAdd('user','↳ Tarik teks penuh dari PDF sumber','pdftext');
       out = await agAiPdfText(st.doc);
-      st.log.push('tarik teks dari PDF');
-    } else if(kind === 'autofill'){
+    } else if(kind==='autofill'){
       say('Menyusun ke struktur SOP…');
+      await agAiEditorChatAdd('user','↳ Susun/lengkapi ke struktur SOP','autofill');
       out = await agLLMText(AG_AI_SYS,
-        `INSTRUKSI: Susun/rapikan menjadi struktur SOP baku yang lengkap. Pertahankan semua isi nyata; untuk yang belum ada, beri penanda [ISI: …]. Judul dokumen: "${st.doc.title}".\n\nISI DOKUMEN SAAT INI:\n${st.content || '(kosong)'}`,
+        `INSTRUKSI: Susun/rapikan menjadi struktur SOP baku yang lengkap. Pertahankan semua isi nyata; untuk yang belum ada beri [ISI: …]. Judul: "${st.doc.title}".\n\nISI DOKUMEN SAAT INI:\n${st.content||'(kosong)'}`,
         'main', { maxTokens: 7000 });
-      st.log.push('susun ke struktur SOP');
     } else {
-      const ins = (document.getElementById('ag-ai-instruct')||{}).value?.trim();
-      if(!ins){ say('Tulis instruksi dulu.'); setBusy(false); return; }
       say('Menerapkan instruksi…');
+      await agAiEditorChatAdd('user', instr, 'instruct');
+      const inp=document.getElementById('ag-ed-instruct'); if(inp) inp.value='';
       out = await agLLMText(AG_AI_SYS,
-        `INSTRUKSI: ${ins}\n\nISI DOKUMEN SAAT INI:\n${st.content || '(kosong)'}`,
+        `INSTRUKSI: ${instr}\n\nISI DOKUMEN SAAT INI:\n${st.content||'(kosong)'}`,
         'main', { maxTokens: 7000 });
-      st.log.push(ins.slice(0, 60));
     }
     out = String(out||'').replace(/^```(?:markdown|md)?\s*/i,'').replace(/```\s*$/,'').trim();
-    if(!out){ say('AI tidak mengembalikan isi. Coba lagi.'); setBusy(false); return; }
-    st.prev = st.content;      // simpan untuk undo satu langkah
+    if(!out){ say('AI tidak mengembalikan isi. Coba lagi.'); await agAiEditorChatAdd('ai','(tidak ada keluaran — coba lagi)','error'); return; }
+
+    st.prev = st.content;
     st.content = out;
-    say('Selesai. Tinjau di kolom kiri.');
+    await agAiEditorPersist('ai');                        // simpan isi baru
+    await agAiEditorChatAdd('ai', `Dokumen diperbarui — ${out.length.toLocaleString('id-ID')} karakter. Tinjau di kiri.`, 'result');
+    say('Selesai. Tinjau di kiri.');
     agAiEditorRender();
   }catch(e){
-    say('❌ ' + e.message);
-  }finally{ setBusy(false); }
+    say('❌ '+e.message);
+    await agAiEditorChatAdd('ai','Gagal: '+e.message,'error');
+  }finally{ busy(false); }
 }
 
 // Tarik teks penuh dari PDF sumber lewat gateway (Gemini menerima lampiran).
@@ -139,32 +226,22 @@ async function agAiPdfText(doc){
   const path = doc.source_file_path;
   if(!path) throw new Error('Dokumen ini tidak punya berkas PDF sumber');
   const buf = await agDownloadStorage(path);
-  // arrayBuffer → base64 (potong per blok agar tidak meledak di string besar)
-  const bytes = new Uint8Array(buf); let bin = '';
-  for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i+0x8000));
+  const bytes = new Uint8Array(buf); let bin='';
+  for(let i=0;i<bytes.length;i+=0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000));
   const b64 = btoa(bin);
   const sys = 'Transkripsikan SELURUH teks dokumen PDF terlampir APA ADANYA ke Markdown. Pertahankan judul, ' +
-    'bagian bernomor, dan penomoran langkah. JANGAN meringkas, JANGAN menambah, JANGAN menghapus. ' +
-    'Bila ada tabel, tuliskan sebagai daftar rapi. Balas hanya teksnya.';
+    'bagian bernomor, dan penomoran langkah. JANGAN meringkas/menambah/menghapus. Tabel tulis sebagai daftar rapi. Balas hanya teksnya.';
   return await agLLMText(sys, 'Transkripsikan berkas terlampir.', 'main',
     { maxTokens: 8000, files: [{ mime_type:'application/pdf', data:b64 }] });
 }
 
 async function agAiEditorSave(proceed){
-  const st = _agAiEd; if(!st) return;
-  const content = (document.getElementById('ag-ai-content')||{}).value ?? st.content;
-  if(!content.trim()){ toast('Isi masih kosong','warn'); return; }
-  try{
-    await agRpc('agentic_doc_update', { p_id: st.docId, p: { extracted_meta: { full_text: content } } });
-    // segarkan salinan memori supaya Review Final memakai isi terbaru
-    const d = agRegistry.find(x=>x.id===st.docId);
-    if(d){ d.extracted_meta = Object.assign({}, d.extracted_meta, { full_text: content }); }
-    if(typeof logActivity==='function')
-      logActivity('doc_ai_edit','document_registry',st.docId,`Isi dokumen disunting via Editor AI (${content.length} karakter)`,st.doc.title);
-    toast('💾 Isi tersimpan','ok');
-    if(proceed){
-      closeModalForce();
-      if(typeof agOpenFinalReview==='function') agOpenFinalReview(st.docId);
-    }
-  }catch(e){ toast('❌ '+e.message,'err'); }
+  const ok = await agAiEditorPersist('save');
+  if(!ok) return;
+  toast('💾 Isi tersimpan','ok');
+  if(proceed){
+    const id = _agAiEd.docId;
+    if(typeof renderAgentic==='function') renderAgentic('docs');
+    if(typeof agOpenFinalReview==='function') setTimeout(()=>agOpenFinalReview(id), 300);
+  }
 }

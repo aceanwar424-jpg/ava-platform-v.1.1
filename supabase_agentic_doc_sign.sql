@@ -278,6 +278,42 @@ END $$;
 
 GRANT EXECUTE ON FUNCTION public.agentic_template_delete(UUID) TO anon, authenticated, service_role;
 
+-- ── 9. Riwayat percakapan Editor Dokumen AI (per dokumen) ──────
+-- Menyimpan riwayat instruksi & tanggapan editor AI agar progres perbaikan
+-- tercatat per dokumen — tidak hilang saat layar ditutup, dan bisa dilihat lagi
+-- saat dokumen dibuka kembali. Isi dokumen sendiri tetap di
+-- document_registry.extracted_meta.full_text.
+CREATE TABLE IF NOT EXISTS agentic.document_ai_chat (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  document_id UUID NOT NULL REFERENCES agentic.document_registry(id) ON DELETE CASCADE,
+  role        TEXT NOT NULL CHECK (role IN ('user','ai','system')),
+  content     TEXT,
+  kind        TEXT,          -- instruct / autofill / pdftext / save
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_docchat ON agentic.document_ai_chat (document_id, created_at);
+
+CREATE OR REPLACE FUNCTION public.agentic_doc_chat_add(p_doc UUID, p_role TEXT, p_content TEXT, p_kind TEXT DEFAULT NULL)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v agentic.document_ai_chat;
+BEGIN
+  IF p_role NOT IN ('user','ai','system') THEN RAISE EXCEPTION 'role tidak dikenal'; END IF;
+  INSERT INTO agentic.document_ai_chat (document_id, role, content, kind)
+  VALUES (p_doc, p_role, p_content, p_kind) RETURNING * INTO v;
+  RETURN to_jsonb(v);
+END $$;
+
+CREATE OR REPLACE FUNCTION public.agentic_doc_chat_list(p_doc UUID)
+RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT COALESCE(jsonb_agg(jsonb_build_object(
+    'id', id, 'role', role, 'content', content, 'kind', kind, 'created_at', created_at
+  ) ORDER BY created_at), '[]'::jsonb)
+  FROM agentic.document_ai_chat WHERE document_id = p_doc;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_doc_chat_add(UUID,TEXT,TEXT,TEXT) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.agentic_doc_chat_list(UUID)              TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;
