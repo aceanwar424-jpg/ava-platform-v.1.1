@@ -440,7 +440,8 @@ async function agRenderTemplates(){
           <td>${r.sample_path?'✅':'—'}</td>
           <td style="white-space:nowrap">
             ${r.storage_path?`<button class="act-btn" title="Tes rakit .docx dari master" onclick="agTemplateTestBuild('${r.id}')">${svgIcon('download',11)||'⬇'}</button>`:''}
-            <button class="act-btn" title="Edit / unggah" onclick="agTemplateEdit('${r.id}')">${svgIcon('edit',11)}</button></td>
+            <button class="act-btn" title="Edit / unggah" onclick="agTemplateEdit('${r.id}')">${svgIcon('edit',11)}</button>
+            <button class="act-btn" title="Hapus template" style="color:#B91C1C" onclick="agTemplateDelete('${r.id}','${(r.name||'').replace(/'/g,'')}')">${typeof icon==='function'?icon('trash',11):'🗑'}</button></td>
         </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:14px">Belum ada template — tambah lalu unggah master .docx contoh Anda.</td></tr>'}</tbody>
       </table></div>`;
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -543,6 +544,16 @@ async function agTemplateSave(){
     await agRpc('agentic_template_upsert', { p });
     closeModal(); toast('Template disimpan','ok'); agRenderTemplates();
   }catch(e){ put('❌ '+agEsc(e.message),'#B91C1C'); }
+}
+
+async function agTemplateDelete(id, name){
+  if(!confirm(`Hapus template "${name||''}"?\n\nBerkas master .docx yang terunggah tidak dapat dikembalikan.\nDokumen yang sudah pernah dirakit TIDAK terpengaruh.`)) return;
+  try{
+    await agRpc('agentic_template_delete', { p_id:id });
+    if(typeof logActivity==='function') logActivity('template_delete','doc_templates',id,`Template dihapus: ${name||id}`,'');
+    toast('Template dihapus','ok');
+    agRenderTemplates();
+  }catch(e){ toast('❌ '+(/not find the function/i.test(e.message)?'Jalankan supabase_agentic_doc_sign.sql dulu':e.message),'err'); }
 }
 
 // Unduh file mentah dari Storage bucket "agentic"

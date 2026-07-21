@@ -262,6 +262,22 @@ END $$;
 GRANT EXECUTE ON FUNCTION public.agentic_doc_set_dept_by_paths(JSONB,TEXT) TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.agentic_doc_set_dept(UUID,TEXT)           TO anon, authenticated, service_role;
 
+-- ── 8. Hapus template dokumen ──────────────────────────────────
+-- Menghapus baris template. Dokumen yang sudah pernah dirakit tidak terpengaruh
+-- (mereka .docx tersendiri). Berkas master di Storage menjadi yatim tak terpakai
+-- — tidak menggagalkan apa pun.
+CREATE OR REPLACE FUNCTION public.agentic_template_delete(p_id UUID)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v INT;
+BEGIN
+  DELETE FROM agentic.doc_templates WHERE id = p_id;
+  GET DIAGNOSTICS v = ROW_COUNT;
+  IF v = 0 THEN RAISE EXCEPTION 'Template tidak ditemukan'; END IF;
+  RETURN jsonb_build_object('deleted', v);
+END $$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_template_delete(UUID) TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;
