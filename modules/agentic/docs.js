@@ -87,6 +87,23 @@ function renderAgDocsTab(el){
 
   el.innerHTML = `
     <div class="ag-detail" style="margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Alur Dokumen</div>
+      <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;font-size:11px">
+        ${[
+          ['upload','1. Upload','tarik file — worker proses otomatis'],
+          ['layers','2. Registry','muncul di daftar bawah'],
+          ['sparkles','3. Editor AI','lengkapi/tarik isi (terutama PDF kosong)'],
+          ['file-text','4. Review Final','petakan isi → template .docx'],
+          ['pen-tool','5. TTD','tanda tangan & terbit'],
+        ].map((s,i,a)=>`
+          <div style="flex:1;min-width:120px;background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:8px 10px">
+            <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0A2342">${icon(s[0],13)} ${s[1]}</div>
+            <div style="color:var(--gray);margin-top:2px;line-height:1.3">${s[2]}</div>
+          </div>${i<a.length-1?'<div style="align-self:center;color:var(--gray)">→</div>':''}`).join('')}
+      </div>
+    </div>
+
+    <div class="ag-detail" style="margin-bottom:12px">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${svgIcon('upload',14)} Ingest Dokumen (DOCX / PDF / TXT / MD)</div>
       <div class="ag-drop" id="ag-drop" onclick="document.getElementById('ag-file-input').click()">
         <div style="font-size:13px;font-weight:700;color:#334155">Klik atau tarik file ke sini</div>
@@ -241,6 +258,11 @@ async function agIngestFiles(fileList){
       }catch(e){ put(`⚠️ Gagal set departemen batch: ${agEsc(e.message)} — jalankan supabase_agentic_doc_sign.sql`, '#B45309'); }
     }
     await agReload();
+    // Arahkan langkah berikutnya secara eksplisit — jangan biarkan pengguna menebak.
+    put(`<div style="margin-top:6px;padding:8px 10px;background:#EAF5F3;border-radius:6px;color:#0A2342">
+      <b>✅ Selesai — ${created} dokumen masuk registry.</b> Langkah berikutnya di tabel di bawah:
+      buka <b>${icon('sparkles',12)} Editor AI</b> untuk lengkapi/tarik isi (terutama PDF),
+      lalu <b>${icon('file-text',12)} Review Final</b> untuk merakit .docx sesuai template.</div>`);
   }
 }
 

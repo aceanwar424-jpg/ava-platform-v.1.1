@@ -430,7 +430,9 @@ async function agRenderTemplates(){
     ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase7.sql</strong> untuk mengaktifkan registry template.</div>`
     : `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Unggah master <strong>.docx</strong> asli per level per jenis. Generator dokumen (SA_DOC) akan mengisi isi ke dalam master ini — header, footer, tipe huruf, ukuran, margin, dan spasi tetap PERSIS. Tanpa template, dokumen dibuat dari format standar (belum terjamin identik).</div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
-        <thead><tr><th>Level</th><th>Jenis</th><th>Dept</th><th>Nama</th><th>Master .docx</th><th>Contoh</th><th></th></tr></thead>
+        <thead><tr><th>Level</th><th>Jenis</th><th>Dept</th><th>Nama</th>
+          <th title="Berkas master .docx yang mengunci format. WAJIB — 'terpasang' = template siap dipakai.">Master .docx</th>
+          <th title="Contoh dokumen jadi sebagai acuan. OPSIONAL — '—' tidak apa-apa, template tetap siap pakai.">Contoh <span style="font-weight:400;color:var(--gray)">(opsional)</span></th><th></th></tr></thead>
         <tbody>${rows.map(r=>`<tr>
           <td style="white-space:nowrap">${AG_DOC_LEVELS[r.doc_level]||('L'+r.doc_level)}</td>
           <td>${agEsc(r.doc_type)}</td>
@@ -454,9 +456,11 @@ async function agRenderTemplates(){
 }
 
 let _agTplRows = [];
+let _agTplEditOrig = null;   // baris asli yang sedang disunting (untuk deteksi kunci berubah)
 async function agTemplateEdit(id){
   try{ _agTplRows = await sbGet('agentic_templates_v','select=*') || []; }catch(e){ _agTplRows = []; }
   const r = id ? _agTplRows.find(x=>x.id===id) : null;
+  _agTplEditOrig = r || null;
   const fs = (r && r.format_spec) || {};
   const mg = fs.margins_cm || {};
   openModal(`
@@ -541,7 +545,21 @@ async function agTemplateSave(){
       name:g('agt-name')||'Template', format_spec:spec, placeholders:phList, notes:g('agt-notes')||null };
     if(storage_path) p.storage_path = storage_path;
     if(sample_path) p.sample_path = sample_path;
+    // Bila tak mengunggah master/contoh baru saat edit, pertahankan yang lama
+    // (upsert by level+jenis+dept membuat baris baru saat kunci berubah).
+    const o = _agTplEditOrig;
+    if(o){
+      if(!p.storage_path && o.storage_path) p.storage_path = o.storage_path;
+      if(!p.sample_path && o.sample_path) p.sample_path = o.sample_path;
+    }
     await agRpc('agentic_template_upsert', { p });
+
+    // Bila mengedit dan KUNCI (level+jenis+dept) berubah — mis. dept MUTU→SEMUA —
+    // upsert membuat baris BARU; baris lama jadi duplikat yatim. Hapus yang lama.
+    if(o && (o.doc_level!=p.doc_level || o.doc_type!=p.doc_type || o.department!=p.department)){
+      try{ await agRpc('agentic_template_delete', { p_id:o.id }); }catch(e){}
+    }
+    _agTplEditOrig = null;
     closeModal(); toast('Template disimpan','ok'); agRenderTemplates();
   }catch(e){ put('❌ '+agEsc(e.message),'#B91C1C'); }
 }
