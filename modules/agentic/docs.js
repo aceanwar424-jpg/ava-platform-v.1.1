@@ -835,34 +835,50 @@ const AG_TPL_MATCH_NOTE = {
 // SOP mengikuti susunan bagian baku (Tujuan, Ruang Lingkup, Prosedur, dst).
 // Bagian-bagian ini dipetakan LANGSUNG dari teks dokumen ke placeholder isinya,
 // APA ADANYA — bukan diringkas AI. Untuk dokumen mutu, isi harus persis.
-// Kata kunci judul bagian → nama placeholder kanonik.
+// Kunci = NAMA PLACEHOLDER template (persis dari skema pemilik). Nilai = kata
+// kunci judul bagian yang dideteksi di teks dokumen. Selaras dengan daftar
+// bagian pada prompt Editor AI (AG_AI_SYS di aieditor.js) — ubah keduanya bila
+// skema berubah.
 const AG_SECTION_KEYS = {
-  TUJUAN:          ['tujuan','maksud'],
-  RUANG_LINGKUP:   ['ruang lingkup','lingkup','cakupan'],
-  REFERENSI:       ['referensi','acuan','rujukan','dokumen acuan'],
-  DEFINISI:        ['definisi','istilah','pengertian'],
-  KEBIJAKAN:       ['kebijakan'],
-  TANGGUNG_JAWAB:  ['tanggung jawab','wewenang','tugas dan tanggung jawab'],
-  ALAT_BAHAN:      ['alat dan bahan','alat & bahan','perlengkapan','peralatan dan bahan'],
-  PROSEDUR:        ['prosedur','langkah','uraian prosedur','cara kerja','pelaksanaan','tahapan'],
-  DOKUMEN_TERKAIT: ['dokumen terkait','rekaman mutu','rekaman','lampiran','arsip'],
-  RIWAYAT_REVISI:  ['riwayat revisi','riwayat perubahan','riwayat dokumen'],
+  TUJUAN:                     ['tujuan','maksud'],
+  RUANG_LINGKUP:              ['ruang lingkup','lingkup','cakupan'],
+  PENANGGUNG_JAWAB:           ['penanggung jawab','tanggung jawab','wewenang','tugas dan tanggung jawab'],
+  REFERENSI:                  ['referensi','acuan','rujukan','dokumen acuan'],
+  IKHTISAR_UMUM:              ['ikhtisar umum','ikhtisar','gambaran umum','pendahuluan','ringkasan'],
+  GLOSARIUM:                  ['glosarium','definisi','istilah','pengertian','singkatan'],
+  DOKUMEN_TERKAIT:            ['dokumen terkait','dokumen rujukan','lampiran'],
+  ISI_PROSEDUR:               ['isi prosedur','prosedur','uraian prosedur','langkah','langkah-langkah','cara kerja','tahapan','pelaksanaan'],
+  DIAGRAM_ALUR:               ['diagram alur','alur proses','bagan alur','flowchart','alur kerja'],
+  INDIKATOR_KINERJA_KPI:      ['indikator kinerja','kpi','indikator mutu','sasaran mutu'],
+  PENANGANAN_KETIDAKSESUAIAN: ['penanganan ketidaksesuaian','ketidaksesuaian','pekerjaan tidak sesuai','nonconforming'],
+  CAPA:                       ['capa','tindakan korektif dan preventif','tindakan korektif','tindakan perbaikan'],
+  PELAPORAN_INSIDEN:          ['pelaporan insiden','insiden','kejadian tidak diharapkan','pelaporan kejadian'],
+  PENGELOLAAN_ARSIP:          ['pengelolaan arsip','pengarsipan','arsip','rekaman mutu','rekaman'],
 };
 
 // Nama placeholder → kunci bagian. ISI/KONTEN/BODY = seluruh badan dokumen.
 function agSectionForPlaceholder(name){
   const n = String(name||'').toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_|_$/g,'');
   if(/^(ISI|ISI_DOKUMEN|KONTEN|BODY|URAIAN|BADAN_DOKUMEN)$/.test(n)) return '__FULL__';
-  // padanan langsung & alias
-  const alias = { MAKSUD:'TUJUAN', LINGKUP:'RUANG_LINGKUP', CAKUPAN:'RUANG_LINGKUP',
-    ACUAN:'REFERENSI', RUJUKAN:'REFERENSI', ISTILAH:'DEFINISI', PENGERTIAN:'DEFINISI',
-    WEWENANG:'TANGGUNG_JAWAB', LANGKAH:'PROSEDUR', URAIAN_PROSEDUR:'PROSEDUR',
-    CARA_KERJA:'PROSEDUR', PELAKSANAAN:'PROSEDUR', TAHAPAN:'PROSEDUR',
-    REKAMAN:'DOKUMEN_TERKAIT', REKAMAN_MUTU:'DOKUMEN_TERKAIT', LAMPIRAN:'DOKUMEN_TERKAIT',
-    ALAT_DAN_BAHAN:'ALAT_BAHAN', PERLENGKAPAN:'ALAT_BAHAN' };
   if(AG_SECTION_KEYS[n]) return n;
-  if(alias[n]) return alias[n];
-  return null;
+  // alias nama placeholder lain → kunci baku
+  const alias = {
+    MAKSUD:'TUJUAN', LINGKUP:'RUANG_LINGKUP', CAKUPAN:'RUANG_LINGKUP',
+    TANGGUNG_JAWAB:'PENANGGUNG_JAWAB', WEWENANG:'PENANGGUNG_JAWAB',
+    ACUAN:'REFERENSI', RUJUKAN:'REFERENSI',
+    IKHTISAR:'IKHTISAR_UMUM', GAMBARAN_UMUM:'IKHTISAR_UMUM', PENDAHULUAN:'IKHTISAR_UMUM',
+    DEFINISI:'GLOSARIUM', ISTILAH:'GLOSARIUM', PENGERTIAN:'GLOSARIUM',
+    LAMPIRAN:'DOKUMEN_TERKAIT',
+    PROSEDUR:'ISI_PROSEDUR', LANGKAH:'ISI_PROSEDUR', URAIAN_PROSEDUR:'ISI_PROSEDUR',
+    CARA_KERJA:'ISI_PROSEDUR', PELAKSANAAN:'ISI_PROSEDUR', TAHAPAN:'ISI_PROSEDUR',
+    DIAGRAM:'DIAGRAM_ALUR', ALUR:'DIAGRAM_ALUR', FLOWCHART:'DIAGRAM_ALUR', BAGAN_ALUR:'DIAGRAM_ALUR',
+    KPI:'INDIKATOR_KINERJA_KPI', INDIKATOR_KINERJA:'INDIKATOR_KINERJA_KPI', INDIKATOR_MUTU:'INDIKATOR_KINERJA_KPI',
+    KETIDAKSESUAIAN:'PENANGANAN_KETIDAKSESUAIAN',
+    TINDAKAN_KOREKTIF:'CAPA', KOREKTIF_PREVENTIF:'CAPA', TINDAKAN_KOREKTIF_PREVENTIF:'CAPA',
+    INSIDEN:'PELAPORAN_INSIDEN',
+    ARSIP:'PENGELOLAAN_ARSIP', REKAMAN:'PENGELOLAAN_ARSIP', REKAMAN_MUTU:'PENGELOLAAN_ARSIP', PENGARSIPAN:'PENGELOLAAN_ARSIP',
+  };
+  return alias[n] || null;
 }
 
 // Pecah full_text menjadi { KUNCI_BAGIAN: teks-verbatim, __FULL__: seluruh badan }.
@@ -985,7 +1001,8 @@ async function agOpenFinalReview(docId){
     // Prosedur/Tujuan pada hasil akhir tetap teks bawaan template — bukan isi
     // dokumen yang sedang dikerjakan. Ini perlu dikatakan terus terang, karena
     // dari layar saja gejalanya mudah disalahartikan sebagai AI yang keliru.
-    const adaIsi = phs.some(k => /(^|_)(ISI|KONTEN|BODY|PROSEDUR|LANGKAH|TUJUAN|LINGKUP|TANGGUNG|REFERENSI|DEFINISI|URAIAN)/i.test(k));
+    // Punya placeholder ISI bila ada yang terpetakan ke bagian (bukan sekadar metadata).
+    const adaIsi = phs.some(k => agSectionForPlaceholder(k) != null);
 
     // Berapa kolom isi terisi langsung dari struktur dokumen (bukan AI).
     const dariStruktur = phs.filter(k => source[k] === 'struktur').length;

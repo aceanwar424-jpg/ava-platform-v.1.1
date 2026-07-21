@@ -18,13 +18,18 @@
 
 let _agAiEd = null;   // { docId, doc, content, prev, mode:'preview'|'edit', chat:[] }
 
+// Struktur bagian SELARAS dengan placeholder template pemilik & sectionizer
+// (AG_SECTION_KEYS di docs.js). Bila skema template berubah, ubah keduanya.
 const AG_AI_SYS = 'Anda asisten penyunting dokumen SOP mutu laboratorium (ISO 15189). ' +
-  'Diberi ISI DOKUMEN saat ini dan sebuah INSTRUKSI. Kembalikan SELURUH dokumen versi baru ' +
-  'dalam Markdown, mempertahankan struktur baku: Judul, lalu ## 1. Tujuan, ## 2. Ruang Lingkup, ' +
-  '## 3. Referensi, ## 4. Definisi, ## 5. Tanggung Jawab, ## 6. Prosedur, ## 7. Dokumen Terkait ' +
-  '(sesuaikan bila dokumen memang jenis lain). ATURAN KERAS: JANGAN mengarang nilai spesifik ' +
-  '(nama alat, ambang, nomor, nama orang, tanggal) yang tidak ada dalam isi. Bila sebuah bagian ' +
-  'butuh data nyata dari lab, tulis penanda [ISI: keterangan singkat] agar diisi manusia. ' +
+  'Diberi ISI DOKUMEN saat ini dan sebuah INSTRUKSI. Kembalikan SELURUH dokumen versi baru dalam Markdown. ' +
+  'Awali dengan "# " judul dokumen, lalu bagian-bagian ini memakai heading "## " PERSIS dengan nama ini, ' +
+  'berurutan: ## Tujuan, ## Ruang Lingkup, ## Penanggung Jawab, ## Referensi, ## Ikhtisar Umum, ' +
+  '## Glosarium, ## Dokumen Terkait, ## Isi Prosedur, ## Diagram Alur, ## Indikator Kinerja (KPI), ' +
+  '## Penanganan Ketidaksesuaian, ## CAPA, ## Pelaporan Insiden, ## Pengelolaan Arsip. ' +
+  'Untuk Diagram Alur, tuliskan alur sebagai langkah bernomor/teks (bukan gambar). ' +
+  'ATURAN KERAS: JANGAN mengarang nilai spesifik (nama alat, ambang, nomor, nama orang, tanggal, target KPI) ' +
+  'yang tidak ada dalam isi. Bila sebuah bagian butuh data nyata dari lab, tulis penanda ' +
+  '[ISI: keterangan singkat] agar diisi manusia. Jangan menghapus bagian yang sudah ada isinya. ' +
   'Balas HANYA isi dokumen Markdown, tanpa basa-basi, tanpa blok kode.';
 
 async function agAiEditorOpen(docId){

@@ -509,12 +509,15 @@ async function agTemplateEdit(id){
         <label style="font-size:11.5px;font-weight:700;color:#334155">Daftar placeholder di master (satu per baris, tanpa kurung)
           <span style="font-weight:400;color:var(--gray)">— di file .docx tulis <code>{{NAMA}}</code>.</span>
           <div style="font-weight:400;font-size:10.5px;color:var(--gray);background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin:3px 0">
-            <b>Penanda ISI yang diisi otomatis dari struktur dokumen (verbatim):</b>
-            <code>{{TUJUAN}}</code> <code>{{RUANG_LINGKUP}}</code> <code>{{REFERENSI}}</code>
-            <code>{{DEFINISI}}</code> <code>{{TANGGUNG_JAWAB}}</code> <code>{{PROSEDUR}}</code>
-            <code>{{DOKUMEN_TERKAIT}}</code> — atau <code>{{ISI_DOKUMEN}}</code> untuk seluruh badan.<br>
-            <b>Penanda METADATA (diisi AI/manual):</b> JUDUL_SOP, NAMA_ENTITAS, NOMOR_DOKUMEN,
-            VERSI_DOKUMEN, TANGGAL_EFEKTIF, NAMA_PENYETUJU, dst.
+            <b>Penanda ISI (diisi otomatis verbatim dari struktur dokumen):</b>
+            <code>{{TUJUAN}}</code> <code>{{RUANG_LINGKUP}}</code> <code>{{PENANGGUNG_JAWAB}}</code>
+            <code>{{REFERENSI}}</code> <code>{{IKHTISAR_UMUM}}</code> <code>{{GLOSARIUM}}</code>
+            <code>{{DOKUMEN_TERKAIT}}</code> <code>{{ISI_PROSEDUR}}</code> <code>{{DIAGRAM_ALUR}}</code>
+            <code>{{INDIKATOR_KINERJA_(KPI)}}</code> <code>{{PENANGANAN_KETIDAKSESUAIAN}}</code>
+            <code>{{CAPA}}</code> <code>{{PELAPORAN_INSIDEN}}</code> <code>{{PENGELOLAAN_ARSIP}}</code>.<br>
+            <b>Penanda METADATA (diisi AI/manual):</b> JUDUL_SOP, VERSI_DOKUMEN, STATUS_DOKUMEN,
+            NOMOR_DOKUMEN, KLASIFIKASI_DOKUMEN, TANGGAL_EFEKTIF, TANGGAL_PENINJAUAN, PEMILIK_DOKUMEN,
+            NAMA_PENYETUJU, JABATAN_PENYETUJU.
           </div>
           <textarea id="agt-ph" class="form-input" style="width:100%;font-size:12px" rows="3" placeholder="JUDUL&#10;NO_DOKUMEN&#10;TANGGAL_TERBIT">${agEsc(r&&Array.isArray(r.placeholders)?r.placeholders.join('\n'):'')}</textarea></label>
         <label style="font-size:11.5px;font-weight:700;color:#334155">Catatan (header/footer, penomoran, dll)
