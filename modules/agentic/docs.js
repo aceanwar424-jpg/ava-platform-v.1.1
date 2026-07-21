@@ -144,8 +144,10 @@ function renderAgDocsTab(el){
           <td>${d.current_revision||0}</td>
           <td>${d.next_review_date||'—'}</td>
           <td style="white-space:nowrap">
+            <button class="ag-btn mut" style="padding:4px 9px" title="Editor dokumen AI interaktif — susun/lengkapi/tarik teks PDF, lalu review"
+              onclick="agAiEditorOpen('${d.id}')">${icon('sparkles',12)} Editor AI</button>
             ${d.status!=='PUBLISHED' && (d.extracted_meta&&d.extracted_meta.full_text) ?
-              `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
+              `<button class="ag-btn mut" style="padding:4px 9px" title="Buat task perbaikan AI (latar)" onclick="agMakeRepairTask('${d.id}')">${svgIcon('sparkle',12)} Repair</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Rakit .docx final dari template master" onclick="agBuildDocFromTemplate('${d.id}')">${icon('file-check',12)} .docx</button>` : ''}
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
@@ -257,10 +259,15 @@ async function agMakeRepairTask(docId){
 }
 
 // ── Fase 7D bridge: isi hasil AI → placeholder → .docx final (fidelity 100%) ──
-async function agLLMText(system, prompt, tier){
+async function agLLMText(system, prompt, tier, opts){
+  opts = opts || {};
+  const body = { system, prompt, tier:tier||'main',
+    temperature: opts.temperature!=null ? opts.temperature : 0.2,
+    maxTokens: opts.maxTokens || 2500 };
+  if(Array.isArray(opts.files) && opts.files.length) body.files = opts.files;
   const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway`, {
     method:'POST', headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${SUPABASE_KEY}` },
-    body: JSON.stringify({ system, prompt, tier:tier||'main', temperature:0.2, maxTokens:2500 }) });
+    body: JSON.stringify(body) });
   const d = await res.json().catch(()=>({}));
   if(!res.ok) throw new Error(d.error || `llm-gateway HTTP ${res.status}`);
   return String(d.text||'');
