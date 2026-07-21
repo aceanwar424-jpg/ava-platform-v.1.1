@@ -22,7 +22,8 @@ const STATUS_COLORS = {
 
 let PS = {
   all:[], filtered:[], page:1, perPage:25,
-  search:'', filterCat:'', filterStatus:'', view:'table'
+  search:'', filterCat:'', filterStatus:'', view:'table',
+  mapInstance: null, markers: [], activeInfoWindow: null
 };
 
 // ── Render Page ───────────────────────────────────
@@ -31,10 +32,10 @@ async function renderPartners(params={}) {
     <div class="page-header">
       <div>
         <h1>🤝 Partner Database</h1>
-        <p>Hitlist, pipeline progress, dan output kerjasama semua mitra OneLab</p>
+        <p>Hitlist, pipeline progress, dan visualisasi lokasi peta semua mitra OneLab</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" id="btn-view-toggle" onclick="togglePView()">📊 Kanban</button>
+        <button class="btn btn-ghost btn-sm" id="btn-view-toggle" onclick="togglePView()">📊 Pipeline (Kanban)</button>
         <button class="btn btn-ghost btn-sm" onclick="exportPartnerCSV()">📥 Export</button>
         <button class="btn btn-ghost btn-sm" onclick="navigate('import')">📥 Import Excel</button>
         <button class="btn btn-teal" onclick="openPartnerForm()">+ Tambah Partner</button>
@@ -51,6 +52,7 @@ async function renderPartners(params={}) {
       <div id="pipeline-legend" style="display:flex;gap:14px;flex-wrap:wrap"></div>
     </div>
 
+    <!-- Table View -->
     <div id="pv-table">
       <div class="table-wrap">
         <div class="table-toolbar">
@@ -71,8 +73,31 @@ async function renderPartners(params={}) {
       <div id="partner-pgn"></div>
     </div>
 
+    <!-- Kanban View -->
     <div id="pv-kanban" style="display:none">
       <div id="kanban-board" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:12px"></div>
+    </div>
+
+    <!-- Map View -->
+    <div id="pv-map" style="display:none">
+      <div class="card" style="padding:16px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div class="card-title" style="display:flex;align-items:center;gap:8px">
+            <span>🗺️ Sebaran Mitra di Peta</span>
+            <span id="pmap-stats-badge" class="badge badge-teal" style="font-size:11px">0 lokasi terpetakan</span>
+          </div>
+          <div id="pmap-unmapped-info" style="font-size:12px;color:var(--gray)"></div>
+        </div>
+
+        <div id="partner-map-wrap" style="position:relative;width:100%;height:520px;border-radius:10px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)">
+          <div id="partner-map-canvas" style="width:100%;height:100%;background:var(--lgray);display:flex;align-items:center;justify-content:center;color:var(--gray)">
+            <div style="text-align:center;padding:20px">
+              <div class="spinner" style="margin:0 auto 12px"></div>
+              <div>Memuat Peta Mitra...</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>`;
 
   PS.all = []; PS.filtered = []; PS.page = 1;
@@ -111,7 +136,9 @@ function applyPSFilter() {
     const mS=!PS.filterStatus || p.status===PS.filterStatus;
     return mQ&&mC&&mS;
   });
-  if(PS.view==='table') renderPTable(); else renderKanban();
+  if(PS.view==='table') renderPTable();
+  else if(PS.view==='kanban') renderKanban();
+  else if(PS.view==='map') renderPMap();
 }
 
 // ── Pipeline Bar ──────────────────────────────────
@@ -269,20 +296,199 @@ function renderKanban() {
 }
 
 function togglePView() {
-  const btn=document.getElementById('btn-view-toggle');
-  if(PS.view==='table'){
-    PS.view='kanban';
-    document.getElementById('pv-table').style.display='none';
-    document.getElementById('pv-kanban').style.display='block';
-    if(btn) btn.textContent='📊 Table View';
+  const btn = document.getElementById('btn-view-toggle');
+  if (PS.view === 'table') {
+    PS.view = 'kanban';
+    document.getElementById('pv-table').style.display = 'none';
+    document.getElementById('pv-kanban').style.display = 'block';
+    document.getElementById('pv-map').style.display = 'none';
+    if (btn) btn.textContent = '🗺️ Map View';
     renderKanban();
+  } else if (PS.view === 'kanban') {
+    PS.view = 'map';
+    document.getElementById('pv-table').style.display = 'none';
+    document.getElementById('pv-kanban').style.display = 'none';
+    document.getElementById('pv-map').style.display = 'block';
+    if (btn) btn.textContent = '📋 Table View';
+    renderPMap();
   } else {
-    PS.view='table';
-    document.getElementById('pv-table').style.display='block';
-    document.getElementById('pv-kanban').style.display='none';
-    if(btn) btn.textContent='📋 Pipeline View';
+    PS.view = 'table';
+    document.getElementById('pv-table').style.display = 'block';
+    document.getElementById('pv-kanban').style.display = 'none';
+    document.getElementById('pv-map').style.display = 'none';
+    if (btn) btn.textContent = '📊 Pipeline (Kanban)';
     renderPTable();
   }
+}
+
+// ── Map View ──────────────────────────────────────
+async function renderPMap() {
+  const mapCanvas = document.getElementById('partner-map-canvas');
+  if (!mapCanvas) return;
+
+  // Check if google maps sdk is loaded
+  if (!window.google || !window.google.maps) {
+    const key = await loadMapsApiKey();
+    if (!key) {
+      mapCanvas.innerHTML = `
+        <div style="text-align:center;padding:30px">
+          <div style="font-size:36px;margin-bottom:8px">🔑</div>
+          <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">Google Maps API Key Belum Diset</div>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:12px">Buka menu 🗺️ Maps Prospecting untuk memasukkan API Key</div>
+          <button class="btn btn-teal btn-sm" onclick="navigate('maps')">🗺️ Ke Maps Prospecting</button>
+        </div>`;
+      return;
+    }
+    // Load script dynamically
+    mapCanvas.innerHTML = `
+      <div style="text-align:center;padding:30px">
+        <div class="spinner" style="margin:0 auto 12px"></div>
+        <div>Menghubungkan ke Google Maps...</div>
+      </div>`;
+    
+    if (!document.getElementById('gmsdk-partner')) {
+      window.onPartnerMapsReady = function() { renderPMap(); };
+      const s = document.createElement('script'); s.id = 'gmsdk-partner';
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=onPartnerMapsReady&language=id`;
+      document.head.appendChild(s);
+    }
+    return;
+  }
+
+  // Clear map container and init Google Maps
+  mapCanvas.innerHTML = '';
+  const defaultCenter = { lat: -6.2088, lng: 106.8456 }; // Jakarta
+  PS.mapInstance = new google.maps.Map(mapCanvas, {
+    center: defaultCenter,
+    zoom: 11,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+      position: google.maps.ControlPosition.TOP_RIGHT,
+    },
+    streetViewControl: false,
+    fullscreenControl: true,
+  });
+
+  // Plot partner markers
+  const bounds = new google.maps.LatLngBounds();
+  let mappedCount = 0;
+  let unmappedList = [];
+
+  // Clear old markers
+  (PS.markers || []).forEach(m => m.setMap(null));
+  PS.markers = [];
+
+  PS.filtered.forEach((p) => {
+    const lat = parseFloat(p.latitude);
+    const lng = parseFloat(p.longitude);
+
+    if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+      unmappedList.push(p);
+      return;
+    }
+
+    mappedCount++;
+    const pos = { lat, lng };
+    bounds.extend(pos);
+
+    const stColor = STATUS_COLORS[p.status] || '#00A896';
+    const marker = new google.maps.Marker({
+      position: pos,
+      map: PS.mapInstance,
+      title: p.partner_name,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 8,
+        fillColor: stColor,
+        fillOpacity: 0.95,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+      }
+    });
+
+    const wn = (p.phone || '').replace(/\D/g, '');
+    const waUrl = wn ? `https://wa.me/${wn.startsWith('0') ? '62' + wn.slice(1) : wn}` : '';
+
+    const infoContent = `
+      <div style="padding:6px;max-width:260px;font-family:inherit">
+        <div style="font-weight:800;font-size:14px;color:var(--navy);margin-bottom:2px">${p.partner_name}</div>
+        ${p.partner_code ? `<div style="font-size:11px;color:var(--gray);font-family:monospace;margin-bottom:4px">${p.partner_code}</div>` : ''}
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
+          <span style="background:var(--lgray);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">${catIcon(p.category)} ${p.category}</span>
+          <span style="background:${stColor}20;color:${stColor};font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700">${p.status || 'Prospect'}</span>
+        </div>
+        ${p.address ? `<div style="font-size:11px;color:var(--gray);margin-bottom:6px">${p.address}</div>` : ''}
+        ${p.pic_name ? `<div style="font-size:11px;color:var(--navy);margin-bottom:6px">👤 ${p.pic_name} ${p.phone ? '· ' + p.phone : ''}</div>` : ''}
+        <div style="display:flex;gap:6px;margin-top:8px">
+          ${waUrl ? `<a href="${waUrl}" target="_blank" style="background:#25D366;color:#fff;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">💬 WA</a>` : ''}
+          <button onclick="openPartnerForm(${p.id})" style="background:var(--teal);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">✏️ Edit</button>
+          <button onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" style="background:var(--navy);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">🤝 Kerjasama</button>
+        </div>
+      </div>`;
+
+    marker.addListener('click', () => {
+      if (PS.activeInfoWindow) PS.activeInfoWindow.close();
+      PS.activeInfoWindow = new google.maps.InfoWindow({ content: infoContent });
+      PS.activeInfoWindow.open(PS.mapInstance, marker);
+    });
+
+    PS.markers.push(marker);
+  });
+
+  // Update badge & stats info
+  const statsBadge = document.getElementById('pmap-stats-badge');
+  if (statsBadge) statsBadge.textContent = `${mappedCount} dari ${PS.filtered.length} mitra terpetakan`;
+
+  const unmappedInfo = document.getElementById('pmap-unmapped-info');
+  if (unmappedInfo) {
+    if (unmappedList.length > 0) {
+      unmappedInfo.innerHTML = `⚠️ ${unmappedList.length} mitra belum punya koordinat · <button class="btn btn-ghost btn-xs" onclick="autoGeocodeUnmappedPartners()">📍 Auto-Geocode (${unmappedList.length})</button>`;
+    } else {
+      unmappedInfo.innerHTML = `✅ Semuanya terpetakan dengan sempurna`;
+    }
+  }
+
+  if (mappedCount > 0) {
+    PS.mapInstance.fitBounds(bounds);
+    if (mappedCount === 1) PS.mapInstance.setZoom(14);
+  }
+}
+
+async function autoGeocodeUnmappedPartners() {
+  const unmapped = PS.filtered.filter(p => (!p.latitude || !p.longitude) && p.address);
+  if (!unmapped.length) { toast('Semua mitra ber-alamat sudah punya koordinat', 'info'); return; }
+
+  if (!window.google || !window.google.maps || !google.maps.Geocoder) {
+    toast('Google Maps belum terhubung', 'err'); return;
+  }
+
+  const geocoder = new google.maps.Geocoder();
+  toast(`📍 Memproses geocoding ${unmapped.length} mitra...`, 'info');
+  let count = 0;
+
+  for (const p of unmapped) {
+    try {
+      const res = await new Promise((resolve, reject) => {
+        geocoder.geocode({ address: p.address, componentRestrictions: { country: 'id' } }, (results, status) => {
+          if (status === 'OK' && results[0]) resolve(results[0].geometry.location);
+          else reject(status);
+        });
+      });
+
+      const lat = res.lat();
+      const lng = res.lng();
+
+      await sbPatch('partners', p.id, { latitude: lat, longitude: lng, updated_at: new Date().toISOString() });
+      p.latitude = lat;
+      p.longitude = lng;
+      count++;
+      await new Promise(r => setTimeout(r, 400));
+    } catch(e) {}
+  }
+
+  toast(`✅ Berhasil geocode ${count} lokasi mitra!`, 'ok');
+  await renderPMap();
 }
 
 function highlightPartner(id) {
@@ -404,6 +610,14 @@ async function openPartnerForm(id=null) {
         <label>Alamat</label>
         <input type="text" id="pf-addr" value="${p.address||''}" placeholder="Jl. ...">
       </div>
+      <div class="form-group">
+        <label>Latitude</label>
+        <input type="text" id="pf-lat" value="${p.latitude||''}" placeholder="-6.200000">
+      </div>
+      <div class="form-group">
+        <label>Longitude</label>
+        <input type="text" id="pf-lng" value="${p.longitude||''}" placeholder="106.810000">
+      </div>
       <div class="form-group" style="grid-column:1/-1">
         <label>Catatan</label>
         <textarea id="pf-notes" rows="3"
@@ -427,6 +641,9 @@ async function savePartner(id) {
   if(!cat){  toast('Kategori wajib dipilih','err'); return; }
 
   const user = getUserName ? getUserName() : 'User';
+  const latVal = document.getElementById('pf-lat')?.value.trim();
+  const lngVal = document.getElementById('pf-lng')?.value.trim();
+
   const payload = {
     partner_code:  document.getElementById('pf-code').value.trim() || autoCode(cat),
     partner_name:  name,
@@ -436,6 +653,8 @@ async function savePartner(id) {
     phone:         document.getElementById('pf-phone').value.trim(),
     email:         document.getElementById('pf-email').value.trim(),
     address:       document.getElementById('pf-addr').value.trim(),
+    latitude:      latVal ? parseFloat(latVal) : null,
+    longitude:     lngVal ? parseFloat(lngVal) : null,
     status:        document.getElementById('pf-status').value,
     notes:         document.getElementById('pf-notes').value.trim(),
     updated_at:    new Date().toISOString(),

@@ -2,10 +2,22 @@
 // MODULE: Maps Prospecting v5
 // - Search persis seperti Google Maps
 // - Autocomplete realtime saat ketik
-// - Tidak perlu tekan tombol Set Lokasi
+// - Visual Peta Interaktif & Radius Overlay
 // ═══════════════════════════════════════════
 
-let mapsState = { service:null, ready:false, results:[], selected:new Set(), apiKey:'' };
+let mapsState = {
+  service: null,
+  ready: false,
+  results: [],
+  selected: new Set(),
+  apiKey: '',
+  mapInstance: null,
+  radiusCircle: null,
+  resultMarkers: [],
+  centerMarker: null,
+  activeInfoWindow: null,
+  viewMode: 'both' // 'both', 'map', 'table'
+};
 let autocompleteWidget = null; // Google Places Autocomplete widget
 let searchCenter = null;
 
@@ -45,7 +57,7 @@ async function renderMaps() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>Maps Prospecting</h1>
-        <p>Cari mitra via Google Maps → import langsung ke Leads Management</p></div>
+        <p>Cari mitra via Google Maps → visualisasi peta & radius → import langsung ke Leads Management</p></div>
     </div>
 
     <!-- API Key -->
@@ -83,8 +95,8 @@ async function renderMaps() {
 
       <div class="form-row" style="margin-bottom:14px">
         <div class="form-group">
-          <label>Radius</label>
-          <select id="maps-radius">
+          <label>Radius Jangkauan</label>
+          <select id="maps-radius" onchange="drawMapsRadiusCircle()">
             <option value="500">500 m</option>
             <option value="1000">1 km</option>
             <option value="2000">2 km</option>
@@ -135,7 +147,32 @@ async function renderMaps() {
       </div>
     </div>
 
-    <!-- Results -->
+    <!-- Visual Interactive Google Map Canvas -->
+    <div class="card" id="maps-visual-card" style="margin-bottom:14px;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div class="card-title" style="display:flex;align-items:center;gap:8px">
+          <span>🗺️ Peta Visual Interaktif & Pola Radius</span>
+          <span id="maps-radius-badge" class="badge badge-teal" style="font-size:11px">Radius: 5 km</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost btn-sm active" id="btn-mview-both" onclick="switchMapsViewMode('both')">🗺️ Peta + Hasil</button>
+          <button class="btn btn-ghost btn-sm" id="btn-mview-map" onclick="switchMapsViewMode('map')">🗺️ Hanya Peta</button>
+          <button class="btn btn-ghost btn-sm" id="btn-mview-table" onclick="switchMapsViewMode('table')">📋 Hanya Tabel</button>
+        </div>
+      </div>
+
+      <div id="maps-canvas-wrap" style="position:relative;width:100%;height:450px;border-radius:10px;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow)">
+        <div id="maps-canvas" style="width:100%;height:100%;background:var(--lgray);display:flex;align-items:center;justify-content:center;color:var(--gray)">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:32px;margin-bottom:8px">📍</div>
+            <div style="font-weight:600">Peta Google Maps Belum Terhubung</div>
+            <div style="font-size:12px;margin-top:4px">Masukkan Google Maps API Key di atas lalu klik Sambungkan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Table -->
     <div id="maps-results-wrap" style="display:none">
       <div class="table-wrap">
         <div class="table-toolbar">
@@ -151,9 +188,7 @@ async function renderMaps() {
         </div>
         <div id="maps-results-body"></div>
       </div>
-    </div>
-
-    <div id="map-el" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></div>`;
+    </div>`;
 
   updateMapsCatCount();
 
@@ -186,14 +221,27 @@ function connectMaps() {
 
 window.onMapsReady = function() {
   try {
-    const mapEl = document.getElementById('map-el');
+    const mapEl = document.getElementById('maps-canvas');
     if (!mapEl) return;
 
-    // Init invisible map (required for PlacesService)
-    const map = new google.maps.Map(mapEl, {
-      center: {lat:-6.2, lng:106.8}, zoom:13
+    // Clear loading placeholder in canvas
+    mapEl.innerHTML = '';
+
+    // Init visual Google Map
+    const defaultCenter = searchCenter || { lat: -6.2088, lng: 106.8456 }; // Default: Jakarta
+    mapsState.mapInstance = new google.maps.Map(mapEl, {
+      center: defaultCenter,
+      zoom: 12,
+      mapTypeControl: true,
+      mapTypeControlOptions: {
+        style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+        position: google.maps.ControlPosition.TOP_RIGHT,
+      },
+      streetViewControl: false,
+      fullscreenControl: true,
     });
-    mapsState.service = new google.maps.places.PlacesService(map);
+
+    mapsState.service = new google.maps.places.PlacesService(mapsState.mapInstance);
     mapsState.ready = true;
 
     // Init Autocomplete — persis seperti search bar Google Maps
@@ -222,9 +270,22 @@ window.onMapsReady = function() {
           confirmed.style.display = 'flex';
           confirmed.textContent = `✅ Lokasi: ${place.formatted_address || place.name}`;
 
+          // Update Map view center & radius circle
+          if (mapsState.mapInstance) {
+            mapsState.mapInstance.setCenter(searchCenter);
+            mapsState.mapInstance.setZoom(13);
+            drawMapsCenterMarker();
+            drawMapsRadiusCircle();
+          }
+
           toast('📍 Lokasi ditetapkan!', 'ok');
         }
       });
+    }
+
+    if (searchCenter) {
+      drawMapsCenterMarker();
+      drawMapsRadiusCircle();
     }
 
     showMapsStatus('ok','✅ Google Maps terhubung! Ketik lokasi di kotak pencarian.');
@@ -234,6 +295,78 @@ window.onMapsReady = function() {
     showMapsStatus('err','❌ ' + e.message);
   }
 };
+
+// ── Render Radius Circle & Center Marker ───────────
+function drawMapsCenterMarker() {
+  if (!mapsState.mapInstance || !searchCenter) return;
+  if (mapsState.centerMarker) mapsState.centerMarker.setMap(null);
+
+  mapsState.centerMarker = new google.maps.Marker({
+    position: searchCenter,
+    map: mapsState.mapInstance,
+    title: 'Pusat Pencarian',
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 9,
+      fillColor: '#EF4444',
+      fillOpacity: 1,
+      strokeColor: '#FFFFFF',
+      strokeWeight: 2,
+    }
+  });
+}
+
+function drawMapsRadiusCircle() {
+  if (!mapsState.mapInstance || !searchCenter) return;
+  const radiusEl = document.getElementById('maps-radius');
+  const radiusMeters = radiusEl ? parseInt(radiusEl.value) : 5000;
+
+  const badgeEl = document.getElementById('maps-radius-badge');
+  if (badgeEl) badgeEl.textContent = `Radius: ${radiusMeters >= 1000 ? (radiusMeters/1000)+' km' : radiusMeters+' m'}`;
+
+  if (mapsState.radiusCircle) mapsState.radiusCircle.setMap(null);
+
+  mapsState.radiusCircle = new google.maps.Circle({
+    strokeColor: '#00A896',
+    strokeOpacity: 0.85,
+    strokeWeight: 2,
+    fillColor: '#00A896',
+    fillOpacity: 0.12,
+    map: mapsState.mapInstance,
+    center: searchCenter,
+    radius: radiusMeters,
+  });
+
+  mapsState.mapInstance.fitBounds(mapsState.radiusCircle.getBounds());
+}
+
+function switchMapsViewMode(mode) {
+  mapsState.viewMode = mode;
+  const cardMap = document.getElementById('maps-visual-card');
+  const cardWrap = document.getElementById('maps-canvas-wrap');
+  const resWrap = document.getElementById('maps-results-wrap');
+
+  document.querySelectorAll('#maps-visual-card .btn-row button').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.getElementById(`btn-mview-${mode}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (mode === 'both') {
+    if (cardMap) cardMap.style.display = 'block';
+    if (cardWrap) cardWrap.style.height = '420px';
+    if (resWrap) resWrap.style.display = mapsState.results.length ? 'block' : 'none';
+  } else if (mode === 'map') {
+    if (cardMap) cardMap.style.display = 'block';
+    if (cardWrap) cardWrap.style.height = '600px';
+    if (resWrap) resWrap.style.display = 'none';
+  } else if (mode === 'table') {
+    if (cardMap) cardMap.style.display = 'none';
+    if (resWrap) resWrap.style.display = 'block';
+  }
+
+  if (mapsState.mapInstance) {
+    setTimeout(() => google.maps.event.trigger(mapsState.mapInstance, 'resize'), 150);
+  }
+}
 
 function showMapsStatus(type, msg) {
   const el = document.getElementById('maps-status');
@@ -308,8 +441,11 @@ async function startMapsSearch() {
   const chips = [...document.querySelectorAll('.maps-chip.on')];
   if (!chips.length) { toast('Pilih minimal 1 kategori','err'); return; }
 
+  clearMapsResultMarkers();
   mapsState.results = []; mapsState.selected = new Set();
-  document.getElementById('maps-results-wrap').style.display = 'none';
+  if (mapsState.viewMode === 'both') {
+    document.getElementById('maps-results-wrap').style.display = 'none';
+  }
   document.getElementById('maps-search-btn').disabled = true;
   document.getElementById('maps-search-btn').textContent = '⏳ Mencari...';
   document.getElementById('maps-prog-wrap').style.display = 'block';
@@ -366,8 +502,70 @@ function mapsSearchKw(center, radius, kw) {
   });
 }
 
+function clearMapsResultMarkers() {
+  (mapsState.resultMarkers || []).forEach(m => m.setMap(null));
+  mapsState.resultMarkers = [];
+}
+
+function plotMapsResultMarkers() {
+  if (!mapsState.mapInstance) return;
+  clearMapsResultMarkers();
+
+  mapsState.results.forEach((r, idx) => {
+    if (!r.lat || !r.lng) return;
+    const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
+
+    const isDB = r.in_db;
+    const pinColor = isDB ? '#22C55E' : '#00A896'; // Green for DB, Teal for new prospect
+
+    const marker = new google.maps.Marker({
+      position: pos,
+      map: mapsState.mapInstance,
+      title: r.name,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 7,
+        fillColor: pinColor,
+        fillOpacity: 0.95,
+        strokeColor: '#FFFFFF',
+        strokeWeight: 2,
+      }
+    });
+
+    const infoContent = `
+      <div style="padding:6px;max-width:240px;font-family:inherit">
+        <div style="font-weight:700;font-size:13px;color:#0F172A;margin-bottom:4px">${r.name}</div>
+        <div style="font-size:11px;color:#64748B;margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
+        <div style="font-size:11px;color:#475569;margin-bottom:6px">${r.address}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+          ${r.rating ? `<span style="font-size:11px;font-weight:600">⭐ ${r.rating} (${r.reviews})</span>` : ''}
+          ${isDB ? '<span style="background:#DCFCE7;color:#166534;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">✓ Ada di DB</span>'
+                 : '<span style="background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">Baru</span>'}
+        </div>
+        <div style="display:flex;gap:6px">
+          ${!isDB ? `<button onclick="importOneMaps(${idx})" style="background:#00A896;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">⬆ Import ke Leads</button>` : ''}
+          <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:#F1F5F9;color:#334155;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">🗺️ Open</a>
+        </div>
+      </div>`;
+
+    marker.addListener('click', () => {
+      if (mapsState.activeInfoWindow) mapsState.activeInfoWindow.close();
+      mapsState.activeInfoWindow = new google.maps.InfoWindow({ content: infoContent });
+      mapsState.activeInfoWindow.open(mapsState.mapInstance, marker);
+    });
+
+    mapsState.resultMarkers.push(marker);
+  });
+
+  if (mapsState.resultMarkers.length > 0 && mapsState.radiusCircle) {
+    mapsState.mapInstance.fitBounds(mapsState.radiusCircle.getBounds());
+  }
+}
+
 async function renderMapsResults() {
-  document.getElementById('maps-results-wrap').style.display = 'block';
+  if (mapsState.viewMode !== 'map') {
+    document.getElementById('maps-results-wrap').style.display = 'block';
+  }
   document.getElementById('maps-res-count').textContent = 'Mengecek database...';
   document.getElementById('maps-results-body').innerHTML =
     '<div class="loading-row"><div class="spinner"></div></div>';
@@ -389,6 +587,8 @@ async function renderMapsResults() {
       });
     }
   } catch(e) {}
+
+  plotMapsResultMarkers();
 
   const inDB = mapsState.results.filter(r => r.in_db).length;
   const newOnes = mapsState.results.length - inDB;
@@ -541,6 +741,8 @@ async function importSelectedMaps() {
         category:        cat,
         phone:           r.phone || '',
         address:         r.address || '',
+        latitude:        r.lat ? parseFloat(r.lat) : null,
+        longitude:       r.lng ? parseFloat(r.lng) : null,
         source:          'Maps Prospecting',
         status:          'Baru',
         assigned_name:   user,
