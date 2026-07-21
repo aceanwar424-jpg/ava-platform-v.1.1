@@ -41,11 +41,20 @@ async function agAiEditorOpen(docId){
   agAiEditorRender();
 }
 
+// Sorot penanda [ISI: …] pada dokumen ter-render agar bagian yang perlu diisi
+// manusia langsung terlihat saat review (bukan tersembunyi di tengah teks).
+function agAiHighlightGaps(html){
+  return String(html).replace(/\[ISI:([^\]]*)\]/g,
+    '<mark style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;border-radius:4px;padding:0 5px;font-weight:700;font-style:normal">✎ ISI:$1</mark>');
+}
+function agAiCountGaps(text){ return (String(text||'').match(/\[ISI:[^\]]*\]/g)||[]).length; }
+
 function agAiEditorRender(){
   const st = _agAiEd; if(!st) return;
   const host = document.getElementById('main-content'); if(!host) return;
   const isPdf = /\.pdf$/i.test(st.doc.source_file_path || '');
   const kosong = (st.content||'').trim().length < 200;
+  const gaps = agAiCountGaps(st.content);
 
   host.innerHTML = `
     <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0b1526,#0f2038);color:#fff;border-radius:10px;padding:9px 14px;margin-bottom:12px">
@@ -69,7 +78,8 @@ function agAiEditorRender(){
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px">
-            ${st.mode==='preview'?'Pratinjau Dokumen':'Sunting Teks (Markdown)'} · ${(st.content||'').length.toLocaleString('id-ID')} karakter</div>
+            ${st.mode==='preview'?'Pratinjau Dokumen':'Sunting Teks (Markdown)'} · ${(st.content||'').length.toLocaleString('id-ID')} karakter
+            ${gaps?`<span style="color:#92400E;background:#FEF3C7;border-radius:8px;padding:1px 7px;margin-left:6px;text-transform:none;letter-spacing:0">✎ ${gaps} bagian perlu diisi</span>`:''}</div>
           <div style="display:flex;gap:6px">
             ${st.prev!=null?`<button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorUndo()">↶ Batalkan</button>`:''}
             <button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorToggle()">${st.mode==='preview'?'✏️ Sunting teks':'👁 Pratinjau'}</button>
@@ -79,7 +89,7 @@ function agAiEditorRender(){
         <div style="border:1px solid var(--border);border-radius:10px;background:#fff;min-height:52vh;max-height:64vh;overflow:auto">
           ${st.mode==='preview'
             ? `<div style="padding:22px 26px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6;color:#1a2b3c" class="ag-ed-doc">
-                 ${kosong ? `<div style="color:var(--gray);font-style:italic;text-align:center;padding:40px">Dokumen masih kosong. ${isPdf?'Tekan "Tarik teks dari PDF" di kanan, atau ':''}minta AI menyusun, atau "Sunting teks".</div>` : agMd(st.content)}
+                 ${kosong ? `<div style="color:var(--gray);font-style:italic;text-align:center;padding:40px">Dokumen masih kosong. ${isPdf?'Tekan "Tarik teks dari PDF" di kanan, atau ':''}minta AI menyusun, atau "Sunting teks".</div>` : agAiHighlightGaps(agMd(st.content))}
                </div>`
             : `<textarea id="ag-ed-textarea" oninput="_agAiEd.content=this.value" style="width:100%;min-height:52vh;border:0;outline:0;padding:16px 18px;font-family:ui-monospace,monospace;font-size:11.5px;line-height:1.55;resize:vertical">${agEsc(st.content||'')}</textarea>`}
         </div>
