@@ -81,11 +81,30 @@ async function agUploadStorage(file){
 }
 
 // ── TAB DOKUMEN QMS ──────────────────────────────────────────────
+// Sub-tab Dokumen QMS — memecah isi yang sebelumnya menumpuk dalam satu halaman
+// panjang (alur + unggah + template + registry). Hanya satu bagian yang tampil.
+let _agDocsSub = 'registry';
+function agDocsSub(s){ _agDocsSub = s; const el=document.getElementById('ag-body'); if(el) renderAgDocsTab(el); }
+function agDocsSubBar(nDocs){
+  const items = [
+    ['registry', icon('layers',13)+' Registry ('+nDocs+')'],
+    ['upload',   icon('upload',13)+' Unggah Dokumen'],
+    ['template', icon('file-check',13)+' Template'],
+  ];
+  return '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">' +
+    items.map(function(it){
+      return `<button class="ag-btn ${_agDocsSub===it[0]?'pub':'mut'}" style="padding:6px 14px" onclick="agDocsSub('${it[0]}')">${it[1]}</button>`;
+    }).join('') + '</div>';
+}
+
 function renderAgDocsTab(el){
   const docs = agRegistry.filter(d=>d.status!=='MISSING');
   const missing = agRegistry.filter(d=>d.status==='MISSING');
 
   el.innerHTML = `
+    ${agDocsSubBar(docs.length)}
+
+    ${_agDocsSub==='upload' ? `
     <div class="ag-detail" style="margin-bottom:12px">
       <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Alur Dokumen — pilih sesuai keadaan dokumen Anda</div>
 
@@ -141,13 +160,15 @@ function renderAgDocsTab(el){
         <input type="checkbox" id="ag-auto-gap" checked> Jalankan gap analysis ISO 15189 otomatis setelah semua file ter-ingest
       </label>
       <div id="ag-ingest-log" style="font-size:12px;margin-top:6px"></div>
-    </div>
+    </div>` : ''}
 
+    ${_agDocsSub==='template' ? `
     <div class="ag-detail" style="margin-bottom:12px" id="ag-templates-box">
       <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('layers',14)} Template Dokumen Resmi (fidelity 100%)</div>
       <div class="loading-row"><div class="spinner"></div></div>
-    </div>
+    </div>` : ''}
 
+    ${_agDocsSub==='registry' ? `
     ${missing.length ? `
     <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
       <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Dokumen Wajib yang Belum Ada (${missing.length})</div>
@@ -190,7 +211,7 @@ function renderAgDocsTab(el){
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
-    </div>`;
+    </div>` : ''}`;
 
   // drag & drop
   const drop = document.getElementById('ag-drop');
@@ -758,8 +779,20 @@ async function agExportMasterSOP(){
 // MENANDAI kelengkapan, bukan memaksa — tiap organisasi bisa berbeda.
 const AG_REVIEW_REQUIRED_ROLES = ['Disusun oleh', 'Diperiksa oleh', 'Disetujui oleh'];
 
+// Sub-tab Review — memisahkan pengesahan/jatuh tempo dari deteksi tumpang tindih
+// agar tidak jadi satu halaman panjang.
+let _agRevSub = 'pengesahan';
+function agRevSub(s){ _agRevSub = s; const el=document.getElementById('ag-body'); if(el) renderAgReviewTab(el); }
+
 async function renderAgReviewTab(el){
+  const bar = [['pengesahan', `${icon('pen-tool',13)} Pengesahan & Jatuh Tempo`],
+               ['overlap',    `${icon('layers',13)} Tumpang Tindih`]]
+    .map(it=>`<button class="ag-btn ${_agRevSub===it[0]?'pub':'mut'}" style="padding:6px 14px" onclick="agRevSub('${it[0]}')">${it[1]}</button>`).join('');
+
   el.innerHTML = `
+    <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">${bar}</div>
+
+    ${_agRevSub==='pengesahan' ? `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
       <div style="font-size:12px;color:var(--gray)">
         Jatuh tempo review, kelengkapan pengesahan, dan jejak siapa mengesahkan apa.
@@ -769,8 +802,12 @@ async function renderAgReviewTab(el){
         <button class="ag-btn mut" style="padding:5px 11px" onclick="agRenderReviewBody()">${icon('refresh',13)} Muat Ulang</button>
       </div>
     </div>
-    <div id="ag-review-body"><div class="loading-row"><div class="spinner"></div></div></div>`;
-  await agRenderReviewBody();
+    <div id="ag-review-body"><div class="loading-row"><div class="spinner"></div></div></div>` : ''}
+
+    ${_agRevSub==='overlap' ? `<div id="ag-overlap-sec"></div>` : ''}`;
+
+  if(_agRevSub==='pengesahan') await agRenderReviewBody();
+  else if(typeof agOverlapRenderSection==='function') agOverlapRenderSection('ag-overlap-sec');
 }
 
 async function agRenderReviewBody(){
@@ -869,10 +906,8 @@ async function agRenderReviewBody(){
       : `<div style="font-size:12px;color:var(--gray);font-style:italic">Belum ada pengesahan tercatat.</div>`}
     </div>
 
-    <div id="ag-overlap-sec" style="margin-top:12px"></div>`;
-
-  // Deteksi tumpang tindih antar dokumen (Fase 1) — dimuat setelah badan Review.
-  if (typeof agOverlapRenderSection === 'function') agOverlapRenderSection('ag-overlap-sec');
+`;
+  // Tumpang tindih kini punya sub-tab sendiri (lihat renderAgReviewTab).
 }
 
 // ═══════════════════════════════════════════════════════════════
