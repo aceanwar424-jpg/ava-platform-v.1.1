@@ -10,7 +10,10 @@
 // Schema: supabase_wiki.sql
 // ═══════════════════════════════════════════════════════════════
 
-const WIKI_TABS = ['docs','fix','content','media'];
+// Tab 'fix' (Perbaikan SOP) & 'content' (Content Studio) DIBUANG — keduanya sudah
+// digantikan modul Agentic (Dokumen QMS / Content Studio) dan sudah lama tak
+// tercantum di menu Wiki. Menyisakannya hanya membuat dua pintu untuk hal sama.
+const WIKI_TABS = ['docs','media'];
 let wikiDocs = [], wikiContents = [], wikiMedia = [];
 let _wikiTab = 'docs';
 
@@ -106,8 +109,7 @@ async function renderWiki(tab){
     <div id="wiki-kpi" class="pro-kpi"></div>
 
     <div class="pro-toolbar" id="wiki-tabs">
-      ${[['docs','Dokumen SOP','note'],['fix','Perbaikan SOP','refresh'],
-         ['content','Content Studio','edit'],['media','Media & Gambar','image']]
+      ${[['docs','Dokumen SOP','note'],['media','Media & Gambar','image']]
         .map(([k,l,ic])=>`<button class="pro-chip ${_wikiTab===k?'active':''}" onclick="switchWikiTab('${k}')">${svgIcon(ic,13)} ${l}</button>`).join('')}
     </div>
 
@@ -128,8 +130,6 @@ function switchWikiTab(t){
 function renderWikiTab(){
   const el=document.getElementById('wiki-body'); if(!el) return;
   if(_wikiTab==='docs'){        renderWikiDocsTab(el); wikiPrependOfficialDocs(el); }
-  else if(_wikiTab==='fix'){    wikiTabWithBanner(el, 'fix',    renderWikiFixTab); }
-  else if(_wikiTab==='content'){wikiTabWithBanner(el, 'content',renderWikiContentTab); }
   else if(_wikiTab==='media')   renderWikiMediaTab(el);
 }
 

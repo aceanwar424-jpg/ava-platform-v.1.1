@@ -314,6 +314,50 @@ $$;
 GRANT EXECUTE ON FUNCTION public.agentic_doc_chat_add(UUID,TEXT,TEXT,TEXT) TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.agentic_doc_chat_list(UUID)              TO anon, authenticated, service_role;
 
+-- ── 10. Terbitkan dokumen langsung dari registry ───────────────
+-- MASALAH: agentic_publish bekerja pada TASK (p_task_id). Dokumen yang masuk
+-- lewat ingest tidak punya task, sehingga TIDAK PERNAH bisa berstatus PUBLISHED
+-- — padahal Wiki hanya menampilkan yang PUBLISHED. Akibatnya dokumen final yang
+-- diunggah tak pernah muncul di perpustakaan Wiki.
+-- Fungsi ini menerbitkan dokumen langsung dari registry, memakai pola penomoran
+-- yang sama: OL/<jenis>/<departemen>/<urut 3 digit>.
+CREATE OR REPLACE FUNCTION public.agentic_doc_publish(p_doc_id UUID, p_number TEXT DEFAULT NULL)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v_doc agentic.document_registry; v_num TEXT; v_seq INT;
+BEGIN
+  SELECT * INTO v_doc FROM agentic.document_registry WHERE id = p_doc_id;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Dokumen tidak ditemukan'; END IF;
+
+  v_num := NULLIF(trim(COALESCE(p_number,'')),'');
+  IF v_num IS NULL THEN v_num := v_doc.doc_number; END IF;
+
+  IF v_num IS NULL THEN
+    SELECT count(*)+1 INTO v_seq FROM agentic.document_registry
+     WHERE doc_type = v_doc.doc_type AND department = v_doc.department AND doc_number IS NOT NULL;
+    LOOP
+      v_num := 'OL/'||v_doc.doc_type||'/'||v_doc.department||'/'||lpad(v_seq::text,3,'0');
+      EXIT WHEN NOT EXISTS (SELECT 1 FROM agentic.document_registry WHERE doc_number = v_num);
+      v_seq := v_seq + 1;
+    END LOOP;
+  END IF;
+
+  UPDATE agentic.document_registry
+     SET doc_number       = v_num,
+         status           = 'PUBLISHED',
+         current_revision = GREATEST(COALESCE(current_revision,0), 1),
+         effective_date   = COALESCE(effective_date, CURRENT_DATE),
+         next_review_date = COALESCE(next_review_date, CURRENT_DATE + INTERVAL '2 years'),
+         updated_at       = now()
+   WHERE id = p_doc_id
+  RETURNING * INTO v_doc;
+
+  RETURN to_jsonb(v_doc);
+EXCEPTION WHEN unique_violation THEN
+  RAISE EXCEPTION 'Nomor dokumen "%" sudah dipakai dokumen lain', v_num;
+END $$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_doc_publish(UUID,TEXT) TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
 SELECT 'agentic doc-sign siap' AS status,
        (SELECT count(*) FROM agentic.document_signatures) AS jumlah_tanda_tangan;

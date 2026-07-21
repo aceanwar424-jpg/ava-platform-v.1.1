@@ -185,6 +185,8 @@ function renderAgDocsTab(el){
             ${(d.extracted_meta&&d.extracted_meta.full_text) ?
               `<button class="ag-btn mut" style="padding:4px 9px" title="Tinjau isi yang dipetakan ke template sebelum dokumen final dibuat" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review Final</button>` : ''}
             <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button>
+            ${d.status!=='PUBLISHED' ? `<button class="ag-btn pub" style="padding:4px 9px" title="Terbitkan — beri nomor resmi & tampilkan di Wiki (Dokumen Resmi)"
+              onclick="agPublishDoc('${d.id}')">${agIco('rocket',12)} Terbitkan</button>` : ''}
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
@@ -640,6 +642,35 @@ async function agEditDocNumber(docId){
     toast('✅ Nomor dokumen tersimpan','ok');
     await agReload();
   }catch(e){ toast('❌ ' + e.message, 'err'); }
+}
+
+// Terbitkan dokumen dari registry → status PUBLISHED + nomor resmi.
+// Ini yang membuatnya muncul di Wiki (bagian "Dokumen Resmi"), karena Wiki
+// menyaring status=PUBLISHED. Tanda tangan (TTD) TIDAK mengubah status —
+// keduanya jalur terpisah, jadi jumlah TTD ditampilkan di konfirmasi agar
+// penerbitan tanpa pengesahan tidak terjadi tanpa disadari.
+async function agPublishDoc(docId){
+  const d = agRegistry.find(x => x.id === docId); if(!d) return;
+  let ttd = null;
+  try { ttd = (await agRpc('agentic_doc_signatures', { p_doc_id: docId })) || []; } catch(e){ ttd = null; }
+
+  const infoTtd = ttd === null ? 'Status tanda tangan tidak dapat dibaca.'
+    : ttd.length ? `Tanda tangan tercatat: ${ttd.length} (${ttd.map(s=>s.signer_role).join(', ')}).`
+                 : 'BELUM ADA TANDA TANGAN pada dokumen ini.';
+
+  if(!confirm(`Terbitkan dokumen ini?\n\n${d.title}\n\n${infoTtd}\n\n` +
+    `Setelah terbit: status jadi PUBLISHED, mendapat nomor resmi (bila belum ada), ` +
+    `dan muncul di Wiki → Dokumen Resmi.`)) return;
+
+  try{
+    const r = await agRpc('agentic_doc_publish', { p_doc_id: docId, p_number: null });
+    if(typeof logActivity === 'function')
+      logActivity('doc_publish','document_registry',docId,`Dokumen diterbitkan${r&&r.doc_number?' — No. '+r.doc_number:''}`,d.title);
+    toast(`🚀 Terbit${r&&r.doc_number?` · No. ${r.doc_number}`:''} — kini tampil di Wiki`,'ok');
+    await agReload();
+  }catch(e){
+    toast('❌ '+(/not find the function/i.test(e.message)?'Jalankan supabase_agentic_doc_sign.sql dulu':e.message),'err');
+  }
 }
 
 // Unduh berkas ASLI yang diunggah — utuh, tanpa diproses ulang.
