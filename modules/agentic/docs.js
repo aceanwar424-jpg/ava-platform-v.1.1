@@ -736,12 +736,16 @@ async function agRenderReviewBody(){
 
 let _agFinal = null;   // { docId, buf, phs, map, tpl, doc }
 
+// Selaras dengan urutan prioritas di agentic_template_get (SQL):
+// 1 dept sama · 2 SEMUA (mode normal) · 3 MUTU lama · 4 dept beda · 5 jenis+dept/SEMUA · 6 jenis saja.
+// Prioritas 1 & 2 adalah pemakaian yang benar — tanpa peringatan.
 const AG_TPL_MATCH_NOTE = {
   1: null,
-  2: 'Memakai template umum departemen MUTU (bukan template khusus departemen dokumen ini).',
-  3: 'Memakai template dengan level & jenis sama, tetapi departemen berbeda.',
-  4: 'Memakai template jenis sama dengan level berbeda — periksa kesesuaiannya.',
-  5: 'Memakai template jenis sama saja (level & departemen berbeda) — periksa saksama.',
+  2: null,
+  3: 'Memakai template umum lama (departemen MUTU) — pertimbangkan set template ke "Semua".',
+  4: 'Memakai template dengan level & jenis sama, tetapi departemen berbeda.',
+  5: 'Memakai template jenis sama dengan level berbeda — periksa kesesuaiannya.',
+  6: 'Memakai template jenis sama saja (level & departemen berbeda) — periksa saksama.',
 };
 
 async function agOpenFinalReview(docId){

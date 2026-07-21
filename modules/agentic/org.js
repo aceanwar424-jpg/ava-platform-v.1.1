@@ -434,7 +434,7 @@ async function agRenderTemplates(){
         <tbody>${rows.map(r=>`<tr>
           <td style="white-space:nowrap">${AG_DOC_LEVELS[r.doc_level]||('L'+r.doc_level)}</td>
           <td>${agEsc(r.doc_type)}</td>
-          <td>${agEsc(r.department)}</td>
+          <td>${(r.department||'')==='SEMUA'?'<span style="color:var(--gray)">Semua</span>':agEsc(r.department)}</td>
           <td>${agEsc(r.name)}</td>
           <td>${r.storage_path?`<span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">belum ada</span>'}</td>
           <td>${r.sample_path?'✅':'—'}</td>
@@ -462,16 +462,19 @@ async function agTemplateEdit(id){
     <div style="max-width:560px">
       <h3 style="margin:0 0 10px;color:#0A2342">📐 ${r?'Edit':'Tambah'} Template Dokumen</h3>
       <div style="display:grid;gap:9px">
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <label style="font-size:11.5px;font-weight:700;color:#334155">Level
             <select id="agt-level" class="form-input" style="width:100%">
               ${[1,2,3,4].map(l=>`<option value="${l}" ${r&&r.doc_level==l?'selected':''}>${AG_DOC_LEVELS[l]}</option>`).join('')}
             </select></label>
           <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
             <input id="agt-type" class="form-input" style="width:100%" placeholder="SOP / IK / FORM …" value="${agEsc(r?r.doc_type:'SOP')}"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Dept
-            <input id="agt-dept" class="form-input" style="width:100%" value="${agEsc(r?r.department:'MUTU')}"></label>
         </div>
+        <!-- Template berlaku untuk SEMUA departemen — tidak perlu diset per dept.
+             Nilai 'SEMUA' dikenali pencarian template (agentic_template_get) sebagai
+             wildcard yang cocok untuk dokumen departemen apa pun. -->
+        <input type="hidden" id="agt-dept" value="SEMUA">
+        <div style="font-size:11px;color:var(--gray)">Template ini berlaku untuk <b>semua departemen</b> pada level &amp; jenis di atas.</div>
         <label style="font-size:11.5px;font-weight:700;color:#334155">Nama template
           <input id="agt-name" class="form-input" style="width:100%" value="${agEsc(r?r.name:'')}" placeholder="mis. SOP Pra-Analitik OneLab"></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
@@ -525,7 +528,7 @@ async function agTemplateSave(){
       margins_cm:{ t:Number(g('agt-mt'))||null, b:Number(g('agt-mb'))||null, l:Number(g('agt-ml'))||null, r:Number(g('agt-mr'))||null },
       line_spacing:g('agt-ls')||null };
     const phList = (g('agt-ph')||'').split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
-    const p = { doc_level:Number(g('agt-level')), doc_type:g('agt-type')||'SOP', department:g('agt-dept')||'MUTU',
+    const p = { doc_level:Number(g('agt-level')), doc_type:g('agt-type')||'SOP', department:g('agt-dept')||'SEMUA',
       name:g('agt-name')||'Template', format_spec:spec, placeholders:phList, notes:g('agt-notes')||null };
     if(storage_path) p.storage_path = storage_path;
     if(sample_path) p.sample_path = sample_path;

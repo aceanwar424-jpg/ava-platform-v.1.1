@@ -190,14 +190,19 @@ LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
   FROM (
     SELECT d.*,
       CASE
+        -- Template departemen sama = paling tepat
         WHEN d.doc_level = p_level AND d.doc_type = p_type
              AND d.department = COALESCE(p_dept,'MUTU')                 THEN 1
+        -- Template "SEMUA" = berlaku untuk departemen apa pun (mode utama sekarang)
         WHEN d.doc_level = p_level AND d.doc_type = p_type
-             AND d.department = 'MUTU'                                  THEN 2
-        WHEN d.doc_level = p_level AND d.doc_type = p_type              THEN 3
+             AND d.department = 'SEMUA'                                 THEN 2
+        -- Template umum lama (MUTU) sebagai cadangan
+        WHEN d.doc_level = p_level AND d.doc_type = p_type
+             AND d.department = 'MUTU'                                  THEN 3
+        WHEN d.doc_level = p_level AND d.doc_type = p_type              THEN 4
         WHEN d.doc_type  = p_type
-             AND d.department = COALESCE(p_dept,'MUTU')                 THEN 4
-        WHEN d.doc_type  = p_type                                       THEN 5
+             AND d.department IN (COALESCE(p_dept,'MUTU'),'SEMUA')      THEN 5
+        WHEN d.doc_type  = p_type                                       THEN 6
         ELSE 99
       END AS prio
     FROM agentic.doc_templates d
