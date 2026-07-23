@@ -13,6 +13,7 @@
 let _aiMatches = [];
 let _hubMsgs = [];
 let _hubAnalyzers = [];
+let _inspMatches = null, _inspMsgId = null;
 
 // ── INTI PAKAI-ULANG ───────────────────────────────────────────
 // Parser toleran: HL7 OBX, ASTM R, key=value, CSV/tab
@@ -240,7 +241,10 @@ async function renderAnalyzerHub(){
           <td style="font-size:11px">${m.sample_barcode?`${m.sample_barcode}${barSample?`<div style="font-size:10px;color:#16a34a">${barSample.patient_name||''}</div>`:`<div style="font-size:10px;color:#EF4444">tak dikenal</div>`}`:'<span style="color:var(--gray)">—</span>'}</td>
           <td style="font-family:monospace;font-size:11px;color:var(--gray)" title="${(m.raw_text||'').replace(/"/g,'')}">${raw}${(m.raw_text||'').length>48?'…':''}</td>
           <td><span style="background:${stColor}20;color:${stColor};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${m.status}</span>${m.parse_note?`<div style="font-size:10px;color:var(--gray)">${m.parse_note}</div>`:''}</td>
-          <td>${canProcess?`<button class="btn btn-teal btn-xs" onclick="hubProcessMessage(${m.id})">${barSample?'Parse &amp; Terapkan':'Cocokkan'}</button>`:''}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-xs" onclick="hubInspectMessage(${m.id})" title="Lihat alur: mentah, parse, pemetaan">🔎</button>
+            ${canProcess?`<button class="btn btn-teal btn-xs" onclick="hubProcessMessage(${m.id})">${barSample?'Terapkan':'Cocokkan'}</button>`:''}
+          </td>
         </tr>`;
       }).join(''):`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray)">Belum ada pesan. Pastikan OneLab Connector berjalan di PC lab dan alat mengirim hasil.</td></tr>`}
       </tbody></table></div>
@@ -273,6 +277,95 @@ async function hubProcessMessage(msgId){
   await sbPatch('analyzer_messages',msgId,{status:'MATCHED',parse_note:`${ok} hasil diterapkan`}).catch(()=>{});
   if(typeof logActivity==='function') logActivity('analyzer_import','analyzer_messages',msgId,`Auto-import ${ok} hasil dari ${msg.analyzer_code||'alat'}`);
   toast(`${ok} hasil diterapkan dari ${msg.analyzer_code||'alat'}`,'ok',4000);
+  try { await Promise.all([loadLabSamples(), loadLabResults()]); } catch(e){}
+  renderAnalyzerHub();
+}
+
+// ── INSPECTOR: lihat alur satu pesan (mentah → parse → pemetaan kode item) ──
+const _esc = s => String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+
+function hubInspectMessage(msgId){
+  const msg=_hubMsgs.find(m=>m.id==msgId); if(!msg) return;
+  _inspMatches=null; _inspMsgId=msgId;
+  const a=_hubAnalyzers.find(x=>x.id==msg.analyzer_id)||{};
+  const entries=parseAnalyzerFeed(msg.raw_text||'');
+  const barSample=msg.sample_barcode?labSamples.find(s=>String(s.barcode)===String(msg.sample_barcode)):null;
+  const samples=labSamples.filter(s=>['In Process','Pending','Done'].includes(s.status));
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔎 Inspeksi Pesan Alat</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px">
+      ${_esc(a.nama_alat||msg.analyzer_code||'—')} · ${_esc(msg.protocol||'?')} ·
+      ${msg.received_at?new Date(msg.received_at).toLocaleString('id-ID'):''} · status <b>${_esc(msg.status)}</b>
+      ${msg.sample_barcode?` · barcode ${_esc(msg.sample_barcode)}`:''}
+    </div>
+
+    <div style="font-size:12px;font-weight:700;margin:8px 0 4px">1️⃣ Kiriman mentah (dari alat)</div>
+    <pre style="background:#0b1220;color:#e2e8f0;border-radius:8px;padding:10px;font-size:11.5px;max-height:170px;overflow:auto;white-space:pre-wrap">${_esc(msg.raw_text||'(kosong)')}</pre>
+
+    <div style="font-size:12px;font-weight:700;margin:12px 0 4px">2️⃣ Hasil parse — ${entries.length} baris terbaca</div>
+    <div class="table-wrap" style="max-height:190px;overflow:auto"><table><thead><tr>
+      <th>#</th><th>Kode Alat</th><th>Nilai</th><th>Unit</th><th>Flag</th></tr></thead><tbody>
+      ${entries.length?entries.map((e,i)=>`<tr>
+        <td style="color:var(--gray)">${i+1}</td>
+        <td style="font-family:monospace;font-weight:700">${_esc(e.code)}</td>
+        <td style="font-weight:700">${_esc(e.value)}</td>
+        <td style="font-size:11px;color:var(--gray)">${_esc(e.unit)}</td>
+        <td style="font-size:11px">${_esc(e.flag)}</td></tr>`).join(''):
+        `<tr><td colspan="5" style="text-align:center;color:var(--gray);padding:14px">Tak ada baris yang bisa diparse. Cek protokol (ASTM/HL7) &amp; format kiriman.</td></tr>`}
+    </tbody></table></div>
+
+    <div style="font-size:12px;font-weight:700;margin:12px 0 4px">3️⃣ Pemetaan ke parameter (via host_code / kode analit / LOINC)</div>
+    <div class="form-group" style="margin-bottom:8px"><label>Sampel untuk dipetakan</label>
+      <select id="insp-sample" onchange="hubInspectMap(${msgId})">
+        <option value="">-- pilih sampel --</option>
+        ${samples.map(s=>`<option value="${s.id}" ${barSample&&barSample.id===s.id?'selected':''}>${_esc(s.barcode||('#'+s.id))} · ${_esc(s.patient_name||'')} · ${_esc(s.product_name||'')}</option>`).join('')}
+      </select></div>
+    <div id="insp-map"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
+      ${msg.status==='RECEIVED'?`<button class="btn btn-teal" id="insp-apply" style="display:none" onclick="hubApplyFromInspector(${msgId})">✅ Terapkan ke Hasil</button>`:''}
+    </div>`,'wide');
+  if(barSample) hubInspectMap(msgId);
+}
+
+async function hubInspectMap(msgId){
+  const msg=_hubMsgs.find(m=>m.id==msgId); if(!msg) return;
+  const sampleId=parseInt(document.getElementById('insp-sample')?.value)||null;
+  const box=document.getElementById('insp-map'); if(!box) return;
+  const applyBtn=document.getElementById('insp-apply');
+  if(!sampleId){ box.innerHTML='<div style="font-size:12px;color:var(--gray)">Pilih sampel untuk melihat tiap kode alat dipetakan ke parameter mana.</div>'; if(applyBtn) applyBtn.style.display='none'; return; }
+  box.innerHTML='<div class="loading-row"><div class="spinner"></div></div>';
+  const r=await aiComputeMatches(sampleId, msg.raw_text);
+  _inspMatches=r.matches; _inspMsgId=msgId;
+  box.innerHTML=`
+    <div style="font-size:12px;margin-bottom:6px"><strong>${r.matched}/${r.entries.length}</strong> kode cocok ke parameter sampel ${_esc(r.sample.barcode||'')}</div>
+    <div class="table-wrap" style="max-height:210px;overflow:auto"><table><thead><tr>
+      <th>Kode Alat</th><th>Nilai</th><th>→ Parameter</th><th>Cocok via</th><th>Status</th></tr></thead><tbody>
+      ${r.matches.map(m=>{
+        const d=m.draft;
+        const via=d?([d.host_code&&('host_code:'+d.host_code), d.item_code&&('kode:'+d.item_code), d.loinc_code&&('LOINC:'+d.loinc_code)].filter(Boolean)[0]||'—'):'';
+        return `<tr>
+          <td style="font-family:monospace;font-weight:700">${_esc(m.entry.code)}</td>
+          <td style="font-weight:700">${_esc(m.entry.value)}</td>
+          <td style="font-size:12px">${d?_esc(d.item_name||d.product_name):'<span style="color:#EF4444">tidak cocok</span>'}</td>
+          <td style="font-size:11px;color:var(--gray)">${_esc(via)}</td>
+          <td>${d?'<span class="badge badge-green">✓</span>':'<span class="badge badge-gray">dilewati</span>'}</td></tr>`;
+      }).join('')}
+    </tbody></table></div>
+    ${r.matched<r.entries.length?`<div style="font-size:11px;color:#B45309;margin-top:6px">Kode "tidak cocok" = host_code parameter belum diisi. Set di <b>Master Produk → item → Host Code</b> agar cocok otomatis.</div>`:''}`;
+  if(applyBtn) applyBtn.style.display = r.matched?'':'none';
+}
+
+async function hubApplyFromInspector(msgId){
+  if(!_inspMatches || _inspMsgId!==msgId){ toast('Pilih sampel dulu','warn'); return; }
+  const ok=await aiApplyMatches(_inspMatches);
+  if(!ok){ toast('Tak ada parameter cocok','warn'); return; }
+  await sbPatch('analyzer_messages',msgId,{status:'MATCHED',parse_note:`${ok} hasil diterapkan (inspector)`}).catch(()=>{});
+  if(typeof logActivity==='function') logActivity('analyzer_import','analyzer_messages',msgId,`Inspector: ${ok} hasil diterapkan`);
+  toast(`${ok} hasil diterapkan`,'ok',4000);
+  closeModalForce();
   try { await Promise.all([loadLabSamples(), loadLabResults()]); } catch(e){}
   renderAnalyzerHub();
 }

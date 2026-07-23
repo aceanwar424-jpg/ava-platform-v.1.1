@@ -58,7 +58,7 @@ async function ingest(analyzer, protocol, raw, direction) {
       protocol, raw_text: raw, direction: direction || 'IN' });
     log(`  ⇢ ingest ${analyzer.name} (${protocol}, ${raw.length}b) id=${res && res.id}`);
     const d = STATE.devices.get(analyzer.id);
-    if (d && (direction || 'IN') === 'IN') { d.msgCount++; d.lastMsgAt = new Date(); }
+    if (d && (direction || 'IN') === 'IN') { d.msgCount++; d.lastMsgAt = new Date(); d.lastRaw = String(raw).slice(0, 4000); }
   } catch (e) { log(`  ⚠ ingest gagal (${analyzer.name}): ${e.message}`); }
 }
 
@@ -244,6 +244,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
  <div style="font-size:12px;font-weight:700;margin-bottom:6px">Log</div>
  <pre id="log">…</pre>
 <script>
+ function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
  async function tick(){
    try{
      const r=await fetch('/api/status'); const s=await r.json();
@@ -251,9 +252,11 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
      document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat';
      document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
        const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
-       return '<div class="dev"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+(d.name||'?')+'</h3>'+
-         '<div class="meta">'+(d.mode==='server'?('LISTEN :'+d.port):('CONNECT '+(d.ip||'')+':'+d.port))+' · '+(d.protocol||'')+' · '+(d.direction||'')+'<br>'+
-         'Pesan: <b>'+d.msgCount+'</b> · terakhir '+seen+(d.connectedFrom?'<br>dari '+d.connectedFrom:'')+'</div></div>';
+       return '<div class="dev"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+esc(d.name||'?')+'</h3>'+
+         '<div class="meta">'+(d.mode==='server'?('LISTEN :'+d.port):('CONNECT '+esc(d.ip||'')+':'+d.port))+' · '+esc(d.protocol||'')+' · '+esc(d.direction||'')+'<br>'+
+         'Pesan: <b>'+d.msgCount+'</b> · terakhir '+seen+(d.connectedFrom?'<br>dari '+esc(d.connectedFrom):'')+'</div>'+
+         (d.lastRaw?'<details style="margin-top:6px"><summary style="cursor:pointer;font-size:11px;color:#38bdf8">lihat kiriman mentah terakhir</summary><pre style="max-height:180px;margin-top:6px">'+esc(d.lastRaw)+'</pre></details>':'')+
+         '</div>';
      }).join('') : '<div class="empty">Belum ada alat. Set IP/port + aktifkan integrasi di OneLab → master Alat.</div>';
      document.getElementById('log').textContent = (s.logs||[]).join('\\n');
    }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }

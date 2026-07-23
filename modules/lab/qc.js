@@ -35,7 +35,7 @@ async function renderQCTab(){
     <div class="card" style="margin-bottom:14px">
       <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">🧬 Analyzer &amp; Status Kalibrasi</div>
       <div class="table-wrap"><table><thead><tr>
-        <th>Alat</th><th>Kategori</th><th>Lokasi</th><th>Integrasi</th><th>Kalibrasi Berikutnya</th><th>Status</th>
+        <th>Alat</th><th>Kategori</th><th>Lokasi</th><th>Integrasi</th><th>Kalibrasi Berikutnya</th><th>Status</th><th>Aksi</th>
       </tr></thead><tbody>
       ${_labAnalyzers.length?_labAnalyzers.map(a=>{
         const due=a.kalibrasi_berikutnya&&new Date(a.kalibrasi_berikutnya)<=new Date(today.getTime()+7*864e5);
@@ -54,8 +54,12 @@ async function renderQCTab(){
           <td style="font-size:12px;color:${overdue?'#EF4444':due?'#F59E0B':'var(--gray)'};font-weight:${due||overdue?'700':'400'}">
             ${a.kalibrasi_berikutnya?new Date(a.kalibrasi_berikutnya).toLocaleDateString('id-ID'):'—'}${overdue?' ⚠️':due?' 🔧':''}</td>
           <td><span style="background:${st}20;color:${st};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${a.status||'—'}</span></td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-xs" title="Edit" onclick="openAnalyzerForm(${a.id})">✏️</button>
+            <button class="btn btn-ghost btn-xs" title="Hapus" onclick="deleteAnalyzer(${a.id})">🗑</button>
+          </td>
         </tr>`;
-      }).join(''):`<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--gray)">Belum ada analyzer. Klik "+ Analyzer".</td></tr>`}
+      }).join(''):`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray)">Belum ada analyzer. Klik "+ Analyzer".</td></tr>`}
       </tbody></table></div>
     </div>
 
@@ -103,69 +107,83 @@ function qcVerdict(z){
   return {label:'In Control',color:'#22C55E'};
 }
 
-async function openAnalyzerForm(){
+async function openAnalyzerForm(id=null){
+  const a = id ? (_labAnalyzers.find(x=>x.id===id)||{}) : {};
+  const sel=(cur,val)=> String(cur||'')===String(val)?' selected':'';
+  const opt=(cur,vals)=> vals.map(v=>`<option${sel(cur,v)}>${v}</option>`).join('');
+  const integOn = !!a.integrasi_aktif;
   openModal(`
-    <div class="modal-header"><div class="modal-title">🧬 Tambah Analyzer</div>
+    <div class="modal-header"><div class="modal-title">🧬 ${id?'Edit':'Tambah'} Analyzer</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button></div>
     <div class="form-row">
-      <div class="form-group"><label>Kode Alat</label><input id="az-kode" placeholder="ANZ-001"></div>
-      <div class="form-group" style="grid-column:2/-1"><label>Nama Alat *</label><input id="az-nama" placeholder="Sysmex XN-550"></div>
+      <div class="form-group"><label>Kode Alat</label><input id="az-kode" placeholder="ANZ-001" value="${a.kode_alat||''}"></div>
+      <div class="form-group" style="grid-column:2/-1"><label>Nama Alat *</label><input id="az-nama" placeholder="Sysmex XN-550" value="${a.nama_alat||''}"></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Merk</label><input id="az-merk" placeholder="Sysmex"></div>
-      <div class="form-group"><label>Model</label><input id="az-model"></div>
+      <div class="form-group"><label>Merk</label><input id="az-merk" placeholder="Sysmex" value="${a.merk||''}"></div>
+      <div class="form-group"><label>Model</label><input id="az-model" value="${a.model||''}"></div>
       <div class="form-group"><label>Kategori</label>
-        <select id="az-kat"><option>Hematology</option><option>Chemistry</option><option>Immunology</option><option>Urinalysis</option><option>Coagulation</option><option>Lainnya</option></select></div>
+        <select id="az-kat">${opt(a.kategori,['Hematology','Chemistry','Immunology','Urinalysis','Coagulation','Lainnya'])}</select></div>
     </div>
     <div class="form-row">
-      <div class="form-group"><label>Lokasi</label><input id="az-lokasi" placeholder="Lab Utama"></div>
-      <div class="form-group"><label>Kalibrasi Berikutnya</label><input type="date" id="az-kalib"></div>
+      <div class="form-group"><label>Lokasi</label><input id="az-lokasi" placeholder="Lab Utama" value="${a.lokasi||''}"></div>
+      <div class="form-group"><label>Kalibrasi Berikutnya</label><input type="date" id="az-kalib" value="${a.kalibrasi_berikutnya?String(a.kalibrasi_berikutnya).slice(0,10):''}"></div>
       <div class="form-group"><label>Status</label>
-        <select id="az-status"><option>Aktif</option><option>Maintenance</option><option>Rusak</option></select></div>
+        <select id="az-status">${opt(a.status,['Aktif','Maintenance','Rusak'])}</select></div>
     </div>
-    <div class="form-group"><label><input type="checkbox" id="az-integ" onchange="var c=document.getElementById('az-conn');if(c)c.style.display=this.checked?'block':'none'"> Integrasi analyzer aktif (via OneLab Connector)</label></div>
-    <div id="az-conn" style="display:none;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:6px;background:var(--bg2)">
+    <div class="form-group"><label><input type="checkbox" id="az-integ" ${integOn?'checked':''} onchange="var c=document.getElementById('az-conn');if(c)c.style.display=this.checked?'block':'none'"> Integrasi analyzer aktif (via OneLab Connector)</label></div>
+    <div id="az-conn" style="display:${integOn?'block':'none'};border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:6px;background:var(--bg2)">
       <div class="form-row">
         <div class="form-group"><label>Protokol</label>
-          <select id="az-proto"><option>ASTM</option><option>HL7</option><option>POCT</option></select></div>
+          <select id="az-proto">${opt(a.integrasi_protocol,['ASTM','HL7','POCT'])}</select></div>
         <div class="form-group"><label>Mode Koneksi</label>
-          <select id="az-mode"><option value="server">server — alat konek ke PC connector</option><option value="client">client — PC connector konek ke alat</option></select></div>
+          <select id="az-mode"><option value="server"${sel(a.conn_mode,'server')}>server — alat konek ke PC connector</option><option value="client"${sel(a.conn_mode,'client')}>client — PC connector konek ke alat</option></select></div>
         <div class="form-group"><label>Arah</label>
-          <select id="az-dir"><option value="oneway">1 arah — hasil masuk saja</option><option value="twoway">2 arah — + kirim order ke alat</option></select></div>
+          <select id="az-dir"><option value="oneway"${sel(a.conn_direction,'oneway')}>1 arah — hasil masuk saja</option><option value="twoway"${sel(a.conn_direction,'twoway')}>2 arah — + kirim order ke alat</option></select></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label>IP Address</label><input id="az-ip" placeholder="192.168.1.50"></div>
-        <div class="form-group"><label>Port TCP</label><input type="number" id="az-port" placeholder="9100"></div>
+        <div class="form-group"><label>IP Address</label><input id="az-ip" placeholder="192.168.1.50" value="${a.ip_address||''}"></div>
+        <div class="form-group"><label>Port TCP</label><input type="number" id="az-port" placeholder="9100" value="${a.tcp_port!=null?a.tcp_port:''}"></div>
       </div>
       <div class="form-hint" style="color:var(--gray)">Mode <b>server</b>: isi <b>IP PC connector</b> di sini, lalu di menu alat isi IP PC yang sama + port ini. Mode <b>client</b>: isi <b>IP & port alat</b>. Cari IP PC: <code>ipconfig</code>.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAnalyzer()">Simpan</button>
+      <button class="btn btn-teal" onclick="saveAnalyzer(${id||'null'})">Simpan</button>
     </div>`);
 }
 
-async function saveAnalyzer(){
+async function saveAnalyzer(id=null){
   const nama=document.getElementById('az-nama').value.trim();
   if(!nama){ toast('Nama alat wajib','err'); return; }
+  const integ=document.getElementById('az-integ').checked;
+  const payload={
+    kode_alat:document.getElementById('az-kode').value.trim()||null,
+    nama_alat:nama, merk:document.getElementById('az-merk').value.trim()||null,
+    model:document.getElementById('az-model').value.trim()||null,
+    kategori:document.getElementById('az-kat').value,
+    lokasi:document.getElementById('az-lokasi').value.trim()||null,
+    kalibrasi_berikutnya:document.getElementById('az-kalib').value||null,
+    status:document.getElementById('az-status').value,
+    integrasi_aktif:integ,
+    integrasi_protocol:integ?(document.getElementById('az-proto')?.value||'ASTM'):null,
+    ip_address:integ?(document.getElementById('az-ip')?.value.trim()||null):null,
+    tcp_port:integ?(parseInt(document.getElementById('az-port')?.value)||null):null,
+    conn_mode:integ?(document.getElementById('az-mode')?.value||'server'):null,
+    conn_direction:integ?(document.getElementById('az-dir')?.value||'oneway'):null,
+  };
   try {
-    await sbPost('analyzers',{
-      kode_alat:document.getElementById('az-kode').value.trim()||null,
-      nama_alat:nama, merk:document.getElementById('az-merk').value.trim()||null,
-      model:document.getElementById('az-model').value.trim()||null,
-      kategori:document.getElementById('az-kat').value,
-      lokasi:document.getElementById('az-lokasi').value.trim()||null,
-      kalibrasi_berikutnya:document.getElementById('az-kalib').value||null,
-      status:document.getElementById('az-status').value,
-      integrasi_aktif:document.getElementById('az-integ').checked,
-      integrasi_protocol:document.getElementById('az-integ').checked?(document.getElementById('az-proto')?.value||'ASTM'):null,
-      ip_address:document.getElementById('az-integ').checked?(document.getElementById('az-ip')?.value.trim()||null):null,
-      tcp_port:document.getElementById('az-integ').checked?(parseInt(document.getElementById('az-port')?.value)||null):null,
-      conn_mode:document.getElementById('az-mode')?.value||'server',
-      conn_direction:document.getElementById('az-dir')?.value||'oneway',
-    });
-    toast('✅ Analyzer tersimpan','ok'); closeModalForce(); renderQCTab();
+    if(id){ await sbPatch('analyzers',id,payload); toast('✅ Analyzer diperbarui','ok'); }
+    else  { await sbPost('analyzers',payload);      toast('✅ Analyzer tersimpan','ok'); }
+    closeModalForce(); renderQCTab();
   } catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+async function deleteAnalyzer(id){
+  const a=_labAnalyzers.find(x=>x.id===id)||{};
+  if(!confirm(`Hapus analyzer "${a.nama_alat||''}"? Log QC & pesan lama tetap tersimpan.`)) return;
+  try { await sbDelete('analyzers',id); toast('Analyzer dihapus','ok'); renderQCTab(); }
+  catch(e){ toast('❌ '+e.message,'err'); }
 }
 
 async function openQCForm(){
