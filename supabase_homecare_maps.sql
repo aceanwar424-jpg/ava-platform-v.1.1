@@ -54,7 +54,7 @@ RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
     'service_type', o.service_type, 'status', o.status,
     'scheduled_date', o.scheduled_date, 'scheduled_time', o.scheduled_time,
     'lat', o.lat, 'lng', o.lng, 'track_token', o.track_token,
-    'staff_id', o.staff_id, 'staff_name', COALESCE(s.staff_name, o.staff_name, o.assigned_staff),
+    'staff_id', o.staff_id, 'staff_name', COALESCE(s.staff_name, o.assigned_staff),
     'staff_phone', s.phone,
     'staff_lat', s.current_lat, 'staff_lng', s.current_lng, 'staff_loc_at', s.location_updated_at
   ) ORDER BY o.scheduled_date, o.scheduled_time), '[]'::jsonb)
@@ -71,7 +71,7 @@ RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public AS $$
     'service_type', o.service_type, 'status', o.status,
     'scheduled_date', o.scheduled_date, 'scheduled_time', o.scheduled_time,
     'patient_lat', o.lat, 'patient_lng', o.lng,
-    'staff_name', COALESCE(s.staff_name, o.staff_name), 'staff_phone', s.phone,
+    'staff_name', COALESCE(s.staff_name, o.assigned_staff), 'staff_phone', s.phone,
     'staff_lat', s.current_lat, 'staff_lng', s.current_lng, 'staff_loc_at', s.location_updated_at,
     'loc_fresh', (s.location_updated_at IS NOT NULL AND s.location_updated_at > now() - interval '3 minutes')
   )
