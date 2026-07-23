@@ -40,12 +40,23 @@ async function rpc(fn, args) {
 }
 
 // ── Status hidup (dipakai halaman status lokal http://localhost:PORT) ──
-const STATE = { started: new Date(), devices: new Map(), logs: [] };
+const STATE = { started: new Date(), devices: new Map(), logs: [], rawStream: [] };
 function pushLog(line) { STATE.logs.push(line); if (STATE.logs.length > 250) STATE.logs.shift(); }
 const log = (...a) => {
   const line = new Date().toISOString().slice(11, 19) + ' ' + a.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' ');
   console.log(line); pushLog(line);
 };
+
+function pushRawStream(deviceName, direction, protocol, raw) {
+  STATE.rawStream.push({
+    timestamp: new Date(),
+    device: deviceName,
+    direction: direction || 'IN',
+    protocol: protocol || 'HL7',
+    data: String(raw)
+  });
+  if (STATE.rawStream.length > 50) STATE.rawStream.shift();
+}
 
 // ── Kode kontrol protokol ─────────────────────────────────────────────
 const ENQ = 0x05, ACK = 0x06, NAK = 0x15, STX = 0x02, ETX = 0x03, ETB = 0x17, EOT = 0x04, CR = 0x0D, LF = 0x0A;
@@ -53,20 +64,21 @@ const VT = 0x0B, FS = 0x1C; // HL7 MLLP
 
 // Kirim pesan mentah ke Supabase (non-fatal bila gagal — jangan putus koneksi alat)
 async function ingest(analyzer, protocol, raw, direction) {
+  const dir = direction || 'IN';
+  pushRawStream(analyzer.name, dir, protocol, raw);
   try {
-    // FIX: Bungkus payload di dalam kunci 'p' (SQL RPC public.analyzer_ingest(p JSONB))
     const res = await rpc('analyzer_ingest', {
       p: {
         analyzer_code: analyzer.code,
         analyzer_id: analyzer.id,
         protocol,
         raw_text: raw,
-        direction: direction || 'IN'
+        direction: dir
       }
     });
     log(`  ⇢ ingest ${analyzer.name} (${protocol}, ${raw.length}b) id=${res && res.id}`);
     const d = STATE.devices.get(analyzer.id);
-    if (d && (direction || 'IN') === 'IN') {
+    if (d && dir === 'IN') {
       d.msgCount++;
       d.lastMsgAt = new Date();
       d.lastRaw = String(raw).slice(0, 4000);
@@ -274,7 +286,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-dark);color:var(--text-main);padding:24px}
-  .container{max-width:960px;margin:0 auto}
+  .container{max-width:1100px;margin:0 auto}
   h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
   .sub{font-size:12.5px;color:var(--text-muted);margin-bottom:20px}
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px}
@@ -289,12 +301,18 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
   .bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
   button{background:var(--teal);color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity 0.15s}
   button:hover{opacity:0.9}
-  .log-container{margin-top:16px}
-  pre{background:#060a14;border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Consolas',monospace;font-size:11.5px;line-height:1.6;max-height:450px;overflow:auto;white-space:pre-wrap}
+  .split-row {display:flex;gap:20px;margin-top:20px}
+  .split-col {flex:1;min-width:0}
+  pre{background:#060a14;border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Consolas',monospace;font-size:11px;line-height:1.6;height:450px;overflow:auto;white-space:pre-wrap}
   .empty{color:var(--text-muted);font-size:12.5px;padding:24px;text-align:center;background:var(--card-bg);border:1px solid var(--border);border-radius:12px}
   .log-err{color:var(--red);font-weight:600}
   .log-warn{color:var(--yellow)}
   .log-success{color:#34d399}
+  .raw-item {margin-bottom:14px;border-bottom:1px dashed var(--border);padding-bottom:10px}
+  .raw-header {font-size:10.5px;color:var(--teal);margin-bottom:4px;font-weight:700}
+  @media (max-width: 768px) {
+    .split-row {flex-direction:column}
+  }
 </style></head><body>
 <div class="container">
   <h1>OneLab Connector</h1>
@@ -304,11 +322,20 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
     <span style="font-size:11.5px;color:var(--text-muted)">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
   </div>
   <div class="grid" id="devs"></div>
-  <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Log Aktivitas (Live)</div>
-  <pre id="log">…</pre>
+  
+  <div class="split-row">
+    <div class="split-col">
+      <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Log Aktivitas (Live)</div>
+      <pre id="log">…</pre>
+    </div>
+    <div class="split-col">
+      <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Aliran Data Mentah Real-Time (Raw Stream)</div>
+      <pre id="raw-stream">…</pre>
+    </div>
+  </div>
 </div>
 <script>
-  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+  function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
   async function tick(){
     try{
       const r=await fetch('/api/status'); const s=await r.json();
@@ -355,6 +382,20 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
       const logEl = document.getElementById('log');
       logEl.innerHTML = logText;
       logEl.scrollTop = logEl.scrollHeight; // Auto scroll to bottom
+
+      // Render raw stream
+      const rawText = (s.rawStream || []).map(r => {
+        const time = new Date(r.timestamp).toLocaleTimeString('id-ID');
+        const dirBadge = r.direction === 'IN' ? '📥 [MASUK]' : '📤 [KELUAR]';
+        return '<div class="raw-item">' +
+          '<div class="raw-header">['+time+'] '+esc(r.device)+' ('+esc(r.protocol)+') '+dirBadge+'</div>' +
+          '<div style="color:#38bdf8;word-break:break-all">'+esc(r.data)+'</div>' +
+          '</div>';
+      }).join('');
+      
+      const rawEl = document.getElementById('raw-stream');
+      rawEl.innerHTML = rawText || '<div style="color:var(--text-muted)">Menunggu aliran data alat lab...</div>';
+      rawEl.scrollTop = rawEl.scrollHeight; // Auto scroll to bottom
     }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }
   }
   async function reload(){ await fetch('/reload',{method:'POST'}); setTimeout(tick,300); }
@@ -369,6 +410,7 @@ function startStatusServer() {
         started: STATE.started, supabase: SUPABASE_URL,
         devices: [...STATE.devices.entries()].map(([id, d]) => ({ id, ...d })),
         logs: STATE.logs.slice(-120),
+        rawStream: STATE.rawStream
       }));
       return;
     }
@@ -376,7 +418,7 @@ function startStatusServer() {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(STATUS_HTML);
   });
-  server.on('error', (e) => log(`⚠ status server: e.message`));
+  server.on('error', (e) => log(`⚠ status server: ${e.message}`));
   server.listen(STATUS_PORT, '127.0.0.1', () => log(`🖥  Status lokal: http://localhost:${STATUS_PORT}`));
 }
 
