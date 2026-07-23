@@ -262,7 +262,35 @@ async function printAnamnesaLabels(admissionId) {
   const a = admD?.[0]; if (!a) return;
   if (!anamHasLabTests(a)) { toast('Kunjungan ini tidak ada tes lab','warn'); return; }
   const labels = await ensureSampleLabels(a);
-  if (labels && labels.length) printLabBarcodes(labels);
+
+  // Resolve actual checked-in barcodes from lab_samples if they exist
+  const printable = [];
+  for (const l of labels) {
+    try {
+      const samples = await sbGet('lab_samples', `select=*&label_id=eq.${l.id}`).catch(() => []);
+      if (samples && samples.length > 0) {
+        samples.forEach(s => {
+          printable.push({
+            label_barcode: s.barcode,
+            patient_name: s.patient_name || a.patient_name,
+            mr_number: a.mr_number || l.mr_number,
+            visit_number: s.visit_number || a.visit_number,
+            patient_gender: a.patient_gender,
+            patient_dob: a.patient_dob,
+            patient_age: a.patient_age,
+            sampel_type: s.sampel_type || l.sampel_type,
+            tests: [{ product_name: s.product_name }]
+          });
+        });
+      } else {
+        printable.push(l);
+      }
+    } catch(e) {
+      printable.push(l);
+    }
+  }
+
+  if (printable.length) printLabBarcodes(printable);
   else toast('Tidak ada label untuk dicetak','warn');
 }
 

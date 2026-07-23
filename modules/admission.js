@@ -1387,17 +1387,37 @@ async function renderAdmissionReport() {
 // REPRINT LABEL — untuk label rusak/hilang sebelum check-in
 // ══════════════════════════════════════════════════════════════
 async function reprintSampleLabels(admissionId) {
-  // Cetak ulang barcode (Code 128). Barcode utama digenerate di modul Anamnesa;
-  // fungsi ini memakai ulang alur yang sama bila tersedia.
   try {
-    if (typeof printAnamnesaLabels === 'function') { await printAnamnesaLabels(admissionId); return; }
     const labels = await sbGet('sample_labels', `select=*&admission_id=eq.${admissionId}`).catch(()=>[]);
     if (!labels || !labels.length) { toast('⚠️ Belum ada barcode — selesaikan Anamnesa dulu.','warn',5000); return; }
-    const withTests = await Promise.all(labels.map(async l => {
+    
+    const printable = [];
+    for (const l of labels) {
       const items = await sbGet('sample_label_items', `select=*&label_id=eq.${l.id}`).catch(()=>[]);
-      return { ...l, tests: (items||[]).map(it=>({product_name:it.product_name})) };
-    }));
-    if (typeof printLabBarcodes === 'function') printLabBarcodes(withTests);
+      const samples = await sbGet('lab_samples', `select=*&label_id=eq.${l.id}`).catch(()=>[]);
+      if (samples && samples.length > 0) {
+        samples.forEach(s => {
+          printable.push({
+            label_barcode: s.barcode,
+            patient_name: s.patient_name,
+            mr_number: l.mr_number,
+            visit_number: s.visit_number,
+            patient_gender: l.patient_gender,
+            patient_dob: l.patient_dob,
+            patient_age: l.patient_age,
+            sampel_type: s.sampel_type,
+            tests: [{ product_name: s.product_name }]
+          });
+        });
+      } else {
+        printable.push({
+          ...l,
+          tests: (items||[]).map(it=>({product_name:it.product_name}))
+        });
+      }
+    }
+    
+    if (typeof printLabBarcodes === 'function') printLabBarcodes(printable);
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 

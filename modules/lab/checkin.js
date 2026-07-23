@@ -204,10 +204,48 @@ async function saveLabelCheckin(labelId){
   const azName=azSel?.options[azSel?.selectedIndex]?.textContent?.trim()||'';
   const notes=document.getElementById('lc-notes')?.value.trim()||null;
 
+  // ── DEDUPLICATE BY PRODUCT_ID ──
+  // Panel tes (memiliki banyak komponen dengan product_id sama) hanya dibuatkan 1 baris di lab_samples.
+  const uniqueItems = [];
+  const seenProd = {};
+  for(const it of items){
+    if(!seenProd[it.product_id]){
+      seenProd[it.product_id] = true;
+      uniqueItems.push(it);
+    }
+  }
+
+  // ── GENERATE CHRONOLOGICAL DATE-CODED BARCODE SEQUENCE (e.g. 202623070001) ──
+  let startSeq = 1;
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const dd = String(now.getDate()).padStart(2, '0');
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const prefix = `${yyyy}${dd}${mm}`; // YYYYDDMM, misal "20262307"
+
   try {
-    for(const it of items){
+    const rows = await sbGet('lab_samples', `select=barcode&barcode=like.${prefix}*&order=barcode.desc&limit=1`).catch(() => []);
+    if (rows && rows.length > 0) {
+      const lastBarcode = rows[0].barcode;
+      if (lastBarcode && lastBarcode.length >= 12) {
+        const lastSeq = parseInt(lastBarcode.substring(8));
+        if (!isNaN(lastSeq)) {
+          startSeq = lastSeq + 1;
+        }
+      }
+    }
+  } catch(e) {
+    console.error('[saveLabelCheckin] Failed to fetch last barcode sequence:', e);
+  }
+
+  try {
+    for(let idx=0; idx<uniqueItems.length; idx++){
+      const it = uniqueItems[idx];
+      const seqStr = String(startSeq + idx).padStart(4, '0');
+      const customBarcode = `${prefix}${seqStr}`;
+
       const sample=await sbPost('lab_samples',{
-        barcode:`${label.label_barcode}-${it.product_id}`,
+        barcode:customBarcode,
         admission_id:label.admission_id, visit_number:label.visit_number, patient_name:label.patient_name,
         product_id:it.product_id, product_name:it.product_name, sampel_type:label.sampel_type,
         volume_ml:vol, collected_at:collected, collected_by:collector,
@@ -220,8 +258,8 @@ async function saveLabelCheckin(labelId){
         it.product_id, it.product_name);
     }
     await sbPatch('sample_labels',labelId,{status:'CheckedIn',checked_in_at:new Date().toISOString(),collected_at:collected,collected_by:collector});
-    if(typeof logActivity==='function') logActivity('checkin','sample_labels',labelId,`Check-in ${items.length} tes`,label.patient_name);
-    toast(`✅ ${items.length} tes berhasil check-in dari 1 label`,'ok');
+    if(typeof logActivity==='function') logActivity('checkin','sample_labels',labelId,`Check-in ${uniqueItems.length} tes`,label.patient_name);
+    toast(`✅ ${uniqueItems.length} tes berhasil check-in dari 1 label`,'ok');
     closeModalForce(); labRefresh();
   } catch(e){ toast('❌ '+e.message,'err'); }
 }
