@@ -177,6 +177,7 @@ function labReportCfg(){
 // sampleRows: opsional (untuk preview di Setting PDF) — jika ada, dipakai apa adanya.
 async function printLabReport(patientName, visitNumber, sampleRows){
   const cfg = labReportCfg();
+  const isTemplate = !!cfg.bg_image_url;
   const results = sampleRows || labResults.filter(r=>r.patient_name===patientName&&isReleased(r)&&(!visitNumber||r.visit_number===visitNumber));
   if(!results.length){ toast('Tidak ada hasil','warn'); return; }
   const first=results[0]||{};
@@ -246,20 +247,20 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     <style>
       @page{ 
         size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
-        margin: 0; 
+        margin: ${isTemplate ? '0' : '10mm 10mm 12mm 10mm'}; 
       }
       *{box-sizing:border-box}
       body{
         font-family:Arial,Helvetica,sans-serif;
-        font-size:12px;
+        font-size:11.5px;
         color:#1A2B3C;
         margin:0;
-        padding: ${pTop} ${pRight} ${pBottom} ${pLeft};
-        position: relative;
-        width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
-        min-height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
-        display: flex;
-        flex-direction: column;
+        padding: ${isTemplate ? `${pTop} ${pRight} ${pBottom} ${pLeft}` : '0'};
+        ${isTemplate ? `
+          position: relative;
+          width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
+          height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
+        ` : ''}
       }
       .header{
         display:${cfg.hide_default_header ? 'none' : 'flex'};
@@ -281,26 +282,26 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .pinfo-container {
         width: 100%;
         margin-bottom: 14px;
-        ${cfg.bg_image_url && cfg.patient_info_y ? `position: absolute; top: ${cfg.patient_info_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
+        ${isTemplate && cfg.patient_info_y ? `position: absolute; top: ${cfg.patient_info_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
       }
       .pinfo-title {
         text-align: center;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 800;
         letter-spacing: 0.05em;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         text-transform: uppercase;
         color: #1a2a3a;
       }
       .pinfo{
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 16px;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 12px;
         border-top: 1.5px solid #000;
         border-bottom: 1.5px solid #000;
-        padding: 8px 0;
-        font-size: 11.5px;
-        line-height: 1.55;
+        padding: 6px 0;
+        font-size: 11px;
+        line-height: 1.5;
       }
       .pinfo-col {
         display: flex;
@@ -310,7 +311,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         display: flex;
       }
       .pinfo-label {
-        width: 170px;
+        width: 160px;
         color: #000;
       }
       .pinfo-sep {
@@ -324,30 +325,36 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       }
       
       .results-container {
-        flex: 1;
-        ${cfg.bg_image_url && cfg.table_y ? `position: absolute; top: ${cfg.table_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
+        ${isTemplate && cfg.table_y ? `position: absolute; top: ${cfg.table_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
       }
       
       table{width:100%;border-collapse:collapse;margin-bottom:4px}
       tr{page-break-inside:avoid}
       thead{display:table-header-group}
-      th{border-bottom: 1.5px solid #000; background:none; color:#000; padding:6px 9px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
-      td{padding:5px 9px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '12px'}}
-      .cat{background:${ac}18;color:${ac};font-weight:800;padding:5px 10px;font-size:11.5px;margin-top:12px;border-left:3px solid ${ac}}
+      th{border-bottom: 1.5px solid #000; background:none; color:#000; padding:5px 8px;text-align:left;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+      td{padding:4px 8px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '11px'}}
+      .cat{background:${ac}18;color:${ac};font-weight:800;padding:4px 8px;font-size:11px;margin-top:10px;border-left:3px solid ${ac}}
       .flag{font-weight:800}.crit{color:#DC2626}
-      .legend{font-size:9.5px;color:#000;margin-top:8px}
+      .legend{font-size:9px;color:#000;margin-top:6px}
       
       .footer{
-        margin-top: auto;
         page-break-inside: avoid;
-        ${cfg.bg_image_url && cfg.signature_y ? `position: absolute; bottom: ${cfg.signature_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
+        ${isTemplate ? `
+          position: absolute; 
+          bottom: ${pBottom}; 
+          left: ${pLeft}; 
+          right: ${pRight};
+          margin: 0;
+        ` : `
+          margin-top: 25px;
+        `}
       }
-      .signs{display:flex;justify-content:flex-end;margin-top:16px}
-      .signs > div{width: 250px; font-size:11px; text-align: center;}
-      .signs .line{margin-top:54px;border-top:1px solid #000;padding-top:3px;font-weight:bold;}
+      .signs{display:flex;justify-content:flex-end;margin-top:10px}
+      .signs > div{width: 220px; font-size:11px; text-align: center;}
+      .signs .line{border-top:1px solid #000;padding-top:3px;font-weight:bold;}
       .signs em{color:#546E7A}
-      .disc{display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:16px;font-size:9.5px;color:#94A3B8;line-height:1.4}
-      @media print{ .noprint{display:none} body{padding:0} }
+      .disc{display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:12px;font-size:9.5px;color:#000;line-height:1.4}
+      @media print{ .noprint{display:none} }
     </style></head><body>
     <button class="noprint" onclick="window.print()" style="position:fixed;top:14px;right:14px;padding:8px 18px;background:${hc};color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:9999">🖨 Print</button>
     
