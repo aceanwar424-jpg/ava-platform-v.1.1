@@ -123,7 +123,10 @@ function lpcOpenModal(){
             ${_lpcMsgs.map(m=>`<option value="${m.id}">${m.received_at?new Date(m.received_at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):''} · ${m.status} · ${(m.raw_text||'').replace(/\s+/g,' ').slice(0,30)}…</option>`).join('')}
           </select></div>
         <textarea id="lpc-raw" rows="6" placeholder="Tempel kiriman mentah alat di sini, atau pilih pesan di atas" style="width:100%;font-family:monospace;font-size:11.5px"></textarea>
-        <div style="display:flex;justify-content:flex-end;margin:6px 0"><button class="btn btn-teal btn-sm" onclick="lpcTest()">🔎 Uji Parse</button></div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin:6px 0">
+          <button class="btn btn-ghost btn-sm" onclick="lpcHostMap()" title="Petakan kode alat → parameter (isi host_code)">🔗 Peta Host Code</button>
+          <button class="btn btn-teal btn-sm" onclick="lpcTest()">🔎 Uji Parse</button>
+        </div>
         <div id="lpc-preview" style="font-size:12px;color:var(--gray)">Hasil uji akan tampil di sini.</div>
       </div>
     </div>
@@ -202,4 +205,103 @@ async function lpcSync(){
   try{ await Promise.all([loadLabSamples&&loadLabSamples(), loadLabResults&&loadLabResults()]); }catch(e){}
   if(typeof renderAnalyzerHub==='function' && document.getElementById('lab-integrasi')) renderAnalyzerHub();
   closeModalForce();
+}
+
+// ── PETA HOST CODE (kode alat → parameter produk) ────────────────
+// Isi analyzers→product_items.host_code dari data nyata: parse pesan, sandingkan
+// tiap kode alat dgn parameter produk sampel contoh, simpan sbg host_code.
+// Menulis ke product_items (template, utk pemeriksaan berikutnya) + draft sampel
+// ini (agar langsung cocok). Tidak menyentuh nilai hasil (tetap draft/human).
+let _lpcHostEntries=[], _lpcHostDrafts=[], _lpcHostSampleId='';
+const lpcNorm = s => String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+function lpcSuggest(code, drafts, used){
+  const k=lpcNorm(code); if(!k) return null;
+  // 1) sama persis pada host_code/item_code/loinc
+  let d=drafts.find(x=>!used.has(x.id) && [x.host_code,x.item_code,x.loinc_code].some(v=>lpcNorm(v)===k));
+  if(d) return d;
+  // 2) saling-mengandung pada kode/nama
+  d=drafts.find(x=>!used.has(x.id) && [x.item_code,x.item_name,x.product_name].some(v=>{const n=lpcNorm(v); return n && (n.includes(k)||k.includes(n));}));
+  return d||null;
+}
+
+function lpcHostMap(){
+  const cfg=lpcReadForm();
+  const raw=document.getElementById('lpc-raw')?.value||'';
+  if(!raw.trim()){ toast('Tempel / pilih pesan dulu, lalu Peta Host Code','warn'); return; }
+  const { entries, barcode } = parseWithProfile(raw, cfg);
+  if(!entries.length){ toast('0 baris hasil — sesuaikan parser dulu (Uji Parse)','warn'); return; }
+  _lpcHostEntries=entries;
+  const s = barcode ? (typeof labSamples!=='undefined'?labSamples:[]).find(x=>String(x.barcode)===String(barcode)) : null;
+  _lpcHostSampleId = s ? s.id : '';
+  lpcOpenHostMap();
+}
+
+function lpcOpenHostMap(){
+  const samples=(typeof labSamples!=='undefined'?labSamples:[]).filter(s=>['In Process','Pending','Done'].includes(s.status));
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔗 Peta Host Code · kode alat → parameter</div>
+      <button class="modal-close" onclick="closeModalForce()"></button></div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Pilih sampel contoh (menentukan produk & daftar parameter), sandingkan tiap <b>kode alat</b> dgn parameter, lalu <b>Simpan</b>. Kode alat ditulis ke <code>host_code</code> parameter — berlaku untuk semua pemeriksaan berikutnya, dan langsung ke draft sampel ini.</div>
+    <div class="form-group"><label>Sampel contoh</label>
+      <select id="lpc-hm-sample" onchange="lpcHostReload(this.value)">
+        <option value="">-- pilih sampel --</option>
+        ${samples.map(s=>`<option value="${s.id}" ${s.id==_lpcHostSampleId?'selected':''}>${s.barcode||('#'+s.id)} · ${s.patient_name||''} · ${s.product_name||''}</option>`).join('')}
+      </select></div>
+    <div id="lpc-hm-body" style="margin-top:8px;font-size:12px;color:var(--gray)">Pilih sampel untuk memuat parameter…</div>
+    <div class="modal-footer" style="justify-content:space-between">
+      <button class="btn btn-ghost" onclick="closeModalForce();renderParserConfig(_lpcAid)">← Kembali</button>
+      <button class="btn btn-teal" onclick="lpcSaveHostMap()">💾 Simpan Host Code</button>
+    </div>`,'wide');
+  if(_lpcHostSampleId) lpcHostReload(_lpcHostSampleId);
+}
+
+async function lpcHostReload(sampleId){
+  _lpcHostSampleId=parseInt(sampleId)||sampleId||'';
+  const body=document.getElementById('lpc-hm-body'); if(!body) return;
+  const s=(typeof labSamples!=='undefined'?labSamples:[]).find(x=>x.id==_lpcHostSampleId);
+  if(!s){ body.innerHTML='<div style="color:#B45309">Pilih sampel dulu.</div>'; return; }
+  body.innerHTML='Memuat parameter…';
+  let drafts=(typeof labResults!=='undefined'?labResults:[]).filter(r=>r.admission_id==s.admission_id && r.product_id==s.product_id && r.status==='Draft');
+  if(!drafts.length && s.admission_id){ drafts=await sbGet('lab_results',`select=*&admission_id=eq.${s.admission_id}&product_id=eq.${s.product_id}&status=eq.Draft&order=id.asc`).catch(()=>[]); }
+  _lpcHostDrafts=drafts||[];
+  if(!_lpcHostDrafts.length){ body.innerHTML='<div style="color:#B45309">Sampel ini belum punya parameter draft. Pilih sampel lain dgn produk yang sama.</div>'; return; }
+  const used=new Set();
+  const rows=_lpcHostEntries.map((e,i)=>{
+    const sug=lpcSuggest(e.code,_lpcHostDrafts,used); if(sug) used.add(sug.id);
+    const opts=_lpcHostDrafts.map(d=>{
+      const pid=d.product_item_id||''; const sel=(sug&&sug.id===d.id)?'selected':'';
+      const lbl=`${d.item_name||d.item_code||('#'+d.id)}${d.host_code?` · host:${d.host_code}`:''}${pid?'':' (tanpa template)'}`;
+      return `<option value="${pid}" ${pid?'':'disabled'} ${sel}>${lbl}</option>`;
+    }).join('');
+    return `<tr>
+      <td style="font-family:monospace;font-weight:700">${e.code}</td>
+      <td style="font-weight:700">${e.value}</td><td style="font-size:11px;color:var(--gray)">${e.unit||''}</td>
+      <td><select id="lpc-hm-${i}" data-code="${String(e.code).replace(/"/g,'&quot;')}" style="width:100%;font-size:12px">
+        <option value="">— lewati —</option>${opts}</select></td>
+    </tr>`;
+  }).join('');
+  body.innerHTML=`<div class="table-wrap" style="max-height:340px;overflow:auto"><table><thead><tr>
+    <th>Kode Alat</th><th>Nilai</th><th>Unit</th><th>→ Parameter produk (host_code ditulis)</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>
+    <div class="form-hint" style="color:var(--gray);margin-top:6px">Auto-saran berdasar kemiripan nama/kode — periksa & sesuaikan. “(tanpa template)” tak bisa disimpan sbg host_code global.</div>`;
+}
+
+async function lpcSaveHostMap(){
+  if(!_lpcHostEntries.length){ toast('Tak ada kode untuk dipetakan','warn'); return; }
+  const jobs=[]; const seen=new Set();
+  _lpcHostEntries.forEach((e,i)=>{
+    const sel=document.getElementById(`lpc-hm-${i}`); if(!sel) return;
+    const pid=sel.value; const code=(sel.getAttribute('data-code')||e.code||'').trim();
+    if(pid && code && !seen.has(pid)){ seen.add(pid); jobs.push({ pid, code }); }
+  });
+  if(!jobs.length){ toast('Belum ada pemetaan dipilih','warn'); return; }
+  let okT=0, okD=0;
+  for(const j of jobs){
+    try{ await sbPatch('product_items', j.pid, { host_code:j.code }); okT++; }catch(e){}
+    const dr=_lpcHostDrafts.find(d=>String(d.product_item_id)===String(j.pid));
+    if(dr){ try{ await sbPatch('lab_results', dr.id, { host_code:j.code }); dr.host_code=j.code; okD++; }catch(e){} }
+  }
+  toast(`✅ Host code: ${okT} parameter (template) · ${okD} draft sampel ini`,'ok',6000);
+  try{ if(typeof loadLabResults==='function') await loadLabResults(); }catch(e){}
+  closeModalForce(); renderParserConfig(_lpcAid);
 }

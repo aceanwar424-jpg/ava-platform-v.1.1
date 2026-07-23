@@ -24,8 +24,17 @@ function parseAnalyzerFeed(text){
     let code='', value='', unit='', flag='';
     if(/^OBX\|/i.test(l)){
       const f=l.split('|');
-      code=(f[3]||'').split('^')[0];
+      // Identifier bisa "WBC^..." atau "^WBC^" (nama di komponen ke-2, spt Mindray);
+      // ambil komponen pertama yang tidak kosong.
+      const idc=(f[3]||'').split('^').filter(Boolean);
+      code=idc.length?idc[0]:'';
       value=(f[5]||'').trim(); unit=(f[6]||'').trim(); flag=(f[8]||'').trim();
+      // Sebagian alat (mis. Mindray) mengosongkan Sub-ID (OBX-4) sehingga nilai
+      // bergeser ke field 4. Kalau f5 bukan angka murni tapi f4 angka → geser.
+      const isNum=s=>/^-?\d+(\.\d+)?$/.test((s||'').trim());
+      if(!isNum(value) && isNum(f[4])){
+        value=(f[4]||'').trim(); unit=(f[5]||'').trim(); flag=(f[7]||'').trim();
+      }
     } else if(/^R\|/i.test(l)){
       const f=l.split('|');
       const comps=(f[2]||'').split('^').filter(Boolean);
