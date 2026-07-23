@@ -84,13 +84,32 @@ function checkinSampleStatus(s){
 }
 
 function checkinActions(s){
-  if(s.status==='Rejected') return `<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>`;
-  if(s.status==='Pending')  return `<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
-    <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>`;
   const rs=labResults.filter(r=>r.sample_id==s.id);
+  const hasVal=rs.some(r=>r.result_value&&String(r.result_value).trim());
+  const isFinal=rs.some(r=>['Validated','Approved','Released'].includes(r.status));
+  // Sampel tanpa hasil & belum final → boleh dihapus (mis. duplikat check-in ganda).
+  const del = (!hasVal && !isFinal) ? `<button class="act-btn del" title="Hapus sampel (belum ada hasil)" onclick="deleteCheckinSample(${s.id})">🗑</button>` : '';
+  if(s.status==='Rejected') return `<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>${del}`;
+  if(s.status==='Pending')  return `<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
+    <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>${del}`;
   if(rs.some(r=>r.status==='Approved'||r.status==='Released')) return `<span style="font-size:11px;color:var(--gray)">selesai</span>`;
   if(rs.some(r=>r.status==='Validated'))                       return `<button class="btn btn-outline btn-xs" onclick="switchLabTab('approval')">Approval →</button>`;
-  return `<button class="btn btn-outline btn-xs" onclick="goInputResult(${s.admission_id})">Input Hasil</button>`;
+  return `<button class="btn btn-outline btn-xs" onclick="goInputResult(${s.admission_id})">Input Hasil</button>${del}`;
+}
+
+// Hapus sampel duplikat/salah — dijaga server (hanya jika belum ada hasil).
+async function deleteCheckinSample(id){
+  const s=labSamples.find(x=>x.id==id)||{};
+  if(!confirm(`Hapus sampel ${s.barcode||('#'+id)} — ${s.product_name||''}?\nHanya bisa jika belum ada hasil (mis. duplikat check-in).`)) return;
+  try{
+    await sbRpc('lab_sample_delete',{p_sample_id:id});
+    toast('Sampel dihapus','ok');
+    if(_ciSel==id) _ciSel=null;
+    await Promise.all([loadLabSamples(),loadLabResults()]);
+    renderCheckinTab(); renderLabKPI();
+  }catch(e){
+    toast('❌ '+(e.message||e),'err');
+  }
 }
 
 // Proses semua sampel Pending (lintas pasien).
