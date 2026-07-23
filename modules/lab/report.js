@@ -257,7 +257,9 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         padding: ${pTop} ${pRight} ${pBottom} ${pLeft};
         position: relative;
         width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
-        height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
+        min-height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
+        display: flex;
+        flex-direction: column;
       }
       .header{
         display:${cfg.hide_default_header ? 'none' : 'flex'};
@@ -275,7 +277,6 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .brand .acc{font-size:10px;color:${ac};font-weight:700;margin-top:3px}
       .doc-title{text-align:right}
       .doc-title .t{font-size:16px;font-weight:800;color:${hc}}
-      .doc-title .d{font-size:11px;color:#546E7A}
       
       .pinfo-container {
         width: 100%;
@@ -323,10 +324,13 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       }
       
       .results-container {
+        flex: 1;
         ${cfg.bg_image_url && cfg.table_y ? `position: absolute; top: ${cfg.table_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
       }
       
       table{width:100%;border-collapse:collapse;margin-bottom:4px}
+      tr{page-break-inside:avoid}
+      thead{display:table-header-group}
       th{border-bottom: 1.5px solid #000; background:none; color:#000; padding:6px 9px;text-align:left;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
       td{padding:5px 9px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '12px'}}
       .cat{background:${ac}18;color:${ac};font-weight:800;padding:5px 10px;font-size:11.5px;margin-top:12px;border-left:3px solid ${ac}}
@@ -334,10 +338,9 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .legend{font-size:9.5px;color:#000;margin-top:8px}
       
       .footer{
-        position: absolute;
-        bottom: ${pBottom};
-        left: ${pLeft};
-        right: ${pRight};
+        margin-top: auto;
+        page-break-inside: avoid;
+        ${cfg.bg_image_url && cfg.signature_y ? `position: absolute; bottom: ${cfg.signature_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
       }
       .signs{display:flex;justify-content:flex-end;margin-top:16px}
       .signs > div{width: 250px; font-size:11px; text-align: center;}
@@ -362,7 +365,6 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       </div>
       <div class="doc-title">
         <div class="t">HASIL PEMERIKSAAN LABORATORIUM</div>
-        <div class="d">Dicetak: ${new Date().toLocaleString('id-ID',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
       </div>
     </div>
     
