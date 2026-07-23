@@ -60,22 +60,40 @@ async function aiComputeMatches(sampleId, text, entriesOverride){
   if(!drafts.length && s.admission_id){
     drafts=await sbGet('lab_results',`select=*&admission_id=eq.${s.admission_id}&product_id=eq.${s.product_id}&status=eq.Draft&order=id.asc`).catch(()=>[]);
   }
-  // Master parameter (product_items) — memuat host_code yang dipetakan lewat
-  // Peta Host Code / master, meski baris draft belum menyalinnya.
-  let itemsById={};
-  try{ if(typeof labProductItems==='function') (await labProductItems(s.product_id)||[]).forEach(it=>{ itemsById[it.id]=it; }); }catch(e){}
-  const keyOf=d=>{
-    const it = d.product_item_id ? itemsById[d.product_item_id] : null;
-    return [d.host_code, d.item_code, d.loinc_code,
-            it&&it.host_code, it&&it.code, it&&it.loinc_code,
-            (!d.product_item_id?prod.host_code:null), (!d.product_item_id?prod.kode_internal:null)]
-      .filter(Boolean).map(x=>String(x).toLowerCase());
-  };
+  const norm = x => String(x==null?'':x).trim().toLowerCase();
+
+  // Master parameter (product_items) — sumber host_code yang Anda petakan.
+  // Ambil SEGAR (bukan cache) agar host_code yang baru diedit langsung terbaca.
+  let items=[];
+  try{ items=(await sbGet('product_items',`select=id,code,name_id,host_code,loinc_code&product_id=eq.${s.product_id}`))||[]; }
+  catch(e){ try{ if(typeof labProductItems==='function') items=(await labProductItems(s.product_id))||[]; }catch(_){} }
+  // index kode alat (host_code / code) → item master
+  const itemByCode={};
+  items.forEach(it=>{ [it.host_code, it.code].forEach(c=>{ const k=norm(c); if(k && !itemByCode[k]) itemByCode[k]=it; }); });
+  // index draft menurut product_item_id dan menurut nama/kode (fallback bila id tak sinkron)
+  const draftByItemId={}, draftByName={};
+  drafts.forEach(d=>{
+    if(d.product_item_id!=null) draftByItemId[String(d.product_item_id)]=d;
+    [d.item_name, d.item_code].forEach(n=>{ const k=norm(n); if(k && !draftByName[k]) draftByName[k]=d; });
+  });
+
+  // Kunci milik baris draft sendiri (host_code/item_code/loinc + host produk utk non-panel).
+  const keyOfDraft=d=>[d.host_code, d.item_code, d.loinc_code,
+      (!d.product_item_id?prod.host_code:null), (!d.product_item_id?prod.kode_internal:null)]
+    .filter(Boolean).map(norm);
 
   const matches=[]; const used=new Set();
   entries.forEach(e=>{
-    const key=String(e.code).toLowerCase();
-    const d=drafts.find(dr=>!used.has(dr.id) && keyOf(dr).includes(key));
+    const key=norm(e.code);
+    let d = drafts.find(dr=>!used.has(dr.id) && keyOfDraft(dr).includes(key));
+    // Via master: kode alat → item (host_code) → draft (id, lalu nama)
+    if(!d){
+      const it=itemByCode[key];
+      if(it){
+        const cands=[draftByItemId[String(it.id)], draftByName[norm(it.name_id)], draftByName[norm(it.code)]];
+        d = cands.find(x=>x && !used.has(x.id)) || null;
+      }
+    }
     if(d) used.add(d.id);
     matches.push({ entry:e, draft:d||null });
   });
