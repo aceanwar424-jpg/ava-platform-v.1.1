@@ -838,26 +838,72 @@ function checkoutLabBooking() {
   }, 10000);
 }
 
-function checkoutHomeCare() {
+// RPC helper (pakai SB_HEADERS/SUPABASE_URL global dari js/core/api.js)
+async function appRpc(fn, args){
+  const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method:'POST', headers:SB_HEADERS, body:JSON.stringify(args||{}) });
+  if(!r.ok){ let d=null; try{ d=await r.json(); }catch(_){} throw new Error((d&&(d.message||d.hint))||('RPC '+fn+' gagal ('+r.status+')')); }
+  return r.json();
+}
+// Ambil GPS pasien sebagai titik penjemputan (pasien memesan dari rumah)
+function hcUseMyLocation(){
+  const st = document.getElementById('hc-loc-status');
+  if(!navigator.geolocation){ if(st) st.textContent='❌ GPS tidak didukung browser'; return; }
+  if(st) st.textContent='⏳ Mengambil lokasi…';
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+    document.getElementById('hc-lat').value=lat.toFixed(7);
+    document.getElementById('hc-lng').value=lng.toFixed(7);
+    if(st) st.innerHTML=`✅ Lokasi tersimpan (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
+  }, err=>{ if(st) st.textContent='❌ '+err.message+' — nakes bisa set lokasi dari alamat.'; }, {enableHighAccuracy:true, timeout:15000});
+}
+// Sukses booking → tawarkan halaman pelacakan (track.html di root, relatif dari apps/)
+function hcShowBookingSuccess(num, token){
+  const link = token ? new URL('../track.html?token='+encodeURIComponent(token), location.href).href : '';
+  if(link){
+    if(confirm(`✅ Pesanan Home Care ${num} berhasil dibuat!\n\nTim medis akan mengonfirmasi & menugaskan nakes. Anda bisa melacak posisi nakes secara real-time.\n\nBuka halaman pelacakan sekarang?`))
+      window.open(link, '_blank');
+  } else {
+    alert(`✅ Pesanan Home Care ${num} berhasil dibuat! Tim medis akan menghubungi Anda untuk konfirmasi jadwal & nakes.`);
+  }
+  showView('patient-view', 'Dashboard');
+}
+
+async function checkoutHomeCare() {
   if (bookingCart.length === 0) {
     alert('Anda belum memilih pemeriksaan apapun di menu lab test.');
     return;
   }
+  const addrDetail = (document.getElementById('hc-addr-detail')?.value||'').trim();
+  const addrFull   = (document.getElementById('hc-addr-full')?.value||'').trim();
+  if (!addrFull) { alert('Masukkan alamat lengkap penjemputan!'); return; }
+  const addr = [addrFull, addrDetail].filter(Boolean).join(' — ');
 
-  const addr = document.getElementById('hc-addr-full').value.trim();
-  if (!addr) {
-    alert('Masukkan alamat lengkap penjemputan!');
-    return;
-  }
-
-  alert(`Pemesanan Home Care sukses!\nPetugas medis akan melakukan kunjungan untuk melakukan pengambilan sampel di alamat: ${addr}`);
-  
-  // Reset cart
-  bookingCart = [];
-  updateCartUIs();
-  renderLabCatalogue();
-
-  showView('patient-view', 'Dashboard');
+  const btn = document.getElementById('hc-pay-btn'); const oldTxt = btn ? btn.textContent : '';
+  if (btn){ btn.disabled = true; btn.textContent = 'Memproses…'; }
+  try {
+    const tests   = bookingCart.map(i=>i.name).join(', ');
+    const subtotal= bookingCart.reduce((s,i)=>s+(i.price||0),0);
+    const lat = parseFloat(document.getElementById('hc-lat')?.value) || null;
+    const lng = parseFloat(document.getElementById('hc-lng')?.value) || null;
+    const name  = (currentUserProfile?.full_name) || currentUsername || 'Pasien App';
+    const phone = currentUserProfile?.phone || '';
+    const num   = 'HC-'+Date.now().toString().slice(-6);
+    const res = await sbPost('homecare_orders', {
+      order_number: num, patient_name: name, patient_phone: phone,
+      patient_address: addr, service_type: 'Pengambilan Sampel (Home Care)',
+      scheduled_date: document.getElementById('hc-date-field')?.value || null,
+      status: 'Baru', total_amount: subtotal, lat, lng,
+      notes: 'Booking via App Pasien. Pemeriksaan: '+tests,
+      created_by_name: name, updated_at: new Date().toISOString(),
+    });
+    const orderId = res?.[0]?.id;
+    let token = '';
+    if (orderId) { try { token = await appRpc('homecare_ensure_token', {p_order_id: orderId}); } catch(e){} }
+    bookingCart = []; updateCartUIs(); if (typeof renderLabCatalogue==='function') renderLabCatalogue();
+    hcShowBookingSuccess(num, token);
+  } catch(e) {
+    alert('❌ Gagal membuat pesanan: '+e.message);
+  } finally { if (btn){ btn.disabled=false; btn.textContent=oldTxt; } }
 }
 
 // Update Login Form UI dynamically based on role selection
@@ -960,13 +1006,24 @@ function closeHomeCareModal() {
   if (modal) modal.classList.remove('open');
 }
 
-function submitHomeCareForm(event) {
+async function submitHomeCareForm(event) {
   event.preventDefault();
-  const service = document.getElementById('hc-service').value.trim();
-  const address = document.getElementById('hc-address').value.trim();
-  
+  const service = (document.getElementById('hc-service')?.value||'').trim();
+  const address = (document.getElementById('hc-address')?.value||'').trim();
   closeHomeCareModal();
-  alert(`Booking Home Care sukses! Tenaga medis AvaHealth akan melakukan kunjungan untuk layanan "${service}" ke alamat Anda pada tanggal kunjungan.`);
+  try {
+    const name = (currentUserProfile?.full_name) || currentUsername || 'Pasien App';
+    const num  = 'HC-'+Date.now().toString().slice(-6);
+    const res = await sbPost('homecare_orders', {
+      order_number: num, patient_name: name, patient_phone: currentUserProfile?.phone || '',
+      patient_address: address, service_type: service || 'Layanan Home Care',
+      status: 'Baru', notes: 'Booking cepat via App Pasien',
+      created_by_name: name, updated_at: new Date().toISOString(),
+    });
+    const orderId = res?.[0]?.id;
+    let token = ''; if (orderId){ try { token = await appRpc('homecare_ensure_token', {p_order_id: orderId}); } catch(e){} }
+    hcShowBookingSuccess(num, token);
+  } catch(e) { alert('❌ Gagal membuat pesanan: '+e.message); }
 }
 
 // --- BUY PACKAGE MODAL TRIGGERS ---
