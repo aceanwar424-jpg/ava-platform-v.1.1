@@ -755,7 +755,11 @@ function updateCartUIs() {
   // 2. Update Booking Home Care Cart
   if (hcCartContainer) {
     if (bookingCart.length === 0) {
-      hcCartContainer.innerHTML = `<span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>`;
+      hcCartContainer.innerHTML = `
+        <div style="text-align:center; padding:8px 0;">
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Belum memilih pemeriksaan.</div>
+          <button type="button" class="btn btn-sm btn-teal" onclick="showView('book-test-view','Pesan Lab')" style="margin:0; padding:8px 14px; font-size:12px;">+ Pilih Pemeriksaan</button>
+        </div>`;
     } else {
       hcCartContainer.innerHTML = bookingCart.map(item => `
         <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-main);">
@@ -856,6 +860,46 @@ function hcUseMyLocation(){
     if(st) st.innerHTML=`✅ Lokasi tersimpan (${lat.toFixed(5)}, ${lng.toFixed(5)})`;
   }, err=>{ if(st) st.textContent='❌ '+err.message+' — nakes bisa set lokasi dari alamat.'; }, {enableHighAccuracy:true, timeout:15000});
 }
+
+// ── Autocomplete alamat (saran seperti di peta) ────────────────────────
+// Memakai Nominatim (OpenStreetMap) — gratis, tanpa kunci, cakupan Indonesia.
+// Memilih saran mengisi alamat SEKALIGUS koordinat (lat/lng) untuk pelacakan.
+let _hcAddrTimer = null, _hcAddrSel = [];
+function hcAddrSearch(q){
+  q = (q||'').trim();
+  clearTimeout(_hcAddrTimer);
+  if(q.length < 3){ hcAddrHideSuggest(); return; }
+  _hcAddrTimer = setTimeout(async ()=>{
+    const box = document.getElementById('hc-addr-suggest'); if(!box) return;
+    box.style.display='block';
+    box.innerHTML = `<div style="padding:10px 12px; font-size:12px; color:#64748b;">Mencari…</div>`;
+    try{
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=id&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`;
+      const res = await fetch(url, { headers:{ 'Accept':'application/json' } });
+      const data = await res.json();
+      _hcAddrSel = data || [];
+      if(!_hcAddrSel.length){ box.innerHTML = `<div style="padding:10px 12px; font-size:12px; color:#64748b;">Tak ada hasil. Coba lebih spesifik, atau pakai GPS.</div>`; return; }
+      box.innerHTML = _hcAddrSel.map((d,i)=>`
+        <div onmousedown="hcAddrPick(${i})" style="padding:9px 12px; font-size:12.5px; color:#0f172a; cursor:pointer; border-bottom:1px solid #f1f5f9;"
+          onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#fff'">
+          📍 ${(d.display_name||'').replace(/</g,'&lt;')}
+        </div>`).join('');
+    }catch(e){ box.innerHTML = `<div style="padding:10px 12px; font-size:12px; color:#ef4444;">Gagal memuat saran — pakai GPS atau ketik manual.</div>`; }
+  }, 450);
+}
+function hcAddrPick(i){
+  const d = _hcAddrSel[i]; if(!d) return;
+  const full = document.getElementById('hc-addr-full');
+  if(full) full.value = d.display_name || '';
+  if(d.lat && d.lon){
+    document.getElementById('hc-lat').value = (+d.lat).toFixed(7);
+    document.getElementById('hc-lng').value = (+d.lon).toFixed(7);
+    const st = document.getElementById('hc-loc-status');
+    if(st) st.innerHTML = `✅ Lokasi tersimpan dari alamat (${(+d.lat).toFixed(5)}, ${(+d.lon).toFixed(5)})`;
+  }
+  hcAddrHideSuggest();
+}
+function hcAddrHideSuggest(){ const b=document.getElementById('hc-addr-suggest'); if(b) b.style.display='none'; }
 // Sukses booking → tawarkan halaman pelacakan (track.html di root, relatif dari apps/)
 function hcShowBookingSuccess(num, token){
   const link = token ? new URL('../track.html?token='+encodeURIComponent(token), location.href).href : '';

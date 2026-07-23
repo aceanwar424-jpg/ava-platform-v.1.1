@@ -839,12 +839,13 @@
                 <input type="text" id="hc-addr-detail" placeholder="Contoh: Perumahan Indah Blok A No. 12" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
               </div>
 
-              <div class="input-group" style="margin-bottom:0;">
+              <div class="input-group" style="margin-bottom:0; position:relative;">
                 <label style="color:#64748b;">Your Address</label>
-                <input type="text" id="hc-addr-full" placeholder="Masukkan alamat lengkap penjemputan" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
+                <input type="text" id="hc-addr-full" autocomplete="off" placeholder="Ketik alamat — muncul saran seperti di peta" oninput="hcAddrSearch(this.value)" onblur="setTimeout(hcAddrHideSuggest,180)" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a; width:100%;">
+                <div id="hc-addr-suggest" style="display:none; position:absolute; left:0; right:0; top:100%; z-index:30; background:#fff; border:1px solid #cbd5e1; border-radius:8px; margin-top:4px; box-shadow:0 8px 24px -8px rgba(0,0,0,.25); max-height:220px; overflow-y:auto;"></div>
                 <div style="display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap;">
                   <button type="button" class="btn btn-teal" onclick="hcUseMyLocation()" style="padding:8px 12px; font-size:12px;">📍 Gunakan Lokasi Saya (GPS)</button>
-                  <span id="hc-loc-status" style="font-size:11.5px; color:#64748b;">Untuk pelacakan nakes saat kunjungan</span>
+                  <span id="hc-loc-status" style="font-size:11.5px; color:#64748b;">Ketik alamat untuk saran, atau pakai GPS</span>
                   <input type="hidden" id="hc-lat"><input type="hidden" id="hc-lng">
                 </div>
               </div>
@@ -865,7 +866,7 @@
             <h5 style="font-size:13px; font-weight:700; color:#0f2963; border-bottom:1px solid #e2e8f0; padding-bottom:8px;">Order review</h5>
             <div id="hc-cart-items" style="display:flex; flex-direction:column; gap:8px;">
               <!-- Tied to checkout selections -->
-              <span style="font-size:11px; color:var(--text-muted); text-align:center; padding:12px 0;">Belum memilih pemeriksaan. Silakan pilih di menu lab test terlebih dahulu.</span>
+              <div style="text-align:center; padding:8px 0;"><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">Belum memilih pemeriksaan.</div><button type="button" class="btn btn-sm btn-teal" onclick="showView('book-test-view','Pesan Lab')" style="margin:0; padding:8px 14px; font-size:12px;">+ Pilih Pemeriksaan</button></div>
             </div>
 
             <div style="border-top:1px solid #e2e8f0; padding-top:12px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
@@ -1980,6 +1981,6 @@
   </div>
 
   <script src="../js/core/api.js?v=20260719k"></script>
-  <script src="app.js?v=20260719g"></script>
+  <script src="app.js?v=20260721n"></script>
 </body>
 </html>
