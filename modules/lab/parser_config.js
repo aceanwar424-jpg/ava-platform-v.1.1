@@ -123,7 +123,8 @@ function lpcOpenModal(){
             ${_lpcMsgs.map(m=>`<option value="${m.id}">${m.received_at?new Date(m.received_at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):''} · ${m.status} · ${(m.raw_text||'').replace(/\s+/g,' ').slice(0,30)}…</option>`).join('')}
           </select></div>
         <textarea id="lpc-raw" rows="6" placeholder="Tempel kiriman mentah alat di sini, atau pilih pesan di atas" style="width:100%;font-family:monospace;font-size:11.5px"></textarea>
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin:6px 0">
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin:6px 0;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="lpcAutoDetect()" title="Tebak posisi field dari pesan nyata">✨ Auto-deteksi</button>
           <button class="btn btn-ghost btn-sm" onclick="lpcHostMap()" title="Petakan kode alat → parameter (isi host_code)">🔗 Peta Host Code</button>
           <button class="btn btn-teal btn-sm" onclick="lpcTest()">🔎 Uji Parse</button>
         </div>
@@ -162,7 +163,7 @@ function lpcTest(){
   const box=document.getElementById('lpc-preview'); if(!box) return;
   if(!raw.trim()){ box.innerHTML='<span style="color:#B45309">Tempel/ pilih pesan dulu.</span>'; return; }
   const { entries, barcode } = parseWithProfile(raw, cfg);
-  const sample = barcode ? (typeof labSamples!=='undefined'?labSamples:[]).find(s=>String(s.barcode)===String(barcode)) : null;
+  const sample = barcode ? (typeof labSamples!=='undefined'?labSamples:[]).find(s=>String(s.barcode)===String(barcode)||String(s.visit_number)===String(barcode)) : null;
   box.innerHTML=`
     <div style="margin-bottom:6px">Barcode terbaca: <b style="font-family:monospace">${barcode||'(tak ada)'}</b>
       ${barcode?(sample?`<span class="badge badge-green">✓ ${sample.patient_name||'sampel ditemukan'}</span>`:'<span class="badge" style="background:#FEE2E2;color:#B91C1C">sampel tak ditemukan</span>'):''}</div>
@@ -172,6 +173,75 @@ function lpcTest(){
       :'<tr><td colspan="4" style="text-align:center;color:#B45309;padding:12px">0 baris — sesuaikan Record/field hasil.</td></tr>'}
     </tbody></table></div>`;
 }
+// Tebak posisi field dari pesan nyata (mengatasi format alat non-standar).
+function lpcAutoDetect(){
+  const raw=document.getElementById('lpc-raw')?.value||'';
+  if(!raw.trim()){ toast('Tempel / pilih pesan dulu','warn'); return; }
+  const fs=(document.getElementById('lpc-fs')?.value)||'|';
+  const cs=(document.getElementById('lpc-cs')?.value)||'^';
+  const isNum=v=>/^-?\d+(?:[.,]\d+)?$/.test(String(v||'').trim());
+  const lines=raw.split(/\r\n|\r|\n/).map(l=>l.trim()).filter(Boolean);
+
+  // Kelompokkan baris per tipe record (buang nomor frame ASTM di depan).
+  const groups={};
+  lines.forEach(l=>{ const f=l.split(fs); const rec=(f[0]||'').replace(/^\d+/,'').trim().toUpperCase(); if(rec) (groups[rec]=groups[rec]||[]).push(f); });
+
+  // Record hasil = yang paling sering memuat angka & muncul >=2x.
+  let best=null,bestScore=-1;
+  Object.entries(groups).forEach(([rec,rows])=>{
+    const score=rows.filter(f=>f.some(isNum)).length;
+    if(rows.length>=2 && score>bestScore){ bestScore=score; best=[rec,rows]; }
+  });
+  if(!best){ toast('Tak bisa deteksi otomatis — set manual','warn'); return; }
+  const [rec,rows]=best;
+  const maxLen=Math.max(...rows.map(f=>f.length));
+
+  // Statistik per index field.
+  const numFrac=[],alphaFrac=[];
+  for(let i=0;i<maxLen;i++){
+    let n=0,a=0,t=0;
+    rows.forEach(f=>{ const v=(f[i]||'').trim(); if(!v)return; t++; if(isNum(v))n++; else if(/[a-zA-Z]/.test(v))a++; });
+    numFrac[i]=t?n/t:0; alphaFrac[i]=t?a/t:0;
+  }
+  // Field nilai = fraksi numerik tertinggi (setelah index 2).
+  let vf=-1,vfr=0; for(let i=3;i<maxLen;i++){ if(numFrac[i]>vfr){ vfr=numFrac[i]; vf=i; } }
+  if(vf<0){ toast('Tak menemukan kolom nilai','warn'); return; }
+  // Field kode = field alfabetik terdekat SEBELUM nilai.
+  let cf=-1; for(let i=vf-1;i>=2;i--){ if(alphaFrac[i]>0.5){ cf=i; break; } }
+  // Komponen kode = index komponen non-kosong pertama pada contoh kode.
+  let cc='';
+  if(cf>=0){
+    const sample=(rows.find(f=>(f[cf]||'').trim())||[])[cf]||'';
+    const parts=sample.split(cs);
+    if(parts.length>1){ const idx=parts.findIndex(x=>x.trim()!==''); cc = idx<0?'0':String(idx); }
+  }
+  // Field unit = tepat setelah nilai bila alfabetik.
+  let uf=(vf+1<maxLen && alphaFrac[vf+1]>0.3 && numFrac[vf+1]<0.5)? vf+1 : '';
+  // Field flag = field pendek H/L/N/A/F setelah nilai.
+  let ff=''; for(let i=vf+1;i<maxLen;i++){ if(rows.some(f=>/^[HLNAF*]{1,2}$/i.test((f[i]||'').trim()))){ ff=i; break; } }
+
+  // Barcode: cari field (di record apa pun) yang cocok dgn barcode/visit sampel nyata.
+  let brec='', bf='', bc='';
+  const samples=(typeof labSamples!=='undefined'?labSamples:[]);
+  outer: for(const [r,rws] of Object.entries(groups)){
+    const m=Math.max(...rws.map(f=>f.length));
+    for(let i=1;i<m;i++){
+      for(const f of rws){
+        const v=(f[i]||'').split(cs).find(x=>x.trim())||''; const vv=v.trim();
+        if(vv && samples.some(s=>String(s.barcode)===vv || String(s.visit_number)===vv)){ brec=r; bf=i; break outer; }
+      }
+    }
+  }
+
+  const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=(v==null?'':v); };
+  set('lpc-format','delimited'); set('lpc-fs',fs); set('lpc-cs',cs);
+  set('lpc-rrec',rec); set('lpc-cf',cf>=0?cf:''); set('lpc-cc',cc);
+  set('lpc-vf',vf); set('lpc-uf',uf); set('lpc-ff',ff);
+  set('lpc-brec',brec); set('lpc-bf',bf); set('lpc-bc',bc);
+  toast(`Deteksi: record ${rec}, kode f${cf}${cc!==''?'.'+cc:''}, nilai f${vf}${brec?` · barcode ${brec} f${bf}`:' · barcode tak ketemu'}`,'ok',5000);
+  lpcTest();
+}
+
 async function lpcSave(silent){
   const cfg=lpcReadForm();
   try{ await sbPatch('analyzers', _lpcAid, { parser_config: cfg, updated_at:new Date().toISOString() });
