@@ -50,6 +50,7 @@ async function renderHomeCare() {
       <div><h1>Home Care</h1>
         <p>Manajemen order layanan kunjungan rumah — jadwal, nakes, billing</p></div>
       <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="renderHCLiveMap()">🗺️ Peta Live</button>
         <button class="btn btn-ghost btn-sm" onclick="renderHCStaff()">👥 Master Nakes</button>
         <button class="btn btn-ghost btn-sm" onclick="renderHCTariff()">🏷️ Master Tarif</button>
         <button class="btn btn-ghost btn-sm" onclick="renderHCReport()">📊 Laporan</button>
@@ -557,6 +558,13 @@ async function openHCForm(id=null) {
       <div class="form-group" style="grid-column:1/-1">
         <label>Alamat Kunjungan *</label>
         <textarea id="hf-addr" rows="2" placeholder="Jl. ..., RT/RW, Kelurahan, Kecamatan">${o.patient_address||''}</textarea>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="hcPickLocation()">📍 Set Lokasi di Peta</button>
+          <span id="hf-loc-status" style="font-size:11.5px;color:var(--gray)">${(o.lat&&o.lng)?`✅ Lokasi tersimpan (${(+o.lat).toFixed(5)}, ${(+o.lng).toFixed(5)})`:'Belum ada titik lokasi — untuk pelacakan peta'}</span>
+          <input type="hidden" id="hf-lat" value="${o.lat||''}">
+          <input type="hidden" id="hf-lng" value="${o.lng||''}">
+        </div>
+        <div id="hf-map" style="display:none;height:220px;border-radius:10px;margin-top:8px;border:1px solid var(--border)"></div>
       </div>
       <div class="form-group">
         <label>Tanggal Kunjungan</label>
@@ -743,6 +751,8 @@ async function saveHCOrder(id) {
     commission_amount: Math.round(amount * commPct / 100),
     partner_id:      parseInt(document.getElementById('hf-partner').value)||null,
     notes:           document.getElementById('hf-notes').value.trim(),
+    lat:             parseFloat(document.getElementById('hf-lat')?.value) || null,
+    lng:             parseFloat(document.getElementById('hf-lng')?.value) || null,
     created_by_name: user,
     updated_at:      new Date().toISOString(),
     ...(num ? {order_number:num} : {}),
@@ -1309,4 +1319,187 @@ async function saveHCTariff(id) {
     else { await sbPost('homecare_tariffs',payload); toast('✅ Tarif ditambahkan','ok'); }
     closeModalForce(); await loadHCMasters(true); renderHCTariffTable();
   } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HOME CARE — INTEGRASI PETA LIVE (booking pin + tracking GPS)
+// ═══════════════════════════════════════════════════════════════
+async function hcRpc(fn, args){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method:'POST', headers:SB_HEADERS, body:JSON.stringify(args||{}) });
+  let d=null; try{ d=await res.json(); }catch(e){}
+  if(!res.ok) throw new Error((d&&(d.message||d.hint)) || `RPC ${fn} gagal (${res.status})`);
+  return d;
+}
+
+// Loader Google Maps (promise, reuse loadMapsApiKey; skip bila sudah dimuat modul lain)
+let _hcGmapsPromise = null;
+function hcEnsureGmaps(){
+  if (window.google && window.google.maps) return Promise.resolve();
+  if (_hcGmapsPromise) return _hcGmapsPromise;
+  _hcGmapsPromise = (async () => {
+    const key = (typeof loadMapsApiKey==='function') ? await loadMapsApiKey() : '';
+    if (!key) throw new Error('Google Maps API key belum diset (menu Maps → simpan API Key).');
+    await new Promise((resolve, reject) => {
+      window.__hcGmapsReady = () => resolve();
+      const s = document.createElement('script');
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=__hcGmapsReady&language=id`;
+      s.async = true; s.onerror = () => reject(new Error('Gagal memuat Google Maps'));
+      document.head.appendChild(s);
+    });
+  })();
+  return _hcGmapsPromise;
+}
+
+// ── Pemilih lokasi pasien di form booking ────────────────────────
+let _hcPickMap=null, _hcPickMarker=null;
+async function hcPickLocation(){
+  const mapEl=document.getElementById('hf-map'); const st=document.getElementById('hf-loc-status');
+  if(!mapEl) return;
+  try{ await hcEnsureGmaps(); }catch(e){ toast(e.message,'err'); return; }
+  mapEl.style.display='block';
+  const addr=(document.getElementById('hf-addr').value||'').trim();
+  const curLat=parseFloat(document.getElementById('hf-lat').value), curLng=parseFloat(document.getElementById('hf-lng').value);
+  const hasCur = !isNaN(curLat)&&!isNaN(curLng);
+  const center = hasCur?{lat:curLat,lng:curLng}:{lat:-6.2088,lng:106.8456};
+  _hcPickMap=new google.maps.Map(mapEl,{center,zoom:hasCur?16:12,mapTypeControl:false,streetViewControl:false});
+  const setPin=(pos)=>{
+    if(_hcPickMarker) _hcPickMarker.setMap(null);
+    _hcPickMarker=new google.maps.Marker({position:pos,map:_hcPickMap,draggable:true});
+    const put=(p)=>{ document.getElementById('hf-lat').value=p.lat.toFixed(7); document.getElementById('hf-lng').value=p.lng.toFixed(7);
+      st.textContent=`✅ Lokasi: ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)} (geser/klik untuk sesuaikan)`; };
+    put(pos);
+    _hcPickMarker.addListener('dragend',e=>put({lat:e.latLng.lat(),lng:e.latLng.lng()}));
+  };
+  _hcPickMap.addListener('click',e=>setPin({lat:e.latLng.lat(),lng:e.latLng.lng()}));
+  if(hasCur){ setPin(center); }
+  else if(addr){
+    st.textContent='⏳ Mencari alamat…';
+    new google.maps.Geocoder().geocode({address:addr+', Indonesia'},(r,s)=>{
+      if(s==='OK'&&r[0]){ const l=r[0].geometry.location; const p={lat:l.lat(),lng:l.lng()}; _hcPickMap.setCenter(p); _hcPickMap.setZoom(16); setPin(p); }
+      else st.textContent='Alamat tak ditemukan otomatis — klik peta untuk menandai lokasi.';
+    });
+  } else st.textContent='Klik peta untuk menandai lokasi pasien.';
+}
+
+// ── Peta Live (admin/operator) ───────────────────────────────────
+let _hcLive={ map:null, markers:[], staffMarkers:{}, timer:null, directions:null, info:null, orders:[] };
+async function renderHCLiveMap(){
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div><h1>🗺️ Peta Live Home Care</h1>
+        <p>Posisi nakes real-time + order aktif · klik pin untuk rute &amp; ETA</p></div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Kembali</button>
+        <button class="btn btn-ghost btn-sm" onclick="hcRefreshLive(true)">🔄 Refresh</button>
+        <button class="btn btn-teal btn-sm" onclick="hcOpenShareLocation()">📡 Bagikan Lokasi (Nakes)</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--gray);margin-bottom:8px">
+      ${Object.entries(HC_STATUS).filter(([s])=>!['Selesai','Dibatalkan'].includes(s)).map(([s,v])=>
+        `<span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${v.color};vertical-align:middle"></span> ${s}</span>`).join('')}
+      <span>🚑 nakes (live)</span>
+    </div>
+    <div id="hc-live-status" style="font-size:12px;color:var(--gray);margin-bottom:8px">Memuat peta…</div>
+    <div id="hc-live-map" style="height:70vh;min-height:420px;border-radius:12px;border:1px solid var(--border)"></div>`;
+  try{ await hcEnsureGmaps(); }catch(e){ document.getElementById('hc-live-map').innerHTML=`<div style="padding:20px;color:#B91C1C">❌ ${e.message}</div>`; return; }
+  _hcLive.map=new google.maps.Map(document.getElementById('hc-live-map'),{center:{lat:-6.2088,lng:106.8456},zoom:12,mapTypeControl:false,streetViewControl:false});
+  _hcLive.directions=new google.maps.DirectionsRenderer({map:_hcLive.map,suppressMarkers:true,polylineOptions:{strokeColor:'#0EA5E9',strokeWeight:5}});
+  if(_hcLive.timer) clearInterval(_hcLive.timer);
+  await hcRefreshLive(true);
+  _hcLive.timer=setInterval(()=>{ if(!document.getElementById('hc-live-map')){ clearInterval(_hcLive.timer); _hcLive.timer=null; return; } hcRefreshLive(false); }, 20000);
+}
+async function hcRefreshLive(fit){
+  if(!_hcLive.map) return;
+  let orders=[]; try{ orders=await hcRpc('homecare_live_orders',{}); }catch(e){ const el=document.getElementById('hc-live-status'); if(el) el.textContent='❌ '+e.message; return; }
+  _hcLive.orders=Array.isArray(orders)?orders:[];
+  _hcLive.markers.forEach(m=>m.setMap(null)); _hcLive.markers=[];
+  Object.values(_hcLive.staffMarkers).forEach(m=>m.setMap(null)); _hcLive.staffMarkers={};
+  const bounds=new google.maps.LatLngBounds(); let plotted=0, staffLive=0;
+  _hcLive.orders.forEach(o=>{
+    const col=(HC_STATUS[o.status]||{}).color||'#64748b';
+    if(o.lat&&o.lng){
+      const m=new google.maps.Marker({position:{lat:+o.lat,lng:+o.lng},map:_hcLive.map,title:`${o.patient_name} · ${o.status}`,
+        icon:{path:google.maps.SymbolPath.CIRCLE,scale:8,fillColor:col,fillOpacity:1,strokeColor:'#fff',strokeWeight:2}});
+      m.addListener('click',()=>hcLiveOrderInfo(o,m));
+      _hcLive.markers.push(m); bounds.extend(m.getPosition()); plotted++;
+    }
+    if(o.staff_lat&&o.staff_lng){
+      staffLive++;
+      const sm=new google.maps.Marker({position:{lat:+o.staff_lat,lng:+o.staff_lng},map:_hcLive.map,
+        title:`Nakes: ${o.staff_name}`, label:{text:'🚑',fontSize:'20px'}, zIndex:999});
+      _hcLive.staffMarkers[o.staff_id||o.id]=sm; bounds.extend(sm.getPosition());
+    }
+  });
+  if(fit && (plotted+staffLive)>0){ _hcLive.map.fitBounds(bounds); if((plotted+staffLive)===1) _hcLive.map.setZoom(15); }
+  const el=document.getElementById('hc-live-status');
+  if(el) el.textContent=`${_hcLive.orders.length} order aktif · ${plotted} berlokasi · ${staffLive} nakes berbagi lokasi · diperbarui ${new Date().toLocaleTimeString('id-ID')}`;
+}
+function hcTrackLink(token){ return `${location.origin}${location.pathname.replace(/[^/]*$/,'')}track.html?token=${token}`; }
+function hcLiveOrderInfo(o, marker){
+  const st=(HC_STATUS[o.status]||{});
+  const html=`<div style="font-size:12.5px;min-width:210px">
+    <div style="font-weight:800">${st.icon||''} ${o.patient_name||'—'}</div>
+    <div style="color:#64748b">${o.service_type||''} · ${o.status}</div>
+    <div style="margin:3px 0">${o.scheduled_date||''} ${o.scheduled_time||''}</div>
+    <div>Nakes: <b>${o.staff_name||'—'}</b>${o.staff_lat?' · <span style="color:#16a34a">📡 live</span>':' · <span style="color:#94a3b8">offline</span>'}</div>
+    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+      ${(o.staff_lat&&o.lat)?`<button class="btn btn-teal btn-sm" onclick="hcRouteToPatient(${o.id})">🧭 Rute + ETA</button>`:''}
+      <button class="btn btn-ghost btn-sm" onclick="hcCopyTrackLink(${o.id})">🔗 Link Pasien</button>
+      <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">✏️ Detail</button>
+    </div>
+    <div id="hc-eta-${o.id}" style="font-size:11.5px;color:var(--teal);margin-top:4px"></div></div>`;
+  if(_hcLive.info) _hcLive.info.close();
+  _hcLive.info=new google.maps.InfoWindow({content:html}); _hcLive.info.open(_hcLive.map,marker);
+}
+function hcRouteToPatient(id){
+  const o=_hcLive.orders.find(x=>x.id===id); if(!o||!o.staff_lat||!o.lat) return;
+  new google.maps.DirectionsService().route({
+    origin:{lat:+o.staff_lat,lng:+o.staff_lng}, destination:{lat:+o.lat,lng:+o.lng}, travelMode:'DRIVING'
+  },(res,status)=>{
+    const etaEl=document.getElementById(`hc-eta-${id}`);
+    if(status==='OK'&&res.routes[0]){ _hcLive.directions.setDirections(res); const leg=res.routes[0].legs[0]; if(etaEl) etaEl.textContent=`🚗 ${leg.distance.text} · ETA ${leg.duration.text}`; }
+    else if(etaEl) etaEl.textContent='Rute tak ditemukan';
+  });
+}
+async function hcCopyTrackLink(id){
+  try{
+    const tok=await hcRpc('homecare_ensure_token',{p_order_id:id});
+    const link=hcTrackLink(tok);
+    try{ await navigator.clipboard.writeText(link); toast('🔗 Link pelacakan pasien disalin','ok'); }
+    catch(e){ prompt('Salin link pelacakan pasien:', link); }
+  }catch(e){ toast(e.message,'err'); }
+}
+
+// ── Nakes berbagi lokasi (GPS) ───────────────────────────────────
+let _hcWatchId=null, _hcWatchStaff=null;
+async function hcOpenShareLocation(){
+  try{ await loadHCMasters(); }catch(e){}
+  const opts=(typeof hcStaff!=='undefined'?hcStaff:[]).filter(s=>s.is_active!==false)
+    .map(s=>`<option value="${s.id}">${s.staff_name}${s.role_title?' · '+s.role_title:''}</option>`).join('');
+  openModal(`<div class="modal-header"><div class="modal-title">📡 Bagikan Lokasi Nakes</div><button class="modal-close" onclick="hcStopShare();closeModalForce()">✕</button></div>
+    <div style="padding:4px 2px">
+      <p style="font-size:12.5px;color:var(--gray)">Pilih nama Anda (nakes) lalu izinkan akses lokasi. Posisi GPS dikirim otomatis selama halaman ini terbuka — admin & pasien melihat pergerakan Anda.</p>
+      <div class="form-group"><label>Nakes</label><select id="hc-share-staff">${opts||'<option value="">(belum ada master nakes)</option>'}</select></div>
+      <div id="hc-share-status" style="font-size:12px;margin-top:8px;padding:8px;border-radius:8px;background:var(--bg2)">Siap.</div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-teal" onclick="hcStartShare()">▶ Mulai Bagikan</button>
+        <button class="btn btn-ghost" onclick="hcStopShare()">⏹ Stop</button>
+      </div></div>`);
+}
+function hcStartShare(){
+  const sel=document.getElementById('hc-share-staff'); const st=document.getElementById('hc-share-status');
+  const sid=parseInt(sel&&sel.value); if(!sid){ toast('Pilih nakes','warn'); return; }
+  if(!navigator.geolocation){ if(st) st.textContent='❌ Browser tak mendukung geolocation'; return; }
+  hcStopShare(); _hcWatchStaff=sid;
+  if(st) st.textContent='⏳ Meminta izin lokasi…';
+  _hcWatchId=navigator.geolocation.watchPosition(async pos=>{
+    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+    try{ await hcRpc('homecare_track_update',{p_staff_id:sid,p_lat:lat,p_lng:lng});
+      if(st) st.innerHTML=`📡 Terkirim: ${lat.toFixed(5)}, ${lng.toFixed(5)} · ${new Date().toLocaleTimeString('id-ID')}`; }
+    catch(e){ if(st) st.textContent='❌ '+e.message; }
+  }, err=>{ if(st) st.textContent='❌ '+err.message; }, {enableHighAccuracy:true,maximumAge:8000,timeout:20000});
+}
+function hcStopShare(){
+  if(_hcWatchId!=null){ navigator.geolocation.clearWatch(_hcWatchId); _hcWatchId=null; }
+  const st=document.getElementById('hc-share-status'); if(st&&_hcWatchStaff) st.textContent='⏹ Berhenti berbagi lokasi.';
 }

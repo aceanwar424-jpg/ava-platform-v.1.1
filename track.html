@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Lacak Nakes — OneLab Home Care</title>
+<style>
+  :root{ --teal:#14b8a6; --ink:#0f172a; --mut:#64748b; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:-apple-system,Segoe UI,Roboto,Inter,sans-serif; background:#eef2f6; color:var(--ink); }
+  header{ background:linear-gradient(135deg,#0b1526,#0f2038); color:#fff; padding:14px 16px; display:flex; align-items:center; gap:10px; }
+  header .mk{ width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#14b8a6,#0ea5e9);display:grid;place-items:center;font-weight:800;font-size:13px }
+  header h1{ font-size:15px; font-weight:800; letter-spacing:-.2px }
+  header p{ font-size:11px; color:#93a4bd }
+  #card{ background:#fff; margin:12px; border-radius:14px; padding:14px 16px; box-shadow:0 8px 24px -18px rgba(15,23,42,.4) }
+  .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin:6px 0 }
+  .lbl{ font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:.4px }
+  .val{ font-size:14px; font-weight:700 }
+  #badge{ display:inline-block; padding:4px 12px; border-radius:999px; font-size:12px; font-weight:700; color:#fff }
+  #eta{ font-size:22px; font-weight:800; color:var(--teal) }
+  #map{ height:52vh; min-height:300px; margin:0 12px 12px; border-radius:14px; border:1px solid #dbe2ea; background:#dde5ec }
+  #msg{ margin:12px; padding:14px; border-radius:12px; background:#fff; font-size:13px; color:var(--mut); text-align:center }
+  .pulse{ animation:pulse 1.4s infinite } @keyframes pulse{ 0%,100%{opacity:1} 50%{opacity:.5} }
+  a.call{ display:inline-block;margin-top:4px;font-size:12.5px;color:var(--teal);font-weight:700;text-decoration:none }
+</style>
+</head>
+<body>
+<header>
+  <div class="mk">OL</div>
+  <div><h1>Pelacakan Nakes</h1><p>OneLab Home Care</p></div>
+</header>
+
+<div id="msg" class="pulse">Memuat data pelacakan…</div>
+<div id="card" style="display:none">
+  <div class="row"><div><div class="lbl">Nakes</div><div class="val" id="v-staff">—</div>
+    <a class="call" id="v-call" href="#" style="display:none">📞 Hubungi</a></div>
+    <div style="text-align:right"><div class="lbl">Status</div><span id="badge">—</span></div></div>
+  <div class="row"><div><div class="lbl">Layanan</div><div class="val" id="v-svc">—</div></div>
+    <div style="text-align:right"><div class="lbl">Perkiraan tiba</div><div id="eta">—</div></div></div>
+  <div class="lbl" style="margin-top:6px" id="v-fresh"></div>
+</div>
+<div id="map" style="display:none"></div>
+
+<script>
+const SUPABASE_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
+const HDR = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, 'Content-Type':'application/json' };
+const STATUS_COLOR = { 'Baru':'#94A3B8','Dikonfirmasi':'#0EA5E9','Dijadwalkan':'#8B5CF6','Dalam Perjalanan':'#F97316','Sedang Dilayani':'#22C55E','Selesai':'#00897B','Dibatalkan':'#EF4444' };
+const token = new URLSearchParams(location.search).get('token');
+let map, patientMarker, staffMarker, directions, mapReady=false;
+
+function showMsg(t){ const m=document.getElementById('msg'); m.style.display='block'; m.classList.remove('pulse'); m.textContent=t; }
+
+async function rpc(fn,args){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:HDR,body:JSON.stringify(args||{})});
+  if(!r.ok) throw new Error('Gagal memuat data ('+r.status+')');
+  return r.json();
+}
+async function getMapsKey(){
+  try{ const r=await fetch(`${SUPABASE_URL}/rest/v1/settings?key=eq.maps_api_key&select=value`,{headers:HDR});
+    const d=await r.json(); return d?.[0]?.value || ''; }catch(e){ return ''; }
+}
+function loadMaps(key){ return new Promise((res,rej)=>{
+  if(window.google&&google.maps) return res();
+  window.__ready=()=>res(); const s=document.createElement('script');
+  s.src=`https://maps.googleapis.com/maps/api/js?key=${key}&callback=__ready&language=id`;
+  s.async=true; s.onerror=()=>rej(new Error('Gagal memuat peta')); document.head.appendChild(s);
+}); }
+
+async function tick(){
+  let d; try{ d=await rpc('homecare_track_public',{p_token:token}); }catch(e){ showMsg('❌ '+e.message); return; }
+  if(!d || !d.order_number){ showMsg('Link pelacakan tidak valid atau order telah selesai.'); return; }
+  document.getElementById('msg').style.display='none';
+  document.getElementById('card').style.display='block';
+  document.getElementById('v-staff').textContent = d.staff_name || 'Belum ditugaskan';
+  document.getElementById('v-svc').textContent = d.service_type || '—';
+  const b=document.getElementById('badge'); b.textContent=d.status||'—'; b.style.background=STATUS_COLOR[d.status]||'#64748b';
+  const call=document.getElementById('v-call');
+  if(d.staff_phone){ call.style.display='inline-block'; call.href='tel:'+d.staff_phone; } else call.style.display='none';
+  document.getElementById('v-fresh').textContent = d.staff_loc_at
+    ? (d.loc_fresh ? '📡 Lokasi nakes live' : '⚠ Lokasi terakhir '+new Date(d.staff_loc_at).toLocaleTimeString('id-ID'))
+    : 'Nakes belum berbagi lokasi';
+
+  if(!mapReady && (d.patient_lat || d.staff_lat)){
+    document.getElementById('map').style.display='block';
+    const c = d.patient_lat?{lat:+d.patient_lat,lng:+d.patient_lng}:{lat:+d.staff_lat,lng:+d.staff_lng};
+    map=new google.maps.Map(document.getElementById('map'),{center:c,zoom:14,mapTypeControl:false,streetViewControl:false,fullscreenControl:false});
+    directions=new google.maps.DirectionsRenderer({map,suppressMarkers:true,polylineOptions:{strokeColor:'#14b8a6',strokeWeight:5}});
+    mapReady=true;
+  }
+  if(mapReady){
+    if(d.patient_lat){ const p={lat:+d.patient_lat,lng:+d.patient_lng};
+      if(!patientMarker) patientMarker=new google.maps.Marker({position:p,map,label:{text:'🏠',fontSize:'20px'},title:'Lokasi Anda'});
+      else patientMarker.setPosition(p); }
+    if(d.staff_lat){ const s={lat:+d.staff_lat,lng:+d.staff_lng};
+      if(!staffMarker) staffMarker=new google.maps.Marker({position:s,map,label:{text:'🚑',fontSize:'22px'},zIndex:99,title:d.staff_name||'Nakes'});
+      else staffMarker.setPosition(s); }
+    // Rute + ETA bila kedua titik ada & nakes dalam perjalanan
+    if(d.patient_lat && d.staff_lat && d.loc_fresh && d.status!=='Selesai'){
+      new google.maps.DirectionsService().route({origin:{lat:+d.staff_lat,lng:+d.staff_lng},destination:{lat:+d.patient_lat,lng:+d.patient_lng},travelMode:'DRIVING'},(r,st)=>{
+        if(st==='OK'&&r.routes[0]){ directions.setDirections(r); const leg=r.routes[0].legs[0];
+          document.getElementById('eta').textContent=leg.duration.text; }
+      });
+      const bnds=new google.maps.LatLngBounds(); bnds.extend(patientMarker.getPosition()); bnds.extend(staffMarker.getPosition()); map.fitBounds(bnds);
+    } else if(d.status==='Sedang Dilayani'){ document.getElementById('eta').textContent='Sedang dilayani'; }
+      else if(d.status==='Selesai'){ document.getElementById('eta').textContent='Selesai'; }
+      else document.getElementById('eta').textContent='—';
+  }
+}
+
+(async ()=>{
+  if(!token){ showMsg('Token pelacakan tidak ditemukan di tautan.'); return; }
+  const key=await getMapsKey();
+  if(key){ try{ await loadMaps(key); }catch(e){ /* peta gagal, tetap tampil kartu */ } }
+  await tick();
+  setInterval(tick, 15000);
+})();
+</script>
+</body>
+</html>
