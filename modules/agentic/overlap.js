@@ -175,7 +175,9 @@ function agOverlapPaint(rows){
       border-radius:8px;padding:9px 11px;margin-bottom:7px;${dim?'opacity:.6':''}">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
         <div style="font-size:11px;font-weight:800;color:var(--navy)">
-          Kemiripan ${(r.score*100).toFixed(0)}% ${agOvTypeChip(r.overlap_type)}
+          Kemiripan ${(r.score*100).toFixed(0)}%
+          <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;${r.method==='semantic'?'background:#EDE9FE;color:#5B21B6':'background:#E0F2FE;color:#075985'}">${r.method==='semantic'?'makna':'kata'}</span>
+          ${agOvTypeChip(r.overlap_type)}
           ${r.status!=='DETECTED'?`<span style="font-size:10px;color:var(--gray);font-weight:600">· ${agEsc(r.status)}${r.reviewed_by?' oleh '+agEsc(r.reviewed_by):''}</span>`:''}
         </div>
         ${r.status==='DETECTED'?`<div style="display:flex;gap:5px">
@@ -229,14 +231,34 @@ function agOverlapRenderSection(containerId){
             <input id="ag-ov-th" type="number" min="0.3" max="0.95" step="0.05" value="0.5" style="width:64px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-size:11.5px"></label>
           <label style="font-size:11px;color:var(--gray);display:flex;align-items:center;gap:4px">
             <input id="ag-ov-samedept" type="checkbox"> hanya dept sama</label>
-          <button class="ag-btn pub" style="padding:6px 12px" onclick="agOverlapScan()">${typeof icon==='function'?icon('refresh',13):''} Pindai Sekarang</button>
+          <button class="ag-btn mut" style="padding:6px 12px" onclick="agOverlapScan()" title="Berbasis kesamaan KATA (Jaccard) — cepat, tanpa AI, tanpa indeks">${typeof icon==='function'?icon('refresh',13):''} Pindai Kata</button>
+          <button class="ag-btn pub" style="padding:6px 12px" onclick="agOverlapScanSemantic()" title="Berbasis kesamaan MAKNA (embedding) — butuh dokumen diindeks di Tanya Dokumen">${typeof icon==='function'?icon('sparkles',13):''} Pindai Makna (AI)</button>
         </div>
       </div>
       <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">
-        Membandingkan ${nText} dokumen berteks satu sama lain. Tanpa AI — deteksi berbasis kesamaan istilah &amp; klausul.
-        Hasil bersifat <b>anjuran</b>; keputusan gabung/biarkan ada pada Anda.
+        <b>Pindai Kata</b>: cepat, dari kesamaan istilah &amp; klausul (${nText} dokumen berteks). <b>Pindai Makna</b>:
+        menangkap SOP yang bermakna sama walau katanya beda — butuh dokumen diindeks dulu (Tanya Dokumen → Indeks).
+        Untuk makna, mulai ambang tinggi (mis. 0,82). Hasil bersifat <b>anjuran</b>.
       </div>
       <div id="ag-ov-result"></div>
     </div>`;
   agOverlapLoad();
+}
+
+// Pindai berbasis makna (embedding centroid) — perhitungan di Postgres.
+async function agOverlapScanSemantic(){
+  let th = parseFloat((document.getElementById('ag-ov-th') || {}).value);
+  if(!(th>0)) th = 0.82;
+  if(th < 0.6 && !confirm(`Ambang makna ${th} cukup rendah — bisa banyak positif palsu. Lanjut?\n(Saran: 0,80–0,88)`)) return;
+  const body = document.getElementById('ag-ov-result');
+  if(body) body.innerHTML = `<div class="loading-row"><div class="spinner"></div></div><div style="text-align:center;font-size:11px;color:var(--gray)">membandingkan makna dokumen…</div>`;
+  try{
+    const r = await agRpc('agentic_overlap_scan_semantic', { p_threshold: th });
+    if(r && r.note){ if(body) body.innerHTML = `<div class="status-box status-warn">${agEsc(r.note)}</div>`; return; }
+    if(typeof logActivity==='function') logActivity('overlap_semantic','document_overlaps','scan',`Pindai makna: ${(r&&r.inserted)||0} pasangan ≥ ${th} dari ${(r&&r.docs)||0} dok`,'');
+    toast(`Pindai makna selesai — ${(r&&r.inserted)||0} pasangan baru (${(r&&r.docs)||0} dokumen terindeks)`, (r&&r.inserted)?'warn':'ok');
+    await agOverlapLoad();
+  }catch(e){
+    if(body) body.innerHTML = `<div class="status-box status-warn">Gagal — pastikan <code>supabase_agentic_overlap.sql</code> (Fase 2) &amp; <code>supabase_agentic_rag.sql</code> sudah dijalankan, dan dokumen sudah diindeks.<div style="font-size:11px;color:var(--gray);margin-top:4px">${agEsc(e.message)}</div></div>`;
+  }
 }

@@ -112,6 +112,93 @@ GRANT EXECUTE ON FUNCTION public.agentic_overlap_save(JSONB)          TO anon, a
 GRANT EXECUTE ON FUNCTION public.agentic_overlap_list()              TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.agentic_overlap_status(UUID,TEXT,TEXT) TO anon, authenticated, service_role;
 
+-- ══════════════════════════════════════════════════════════════
+-- FASE 2 — Deteksi tumpang tindih SEMANTIK (berbasis embedding)
+-- ──────────────────────────────────────────────────────────────
+-- Fase 1 (di atas) memakai kemiripan KATA (Jaccard). Fase 2 memakai kemiripan
+-- MAKNA: cosine antar centroid embedding dokumen (agentic.document_embeddings,
+-- diisi oleh RAG — supabase_agentic_rag.sql). Menangkap dua SOP yang bermakna
+-- sama walau katanya berbeda. Perhitungan seluruhnya di Postgres (pgvector).
+--
+-- Kolom method membedakan pasangan hasil lexical vs semantik agar tiap pemindaian
+-- hanya menyentuh hasilnya sendiri, dan keputusan manusia (RESOLVED/DISMISSED)
+-- tetap dipertahankan.
+-- ══════════════════════════════════════════════════════════════
+
+ALTER TABLE agentic.document_overlaps
+  ADD COLUMN IF NOT EXISTS method TEXT NOT NULL DEFAULT 'lexical';
+
+-- Selaraskan penyimpan lexical: tandai method & hanya buang deteksi lexical.
+CREATE OR REPLACE FUNCTION public.agentic_overlap_save(p_pairs JSONB)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v_ins INT := 0;
+BEGIN
+  DELETE FROM agentic.document_overlaps WHERE status = 'DETECTED' AND method = 'lexical';
+  WITH src AS (
+    SELECT LEAST((e->>'doc_a')::uuid,(e->>'doc_b')::uuid) AS a,
+           GREATEST((e->>'doc_a')::uuid,(e->>'doc_b')::uuid) AS b,
+           (e->>'score')::numeric AS score,
+           COALESCE(e->'shared_terms','[]'::jsonb)   AS terms,
+           COALESCE(e->'shared_clauses','[]'::jsonb) AS clauses
+    FROM jsonb_array_elements(COALESCE(p_pairs,'[]'::jsonb)) e
+    WHERE (e->>'doc_a')::uuid <> (e->>'doc_b')::uuid
+  ), ins AS (
+    INSERT INTO agentic.document_overlaps (doc_a, doc_b, score, shared_terms, shared_clauses, method)
+    SELECT a, b, score, terms, clauses, 'lexical' FROM src
+    ON CONFLICT (doc_a, doc_b) DO NOTHING RETURNING 1
+  )
+  SELECT count(*) INTO v_ins FROM ins;
+  RETURN jsonb_build_object('inserted', v_ins);
+END $$;
+
+-- Pemindaian semantik: cosine antar centroid dokumen, simpan pasangan >= ambang.
+CREATE OR REPLACE FUNCTION public.agentic_overlap_scan_semantic(p_threshold NUMERIC DEFAULT 0.82)
+RETURNS JSONB LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, agentic AS $$
+DECLARE v_ins INT := 0; v_docs INT;
+BEGIN
+  SELECT count(*) INTO v_docs FROM agentic.document_embeddings WHERE embedding IS NOT NULL;
+  IF v_docs < 2 THEN
+    RETURN jsonb_build_object('inserted',0,'docs',v_docs,
+      'note','Butuh >= 2 dokumen terindeks. Indeks dulu di Tanya Dokumen.');
+  END IF;
+
+  DELETE FROM agentic.document_overlaps WHERE status='DETECTED' AND method='semantic';
+
+  WITH pair AS (
+    SELECT a.document_id AS da, b.document_id AS db,
+           (1 - (a.embedding <=> b.embedding))::numeric AS sim
+    FROM agentic.document_embeddings a
+    JOIN agentic.document_embeddings b ON a.document_id < b.document_id
+    WHERE a.embedding IS NOT NULL AND b.embedding IS NOT NULL
+  ), ins AS (
+    INSERT INTO agentic.document_overlaps (doc_a, doc_b, score, method)
+    SELECT da, db, round(sim,3), 'semantic' FROM pair
+    WHERE sim >= COALESCE(p_threshold,0.82)
+    ON CONFLICT (doc_a, doc_b) DO NOTHING RETURNING 1
+  )
+  SELECT count(*) INTO v_ins FROM ins;
+  RETURN jsonb_build_object('inserted', v_ins, 'docs', v_docs);
+END $$;
+
+-- List: sertakan method.
+CREATE OR REPLACE FUNCTION public.agentic_overlap_list()
+RETURNS JSONB LANGUAGE sql SECURITY DEFINER SET search_path = public, agentic AS $$
+  SELECT COALESCE(jsonb_agg(jsonb_build_object(
+    'id', o.id, 'score', o.score, 'status', o.status, 'method', o.method,
+    'overlap_type', o.overlap_type, 'recommendation', o.recommendation,
+    'shared_terms', o.shared_terms, 'shared_clauses', o.shared_clauses,
+    'reviewed_by', o.reviewed_by, 'reviewed_at', o.reviewed_at,
+    'doc_a', o.doc_a, 'doc_b', o.doc_b,
+    'a_title', da.title, 'a_number', da.doc_number, 'a_dept', da.department,
+    'b_title', db.title, 'b_number', db.doc_number, 'b_dept', db.department
+  ) ORDER BY (o.status='DETECTED') DESC, o.score DESC), '[]'::jsonb)
+  FROM agentic.document_overlaps o
+  JOIN agentic.document_registry da ON da.id = o.doc_a
+  JOIN agentic.document_registry db ON db.id = o.doc_b;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.agentic_overlap_scan_semantic(NUMERIC) TO anon, authenticated, service_role;
+
 -- ── Verifikasi ─────────────────────────────────────────────────
-SELECT 'agentic overlap (Fase 1) siap' AS status,
+SELECT 'agentic overlap (Fase 1 + 2) siap' AS status,
        (SELECT count(*) FROM agentic.document_overlaps) AS jumlah_pasangan;
