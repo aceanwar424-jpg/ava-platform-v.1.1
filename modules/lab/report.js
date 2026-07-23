@@ -236,17 +236,17 @@ async function printLabReport(patientName, visitNumber, sampleRows){
   const contact=[cfg.phone?'☎ '+cfg.phone:'',cfg.email||'',cfg.website||''].filter(Boolean).join(' · ');
   
   // Hitung padding/margin
-  const pTop = cfg.bg_image_url ? (cfg.margin_top || '20mm') : '22px';
-  const pBottom = cfg.bg_image_url ? (cfg.margin_bottom || '20mm') : '22px';
-  const pLeft = cfg.bg_image_url ? (cfg.margin_left || '15mm') : '22px';
-  const pRight = cfg.bg_image_url ? (cfg.margin_right || '15mm') : '22px';
+  const pTop = cfg.margin_top || '20mm';
+  const pBottom = cfg.margin_bottom || '20mm';
+  const pLeft = cfg.margin_left || '15mm';
+  const pRight = cfg.margin_right || '15mm';
 
   w.document.open();
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hasil Lab — ${patientName}</title>
     <style>
       @page{ 
         size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
-        margin: ${cfg.bg_image_url ? '0' : '14mm 12mm'}; 
+        margin: 0; 
       }
       *{box-sizing:border-box}
       body{
@@ -255,7 +255,9 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         color:#1A2B3C;
         margin:0;
         padding: ${pTop} ${pRight} ${pBottom} ${pLeft};
-        ${cfg.bg_image_url ? `width: ${cfg.paper_width || '210mm'}; height: ${cfg.paper_height || '297mm'}; position: relative;` : ''}
+        position: relative;
+        width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
+        height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
       }
       .header{
         display:${cfg.hide_default_header ? 'none' : 'flex'};
@@ -332,7 +334,10 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .legend{font-size:9.5px;color:#000;margin-top:8px}
       
       .footer{
-        ${cfg.bg_image_url && cfg.signature_y ? `position: absolute; bottom: ${cfg.signature_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : 'margin-top: 30px;'}
+        position: absolute;
+        bottom: ${pBottom};
+        left: ${pLeft};
+        right: ${pRight};
       }
       .signs{display:flex;justify-content:flex-end;margin-top:16px}
       .signs > div{width: 250px; font-size:11px; text-align: center;}
