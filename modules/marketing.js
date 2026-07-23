@@ -27,7 +27,7 @@ const MKT_TYPES = [
     contentPlaceholder:'Dengan hormat,\n\n...',
     hasFile: false },
 
-  { key:'proposal',    label:'📋 Proposal Mitra', icon:'📋',
+  { key:'proposal',    label:'Proposal Mitra', icon:'',
     fields:['content','file'],
     hint:'Proposal kerjasama. Bisa upload file DOC/PDF sebagai template visual.',
     contentLabel:'Isi Proposal (teks)',
@@ -61,7 +61,7 @@ const MKT_TYPES = [
     fileAccepts: ['application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
     isLetterType: true },
 
-  { key:'mou_template',label:'📜 Template MOU', icon:'📜',
+  { key:'mou_template',label:'Template MOU', icon:'',
     fields:['content','file'],
     hint:'Upload template MOU dalam format DOC/DOCX.',
     contentLabel:'Ringkasan / Catatan MOU',
@@ -152,7 +152,7 @@ async function renderMarketing() {
       </button>
       <button id="mkt-section-voucher" class="ms-tab"
         onclick="switchMktSection('voucher')">
-        🎟 Voucher Builder
+        Voucher Builder
       </button>
     </div>
 
@@ -228,7 +228,7 @@ async function renderVoucherInline(container) {
       </div>
       <div class="tabs">
         <button class="tab-btn active" onclick="switchVoucherTab('campaigns',this)">🎯 Campaign</button>
-        <button class="tab-btn" onclick="switchVoucherTab('vouchers',this)">🎟 Daftar Voucher</button>
+        <button class="tab-btn" onclick="switchVoucherTab('vouchers',this)">Daftar Voucher</button>
       </div>
       <div id="campaigns-tab">
         <div id="campaigns-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">
@@ -238,7 +238,7 @@ async function renderVoucherInline(container) {
       <div id="vouchers-tab" style="display:none">
         <div class="table-wrap">
           <div class="table-toolbar">
-            <input class="table-search" id="vc-search" placeholder="🔍 Cari kode, nama penerima..."
+            <input class="table-search" id="vc-search" placeholder="Cari kode, nama penerima..."
               oninput="filterVouchers(this.value)">
             <select class="table-filter" id="vc-campaign" onchange="filterVouchers()">
               <option value="">Semua Campaign</option>
@@ -315,7 +315,7 @@ function renderMktGrid(templates) {
         ${t.file_url ? (isImage
           ? `<img src="${t.file_url}" style="width:100%;height:140px;object-fit:cover;border-radius:8px;background:var(--lgray)">`
           : `<div style="height:80px;background:var(--lgray);border-radius:8px;display:flex;align-items:center;justify-content:center;gap:8px">
-              <span style="font-size:32px">${t.file_type?.includes('pdf')?'📄':'📝'}</span>
+              <span style="font-size:32px">${t.file_type?.includes('pdf')?'📄':''}</span>
               <div><div style="font-size:12px;font-weight:600;color:var(--navy)">${t.file_name||'File template'}</div>
               <a href="${t.file_url}" target="_blank" style="font-size:11px;color:var(--teal)">Buka file ↗</a></div>
             </div>`)
@@ -330,17 +330,17 @@ function renderMktGrid(templates) {
             </div>
           </div>
           <div style="display:flex;gap:4px;flex-shrink:0">
-            <button class="act-btn edit" onclick="openMktForm(${t.id})">✏️</button>
-            <button class="act-btn del" onclick="deleteMkt(${t.id},'${(t.title||'').replace(/'/g,"\\'")}')">🗑</button>
+            <button class="act-btn edit" onclick="openMktForm(${t.id})">${icon('edit', 12)}</button>
+            <button class="act-btn del" onclick="deleteMkt(${t.id},'${(t.title||'').replace(/'/g,"\\'")}')">${icon('trash', 12)}</button>
           </div>
         </div>
 
         ${preview ? `<div style="font-size:12px;color:var(--gray);line-height:1.5;background:var(--lgray);padding:8px;border-radius:6px;max-height:60px;overflow:hidden">${preview}${(t.content||'').length>100?'...':''}</div>` : ''}
 
         <div style="display:flex;gap:6px;margin-top:auto">
-          <button class="btn btn-teal btn-sm" style="flex:1" onclick="previewMkt(${t.id})">👁 Lihat</button>
-          <button class="btn btn-outline btn-sm" onclick="copyMktContent(${t.id})">📋 Salin</button>
-          ${t.type==='wa_message'||t.type==='email' ? `<button class="btn btn-ghost btn-sm" onclick="shareMktWA(${t.id})">💬</button>` : ''}
+          <button class="btn btn-teal btn-sm" style="flex:1" onclick="previewMkt(${t.id})">Lihat</button>
+          <button class="btn btn-outline btn-sm" onclick="copyMktContent(${t.id})">Salin</button>
+          ${t.type==='wa_message'||t.type==='email' ? `<button class="btn btn-ghost btn-sm" onclick="shareMktWA(${t.id})" style="font-size:10.5px;font-weight:700">WA</button>` : ''}
         </div>
       </div>`;
   }).join('');
@@ -355,7 +355,7 @@ function previewMkt(id) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${typeInfo.label} — ${t.title}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     ${t.file_url ? `
       <div style="margin-bottom:14px">
@@ -363,7 +363,7 @@ function previewMkt(id) {
         ${isImage
           ? `<img src="${t.file_url}" style="width:100%;border-radius:8px;max-height:300px;object-fit:contain;background:var(--lgray)">`
           : `<div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--lgray);border-radius:8px">
-              <span style="font-size:28px">${t.file_type?.includes('pdf')?'📄':'📝'}</span>
+              <span style="font-size:28px">${t.file_type?.includes('pdf')?'📄':''}</span>
               <div>
                 <div style="font-size:13px;font-weight:600;color:var(--navy)">${t.file_name||'File template'}</div>
                 <a href="${t.file_url}" target="_blank" class="btn btn-teal btn-sm" style="margin-top:4px;text-decoration:none;display:inline-block">⬇️ Download / Buka</a>
@@ -378,7 +378,7 @@ ${t.content}
       </div>` : ''}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      ${t.content ? `<button class="btn btn-outline" onclick="copyMktContent(${id});closeModalForce()">📋 Salin</button>` : ''}
+      ${t.content ? `<button class="btn btn-outline" onclick="copyMktContent(${id});closeModalForce()">Salin</button>` : ''}
       ${t.type==='wa_message' ? `<button class="btn btn-teal" onclick="shareMktWA(${id})">💬 Buka WA</button>` : ''}
     </div>`);
 }
@@ -386,7 +386,7 @@ ${t.content}
 function copyMktContent(id) {
   const t = mktAll.find(x=>x.id===id);
   if(!t || !t.content) { toast('Tidak ada konten teks','warn'); return; }
-  navigator.clipboard.writeText(t.content).then(()=>toast('📋 Tersalin!','ok')).catch(()=>toast('Gagal','err'));
+  navigator.clipboard.writeText(t.content).then(()=>toast('Tersalin!','ok')).catch(()=>toast('Gagal','err'));
 }
 
 function shareMktWA(id) {
@@ -412,7 +412,7 @@ async function openMktForm(id=null, defaultType=null) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${typeInfo.icon||'📄'} ${id?'Edit':'Tambah'} ${typeInfo.label.replace(/^\S+\s/,'')}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-group">
@@ -503,7 +503,7 @@ async function openMktForm(id=null, defaultType=null) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" id="mf-save-btn" onclick="saveMkt(${id||'null'})">
-        ${id?'💾 Simpan':'➕ Tambah'}
+        ${id?'Simpan':'+ Tambah'}
       </button>
     </div>`);
 }
@@ -554,7 +554,7 @@ async function saveMkt(id) {
       }
     } catch(e) {
       toast('❌ Gagal upload file: '+e.message,'err');
-      if (btn) { btn.disabled=false; btn.textContent=id?'💾 Simpan':'➕ Tambah'; }
+      if (btn) { btn.disabled=false; btn.textContent=id?'Simpan':'+ Tambah'; }
       return;
     }
   }
@@ -591,7 +591,7 @@ async function saveMkt(id) {
     await loadMktTemplates();
   } catch(e) {
     toast('❌ '+e.message,'err');
-    if (btn) { btn.disabled=false; btn.textContent=id?'💾 Simpan':'➕ Tambah'; }
+    if (btn) { btn.disabled=false; btn.textContent=id?'Simpan':'+ Tambah'; }
   }
 }
 
@@ -599,7 +599,7 @@ async function deleteMkt(id, title) {
   if (!confirm(`Hapus template "${title}"?`)) return;
   try {
     await sbDelete('marketing_templates', id);
-    toast('🗑 Template dihapus','info');
+    toast('Template dihapus','info');
     await loadMktTemplates();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }

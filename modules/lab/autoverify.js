@@ -71,7 +71,7 @@ async function renderAutoverifyPanel(containerId, results) {
         <b style="color:${eligible.length ? '#15803D' : 'var(--gray)'}">${eligible.length}</b> hasil memenuhi syarat
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="openAutoverifyRules()">⚙️ Atur Aturan</button>
+        <button class="btn btn-ghost btn-sm" onclick="openAutoverifyRules()">Atur Aturan</button>
         ${eligible.length ? `<button class="btn btn-teal btn-sm" onclick="runAutoverify()">✅ Verifikasi Otomatis (${eligible.length})</button>` : ''}
       </div>
     </div>`;
@@ -108,8 +108,8 @@ async function openAutoverifyRules() {
   const belumDiatur = prods.filter(p => !rules.some(r => String(r.product_id) === String(p.id)));
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">⚙️ Aturan Autoverifikasi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Aturan Autoverifikasi</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:10px 13px;
       margin-bottom:12px;font-size:12.5px;color:#7a4a12">
@@ -135,7 +135,7 @@ async function openAutoverifyRules() {
           <td style="text-align:center"><input type="checkbox" ${r.is_active ? 'checked' : ''}
             onchange="toggleAutoverify(${r.id},this.checked)"></td>
           <td style="font-size:11.5px;color:var(--gray)">dalam rentang · tidak kritis · delta aman</td>
-          <td><button class="act-btn del" onclick="deleteAutoverifyRule(${r.id})">🗑</button></td>
+          <td><button class="act-btn del" onclick="deleteAutoverifyRule(${r.id})">${icon('trash', 12)}</button></td>
         </tr>`;
       }).join('') : `<tr><td colspan="4" style="padding:20px;text-align:center;color:var(--gray)">
         Belum ada aturan. Selama kosong, tidak ada hasil yang diverifikasi otomatis.</td></tr>`}

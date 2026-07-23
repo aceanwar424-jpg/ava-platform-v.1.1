@@ -316,7 +316,7 @@ async function openBatchEntry(nameEnc){
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Input Batch — ${name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
       Masukkan nilai lalu tekan <strong>Simpan Semua</strong>. Interpretasi & nilai kritis dihitung otomatis dari rentang rujukan.</div>

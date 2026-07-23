@@ -62,9 +62,9 @@ function renderAnamKPI() {
   const done    = anamAll.filter(a=>a.status==='Anamnesa').length;
   el.innerHTML = [
     {icon:'🕒', val:pending, label:'Menunggu Anamnesa', color:'#F59E0B'},
-    {icon:'🩺', val:done,    label:'Anamnesa Selesai',  color:'#8B5CF6'},
-    {icon:'🧪', val:inLab,   label:'Di Lab',            color:'#0EA5E9'},
-    {icon:'📋', val:anamAll.length, label:'Total Antrian', color:'#0A2342'},
+    {icon:'', val:done,    label:'Anamnesa Selesai',  color:'#8B5CF6'},
+    {icon:'', val:inLab,   label:'Di Lab',            color:'#0EA5E9'},
+    {icon:'', val:anamAll.length, label:'Total Antrian', color:'#0A2342'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:16px">${k.icon}</div>
@@ -124,8 +124,8 @@ async function openAnamnesaForm(admissionId) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🩺 Anamnesa — ${a.patient_name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Anamnesa — ${a.patient_name}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${a.mr_number||''}</strong> · ${a.visit_number} · ${a.patient_gender||''} ${a.patient_age?a.patient_age+' th':''} · ${anamServicesSummary(a)}
@@ -172,13 +172,13 @@ async function openAnamnesaForm(admissionId) {
 
     <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#1E40AF">
       ${hasLab
-        ? '🧪 Kunjungan ini <strong>ada tes lab</strong>. Setelah anamnesa disimpan, barcode akan digenerate & dicetak, lalu pasien dilempar ke <strong>Lab</strong>.'
+        ? 'Kunjungan ini <strong>ada tes lab</strong>. Setelah anamnesa disimpan, barcode akan digenerate & dicetak, lalu pasien dilempar ke <strong>Lab</strong>.'
         : 'ℹ️ Kunjungan ini <strong>tanpa tes lab</strong>. Setelah anamnesa disimpan, status menjadi <strong>Selesai</strong>.'}
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-outline" onclick="saveAnamnesa(${admissionId},false)">💾 Simpan Saja</button>
+      <button class="btn btn-outline" onclick="saveAnamnesa(${admissionId},false)">Simpan Saja</button>
       <button class="btn btn-teal" onclick="saveAnamnesa(${admissionId},true)">
         ${hasLab?'✅ Simpan → Print Barcode → Lab':'✅ Simpan → Selesai'}</button>
     </div>`, 'wide');
@@ -330,7 +330,7 @@ function renderExam(){
             <div style="color:var(--gray)">${a.patient_name||''} · ${a.patient_gender==='F'?'Perempuan':a.patient_gender==='M'?'Laki-laki':''}${a.patient_age?' · '+a.patient_age+' th':''}</div>
           </div>
           <div style="text-align:center">${bc}<div style="font-family:monospace;font-size:9px;color:#475569">${a.visit_number||''}</div></div>
-          <button class="btn btn-ghost btn-sm" onclick="closeExam()">✕ Tutup</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeExam()">Tutup</button>
         </div>
         <div class="exam-body" id="exam-body"></div>
       </div>
@@ -497,13 +497,13 @@ async function loadExamICD(){
       <td style="font-size:11px">${r.case_type||''}</td>
       <td style="font-size:11px;color:var(--gray)">${r.description||'—'}</td>
       <td style="font-size:11px;color:var(--gray)">${r.dx_date||'—'}</td>
-      <td><button class="act-btn del" onclick="examDelICD(${r.id})">✕</button></td></tr>`).join('')
+      <td><button class="act-btn del" onclick="examDelICD(${r.id})" style="font-size:10.5px;font-weight:700"></button></td></tr>`).join('')
       :`<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:18px">Belum ada diagnosis</td></tr>`}
     </tbody></table>`;
 }
 function examAddICD(){
   openModal(`<div class="modal-header"><div class="modal-title">Tambah ICD-X Diagnostic</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>ICD Code *</label><input id="icd-code" placeholder="Z00.0"></div>
       <div class="form-group" style="grid-column:2/-1"><label>Diagnose Name *</label><input id="icd-name" placeholder="General medical examination"></div>

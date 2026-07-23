@@ -265,7 +265,7 @@ function refViewTracking() {
           ${formatCurrency(m)}${refRugi(t) ? ' ⚠️' : ''}</td>
         <td><div class="act-row">
           ${t.status === 'Dikirim' ? `
-            <button class="btn btn-teal btn-xs" onclick="refOpenReceiveForm(${t.id})">📥 Terima Hasil</button>
+            <button class="btn btn-teal btn-xs" onclick="refOpenReceiveForm(${t.id})">Terima Hasil</button>
             <button class="btn btn-ghost btn-xs" style="color:#B91C1C" onclick="refCancelTest(${t.id})">Batalkan</button>` : ''}
           ${t.status === 'Diterima' ? `
             <button class="btn btn-ghost btn-xs" onclick="refOpenResultView(${t.id})">Lihat Hasil</button>` : ''}
@@ -319,7 +319,7 @@ function refOpenLabForm(id) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${id ? 'Ubah' : 'Tambah'} Lab Rekanan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group"><label>Nama Laboratorium *</label>
       <input type="text" id="ref-lf-name" value="${refEsc(l.name || '')}" placeholder="Nama lab rekanan"></div>
@@ -408,7 +408,7 @@ async function refOpenSendForm() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Kirim Pemeriksaan ke Lab Rekanan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-group" style="position:relative">
@@ -605,8 +605,8 @@ function refOpenReceiveForm(id) {
   const late = refIsLate(t);
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📥 Terima Hasil Rujukan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Terima Hasil Rujukan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div style="background:var(--bg2);border-radius:9px;padding:11px 13px;margin-bottom:13px;font-size:12.5px">
@@ -668,8 +668,8 @@ function refOpenResultView(id) {
   if (!t) return;
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🧾 Hasil Rujukan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Hasil Rujukan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--bg2);border-radius:9px;padding:11px 13px;margin-bottom:13px;font-size:12.5px">
       <div style="font-weight:700">${refEsc(t.patient_name || '—')}</div>

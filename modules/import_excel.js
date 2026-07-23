@@ -81,7 +81,7 @@ const IMPORT_TEMPLATES = {
   corporate_employees: {
     label: 'Karyawan Corporate',
     table: 'corporate_employees',
-    icon: '👥',
+    icon: '',
     sheet: 'Employees',
     upsertKey: null,
     note: '⚠️ Kolom kode_corp wajib ada dan harus cocok dengan data corporate yang sudah ada.',
@@ -101,7 +101,7 @@ const IMPORT_TEMPLATES = {
   partners: {
     label: 'Partner / Mitra',
     table: 'partners',
-    icon: '🤝',
+    icon: '',
     sheet: 'Partners',
     upsertKey: null,
     columns: [
@@ -120,7 +120,7 @@ const IMPORT_TEMPLATES = {
   product_items: {
     label: 'Code Item / Analit (per tes)',
     table: 'product_items',
-    icon: '🔬',
+    icon: '',
     sheet: 'CodeItems',
     upsertKey: null,
     special: 'product_items',
@@ -145,7 +145,7 @@ const IMPORT_TEMPLATES = {
   ref_ranges: {
     label: 'Reference Range / Nilai Rujukan',
     table: 'ref_ranges',
-    icon: '📊',
+    icon: '',
     sheet: 'RefRanges',
     upsertKey: null,
     special: 'ref_ranges',
@@ -219,7 +219,7 @@ function renderImportExcel() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📥 Bulk Upload — Config Master</h1>
+        <h1>Bulk Upload — Config Master</h1>
         <p>Upload massal semua master data (tes, code item, ref range, paket, korporat, keluarga, alat). Download template (CSV) dulu, isi, lalu upload.</p>
       </div>
       <div class="btn-row">
@@ -252,10 +252,10 @@ function renderImportExcel() {
 
     <!-- Import Log -->
     <div class="card">
-      <div class="card-title" style="margin-bottom:12px">📋 Log Import</div>
+      <div class="card-title" style="margin-bottom:12px">Log Import</div>
       <div id="import-log">
         <div class="empty-state" style="padding:30px">
-          <div class="ico" style="font-size:36px">📋</div>
+          <div class="ico" style="font-size:36px"></div>
           <p>Belum ada aktivitas import. Upload file Excel untuk mulai.</p>
         </div>
       </div>
@@ -391,7 +391,7 @@ function openImportModal(key) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${tpl.icon} Import ${tpl.label}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="status-box status-warn" style="margin-bottom:16px;font-size:13px">
@@ -555,9 +555,9 @@ function showImportPreview(key, tpl, parsed, headerRow, colMap) {
 
   statsEl.innerHTML = `
     <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <span>📊 Total baris valid: <strong>${parsed.length}</strong></span>
-      <span>📋 Kolom terbaca: <strong>${Object.keys(colMap).length}/${tpl.columns.length}</strong></span>
-      ${tpl.upsertKey ? `<span style="color:var(--teal)">🔄 Mode: Upsert (update jika ${tpl.upsertKey} sama)</span>` : `<span style="color:var(--accent)">➕ Mode: Insert (tambah semua)</span>`}
+      <span>Total baris valid: <strong>${parsed.length}</strong></span>
+      <span>Kolom terbaca: <strong>${Object.keys(colMap).length}/${tpl.columns.length}</strong></span>
+      ${tpl.upsertKey ? `<span style="color:var(--teal)">Mode: Upsert (update jika ${tpl.upsertKey} sama)</span>` : `<span style="color:var(--accent)">+ Mode: Insert (tambah semua)</span>`}
     </div>`;
 
   if (btnEl) btnEl.style.display = parsed.length ? '' : 'none';
@@ -792,7 +792,7 @@ function loadSheetJS(callback) {
   if (typeof XLSX !== 'undefined') { callback(); return; }
   const script = document.createElement('script');
   script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-  script.onload = () => { toast('📦 SheetJS loaded','info',1000); callback(); };
+  script.onload = () => { toast('SheetJS loaded','info',1000); callback(); };
   script.onerror = () => toast('❌ Gagal load library Excel','err');
   document.head.appendChild(script);
 }

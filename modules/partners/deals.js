@@ -3,16 +3,16 @@
 // ═══════════════════════════════════════════
 
 const DEAL_TYPES = [
-  { key:'MCU',          label:'🏥 MCU Karyawan',         color:'#0EA5E9', nextModule:'project' },
-  { key:'HealthDay',    label:'📅 Employee Health Day',  color:'#6366F1', nextModule:'project' },
+  { key:'MCU',          label:'MCU Karyawan',         color:'#0EA5E9', nextModule:'project' },
+  { key:'HealthDay',    label:'Employee Health Day',  color:'#6366F1', nextModule:'project' },
   { key:'Screening',    label:'🎯 Skrining Massal',      color:'#F59E0B', nextModule:'project' },
   { key:'Wellness',     label:'💪 Program Wellness',     color:'#22C55E', nextModule:'project' },
   { key:'Branding',     label:'📣 Branding Platform',    color:'#8B5CF6', nextModule:'mou' },
   { key:'OfficeCare',   label:'🏢 Office Care',          color:'#F97316', nextModule:'mou' },
   { key:'HomeCare',     label:'🏠 Home Care',            color:'#EF4444', nextModule:'mou' },
   { key:'Personal',     label:'👤 Personal Health',      color:'#EC4899', nextModule:null },
-  { key:'LabDiagnostic',label:'🔬 Lab Diagnostik',       color:'#14B8A6', nextModule:'mou' },
-  { key:'Lainnya',      label:'📋 Lainnya',              color:'#94A3B8', nextModule:null },
+  { key:'LabDiagnostic',label:'Lab Diagnostik',       color:'#14B8A6', nextModule:'mou' },
+  { key:'Lainnya',      label:'Lainnya',              color:'#94A3B8', nextModule:null },
 ];
 
 const DEAL_FREQ  = ['Sekali','Per Event','Bulanan','Kuartalan','Tahunan','Ongoing'];
@@ -21,8 +21,8 @@ const DEAL_STATUS = ['Active','Inactive','Completed','Expired'];
 async function openDealsModal(partnerId, partnerName) {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🤝 Output Kerjasama — ${partnerName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Output Kerjasama — ${partnerName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Summary -->
@@ -30,7 +30,7 @@ async function openDealsModal(partnerId, partnerName) {
 
     <div style="margin-bottom:12px;display:flex;justify-content:flex-end;gap:8px">
       <button class="btn btn-teal btn-sm" onclick="openDealForm(${partnerId},null,'${partnerName.replace(/'/g,"\\'")}')">
-        ➕ Tambah Output Kerjasama
+        + Tambah Output Kerjasama
       </button>
     </div>
 
@@ -81,7 +81,7 @@ function renderDealsList(partnerId, deals) {
   if (!deals.length) {
     el.innerHTML = `
       <div class="empty-state" style="padding:30px">
-        <div class="ico">🤝</div>
+        <div class="ico"></div>
         <h3>Belum ada output kerjasama</h3>
         <p>Catat setiap output kerjasama: MCU, Wellness, Branding, dll.<br>
         Masing-masing output bisa dilanjutkan ke MOU atau Project.</p>
@@ -164,7 +164,7 @@ async function openDealForm(partnerId, dealId=null, partnerNameHint='') {
     <div style="background:#fff;border-radius:14px;max-width:540px;width:100%;padding:22px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div style="font-size:16px;font-weight:800;color:var(--navy)">${dealId?'Edit Output Kerjasama':'Tambah Output Kerjasama'}</div>
-        <button onclick="document.getElementById('deal-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+        <button onclick="document.getElementById('deal-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray)" style="font-size:10.5px;font-weight:700"></button>
       </div>
 
       <div class="form-group">
@@ -252,7 +252,7 @@ async function openDealForm(partnerId, dealId=null, partnerNameHint='') {
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <button class="btn btn-ghost" onclick="document.getElementById('deal-overlay').remove()">Batal</button>
         <button class="btn btn-teal" id="df-save-btn" onclick="saveDeal(${partnerId},${dealId||'null'})">
-          ${dealId?'💾 Simpan':'➕ Tambah'}
+          ${dealId?'Simpan':'+ Tambah'}
         </button>
       </div>
     </div>`;
@@ -319,7 +319,7 @@ async function saveDeal(partnerId, dealId) {
     await loadDeals(partnerId);
   } catch(e) {
     toast('❌ '+e.message,'err');
-    if (btn) { btn.disabled=false; btn.textContent=dealId?'💾 Simpan':'➕ Tambah'; }
+    if (btn) { btn.disabled=false; btn.textContent=dealId?'Simpan':'+ Tambah'; }
   }
 }
 
@@ -336,7 +336,7 @@ async function deleteDeal(dealId, partnerId) {
   if (!confirm('Hapus output kerjasama ini?')) return;
   try {
     await sbDelete('partner_deals', dealId);
-    toast('🗑 Dihapus','info');
+    toast('Dihapus','info');
     await loadDeals(partnerId);
   } catch(e) { toast('❌ '+e.message,'err'); }
 }

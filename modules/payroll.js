@@ -14,7 +14,7 @@ async function renderPayroll() {
       <div><h1>Penggajian</h1>
         <p>Gaji pokok, tunjangan, komisi nakes, BPJS, dan PPh 21</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="openPayrollSettings()">⚙️ Parameter</button>
+        <button class="btn btn-ghost btn-sm" onclick="openPayrollSettings()">Parameter</button>
         <button class="btn btn-ghost btn-sm" onclick="openEmployeeComponents()">💼 Tunjangan Karyawan</button>
       </div>
     </div>
@@ -74,7 +74,7 @@ function paintPayroll() {
 
   if (!payRun) {
     if (st) st.textContent = '';
-    el.innerHTML = `<div class="empty-state"><div class="ico">💵</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada perhitungan gaji untuk ${payPeriod}</h3>
       <p>Klik "Hitung Gaji Periode Ini". Perhitungan dapat diulang selama belum final.</p></div>`;
     return;
@@ -82,7 +82,7 @@ function paintPayroll() {
 
   const final = payRun.status === 'Final';
   if (st) st.innerHTML = final
-    ? `<span style="color:#15803D;font-weight:600">🔒 Final</span> · dikunci ${payRun.finalized_at ? new Date(payRun.finalized_at).toLocaleString('id-ID') : ''}`
+    ? `<span style="color:#15803D;font-weight:600">Final</span> · dikunci ${payRun.finalized_at ? new Date(payRun.finalized_at).toLocaleString('id-ID') : ''}`
     : `<span style="color:#B45309;font-weight:600">Draft</span> · masih bisa dihitung ulang`;
 
   el.innerHTML = `
@@ -100,7 +100,7 @@ function paintPayroll() {
     </div>
 
     ${!final ? `<div style="text-align:right;margin-bottom:12px">
-      <button class="btn btn-teal" onclick="finalizePayroll(${payRun.id})">🔒 Finalkan &amp; Catat Jurnal</button>
+      <button class="btn btn-teal" onclick="finalizePayroll(${payRun.id})">Finalkan &amp; Catat Jurnal</button>
     </div>` : ''}
 
     <div class="table-wrap"><table><thead><tr>
@@ -122,7 +122,7 @@ function paintPayroll() {
       <td style="text-align:right;font-variant-numeric:tabular-nums;color:#B45309">${formatCurrency(i.bpjs_employee)}</td>
       <td style="text-align:right;font-variant-numeric:tabular-nums;color:#B45309">${formatCurrency(i.pph21)}</td>
       <td style="text-align:right;font-weight:800;font-variant-numeric:tabular-nums;color:#15803D">${formatCurrency(i.net)}</td>
-      <td><button class="btn btn-ghost btn-xs" onclick="printPayslip(${i.id})">🧾 Slip</button></td>
+      <td><button class="btn btn-ghost btn-xs" onclick="printPayslip(${i.id})">Slip</button></td>
     </tr>`).join('') || '<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--gray)">Tidak ada karyawan aktif</td></tr>'}
     </tbody></table></div>`;
 }
@@ -143,7 +143,7 @@ async function finalizePayroll(runId) {
   if (!confirm('Finalkan gaji periode ini?\n\nSetelah final, perhitungan terkunci dan jurnal beban gaji tercatat. Koreksi hanya lewat jurnal balik.')) return;
   try {
     await sbRpc('finalize_payroll', { p_run_id: runId });
-    toast('🔒 Gaji difinalkan dan jurnal tercatat', 'ok');
+    toast('Gaji difinalkan dan jurnal tercatat', 'ok');
     await loadPayroll();
   } catch (e) { toast('❌ ' + e.message, 'err'); }
 }
@@ -152,8 +152,8 @@ async function openPayrollSettings() {
   const rows = paySettings || [];
   if (!rows.length) { toast('Jalankan supabase_fase4b.sql dulu', 'warn'); return; }
   openModal(`
-    <div class="modal-header"><div class="modal-title">⚙️ Parameter Penggajian</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Parameter Penggajian</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:10px 13px;
       margin-bottom:12px;font-size:12.5px;color:#7a4a12">
       Nilai di bawah adalah <b>titik awal</b>, bukan angka resmi. Peraturan pajak dan iuran BPJS
@@ -172,7 +172,7 @@ async function openPayrollSettings() {
     </tr>`).join('')}</tbody></table></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePayrollSettings()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="savePayrollSettings()">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -206,7 +206,7 @@ async function openEmployeeComponents() {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">💼 Tunjangan &amp; Potongan Karyawan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Karyawan</label>
         <select id="ec-emp">${(emps || []).map(e => `<option value="${e.id}">${e.full_name}</option>`).join('')}</select></div>
@@ -228,7 +228,7 @@ async function openEmployeeComponents() {
         <td style="font-size:12.5px">${c.component || '—'}</td>
         <td style="font-size:11.5px;color:${c.comp_type === 'Potongan' ? '#B45309' : 'var(--teal)'}">${c.comp_type}</td>
         <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(c.amount)}</td>
-        <td><button class="act-btn del" onclick="deleteEmployeeComponent(${c.id})">🗑</button></td>
+        <td><button class="act-btn del" onclick="deleteEmployeeComponent(${c.id})">${icon('trash', 12)}</button></td>
       </tr>`;
     }).join('') || '<tr><td colspan="5" style="padding:16px;text-align:center;color:var(--gray)">Belum ada komponen</td></tr>'}
     </tbody></table></div>

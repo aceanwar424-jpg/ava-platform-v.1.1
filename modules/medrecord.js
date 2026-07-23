@@ -178,7 +178,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
         <!-- Anamnesa -->
         ${an?`
           <div style="margin-bottom:14px">
-            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🩺 Anamnesa & TTV</div>
+            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Anamnesa & TTV</div>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin-bottom:8px">
               ${[
                 {l:'Tensi',    v:`${an.systole||'—'}/${an.diastole||'—'} mmHg`},
@@ -198,7 +198,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
         <!-- Lab Results -->
         ${labR.length?`
           <div style="margin-bottom:14px">
-            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🧪 Hasil Laboratorium (${labR.length} tes)</div>
+            <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Hasil Laboratorium (${labR.length} tes)</div>
             <div style="overflow-x:auto">
               <table style="width:100%;font-size:12px;border-collapse:collapse">
                 <thead><tr style="background:var(--lgray)">
@@ -248,7 +248,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
             <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">❤️ Pemeriksaan Supportive (${suppR.length})</div>
             ${suppR.map(r=>{
               const c=cMap[r.color_code]||'#94A3B8';
-              const cfg=Object.entries(SUPPORTIVE_TYPES||{}).find(([t])=>r.product_name===t)?.[1]||{icon:'📋'};
+              const cfg=Object.entries(SUPPORTIVE_TYPES||{}).find(([t])=>r.product_name===t)?.[1]||{icon:''};
               return `<div style="background:var(--lgray);border-radius:8px;padding:10px 12px;margin-bottom:6px">
                 <div style="display:flex;align-items:center;gap:8px">
                   <span style="font-size:18px">${cfg.icon}</span>
@@ -335,7 +335,7 @@ function paintMRClinical() {
 
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
-        <div class="card-title">🩺 Rekam Klinis</div>
+        <div class="card-title">Rekam Klinis</div>
         <div class="btn-row">
           <button class="btn btn-outline btn-sm" onclick="openMRTimeline()">🕒 Garis Waktu</button>
           <button class="btn btn-ghost btn-sm" onclick="openAllergyForm()">+ Alergi</button>
@@ -378,7 +378,7 @@ function paintMRClinical() {
             ${n.locked?'background:var(--bg2)':''}">
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
               <div style="font-size:12px;font-weight:700">
-                ${n.locked?'🔒':'✏️'} ${n.note_type}
+                ${n.locked?'':''} ${n.note_type}
                 <span style="font-weight:400;color:var(--gray)">· ${n.author_name||'—'}${n.author_role?` (${n.author_role})`:''}
                 · ${new Date(n.created_at).toLocaleString('id-ID')}</span>
               </div>
@@ -395,8 +395,8 @@ function paintMRClinical() {
 
 function openNoteForm() {
   openModal(`
-    <div class="modal-header"><div class="modal-title">✏️ Catatan Klinis — ${mrClinical.name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Catatan Klinis — ${mrClinical.name}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Jenis</label>
         <select id="cn-type">${['SOAP','CPPT'].map(x=>`<option>${x}</option>`).join('')}</select></div>
@@ -410,7 +410,7 @@ function openNoteForm() {
     <div class="form-hint">Setelah ditandatangani, catatan terkunci. Koreksi dibuat sebagai adendum.</div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveNote()">💾 Simpan Draft</button>
+      <button class="btn btn-teal" onclick="saveNote()">Simpan Draft</button>
     </div>`, 'wide');
 }
 
@@ -449,14 +449,14 @@ async function signNote(id) {
 function openAllergyForm() {
   openModal(`
     <div class="modal-header"><div class="modal-title">⚠️ Tambah Alergi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Alergen *</label><input type="text" id="al-agent" placeholder="Penisilin, seafood, debu..."></div>
     <div class="form-group"><label>Reaksi</label><input type="text" id="al-react" placeholder="Ruam, sesak, bengkak..."></div>
     <div class="form-group"><label>Tingkat</label>
       <select id="al-sev">${['Ringan','Sedang','Berat'].map(x=>`<option${x==='Sedang'?' selected':''}>${x}</option>`).join('')}</select></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAllergy()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveAllergy()">Simpan</button>
     </div>`);
 }
 
@@ -478,8 +478,8 @@ async function saveAllergy() {
 
 function openProblemForm() {
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 Tambah Masalah / Diagnosis Kronis</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Tambah Masalah / Diagnosis Kronis</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode ICD-10</label><input type="text" id="pb-icd" placeholder="E11.9"></div>
       <div class="form-group"><label>Sejak</label><input type="date" id="pb-onset"></div>
@@ -487,7 +487,7 @@ function openProblemForm() {
     <div class="form-group"><label>Diagnosis *</label><input type="text" id="pb-dx" placeholder="Diabetes Melitus Tipe 2"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveProblem()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveProblem()">Simpan</button>
     </div>`);
 }
 
@@ -518,8 +518,8 @@ async function resolveProblem(id) {
 
 function openVitalForm() {
   openModal(`
-    <div class="modal-header"><div class="modal-title">🩺 Catat Tanda Vital</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Catat Tanda Vital</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
       <div class="form-group"><label>Sistolik</label><input type="number" id="vt-sys" placeholder="120"></div>
       <div class="form-group"><label>Diastolik</label><input type="number" id="vt-dia" placeholder="80"></div>
@@ -532,7 +532,7 @@ function openVitalForm() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveVital()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveVital()">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -560,7 +560,7 @@ function showVitalTrend() {
   const v = mrClinical.vitals;
   openModal(`
     <div class="modal-header"><div class="modal-title">📈 Tren Tanda Vital — ${mrClinical.name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="table-wrap"><table><thead><tr>
       <th>Waktu</th><th>TD</th><th>Nadi</th><th>Suhu</th><th>SpO₂</th><th>BB</th><th>IMT</th>
     </tr></thead><tbody>${v.map(x=>`<tr>

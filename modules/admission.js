@@ -6,9 +6,9 @@
 let admAll = [], admFilter = { status:'', type:'', search:'' };
 
 const ADM_STATUS = {
-  'Registered':  {color:'#0EA5E9', icon:'📋'},
-  'Anamnesa':    {color:'#8B5CF6', icon:'🩺'},
-  'Lab':         {color:'#F59E0B', icon:'🧪'},
+  'Registered':  {color:'#0EA5E9', icon:''},
+  'Anamnesa':    {color:'#8B5CF6', icon:''},
+  'Lab':         {color:'#F59E0B', icon:''},
   'Radiology':   {color:'#F97316', icon:'🫁'},
   'Done':        {color:'#22C55E', icon:'✅'},
   'Cancelled':   {color:'#EF4444', icon:'❌'},
@@ -145,12 +145,12 @@ function renderAdmKPI() {
   const active  = admAll.filter(a=>!['Done','Cancelled'].includes(a.status)).length;
   const revenue = admAll.filter(a=>a.payment_status==='Paid').reduce((s,a)=>s+(a.net_amount||0),0);
   el.innerHTML = [
-    {icon:'📋', val:admAll.length,        label:'Total Hari Ini',  color:'#0A2342'},
+    {icon:'', val:admAll.length,        label:'Total Hari Ini',  color:'#0A2342'},
     {icon:'🔵', val:active,               label:'Sedang Dilayani', color:'#0EA5E9'},
     {icon:'✅', val:done,                 label:'Selesai',         color:'#22C55E'},
     {icon:'❌', val:admAll.filter(a=>a.status==='Cancelled').length, label:'Batal', color:'#EF4444'},
-    {icon:'💰', val:formatCurrency(revenue), label:'Revenue Hari Ini', color:'#8B5CF6'},
-    {icon:'🏥', val:admAll.filter(a=>a.visit_type==='Project MCU').length, label:'MCU Project', color:'#F59E0B'},
+    {icon:'', val:formatCurrency(revenue), label:'Revenue Hari Ini', color:'#8B5CF6'},
+    {icon:'', val:admAll.filter(a=>a.visit_type==='Project MCU').length, label:'MCU Project', color:'#F59E0B'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:18px">${k.icon}</div>
@@ -332,7 +332,7 @@ function renderPatientIdTable() {
             </td>
             <td style="padding:3px"><input type="text" value="${row.id_number||''}" oninput="updatePatientIdField(${i},'id_number',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px"><input type="text" value="${row.issuer_country||'Indonesia'}" oninput="updatePatientIdField(${i},'issuer_country',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removePatientId(${i})" style="color:#EF4444">✕</button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removePatientId(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -386,7 +386,7 @@ function renderServiceLines() {
             <td style="padding:3px"><input type="number" value="${row.discount_pct||0}" oninput="updateServiceLine(${i},'discount_pct',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px"><input type="number" value="${row.discount_idr||0}" oninput="updateServiceLine(${i},'discount_idr',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px;font-weight:700">${formatCurrency(subtotal)}</td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeServiceLine(${i})" style="color:#EF4444">✕</button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeServiceLine(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -609,7 +609,7 @@ function refreshVoucherUI() {
   wrap.innerHTML = `
     <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
       value="${v?.code||''}" ${v?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
-    ${v ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">✕ Lepas</button>`
+    ${v ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">Lepas</button>`
         : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}`;
 }
 
@@ -676,8 +676,8 @@ async function openAdmissionForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Registrasi':'📋 Service Registration Form'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Registrasi':'Service Registration Form'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px">
@@ -714,7 +714,7 @@ async function openAdmissionForm(id=null) {
             <div class="form-group" style="grid-column:1/-1"><label>Nama Lengkap * <span style="font-weight:400;color:var(--gray)">— pasien lama? cari dulu agar tidak isi ulang</span></label>
               <div style="display:flex;gap:6px">
                 <input type="text" id="af-name" value="${a.patient_name||''}" placeholder="Nama sesuai KTP" style="flex:1">
-                <button type="button" class="btn btn-ghost btn-sm" onclick="openPatientSearch()" title="Cari pasien terdaftar">🔍 Cari Pasien</button>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="openPatientSearch()" title="Cari pasien terdaftar">Cari Pasien</button>
               </div></div>
             <div class="form-group">
               <label>Gender / Salutation</label>
@@ -835,7 +835,7 @@ async function openAdmissionForm(id=null) {
         <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
           value="${admFormState.voucher?.code||''}" ${admFormState.voucher?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
         ${admFormState.voucher
-          ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">✕ Lepas</button>`
+          ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">Lepas</button>`
           : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}
       </div>
       <div id="af-voucher-msg" style="font-size:11.5px;margin-bottom:14px">${admFormState.voucher?`<span style="color:#16A34A">✅ Voucher ${admFormState.voucher.code} aktif</span>`:''}</div>
@@ -872,7 +872,7 @@ async function openAdmissionForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAdmission(${id||'null'})">${id?'💾 Update':'📋 Save & Print'}</button>
+      <button class="btn btn-teal" onclick="saveAdmission(${id||'null'})">${id?'Update':'Save & Print'}</button>
     </div>`,'wide');
 
   renderPatientIdTable();
@@ -900,8 +900,8 @@ function switchAdmTab(tab) {
 function openPackagePicker() {
   openModal(`
     <div class="modal-header"><div class="modal-title">🗂️ Pilih Paket</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
-    <input class="table-search" placeholder="🔍 Cari paket..." oninput="filterPkgPicker(this.value)" style="margin-bottom:10px;width:100%">
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+    <input class="table-search" placeholder="Cari paket..." oninput="filterPkgPicker(this.value)" style="margin-bottom:10px;width:100%">
     <div id="pkg-picker-list" style="max-height:340px;overflow-y:auto">
       ${(admMasterPackages||[]).map(p=>`
         <div class="pkg-pick-item" data-s="${(p.nama_paket||'').toLowerCase()} ${(p.kode_paket||'').toLowerCase()}"
@@ -972,8 +972,8 @@ function openPatientSearch() {
   ov.innerHTML = `
     <div style="background:#fff;border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.28);width:100%;max-width:640px;max-height:82vh;display:flex;flex-direction:column;padding:20px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-size:16px;font-weight:800;color:var(--navy)">🔍 Cari Pasien Terdaftar</div>
-        <button onclick="closePatientSearch()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
+        <div style="font-size:16px;font-weight:800;color:var(--navy)">Cari Pasien Terdaftar</div>
+        <button onclick="closePatientSearch()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)" style="font-size:10.5px;font-weight:700"></button>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:10px" id="pat-search-tabs">
         ${[['name','Nama'],['dob','Tgl Lahir'],['mr','No. MR'],['id','No. ID / KTP']].map(([k,l])=>`
@@ -1282,8 +1282,8 @@ async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
 async function renderAdmissionReport() {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📊 Laporan Admission</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Laporan Admission</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
       ${[

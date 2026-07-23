@@ -426,8 +426,8 @@ async function renderPMap() {
         ${p.pic_name ? `<div style="font-size:11px;color:var(--navy);margin-bottom:6px">👤 ${p.pic_name} ${p.phone ? '· ' + p.phone : ''}</div>` : ''}
         <div style="display:flex;gap:6px;margin-top:8px">
           ${waUrl ? `<a href="${waUrl}" target="_blank" style="background:#25D366;color:#fff;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">💬 WA</a>` : ''}
-          <button onclick="openPartnerForm(${p.id})" style="background:var(--teal);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">✏️ Edit</button>
-          <button onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" style="background:var(--navy);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">🤝 Kerjasama</button>
+          <button onclick="openPartnerForm(${p.id})" style="background:var(--teal);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Edit</button>
+          <button onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" style="background:var(--navy);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Kerjasama</button>
         </div>
       </div>`;
 
@@ -533,7 +533,7 @@ function quickStatusChange(id, currentStatus) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Update Status Partner</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Status Baru</label>
@@ -580,15 +580,15 @@ async function openPartnerForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Partner':'➕ Tambah Partner'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Partner':'+ Tambah Partner'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     ${id ? `
     <div style="background:var(--lgray);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--gray);display:flex;gap:16px;flex-wrap:wrap">
       ${p.assigned_name?`<span>👤 Dibuat oleh: <strong style="color:var(--navy)">${p.assigned_name}</strong></span>`:''}
-      ${p.created_at?`<span>📅 Dibuat: <strong>${formatDate(p.created_at)}</strong></span>`:''}
-      ${p.updated_at?`<span>🔄 Update: <strong>${timeAgo(p.updated_at)}</strong></span>`:''}
+      ${p.created_at?`<span>Dibuat: <strong>${formatDate(p.created_at)}</strong></span>`:''}
+      ${p.updated_at?`<span>Update: <strong>${timeAgo(p.updated_at)}</strong></span>`:''}
     </div>` : ''}
 
     <div class="form-row">
@@ -653,9 +653,9 @@ async function openPartnerForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      ${id?`<button class="btn btn-outline" onclick="closeModalForce();setTimeout(()=>showDealsOverlay(${id},'${(p.partner_name||'').replace(/'/g,"\\'")}'),200)">🤝 Kelola Kerjasama</button>`:''}
+      ${id?`<button class="btn btn-outline" onclick="closeModalForce();setTimeout(()=>showDealsOverlay(${id},'${(p.partner_name||'').replace(/'/g,"\\'")}'),200)">Kelola Kerjasama</button>`:''}
       <button class="btn btn-teal" onclick="savePartner(${id||'null'})">
-        ${id?'💾 Simpan':'➕ Tambah'}
+        ${id?'Simpan':'+ Tambah'}
       </button>
     </div>`);
 }
@@ -752,7 +752,7 @@ function showDealsOverlay(partnerId, partnerName) {
           </button>
           <button onclick="document.getElementById('deals-overlay').remove()"
             style="background:var(--lgray);border:none;border-radius:50%;width:30px;height:30px;
-            cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+            cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center" style="font-size:10.5px;font-weight:700"></button>
         </div>
       </div>
 

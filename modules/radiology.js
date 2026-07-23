@@ -11,8 +11,8 @@ const RADIO_TYPES = [
 
 const RADIO_STATUS = {
   'Waiting':    {color:'#F59E0B',icon:'⏳'},
-  'Processing': {color:'#0EA5E9',icon:'🔄'},
-  'Done':       {color:'#8B5CF6',icon:'📝'},
+  'Processing': {color:'#0EA5E9',icon:''},
+  'Done':       {color:'#8B5CF6',icon:''},
   'Validated':  {color:'#22C55E',icon:'✅'},
 };
 
@@ -31,7 +31,7 @@ async function renderRadiology() {
     <div id="radio-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
 
     <div class="pro-toolbar">
-      <input class="table-search" id="radio-q" placeholder="🔍 Cari nama pasien, no. kunjungan..."
+      <input class="table-search" id="radio-q" placeholder="Cari nama pasien, no. kunjungan..."
         oninput="filterRadio()" style="flex:1;min-width:220px">
       <select class="table-filter" id="radio-status" onchange="filterRadio()">
         <option value="">Semua Status</option>
@@ -84,9 +84,9 @@ async function getRadioProdIds() {
 function renderRadioKPI() {
   const el = document.getElementById('radio-kpi'); if (!el) return;
   el.innerHTML = [
-    {icon:'🏥',val:radioAll.length,                                    label:'Total Pemeriksaan',color:'#0A2342'},
+    {icon:'',val:radioAll.length,                                    label:'Total Pemeriksaan',color:'#0A2342'},
     {icon:'⏳',val:radioAll.filter(r=>r.status==='Draft').length,      label:'Menunggu Input',   color:'#F59E0B'},
-    {icon:'📝',val:radioAll.filter(r=>r.status==='Validated').length,  label:'Tervalidasi',      color:'#22C55E'},
+    {icon:'',val:radioAll.filter(r=>r.status==='Validated').length,  label:'Tervalidasi',      color:'#22C55E'},
     {icon:'🔏',val:radioAll.filter(r=>r.status==='Approved').length,   label:'Approved',         color:'#8B5CF6'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
@@ -150,7 +150,7 @@ function renderRadioList(data) {
               color:${r.status==='Approved'?'#2E7D32':r.status==='Validated'?'#1565C0':'#92400E'};
               padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">${r.status||'Draft'}</span>
             <div class="act-row" style="margin-top:8px;justify-content:flex-end">
-              <button class="act-btn edit" onclick="openRadioForm(${r.id})">✏️ Edit</button>
+              <button class="act-btn edit" onclick="openRadioForm(${r.id})">Edit</button>
               ${r.status==='Draft'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
               ${r.status==='Validated'?`<button class="act-btn" style="color:#8B5CF6;font-size:11px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
               <button class="act-btn" onclick="printRadioResult(${r.id})" title="Print">🖨</button>
@@ -186,8 +186,8 @@ async function openRadioForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit':'🫁 Input'} Hasil Radiologi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'🫁 Input'} Hasil Radiologi</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -259,7 +259,7 @@ async function openRadioForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveRadioResult(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveRadioResult(${id||'null'})">Simpan</button>
     </div>`);
 }
 

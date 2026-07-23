@@ -30,7 +30,7 @@ function renderCheckinTab(){
 
   el.innerHTML=`
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <input class="table-search" id="barcode-input" placeholder="🔍 Scan / ketik barcode label atau nama pasien..."
+      <input class="table-search" id="barcode-input" placeholder="Scan / ketik barcode label atau nama pasien..."
         onkeydown="if(event.key==='Enter')checkInBarcode(this.value)" style="flex:1">
       <button class="btn btn-teal" onclick="checkInBarcode(document.getElementById('barcode-input').value)">Check In</button>
       <button class="btn btn-ghost" onclick="openSampleForm()">+ Manual</button>
@@ -162,8 +162,8 @@ async function openLabelCheckin(labelId){
   const now=new Date().toISOString().slice(0,16);
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🧪 Check In Label — ${label.label_barcode}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Check In Label — ${label.label_barcode}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${label.patient_name}</strong> · ${label.visit_number} ·
@@ -185,7 +185,7 @@ async function openLabelCheckin(labelId){
     <div class="form-group"><label>Catatan</label><input type="text" id="lc-notes" placeholder="Kondisi sampel..."></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveLabelCheckin(${labelId})">🧪 Check In Semua (${items.length} Tes)</button>
+      <button class="btn btn-teal" onclick="saveLabelCheckin(${labelId})">Check In Semua (${items.length} Tes)</button>
     </div>`);
 }
 
@@ -240,8 +240,8 @@ async function openCheckinForAdmission(adm){
   const now=new Date().toISOString().slice(0,16);
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🧪 Check In Sampel — ${adm.patient_name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Check In Sampel — ${adm.patient_name}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${adm.visit_number}</strong> · ${adm.patient_name}</div>
@@ -263,15 +263,15 @@ async function openCheckinForAdmission(adm){
     <div class="form-group"><label>Catatan</label><input type="text" id="sc-notes" placeholder="Kondisi sampel, catatan khusus..."></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveSampleCheckin(${adm.id})">🧪 Check In</button>
+      <button class="btn btn-teal" onclick="saveSampleCheckin(${adm.id})">Check In</button>
     </div>`);
 }
 
 async function openSampleForm(){
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🧪 Check In Sampel Manual</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Check In Sampel Manual</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group"><label>Cari No. Kunjungan / Nama Pasien</label>
       <input type="text" id="ci-search" placeholder="Ketik untuk cari..." oninput="searchAdmForCheckin(this.value)"></div>
@@ -344,7 +344,7 @@ function rejectSample(id){
   openModal(`
     <div class="modal-header">
       <div class="modal-title">🚫 Tolak Sampel</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:#FFF8E1;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${s.patient_name||'—'}</strong> · ${s.product_name||'—'} · <span style="font-family:monospace">${s.barcode||''}</span></div>

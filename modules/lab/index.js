@@ -253,9 +253,9 @@ function injectLisStyle(){
 // dirender SATU tab yang diminta, dengan judul & tautan kembali ke indeks.
 // ═══════════════════════════════════════════════════════════════
 const LAB_TAB_META = {
-  checkin:    { label:'Penerimaan Sampel', ico:'🧪' },
-  worklist:   { label:'Worklist & TAT',    ico:'🔬' },
-  result:     { label:'Input Hasil',       ico:'📝' },
+  checkin:    { label:'Penerimaan Sampel', ico:'' },
+  worklist:   { label:'Worklist & TAT',    ico:'' },
+  result:     { label:'Input Hasil',       ico:'' },
   validation: { label:'Validasi',          ico:'✅' },
   approval:   { label:'Approval',          ico:'🔏' },
   report:     { label:'Rekam Medis Lab',   ico:'📁' },
@@ -266,7 +266,7 @@ const LAB_TAB_META = {
 async function renderLab(tab='checkin'){
   if(!LAB_TABS.includes(tab)) tab='checkin';
   injectLisStyle();
-  const meta = LAB_TAB_META[tab] || { label:'LIS', ico:'🔬' };
+  const meta = LAB_TAB_META[tab] || { label:'LIS', ico:'' };
   document.getElementById('main-content').innerHTML = `
     <div id="lab-shell" class="lis">
       <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center">
@@ -313,13 +313,13 @@ async function labCategorySummary(containerId){
   const released  = labResults.filter(r=>isReleased(r)).length;
 
   const cards=[
-    {icon:'🧪',val:pending,   label:'Sampel Pending',color:'#F59E0B',tab:'checkin'},
+    {icon:'',val:pending,   label:'Sampel Pending',color:'#F59E0B',tab:'checkin'},
     {icon:'⚗️',val:inProc,    label:'Diproses',      color:'#0EA5E9',tab:'worklist'},
     {icon:'⏰',val:overdue,   label:'TAT Terlambat', color:'#EF4444',tab:'worklist'},
-    {icon:'📝',val:draftRes,  label:'Draft Hasil',   color:'#8B5CF6',tab:'result'},
-    {icon:'🚨',val:critical,  label:'Nilai Kritis',  color:'#DC2626',tab:'validation'},
+    {icon:'',val:draftRes,  label:'Draft Hasil',   color:'#8B5CF6',tab:'result'},
+    {icon:'',val:critical,  label:'Nilai Kritis',  color:'#DC2626',tab:'validation'},
     {icon:'✅',val:validated, label:'Tervalidasi',   color:'#22C55E',tab:'approval'},
-    {icon:'📤',val:released,  label:'Released',       color:'#0A2342',tab:'report'},
+    {icon:'',val:released,  label:'Released',       color:'#0A2342',tab:'report'},
     {icon:'🔌',val:'',        label:'Integrasi Alat', color:'#0E7C86',tab:'integrasi'},
   ];
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px">
@@ -363,13 +363,13 @@ function renderLabKPI(){
   const released  = labResults.filter(r=>isReleased(r)).length;
 
   el.innerHTML=[
-    {icon:'🧪',val:pending,   label:'Sampel Pending', color:'#F59E0B', tab:'checkin'},
+    {icon:'',val:pending,   label:'Sampel Pending', color:'#F59E0B', tab:'checkin'},
     {icon:'⚗️',val:inProc,    label:'Diproses',       color:'#0EA5E9', tab:'worklist'},
     {icon:'⏰',val:overdue,   label:'TAT Terlambat',  color:'#EF4444', tab:'worklist'},
-    {icon:'📝',val:draftRes,  label:'Draft Hasil',    color:'#8B5CF6', tab:'result'},
-    {icon:'🚨',val:critical,  label:'Nilai Kritis',   color:'#DC2626', tab:'validation'},
+    {icon:'',val:draftRes,  label:'Draft Hasil',    color:'#8B5CF6', tab:'result'},
+    {icon:'',val:critical,  label:'Nilai Kritis',   color:'#DC2626', tab:'validation'},
     {icon:'✅',val:validated, label:'Tervalidasi',    color:'#22C55E', tab:'approval'},
-    {icon:'📤',val:released,  label:'Released',        color:'#0A2342', tab:'report'},
+    {icon:'',val:released,  label:'Released',        color:'#0A2342', tab:'report'},
   ].map(k=>`
     <div onclick="switchLabTab('${k.tab}',document.querySelector('#lab-tabs .tab-btn:nth-child(${LAB_TABS.indexOf(k.tab)+1})'))"
       style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color};text-align:center;cursor:pointer">
@@ -387,7 +387,7 @@ function renderCriticalBanner(){
   el.innerHTML=`
     <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:10px;padding:12px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#B91C1C;font-size:13px;margin-bottom:4px">
-        🚨 ${crit.length} NILAI KRITIS belum dilaporkan
+        ${crit.length} NILAI KRITIS belum dilaporkan
       </div>
       <div style="font-size:11.5px;color:#991B1B;margin-bottom:8px">
         Wajib dilaporkan ke dokter penanggung jawab beserta bukti read-back (ISO 15189).
@@ -425,8 +425,8 @@ async function ackCritical(id){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🚨 Pelaporan Nilai Kritis</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Pelaporan Nilai Kritis</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px 14px;margin-bottom:14px">
@@ -481,7 +481,7 @@ async function ackCritical(id){
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-danger" onclick="saveCriticalNotification(${id})">💾 Simpan Pelaporan</button>
+      <button class="btn btn-danger" onclick="saveCriticalNotification(${id})">Simpan Pelaporan</button>
     </div>`, 'wide');
 }
 

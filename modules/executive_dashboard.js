@@ -29,7 +29,7 @@ function injectExecToggle() {
   btn.className = 'topbar-btn';
   btn.title     = 'Executive Dashboard';
   btn.style.cssText = 'background:var(--navy);color:#fff;border-color:var(--navy);font-size:12px;padding:4px 10px;width:auto';
-  btn.textContent   = '👁 Exec View';
+  btn.textContent   = 'Exec View';
   btn.onclick       = toggleExecView;
   topbar.insertBefore(btn, topbar.firstChild);
 }
@@ -39,7 +39,7 @@ function toggleExecView() {
   execViewActive = !execViewActive;
   const btn = document.getElementById('exec-toggle-btn');
   if (btn) {
-    btn.textContent   = execViewActive ? '← Standard View' : '👁 Exec View';
+    btn.textContent   = execViewActive ? '← Standard View' : 'Exec View';
     btn.style.background = execViewActive ? 'var(--teal)' : 'var(--navy)';
     btn.style.borderColor= execViewActive ? 'var(--teal)' : 'var(--navy)';
   }
@@ -54,7 +54,7 @@ async function renderExecutiveDashboard() {
       <div>
         <h1 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:20px;font-weight:800;
           color:var(--text);letter-spacing:-.3px">
-          👁 Executive Dashboard
+          Executive Dashboard
         </h1>
         <p style="font-size:13px;color:var(--text3)">
           Real-time monitoring · Semua tim · Quick decision
@@ -84,7 +84,7 @@ async function renderExecutiveDashboard() {
     <!-- Task Monitor -->
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
-        <div class="card-title">📋 All Tasks — Live Monitor</div>
+        <div class="card-title">All Tasks — Live Monitor</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${['Semua','Overdue','Blocked','Todo','InProgress'].map((f,i)=>`
             <button class="btn btn-xs ${i===0?'btn-navy':'btn-ghost'}" id="exec-filter-${f.toLowerCase().replace(' ','')}"
@@ -157,7 +157,7 @@ function renderExecKPI() {
   const highPri = tasks.filter(t=>['High','Critical'].includes(t.priority)&&t.status!=='Done').length;
 
   el.innerHTML = [
-    {icon:'👥', val:`${hadir}/${emps.length}`, label:'Hadir Hari Ini',  color:'#22C55E'},
+    {icon:'', val:`${hadir}/${emps.length}`, label:'Hadir Hari Ini',  color:'#22C55E'},
     {icon:'⚠️', val:overdue,                   label:'Task Overdue',    color:'#EF4444'},
     {icon:'🚫', val:blocked,                   label:'Task Blocked',    color:'#F59E0B'},
     {icon:'✅', val:doneToday,                 label:'Done Hari Ini',   color:'#0891B2'},
@@ -300,10 +300,10 @@ function renderExecTasks(filter) {
               </td>
               <td style="padding:8px 12px">
                 <div class="act-row" style="gap:4px;flex-wrap:nowrap">
-                  <button class="btn btn-xs btn-ghost" onclick="openTaskDetail(${t.id})" title="Detail">👁</button>
-                  <button class="btn btn-xs btn-outline" onclick="execAssignExtra(${t.id},'${(t.title||'').replace(/'/g,'').slice(0,30)}')" title="Assign Tambahan">👥</button>
+                  <button class="btn btn-xs btn-ghost" onclick="openTaskDetail(${t.id})" title="Detail">${icon('file-text', 12)}</button>
+                  <button class="btn btn-xs btn-outline" onclick="execAssignExtra(${t.id},'${(t.title||'').replace(/'/g,'').slice(0,30)}')" title="Assign Tambahan"></button>
                   <button class="btn btn-xs" style="background:var(--teal);color:#fff"
-                    onclick="execPingPIC(${t.id},'${(t.assigned_to||'').replace(/'/g,'')}')" title="Ping WA">💬</button>
+                    onclick="execPingPIC(${t.id},'${(t.assigned_to||'').replace(/'/g,'')}')" title="Ping WA" style="font-size:10.5px;font-weight:700">WA</button>
                   ${t.status!=='Done'?`<button class="btn btn-xs" style="background:#22C55E;color:#fff"
                     onclick="execForceDone(${t.id})" title="Force Done">✅</button>`:''}
                 </div>
@@ -319,8 +319,8 @@ async function execAssignExtra(taskId, taskTitle) {
   const emps = execState.employees;
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">👥 Assign Tambahan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Assign Tambahan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
       Task: <strong>${taskTitle}</strong>
@@ -338,7 +338,7 @@ async function execAssignExtra(taskId, taskTitle) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="doExecAssignExtra(${taskId})">👥 Assign</button>
+      <button class="btn btn-teal" onclick="doExecAssignExtra(${taskId})">Assign</button>
     </div>`,'narrow');
 }
 
@@ -377,7 +377,7 @@ async function execPingPIC(taskId, assignee) {
   if (!assignee) { toast('Task tidak punya PIC','warn'); return; }
   const td = await sbGet('tasks',`select=title,due_date,status&id=eq.${taskId}`).catch(()=>[]);
   const t  = td[0]||{};
-  const msg = `📋 *Reminder Task OneLab*\n\nHai ${assignee.split(' ')[0]},\n\nTask berikut memerlukan update:\n*${t.title||'—'}*\nDeadline: ${t.due_date||'—'}\nStatus: ${t.status||'—'}\n\nMohon update progress atau hubungi Head of Operations jika ada kendala.\n\n_Pesan otomatis dari sistem OneLab_`;
+  const msg = `*Reminder Task OneLab*\n\nHai ${assignee.split(' ')[0]},\n\nTask berikut memerlukan update:\n*${t.title||'—'}*\nDeadline: ${t.due_date||'—'}\nStatus: ${t.status||'—'}\n\nMohon update progress atau hubungi Head of Operations jika ada kendala.\n\n_Pesan otomatis dari sistem OneLab_`;
   const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
   toast(`💬 WA dibuka untuk ${assignee.split(' ')[0]}`,'ok',2000);

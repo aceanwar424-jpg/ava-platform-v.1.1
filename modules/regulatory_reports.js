@@ -6,7 +6,7 @@
 const REPORT_TYPES = [
   {
     id:'INM', label:'INM', fullLabel:'Indikator Nasional Mutu',
-    icon:'📊', color:'#0891B2',
+    icon:'', color:'#0891B2',
     frekuensi:'Bulanan', deadline:'Tgl 10 bulan berikutnya',
     pic_default:'Faiz, Hilmy',
     description:'Pelaporan indikator mutu wajib ke Kemenkes/Dinkes setiap bulan.',
@@ -22,7 +22,7 @@ const REPORT_TYPES = [
   },
   {
     id:'SISDMK', label:'SISDMK', fullLabel:'Sistem Informasi SDM Kesehatan',
-    icon:'👥', color:'#7C3AED',
+    icon:'', color:'#7C3AED',
     frekuensi:'Per Quarter', deadline:'Akhir kuartal',
     pic_default:'Ace Darojatun Anwar',
     description:'Update data SDM Kesehatan ke sistem Kemenkes.',
@@ -30,7 +30,7 @@ const REPORT_TYPES = [
   },
   {
     id:'SIMPEL', label:'SIMPEL', fullLabel:'Sistem Informasi Pelaporan',
-    icon:'📋', color:'#F59E0B',
+    icon:'', color:'#F59E0B',
     frekuensi:'Bulanan', deadline:'Tgl 5 bulan berikutnya',
     pic_default:'Faiz',
     description:'Pelaporan laboratorium ke sistem SIMPEL Kemenkes.',
@@ -38,7 +38,7 @@ const REPORT_TYPES = [
   },
   {
     id:'KASIR', label:'Rekap Kasir', fullLabel:'Rekonsiliasi Kasir Harian',
-    icon:'💰', color:'#22C55E',
+    icon:'', color:'#22C55E',
     frekuensi:'Harian', deadline:'EOD 18:00',
     pic_default:'Liza',
     description:'Rekap dan rekonsiliasi kasir setiap hari kerja.',
@@ -54,7 +54,7 @@ const REPORT_TYPES = [
   },
   {
     id:'AUDIT_INTERNAL', label:'Audit Internal', fullLabel:'Audit Internal Klinik',
-    icon:'🔍', color:'#0EA5E9',
+    icon:'', color:'#0EA5E9',
     frekuensi:'Bulanan', deadline:'Akhir bulan',
     pic_default:'Ace Darojatun Anwar',
     description:'Audit internal SOP, kebersihan, keamanan, dan alur layanan.',
@@ -69,7 +69,7 @@ async function renderRegulatoryReports() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📊 Pelaporan & Audit</h1>
+        <h1>Pelaporan & Audit</h1>
         <p>INM · IKP · SISDMK · SIMPEL · Audit Internal · Rekap Kasir</p>
       </div>
       <div class="btn-row">
@@ -78,9 +78,9 @@ async function renderRegulatoryReports() {
     </div>
 
     <div class="ms-topbar" style="margin-bottom:18px">
-      <button class="ms-tab active" onclick="switchReportTab('dashboard',this)">📊 Dashboard</button>
-      <button class="ms-tab" onclick="switchReportTab('records',this)">📋 Riwayat</button>
-      <button class="ms-tab" onclick="switchReportTab('calendar',this)">📅 Kalender</button>
+      <button class="ms-tab active" onclick="switchReportTab('dashboard',this)">Dashboard</button>
+      <button class="ms-tab" onclick="switchReportTab('records',this)">Riwayat</button>
+      <button class="ms-tab" onclick="switchReportTab('calendar',this)">Kalender</button>
     </div>
 
     <div id="report-main">
@@ -135,7 +135,7 @@ function renderReportDashboard() {
             <div style="display:flex;gap:10px;font-size:11.5px">
               <span>PIC: <strong>${rt.pic_default}</strong></span>
               ${pending?`<span style="color:${overdue?'#EF4444':'#F59E0B'};font-weight:700">
-                ${overdue?`⚠️ ${overdue} overdue`:`📋 ${pending} pending`}
+                ${overdue?`⚠️ ${overdue} overdue`:`${pending} pending`}
               </span>`:`<span style="color:#22C55E;font-weight:700">✅ Clear</span>`}
             </div>
           </div>`;
@@ -150,7 +150,7 @@ function renderReportDashboard() {
           const isOverdue = t.due_date < today;
           return `
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-              <div style="font-size:20px">${REPORT_TYPES.find(r=>r.label===t.category||r.id===t.category)?.icon||'📋'}</div>
+              <div style="font-size:20px">${REPORT_TYPES.find(r=>r.label===t.category||r.id===t.category)?.icon||''}</div>
               <div style="flex:1">
                 <div style="font-weight:600;font-size:13px">${t.title}</div>
                 <div style="font-size:11px;color:var(--text3)">PIC: ${t.assigned_to||'—'} · ${t.category}</div>
@@ -163,7 +163,7 @@ function renderReportDashboard() {
                   ${t.status}
                 </span>
               </div>
-              <button class="act-btn edit" onclick="openTaskDetail(${t.id})">📋</button>
+              <button class="act-btn edit" onclick="openTaskDetail(${t.id})"></button>
             </div>`;
         }).join('') :
         `<div class="empty-state" style="padding:30px">
@@ -193,7 +193,7 @@ function renderReportRecords() {
           ${done.map((t,i)=>`
             <tr style="background:${i%2?'var(--bg2)':'#fff'};border-bottom:1px solid var(--border);cursor:pointer"
               onclick="openTaskDetail(${t.id})">
-              <td style="padding:9px 12px">${REPORT_TYPES.find(r=>r.label===t.category)?.icon||'📋'} ${t.category}</td>
+              <td style="padding:9px 12px">${REPORT_TYPES.find(r=>r.label===t.category)?.icon||''} ${t.category}</td>
               <td style="padding:9px 12px;font-weight:600">${t.title}</td>
               <td style="padding:9px 12px;color:var(--text3)">${t.assigned_to||'—'}</td>
               <td style="padding:9px 12px">${t.completed_at?.slice(0,10)||t.updated_at?.slice(0,10)||'—'}</td>
@@ -201,7 +201,7 @@ function renderReportRecords() {
             </tr>`).join('')}
         </tbody>
       </table>` :
-      `<div class="empty-state" style="padding:40px"><div class="ico">📋</div>
+      `<div class="empty-state" style="padding:40px"><div class="ico"></div>
         <h3>Belum ada laporan selesai</h3></div>`}
     </div>`;
 }
@@ -210,14 +210,14 @@ function renderReportCalendar() {
   const el = document.getElementById('report-main'); if (!el) return;
   el.innerHTML = `
     <div class="card">
-      <div class="card-title" style="margin-bottom:14px">📅 Kalender Pelaporan</div>
+      <div class="card-title" style="margin-bottom:14px">Kalender Pelaporan</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px">
         ${REPORT_TYPES.map(rt=>`
           <div style="border-left:4px solid ${rt.color};padding:12px 14px;background:var(--bg2);border-radius:0 var(--r) var(--r) 0">
             <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">
               ${rt.icon} ${rt.label}
             </div>
-            <div style="font-size:12px;color:var(--text3)">📅 ${rt.frekuensi}</div>
+            <div style="font-size:12px;color:var(--text3)">${rt.frekuensi}</div>
             <div style="font-size:12px;color:${rt.color};font-weight:600">⏰ ${rt.deadline}</div>
             <div style="font-size:11.5px;color:var(--text3);margin-top:4px">PIC: ${rt.pic_default}</div>
           </div>`).join('')}
@@ -230,7 +230,7 @@ function openReportTypeDetail(typeId) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${rt.icon} ${rt.fullLabel}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="margin-bottom:14px">
       <div class="form-row">

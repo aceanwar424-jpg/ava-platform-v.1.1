@@ -15,8 +15,8 @@ async function renderHRD() {
       <div><h1>HRD &amp; SDM</h1>
         <p>Data karyawan, absensi, cuti, dan penggajian OneLab Diagnostics</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="openBulkSyncPositionShift()">🔗 Lengkapi Jabatan &amp; Jadwal</button>
-        <button class="btn btn-ghost btn-sm" onclick="openPayrollModal()">💵 Payroll</button>
+        <button class="btn btn-ghost btn-sm" onclick="openBulkSyncPositionShift()">Lengkapi Jabatan &amp; Jadwal</button>
+        <button class="btn btn-ghost btn-sm" onclick="openPayrollModal()">Payroll</button>
         <button class="btn btn-teal" onclick="openEmpForm()">+ Tambah Karyawan</button>
       </div>
     </div>
@@ -27,16 +27,16 @@ async function renderHRD() {
     </div>
 
     <div class="tabs" id="hrd-tabs">
-      <button class="tab-btn active" onclick="switchHRDTab('emp',this)">👥 Data Karyawan</button>
+      <button class="tab-btn active" onclick="switchHRDTab('emp',this)">Data Karyawan</button>
       <button class="tab-btn" onclick="switchHRDTab('leave',this)">🕐 Absensi &amp; Cuti</button>
-      <button class="tab-btn" onclick="switchHRDTab('payroll',this)">💵 Penggajian</button>
+      <button class="tab-btn" onclick="switchHRDTab('payroll',this)">Penggajian</button>
     </div>
 
     <!-- Karyawan Tab -->
     <div id="hrd-emp">
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input class="table-search" id="emp-q" placeholder="🔍 Cari nama, posisi, divisi..."
+          <input class="table-search" id="emp-q" placeholder="Cari nama, posisi, divisi..."
             oninput="filterEmp()" style="flex:1">
           <select class="table-filter" id="emp-div" onchange="filterEmp()">
             <option value="">Semua Divisi</option>
@@ -112,11 +112,11 @@ function renderHRDKPI() {
   const topDiv   = Object.entries(byDiv).sort((a,b)=>b[1]-a[1])[0];
 
   el.innerHTML = [
-    {icon:'👥',val:empAll.length,  label:'Total Karyawan', color:'#0A2342'},
+    {icon:'',val:empAll.length,  label:'Total Karyawan', color:'#0A2342'},
     {icon:'✅',val:active,         label:'Aktif',           color:'#22C55E'},
-    {icon:'🔄',val:probasi,        label:'Probasi',         color:'#F59E0B'},
-    {icon:'📋',val:kontrak,        label:'Kontrak',         color:'#0EA5E9'},
-    {icon:'💰',val:formatCurrency(totalGaji),label:'Total Gaji/Bln',color:'#8B5CF6'},
+    {icon:'',val:probasi,        label:'Probasi',         color:'#F59E0B'},
+    {icon:'',val:kontrak,        label:'Kontrak',         color:'#0EA5E9'},
+    {icon:'',val:formatCurrency(totalGaji),label:'Total Gaji/Bln',color:'#8B5CF6'},
     {icon:'🏆',val:topDiv?`${topDiv[0]} (${topDiv[1]})`:'—',label:'Divisi Terbesar',color:'#00897B'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);
@@ -142,7 +142,7 @@ function filterEmp() {
 function renderEmpTable(data) {
   const el = document.getElementById('emp-tbody');
   if (!data.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">👥</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>${empAll.length?'Tidak ada hasil':'Belum ada data karyawan'}</h3>
       <button class="btn btn-teal" style="margin-top:12px" onclick="openEmpForm()">+ Tambah Karyawan</button>
     </div>`; return;
@@ -188,9 +188,9 @@ function renderEmpTable(data) {
     <td style="font-size:11px;color:var(--gray)">${e.join_date?formatDateShort(e.join_date):'—'}</td>
     <td>
       <div class="act-row">
-        <button class="act-btn edit" onclick="openEmpForm(${e.id})">✏️</button>
-        <button class="act-btn" onclick="openLeaveForm(${e.id},'${(e.full_name||'').replace(/'/g,"\\'")}')">📅</button>
-        <button class="act-btn del" onclick="deleteEmp(${e.id})">🗑</button>
+        <button class="act-btn edit" onclick="openEmpForm(${e.id})">${icon('edit', 12)}</button>
+        <button class="act-btn" onclick="openLeaveForm(${e.id},'${(e.full_name||'').replace(/'/g,"\\'")}')"></button>
+        <button class="act-btn del" onclick="deleteEmp(${e.id})">${icon('trash', 12)}</button>
       </div>
     </td>
   </tr>`;
@@ -235,14 +235,14 @@ async function openEmpForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Karyawan':'➕ Tambah Karyawan'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Karyawan':'+ Tambah Karyawan'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     ${(!id && unlinkedUsers.length) ? `
     <div style="background:var(--teal-light);border-radius:var(--r);padding:10px 14px;margin-bottom:14px">
       <label style="font-size:11.5px;font-weight:700;color:var(--teal);margin-bottom:4px;display:block">
-        ⚡ Isi Otomatis dari User Terdaftar
+        Isi Otomatis dari User Terdaftar
       </label>
       <select id="ef-from-user" onchange="fillEmpFromUser(this)" style="font-size:12.5px">
         <option value="">-- Ketik manual, atau pilih user di sini --</option>
@@ -301,7 +301,7 @@ async function openEmpForm(id=null) {
 
     <div style="border-top:1px solid var(--border);margin:12px 0;padding-top:12px">
       <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">
-        🏛️ Jabatan &amp; Jadwal Kerja <span style="font-weight:500;text-transform:none;color:var(--text3)">(opsional — bisa dilengkapi belakangan)</span>
+        Jabatan &amp; Jadwal Kerja <span style="font-weight:500;text-transform:none;color:var(--text3)">(opsional — bisa dilengkapi belakangan)</span>
       </div>
       <div style="font-size:11.5px;color:var(--text3);margin-bottom:10px">
         Pilih di sini agar otomatis sinkron ke Struktur Organisasi dan Jadwal Kerja — tidak perlu input ulang di modul terpisah.
@@ -356,7 +356,7 @@ async function openEmpForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveEmployee(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveEmployee(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -460,7 +460,7 @@ async function syncEmployeeShift(employeeId, shiftCode) {
 
 async function deleteEmp(id) {
   if (!confirm('Hapus data karyawan ini?')) return;
-  try { await sbDelete('employees',id); toast('🗑 Dihapus','info'); await loadEmployees(); }
+  try { await sbDelete('employees',id); toast('Dihapus','info'); await loadEmployees(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -485,7 +485,7 @@ function renderLeaveTable(data) {
   const el=document.getElementById('leave-tbody');
   if(!el) return;
   if(!data.length){
-    el.innerHTML=`<div class="empty-state"><div class="ico">📅</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>${leaveAll.length?'Tidak ada hasil':'Belum ada pengajuan cuti'}</h3>
     </div>`; return;
   }
@@ -507,7 +507,7 @@ function renderLeaveTable(data) {
         <div class="act-row">
           ${l.status==='Pending'?`
             <button class="act-btn" style="color:#22C55E" onclick="approveLeave(${l.id},'Approved')">✅</button>
-            <button class="act-btn" style="color:#EF4444" onclick="approveLeave(${l.id},'Rejected')">❌</button>`:''}
+            <button class="act-btn" style="color:#EF4444" onclick="approveLeave(${l.id},'Rejected')" style="font-size:10.5px;font-weight:700">Batal</button>`:''}
         </div>
       </td>
     </tr>`;
@@ -524,8 +524,8 @@ async function openLeaveForm(empId=null, empName='') {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📅 Ajukan Cuti / Izin</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Ajukan Cuti / Izin</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Karyawan *</label>
@@ -560,7 +560,7 @@ async function openLeaveForm(empId=null, empName='') {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveLeave()">💾 Ajukan</button>
+      <button class="btn btn-teal" onclick="saveLeave()">Ajukan</button>
     </div>`);
 }
 
@@ -661,13 +661,13 @@ function openPayrollModal() {
 async function openBulkSyncPositionShift() {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🔗 Lengkapi Jabatan &amp; Jadwal Massal</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Lengkapi Jabatan &amp; Jadwal Massal</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div id="bulk-sync-body"><div class="loading-row"><div class="spinner"></div></div></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-teal" onclick="saveBulkSyncPositionShift()">💾 Simpan Semua</button>
+      <button class="btn btn-teal" onclick="saveBulkSyncPositionShift()">Simpan Semua</button>
     </div>`, 'wide');
 
   await loadBulkSyncList();
@@ -789,7 +789,7 @@ function openCreateAccountForm(empId, empName, empEmail) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">👤 Buat Akun untuk ${empName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="status-box status-info" style="font-size:12px;margin-bottom:14px">
       ℹ️ Ini membuat profil akses di sistem. Karyawan tetap perlu mendaftar/login sendiri

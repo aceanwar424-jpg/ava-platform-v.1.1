@@ -355,8 +355,8 @@ async function inpOpenAdmitForm(bedId) {
   const pilihanDokter = (dokter.length ? dokter : inpEmployees);
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">🛏 Admisi Rawat Inap</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Admisi Rawat Inap</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div class="form-group"><label>Pasien Terdaftar *</label>
       <div style="display:flex;gap:6px">
@@ -408,7 +408,7 @@ async function inpOpenAdmitForm(bedId) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="inpSaveAdmission()">💾 Rawat Inapkan</button>
+      <button class="btn btn-teal" onclick="inpSaveAdmission()">Rawat Inapkan</button>
     </div>`, 'wide');
 
   inpAdmitRateHint();
@@ -498,7 +498,7 @@ function inpOpenTransfer(stayId) {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">↔ Pindah Ruang</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:var(--bg2);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:12.5px">
       <b>${inpEsc(s.patient_name)}</b> · ${inpEsc(s.mr_number || '')}<br>
       Sekarang: ${inpEsc([s.ward_name, s.room_no, s.bed_no].filter(Boolean).join(' / '))}
@@ -562,16 +562,16 @@ async function inpOpenStay(stayId) {
 
   const st = INP_STAY_STATUS[s.status] || INP_STAY_STATUS['Dirawat'];
   const tabs = [
-    { k: 'cppt',    l: '📝 Visite & Catatan' },
+    { k: 'cppt',    l: 'Visite & Catatan' },
     { k: 'ttv',     l: '❤️ Tanda Vital' },
-    { k: 'billing', l: '💰 Billing' },
-    { k: 'resume',  l: '📋 Resume Pulang' },
+    { k: 'billing', l: 'Billing' },
+    { k: 'resume',  l: 'Resume Pulang' },
   ];
 
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${inpEsc(s.patient_name)} — ${inpEsc(s.stay_number || '')}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:var(--bg2);border-radius:8px;padding:11px 13px;margin-bottom:12px;
       font-size:12.5px;display:flex;gap:16px;flex-wrap:wrap">
@@ -646,7 +646,7 @@ async function inpPaintNotes() {
       <div class="form-group"><label>P — Rencana</label>
         <textarea id="inp-note-p" rows="2" placeholder="Terapi, tindakan, rencana pemeriksaan"></textarea></div>
       <div style="text-align:right">
-        <button class="btn btn-teal btn-xs" onclick="inpSaveNote()">💾 Simpan Catatan</button></div>
+        <button class="btn btn-teal btn-xs" onclick="inpSaveNote()">Simpan Catatan</button></div>
     </div>
 
     <div style="font-weight:700;font-size:12.5px;margin-bottom:8px">
@@ -723,7 +723,7 @@ async function inpPaintVitals() {
         ${f('inp-vs-tb', 'Tinggi cm', '')}
       </div>
       <div style="text-align:right;margin-top:8px">
-        <button class="btn btn-teal btn-xs" onclick="inpSaveVitals()">💾 Simpan</button></div>
+        <button class="btn btn-teal btn-xs" onclick="inpSaveVitals()">Simpan</button></div>
     </div>
 
     ${rows.length ? `<div class="table-wrap"><table><thead><tr>
@@ -792,7 +792,7 @@ async function inpPaintBilling() {
   el.innerHTML = `
     <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px">
       ${s.status === 'Dirawat'
-        ? `<button class="btn btn-ghost btn-xs" onclick="inpSyncRoomCharges(${s.id})">🔄 Perbarui Biaya Kamar</button>
+        ? `<button class="btn btn-ghost btn-xs" onclick="inpSyncRoomCharges(${s.id})">Perbarui Biaya Kamar</button>
            <button class="btn btn-teal btn-xs" onclick="inpOpenAddCharge(${s.id})">+ Tambah Biaya</button>` : ''}
       <button class="btn btn-ghost btn-xs" onclick="inpPrintBill(${s.id})">🖨 Cetak Rincian</button>
       <div style="margin-left:auto;font-size:13px">
@@ -845,7 +845,7 @@ function inpOpenAddCharge(stayId) {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">+ Tambah Biaya</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Jenis Biaya *</label>
         <select id="inp-chg-type" onchange="inpChargeTypeHint(${visitRate})">
@@ -865,7 +865,7 @@ function inpOpenAddCharge(stayId) {
     <div id="inp-chg-total" style="font-size:12.5px;color:var(--teal);margin-bottom:10px"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="inpSaveCharge(${stayId})">💾 Simpan Biaya</button>
+      <button class="btn btn-teal" onclick="inpSaveCharge(${stayId})">Simpan Biaya</button>
     </div>`, 'wide');
 
   inpChargeTotalHint();
@@ -1224,7 +1224,7 @@ function inpOpenWardForm(id) {
   const w = id ? inpWards.find(x => x.id === id) : null;
   openModal(`
     <div class="modal-header"><div class="modal-title">${w ? 'Ubah' : 'Tambah'} Bangsal</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode *</label>
         <input type="text" id="inp-w-code" value="${inpEsc(w?.code || '')}" placeholder="MLT"></div>
@@ -1244,7 +1244,7 @@ function inpOpenWardForm(id) {
       <input type="text" id="inp-w-notes" value="${inpEsc(w?.notes || '')}"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="inpSaveWard(${w ? w.id : 'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="inpSaveWard(${w ? w.id : 'null'})">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -1277,7 +1277,7 @@ function inpOpenBedForm(id, wardId) {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">${b ? 'Ubah' : 'Tambah'} Tempat Tidur</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Bangsal *</label>
         <select id="inp-b-ward">
@@ -1303,7 +1303,7 @@ function inpOpenBedForm(id, wardId) {
       <input type="text" id="inp-b-notes" value="${inpEsc(b?.notes || '')}"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="inpSaveBed(${b ? b.id : 'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="inpSaveBed(${b ? b.id : 'null'})">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -1352,7 +1352,7 @@ function inpOpenClassForm(id) {
   const c = id ? inpClasses.find(x => x.id === id) : null;
   openModal(`
     <div class="modal-header"><div class="modal-title">${c ? 'Ubah' : 'Tambah'} Kelas Perawatan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode Kelas *</label>
         <input type="text" id="inp-c-code" value="${inpEsc(c?.code || '')}" placeholder="VIP / 1 / 2 / 3"
@@ -1371,7 +1371,7 @@ function inpOpenClassForm(id) {
       tidak ikut berubah.</div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="inpSaveClass(${c ? c.id : 'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="inpSaveClass(${c ? c.id : 'null'})">Simpan</button>
     </div>`, 'wide');
 }
 

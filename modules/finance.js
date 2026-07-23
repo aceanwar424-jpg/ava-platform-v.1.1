@@ -36,16 +36,16 @@ async function renderFinance() {
     </div>
 
     <div class="tabs" id="fin-tabs">
-      <button class="tab-btn active" onclick="switchFinTab('invoice',this)">💰 Invoice</button>
+      <button class="tab-btn active" onclick="switchFinTab('invoice',this)">Invoice</button>
       <button class="tab-btn" onclick="switchFinTab('payment',this)">💳 Pembayaran</button>
-      <button class="tab-btn" onclick="switchFinTab('report',this)">📊 Laporan</button>
+      <button class="tab-btn" onclick="switchFinTab('report',this)">Laporan</button>
       <button class="tab-btn" onclick="switchFinTab('commission',this)">🏆 Komisi Sales</button>
     </div>
 
     <div id="fin-invoice">
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input class="table-search" id="fin-q" placeholder="🔍 Cari nomor invoice, partner..."
+          <input class="table-search" id="fin-q" placeholder="Cari nomor invoice, partner..."
             oninput="filterInvoices()" style="flex:1">
           <select class="table-filter" id="fin-status" onchange="filterInvoices()">
             <option value="">Semua Status</option>
@@ -120,7 +120,7 @@ function filterInvoices() {
 function renderInvoiceTable(data) {
   const el = document.getElementById('fin-inv-tbody');
   if(!data.length){
-    el.innerHTML=`<div class="empty-state"><div class="ico">💰</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada invoice</h3><p>Klik "+ Buat Invoice" untuk membuat invoice pertama.</p></div>`;
     return;
   }
@@ -141,8 +141,8 @@ function renderInvoiceTable(data) {
       <td><span class="badge" style="background:${sc}20;color:${sc}">${i.status||'Draft'}</span></td>
       <td><div class="act-row">
         <button class="act-btn" onclick="markInvoicePaid(${i.id})" title="Tandai Dibayar" style="color:#22C55E">✓</button>
-        <button class="act-btn edit" onclick="openInvoiceForm(${i.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteInvoice(${i.id})">🗑</button>
+        <button class="act-btn edit" onclick="openInvoiceForm(${i.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteInvoice(${i.id})">${icon('trash', 12)}</button>
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -175,8 +175,8 @@ async function openInvoiceForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Invoice':'➕ Buat Invoice'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Invoice':'+ Buat Invoice'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -231,7 +231,7 @@ async function openInvoiceForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveInvoice(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveInvoice(${id||'null'})">Simpan</button>
     </div>`);
   calcInvTotal();
 }
@@ -297,7 +297,7 @@ async function markInvoicePaid(id) {
 
 async function deleteInvoice(id) {
   if(!confirm('Hapus invoice ini?')) return;
-  try { await sbDelete('invoices',id); toast('🗑 Invoice dihapus','info'); await loadInvoices(); }
+  try { await sbDelete('invoices',id); toast('Invoice dihapus','info'); await loadInvoices(); }
   catch(e){ toast('❌ '+e.message,'err'); }
 }
 

@@ -14,8 +14,8 @@ function renderLabReportConfig(){
       <div><h1>🖨️ Setting Hasil PDF</h1>
         <p>Kop surat, logo, kontak, akreditasi, tanda tangan &amp; opsi untuk cetak hasil lab</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="previewLabReport()">👁 Preview</button>
-        <button class="btn btn-teal" onclick="saveLabReportCfg()">💾 Simpan</button>
+        <button class="btn btn-ghost btn-sm" onclick="previewLabReport()">Preview</button>
+        <button class="btn btn-teal" onclick="saveLabReportCfg()">Simpan</button>
       </div>
     </div>
 

@@ -8,17 +8,17 @@ const ALL_PAGES = {
   // key: [group, label, icon]
   'dashboard':        ['Utama',           'Dashboard',           '🏠'],
   // Marketing & Sales
-  'partners':         ['Marketing & Sales','Partner Database',    '🤝'],
-  'maps':             ['Marketing & Sales','Maps Prospecting',    '🗺️'],
+  'partners':         ['Marketing & Sales','Partner Database',    ''],
+  'maps':             ['Marketing & Sales','Maps Prospecting',    ''],
   'leads':            ['Marketing & Sales','Leads Management',    '🎯'],
   'marketing':        ['Marketing & Sales','Marketing & Voucher', '📣'],
   'okr':              ['Marketing & Sales','OKR & Target Sales',  '📈'],
-  'mcu':              ['Marketing & Sales','Project MCU',         '🏥'],
+  'mcu':              ['Marketing & Sales','Project MCU',         ''],
   'surat':            ['Marketing & Sales','Surat Keluar',        '📄'],
-  'mou':              ['Marketing & Sales','MOU / Perjanjian',    '📜'],
+  'mou':              ['Marketing & Sales','MOU / Perjanjian',    ''],
   // Operasional Lab
-  'lab-checkin':      ['Operasional Lab',  'Check In Sampel',    '🧪'],
-  'lab-result':       ['Operasional Lab',  'Enter Result',       '📝'],
+  'lab-checkin':      ['Operasional Lab',  'Check In Sampel',    ''],
+  'lab-result':       ['Operasional Lab',  'Enter Result',       ''],
   'lab-validation':   ['Operasional Lab',  'Validasi Hasil',     '✅'],
   'lab-approval':     ['Operasional Lab',  'Approval Lab',       '🔏'],
   'medrecord':        ['Operasional Lab',  'Medical Record',     '📁'],
@@ -29,37 +29,37 @@ const ALL_PAGES = {
   'package':          ['Layanan Klinik',   'Package Service',    '🗂️'],
   // Home Care
   'homecare':         ['Home Care',        'Order Home Care',    '🏠'],
-  'hc-schedule':      ['Home Care',        'Jadwal Kunjungan',   '📅'],
-  'hc-billing':       ['Home Care',        'Billing Fee Nakes',  '💵'],
-  'hc-report':        ['Home Care',        'Report Home Care',   '📊'],
+  'hc-schedule':      ['Home Care',        'Jadwal Kunjungan',   ''],
+  'hc-billing':       ['Home Care',        'Billing Fee Nakes',  ''],
+  'hc-report':        ['Home Care',        'Report Home Care',   ''],
   // Finance
   'cashier':          ['Finance',          'Cashier',            '🏧'],
-  'finance':          ['Finance',          'Invoice & Tagihan',  '💰'],
+  'finance':          ['Finance',          'Invoice & Tagihan',  ''],
   'finance-ar':       ['Finance',          'Tagihan AR',         '📑'],
   'finance-comm':     ['Finance',          'Komisi Sales',       '🏆'],
-  'finance-report':   ['Finance',          'Laporan Keuangan',   '📊'],
+  'finance-report':   ['Finance',          'Laporan Keuangan',   ''],
   // Inventory
-  'inventory':        ['Inventory',        'Stock & Reagen',     '📦'],
+  'inventory':        ['Inventory',        'Stock & Reagen',     ''],
   'inventory-pr':     ['Inventory',        'Purchase Request',   '🛒'],
   'inventory-supplier':['Inventory',       'Supplier',           '🏭'],
   // HRD
-  'hrd':              ['HRD',              'Data Karyawan',      '👥'],
-  'org-structure':    ['HRD',              'Struktur Organisasi','🏛️'],
-  'work-schedule':    ['HRD',              'Jadwal Kerja',       '📅'],
+  'hrd':              ['HRD',              'Data Karyawan',      ''],
+  'org-structure':    ['HRD',              'Struktur Organisasi',''],
+  'work-schedule':    ['HRD',              'Jadwal Kerja',       ''],
   'shift-calendar':   ['HRD',              'Kalender Shift',     '📆'],
   'attendance':       ['HRD',              'Absensi',            '⏰'],
   'hrd-cuti':         ['HRD',              'Cuti & Izin',        '🕐'],
-  'hrd-payroll':      ['HRD',              'Penggajian',         '💵'],
+  'hrd-payroll':      ['HRD',              'Penggajian',         ''],
   // Produktivitas
-  'tasks':            ['Produktivitas',    'Task Management',    '📋'],
-  'regulatory':       ['Produktivitas',    'Pelaporan & Audit',  '📊'],
+  'tasks':            ['Produktivitas',    'Task Management',    ''],
+  'regulatory':       ['Produktivitas',    'Pelaporan & Audit',  ''],
   // Konfigurasi
   'product':          ['Konfigurasi',      'Product',            '🧬'],
   'corporate':        ['Konfigurasi',      'Corporate',          '🏢'],
-  'import':           ['Konfigurasi',      'Import Excel',       '📥'],
-  'settings':         ['Konfigurasi',      'Pengaturan',         '⚙️'],
+  'import':           ['Konfigurasi',      'Import Excel',       ''],
+  'settings':         ['Konfigurasi',      'Pengaturan',         ''],
   'users':            ['Konfigurasi',      'User Management',    '👤'],
-  'audit':            ['Konfigurasi',      'Jejak Audit',        '📜'],
+  'audit':            ['Konfigurasi',      'Jejak Audit',        ''],
 };
 
 // ── Default pages per role (page keys) ────
@@ -226,7 +226,7 @@ async function renderUsers() {
   if (getUserRole() !== 'super_admin') {
     document.getElementById('main-content').innerHTML = `
       <div class="empty-state" style="min-height:60vh">
-        <div class="ico">🔒</div><h3>Akses Ditolak</h3>
+        <div class="ico"></div><h3>Akses Ditolak</h3>
         <p>Hanya Super Admin yang bisa mengelola user.</p>
       </div>`; return;
   }
@@ -323,13 +323,13 @@ function renderUsersTable(users, employees=[]) {
           ${linkedEmp ? `
             <div style="font-size:12px;font-weight:600">${linkedEmp.position||'—'}</div>
             <div style="font-size:10.5px;color:var(--text3)">${linkedEmp.division||''}</div>
-            <div style="font-size:9.5px;color:var(--teal);margin-top:2px">🔗 ${linkedEmp.full_name}</div>
+            <div style="font-size:9.5px;color:var(--teal);margin-top:2px">${linkedEmp.full_name}</div>
           ` : `
             <div style="font-size:11px;color:var(--text3);font-style:italic;margin-bottom:3px">Belum terhubung</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap">
               <button class="btn btn-xs btn-ghost" style="padding:1px 7px"
                 onclick="openLinkEmployeeForm('${u.id}','${(u.full_name||'').replace(/'/g,"\\'")}')">
-                🔗 Hubungkan
+                Hubungkan
               </button>
               <button class="btn btn-xs" style="padding:1px 7px;background:var(--teal-light);color:var(--teal);border:1px solid var(--teal)"
                 onclick="jadikanKaryawan('${u.id}','${(u.full_name||'').replace(/'/g,"\\'")}','${u.email||''}','${u.phone||''}')">
@@ -358,7 +358,7 @@ function renderUsersTable(users, employees=[]) {
         <td>
           <button class="act-btn edit"
             onclick="openEditUserRole('${u.id}','${(u.full_name||'').replace(/'/g,"\\'")}','${role}')">
-            ✏️ Role
+            Role
           </button>
         </td>
       </tr>`;
@@ -376,8 +376,8 @@ function openEditUserRole(userId, userName, currentRole) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">✏️ Akses & Role — ${userName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Akses & Role — ${userName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Role selector -->
@@ -397,7 +397,7 @@ function openEditUserRole(userId, userName, currentRole) {
     <div style="border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:4px">
       <div style="background:var(--navy);color:#fff;padding:8px 14px;font-size:12px;font-weight:700;
         display:flex;align-items:center;justify-content:space-between">
-        <span>📋 Akses Menu</span>
+        <span>Akses Menu</span>
         <div style="display:flex;gap:6px">
           <button class="btn btn-xs" style="background:rgba(255,255,255,.15);color:#fff;border:none"
             onclick="selectAllMenus(true)">Pilih Semua</button>
@@ -433,7 +433,7 @@ function openEditUserRole(userId, userName, currentRole) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-outline btn-sm" onclick="resetToRoleDefault('${currentRole}')">↺ Default Role</button>
-      <button class="btn btn-teal" onclick="saveUserRoleAndMenu('${userId}','${userName}')">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveUserRoleAndMenu('${userId}','${userName}')">Simpan</button>
     </div>`, 'wide');
 
   updatePermSummary(currentRole);
@@ -474,13 +474,13 @@ function updatePermSummary(role) {
   const rc = ROLES[role]||ROLES.sales;
   const el = document.getElementById('ur-perm-summary'); if (!el) return;
   const perms = [
-    [rc.canDelete,       '🗑 Hapus data'],
-    [rc.canBulkDelete,   '🗑 Bulk delete'],
-    [rc.canExport,       '📥 Export CSV'],
+    [rc.canDelete,       'Hapus data'],
+    [rc.canBulkDelete,   'Bulk delete'],
+    [rc.canExport,       'Export CSV'],
     [rc.canManageUsers,  '👤 Kelola user'],
     [rc.canApproveLogbook,'✅ Approve logbook'],
-    [rc.canAssignTask,   '📋 Assign task'],
-    [rc.canSeeTeamBoard, '👥 Team board'],
+    [rc.canAssignTask,   'Assign task'],
+    [rc.canSeeTeamBoard, 'Team board'],
   ];
   el.innerHTML = `
     <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:6px;width:100%">
@@ -532,8 +532,8 @@ async function saveUserRoleAndMenu(userId, userName) {
 function openInviteUserForm() {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">➕ Tambah User Profile</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">+ Tambah User Profile</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:#FFF8E1;border-radius:8px;padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:12px">
       ℹ️ User mendaftar sendiri di halaman login. Setelah login pertama, role diatur di sini.
@@ -557,7 +557,7 @@ function openInviteUserForm() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="createUserProfile()">➕ Simpan</button>
+      <button class="btn btn-teal" onclick="createUserProfile()">+ Simpan</button>
     </div>`);
 }
 
@@ -587,8 +587,8 @@ async function openLinkEmployeeForm(userId, userName) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🔗 Hubungkan ke Data Karyawan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Hubungkan ke Data Karyawan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:13px;color:var(--text2);margin-bottom:14px">
       Hubungkan akun login <strong>${userName}</strong> ke data karyawan yang sesuai di Data SDM.
@@ -604,7 +604,7 @@ async function openLinkEmployeeForm(userId, userName) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveLinkEmployee('${userId}')">🔗 Hubungkan</button>
+      <button class="btn btn-teal" onclick="saveLinkEmployee('${userId}')">Hubungkan</button>
     </div>`, 'narrow');
 }
 

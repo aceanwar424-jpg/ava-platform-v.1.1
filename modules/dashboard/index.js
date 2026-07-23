@@ -33,7 +33,7 @@ async function renderDashboard() {
     </div>
     <div class="card" style="margin-bottom:18px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-        <div class="card-title">📊 Sales Pipeline</div>
+        <div class="card-title">Sales Pipeline</div>
         <span style="font-size:12px;color:var(--text3)" id="dash-pipeline-total"></span>
       </div>
       <div id="dash-pipeline-bar" style="display:flex;gap:3px;height:10px;border-radius:10px;overflow:hidden;margin-bottom:12px;background:var(--bg2)"></div>
@@ -45,17 +45,17 @@ async function renderDashboard() {
         <div id="dash-followup"><div class="loading-row" style="padding:24px"><div class="spinner"></div></div></div>
       </div>
       <div class="card">
-        <div class="card-title" style="margin-bottom:12px">🤝 Output Kerjasama Terbaru</div>
+        <div class="card-title" style="margin-bottom:12px">Output Kerjasama Terbaru</div>
         <div id="dash-deals"><div class="loading-row" style="padding:24px"><div class="spinner"></div></div></div>
       </div>
     </div>
     <div class="grid-2">
       <div class="card">
-        <div class="card-title" style="margin-bottom:12px">👥 Team Performance (Bulan Ini)</div>
+        <div class="card-title" style="margin-bottom:12px">Team Performance (Bulan Ini)</div>
         <div id="dash-team"><div class="loading-row" style="padding:24px"><div class="spinner"></div></div></div>
       </div>
       <div class="card">
-        <div class="card-title" style="margin-bottom:12px">📋 Aktivitas Terbaru</div>
+        <div class="card-title" style="margin-bottom:12px">Aktivitas Terbaru</div>
         <div id="dash-activity" style="max-height:280px;overflow-y:auto">
           <div class="loading-row" style="padding:24px"><div class="spinner"></div></div>
         </div>
@@ -100,10 +100,10 @@ async function loadDashboardData() {
     const convRate = totalLeads > 0 ? Math.round(wonLeads/totalLeads*100) : 0;
 
     const kpiData = [
-      { icon:'🤝', val:totalPartners,         sub:`${activePartners} aktif · +${newPartnersMonth} bulan ini`, label:'Total Partner',       color:'#0EA5E9' },
+      { icon:'', val:totalPartners,         sub:`${activePartners} aktif · +${newPartnersMonth} bulan ini`, label:'Total Partner',       color:'#0EA5E9' },
       { icon:'🎯', val:activeLeads,            sub:`${wonLeads} won · Conv ${convRate}%`,                     label:'Leads Aktif',          color:'#8B5CF6' },
-      { icon:'💰', val:formatCurrency(monthRev), sub:`YTD: ${formatCurrency(totalRev)}`,                      label:'Revenue Bulan Ini',    color:'#22C55E' },
-      { icon:'📊', val:formatCurrency(pipelineVal), sub:`${activeLeads} leads potensial`,                     label:'Pipeline Value',       color:'#F59E0B' },
+      { icon:'', val:formatCurrency(monthRev), sub:`YTD: ${formatCurrency(totalRev)}`,                      label:'Revenue Bulan Ini',    color:'#22C55E' },
+      { icon:'', val:formatCurrency(pipelineVal), sub:`${activeLeads} leads potensial`,                     label:'Pipeline Value',       color:'#F59E0B' },
       { icon:'🔥', val:activeDeals,            sub:`Deal kerjasama aktif`,                                    label:'Deal Aktif',           color:'#EF4444' },
       { icon:'📈', val:`${convRate}%`,         sub:`${wonLeads} dari ${totalLeads} leads`,                    label:'Conversion Rate',      color:'#00897B' },
     ];
@@ -164,11 +164,11 @@ async function loadDashboardData() {
                   ${l.lead_name||l.company||'—'}
                 </div>
                 <div style="font-size:11px;color:${isOverdue?'#EF4444':'#F59E0B'}">
-                  ${isOverdue?'⚠️ Terlambat':'📅 Hari ini'} · ${l.followup_date}
+                  ${isOverdue?'⚠️ Terlambat':'Hari ini'} · ${l.followup_date}
                 </div>
               </div>
               <button onclick="event.stopPropagation();window.open('https://wa.me/${''}')"
-                style="background:none;border:none;font-size:16px;cursor:pointer;color:#25D366;flex-shrink:0">💬</button>
+                style="background:none;border:none;font-size:16px;cursor:pointer;color:#25D366;flex-shrink:0" style="font-size:10.5px;font-weight:700">WA</button>
             </div>`;
         }).join('');
         if (overdueLeads.length > 6) {
@@ -248,9 +248,9 @@ async function loadDashboardData() {
     const actEl = document.getElementById('dash-activity');
     if (actEl) {
       const actIcons = {
-        'create':'✨','update':'✏️','delete':'🗑','convert':'🔄',
-        'call':'📞','whatsapp':'💬','meeting':'🤝','email':'📧',
-        'status_change':'🔄','note':'📝','bulk_delete':'🗑'
+        'create':'✨','update':'','delete':'','convert':'',
+        'call':'','whatsapp':'💬','meeting':'','email':'📧',
+        'status_change':'','note':'','bulk_delete':''
       };
       if (!(activity||[]).length) {
         actEl.innerHTML = `<div class="empty-state" style="padding:20px"><p>Belum ada aktivitas</p></div>`;

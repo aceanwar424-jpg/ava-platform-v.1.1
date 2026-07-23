@@ -98,7 +98,7 @@ async function renderSupportive() {
     </div>
 
     <div class="pro-toolbar">
-      <input class="table-search" id="supp-q" placeholder="🔍 Cari nama pasien..."
+      <input class="table-search" id="supp-q" placeholder="Cari nama pasien..."
         oninput="filterSupp()" style="flex:1;min-width:220px">
       <select class="table-filter" id="supp-status" onchange="filterSupp()">
         <option value="">Semua Status</option>
@@ -173,7 +173,7 @@ function renderSuppList(data) {
       <th>Interpretasi</th><th>Dokter</th><th>Status</th><th>Aksi</th>
     </tr></thead><tbody>
     ${data.map(r=>{
-      const cfg = Object.entries(SUPPORTIVE_TYPES).find(([t])=>r.product_name===t||r.notes?.includes(`[SUPP:${t}]`))?.[1]||{icon:'📋',color:'#94A3B8'};
+      const cfg = Object.entries(SUPPORTIVE_TYPES).find(([t])=>r.product_name===t||r.notes?.includes(`[SUPP:${t}]`))?.[1]||{icon:'',color:'#94A3B8'};
       const notes = tryParseJSON(r.notes)||{};
       const mainResult = r.product_name==='EKG 12 Lead'?`${notes.rate||'—'} bpm, ${notes.rhythm||'—'}`:
                         r.product_name==='Spirometri'?`FEV1/FVC: ${notes.ratio||'—'}%, ${notes.pola||'—'}`:
@@ -202,7 +202,7 @@ function renderSuppList(data) {
         </td>
         <td>
           <div class="act-row">
-            <button class="act-btn edit" onclick="openSupportiveForm(${r.id})">✏️</button>
+            <button class="act-btn edit" onclick="openSupportiveForm(${r.id})">${icon('edit', 12)}</button>
             ${r.status==='Draft'?`<button class="act-btn" style="color:#22C55E;font-size:10px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
             ${r.status==='Validated'?`<button class="act-btn" style="color:#8B5CF6;font-size:10px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
             <button class="act-btn" onclick="printSuppResult(${r.id})">🖨</button>
@@ -233,8 +233,8 @@ async function openSupportiveForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit':'➕ Input'} Pemeriksaan Supportive</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'+ Input'} Pemeriksaan Supportive</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -273,7 +273,7 @@ async function openSupportiveForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveSuppResult(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveSuppResult(${id||'null'})">Simpan</button>
     </div>`);
 
   renderSuppFields(currentType, existingData);
@@ -409,7 +409,7 @@ async function saveSuppResult(id) {
 function printSuppResult(id) {
   const r = suppAll.find(s=>s.id===id); if (!r) return;
   const data = tryParseJSON(r.notes)||{};
-  const cfg  = SUPPORTIVE_TYPES[r.product_name]||{icon:'📋',color:'#0A2342',fields:[]};
+  const cfg  = SUPPORTIVE_TYPES[r.product_name]||{icon:'',color:'#0A2342',fields:[]};
   const orgName = localStorage.getItem('ol_org_name')||'OneLab Diagnostics';
   const c={green:'#22C55E',yellow:'#F59E0B',orange:'#F97316',red:'#EF4444'}[r.color_code]||'#94A3B8';
 

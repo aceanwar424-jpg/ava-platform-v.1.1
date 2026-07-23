@@ -26,9 +26,9 @@ async function renderConfigProduct() {
         <p>Kelola semua tes, layanan, harga, HPP, dan nilai rujukan</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderConfigRefRange()">📊 Ref Range</button>
-        <button class="btn btn-teal" onclick="navigate('import')">📥 Import Excel</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportProductsCSV()">📤 Export CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderConfigRefRange()">Ref Range</button>
+        <button class="btn btn-teal" onclick="navigate('import')">Import Excel</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportProductsCSV()">Export CSV</button>
         <button class="btn btn-teal" onclick="openProductForm()">+ Tambah Tes</button>
       </div>
     </div>
@@ -41,7 +41,7 @@ async function renderConfigProduct() {
     <!-- Filter -->
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="prod-q" placeholder="🔍 Cari nama tes, kode..."
+        <input class="table-search" id="prod-q" placeholder="Cari nama tes, kode..."
           oninput="prodFilter.q=this.value;applyProdFilter()" style="flex:1">
         <select class="table-filter" id="prod-kat" onchange="prodFilter.kategori=this.value;applyProdFilter()">
           <option value="">Semua Kategori</option>
@@ -160,9 +160,9 @@ function renderProdTable(data) {
       </td>
       <td>
         <div class="act-row">
-          <button class="act-btn" onclick="openRefRangeForProduct(${p.id},'${(p.nama_tes||'').replace(/'/g,"\\'")}')" title="Ref Range">📊</button>
-          <button class="act-btn edit" onclick="openProductForm(${p.id})">✏️</button>
-          <button class="act-btn del" onclick="deleteProduct(${p.id})">🗑</button>
+          <button class="act-btn" onclick="openRefRangeForProduct(${p.id},'${(p.nama_tes||'').replace(/'/g,"\\'")}')" title="Ref Range"></button>
+          <button class="act-btn edit" onclick="openProductForm(${p.id})">${icon('edit', 12)}</button>
+          <button class="act-btn del" onclick="deleteProduct(${p.id})">${icon('trash', 12)}</button>
         </div>
       </td>
     </tr>`).join('')}
@@ -230,7 +230,7 @@ function renderProductItemTable() {
               <option value="">-- Pilih --</option>${SPECIMEN_TYPES.map(s=>`<option ${row.specimen_type===s?'selected':''}>${s}</option>`).join('')}</select></td>
             <td style="padding:3px"><input type="text" value="${piVal(row.host_code)}" oninput="updateProdItem(${i},'host_code',this.value)" placeholder="731" style="font-size:11px;padding:3px;width:84px;font-family:monospace"></td>
             <td style="padding:3px;text-align:center"><input type="checkbox" ${row.is_active!==false?'checked':''} onchange="updateProdItem(${i},'is_active',this.checked)"></td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeProdItem(${i})" style="color:#EF4444">✕</button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeProdItem(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`).join('')}
       </tbody>
     </table></div>
@@ -322,8 +322,8 @@ async function openProductForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Produk/Tes':'🧬 Tambah Produk/Tes'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Produk/Tes':'🧬 Tambah Produk/Tes'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Kode-kode -->
@@ -478,8 +478,8 @@ async function openProductForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      ${id?`<button class="btn btn-outline btn-sm" onclick="closeModalForce();openRefRangeForProduct(${id},'${(p.nama_tes||'').replace(/'/g,"\\'")}')">📊 Ref Range</button>`:''}
-      <button class="btn btn-teal" onclick="saveProduct(${id||'null'})">💾 Simpan</button>
+      ${id?`<button class="btn btn-outline btn-sm" onclick="closeModalForce();openRefRangeForProduct(${id},'${(p.nama_tes||'').replace(/'/g,"\\'")}')">Ref Range</button>`:''}
+      <button class="btn btn-teal" onclick="saveProduct(${id||'null'})">Simpan</button>
     </div>`,'wide');
 
   calcProdMargin();
@@ -563,7 +563,7 @@ async function saveProduct(id) {
 
 async function deleteProduct(id) {
   if (!confirm('Hapus produk/tes ini? Ref range terkait juga akan terhapus.')) return;
-  try { await sbDelete('products',id); toast('🗑 Dihapus','info'); await loadProducts(); }
+  try { await sbDelete('products',id); toast('Dihapus','info'); await loadProducts(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -632,7 +632,7 @@ async function loadRefRanges() {
 function renderRRTable(data) {
   const el = document.getElementById('rr-tbody');
   if (!data.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">📊</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada reference range</h3>
       <p>Tambah nilai rujukan per tes untuk mendukung interpretasi hasil lab.</p>
     </div>`; return;
@@ -681,8 +681,8 @@ function renderRRTable(data) {
         <td><div style="width:16px;height:16px;border-radius:50%;background:${c};margin:auto"></div></td>
         <td>
           <div class="act-row">
-            <button class="act-btn edit" onclick="openRRForm(${r.id})">✏️</button>
-            <button class="act-btn del" onclick="deleteRR(${r.id})">🗑</button>
+            <button class="act-btn edit" onclick="openRRForm(${r.id})">${icon('edit', 12)}</button>
+            <button class="act-btn del" onclick="deleteRR(${r.id})">${icon('trash', 12)}</button>
           </div>
         </td>
       </tr>`;
@@ -713,8 +713,8 @@ async function openRRForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Ref Range':'📊 Tambah Reference Range'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Ref Range':'Tambah Reference Range'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -846,7 +846,7 @@ async function openRRForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveRR(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveRR(${id||'null'})">Simpan</button>
     </div>`);
 
   // init: muat analit produk, preselect, set tampilan tipe nilai
@@ -935,7 +935,7 @@ async function saveRR(id) {
 
 async function deleteRR(id) {
   if (!confirm('Hapus reference range ini?')) return;
-  try { await sbDelete('ref_ranges',id); toast('🗑 Dihapus','info'); await loadRefRanges(); }
+  try { await sbDelete('ref_ranges',id); toast('Dihapus','info'); await loadRefRanges(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -954,5 +954,5 @@ function exportProductsCSV() {
   const blob = new Blob([csv], {type:'text/csv'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
   a.download = 'products_export.csv'; a.click();
-  toast('📥 Export CSV berhasil','ok');
+  toast('Export CSV berhasil','ok');
 }

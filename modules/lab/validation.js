@@ -90,7 +90,7 @@ function renderValidationTab(){
         <span class="badge badge-gold">${toValidate.length} hasil siap divalidasi</span>
         ${unackCrit?`<span class="badge" style="background:#FEF2F2;color:#DC2626;margin-left:6px">${unackCrit} Kritis Belum Dilapor</span>`:''}
       </div>
-      ${toValidate.length?`<button class="btn btn-ghost btn-sm" onclick="validateAllResults()">⚡ Validasi Semua Pasien (non-kritis)</button>`:''}
+      ${toValidate.length?`<button class="btn btn-ghost btn-sm" onclick="validateAllResults()">Validasi Semua Pasien (non-kritis)</button>`:''}
     </div>
     ${patients.length?valPaneHtml('validate')
       :`<div class="empty-state"><div class="ico">✅</div><h3>Semua hasil sudah divalidasi</h3></div>`}`;
@@ -116,7 +116,7 @@ function renderApprovalTab(){
   el.innerHTML=`
     <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <span class="badge badge-purple">${toApprove.length} hasil siap diapprove &amp; rilis</span>
-      ${toApprove.length?`<button class="btn btn-ghost btn-sm" onclick="approveAllResults()">⚡ Approve Semua Pasien</button>`:''}
+      ${toApprove.length?`<button class="btn btn-ghost btn-sm" onclick="approveAllResults()">Approve Semua Pasien</button>`:''}
     </div>
     ${patients.length?valPaneHtml('approve')
       :`<div class="empty-state"><div class="ico">✅</div><h3>Semua hasil sudah diapprove</h3></div>`}`;
@@ -296,7 +296,7 @@ function selectValResult(rid, mode='validate'){
       <div style="color:var(--navy);line-height:1.4;margin-bottom:6px">${r.ai_conclusion}</div>
       ${isApprovalTab?`
         <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:#fff;color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
-        <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">📝 Save Edit</button>
+        <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">Save Edit</button>
       `:''}
     </div>
   `:'';
@@ -321,7 +321,7 @@ function selectValResult(rid, mode='validate'){
     <datalist id="${VAL_MODES[mode].prefix}-note-presets">
       ${LAB_NOTE_PRESETS.map(p=>`<option value="${p.replace(/"/g,'&quot;')}">`).join('')}
     </datalist>
-    <button class="btn btn-teal btn-sm" style="margin-top:6px;width:100%" onclick="saveResultNote(${rid},'${mode}')">💾 Simpan Catatan</button>
+    <button class="btn btn-teal btn-sm" style="margin-top:6px;width:100%" onclick="saveResultNote(${rid},'${mode}')">Simpan Catatan</button>
     <div style="font-size:10px;color:var(--gray);margin-top:4px">Catatan tersimpan ikut tampil di hasil cetak.</div>`;
 }
 

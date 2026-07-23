@@ -117,7 +117,7 @@ async function renderPayables() {
       gap:10px;margin-bottom:16px"></div>
 
     <div class="tabs" id="ap-tabs" style="margin-bottom:14px">
-      <button class="tab-btn active" onclick="apSwitchTab('daftar',this)">🧾 Daftar Faktur</button>
+      <button class="tab-btn active" onclick="apSwitchTab('daftar',this)">Daftar Faktur</button>
       <button class="tab-btn" onclick="apSwitchTab('umur',this)">⏳ Umur Hutang</button>
     </div>
 
@@ -203,7 +203,7 @@ function apPaintRingkasan() {
   const kartu = [
     { ico: '💳', label: 'Total Hutang Berjalan', val: formatCurrency(totalHutang),
       sub: `${belumBayar.length} faktur belum dibayar`, warna: '#0E7C86' },
-    { ico: '📅', label: 'Jatuh Tempo Minggu Ini', val: formatCurrency(nilaiMingguIni),
+    { ico: '', label: 'Jatuh Tempo Minggu Ini', val: formatCurrency(nilaiMingguIni),
       sub: `${mingguIni.length} faktur dalam 7 hari`, warna: '#B45309' },
     { ico: '⚠️', label: 'Faktur Bermasalah', val: String(bermasalah.length),
       sub: 'Berselisih atau lewat tempo & belum cocok', warna: bermasalah.length ? '#B91C1C' : '#15803D' },
@@ -253,7 +253,7 @@ function apPaintDaftar(el) {
     </div>`;
 
   if (!rows.length) {
-    el.innerHTML = filterBar + `<div class="empty-state"><div class="ico">🧾</div>
+    el.innerHTML = filterBar + `<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada faktur supplier</h3>
       <p>Catat faktur yang diterima dari supplier, lalu jalankan pencocokan tiga arah
          sebelum pembayaran dilakukan.</p></div>`;
@@ -285,12 +285,12 @@ function apPaintDaftar(el) {
         <td>${apBadgeCocok(i.match_status)}</td>
         <td>${apBadgeBayar(i.payment_status)}</td>
         <td><div class="act-row">
-          <button class="act-btn" onclick="apOpenRincian(${i.id})" title="Rincian & pencocokan">👁️</button>
+          <button class="act-btn" onclick="apOpenRincian(${i.id})" title="Rincian & pencocokan">${icon('file-text', 12)}</button>
           ${i.payment_status !== 'Dibayar'
-            ? `<button class="act-btn" onclick="apJalankanCocok(${i.id})" title="Jalankan pencocokan tiga arah">🔗</button>`
+            ? `<button class="act-btn" onclick="apJalankanCocok(${i.id})" title="Jalankan pencocokan tiga arah"></button>`
             : ''}
           ${bolehBayar
-            ? `<button class="act-btn" onclick="apAskBayar(${i.id})" title="Bayar faktur">💰</button>`
+            ? `<button class="act-btn" onclick="apAskBayar(${i.id})" title="Bayar faktur"></button>`
             : ''}
         </div></td>
       </tr>`;
@@ -371,7 +371,7 @@ function apPaintUmurHutang(el) {
             <td style="text-align:right;font-weight:650;font-variant-numeric:tabular-nums">
               ${formatCurrency(i.total_amount)}</td>
             <td>${apBadgeCocok(i.match_status)}</td>
-            <td><button class="act-btn" onclick="apOpenRincian(${i.id})" title="Rincian">👁️</button></td>
+            <td><button class="act-btn" onclick="apOpenRincian(${i.id})" title="Rincian">${icon('file-text', 12)}</button></td>
           </tr>`;
         }).join('')}</tbody></table></div>
       </div>`).join('')}`;
@@ -400,8 +400,8 @@ async function apOpenFormFaktur() {
 
   const hariIni = new Date().toISOString().slice(0, 10);
   openModal(`
-    <div class="modal-header"><div class="modal-title">🧾 Faktur Supplier Baru</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Faktur Supplier Baru</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Faktur wajib ditautkan ke Purchase Order agar dapat dicocokkan dengan penerimaan barang.
@@ -437,7 +437,7 @@ async function apOpenFormFaktur() {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="apSimpanFaktur()">💾 Simpan & Cocokkan</button>
+      <button class="btn btn-teal" onclick="apSimpanFaktur()">Simpan & Cocokkan</button>
     </div>`, 'wide');
 }
 
@@ -548,8 +548,8 @@ function apTampilkanHasilCocok(id, r) {
   const selisih = apNum(r.selisih);
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">🔗 Hasil Pencocokan Tiga Arah</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Hasil Pencocokan Tiga Arah</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Faktur <b>${apEsc(inv.invoice_number || '—')}</b> · ${apEsc(inv.supplier_name || '—')}
@@ -597,7 +597,7 @@ function apTampilkanHasilCocok(id, r) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       ${cocok && inv.payment_status !== 'Dibayar'
-        ? `<button class="btn btn-teal" onclick="closeModalForce();apAskBayar(${id})">💰 Bayar Faktur</button>`
+        ? `<button class="btn btn-teal" onclick="closeModalForce();apAskBayar(${id})">Bayar Faktur</button>`
         : ''}
     </div>`, 'wide');
 }
@@ -620,8 +620,8 @@ async function apOpenRincian(id) {
     <td style="padding:6px;text-align:right">${v}</td></tr>`;
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">🧾 ${apEsc(inv.invoice_number || 'Faktur Supplier')}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${apEsc(inv.invoice_number || 'Faktur Supplier')}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
       ${apBadgeCocok(inv.match_status)} ${apBadgeBayar(inv.payment_status)}
@@ -655,10 +655,10 @@ async function apOpenRincian(id) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       ${inv.payment_status !== 'Dibayar'
-        ? `<button class="btn btn-outline" onclick="closeModalForce();apJalankanCocok(${id})">🔗 Cocokkan Ulang</button>`
+        ? `<button class="btn btn-outline" onclick="closeModalForce();apJalankanCocok(${id})">Cocokkan Ulang</button>`
         : ''}
       ${bolehBayar
-        ? `<button class="btn btn-teal" onclick="closeModalForce();apAskBayar(${id})">💰 Bayar Faktur</button>`
+        ? `<button class="btn btn-teal" onclick="closeModalForce();apAskBayar(${id})">Bayar Faktur</button>`
         : ''}
     </div>`, 'wide');
 }
@@ -676,22 +676,22 @@ function apAskBayar(id) {
   if (alasan) {
     openModal(`
       <div class="modal-header"><div class="modal-title">🚫 Pembayaran Ditolak</div>
-        <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
       <div class="status-box status-warn" style="font-size:12.5px">
         Faktur <b>${apEsc(inv.invoice_number || '—')}</b> belum dapat dibayar.<br><br>${alasan}
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
         ${inv.payment_status !== 'Dibayar'
-          ? `<button class="btn btn-outline" onclick="closeModalForce();apJalankanCocok(${id})">🔗 Cocokkan Sekarang</button>`
+          ? `<button class="btn btn-outline" onclick="closeModalForce();apJalankanCocok(${id})">Cocokkan Sekarang</button>`
           : ''}
       </div>`);
     return;
   }
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">💰 Bayar Faktur Supplier</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Bayar Faktur Supplier</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Pembayaran akan dicatat beserta jurnalnya secara otomatis dan tidak dapat dibatalkan
       dari layar ini. Koreksi hanya dapat dilakukan lewat jurnal balik di modul Akuntansi.
@@ -710,7 +710,7 @@ function apAskBayar(id) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="apDoBayar(${id})">💰 Konfirmasi Pembayaran</button>
+      <button class="btn btn-teal" onclick="apDoBayar(${id})">Konfirmasi Pembayaran</button>
     </div>`);
 }
 

@@ -39,8 +39,8 @@ async function renderLeads() {
         <p>Pipeline prospek — dari kontak pertama sampai closing</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="navigate('maps')">🗺 Maps</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderLeadsKanban()">📊 Kanban</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('maps')">Maps</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderLeadsKanban()">Kanban</button>
         <button class="btn btn-teal" onclick="openLeadForm()">+ Tambah Lead</button>
       </div>
     </div>
@@ -64,7 +64,7 @@ async function renderLeads() {
           <option value="">Semua Sumber</option>
           ${LEAD_SOURCES.map(s=>`<option>${s}</option>`).join('')}
         </select>
-        <button class="btn btn-ghost btn-sm" onclick="exportLeadsCSV()">📥 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportLeadsCSV()">Export</button>
         <span id="ld-count" style="font-size:12px;color:var(--text3);white-space:nowrap;margin-left:auto"></span>
       </div>
       <div id="leads-tbody">
@@ -247,7 +247,7 @@ function renderLeadsTable(data) {
             <td>
               ${l.followup_date ? `
                 <div style="font-size:12px;font-weight:600;color:${isOverdue?'#EF4444':isSoon?'#F59E0B':'var(--text)'}">
-                  ${isOverdue?'⚠️ ':''}${isSoon?'📅 Today ':''}${formatDateShort(l.followup_date)}
+                  ${isOverdue?'⚠️ ':''}${isSoon?'Today ':''}${formatDateShort(l.followup_date)}
                 </div>
                 ${l.followup_note?`<div style="font-size:10px;color:var(--text3)">${l.followup_note.substring(0,30)}...</div>`:''}
               ` : '<span style="color:#ccc;font-size:12px">Belum diset</span>'}
@@ -258,13 +258,13 @@ function renderLeadsTable(data) {
             <td style="font-size:12px;color:var(--text3)">${l.assigned_name||'—'}</td>
             <td>
               <div class="act-row">
-                <button class="act-btn" onclick="openLeadDetail(${l.id})" title="Detail & Aktivitas">📋</button>
-                ${l.phone?`<button class="act-btn wa" onclick="window.open('https://wa.me/${(l.phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')" title="WA">💬</button>`:''}
-                <button class="act-btn edit" onclick="openLeadForm(${l.id})">✏️</button>
+                <button class="act-btn" onclick="openLeadDetail(${l.id})" title="Detail & Aktivitas"></button>
+                ${l.phone?`<button class="act-btn wa" onclick="window.open('https://wa.me/${(l.phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')" title="WA" style="font-size:10.5px;font-weight:700">WA</button>`:''}
+                <button class="act-btn edit" onclick="openLeadForm(${l.id})">${icon('edit', 12)}</button>
                 ${!['Won','Lost'].includes(l.status)?`
                   <button class="act-btn" onclick="convertLeadToPartner(${l.id})"
                     style="color:#22C55E;font-size:11px;padding:4px 7px" title="Convert ke Partner">→Partner</button>`:''}
-                <button class="act-btn del" onclick="deleteLead(${l.id})">🗑</button>
+                <button class="act-btn del" onclick="deleteLead(${l.id})">${icon('trash', 12)}</button>
               </div>
             </td>
           </tr>`;
@@ -290,7 +290,7 @@ async function openLeadDetail(id) {
           ${lead.source?`<span class="badge badge-navy" style="font-size:10px">${lead.source}</span>`:''}
         </div>
       </div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Info Grid -->
@@ -321,7 +321,7 @@ async function openLeadDetail(id) {
 
     <!-- Activity Tracker -->
     <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
-      <span>📋 Riwayat Aktivitas</span>
+      <span>Riwayat Aktivitas</span>
       <button class="btn btn-teal btn-xs" onclick="openAddActivity(${id})">+ Catat Aktivitas</button>
     </div>
     <div id="activity-list-${id}" style="margin-bottom:14px">
@@ -344,7 +344,7 @@ async function openLeadDetail(id) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-outline" onclick="closeModalForce();openLeadForm(${id})">✏️ Edit</button>
+      <button class="btn btn-outline" onclick="closeModalForce();openLeadForm(${id})">Edit</button>
       ${!['Won','Lost'].includes(lead.status)?`
         <button class="btn btn-teal" onclick="convertLeadToPartner(${id})">✅ Convert ke Partner</button>`:''}
     </div>`);
@@ -365,9 +365,9 @@ function renderActivitiesList(activities) {
     </div>`;
 
   const icons = {
-    'call':'📞','whatsapp':'💬','email':'📧','meeting':'🤝',
-    'visit':'🚗','proposal':'📋','demo':'🎯','note':'📝',
-    'status_change':'🔄','create':'✨','update':'✏️'
+    'call':'','whatsapp':'💬','email':'📧','meeting':'',
+    'visit':'🚗','proposal':'','demo':'🎯','note':'',
+    'status_change':'','create':'✨','update':''
   };
 
   return activities.map(a => `
@@ -386,16 +386,16 @@ function renderActivitiesList(activities) {
 
 function openAddActivity(leadId) {
   const types = [
-    {key:'call',label:'📞 Telepon'},{key:'whatsapp',label:'💬 WhatsApp'},
-    {key:'email',label:'📧 Email'},{key:'meeting',label:'🤝 Meeting'},
-    {key:'visit',label:'🚗 Kunjungan'},{key:'proposal',label:'📋 Kirim Proposal'},
-    {key:'note',label:'📝 Catatan'}
+    {key:'call',label:'Telepon'},{key:'whatsapp',label:'💬 WhatsApp'},
+    {key:'email',label:'📧 Email'},{key:'meeting',label:'Meeting'},
+    {key:'visit',label:'🚗 Kunjungan'},{key:'proposal',label:'Kirim Proposal'},
+    {key:'note',label:'Catatan'}
   ];
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📋 Catat Aktivitas</div>
-      <button class="modal-close" onclick="closeModalForce();openLeadDetail(${leadId})">✕</button>
+      <div class="modal-title">Catat Aktivitas</div>
+      <button class="modal-close" onclick="closeModalForce();openLeadDetail(${leadId})" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Tipe Aktivitas *</label>
@@ -426,7 +426,7 @@ function openAddActivity(leadId) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce();openLeadDetail(${leadId})">Batal</button>
-      <button class="btn btn-teal" onclick="saveActivity(${leadId})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveActivity(${leadId})">Simpan</button>
     </div>`);
 }
 
@@ -488,7 +488,7 @@ function quickLeadStatus(id, current) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">Update Status Lead</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
       ${LEAD_STATUSES.map(s=>`
@@ -516,8 +516,8 @@ async function openLeadForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Lead':'➕ Tambah Lead'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Lead':'+ Tambah Lead'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -607,7 +607,7 @@ async function openLeadForm(id=null) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveLead(${id||'null'})">
-        ${id?'💾 Simpan':'➕ Tambah Lead'}
+        ${id?'Simpan':'+ Tambah Lead'}
       </button>
     </div>`);
 }
@@ -710,7 +710,7 @@ async function convertLeadToPartner(id) {
     openModal(`
       <div class="modal-header">
         <div class="modal-title">✅ Lead Berhasil Diconvert!</div>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
       <div style="text-align:center;padding:20px 0">
         <div style="font-size:48px;margin-bottom:12px">🎉</div>
@@ -724,7 +724,7 @@ async function convertLeadToPartner(id) {
           style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:24px">🤝</div>
+          <div style="font-size:24px"></div>
           <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:6px">Partner Database</div>
           <div style="font-size:11px;color:var(--text3)">Kelola output kerjasama</div>
         </button>
@@ -732,7 +732,7 @@ async function convertLeadToPartner(id) {
           style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:24px">📜</div>
+          <div style="font-size:24px"></div>
           <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:6px">Buat MOU</div>
           <div style="font-size:11px;color:var(--text3)">Langsung buat perjanjian</div>
         </button>
@@ -740,7 +740,7 @@ async function convertLeadToPartner(id) {
           style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
-          <div style="font-size:24px">🏥</div>
+          <div style="font-size:24px"></div>
           <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:6px">Buat Project MCU</div>
           <div style="font-size:11px;color:var(--text3)">Setup project & RAB</div>
         </button>
@@ -764,7 +764,7 @@ async function deleteLead(id) {
   if (!confirm('Hapus lead ini?')) return;
   try {
     await sbDelete('leads', id);
-    toast('🗑 Lead dihapus','info');
+    toast('Lead dihapus','info');
     await loadLeads();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
@@ -795,7 +795,7 @@ async function renderOKR() {
     <!-- Filter & list -->
     <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
       <select id="okr-period" class="table-filter" style="min-width:180px" onchange="loadOKR()">
-        <option value="">📋 Semua Periode</option>
+        <option value="">Semua Periode</option>
         ${generatePeriodOptions(now)}
       </select>
       <select id="okr-assignee" class="table-filter" onchange="loadOKR()">
@@ -853,9 +853,9 @@ async function loadOKRRealKPI() {
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">
         ${[
-          {icon:'🤝', val:newPartners.length, label:'Partner Baru (YTD)', color:'#0EA5E9'},
-          {icon:'💰', val:formatCurrency(totalRev), label:'Revenue Terkumpul', color:'#22C55E'},
-          {icon:'📊', val:formatCurrency(pipelineVal), label:'Pipeline Value', color:'#F59E0B'},
+          {icon:'', val:newPartners.length, label:'Partner Baru (YTD)', color:'#0EA5E9'},
+          {icon:'', val:formatCurrency(totalRev), label:'Revenue Terkumpul', color:'#22C55E'},
+          {icon:'', val:formatCurrency(pipelineVal), label:'Pipeline Value', color:'#F59E0B'},
           {icon:'🎯', val:wonLeads.length, label:'Leads Won', color:'#8B5CF6'},
           {icon:'🔥', val:activeDeals.length, label:'Deal Aktif', color:'#EF4444'},
           {icon:'📈', val:`${wonLeads.length && (leads||[]).length ? Math.round(wonLeads.length/(leads||[]).length*100) : 0}%`, label:'Conversion Rate', color:'#00897B'},
@@ -943,8 +943,8 @@ function renderOKRList() {
               </div>
               <div style="display:flex;gap:6px;align-items:center">
                 <span style="font-size:13px;font-weight:700;color:${color}">${pct}%</span>
-                <button class="act-btn edit" onclick="openUpdateOKR(${o.id})">✏️</button>
-                <button class="act-btn del" onclick="deleteOKR(${o.id})">🗑</button>
+                <button class="act-btn edit" onclick="openUpdateOKR(${o.id})">${icon('edit', 12)}</button>
+                <button class="act-btn del" onclick="deleteOKR(${o.id})">${icon('trash', 12)}</button>
               </div>
             </div>
             <div style="background:var(--lgray);border-radius:4px;height:8px;overflow:hidden;margin-bottom:6px">
@@ -978,8 +978,8 @@ async function openOKRForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit OKR':'➕ Tambah OKR'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit OKR':'+ Tambah OKR'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Objective *</label>
@@ -1028,7 +1028,7 @@ async function openOKRForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveOKR(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveOKR(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -1038,8 +1038,8 @@ async function openUpdateOKR(id) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📊 Update Realisasi OKR</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Update Realisasi OKR</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--lgray);border-radius:8px;padding:12px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:700;color:var(--text)">${o.objective||'—'}</div>
@@ -1055,7 +1055,7 @@ async function openUpdateOKR(id) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveOKRUpdate(${id})">💾 Update</button>
+      <button class="btn btn-teal" onclick="saveOKRUpdate(${id})">Update</button>
     </div>`);
 }
 
@@ -1113,7 +1113,7 @@ async function deleteOKR(id) {
   if (!confirm('Hapus OKR ini?')) return;
   try {
     await sbDelete('okr_targets', id);
-    toast('🗑 OKR dihapus','info');
+    toast('OKR dihapus','info');
     await loadOKR();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }

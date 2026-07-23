@@ -22,17 +22,17 @@ let autocompleteWidget = null; // Google Places Autocomplete widget
 let searchCenter = null;
 
 const MAP_CATEGORIES = [
-  {label:'🏥 Klinik Pratama', q:'klinik pratama', group:'Medis'},
-  {label:'🏥 Klinik Utama',   q:'klinik utama',   group:'Medis'},
+  {label:'Klinik Pratama', q:'klinik pratama', group:'Medis'},
+  {label:'Klinik Utama',   q:'klinik utama',   group:'Medis'},
   {label:'👨‍⚕️ Dokter Umum',   q:'dokter praktik umum', group:'Medis'},
-  {label:'🩺 Spesialis',      q:'dokter spesialis', group:'Medis'},
+  {label:'Spesialis',      q:'dokter spesialis', group:'Medis'},
   {label:'👶 Dokter Anak',    q:'dokter anak',     group:'Medis'},
   {label:'🦷 Dokter Gigi',    q:'klinik gigi',     group:'Medis'},
-  {label:'👁 Dokter Mata',    q:'klinik mata',     group:'Medis'},
+  {label:'Dokter Mata',    q:'klinik mata',     group:'Medis'},
   {label:'🤰 Kandungan',      q:'dokter kandungan', group:'Medis'},
   {label:'🏨 Puskesmas',      q:'puskesmas',       group:'Medis'},
   {label:'🏦 Rumah Sakit',    q:'rumah sakit',     group:'Medis'},
-  {label:'🔬 Lab Klinik',     q:'laboratorium klinik', group:'Medis'},
+  {label:'Lab Klinik',     q:'laboratorium klinik', group:'Medis'},
   {label:'💊 Apotek',         q:'apotek',          group:'Farmasi'},
   {label:'💊 Apotek K24',     q:'apotek k24',      group:'Farmasi'},
   {label:'🏋️ Gym & Fitness',  q:'gym fitness center', group:'Wellness'},
@@ -66,9 +66,9 @@ async function renderMaps() {
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input type="password" id="mk" class="table-search" style="flex:1;min-width:200px"
           placeholder="AIza..." value="${mapsState.apiKey}">
-        <button class="btn btn-ghost btn-sm" onclick="toggleMK()">👁</button>
-        <button class="btn btn-teal btn-sm" onclick="connectMaps()">⚡ Sambungkan</button>
-        <button class="btn btn-outline btn-sm" onclick="saveMapsApiKey()">💾 Simpan</button>
+        <button class="btn btn-ghost btn-sm" onclick="toggleMK()">${icon('file-text', 12)}</button>
+        <button class="btn btn-teal btn-sm" onclick="connectMaps()">Sambungkan</button>
+        <button class="btn btn-outline btn-sm" onclick="saveMapsApiKey()">Simpan</button>
       </div>
       <div id="maps-status" class="status-box ${mapsState.apiKey?'status-info':'status-warn'}" style="margin-top:8px">
         ${mapsState.apiKey?'⏳ Key ditemukan, klik Sambungkan...':'⚠️ Masukkan API key lalu simpan.'}
@@ -134,7 +134,7 @@ async function renderMaps() {
 
       <div class="btn-row" style="margin-top:14px">
         <button class="btn btn-primary" id="maps-search-btn" onclick="startMapsSearch()" disabled>
-          🔍 Cari Mitra
+          Cari Mitra
         </button>
         <span id="maps-cat-count" style="font-size:12px;color:var(--gray);align-self:center"></span>
       </div>
@@ -151,13 +151,13 @@ async function renderMaps() {
     <div class="card" id="maps-visual-card" style="margin-bottom:14px;padding:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <div class="card-title" style="display:flex;align-items:center;gap:8px">
-          <span>🗺️ Peta Visual Interaktif & Pola Radius</span>
+          <span>Peta Visual Interaktif & Pola Radius</span>
           <span id="maps-radius-badge" class="badge badge-teal" style="font-size:11px">Radius: 5 km</span>
         </div>
         <div class="btn-row">
-          <button class="btn btn-ghost btn-sm active" id="btn-mview-both" onclick="switchMapsViewMode('both')">🗺️ Peta + Hasil</button>
-          <button class="btn btn-ghost btn-sm" id="btn-mview-map" onclick="switchMapsViewMode('map')">🗺️ Hanya Peta</button>
-          <button class="btn btn-ghost btn-sm" id="btn-mview-table" onclick="switchMapsViewMode('table')">📋 Hanya Tabel</button>
+          <button class="btn btn-ghost btn-sm active" id="btn-mview-both" onclick="switchMapsViewMode('both')">Peta + Hasil</button>
+          <button class="btn btn-ghost btn-sm" id="btn-mview-map" onclick="switchMapsViewMode('map')">Hanya Peta</button>
+          <button class="btn btn-ghost btn-sm" id="btn-mview-table" onclick="switchMapsViewMode('table')">Hanya Tabel</button>
         </div>
       </div>
 
@@ -177,7 +177,7 @@ async function renderMaps() {
       <div class="table-wrap">
         <div class="table-toolbar">
           <span id="maps-res-count" style="font-size:13px;font-weight:700;color:var(--navy)"></span>
-          <input class="table-search" id="maps-res-filter" placeholder="🔍 Filter hasil..."
+          <input class="table-search" id="maps-res-filter" placeholder="Filter hasil..."
             oninput="filterMapsRes(this.value)" style="max-width:200px">
           <div class="btn-row" style="margin-left:auto">
             <button class="btn btn-ghost btn-sm" onclick="toggleAllMapsSelect()">☑ Pilih Semua</button>
@@ -467,7 +467,7 @@ async function startMapsSearch() {
   document.getElementById('maps-prog-txt').textContent =
     `✅ ${mapsState.results.length} lokasi ditemukan`;
   document.getElementById('maps-search-btn').disabled = false;
-  document.getElementById('maps-search-btn').textContent = '🔍 Cari Mitra';
+  document.getElementById('maps-search-btn').textContent = 'Cari Mitra';
 
   await renderMapsResults();
 }
@@ -538,13 +538,13 @@ function plotMapsResultMarkers() {
         <div style="font-size:11px;color:#64748B;margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
         <div style="font-size:11px;color:#475569;margin-bottom:6px">${r.address}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
-          ${r.rating ? `<span style="font-size:11px;font-weight:600">⭐ ${r.rating} (${r.reviews})</span>` : ''}
+          ${r.rating ? `<span style="font-size:11px;font-weight:600">${r.rating} (${r.reviews})</span>` : ''}
           ${isDB ? '<span style="background:#DCFCE7;color:#166534;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">✓ Ada di DB</span>'
                  : '<span style="background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">Baru</span>'}
         </div>
         <div style="display:flex;gap:6px">
           ${!isDB ? `<button onclick="importOneMaps(${idx})" style="background:#00A896;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">⬆ Import ke Leads</button>` : ''}
-          <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:#F1F5F9;color:#334155;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">🗺️ Open</a>
+          <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:#F1F5F9;color:#334155;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">Open</a>
         </div>
       </div>`;
 
@@ -599,7 +599,7 @@ async function renderMapsResults() {
 
   if (!mapsState.results.length) {
     document.getElementById('maps-results-body').innerHTML =
-      '<div class="empty-state"><div class="ico">🔍</div><h3>Tidak ada hasil</h3><p>Coba perluas radius atau tambah kategori.</p></div>';
+      '<div class="empty-state"><div class="ico"></div><h3>Tidak ada hasil</h3><p>Coba perluas radius atau tambah kategori.</p></div>';
     return;
   }
 
@@ -629,14 +629,14 @@ async function renderMapsResults() {
             <td id="mp-${i}" class="td-phone">
               ${r.phone ? r.phone
                 : r.db_phone ? `<span style="color:var(--gray);font-size:11px">${r.db_phone}</span>`
-                : `<button class="act-btn" onclick="fetchMapsPhone(${i})">📞</button>`}
+                : `<button class="act-btn" onclick="fetchMapsPhone(${i})"></button>`}
             </td>
-            <td>${r.rating ? `⭐${r.rating}` : '—'}</td>
+            <td>${r.rating ? `${r.rating}` : '—'}</td>
             <td>
               <div class="act-row">
-                <button class="act-btn maps" onclick="window.open('${mu}','_blank')">🗺</button>
+                <button class="act-btn maps" onclick="window.open('${mu}','_blank')">${icon('map', 12)}</button>
                 ${r.in_db
-                  ? `<button class="act-btn edit" onclick="navigate('partners',{highlight:${r.db_id}})">✏️</button>`
+                  ? `<button class="act-btn edit" onclick="navigate('partners',{highlight:${r.db_id}})">${icon('edit', 12)}</button>`
                   : `<button class="act-btn" onclick="importOneMaps(${i})" title="Import satu">⬆</button>`}
               </div>
             </td>
@@ -693,20 +693,20 @@ function fetchMapsPhone(idx) {
       if (st === google.maps.places.PlacesServiceStatus.OK && res) {
         const ph = res.formatted_phone_number || '';
         if (!ph) {
-          if (cell) cell.innerHTML = `<button class="act-btn" onclick="fetchMapsPhone(${idx})">📞</button>`;
+          if (cell) cell.innerHTML = `<button class="act-btn" onclick="fetchMapsPhone(${idx})"></button>`;
           toast('Nomor tidak tersedia','warn'); return;
         }
         mapsState.results[idx].phone = ph;
         if (cell) cell.innerHTML = `<span class="td-phone">${ph}</span>`;
         if (r.in_db && r.db_id) {
           sbPatch('partners', r.db_id, {phone: ph, updated_at: new Date().toISOString()})
-            .then(() => toast(`📞 ${r.name} diupdate`, 'ok'))
+            .then(() => toast(`${r.name} diupdate`, 'ok'))
             .catch(() => {});
         } else {
-          toast('📞 ' + ph, 'ok');
+          toast('' + ph, 'ok');
         }
       } else {
-        if (cell) cell.innerHTML = `<button class="act-btn" onclick="fetchMapsPhone(${idx})">📞</button>`;
+        if (cell) cell.innerHTML = `<button class="act-btn" onclick="fetchMapsPhone(${idx})"></button>`;
       }
     }
   );

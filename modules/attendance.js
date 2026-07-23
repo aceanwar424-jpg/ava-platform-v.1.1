@@ -35,9 +35,9 @@ async function renderAttendance() {
     </div>
     <div class="ms-topbar" style="margin-bottom:18px">
       <button class="ms-tab active" onclick="switchAttTab('clock',this)">⏰ Clock In/Out</button>
-      <button class="ms-tab" onclick="switchAttTab('history',this)">📋 Riwayat</button>
-      <button class="ms-tab" onclick="switchAttTab('team',this)">👥 Tim (SPV)</button>
-      <button class="ms-tab" onclick="switchAttTab('config',this)">⚙️ Konfigurasi</button>
+      <button class="ms-tab" onclick="switchAttTab('history',this)">Riwayat</button>
+      <button class="ms-tab" onclick="switchAttTab('team',this)">Tim (SPV)</button>
+      <button class="ms-tab" onclick="switchAttTab('config',this)">Konfigurasi</button>
     </div>
     <div id="att-main"><div class="loading-row"><div class="spinner"></div></div></div>`;
 
@@ -153,7 +153,7 @@ async function startClock(type) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">📍 ${type==='in'?'Clock In':'Clock Out'}</div>
-      <button class="modal-close" onclick="stopCamera();closeModalForce()">✕</button>
+      <button class="modal-close" onclick="stopCamera();closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Step 1: GPS -->
@@ -266,7 +266,7 @@ function showGPSError(msg) {
   if (!gpsEl) return;
   gpsEl.innerHTML = `
     <div style="text-align:center;padding:20px">
-      <div style="font-size:40px;margin-bottom:12px">⛔</div>
+      <div style="font-size:40px;margin-bottom:12px"></div>
       <div style="font-weight:700;color:#DC2626;margin-bottom:8px">Clock In Ditolak</div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${msg}</div>
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
@@ -453,7 +453,7 @@ async function renderAttHistory() {
     `select=*&employee_name=eq.${encodeURIComponent(user)}&order=tanggal.desc&limit=30`).catch(()=>[]);
 
   if (!recs?.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📋</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada riwayat absensi</h3></div>`;
     return;
   }
@@ -505,7 +505,7 @@ async function renderTeamAttendance() {
   const el   = document.getElementById('att-main'); if (!el) return;
   const role = getUserRole?getUserRole():'sales';
   if (!isSpv()) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🔒</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Akses SPV Only</h3></div>`;
     return;
   }
@@ -582,7 +582,7 @@ async function renderAttConfig() {
           <input type="text" id="cfg-upload-preset" value="${cfg.uploadPreset}" placeholder="your_preset">
           <div class="form-hint">Buat di Cloudinary: Settings → Upload → Add upload preset → Unsigned</div>
         </div>
-        <button class="btn btn-teal btn-sm" onclick="saveCloudinaryConfig()">💾 Simpan</button>
+        <button class="btn btn-teal btn-sm" onclick="saveCloudinaryConfig()">Simpan</button>
       </div>
 
       <!-- Work Locations -->
@@ -598,7 +598,7 @@ async function renderAttConfig() {
                 <div style="font-weight:600;font-size:13px">${loc.name}</div>
                 <div style="font-size:11px;color:var(--text3)">${loc.latitude}, ${loc.longitude} · Radius ${loc.radius_m||10}m</div>
               </div>
-              <button class="act-btn del" onclick="deleteLocation(${loc.id},'${(loc.name||'').replace(/'/g,'')}')">🗑</button>
+              <button class="act-btn del" onclick="deleteLocation(${loc.id},'${(loc.name||'').replace(/'/g,'')}')">${icon('trash', 12)}</button>
             </div>`).join('') :
             '<div style="color:var(--text3);font-size:12px;text-align:center;padding:16px">Belum ada lokasi</div>'}
         </div>
@@ -619,7 +619,7 @@ async function openLocationForm() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">📍 Tambah Lokasi Kerja</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Nama Lokasi *</label>
@@ -649,7 +649,7 @@ async function openLocationForm() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveLocation()">💾 Simpan Lokasi</button>
+      <button class="btn btn-teal" onclick="saveLocation()">Simpan Lokasi</button>
     </div>`);
 }
 
@@ -677,7 +677,7 @@ async function deleteLocation(id, name) {
   if (!confirm(`Hapus lokasi "${name}"?`)) return;
   try {
     await sbDelete('work_locations',id);
-    toast('🗑 Dihapus','info');
+    toast('Dihapus','info');
     renderAttConfig();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }

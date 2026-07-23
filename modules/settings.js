@@ -8,38 +8,38 @@ async function renderSettings() {
     </div>
 
     <div class="tabs" id="set-tabs">
-      <button class="tab-btn active" onclick="switchSetTab('general',this)">⚙️ Umum</button>
+      <button class="tab-btn active" onclick="switchSetTab('general',this)">Umum</button>
       <button class="tab-btn" onclick="switchSetTab('rolemenu',this)">🔐 Akses Menu</button>
-      <button class="tab-btn" onclick="switchSetTab('activity',this)">📋 Log Aktivitas</button>
+      <button class="tab-btn" onclick="switchSetTab('activity',this)">Log Aktivitas</button>
       <button class="tab-btn" onclick="switchSetTab('data',this)">🗄 Data</button>
-      <button class="tab-btn" onclick="switchSetTab('masterdata',this)">📋 Master Data</button>
+      <button class="tab-btn" onclick="switchSetTab('masterdata',this)">Master Data</button>
       ${isSuperAdmin ? `<button class="tab-btn" onclick="switchSetTab('admin',this)">🛠 Admin Tools</button>` : ''}
     </div>
 
     <div id="set-general">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px">
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px">🔗 Supabase</div>
+          <div class="card-title" style="margin-bottom:14px">Supabase</div>
           <div class="form-group">
             <label>Project URL</label>
             <input value="${SUPABASE_URL}" readonly style="background:var(--lgray);font-size:12px">
           </div>
           <div id="set-conn" class="status-box status-info" style="margin-bottom:10px">Memeriksa...</div>
-          <button class="btn btn-teal btn-sm" onclick="checkSetConn()">🔄 Cek</button>
+          <button class="btn btn-teal btn-sm" onclick="checkSetConn()">Cek</button>
         </div>
         <div class="card">
-          <div class="card-title" style="margin-bottom:14px">🗺 Google Maps API</div>
+          <div class="card-title" style="margin-bottom:14px">Google Maps API</div>
           <div class="form-group">
             <label>API Key</label>
             <input type="password" id="set-maps-key" value="${localStorage.getItem('ol_maps_key')||''}" placeholder="AIza...">
           </div>
           <div class="btn-row">
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('set-maps-key').type=document.getElementById('set-maps-key').type==='password'?'text':'password'">👁</button>
-            <button class="btn btn-teal btn-sm" onclick="saveSetMapsKey()">💾 Simpan</button>
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('set-maps-key').type=document.getElementById('set-maps-key').type==='password'?'text':'password'">${icon('file-text', 12)}</button>
+            <button class="btn btn-teal btn-sm" onclick="saveSetMapsKey()">Simpan</button>
           </div>
         </div>
         <div class="card" style="grid-column:1/-1">
-          <div class="card-title" style="margin-bottom:14px">📊 Statistik Database</div>
+          <div class="card-title" style="margin-bottom:14px">Statistik Database</div>
           <div id="set-stats" class="loading-row"><div class="spinner"></div></div>
         </div>
       </div>
@@ -65,7 +65,7 @@ async function renderSettings() {
         <div class="card-title" style="margin-bottom:14px;color:var(--danger)">⚠️ Manajemen Data</div>
         <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Tindakan berikut tidak dapat dibatalkan. Lakukan dengan hati-hati.</p>
         <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn btn-danger btn-sm" onclick="exportAllData()">📥 Export Semua Data (Backup)</button>
+          <button class="btn btn-danger btn-sm" onclick="exportAllData()">Export Semua Data (Backup)</button>
         </div>
       </div>
     </div>
@@ -86,7 +86,7 @@ async function renderSettings() {
 
         <!-- Bulk Delete -->
         <div class="card">
-          <div class="card-title" style="margin-bottom:12px;color:var(--danger)">🗑 Bulk Delete</div>
+          <div class="card-title" style="margin-bottom:12px;color:var(--danger)">Bulk Delete</div>
           <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Hapus massal data untuk reset atau pembersihan. Tidak bisa dibatalkan.</p>
           <div style="display:flex;flex-direction:column;gap:8px">
             <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('partners')">Hapus Semua Partner</button>
@@ -101,7 +101,7 @@ async function renderSettings() {
 
         <!-- Reset Password -->
         <div class="card">
-          <div class="card-title" style="margin-bottom:12px">🔒 Keamanan</div>
+          <div class="card-title" style="margin-bottom:12px">Keamanan</div>
           <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Info akun aktif dan koneksi Supabase.</p>
           <div style="font-size:12px;background:var(--lgray);border-radius:8px;padding:10px 12px;margin-bottom:10px">
             <div><strong>User ID:</strong> <span id="admin-uid" style="color:var(--teal)">—</span></div>
@@ -112,12 +112,12 @@ async function renderSettings() {
 
         <!-- Email Confirmation Fix -->
         <div class="card">
-          <div class="card-title" style="margin-bottom:12px">⚡ Quick Fix SQL</div>
+          <div class="card-title" style="margin-bottom:12px">Quick Fix SQL</div>
           <p style="font-size:13px;color:var(--gray);margin-bottom:10px">SQL siap pakai untuk fix umum. Copy dan jalankan di Supabase SQL Editor.</p>
           <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('confirm_email')">📋 Fix Email Confirmation</button>
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('disable_rls')">📋 Disable RLS semua tabel</button>
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">📋 Check semua tabel</button>
+            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('confirm_email')">Fix Email Confirmation</button>
+            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('disable_rls')">Disable RLS semua tabel</button>
+            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">Check semua tabel</button>
           </div>
         </div>
 
@@ -193,7 +193,7 @@ async function loadSetActivity() {
           </tr>`).join('')}
         </tbody>
       </table>`:
-      '<div class="empty-state"><div class="ico">📋</div><h3>Belum ada log</h3></div>';
+      '<div class="empty-state"><div class="ico"></div><h3>Belum ada log</h3></div>';
   } catch(e){ el.innerHTML=`<div class="status-box status-err">❌ ${e.message}</div>`; }
 }
 
@@ -219,7 +219,7 @@ async function exportAllData() {
     const a=document.createElement('a');
     a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
     a.download=`OneLab_Backup_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.csv`;
-    a.click(); toast('📥 Backup diunduh','ok');
+    a.click(); toast('Backup diunduh','ok');
   } catch(e){ toast('❌ '+e.message,'err'); }
 }
 
@@ -300,7 +300,7 @@ function copyAdminSQL(key) {
   const sql = ADMIN_SQL[key];
   if (!sql) return;
   navigator.clipboard.writeText(sql)
-    .then(() => toast('📋 SQL tersalin — paste di Supabase SQL Editor','ok'))
+    .then(() => toast('SQL tersalin — paste di Supabase SQL Editor','ok'))
     .catch(() => toast('❌ Gagal copy','err'));
 }
 
@@ -310,7 +310,7 @@ async function renderMasterData() {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
 
       <div class="card">
-        <div class="card-title" style="margin-bottom:10px">🏥 Master Kategori Partner</div>
+        <div class="card-title" style="margin-bottom:10px">Master Kategori Partner</div>
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Kelola jenis/kategori mitra yang tersedia di form Partner Database.
         </div>
@@ -323,19 +323,19 @@ async function renderMasterData() {
       </div>
 
       <div class="card">
-        <div class="card-title" style="margin-bottom:10px">🔬 Master Layanan Lab</div>
+        <div class="card-title" style="margin-bottom:10px">Master Layanan Lab</div>
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Jenis pemeriksaan dan layanan yang tersedia untuk MCU, Home Care, dll.
         </div>
-        <button class="btn btn-teal btn-sm" onclick="openMasterServices()">⚙️ Kelola Layanan</button>
+        <button class="btn btn-teal btn-sm" onclick="openMasterServices()">Kelola Layanan</button>
       </div>
 
       <div class="card">
-        <div class="card-title" style="margin-bottom:10px">💰 Master Harga</div>
+        <div class="card-title" style="margin-bottom:10px">Master Harga</div>
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Tarif standar per jenis pemeriksaan untuk kalkulasi RAB otomatis.
         </div>
-        <button class="btn btn-teal btn-sm" onclick="navigate('inventory')">📦 Kelola di Inventory</button>
+        <button class="btn btn-teal btn-sm" onclick="navigate('inventory')">Kelola di Inventory</button>
       </div>
 
       <div class="card">
@@ -343,7 +343,7 @@ async function renderMasterData() {
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Nama, alamat, logo, kontak OneLab — dipakai di invoice, surat, voucher.
         </div>
-        <button class="btn btn-teal btn-sm" onclick="openOrgSettings()">⚙️ Edit Identitas</button>
+        <button class="btn btn-teal btn-sm" onclick="openOrgSettings()">Edit Identitas</button>
       </div>
 
       <div class="card">
@@ -351,7 +351,7 @@ async function renderMasterData() {
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Reset atau lihat nomor urut surat, invoice, dan voucher.
         </div>
-        <button class="btn btn-outline btn-sm" onclick="loadDocSequences()">👁 Lihat Urutan</button>
+        <button class="btn btn-outline btn-sm" onclick="loadDocSequences()">Lihat Urutan</button>
       </div>
 
       <div class="card">
@@ -359,7 +359,7 @@ async function renderMasterData() {
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Google Maps API key, Supabase connection, dan integrasi eksternal.
         </div>
-        <button class="btn btn-teal btn-sm" onclick="switchSetTab('general',document.querySelector('#set-tabs .tab-btn'))">⚙️ Ke Pengaturan Umum</button>
+        <button class="btn btn-teal btn-sm" onclick="switchSetTab('general',document.querySelector('#set-tabs .tab-btn'))">Ke Pengaturan Umum</button>
       </div>
 
     </div>`;
@@ -368,8 +368,8 @@ async function renderMasterData() {
 async function openMasterServices() {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🔬 Master Layanan Lab</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Master Layanan Lab</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:13px;color:var(--gray);margin-bottom:14px">
       Daftar layanan standar OneLab — digunakan di Home Care, MCU, dan Voucher.
@@ -397,7 +397,7 @@ async function openOrgSettings() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">👤 Identitas Organisasi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Nama Organisasi</label>
@@ -419,7 +419,7 @@ async function openOrgSettings() {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveOrgSettings()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveOrgSettings()">Simpan</button>
     </div>`);
 }
 
@@ -438,7 +438,7 @@ async function loadDocSequences() {
     openModal(`
       <div class="modal-header">
         <div class="modal-title">📄 Nomor Urut Dokumen</div>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
       <table><thead><tr><th>Tahun</th><th>Bulan</th><th>Tipe</th><th>Urutan Terakhir</th></tr></thead>
       <tbody>${(data||[]).map(d=>`<tr>
@@ -485,7 +485,7 @@ function renderRoleMenuConfig() {
       </div>
       <div style="margin-left:auto;display:flex;gap:8px">
         <button class="btn btn-ghost btn-sm" onclick="resetAllRolePages()">↩ Reset Default</button>
-        <button class="btn btn-teal btn-sm" onclick="saveAllRolePages()">💾 Simpan Semua</button>
+        <button class="btn btn-teal btn-sm" onclick="saveAllRolePages()">Simpan Semua</button>
       </div>
     </div>
 

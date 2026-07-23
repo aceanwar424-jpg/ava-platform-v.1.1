@@ -106,7 +106,7 @@ function paintQueue() {
 function openQueueForm() {
   openModal(`
     <div class="modal-header"><div class="modal-title">🎫 Ambil Nomor Antrian</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Layanan *</label>
       <select id="qf-svc">${QUEUE_SERVICES.map(s=>`<option>${s}</option>`).join('')}</select></div>
     <div class="form-group"><label>Nama Pasien</label>
@@ -194,7 +194,7 @@ async function renderAppointments() {
       <span style="align-self:center;color:var(--gray)">s/d</span>
       <input type="date" class="table-filter" id="ap-to"
         value="${new Date(Date.now()+14*86400000).toISOString().split('T')[0]}" onchange="loadAppointments()">
-      <input class="table-search" id="ap-q" placeholder="🔍 Cari pasien..." oninput="paintAppointments()" style="flex:1;min-width:180px">
+      <input class="table-search" id="ap-q" placeholder="Cari pasien..." oninput="paintAppointments()" style="flex:1;min-width:180px">
     </div>
     <div id="ap-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
   await loadAppointments();
@@ -219,7 +219,7 @@ function paintAppointments() {
   const q = (document.getElementById('ap-q')?.value||'').toLowerCase();
   const list = apptAll.filter(a=>!q || (a.patient_name||'').toLowerCase().includes(q));
   if (!list.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📅</div><h3>Belum ada perjanjian</h3></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada perjanjian</h3></div>`;
     return;
   }
   const stCol = {'Terjadwal':'#0E7C86','Hadir':'#15803D','Tidak Hadir':'#B91C1C','Batal':'#6B7A8B'};
@@ -264,8 +264,8 @@ function paintAppointments() {
 function openApptForm() {
   const now = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
   openModal(`
-    <div class="modal-header"><div class="modal-title">📅 Buat Perjanjian</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Buat Perjanjian</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Nama Pasien *</label><input type="text" id="af2-name"></div>
       <div class="form-group"><label>No. HP / WA</label><input type="text" id="af2-phone" placeholder="08xxxxxxxxxx"></div>
@@ -285,7 +285,7 @@ function openApptForm() {
     <div id="af2-clash"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAppt()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveAppt()">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -351,7 +351,7 @@ function renderQueueKiosk() {
   document.body.classList.add('kiosk-mode');
   document.getElementById('main-content').innerHTML = `
     <div class="kiosk">
-      <button class="kiosk-exit" onclick="exitKiosk()" title="Keluar dari mode kiosk">✕</button>
+      <button class="kiosk-exit" onclick="exitKiosk()" title="Keluar dari mode kiosk" style="font-size:10.5px;font-weight:700"></button>
       <div class="kiosk-head">
         <div class="kiosk-logo">OL</div>
         <h1>Selamat Datang</h1>

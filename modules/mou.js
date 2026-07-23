@@ -16,7 +16,7 @@ async function renderMOU() {
       <div><h1>MOU / Perjanjian Kerjasama</h1>
         <p>Kelola semua dokumen perjanjian dengan mitra OneLab</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="exportMOUCSV()">📥 CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportMOUCSV()">CSV</button>
         <button class="btn btn-teal" onclick="openMOUForm()">+ Buat MOU</button>
       </div>
     </div>
@@ -26,7 +26,7 @@ async function renderMOU() {
 
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="mou-q" placeholder="🔍 Cari nomor, partner, judul..."
+        <input class="table-search" id="mou-q" placeholder="Cari nomor, partner, judul..."
           oninput="filterMOU()" style="flex:1">
         <select class="table-filter" id="mou-status-f" onchange="filterMOU()">
           <option value="">Semua Status</option>
@@ -77,7 +77,7 @@ function filterMOU() {
 function renderMOUTable(data) {
   const el = document.getElementById('mou-tbody');
   if (!data.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📜</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>${mouAll.length?'Tidak ada hasil':'Belum ada MOU'}</h3>
       <p>Buat MOU baru atau generate dari Output Kerjasama.</p></div>`; return;
   }
@@ -101,9 +101,9 @@ function renderMOUTable(data) {
         <td><span style="background:${col}20;color:${col};padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700">${m.status}</span></td>
         <td style="font-size:11px;color:var(--gray)">${m.created_by_name||'—'}</td>
         <td><div class="act-row">
-          ${m.file_url?`<a href="${m.file_url}" target="_blank" class="act-btn" title="Download">📥</a>`:''}
-          <button class="act-btn edit" onclick="openMOUForm(${m.id})">✏️</button>
-          <button class="act-btn del" onclick="deleteMOU(${m.id})">🗑</button>
+          ${m.file_url?`<a href="${m.file_url}" target="_blank" class="act-btn" title="Download"></a>`:''}
+          <button class="act-btn edit" onclick="openMOUForm(${m.id})">${icon('edit', 12)}</button>
+          <button class="act-btn del" onclick="deleteMOU(${m.id})">${icon('trash', 12)}</button>
         </div></td>
       </tr>`;
     }).join('')}</tbody></table>`;
@@ -122,8 +122,8 @@ async function openMOUForm(id=null) {
   const today = new Date().toISOString().split('T')[0];
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit MOU':'📜 Buat MOU Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit MOU':'Buat MOU Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -180,7 +180,7 @@ async function openMOUForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" id="mf-save" onclick="saveMOU(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" id="mf-save" onclick="saveMOU(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -203,7 +203,7 @@ async function saveMOU(id) {
       const up = await uploadFile(fi.files[0],'documents','mou');
       fileUrl=up.url; fileName=up.name;
     }
-  } catch(e) { toast('❌ Upload gagal: '+e.message,'err'); if(btn){btn.disabled=false;btn.textContent='💾 Simpan';} return; }
+  } catch(e) { toast('❌ Upload gagal: '+e.message,'err'); if(btn){btn.disabled=false;btn.textContent='Simpan';} return; }
 
   const partnerSel = document.getElementById('mf-partner');
   const payload = {
@@ -227,13 +227,13 @@ async function saveMOU(id) {
     closeModalForce(); await loadMOUs();
   } catch(e) {
     toast('❌ '+e.message,'err');
-    if(btn){btn.disabled=false;btn.textContent='💾 Simpan';}
+    if(btn){btn.disabled=false;btn.textContent='Simpan';}
   }
 }
 
 async function deleteMOU(id) {
   if (!confirm('Hapus MOU ini?')) return;
-  try { await sbDelete('mous',id); toast('🗑 MOU dihapus','info'); await loadMOUs(); }
+  try { await sbDelete('mous',id); toast('MOU dihapus','info'); await loadMOUs(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 

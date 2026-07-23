@@ -148,8 +148,8 @@ async function rxOpenPrescriptionForm() {
   rxLines = []; rxWarnAllergy = null; rxWarnInteraction = null;
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 Resep Baru</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Resep Baru</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div class="form-group"><label>Nama Pasien *</label>
       <div style="display:flex;gap:6px">
@@ -183,7 +183,7 @@ async function rxOpenPrescriptionForm() {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="rxSavePrescription()">💾 Simpan Resep</button>
+      <button class="btn btn-teal" onclick="rxSavePrescription()">Simpan Resep</button>
     </div>`, 'wide');
   rxRenderLines();
 }
@@ -248,7 +248,7 @@ function rxRenderLines() {
           ${keras ? '⚠ ' : ''}Golongan ${d.drug_class || '—'}${d.is_formulary ? ' · formularium' : ' · NON-formularium'}
           ${(d.stock_qty || 0) < (l.qty || 0) ? ' · <b style="color:#B91C1C">stok tidak cukup</b>' : ''}</div>` : ''}
       </td>
-      <td style="padding:4px;width:34px"><button class="act-btn del" onclick="rxRemoveLine(${i})">✕</button></td>
+      <td style="padding:4px;width:34px"><button class="act-btn del" onclick="rxRemoveLine(${i})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>
     <tr style="border-bottom:1px solid var(--border)"><td colspan="3" style="padding:0 4px 6px">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
@@ -385,8 +385,8 @@ async function rxOpenDetail(id) {
   const p = rxPrescriptions.find(x => x.id === id) || {};
   const items = await sbGet('prescription_items', `select=*&rx_id=eq.${id}&order=id.asc`).catch(() => []);
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 ${p.rx_number || 'Resep'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${p.rx_number || 'Resep'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:var(--bg2);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:12.5px">
       <b>${p.patient_name || '—'}</b> ${p.mr_number ? '· ' + p.mr_number : ''} ·
       ${p.rx_date ? formatDateShort(p.rx_date) : ''}<br>
@@ -420,7 +420,7 @@ async function rxOpenDispense(id) {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">💊 Serahkan Obat — ${p.rx_number || ''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">
       Stok dipotong mengikuti kedaluwarsa terdekat (FEFO) dalam satu transaksi.
       Bila stok salah satu obat tidak mencukupi, seluruh penyerahan dibatalkan.
@@ -441,7 +441,7 @@ async function rxOpenDispense(id) {
 
     ${adaKeras ? `<div style="background:#FBEAEA;border:1px solid #B91C1C;border-radius:8px;padding:10px 13px;
       margin-top:12px;font-size:12.5px;color:#7f1d1d">
-      <b>🔒 Mengandung golongan Narkotika/Psikotropika.</b>
+      <b>Mengandung golongan Narkotika/Psikotropika.</b>
       Identitas penerima wajib dicatat dan masuk register khusus.</div>` : ''}
 
     <div class="form-row" style="margin-top:10px">
@@ -488,8 +488,8 @@ async function rxDoDispense(id, perluIdentitas) {
 
 function rxAskCancel(id) {
   openModal(`
-    <div class="modal-header"><div class="modal-title">✕ Batalkan Resep</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Batalkan Resep</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Alasan pembatalan *</label>
       <textarea id="rx-cancel-reason" rows="2"></textarea></div>
     <div class="modal-footer">
@@ -553,14 +553,14 @@ function rxPaintDrugs(el) {
             <div style="font-size:11px;color:var(--gray)">${d.brand_name || ''} ${d.drug_code ? '· ' + d.drug_code : ''}</div></td>
           <td style="font-size:12px">${d.strength || ''} ${d.dosage_form || ''}</td>
           <td><span style="font-size:11px;font-weight:700;color:${keras ? '#B91C1C' : 'var(--gray)'}">
-            ${keras ? '🔒 ' : ''}${d.drug_class || '—'}</span>
+            ${keras ? '' : ''}${d.drug_class || '—'}</span>
             ${d.is_formulary ? '' : '<div style="font-size:10px;color:#B45309">non-formularium</div>'}</td>
           <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(d.unit_price)}</td>
           <td style="text-align:right;font-weight:700;color:${low ? '#B91C1C' : 'var(--text)'}">${d.stock_qty || 0}
             ${low ? '<div style="font-size:10px">di bawah minimum</div>' : ''}</td>
           <td><div class="act-row">
             <button class="btn btn-ghost btn-xs" onclick="rxOpenReceive(${d.id})">+ Stok</button>
-            <button class="act-btn edit" onclick="rxOpenDrugForm(${d.id})">✏️</button>
+            <button class="act-btn edit" onclick="rxOpenDrugForm(${d.id})">${icon('edit', 12)}</button>
           </div></td>
         </tr>`;
       }).join('')}</tbody></table></div>`}`;
@@ -569,8 +569,8 @@ function rxPaintDrugs(el) {
 function rxOpenDrugForm(id) {
   const d = id ? (rxDrugs.find(x => x.id === id) || {}) : {};
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id ? '✏️ Ubah' : '💊 Tambah'} Obat</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id ? 'Ubah' : '💊 Tambah'} Obat</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode</label><input type="text" id="rd-code" value="${d.drug_code || ''}"></div>
       <div class="form-group"><label>Golongan *</label>
@@ -596,7 +596,7 @@ function rxOpenDrugForm(id) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="rxSaveDrug(${id || 'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="rxSaveDrug(${id || 'null'})">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -626,8 +626,8 @@ async function rxSaveDrug(id) {
 function rxOpenReceive(drugId) {
   const d = rxDrugs.find(x => x.id === drugId) || {};
   openModal(`
-    <div class="modal-header"><div class="modal-title">📦 Terima Stok — ${d.generic_name || ''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Terima Stok — ${d.generic_name || ''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Jumlah *</label><input type="number" min="1" id="rr-qty"></div>
       <div class="form-group"><label>No. Batch *</label><input type="text" id="rr-batch"></div>
@@ -639,7 +639,7 @@ function rxOpenReceive(drugId) {
     <div class="form-group"><label>Pemasok</label><input type="text" id="rr-sup"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="rxDoReceive(${drugId})">📦 Terima</button>
+      <button class="btn btn-teal" onclick="rxDoReceive(${drugId})">Terima</button>
     </div>`);
 }
 
@@ -681,7 +681,7 @@ async function rxPaintStock(el) {
   el.innerHTML = `
     ${kadaluarsa.length ? `<div style="background:#FBEAEA;border:1.5px solid #B91C1C;border-radius:8px;
       padding:11px 14px;margin-bottom:12px">
-      <div style="font-weight:800;color:#B91C1C;font-size:13px">⛔ ${kadaluarsa.length} batch SUDAH kedaluwarsa — jangan diserahkan</div>
+      <div style="font-weight:800;color:#B91C1C;font-size:13px">${kadaluarsa.length} batch SUDAH kedaluwarsa — jangan diserahkan</div>
       <div style="font-size:11.5px;color:#7f1d1d;margin-top:3px">
         ${kadaluarsa.slice(0, 6).map(b => `${nama(b.drug_id)} lot ${b.batch_no || '—'} (${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}</div>
     </div>` : ''}
@@ -737,7 +737,7 @@ async function rxPaintNarcotic(el) {
       <td style="font-family:ui-monospace,monospace;font-size:11.5px">${r.recipient_id_number || '—'}</td>
       <td style="text-align:right;font-weight:700">${r.qty || 0}</td>
     </tr>`).join('')}</tbody></table></div>`
-      : '<div class="empty-state"><div class="ico">🔒</div><h3>Belum ada penyerahan golongan khusus</h3></div>'}`;
+      : '<div class="empty-state"><div class="ico"></div><h3>Belum ada penyerahan golongan khusus</h3></div>'}`;
 }
 
 async function rxPaintReport(el) {

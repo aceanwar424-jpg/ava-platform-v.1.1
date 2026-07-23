@@ -29,7 +29,7 @@ async function renderCrmPipeline() {
     <div class="page-header">
       <div><h1>Pipeline &amp; Pendapatan</h1>
         <p>Menyambungkan corong penjualan ke pendapatan yang benar-benar masuk</p></div>
-      <button class="btn btn-ghost btn-sm" onclick="crmOpenStages()">⚙️ Tahapan</button>
+      <button class="btn btn-ghost btn-sm" onclick="crmOpenStages()">Tahapan</button>
     </div>
     <div id="crm-warn"></div>
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
@@ -39,7 +39,7 @@ async function renderCrmPipeline() {
       <span id="crm-note" style="font-size:12px;color:var(--text3)"></span>
     </div>
     <div class="tabs" id="crm-tabs" style="margin-bottom:14px">
-      <button class="tab-btn active" onclick="crmSwitchTab('pipeline',this)">📊 Papan Pipeline</button>
+      <button class="tab-btn active" onclick="crmSwitchTab('pipeline',this)">Papan Pipeline</button>
       <button class="tab-btn" onclick="crmSwitchTab('corong',this)">🔻 Corong &amp; Konversi</button>
       <button class="tab-btn" onclick="crmSwitchTab('partner',this)">🏢 Nilai Pelanggan</button>
       <button class="tab-btn" onclick="crmSwitchTab('target',this)">🎯 Target vs Realisasi</button>
@@ -103,9 +103,9 @@ async function crmPaintBoard(el) {
     : '';
 
   if (!crmStages.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📊</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Tahapan pipeline belum diatur</h3>
-      <button class="btn btn-teal" style="margin-top:10px" onclick="crmOpenStages()">⚙️ Atur Tahapan</button></div>`;
+      <button class="btn btn-teal" style="margin-top:10px" onclick="crmOpenStages()">Atur Tahapan</button></div>`;
     return;
   }
 
@@ -286,7 +286,7 @@ async function crmOpenPartnerTrend(partnerId, nama) {
   const maks = Math.max(...(rows || []).map(r => +r.revenue || 0), 1);
   openModal(`
     <div class="modal-header"><div class="modal-title">🏢 ${nama}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     ${(rows || []).length ? `<div style="display:flex;align-items:flex-end;gap:5px;height:150px;margin-bottom:12px">
       ${rows.map(r => `<div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%">
         <div style="width:100%;background:var(--teal);border-radius:3px 3px 0 0;
@@ -348,8 +348,8 @@ async function crmOpenStages() {
   let rows = crmStages;
   if (!rows.length) rows = await sbGet('crm_pipeline_stages', 'select=*&order=sort_order').catch(() => []);
   openModal(`
-    <div class="modal-header"><div class="modal-title">⚙️ Tahapan Pipeline</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Tahapan Pipeline</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">
       Tahapan disimpan sebagai data, sehingga bisa diubah tanpa menyentuh program.
       <b>Hari menganggur</b> menentukan kapan sebuah deal ditandai perlu ditindaklanjuti.
@@ -369,7 +369,7 @@ async function crmOpenStages() {
     </tr>`).join('')}</tbody></table></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="crmSaveStages()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="crmSaveStages()">Simpan</button>
     </div>`, 'wide');
 }
 

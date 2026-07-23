@@ -416,7 +416,7 @@ async function audShowDetail(id) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">${audIco('scroll',16)} Rincian Perubahan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
       ${audEsc(audActionMeta(r.action).label)} pada <b>${audEsc(audTableLabel(r.table_name))}</b>

@@ -80,11 +80,11 @@ async function renderAssets(initialTab = 'list') {
   astTab = initialTab || 'list';
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
-      <div><h1>🏛️ Aset Tetap &amp; Kalibrasi</h1>
+      <div><h1>Aset Tetap &amp; Kalibrasi</h1>
         <p style="color:var(--text3);font-size:13px">
           Daftar aset, penyusutan garis lurus, dan jadwal kalibrasi alat</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="astOpenMaintForm()">🗓️ Jadwal Baru</button>
+        <button class="btn btn-ghost btn-sm" onclick="astOpenMaintForm()">Jadwal Baru</button>
         <button class="btn btn-teal btn-sm" onclick="astOpenAssetForm()">+ Tambah Aset</button>
       </div>
     </div>
@@ -95,7 +95,7 @@ async function renderAssets(initialTab = 'list') {
          id="ast-summary"></div>
 
     <div class="tabs" id="ast-tabs" style="margin-bottom:14px">
-      <button class="tab-btn${astTab === 'list'  ? ' active' : ''}" onclick="astSwitchTab('list',this)">🏛️ Daftar Aset</button>
+      <button class="tab-btn${astTab === 'list'  ? ' active' : ''}" onclick="astSwitchTab('list',this)">Daftar Aset</button>
       <button class="tab-btn${astTab === 'depr'  ? ' active' : ''}" onclick="astSwitchTab('depr',this)">📉 Penyusutan</button>
       <button class="tab-btn${astTab === 'maint' ? ' active' : ''}" onclick="astSwitchTab('maint',this)">🔧 Jadwal Kalibrasi</button>
     </div>
@@ -159,7 +159,7 @@ function astPaintUnfit() {
     <div style="background:#FEF2F2;border:1px solid #DC262655;border-left:5px solid #DC2626;
       border-radius:10px;padding:13px 16px;margin-bottom:14px">
       <div style="font-weight:800;color:#B91C1C;font-size:13.5px;margin-bottom:4px">
-        ⛔ ${unfit.length} alat lewat jatuh tempo kalibrasi — tidak layak dipakai mengeluarkan hasil
+        ${unfit.length} alat lewat jatuh tempo kalibrasi — tidak layak dipakai mengeluarkan hasil
       </div>
       <div style="font-size:12.5px;color:#7F1D1D;margin-bottom:8px">
         Hasil yang dikeluarkan alat di bawah ini tidak dapat dipertanggungjawabkan
@@ -187,11 +187,11 @@ function astPaintSummary() {
   const segera     = astOpenMaints().filter(m => astDueState(m.due_date).key === 'soon').length;
 
   const kartu = [
-    { icon:'💰', val: astAssetsOk ? formatCurrency(perolehan) : '—',
+    { icon:'', val: astAssetsOk ? formatCurrency(perolehan) : '—',
       label:`Nilai Perolehan · ${aktif.length} aset aktif`, color:'#0E7C86' },
     { icon:'📉', val: astAssetsOk ? formatCurrency(nilaiBuku) : '—',
       label:'Nilai Buku Berjalan', color:'#7C3AED' },
-    { icon:'⛔', val: astMaintOk ? String(terlambat) : '—',
+    { icon:'', val: astMaintOk ? String(terlambat) : '—',
       label:'Jadwal Terlambat', color: terlambat ? '#DC2626' : '#16A34A' },
     { icon:'⏳', val: astMaintOk ? String(segera) : '—',
       label:'Jatuh Tempo ≤ 30 Hari', color:'#B45309' },
@@ -236,7 +236,7 @@ function astPaintList(el) {
   el.innerHTML = `
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="ast-q" placeholder="🔍 Cari kode / nama / lokasi..."
+        <input class="table-search" id="ast-q" placeholder="Cari kode / nama / lokasi..."
           value="${astEsc(astFilter.search)}" oninput="astApplyFilter()">
         <select class="table-filter" id="ast-f-kat" onchange="astApplyFilter()">
           <option value="">Semua Kategori</option>
@@ -247,7 +247,7 @@ function astPaintList(el) {
           ${AST_STATUS.map(s => `<option${astFilter.status === s ? ' selected' : ''}>${s}</option>`).join('')}
         </select>
       </div>
-      ${!data.length ? `<div class="empty-state"><div class="ico">🏛️</div>
+      ${!data.length ? `<div class="empty-state"><div class="ico"></div>
         <h3>Belum ada aset tercatat</h3>
         <p>Tambahkan aset tetap agar penyusutannya bisa dihitung dan masuk ke pembukuan
            secara otomatis setiap bulan.</p></div>`
@@ -270,7 +270,7 @@ function astPaintList(el) {
               <div style="font-size:11px;color:var(--gray)">
                 ${astEsc(a.lokasi) || 'Tanpa lokasi'}${a.penanggung_jawab ? ' · ' + astEsc(a.penanggung_jawab) : ''}</div>
               ${unfit ? `<div style="font-size:11px;color:#B91C1C;font-weight:700;margin-top:2px">
-                ⛔ kalibrasi terlambat — jangan dipakai mengeluarkan hasil</div>` : ''}
+                kalibrasi terlambat — jangan dipakai mengeluarkan hasil</div>` : ''}
             </td>
             <td style="font-size:12px">${astEsc(a.kategori) || '—'}</td>
             <td style="font-size:11.5px;color:var(--gray)">${a.tanggal_perolehan ? formatDateShort(a.tanggal_perolehan) : '—'}
@@ -282,9 +282,9 @@ function astPaintList(el) {
             <td><span class="badge ${a.status === 'Aktif' ? 'badge-green'
                                     : a.status === 'Rusak' ? 'badge-red' : 'badge-gray'}">${astEsc(a.status) || 'Aktif'}</span></td>
             <td><div class="act-row">
-              <button class="act-btn" onclick="astOpenAssetForm(${a.id})" title="Ubah">✏️</button>
+              <button class="act-btn" onclick="astOpenAssetForm(${a.id})" title="Ubah">${icon('edit', 12)}</button>
               <button class="act-btn" onclick="astOpenMaintForm(null,${a.id})" title="Buat jadwal kalibrasi">🔧</button>
-              <button class="act-btn del" onclick="astAskDeleteAsset(${a.id})" title="Hapus">🗑️</button>
+              <button class="act-btn del" onclick="astAskDeleteAsset(${a.id})" title="Hapus">${icon('trash', 12)}</button>
             </div></td>
           </tr>`;
         }).join('')}</tbody></table>`}
@@ -310,8 +310,8 @@ async function astOpenAssetForm(id = null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id ? '✏️ Ubah Aset' : '➕ Tambah Aset Tetap'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <div class="modal-title">${id ? 'Ubah Aset' : '+ Tambah Aset Tetap'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div class="form-row">
       <div class="form-group"><label>Kode Aset</label>
@@ -373,7 +373,7 @@ async function astOpenAssetForm(id = null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="astSaveAsset(${id || 'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="astSaveAsset(${id || 'null'})">Simpan</button>
     </div>`, 'wide');
 }
 
@@ -428,8 +428,8 @@ function astAskDeleteAsset(id) {
   const a = astItems.find(x => x.id === id) || {};
   const sudahSusut = astDeprs.some(d => d.asset_id === id);
   openModal(`
-    <div class="modal-header"><div class="modal-title">🗑️ Hapus Aset</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Hapus Aset</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:13px;margin-bottom:10px">
       Hapus <b>${astEsc(a.nama)}</b> dari daftar aset tetap?</div>
     ${sudahSusut ? `<div class="status-box status-warn" style="margin-bottom:10px">
@@ -545,7 +545,7 @@ function astAskRunDepr() {
   const sudah = astDeprs.filter(d => d.periode === astPeriod);
   openModal(`
     <div class="modal-header"><div class="modal-title">▶️ Jalankan Penyusutan ${astPeriod}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:13px;color:var(--text3);margin-bottom:10px">
       Setiap aset aktif akan disusutkan satu bulan dengan metode garis lurus,
       dan tiap barisnya mencatat jurnal <b>Beban Penyusutan</b> pada
@@ -601,7 +601,7 @@ function astPaintMaint(el) {
 
   el.innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
-      <button class="btn btn-teal btn-sm" onclick="astOpenMaintForm()">🗓️ Jadwal Baru</button>
+      <button class="btn btn-teal btn-sm" onclick="astOpenMaintForm()">Jadwal Baru</button>
       <span style="font-size:12.5px;color:var(--text3)">
         ${urut.length} jadwal terbuka · ${astOverdueMaints().length} terlambat</span>
     </div>
@@ -621,7 +621,7 @@ function astPaintMaint(el) {
             <td>
               <div style="font-weight:650">${astEsc(m.asset_name) || 'Tanpa nama'}</div>
               ${bahaya ? `<div style="font-size:11px;color:#B91C1C;font-weight:800;margin-top:2px">
-                ⛔ TIDAK LAYAK MENGELUARKAN HASIL</div>` : ''}
+                TIDAK LAYAK MENGELUARKAN HASIL</div>` : ''}
             </td>
             <td><span class="badge ${m.maint_type === 'Kalibrasi' ? 'badge-teal'
                                     : m.maint_type === 'Perbaikan' ? 'badge-rose' : 'badge-navy'}">${astEsc(m.maint_type) || '—'}</span></td>
@@ -630,8 +630,8 @@ function astPaintMaint(el) {
             <td style="font-size:11.5px;color:var(--gray)">${m.interval_days || 0} hari</td>
             <td><div class="act-row">
               <button class="act-btn" onclick="astOpenCompleteForm(${m.id})" title="Tandai selesai">✅</button>
-              <button class="act-btn" onclick="astOpenMaintForm(${m.id})" title="Ubah">✏️</button>
-              <button class="act-btn del" onclick="astAskDeleteMaint(${m.id})" title="Hapus">🗑️</button>
+              <button class="act-btn" onclick="astOpenMaintForm(${m.id})" title="Ubah">${icon('edit', 12)}</button>
+              <button class="act-btn del" onclick="astAskDeleteMaint(${m.id})" title="Hapus">${icon('trash', 12)}</button>
             </div></td>
           </tr>`;
         }).join('')}</tbody></table>`}
@@ -640,7 +640,7 @@ function astPaintMaint(el) {
     <div style="font-size:12px;font-weight:800;color:var(--gray);text-transform:uppercase;
       letter-spacing:.08em;margin-bottom:8px">Riwayat Terakhir</div>
     <div class="table-wrap">
-      ${!selesai.length ? `<div class="empty-state" style="padding:26px"><div class="ico">📜</div>
+      ${!selesai.length ? `<div class="empty-state" style="padding:26px"><div class="ico"></div>
         <h3>Belum ada riwayat</h3></div>`
       : `<table><thead><tr>
           <th>Alat / Aset</th><th>Jenis</th><th>Dikerjakan</th><th>Hasil</th>
@@ -671,8 +671,8 @@ async function astOpenMaintForm(id = null, presetAssetId = null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id ? '✏️ Ubah Jadwal' : '🗓️ Jadwal Kalibrasi / Pemeliharaan Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <div class="modal-title">${id ? 'Ubah Jadwal' : 'Jadwal Kalibrasi / Pemeliharaan Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div class="form-group"><label>Alat Lab (opsional)</label>
       <select id="ast-m-analyzer" onchange="astMaintPickAnalyzer()">
@@ -718,7 +718,7 @@ async function astOpenMaintForm(id = null, presetAssetId = null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="astSaveMaint(${id || 'null'})">💾 Simpan Jadwal</button>
+      <button class="btn btn-teal" onclick="astSaveMaint(${id || 'null'})">Simpan Jadwal</button>
     </div>`, 'wide');
 }
 
@@ -780,8 +780,8 @@ async function astSaveMaint(id) {
 function astAskDeleteMaint(id) {
   const m = astMaints.find(x => x.id === id) || {};
   openModal(`
-    <div class="modal-header"><div class="modal-title">🗑️ Hapus Jadwal</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Hapus Jadwal</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:13px;margin-bottom:10px">
       Hapus jadwal ${astEsc(m.maint_type)} untuk <b>${astEsc(m.asset_name)}</b>?
     </div>
@@ -816,7 +816,7 @@ function astOpenCompleteForm(id) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">✅ Selesaikan ${astEsc(m.maint_type)}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="font-size:13px;margin-bottom:4px"><b>${astEsc(m.asset_name)}</b></div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:12px">

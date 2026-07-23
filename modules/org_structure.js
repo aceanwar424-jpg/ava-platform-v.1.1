@@ -32,18 +32,18 @@ async function renderOrgStructure() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>🏛️ Struktur Organisasi</h1>
+        <h1>Struktur Organisasi</h1>
         <p>Jabatan, hierarki, dan org chart OneLab Diagnostics</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="seedOrgPositions()">📥 Import dari Template</button>
+        <button class="btn btn-ghost btn-sm" onclick="seedOrgPositions()">Import dari Template</button>
         <button class="btn btn-teal" onclick="openPositionForm()">+ Tambah Jabatan</button>
       </div>
     </div>
 
     <div class="tabs" id="org-tabs">
       <button class="tab-btn active" onclick="switchOrgTab('chart',this)">🗂️ Org Chart</button>
-      <button class="tab-btn" onclick="switchOrgTab('list',this)">📋 Daftar Jabatan</button>
+      <button class="tab-btn" onclick="switchOrgTab('list',this)">Daftar Jabatan</button>
     </div>
 
     <div id="org-chart">
@@ -80,10 +80,10 @@ function renderOrgChart() {
   const el = document.getElementById('org-chart'); if (!el) return;
   if (!orgPositions.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="ico">🏛️</div>
+      <div class="ico"></div>
       <h3>Belum ada data jabatan</h3>
       <p>Klik "Import dari Template" untuk load jabatan dari data klinik.</p>
-      <button class="btn btn-teal" style="margin-top:14px" onclick="seedOrgPositions()">📥 Import Template</button>
+      <button class="btn btn-teal" style="margin-top:14px" onclick="seedOrgPositions()">Import Template</button>
     </div>`; return;
   }
 
@@ -150,7 +150,7 @@ function renderOrgChart() {
 function renderOrgList() {
   const el = document.getElementById('org-list'); if (!el) return;
   if (!orgPositions.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📋</div><h3>Belum ada jabatan</h3></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada jabatan</h3></div>`;
     return;
   }
   const LEVEL_COLORS = {1:'#0891B2',2:'#7C3AED',3:'#059669',4:'#94A3B8'};
@@ -194,8 +194,8 @@ function renderOrgList() {
                 </td>
                 <td style="padding:10px 14px">
                   <div class="act-row">
-                    <button class="act-btn edit" onclick="openPositionForm(${pos.id})">✏️</button>
-                    <button class="act-btn del" onclick="deletePosition(${pos.id},'${pos.title.replace(/'/g,'').slice(0,20)}')">🗑</button>
+                    <button class="act-btn edit" onclick="openPositionForm(${pos.id})">${icon('edit', 12)}</button>
+                    <button class="act-btn del" onclick="deletePosition(${pos.id},'${pos.title.replace(/'/g,'').slice(0,20)}')">${icon('trash', 12)}</button>
                   </div>
                 </td>
               </tr>`;
@@ -212,8 +212,8 @@ async function openPositionForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🏛️ ${id?'Edit':'Tambah'} Jabatan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'Tambah'} Jabatan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Nama Jabatan *</label>
@@ -255,7 +255,7 @@ async function openPositionForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePosition(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="savePosition(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -287,7 +287,7 @@ async function deletePosition(id, title) {
   if (!confirm(`Hapus jabatan "${title}"?`)) return;
   try {
     await sbDelete('positions',id);
-    toast('🗑 Jabatan dihapus','info');
+    toast('Jabatan dihapus','info');
     await loadOrgData();
     renderOrgChart();
   } catch(e) { toast('❌ '+e.message,'err'); }

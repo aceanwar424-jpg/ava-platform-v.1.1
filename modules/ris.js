@@ -152,7 +152,7 @@ async function openRISOrderForm() {
   const now = new Date(Date.now() - new Date().getTimezoneOffset() * 60000);
   openModal(`
     <div class="modal-header"><div class="modal-title">🫁 Order Pemeriksaan Radiologi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Nama Pasien *</label>
       <div style="display:flex;gap:6px">
         <input type="text" id="rf-name" oninput="risSearchPatient(this.value)" autocomplete="off" style="flex:1">
@@ -179,7 +179,7 @@ async function openRISOrderForm() {
       <input type="text" id="rf-prep" placeholder="Puasa 6 jam, minum air putih..."></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveRISOrder()">💾 Buat Order</button>
+      <button class="btn btn-teal" onclick="saveRISOrder()">Buat Order</button>
     </div>`, 'wide');
 }
 
@@ -266,7 +266,7 @@ function risOpenSendDevice(id) {
   const o = risOrders.find(x => x.id === id) || {};
   openModal(`
     <div class="modal-header"><div class="modal-title">📡 Kirim ke Alat — ${o.accession_no || ''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       <b>${o.patient_name || ''}</b> · ${o.procedure_name || ''} (${o.modality_code || ''})<br>
       Kirim order ke antrian alat agar radiografer dapat memanggilnya di mesin.
@@ -340,8 +340,8 @@ async function openRISReport(orderId) {
 
   const locked = rep?.locked;
   openModal(`
-    <div class="modal-header"><div class="modal-title">📝 Laporan — ${o.accession_no || ''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Laporan — ${o.accession_no || ''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:var(--bg2);border-radius:8px;padding:10px 13px;margin-bottom:12px;font-size:12.5px">
       <b>${o.patient_name || '—'}</b> · ${o.mr_number || ''} · ${o.procedure_name || ''} (${o.modality_code || ''})
@@ -352,7 +352,7 @@ async function openRISReport(orderId) {
 
     ${locked ? `<div style="background:#E8F5EC;border:1px solid #15803D55;border-radius:8px;padding:9px 13px;
       margin-bottom:12px;font-size:12.5px;color:#15803D">
-      🔒 Ditandatangani ${rep.radiologist || ''} pada ${rep.signed_at ? new Date(rep.signed_at).toLocaleString('id-ID') : ''}</div>` : ''}
+      Ditandatangani ${rep.radiologist || ''} pada ${rep.signed_at ? new Date(rep.signed_at).toLocaleString('id-ID') : ''}</div>` : ''}
 
     <div class="form-group"><label>Teknik Pemeriksaan</label>
       <input type="text" id="rr-tech" value="${rep?.technique || ''}" ${locked ? 'disabled' : ''}></div>
@@ -373,7 +373,7 @@ async function openRISReport(orderId) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       ${rep?.id ? `<button class="btn btn-ghost" onclick="printRISReport(${orderId})">🖨 Cetak</button>` : ''}
-      ${!locked ? `<button class="btn btn-ghost" onclick="saveRISReport(${orderId},${rep?.id || 'null'},false)">💾 Simpan Draft</button>
+      ${!locked ? `<button class="btn btn-ghost" onclick="saveRISReport(${orderId},${rep?.id || 'null'},false)">Simpan Draft</button>
         <button class="btn btn-teal" onclick="saveRISReport(${orderId},${rep?.id || 'null'},true)">🔏 Tandatangani</button>` : ''}
     </div>`, 'wide');
 }

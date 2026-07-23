@@ -55,8 +55,8 @@ async function renderQCTab(){
             ${a.kalibrasi_berikutnya?new Date(a.kalibrasi_berikutnya).toLocaleDateString('id-ID'):'—'}${overdue?' ⚠️':due?' 🔧':''}</td>
           <td><span style="background:${st}20;color:${st};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${a.status||'—'}</span></td>
           <td style="white-space:nowrap">
-            <button class="btn btn-ghost btn-xs" title="Edit" onclick="openAnalyzerForm(${a.id})">✏️</button>
-            <button class="btn btn-ghost btn-xs" title="Hapus" onclick="deleteAnalyzer(${a.id})">🗑</button>
+            <button class="btn btn-ghost btn-xs" title="Edit" onclick="openAnalyzerForm(${a.id})">${icon('edit', 12)}</button>
+            <button class="btn btn-ghost btn-xs" title="Hapus" onclick="deleteAnalyzer(${a.id})">${icon('trash', 12)}</button>
           </td>
         </tr>`;
       }).join(''):`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--gray)">Belum ada analyzer. Klik "+ Analyzer".</td></tr>`}
@@ -65,11 +65,11 @@ async function renderQCTab(){
 
     ${!qcAvailable?`
       <div style="background:#FFF8E1;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;font-size:12.5px;color:#92400E">
-        ⚙️ Modul <strong>Log QC</strong> memerlukan tabel <code>lab_qc_runs</code>.
+        Modul <strong>Log QC</strong> memerlukan tabel <code>lab_qc_runs</code>.
         Jalankan <code>supabase_lab_lis.sql</code> di Supabase SQL Editor untuk mengaktifkannya.
       </div>` : `
       <div class="card">
-        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">📊 Log Quality Control (Westgard)</div>
+        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">Log Quality Control (Westgard)</div>
         <div class="table-wrap"><table><thead><tr>
           <th>Waktu</th><th>Alat</th><th>Tes</th><th>Level</th><th>Target±SD</th><th>Terukur</th><th>Z-score</th><th>Evaluasi</th><th></th>
         </tr></thead><tbody>
@@ -114,7 +114,7 @@ async function openAnalyzerForm(id=null){
   const integOn = !!a.integrasi_aktif;
   openModal(`
     <div class="modal-header"><div class="modal-title">🧬 ${id?'Edit':'Tambah'} Analyzer</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode Alat</label><input id="az-kode" placeholder="ANZ-001" value="${a.kode_alat||''}"></div>
       <div class="form-group" style="grid-column:2/-1"><label>Nama Alat *</label><input id="az-nama" placeholder="Sysmex XN-550" value="${a.nama_alat||''}"></div>
@@ -189,8 +189,8 @@ async function deleteAnalyzer(id){
 async function openQCForm(){
   const azOpts=(_labAnalyzers||[]).map(a=>`<option value="${a.id}" data-name="${a.nama_alat}">${a.nama_alat}</option>`).join('');
   openModal(`
-    <div class="modal-header"><div class="modal-title">📊 Log QC Run</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Log QC Run</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1"><label>Analyzer *</label>
         <select id="qc-az"><option value="">-- Pilih --</option>${azOpts}</select></div>
@@ -209,7 +209,7 @@ async function openQCForm(){
     <div class="form-group"><label>Lot / Catatan</label><input id="qc-notes" placeholder="Lot reagen, tindakan..."></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveQCRun()">💾 Simpan Log QC</button>
+      <button class="btn btn-teal" onclick="saveQCRun()">Simpan Log QC</button>
     </div>`);
 }
 
@@ -340,7 +340,7 @@ async function openLJChart(analyzerId, testName) {
   const ev = westgardEvaluate(runs);
   openModal(`
     <div class="modal-header"><div class="modal-title">📈 Levey-Jennings — ${testName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:${ev.color}14;border:1px solid ${ev.color}55;border-radius:8px;
       padding:10px 14px;margin-bottom:12px">
       <div style="font-weight:800;color:${ev.color};font-size:13px">

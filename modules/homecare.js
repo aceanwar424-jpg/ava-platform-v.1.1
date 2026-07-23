@@ -9,9 +9,9 @@ const HC_SERVICES = [
 ];
 
 const HC_STATUS = {
-  'Baru':        {color:'#94A3B8',icon:'📋'},
+  'Baru':        {color:'#94A3B8',icon:''},
   'Dikonfirmasi':{color:'#0EA5E9',icon:'✅'},
-  'Dijadwalkan': {color:'#8B5CF6',icon:'📅'},
+  'Dijadwalkan': {color:'#8B5CF6',icon:''},
   'Dalam Perjalanan':{color:'#F97316',icon:'🚗'},
   'Sedang Dilayani':{color:'#22C55E',icon:'⚕️'},
   'Selesai':     {color:'#00897B',icon:'🎉'},
@@ -118,12 +118,12 @@ function renderHCKPI() {
   const revenue  = hcAll.filter(o=>o.status==='Selesai').reduce((s,o)=>s+(o.total_amount||0),0);
 
   el.innerHTML = [
-    {icon:'📋',val:hcAll.length,    label:'Total Order',   color:'#0A2342'},
-    {icon:'📅',val:todayOrders.length,label:'Jadwal Hari Ini',color:'#8B5CF6'},
+    {icon:'',val:hcAll.length,    label:'Total Order',   color:'#0A2342'},
+    {icon:'',val:todayOrders.length,label:'Jadwal Hari Ini',color:'#8B5CF6'},
     {icon:'⏳',val:pending,         label:'Menunggu',      color:'#F59E0B'},
     {icon:'🔵',val:active,          label:'Aktif',         color:'#0EA5E9'},
     {icon:'✅',val:done,            label:'Selesai',       color:'#22C55E'},
-    {icon:'💰',val:formatCurrency(revenue),label:'Revenue', color:'#00897B'},
+    {icon:'',val:formatCurrency(revenue),label:'Revenue', color:'#00897B'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);
       border-left:4px solid ${k.color};text-align:center">
@@ -183,7 +183,7 @@ function renderHCList(orders) {
               <div>
                 <div style="font-size:14px;font-weight:700;color:var(--navy)">${o.patient_name||'—'}</div>
                 <div style="font-size:12px;color:var(--gray);margin-top:2px">
-                  📞 ${o.patient_phone||'—'} &nbsp;·&nbsp; 🩺 ${o.service_type||'—'}
+                  ${o.patient_phone||'—'} &nbsp;·&nbsp; ${o.service_type||'—'}
                 </div>
                 <div style="font-size:11px;color:var(--gray);margin-top:2px">📍 ${(o.patient_address||'').substring(0,60)}${o.patient_address?.length>60?'...':''}</div>
               </div>
@@ -191,7 +191,7 @@ function renderHCList(orders) {
                 <span style="background:${st.color}20;color:${st.color};padding:3px 10px;
                   border-radius:10px;font-size:11px;font-weight:700">${o.status||'Baru'}</span>
                 <div style="font-size:12px;font-weight:700;color:${isPast?'#EF4444':isToday?'#8B5CF6':'var(--navy)'};margin-top:4px">
-                  ${isToday?'📅 HARI INI':''}${isPast?'⚠️ LEWAT':''}
+                  ${isToday?'HARI INI':''}${isPast?'⚠️ LEWAT':''}
                   ${o.scheduled_date?formatDateShort(o.scheduled_date):'Belum dijadwalkan'}
                   ${o.scheduled_time?' · '+o.scheduled_time:''}
                 </div>
@@ -205,15 +205,15 @@ function renderHCList(orders) {
         <!-- Quick Actions -->
         <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap">
           ${o.status==='Baru'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dikonfirmasi')">✅ Konfirmasi</button>`:''}
-          ${o.status==='Dikonfirmasi'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dijadwalkan')">📅 Jadwalkan</button>`:''}
+          ${o.status==='Dikonfirmasi'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dijadwalkan')">Jadwalkan</button>`:''}
           ${o.status==='Dijadwalkan'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dalam Perjalanan')">🚗 Berangkat</button>`:''}
           ${o.status==='Dalam Perjalanan'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Sedang Dilayani')">⚕️ Mulai Layanan</button>`:''}
           ${o.status==='Sedang Dilayani'?`<button class="btn btn-teal btn-sm" onclick="completeHCVisit(${o.id})">🎉 Selesai & Dokumentasi</button>`:''}
-          ${o.status==='Selesai'?`<button class="btn btn-outline btn-sm" onclick="viewHCVisit(${o.id})">📋 Rekam Kunjungan</button>`:''}
-          ${o.status==='Selesai'&&o.billing_status!=='Lunas'?`<button class="btn btn-outline btn-sm" onclick="openHCBillingAction(${o.id})">🧾 ${o.billing_status==='Ditagih'?'Tandai Lunas':'Tagih'}</button>`:''}
-          ${o.status==='Selesai'?`<button class="btn btn-ghost btn-sm" onclick="openHCRating(${o.id})">${o.rating?'⭐'.repeat(o.rating):'⭐ Rating'}</button>`:''}
+          ${o.status==='Selesai'?`<button class="btn btn-outline btn-sm" onclick="viewHCVisit(${o.id})">Rekam Kunjungan</button>`:''}
+          ${o.status==='Selesai'&&o.billing_status!=='Lunas'?`<button class="btn btn-outline btn-sm" onclick="openHCBillingAction(${o.id})">${o.billing_status==='Ditagih'?'Tandai Lunas':'Tagih'}</button>`:''}
+          ${o.status==='Selesai'?`<button class="btn btn-ghost btn-sm" onclick="openHCRating(${o.id})">${o.rating?''.repeat(o.rating):'Rating'}</button>`:''}
           ${o.patient_phone?`<button class="btn btn-outline btn-sm" onclick="window.open('https://wa.me/${(o.patient_phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')">💬 WA Pasien</button>`:''}
-          <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">✏️ Edit</button>
+          <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">Edit</button>
           ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="cancelHCOrder(${o.id})">Batal</button>`:''}
         </div>
       </div>`;
@@ -235,7 +235,7 @@ async function updateHCStatus(id, status) {
 function cancelHCOrder(id) {
   openModal(`
     <div class="modal-header"><div class="modal-title">❌ Batalkan Order Home Care</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Alasan Pembatalan *</label>
       <textarea id="hc-cancel-reason" rows="3" placeholder="Contoh: pasien reschedule, salah input, dll"></textarea></div>
     <div class="modal-footer">
@@ -271,9 +271,9 @@ async function completeHCVisit(id) {
   hcInvItems = (await sbGet('inventory_items','select=id,item_code,item_name,unit,unit_price,stock_qty&order=item_name.asc').catch(()=>[]))||[];
   hcBhpLines = [];
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 Dokumentasi Kunjungan — ${o.patient_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:10px">🩺 ${o.service_type||''} · 📅 ${o.scheduled_date?formatDateShort(o.scheduled_date):''} ${o.scheduled_time||''}</div>
+    <div class="modal-header"><div class="modal-title">Dokumentasi Kunjungan — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:10px">${o.service_type||''} · ${o.scheduled_date?formatDateShort(o.scheduled_date):''} ${o.scheduled_time||''}</div>
 
     <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">Tanda Vital</div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
@@ -333,7 +333,7 @@ function renderHCBhp() {
         ${hcInvItems.map(i=>`<option value="${i.id}" ${String(b.item_id)===String(i.id)?'selected':''}>${i.item_name} (stok ${i.stock_qty||0} ${i.unit||''})</option>`).join('')}
       </select></td>
       <td style="padding:3px;width:70px"><input type="number" min="0" value="${b.qty||0}" onchange="updateHCBhp(${idx},'qty',this.value)" style="width:60px;font-size:11px;padding:4px"></td>
-      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeHCBhpRow(${idx})">✕</button></td>
+      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeHCBhpRow(${idx})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>`;
   }).join('')}</tbody></table>`;
 }
@@ -388,16 +388,16 @@ async function saveHCVisit(orderId, recordId) {
 async function viewHCVisit(orderId) {
   const rec = (await sbGet('homecare_visit_records',`select=*&order_id=eq.${orderId}&order=id.desc&limit=1`).catch(()=>[]))?.[0];
   if (!rec) {
-    openModal(`<div class="modal-header"><div class="modal-title">📋 Rekam Kunjungan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
-      <div class="empty-state"><div class="ico">📋</div><h3>Belum ada dokumentasi</h3>
+    openModal(`<div class="modal-header"><div class="modal-title">Rekam Kunjungan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+      <div class="empty-state"><div class="ico"></div><h3>Belum ada dokumentasi</h3>
         <button class="btn btn-teal" style="margin-top:10px" onclick="closeModalForce();completeHCVisit(${orderId})">+ Isi Dokumentasi</button></div>`);
     return;
   }
   const row = (l,v)=> v!=null&&v!==''?`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12.5px"><span style="color:var(--gray)">${l}</span><strong>${v}</strong></div>`:'';
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 Rekam Kunjungan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Rekam Kunjungan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Dicatat oleh ${rec.recorded_by||'—'} · ${rec.recorded_at?new Date(rec.recorded_at).toLocaleString('id-ID'):''}</div>
     ${row('Tekanan Darah', (rec.bp_systolic||rec.bp_diastolic)?`${rec.bp_systolic||'—'}/${rec.bp_diastolic||'—'} mmHg`:'')}
     ${row('Nadi', rec.pulse?rec.pulse+' x/mnt':'')}
@@ -412,7 +412,7 @@ async function viewHCVisit(orderId) {
     ${rec.photo_url?`<div style="margin-top:10px"><a href="${rec.photo_url}" target="_blank" class="btn btn-ghost btn-sm">🖼️ Lihat Foto Bukti</a></div>`:''}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-teal" onclick="closeModalForce();completeHCVisit(${orderId})">✏️ Edit Dokumentasi</button>
+      <button class="btn btn-teal" onclick="closeModalForce();completeHCVisit(${orderId})">Edit Dokumentasi</button>
     </div>`);
 }
 
@@ -423,8 +423,8 @@ async function openHCBillingAction(id) {
   const o = hcAll.find(x=>x.id===id) || {};
   const isDitagih = o.billing_status==='Ditagih';
   openModal(`
-    <div class="modal-header"><div class="modal-title">🧾 Billing — ${o.patient_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Billing — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12.5px;margin-bottom:12px">
       <div><strong>Layanan:</strong> ${o.service_type||'—'}</div>
       <div><strong>Tarif:</strong> ${formatCurrency(o.total_amount||0)}</div>
@@ -440,7 +440,7 @@ async function openHCBillingAction(id) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="setHCBilling(${id},'${isDitagih?'Lunas':'Ditagih'}')">
-        ${isDitagih?'✅ Tandai Lunas':'🧾 Tandai Ditagih'}</button>
+        ${isDitagih?'✅ Tandai Lunas':'Tandai Ditagih'}</button>
     </div>`);
 }
 
@@ -467,7 +467,7 @@ async function setHCBilling(id, status) {
         });
         const invId = inv?.[0]?.id || inv?.id;
         if (invId) patch.invoice_id = invId;
-        toast('🧾 Invoice dibuat di Finance','ok');
+        toast('Invoice dibuat di Finance','ok');
       } catch(err) { toast('⚠️ Invoice gagal dibuat: '+err.message,'warn'); }
     }
 
@@ -484,18 +484,18 @@ async function setHCBilling(id, status) {
 function openHCRating(id) {
   const o = hcAll.find(x=>x.id===id) || {};
   openModal(`
-    <div class="modal-header"><div class="modal-title">⭐ Kepuasan Pasien — ${o.patient_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Kepuasan Pasien — ${o.patient_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Rating (1–5)</label>
       <select id="hcr-rating">
         <option value="">-- Belum dinilai --</option>
-        ${[1,2,3,4,5].map(n=>`<option value="${n}" ${String(o.rating)===String(n)?'selected':''}>${'⭐'.repeat(n)} (${n})</option>`).join('')}
+        ${[1,2,3,4,5].map(n=>`<option value="${n}" ${String(o.rating)===String(n)?'selected':''}>${''.repeat(n)} (${n})</option>`).join('')}
       </select></div>
     <div class="form-group"><label>Masukan / Keluhan</label>
       <textarea id="hcr-feedback" rows="3">${o.feedback||''}</textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveHCRating(${id})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveHCRating(${id})">Simpan</button>
     </div>`);
 }
 
@@ -536,8 +536,8 @@ async function openHCForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Order':'🏠 Order Home Care Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Order':'🏠 Order Home Care Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -586,7 +586,7 @@ async function openHCForm(id=null) {
       <div class="form-group">
         <label>Nakes / Tim yang Bertugas</label>
         <select id="hf-staff" onchange="hcOnStaffChange()">${staffOpts}</select>
-        ${activeStaff.length?'':'<div class="form-hint" style="color:#F59E0B">Belum ada master Nakes. Tambah via tombol "👥 Master Nakes".</div>'}
+        ${activeStaff.length?'':'<div class="form-hint" style="color:#F59E0B">Belum ada master Nakes. Tambah via tombol "Master Nakes".</div>'}
       </div>
       <div class="form-group">
         <label>Status</label>
@@ -618,7 +618,7 @@ async function openHCForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveHCOrder(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveHCOrder(${id||'null'})">Simpan</button>
     </div>`);
   hcUpdateCommissionPreview();
   hcCheckScheduleConflict(id);
@@ -792,8 +792,8 @@ function renderHCReport() {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📊 Laporan Home Care</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Laporan Home Care</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
       ${[
@@ -828,8 +828,8 @@ async function renderHCSchedule() {
         <p>Kalender harian nakes & assign tugas</p></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Orders</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderHCBilling()">💵 Billing Nakes</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderHCFullReport()">📊 Report</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderHCBilling()">Billing Nakes</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderHCFullReport()">Report</button>
       </div>
     </div>
 
@@ -869,7 +869,7 @@ async function loadHCSchedule() {
     const orders = Array.isArray(data)?data:[];
 
     if (!orders.length) {
-      el.innerHTML=`<div class="empty-state"><div class="ico">📅</div>
+      el.innerHTML=`<div class="empty-state"><div class="ico"></div>
         <h3>Tidak ada jadwal untuk ${formatDateShort(date)}</h3>
       </div>`; return;
     }
@@ -1012,7 +1012,7 @@ async function loadHCBilling() {
     if (sumEl) sumEl.textContent=`${orders.length} order selesai · ${Object.keys(byNakes).length} nakes`;
 
     if (!Object.keys(byNakes).length) {
-      el.innerHTML=`<div class="empty-state"><div class="ico">💵</div><h3>Belum ada order selesai bulan ini</h3></div>`; return;
+      el.innerHTML=`<div class="empty-state"><div class="ico"></div><h3>Belum ada order selesai bulan ini</h3></div>`; return;
     }
 
     el.innerHTML=`<div class="table-wrap"><table>
@@ -1053,7 +1053,7 @@ async function renderHCFullReport() {
       <input type="date" class="table-filter" id="hcr-from" value="${new Date(Date.now()-30*86400000).toISOString().split('T')[0]}">
       <span style="align-self:center;color:var(--gray)">s/d</span>
       <input type="date" class="table-filter" id="hcr-to" value="${new Date().toISOString().split('T')[0]}">
-      <button class="btn btn-teal btn-sm" onclick="loadHCReport()">🔍 Tampilkan</button>
+      <button class="btn btn-teal btn-sm" onclick="loadHCReport()">Tampilkan</button>
     </div>
     <div id="hcr-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
   await loadHCReport();
@@ -1133,7 +1133,7 @@ async function loadHCReport() {
             return `<tr><td style="font-weight:600">${n}</td>
               <td style="text-align:center">${d.n}</td>
               <td style="font-weight:600">${formatCurrency(d.rev)}</td>
-              <td style="text-align:center">${ar==='—'?'—':'⭐ '+ar}</td></tr>`;
+              <td style="text-align:center">${ar==='—'?'—':''+ar}</td></tr>`;
           }).join('')||'<tr><td colspan="4" style="color:var(--gray);padding:8px">Belum ada data</td></tr>'}</tbody></table></div>
       </div>`;
   } catch(e) { el.innerHTML=`<div class="status-box status-err">${e.message}</div>`; }
@@ -1144,7 +1144,7 @@ function showNakesDetail(name, ids) {
   const orders = hcAll.filter(o=>ids.includes(o.id));
   openModal(`
     <div class="modal-header"><div class="modal-title">👤 Detail Order — ${name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
       <th style="padding:5px;text-align:left">Tanggal</th><th style="padding:5px;text-align:left">Pasien</th>
       <th style="padding:5px;text-align:left">Layanan</th><th style="padding:5px;text-align:right">Tarif</th><th style="padding:5px;text-align:right">Komisi</th>
@@ -1171,7 +1171,7 @@ async function renderHCStaff() {
       .hc-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#0f766e;margin-right:5px;vertical-align:middle;animation:hcLivePulse 1.4s infinite}
     </style>
     <div class="page-header">
-      <div><h1>👥 Master Nakes</h1><p>Tenaga kesehatan Home Care — kompetensi, wilayah, komisi</p></div>
+      <div><h1>Master Nakes</h1><p>Tenaga kesehatan Home Care — kompetensi, wilayah, komisi</p></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Orders</button>
         <button class="btn btn-teal" onclick="openHCStaffForm()">+ Tambah Nakes</button>
@@ -1207,7 +1207,7 @@ function hcLocBadge(s) {
 
 function renderHCStaffTable() {
   const el = document.getElementById('hcs-tbody'); if (!el) return;
-  if (!hcStaff.length) { el.innerHTML = `<div class="empty-state"><div class="ico">👥</div><h3>Belum ada Nakes</h3><p>Klik "+ Tambah Nakes".</p></div>`; return; }
+  if (!hcStaff.length) { el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada Nakes</h3><p>Klik "+ Tambah Nakes".</p></div>`; return; }
   el.innerHTML = `<table><thead><tr>
     <th>Nama</th><th>Peran</th><th>Kompetensi</th><th>Wilayah</th><th>Komisi</th><th>Lokasi</th><th>Status</th><th>Aksi</th>
   </tr></thead><tbody>${hcStaff.map(s=>`<tr>
@@ -1219,9 +1219,9 @@ function renderHCStaffTable() {
     <td>${hcLocBadge(s)}</td>
     <td><span class="badge ${s.is_active!==false?'badge-teal':'badge-gray'}">${s.is_active!==false?'Aktif':'Nonaktif'}</span></td>
     <td><div class="act-row">
-      <button class="act-btn" title="Link Portal Nakes" onclick="hcStaffLink(${s.id})">🔗</button>
-      <button class="act-btn edit" onclick="openHCStaffForm(${s.id})">✏️</button>
-      <button class="act-btn del" onclick="deleteHCStaff(${s.id})">🗑</button>
+      <button class="act-btn" title="Link Portal Nakes" onclick="hcStaffLink(${s.id})"></button>
+      <button class="act-btn edit" onclick="openHCStaffForm(${s.id})">${icon('edit', 12)}</button>
+      <button class="act-btn del" onclick="deleteHCStaff(${s.id})">${icon('trash', 12)}</button>
     </div></td>
   </tr>`).join('')}</tbody></table>`;
 }
@@ -1242,16 +1242,16 @@ async function hcStaffLink(staffId) {
   const wa   = (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'62');
   const waMsg = encodeURIComponent(`Halo ${s.staff_name||''}, ini link Portal Nakes Home Care Anda (order & berbagi lokasi):\n${url}`);
   openModal(`
-    <div class="modal-header"><div class="modal-title">🔗 Link Portal Nakes</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Link Portal Nakes</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="padding:4px 2px 8px">
       <div style="font-size:13px;color:var(--gray);margin-bottom:6px">Kirim link ini ke <b>${s.staff_name||'nakes'}</b>. Nakes cukup buka di HP — tanpa login. Link berisi token rahasia, jangan disebar.</div>
       <div class="form-group"><label>Link Portal</label>
         <input type="text" id="hcs-link" value="${url}" readonly onclick="this.select()" style="font-size:12px"></div>
       <div class="btn-row" style="gap:8px;flex-wrap:wrap">
-        <button class="btn btn-teal btn-sm" onclick="hcCopyLink()">📋 Salin Link</button>
+        <button class="btn btn-teal btn-sm" onclick="hcCopyLink()">Salin Link</button>
         ${wa?`<a class="btn btn-ghost btn-sm" href="https://wa.me/${wa}?text=${waMsg}" target="_blank" rel="noopener">💬 Kirim via WhatsApp</a>`:''}
-        <a class="btn btn-ghost btn-sm" href="${url}" target="_blank" rel="noopener">🔎 Pratinjau</a>
+        <a class="btn btn-ghost btn-sm" href="${url}" target="_blank" rel="noopener">Pratinjau</a>
       </div>
     </div>`);
 }
@@ -1272,8 +1272,8 @@ async function openHCStaffForm(id=null) {
     empOpts += (emps||[]).map(e=>`<option value="${e.id}" ${s.employee_id==e.id?'selected':''}>${e.full_name}</option>`).join('');
   } catch(e){}
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit Nakes':'👥 Tambah Nakes'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id?'Edit Nakes':'Tambah Nakes'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Nama Nakes *</label><input type="text" id="hcs-name" value="${s.staff_name||''}"></div>
       <div class="form-group"><label>No. HP / WA</label><input type="text" id="hcs-phone" value="${s.phone||''}"></div>
@@ -1295,7 +1295,7 @@ async function openHCStaffForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveHCStaff(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveHCStaff(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -1323,7 +1323,7 @@ async function saveHCStaff(id) {
 
 async function deleteHCStaff(id) {
   if (!confirm('Hapus Nakes ini?')) return;
-  try { await sbDelete('homecare_staff',id); toast('🗑 Dihapus','info'); await loadHCMasters(true); renderHCStaffTable(); }
+  try { await sbDelete('homecare_staff',id); toast('Dihapus','info'); await loadHCMasters(true); renderHCStaffTable(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -1355,15 +1355,15 @@ function renderHCTariffTable() {
     <td style="text-align:center">${t.commission_pct!=null?t.commission_pct+'%':'—'}</td>
     <td style="text-align:right">${t.commission_flat?formatCurrency(t.commission_flat):'—'}</td>
     <td><span class="badge ${t.is_active!==false?'badge-teal':'badge-gray'}">${t.is_active!==false?'Aktif':'Nonaktif'}</span></td>
-    <td><div class="act-row"><button class="act-btn edit" onclick="openHCTariffForm(${t.id})">✏️</button></div></td>
+    <td><div class="act-row"><button class="act-btn edit" onclick="openHCTariffForm(${t.id})">${icon('edit', 12)}</button></div></td>
   </tr>`).join('')}</tbody></table>`;
 }
 
 function openHCTariffForm(id=null) {
   const t = id ? (hcTariffs.find(x=>x.id===id)||{}) : {};
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit Tarif':'🏷️ Tambah Tarif'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id?'Edit Tarif':'🏷️ Tambah Tarif'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Jenis Layanan *</label>
       <select id="hct-svc">${HC_SERVICES.map(s=>`<option${t.service_type===s?' selected':''}>${s}</option>`).join('')}</select></div>
     <div class="form-row">
@@ -1377,7 +1377,7 @@ function openHCTariffForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveHCTariff(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveHCTariff(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -1462,11 +1462,11 @@ let _hcLive={ map:null, markers:[], staffMarkers:{}, timer:null, directions:null
 async function renderHCLiveMap(){
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
-      <div><h1>🗺️ Peta Live Home Care</h1>
+      <div><h1>Peta Live Home Care</h1>
         <p>Posisi nakes real-time + order aktif · klik pin untuk rute &amp; ETA</p></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="renderHomeCare()">← Kembali</button>
-        <button class="btn btn-ghost btn-sm" onclick="hcRefreshLive(true)">🔄 Refresh</button>
+        <button class="btn btn-ghost btn-sm" onclick="hcRefreshLive(true)">Refresh</button>
         <button class="btn btn-teal btn-sm" onclick="hcOpenShareLocation()">📡 Bagikan Lokasi (Nakes)</button>
       </div>
     </div>
@@ -1520,8 +1520,8 @@ function hcLiveOrderInfo(o, marker){
     <div>Nakes: <b>${o.staff_name||'—'}</b>${o.staff_lat?' · <span style="color:#16a34a">📡 live</span>':' · <span style="color:#94a3b8">offline</span>'}</div>
     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
       ${(o.staff_lat&&o.lat)?`<button class="btn btn-teal btn-sm" onclick="hcRouteToPatient(${o.id})">🧭 Rute + ETA</button>`:''}
-      <button class="btn btn-ghost btn-sm" onclick="hcCopyTrackLink(${o.id})">🔗 Link Pasien</button>
-      <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">✏️ Detail</button>
+      <button class="btn btn-ghost btn-sm" onclick="hcCopyTrackLink(${o.id})">Link Pasien</button>
+      <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">Detail</button>
     </div>
     <div id="hc-eta-${o.id}" style="font-size:11.5px;color:var(--teal);margin-top:4px"></div></div>`;
   if(_hcLive.info) _hcLive.info.close();
@@ -1541,7 +1541,7 @@ async function hcCopyTrackLink(id){
   try{
     const tok=await hcRpc('homecare_ensure_token',{p_order_id:id});
     const link=hcTrackLink(tok);
-    try{ await navigator.clipboard.writeText(link); toast('🔗 Link pelacakan pasien disalin','ok'); }
+    try{ await navigator.clipboard.writeText(link); toast('Link pelacakan pasien disalin','ok'); }
     catch(e){ prompt('Salin link pelacakan pasien:', link); }
   }catch(e){ toast(e.message,'err'); }
 }
@@ -1552,7 +1552,7 @@ async function hcOpenShareLocation(){
   try{ await loadHCMasters(); }catch(e){}
   const opts=(typeof hcStaff!=='undefined'?hcStaff:[]).filter(s=>s.is_active!==false)
     .map(s=>`<option value="${s.id}">${s.staff_name}${s.role_title?' · '+s.role_title:''}</option>`).join('');
-  openModal(`<div class="modal-header"><div class="modal-title">📡 Bagikan Lokasi Nakes</div><button class="modal-close" onclick="hcStopShare();closeModalForce()">✕</button></div>
+  openModal(`<div class="modal-header"><div class="modal-title">📡 Bagikan Lokasi Nakes</div><button class="modal-close" onclick="hcStopShare();closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="padding:4px 2px">
       <p style="font-size:12.5px;color:var(--gray)">Pilih nama Anda (nakes) lalu izinkan akses lokasi. Posisi GPS dikirim otomatis selama halaman ini terbuka — admin & pasien melihat pergerakan Anda.</p>
       <div class="form-group"><label>Nakes</label><select id="hc-share-staff">${opts||'<option value="">(belum ada master nakes)</option>'}</select></div>

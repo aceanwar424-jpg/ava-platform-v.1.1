@@ -26,12 +26,12 @@ async function renderWorkSchedule() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📅 Jadwal Kerja & Shift</h1>
+        <h1>Jadwal Kerja & Shift</h1>
         <p>Setup shift per karyawan — jam weekday vs sabtu, rotasi P1↔P2</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="seedScheduleFromExcel()">📥 Import dari Template</button>
-        <button class="btn btn-outline btn-sm" onclick="navigate('shift-calendar')">📅 Kalender Shift</button>
+        <button class="btn btn-ghost btn-sm" onclick="seedScheduleFromExcel()">Import dari Template</button>
+        <button class="btn btn-outline btn-sm" onclick="navigate('shift-calendar')">Kalender Shift</button>
         <button class="btn btn-teal" onclick="openScheduleForm()">+ Tambah Jadwal</button>
       </div>
     </div>
@@ -39,7 +39,7 @@ async function renderWorkSchedule() {
     <div style="background:var(--teal-light);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--teal)">
       ℹ️ Tabel di bawah ini adalah <strong>template shift mingguan</strong> per karyawan (jam masuk/pulang, hari kerja).
       Untuk assign shift ke <strong>tanggal spesifik di kalender</strong> (misal: tanggal 25 Juni karyawan X masuk P2),
-      gunakan tombol "📅 Kalender Shift" — itu sistem terpisah yang mencatat kehadiran harian.
+      gunakan tombol "Kalender Shift" — itu sistem terpisah yang mencatat kehadiran harian.
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:20px" id="sched-kpi">
@@ -48,7 +48,7 @@ async function renderWorkSchedule() {
 
     <!-- Quick setup templates -->
     <div class="card" style="margin-bottom:18px">
-      <div class="card-title" style="margin-bottom:12px">⚡ Quick Setup — Template Shift</div>
+      <div class="card-title" style="margin-bottom:12px">Quick Setup — Template Shift</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${SHIFT_TEMPLATES.map(t=>`
           <button class="btn btn-ghost btn-sm" onclick='applyShiftTemplate(${JSON.stringify(t).replace(/'/g,"&apos;")})'>
@@ -98,10 +98,10 @@ function renderScheduleKPI() {
     ? (scheduleAll.reduce((s,x)=>s+(calcKapFromSchedule(x)||7),0)/scheduleAll.length).toFixed(1) : '0';
 
   el.innerHTML = [
-    {icon:'📋', val:scheduleAll.length, label:'Total Jadwal',       color:'#0891B2'},
+    {icon:'', val:scheduleAll.length, label:'Total Jadwal',       color:'#0891B2'},
     {icon:'✅', val:active,             label:'Jadwal Aktif',       color:'#22C55E'},
-    {icon:'👥', val:empWithSch,         label:'Karyawan Terjadwal', color:'#7C3AED'},
-    {icon:'🔄', val:withRot,            label:'Dengan Rotasi',      color:'#F59E0B'},
+    {icon:'', val:empWithSch,         label:'Karyawan Terjadwal', color:'#7C3AED'},
+    {icon:'', val:withRot,            label:'Dengan Rotasi',      color:'#F59E0B'},
     {icon:'⏱', val:avgKap+'j',          label:'Rata-rata Kapasitas',color:'#06B6D4'},
   ].map(k=>`
     <div class="kpi-card" style="border-top:3px solid ${k.color}">
@@ -135,7 +135,7 @@ function renderScheduleTable(data) {
   const el = document.getElementById('sched-tbody'); if (!el) return;
   if (!data.length) {
     el.innerHTML = `<div class="empty-state" style="padding:40px">
-      <div class="ico">📅</div><h3>Belum ada jadwal kerja</h3>
+      <div class="ico"></div><h3>Belum ada jadwal kerja</h3>
       <p>Klik "+ Tambah Jadwal" atau "Import dari Template"</p>
       <button class="btn btn-teal" style="margin-top:14px" onclick="openScheduleForm()">+ Tambah Jadwal</button>
     </div>`; return;
@@ -195,8 +195,8 @@ function renderScheduleTable(data) {
               </td>
               <td style="padding:10px 12px">
                 <div class="act-row">
-                  <button class="act-btn edit" onclick="openScheduleForm(${s.id})">✏️</button>
-                  <button class="act-btn del" onclick="deleteSchedule(${s.id},'${(empName||'').replace(/'/g,'').slice(0,20)}')">🗑</button>
+                  <button class="act-btn edit" onclick="openScheduleForm(${s.id})">${icon('edit', 12)}</button>
+                  <button class="act-btn del" onclick="deleteSchedule(${s.id},'${(empName||'').replace(/'/g,'').slice(0,20)}')">${icon('trash', 12)}</button>
                 </div>
               </td>
             </tr>`;
@@ -216,8 +216,8 @@ async function openScheduleForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📅 ${id?'Edit':'Tambah'} Jadwal Shift</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'Tambah'} Jadwal Shift</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -318,7 +318,7 @@ async function openScheduleForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveSchedule(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveSchedule(${id||'null'})">Simpan</button>
     </div>`);
 
   // Wire day toggles
@@ -433,7 +433,7 @@ async function saveSchedule(id) {
 
 async function deleteSchedule(id, name) {
   if (!confirm(`Hapus jadwal ${name}?`)) return;
-  try { await sbDelete('work_schedules',id); toast('🗑 Dihapus','info'); await loadSchedules(); }
+  try { await sbDelete('work_schedules',id); toast('Dihapus','info'); await loadSchedules(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -518,16 +518,16 @@ const SHIFT_COLORS_CAL = {P1:'#0891B2',P2:'#7C3AED',P3:'#059669',OH:'#F59E0B',ML
 async function renderShiftCalendar() {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
-      <div><h1>📅 Kalender Shift</h1><p>Klik tanggal → set shift. Pilih shift dulu di panel atas. Simpan otomatis menambahkan karyawan ke Daftar Jadwal jika belum ada.</p></div>
+      <div><h1>Kalender Shift</h1><p>Klik tanggal → set shift. Pilih shift dulu di panel atas. Simpan otomatis menambahkan karyawan ke Daftar Jadwal jika belum ada.</p></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="renderWorkSchedule()">← Daftar</button>
-        <button class="btn btn-teal btn-sm" onclick="seedOKRTasks()">📥 Import OKR Tasks (164)</button>
-        <button class="btn btn-teal" onclick="saveCalendarShifts()">💾 Simpan</button>
+        <button class="btn btn-teal btn-sm" onclick="seedOKRTasks()">Import OKR Tasks (164)</button>
+        <button class="btn btn-teal" onclick="saveCalendarShifts()">Simpan</button>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:220px 1fr;gap:16px">
       <div class="card" style="height:fit-content">
-        <div class="card-title" style="margin-bottom:10px">👥 Karyawan</div>
+        <div class="card-title" style="margin-bottom:10px">Karyawan</div>
         <div id="cal-emp-list"><div class="spinner"></div></div>
       </div>
       <div>
@@ -551,11 +551,11 @@ async function renderShiftCalendar() {
           <div id="cal-grid"></div>
         </div>
         <div class="card">
-          <div class="card-title" style="margin-bottom:10px">⚡ Isi Cepat</div>
+          <div class="card-title" style="margin-bottom:10px">Isi Cepat</div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             ${SHIFT_TEMPLATES.map(t=>`
               <button class="btn btn-ghost btn-sm" onclick="fillWeekdays('${t.code}')">Weekday → ${t.code}</button>`).join('')}
-            <button class="btn btn-danger btn-sm" onclick="clearCalMonth()">🗑 Clear Bulan</button>
+            <button class="btn btn-danger btn-sm" onclick="clearCalMonth()">Clear Bulan</button>
           </div>
         </div>
       </div>
@@ -780,7 +780,7 @@ async function saveCalendarShifts() {
             notes:       'Auto-generated dari Kalender Shift',
             created_by:  getUserName?getUserName():'System',
           });
-          toast(`📋 ${empName} otomatis ditambahkan ke Daftar Jadwal (${tmpl.name})`, 'info', 4000);
+          toast(`${empName} otomatis ditambahkan ke Daftar Jadwal (${tmpl.name})`, 'info', 4000);
         }
       }
     } catch(e) {

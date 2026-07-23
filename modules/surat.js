@@ -52,9 +52,9 @@ async function renderSurat() {
     </div>
 
     <div class="tabs" id="surat-tabs">
-      <button class="tab-btn active" onclick="switchSuratTab('list',this)">📋 Arsip Surat</button>
+      <button class="tab-btn active" onclick="switchSuratTab('list',this)">Arsip Surat</button>
       <button class="tab-btn" onclick="switchSuratTab('templates',this)">📄 Template Surat</button>
-      <button class="tab-btn" onclick="switchSuratTab('numbering',this)">⚙️ Pengaturan Nomor</button>
+      <button class="tab-btn" onclick="switchSuratTab('numbering',this)">Pengaturan Nomor</button>
       <button class="tab-btn" onclick="switchSuratTab('panduan',this)">❓ Panduan</button>
     </div>
 
@@ -62,7 +62,7 @@ async function renderSurat() {
     <div id="tab-list">
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input class="table-search" id="sl-q" placeholder="🔍 Cari nomor, tujuan, perihal..."
+          <input class="table-search" id="sl-q" placeholder="Cari nomor, tujuan, perihal..."
             oninput="filterSurat()" style="flex:1">
           <select class="table-filter" id="sl-type" onchange="filterSurat()">
             <option value="">Semua Tipe</option>
@@ -132,7 +132,7 @@ async function renderSurat() {
               <option value="never">Tidak Pernah (terus naik)</option>
             </select>
           </div>
-          <button class="btn btn-teal" style="width:100%;margin-top:8px" onclick="saveNumberFormat()">💾 Simpan Format</button>
+          <button class="btn btn-teal" style="width:100%;margin-top:8px" onclick="saveNumberFormat()">Simpan Format</button>
         </div>
 
         <div class="card">
@@ -286,12 +286,12 @@ function renderSuratTable(data) {
             <td><span class="badge ${stBadge}">${s.status||'Draft'}</span></td>
             <td>
               <div class="act-row">
-                <button class="act-btn" onclick="regenerateSurat(${s.id})" title="Download DOCX">📥</button>
+                <button class="act-btn" onclick="regenerateSurat(${s.id})" title="Download DOCX"></button>
                 <button class="act-btn" onclick="downloadSuratPDF(${s.id})" title="Download PDF">📄</button>
-                <button class="act-btn edit" onclick="openSuratForm(${s.id})" title="Edit">✏️</button>
+                <button class="act-btn edit" onclick="openSuratForm(${s.id})" title="Edit">${icon('edit', 12)}</button>
                 <button class="act-btn" onclick="updateSuratStatus(${s.id},'Sent')"
                   title="Tandai Terkirim" style="color:#22C55E">✓</button>
-                <button class="act-btn del" onclick="deleteSurat(${s.id})">🗑</button>
+                <button class="act-btn del" onclick="deleteSurat(${s.id})">${icon('trash', 12)}</button>
               </div>
             </td>
           </tr>`;
@@ -459,8 +459,8 @@ function renderDeptList() {
         <span style="color:var(--text3);margin-left:8px">${d.dept_name}</span>
       </div>
       <div style="display:flex;gap:4px">
-        <button class="btn btn-ghost btn-xs" onclick="openDeptForm(${d.id})">✏️</button>
-        <button class="btn btn-ghost btn-xs" onclick="deleteDept(${d.id})" style="color:#EF4444">🗑</button>
+        <button class="btn btn-ghost btn-xs" onclick="openDeptForm(${d.id})">${icon('edit', 12)}</button>
+        <button class="btn btn-ghost btn-xs" onclick="deleteDept(${d.id})" style="color:#EF4444">${icon('trash', 12)}</button>
       </div>
     </div>`).join('');
 }
@@ -469,8 +469,8 @@ function openDeptForm(id=null) {
   const d = id ? letterDepts.find(x=>x.id===id) : {};
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit':'+ Tambah'} Departemen</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'+ Tambah'} Departemen</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Kode Departemen *</label>
@@ -482,7 +482,7 @@ function openDeptForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveDept(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveDept(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -510,7 +510,7 @@ async function deleteDept(id) {
   if (!confirm('Hapus departemen ini? Surat yang sudah memakai kode ini tidak akan berubah.')) return;
   try {
     await sbPatch('letter_departments', id, { is_active:false });
-    toast('🗑 Departemen dihapus','info');
+    toast('Departemen dihapus','info');
     await loadLetterNumberingConfig();
     renderDeptList();
   } catch(e) { toast('❌ '+e.message,'err'); }
@@ -559,8 +559,8 @@ async function openSuratForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Surat':'📄 Buat Surat Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Surat':'📄 Buat Surat Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -660,9 +660,9 @@ async function openSuratForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-outline" onclick="previewSuratHTML()" title="Preview generik — bukan render dari file DOCX yang diupload">👁 Preview HTML (Generik)</button>
+      <button class="btn btn-outline" onclick="previewSuratHTML()" title="Preview generik — bukan render dari file DOCX yang diupload">Preview HTML (Generik)</button>
       <button class="btn btn-teal" id="sf-save-btn" onclick="saveSurat(${id||'null'})">
-        ${id?'💾 Simpan':'📄 Buat & Download'}
+        ${id?'Simpan':'📄 Buat & Download'}
       </button>
     </div>`);
 }
@@ -721,7 +721,7 @@ async function saveSurat(id) {
       fileName = up.name;
     } catch(e) {
       toast('❌ Gagal upload template: '+e.message,'err');
-      if(btn){ btn.disabled=false; btn.textContent=id?'💾 Simpan':'📄 Buat & Download'; }
+      if(btn){ btn.disabled=false; btn.textContent=id?'Simpan':'📄 Buat & Download'; }
       return;
     }
   }
@@ -782,7 +782,7 @@ async function saveSurat(id) {
     }
   } catch(e) {
     toast('❌ '+e.message,'err');
-    if(btn){ btn.disabled=false; btn.textContent=id?'💾 Simpan':'📄 Buat & Download'; }
+    if(btn){ btn.disabled=false; btn.textContent=id?'Simpan':'📄 Buat & Download'; }
   }
 }
 
@@ -1025,7 +1025,7 @@ async function showDocxPreviewModal(blob, fileName) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">📄 Preview Surat — ${fileName}</div>
-      <button class="modal-close" onclick="closeDocxPreviewModal()">✕</button>
+      <button class="modal-close" onclick="closeDocxPreviewModal()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div id="docx-preview-toolbar" style="display:flex;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:10px;flex-wrap:wrap">
       <button class="btn btn-teal" onclick="downloadCurrentDocx()" id="btn-dl-docx">
@@ -1227,7 +1227,7 @@ function previewSuratHTMLDirect(s) {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">📄 Preview Generik (Bukan Template Asli)</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="status-box status-warn" style="margin-bottom:10px;font-size:12px">
       ⚠️ Ini adalah <strong>layout cadangan generik</strong>, BUKAN rendering dari file Word/DOCX yang Anda upload.
@@ -1349,7 +1349,7 @@ async function loadLetterTemplates() {
     }
     el.innerHTML = data.map(t=>`
       <div class="card">
-        <div style="font-size:16px;margin-bottom:8px">📝</div>
+        <div style="font-size:16px;margin-bottom:8px"></div>
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px">${t.title}</div>
         <div style="font-size:11px;color:var(--gray);margin-bottom:10px">
           ${t.file_name||'—'} · ${timeAgo(t.created_at)}
@@ -1360,8 +1360,8 @@ async function loadLetterTemplates() {
             ⬇️ Download Template
           </a>`:'' }
         <div class="btn-row">
-          <button class="btn btn-ghost btn-sm" onclick="openMktForm(${t.id})">✏️ Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteMkt(${t.id},'${(t.title||'').replace(/'/g,"\\'")}')">🗑</button>
+          <button class="btn btn-ghost btn-sm" onclick="openMktForm(${t.id})">Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMkt(${t.id},'${(t.title||'').replace(/'/g,"\\'")}')">${icon('trash', 12)}</button>
         </div>
       </div>`).join('');
   } catch(e){ el.innerHTML=`<div class="status-box status-err">❌ ${e.message}</div>`; }
@@ -1384,7 +1384,7 @@ async function deleteSurat(id) {
   if(!confirm('Hapus surat dari arsip?')) return;
   try {
     await sbDelete('outgoing_letters', id);
-    toast('🗑 Surat dihapus','info');
+    toast('Surat dihapus','info');
     await loadSuratList();
   } catch(e){ toast('❌ '+e.message,'err'); }
 }

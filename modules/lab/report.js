@@ -21,7 +21,7 @@ function renderReportTab(){
 
   el.innerHTML=`
     <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
-      <input class="table-search" id="report-search" placeholder="🔍 Cari nama pasien / no. kunjungan..." oninput="filterReportCards(this.value)" style="flex:1">
+      <input class="table-search" id="report-search" placeholder="Cari nama pasien / no. kunjungan..." oninput="filterReportCards(this.value)" style="flex:1">
       <span class="badge badge-navy">${groups.length} kunjungan selesai</span>
       <button class="btn btn-ghost btn-sm" onclick="navigate('labreport')">🖨️ Setting PDF</button>
     </div>
@@ -35,7 +35,7 @@ function renderReportTab(){
             <span class="rc-chev" style="color:var(--gray);transition:transform .15s;font-size:12px">▶</span>
             <div style="min-width:0">
               <div style="font-size:14.5px;font-weight:700;color:var(--navy)">${pt.name}
-                ${critCount?`<span style="background:#FEF2F2;color:#DC2626;padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">🚨 ${critCount} kritis</span>`:''}</div>
+                ${critCount?`<span style="background:#FEF2F2;color:#DC2626;padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">${critCount} kritis</span>`:''}</div>
               <div style="font-size:11px;color:var(--gray)">${pt.visit||'—'} · ${pt.results.length} pemeriksaan · ${pt.released_at?new Date(pt.released_at).toLocaleString('id-ID'):''}</div>
             </div>
           </div>
@@ -60,7 +60,7 @@ function renderReportTab(){
             const crit=isCriticalResult(r);
             return `<tr style="border-bottom:1px solid #f1f5f9">
               <td style="padding:6px 10px;font-weight:600">${r.item_name||r.product_name||'—'}${r.item_name?`<div style="font-size:9px;color:var(--gray);font-weight:400">${r.product_name}</div>`:''}</td>
-              <td style="padding:6px 10px;font-weight:800;color:${col}">${r.result_value||'—'}${crit?' 🚨':''}</td>
+              <td style="padding:6px 10px;font-weight:800;color:${col}">${r.result_value||'—'}${crit?' ':''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${r.unit||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>
@@ -120,7 +120,7 @@ async function showTrend(patientName, productId, productName, itemId=null){
   openModal(`
     <div class="modal-header">
       <div class="modal-title">📈 Tren — ${productName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${patientName} · ${data.length} hasil${nmin!=null&&nmax!=null?` · normal ${nmin}–${nmax}`:''}</div>
     <div style="overflow-x:auto;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px">
@@ -227,7 +227,7 @@ function printLabReport(patientName, visitNumber, sampleRows){
       <div class="cat">${cat}</div>
       <table><thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Flag</th><th>Satuan</th><th>Rentang Normal</th><th>Interpretasi</th>${cfg.show_loinc?'<th>LOINC</th>':''}</tr></thead>
       <tbody>${_labPrintCatRows(rows, cfg)}</tbody></table>`).join('')}
-    ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · 🚨 = nilai kritis</div>`:''}
+    ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · = nilai kritis</div>`:''}
     <div class="footer">
       <div class="signs">
         <div><div>${cfg.sign1_role}:</div><div class="line"><em>${cfg.sign1_name||first.entered_by||'—'}</em></div></div>
@@ -252,7 +252,7 @@ function _labPrintRow(r, indent, cfg){
   const span=cfg.show_loinc?7:6;
   return `<tr>
     <td>${name}${cfg.show_method&&r.method?`<div style="font-size:9px;color:#94A3B8">${r.method}</div>`:''}</td>
-    <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit">🚨</span>':''}</td>
+    <td><strong style="color:${col};font-size:14px">${r.result_value||'—'}</strong>${crit?' <span class="crit"></span>':''}</td>
     <td class="flag" style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
     <td style="color:#546E7A">${r.unit||'—'}</td>
     <td style="color:#546E7A">${r.normal_min!=null&&r.normal_max!=null?`${r.normal_min}–${r.normal_max}`:'—'}</td>

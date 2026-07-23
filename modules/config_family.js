@@ -16,7 +16,7 @@ async function renderConfigFamily(){
       </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:14px">
-      <input class="table-search" id="fam-q" placeholder="🔍 Cari nama keluarga / PIC / kode..." oninput="famSearch=this.value;renderFamilyList()" style="flex:1">
+      <input class="table-search" id="fam-q" placeholder="Cari nama keluarga / PIC / kode..." oninput="famSearch=this.value;renderFamilyList()" style="flex:1">
     </div>
     <div id="fam-list"><div class="loading-row"><div class="spinner"></div></div></div>`;
   await loadFamilies();
@@ -59,13 +59,13 @@ function renderFamilyList(){
       <td><div style="font-weight:600">${f.family_name}</div>
           <div style="font-size:10px;color:var(--gray)">${f.membership_no?'No. '+f.membership_no:''}</div></td>
       <td style="font-size:12px">${f.pic_name||'—'}<div style="font-size:10px;color:var(--gray)">${f.pic_phone||''}</div></td>
-      <td><button class="btn btn-ghost btn-xs" onclick="openFamilyMembers(${f.id})">👥 ${f._members||0} anggota</button></td>
+      <td><button class="btn btn-ghost btn-xs" onclick="openFamilyMembers(${f.id})">${f._members||0} anggota</button></td>
       <td style="font-weight:700;color:var(--teal)">${famDiscLabel(f)}</td>
       <td style="font-size:12px;color:var(--gray)">${f.valid_until?new Date(f.valid_until).toLocaleDateString('id-ID'):'—'}</td>
       <td><span style="background:${st}20;color:${st};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${f.status||'—'}</span></td>
       <td><div class="act-row">
-        <button class="act-btn edit" onclick="openFamilyForm(${f.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteFamily(${f.id})">🗑️</button>
+        <button class="act-btn edit" onclick="openFamilyForm(${f.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteFamily(${f.id})">${icon('trash', 12)}</button>
       </div></td>
     </tr>`;
   }).join('')}
@@ -77,8 +77,8 @@ async function openFamilyForm(id=null){
   if(id){ const d=await sbGet('families',`select=*&id=eq.${id}`); f=d[0]||{}; }
   const code=id?(f.family_code||''):`FAM-${Date.now().toString().slice(-6)}`;
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit':'➕'} Keluarga</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id?'Edit':'+'} Keluarga</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode Keluarga</label><input id="ff-code" value="${code}" ${id?'readonly style="background:var(--lgray)"':''}></div>
       <div class="form-group" style="grid-column:2/-1"><label>Nama Keluarga *</label><input id="ff-name" value="${f.family_name||''}" placeholder="Keluarga Budi Santoso"></div>
@@ -102,7 +102,7 @@ async function openFamilyForm(id=null){
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveFamily(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveFamily(${id||'null'})">Simpan</button>
     </div>`,'wide');
 }
 
@@ -141,22 +141,22 @@ async function openFamilyMembers(familyId){
   let members=[];
   try { members=await sbGet('family_members',`select=*&family_id=eq.${familyId}&order=is_primary.desc,id.asc`)||[]; } catch(e){}
   openModal(`
-    <div class="modal-header"><div class="modal-title">👥 Anggota — ${fam.family_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Anggota — ${fam.family_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
       <button class="btn btn-teal btn-sm" onclick="openMemberForm(${familyId})">+ Tambah Anggota</button></div>
     <div class="table-wrap"><table><thead><tr>
       <th>Nama</th><th>Hubungan</th><th>Gender</th><th>Tgl Lahir</th><th>HP</th><th>Aksi</th>
     </tr></thead><tbody>
     ${members.length?members.map(m=>`<tr>
-      <td style="font-weight:600">${m.is_primary?'⭐ ':''}${m.member_name}</td>
+      <td style="font-weight:600">${m.is_primary?'':''}${m.member_name}</td>
       <td style="font-size:12px">${m.relationship||'—'}</td>
       <td style="font-size:12px">${m.gender==='F'?'Perempuan':m.gender==='M'?'Laki-laki':'—'}</td>
       <td style="font-size:12px;color:var(--gray)">${m.birth_date?new Date(m.birth_date).toLocaleDateString('id-ID'):'—'}</td>
       <td style="font-size:12px">${m.phone||'—'}</td>
       <td><div class="act-row">
-        <button class="act-btn edit" onclick="openMemberForm(${familyId},${m.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteMember(${m.id},${familyId})">🗑️</button>
+        <button class="act-btn edit" onclick="openMemberForm(${familyId},${m.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteMember(${m.id},${familyId})">${icon('trash', 12)}</button>
       </div></td>
     </tr>`).join(''):`<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--gray)">Belum ada anggota</td></tr>`}
     </tbody></table></div>
@@ -168,8 +168,8 @@ async function openMemberForm(familyId, memberId=null){
   let m={};
   if(memberId){ const d=await sbGet('family_members',`select=*&id=eq.${memberId}`); m=d[0]||{}; }
   openModal(`
-    <div class="modal-header"><div class="modal-title">${memberId?'✏️ Edit':'➕'} Anggota — ${fam.family_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${memberId?'Edit':'+'} Anggota — ${fam.family_name||''}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1"><label>Nama Anggota *</label><input id="fm-name" value="${m.member_name||''}"></div>
       <div class="form-group"><label>Hubungan</label>
@@ -185,7 +185,7 @@ async function openMemberForm(familyId, memberId=null){
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="openFamilyMembers(${familyId})">← Kembali</button>
-      <button class="btn btn-teal" onclick="saveMember(${familyId},${memberId||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveMember(${familyId},${memberId||'null'})">Simpan</button>
     </div>`,'wide');
 }
 

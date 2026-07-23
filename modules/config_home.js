@@ -17,7 +17,7 @@ const CONFIG_GROUPS = [
     { label:'Pengaturan Umum', page:'settings' },
     { label:'User Management', page:'users' },
   ]},
-  { icon:'📥', title:'Data Tools', desc:'Impor massal', items:[
+  { icon:'', title:'Data Tools', desc:'Impor massal', items:[
     { label:'Bulk Upload (Import Excel/CSV)', page:'import' },
   ]},
 ];
@@ -25,7 +25,7 @@ const CONFIG_GROUPS = [
 function renderConfigHome(){
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
-      <div><h1>⚙️ Configuration</h1><p>Pusat konfigurasi master data &amp; pengaturan sistem</p></div>
+      <div><h1>Configuration</h1><p>Pusat konfigurasi master data &amp; pengaturan sistem</p></div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">
       ${CONFIG_GROUPS.map(g=>`

@@ -12,8 +12,8 @@ async function renderAccounting() {
       <div><h1>Akuntansi</h1>
         <p>Buku besar, neraca saldo, dan laba rugi per unit layanan</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="openCOA()">📚 Bagan Akun</button>
-        <button class="btn btn-ghost btn-sm" onclick="openGLMappings()">🔗 Pemetaan Akun</button>
+        <button class="btn btn-ghost btn-sm" onclick="openCOA()">Bagan Akun</button>
+        <button class="btn btn-ghost btn-sm" onclick="openGLMappings()">Pemetaan Akun</button>
       </div>
     </div>
 
@@ -30,9 +30,9 @@ async function renderAccounting() {
     </div>
 
     <div class="tabs" id="acc-tabs" style="margin-bottom:14px">
-      <button class="tab-btn active" onclick="switchAccTab('tb',this)">📊 Neraca Saldo</button>
-      <button class="tab-btn" onclick="switchAccTab('pl',this)">🏥 Laba Rugi per Unit</button>
-      <button class="tab-btn" onclick="switchAccTab('jv',this)">📒 Jurnal</button>
+      <button class="tab-btn active" onclick="switchAccTab('tb',this)">Neraca Saldo</button>
+      <button class="tab-btn" onclick="switchAccTab('pl',this)">Laba Rugi per Unit</button>
+      <button class="tab-btn" onclick="switchAccTab('jv',this)">Jurnal</button>
     </div>
     <div id="acc-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
   await loadAccounting();
@@ -67,7 +67,7 @@ async function paintTrialBalance(el) {
   const sum = document.getElementById('acc-summary');
   if (!rows || !rows.length) {
     if (sum) sum.textContent = '';
-    el.innerHTML = `<div class="empty-state"><div class="ico">📊</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada jurnal pada periode ini</h3>
       <p>Jurnal terbentuk otomatis saat kasir menerima pembayaran, barang dikeluarkan,
          opname diselesaikan, atau kunjungan home care ditutup.</p></div>`;
@@ -105,7 +105,7 @@ async function paintProfitByUnit(el) {
   const sum = document.getElementById('acc-summary');
   if (!rows || !rows.length) {
     if (sum) sum.textContent = '';
-    el.innerHTML = `<div class="empty-state"><div class="ico">🏥</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada pendapatan atau beban pada periode ini</h3></div>`;
     return;
   }
@@ -149,7 +149,7 @@ async function paintJournals(el) {
   const sum = document.getElementById('acc-summary');
   if (sum) sum.textContent = `${entries.length} jurnal pada periode ini`;
   if (!entries.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📒</div><h3>Belum ada jurnal</h3></div>`;
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada jurnal</h3></div>`;
     return;
   }
   const srcLabel = { cashier: 'Kasir', gi: 'Pengeluaran Barang', opname: 'Stock Opname',
@@ -165,7 +165,7 @@ async function paintJournals(el) {
     <td style="font-size:11.5px;color:var(--gray)">${srcLabel[e.source_type] || e.source_type || '—'}</td>
     <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums">${formatCurrency(e.total_debit)}</td>
     <td><div class="act-row">
-      <button class="act-btn" onclick="openJournalDetail(${e.id})" title="Rincian">👁️</button>
+      <button class="act-btn" onclick="openJournalDetail(${e.id})" title="Rincian">${icon('file-text', 12)}</button>
       ${!e.is_reversal ? `<button class="act-btn del" onclick="askReverseJournal(${e.id})" title="Balik">↩</button>` : ''}
     </div></td>
   </tr>`).join('')}</tbody></table></div>`;
@@ -178,8 +178,8 @@ async function openJournalDetail(id) {
   ]);
   const j = e?.[0]; if (!j) return;
   openModal(`
-    <div class="modal-header"><div class="modal-title">📒 ${j.entry_no || 'Jurnal'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${j.entry_no || 'Jurnal'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       ${j.entry_date ? formatDateShort(j.entry_date) : ''} · ${j.description || ''}<br>
       Dicatat oleh ${j.posted_by || '—'}
@@ -200,7 +200,7 @@ async function openJournalDetail(id) {
 function askReverseJournal(id) {
   openModal(`
     <div class="modal-header"><div class="modal-title">↩ Balik Jurnal</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">
       Jurnal tidak pernah dihapus. Koreksi dilakukan dengan mencatat jurnal balik
       pada periode berjalan, sehingga jejaknya tetap utuh.
@@ -228,8 +228,8 @@ async function openCOA() {
   try { rows = await sbGet('chart_of_accounts', 'select=*&order=code.asc') || []; }
   catch (e) { toast('Jalankan supabase_fase4.sql dulu', 'warn'); return; }
   openModal(`
-    <div class="modal-header"><div class="modal-title">📚 Bagan Akun</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Bagan Akun</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">
       Template standar klinik. Silakan koreksi bersama akuntan sebelum periode pertama ditutup.
     </div>
@@ -249,8 +249,8 @@ async function openGLMappings() {
   try { rows = await sbGet('gl_mappings', 'select=*&order=event_key.asc') || []; }
   catch (e) { toast('Jalankan supabase_fase4.sql dulu', 'warn'); return; }
   openModal(`
-    <div class="modal-header"><div class="modal-title">🔗 Pemetaan Transaksi → Akun</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Pemetaan Transaksi → Akun</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:10px">
       Menentukan akun mana yang terpakai untuk tiap jenis transaksi. Disimpan sebagai data,
       sehingga mengubahnya tidak perlu menyentuh program.
@@ -267,7 +267,7 @@ async function openGLMappings() {
     </tr>`).join('')}</tbody></table></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveGLMappings()">💾 Simpan Pemetaan</button>
+      <button class="btn btn-teal" onclick="saveGLMappings()">Simpan Pemetaan</button>
     </div>`, 'wide');
 }
 

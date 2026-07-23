@@ -28,7 +28,7 @@ async function openMRTimeline() {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">🕒 Garis Waktu — ${nama}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div id="tl-filter" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px"></div>
     <div id="tl-body" style="max-height:60vh;overflow:auto">
       <div class="loading-row"><div class="spinner"></div></div></div>
@@ -71,7 +71,7 @@ async function loadMRTimeline(mr, nama) {
     a.keluhan_utama || a.chief_complaint || a.notes || ''));
 
   (notes || []).forEach(n => push('catatan', n.created_at,
-    `${n.note_type}${n.locked ? ' 🔒' : ' (draft)'}`,
+    `${n.note_type}${n.locked ? ' ' : ' (draft)'}`,
     [n.subjective && 'S: ' + n.subjective, n.assessment && 'A: ' + n.assessment]
       .filter(Boolean).join(' · '),
     `${n.author_name || ''}${n.author_role ? ' · ' + n.author_role : ''}`));
@@ -95,7 +95,7 @@ async function loadMRTimeline(mr, nama) {
     `${g.items.length} pemeriksaan laboratorium`,
     g.items.slice(0, 6).map(r => `${r.product_name}: ${r.result_value || '—'} ${r.unit || ''}`).join(' · ')
       + (g.items.length > 6 ? ` +${g.items.length - 6} lainnya` : ''),
-    g.crit ? `🚨 ${g.crit} nilai kritis` : ''));
+    g.crit ? `${g.crit} nilai kritis` : ''));
 
   (rads || []).forEach(r => push('radiologi', r.performed_at || r.scheduled_at || r.created_at,
     r.procedure_name || 'Pemeriksaan radiologi',

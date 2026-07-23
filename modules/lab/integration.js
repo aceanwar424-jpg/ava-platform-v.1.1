@@ -101,7 +101,7 @@ function openAnalyzerIntake(prefill){
   const samples = labSamples.filter(s=>['In Process','Pending','Done'].includes(s.status));
   openModal(`
     <div class="modal-header"><div class="modal-title">🔌 Terima Hasil dari Analyzer</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
       Pilih sampel, tempel output alat (HL7 OBX / ASTM R / CSV / <code>KODE=NILAI</code>). Nilai dicocokkan otomatis ke tiap parameter lewat <strong>Host Code</strong> / kode analit / LOINC.
     </div>
@@ -119,7 +119,7 @@ OBX|1|NM|WBC^Leukosit||7.2|10^3/uL|...
 R|1|^^^RBC^|4.8|10^6/uL||N
 HGB,14.2,g/dL" style="width:100%;font-family:monospace;font-size:12px">${prefill&&prefill.text?String(prefill.text).replace(/</g,'&lt;'):''}</textarea></div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      <button class="btn btn-teal btn-sm" onclick="parseAnalyzerIntake()">🔎 Parse &amp; Cocokkan</button>
+      <button class="btn btn-teal btn-sm" onclick="parseAnalyzerIntake()">Parse &amp; Cocokkan</button>
     </div>
     <div id="ai-preview"></div>
     <div class="modal-footer">
@@ -242,7 +242,7 @@ async function renderAnalyzerHub(){
           <td style="font-family:monospace;font-size:11px;color:var(--gray)" title="${(m.raw_text||'').replace(/"/g,'')}">${raw}${(m.raw_text||'').length>48?'…':''}</td>
           <td><span style="background:${stColor}20;color:${stColor};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${m.status}</span>${m.parse_note?`<div style="font-size:10px;color:var(--gray)">${m.parse_note}</div>`:''}</td>
           <td style="white-space:nowrap">
-            <button class="btn btn-ghost btn-xs" onclick="hubInspectMessage(${m.id})" title="Lihat alur: mentah, parse, pemetaan">🔎</button>
+            <button class="btn btn-ghost btn-xs" onclick="hubInspectMessage(${m.id})" title="Lihat alur: mentah, parse, pemetaan"></button>
             ${canProcess?`<button class="btn btn-teal btn-xs" onclick="hubProcessMessage(${m.id})">${barSample?'Terapkan':'Cocokkan'}</button>`:''}
           </td>
         </tr>`;
@@ -292,8 +292,8 @@ function hubInspectMessage(msgId){
   const barSample=msg.sample_barcode?labSamples.find(s=>String(s.barcode)===String(msg.sample_barcode)):null;
   const samples=labSamples.filter(s=>['In Process','Pending','Done'].includes(s.status));
   openModal(`
-    <div class="modal-header"><div class="modal-title">🔎 Inspeksi Pesan Alat</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Inspeksi Pesan Alat</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:8px">
       ${_esc(a.nama_alat||msg.analyzer_code||'—')} · ${_esc(msg.protocol||'?')} ·
       ${msg.received_at?new Date(msg.received_at).toLocaleString('id-ID'):''} · status <b>${_esc(msg.status)}</b>

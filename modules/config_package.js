@@ -60,7 +60,7 @@ function renderPkgKPI() {
 function renderPkgList() {
   const el = document.getElementById('pkg-list');
   if (!pkgAll.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">📦</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada paket layanan</h3>
       <button class="btn btn-teal" style="margin-top:12px" onclick="openPackageForm()">+ Buat Paket</button>
     </div>`; return;
@@ -111,10 +111,10 @@ function renderPkgList() {
 
             <div style="display:flex;gap:6px;margin-top:12px">
               <button class="btn btn-outline btn-sm" style="flex:1" onclick="openPackageItems(${p.id},'${(p.nama_paket||'').replace(/'/g,"\\'")}')">
-                📋 Isi Tes
+                Isi Tes
               </button>
-              <button class="btn btn-ghost btn-sm" onclick="openPackageForm(${p.id})">✏️</button>
-              <button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="deletePackage(${p.id})">🗑</button>
+              <button class="btn btn-ghost btn-sm" onclick="openPackageForm(${p.id})">${icon('edit', 12)}</button>
+              <button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="deletePackage(${p.id})">${icon('trash', 12)}</button>
             </div>
           </div>`).join('')}
       </div>
@@ -128,8 +128,8 @@ async function openPackageForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Paket':'📦 Buat Paket Layanan'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Paket':'Buat Paket Layanan'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -201,7 +201,7 @@ async function openPackageForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePackage(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="savePackage(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -248,8 +248,8 @@ async function openPackageItems(pkgId, pkgName) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📋 Tes dalam Paket: ${pkgName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Tes dalam Paket: ${pkgName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Current items -->
@@ -264,7 +264,7 @@ async function openPackageItems(pkgId, pkgName) {
             <span class="badge badge-navy" style="font-size:10px">${i.products?.kategori||'—'}</span>
             <span style="flex:1;font-size:12px;font-weight:600">${i.product_name||i.products?.nama_tes||'—'}</span>
             <span style="font-size:10px;color:var(--gray)">${i.is_optional?'Opsional':''}</span>
-            <button onclick="deletePkgItem(${i.id})" class="act-btn del" style="padding:2px 6px">🗑</button>
+            <button onclick="deletePkgItem(${i.id})" class="act-btn del" style="padding:2px 6px">${icon('trash', 12)}</button>
           </div>`).join('')}` :
         '<div style="color:var(--gray);font-size:13px;margin-bottom:8px">Belum ada tes. Tambahkan di bawah.</div>'
       }
@@ -314,7 +314,7 @@ async function addPkgItem(pkgId) {
 }
 
 async function deletePkgItem(id) {
-  try { await sbDelete('package_items',id); toast('🗑 Dihapus','info'); }
+  try { await sbDelete('package_items',id); toast('Dihapus','info'); }
   catch(e) { toast('❌ '+e.message,'err'); }
   const el=document.getElementById('pkg-items-list');
   if (el) el.innerHTML='<div class="loading-row"><div class="spinner"></div></div>';
@@ -322,7 +322,7 @@ async function deletePkgItem(id) {
 
 async function deletePackage(id) {
   if (!confirm('Hapus paket ini? Item tes di dalamnya juga terhapus.')) return;
-  try { await sbDelete('packages',id); toast('🗑 Dihapus','info'); await loadPackages(); }
+  try { await sbDelete('packages',id); toast('Dihapus','info'); await loadPackages(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -335,9 +335,9 @@ async function renderConfigCorporate() {
       <div><h1>Corporate Management</h1>
         <p>Manajemen klien korporat — kontrak, billing, limit kredit</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()">🏥 Health Facility</button>
-        <button class="btn btn-teal" onclick="navigate('import')">📥 Import</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()">📤 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()">Health Facility</button>
+        <button class="btn btn-teal" onclick="navigate('import')">Import</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()">Export</button>
         <button class="btn btn-teal" onclick="openCorpForm()">+ Tambah Corporate</button>
       </div>
     </div>
@@ -349,7 +349,7 @@ async function renderConfigCorporate() {
 
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="corp-q" placeholder="🔍 Cari nama perusahaan..." oninput="filterCorp()" style="flex:1">
+        <input class="table-search" id="corp-q" placeholder="Cari nama perusahaan..." oninput="filterCorp()" style="flex:1">
         <select class="table-filter" id="corp-status" onchange="filterCorp()">
           <option value="">Semua</option>
           <option>Aktif</option><option>Non-Aktif</option><option>Suspend</option>
@@ -446,9 +446,9 @@ function renderCorpTable(data) {
       <td><span style="background:${sc}20;color:${sc};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${c.status||'—'}</span></td>
       <td>
         <div class="act-row">
-          <button class="act-btn edit" onclick="openCorpForm(${c.id})">✏️</button>
-          <button class="act-btn" onclick="openCorpContracts(${c.id},'${(c.corporate_name||'').replace(/'/g,"\\'")}')">📋</button>
-          <button class="act-btn del" onclick="deleteCorp(${c.id})">🗑</button>
+          <button class="act-btn edit" onclick="openCorpForm(${c.id})">${icon('edit', 12)}</button>
+          <button class="act-btn" onclick="openCorpContracts(${c.id},'${(c.corporate_name||'').replace(/'/g,"\\'")}')"></button>
+          <button class="act-btn del" onclick="deleteCorp(${c.id})">${icon('trash', 12)}</button>
         </div>
       </td>
     </tr>`;
@@ -470,8 +470,8 @@ async function openCorpForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Corporate':'🏢 Tambah Corporate'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Corporate':'🏢 Tambah Corporate'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -556,7 +556,7 @@ async function openCorpForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveCorp(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveCorp(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -593,7 +593,7 @@ async function saveCorp(id) {
 
 async function deleteCorp(id) {
   if (!confirm('Hapus data corporate ini?')) return;
-  try { await sbDelete('corporates',id); toast('🗑 Dihapus','info'); await loadCorporates(); }
+  try { await sbDelete('corporates',id); toast('Dihapus','info'); await loadCorporates(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -610,23 +610,23 @@ async function openCorpEmployees(corpId, corpName) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">👥 Data Karyawan — ${corpName}</div>
+      <div class="modal-title">Data Karyawan — ${corpName}</div>
       <div style="display:flex;gap:6px;align-items:center">
         <span class="badge badge-green">${active} Aktif</span>
         <span class="badge badge-gray">${inactive} Non-Aktif</span>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
 
     <div style="display:flex;gap:8px;margin-bottom:12px">
-      <input class="table-search" id="cemp-q" placeholder="🔍 Cari nama, NIK..." 
+      <input class="table-search" id="cemp-q" placeholder="Cari nama, NIK..." 
         oninput="filterCorpEmps(${corpId})" style="flex:1">
       <select class="table-filter" id="cemp-status" onchange="filterCorpEmps(${corpId})">
         <option value="">Semua</option>
         <option>Aktif</option><option>Non-Aktif</option>
       </select>
       <button class="btn btn-teal btn-sm" onclick="openCorpEmpForm(${corpId},'${corpName.replace(/'/g,"\'")}')" >+ Tambah</button>
-      <button class="btn btn-ghost btn-sm" onclick="importCorpEmps(${corpId})">📥 Import CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="importCorpEmps(${corpId})">Import CSV</button>
     </div>
 
     <div id="cemp-list" style="max-height:400px;overflow-y:auto">
@@ -655,15 +655,15 @@ async function openCorpEmployees(corpId, corpName) {
               </td>
               <td style="padding:6px 10px">
                 <div class="act-row">
-                  <button class="act-btn edit" onclick="openCorpEmpForm(${corpId},'${corpName.replace(/'/g,"\'")}',${ e.id})">✏️</button>
-                  <button class="act-btn del" onclick="deleteCorpEmp(${e.id},${corpId},'${corpName.replace(/'/g,"\'")}')">🗑</button>
+                  <button class="act-btn edit" onclick="openCorpEmpForm(${corpId},'${corpName.replace(/'/g,"\'")}',${ e.id})">${icon('edit', 12)}</button>
+                  <button class="act-btn del" onclick="deleteCorpEmp(${e.id},${corpId},'${corpName.replace(/'/g,"\'")}')">${icon('trash', 12)}</button>
                 </div>
               </td>
             </tr>`).join('')}
           </tbody>
         </table>` :
         `<div class="empty-state" style="padding:30px">
-          <div class="ico">👥</div>
+          <div class="ico"></div>
           <h3>Belum ada data karyawan</h3>
           <p>Tambah manual atau import dari CSV</p>
         </div>`
@@ -688,8 +688,8 @@ async function openCorpEmpForm(corpId, corpName, id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit':'➕ Tambah'} Karyawan — ${corpName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit':'+ Tambah'} Karyawan — ${corpName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1">
@@ -743,7 +743,7 @@ async function openCorpEmpForm(corpId, corpName, id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveCorpEmp(${corpId},${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveCorpEmp(${corpId},${id||'null'})">Simpan</button>
     </div>`);
 
   // Load packages
@@ -794,7 +794,7 @@ async function deleteCorpEmp(id, corpId, corpName) {
   if (!confirm('Hapus data karyawan ini?')) return;
   try {
     await sbDelete('corporate_employees',id);
-    toast('🗑 Dihapus','info');
+    toast('Dihapus','info');
     await openCorpEmployees(corpId, corpName);
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
@@ -816,8 +816,8 @@ async function activateAllCorpEmps(corpId, corpName) {
 function importCorpEmps(corpId) {
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📥 Import Karyawan dari CSV</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Import Karyawan dari CSV</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:#FFF8E1;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px">
       Format CSV: <strong>nama,nik,departemen,gender(M/F),tanggal_lahir,phone,email</strong>
@@ -830,7 +830,7 @@ function importCorpEmps(corpId) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" id="csv-import-btn" onclick="processCSVImport(${corpId})" disabled>
-        📥 Import
+        Import
       </button>
     </div>`);
 }
@@ -906,8 +906,8 @@ async function openCorpContracts(corpId, corpName) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📋 Kontrak: ${corpName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Kontrak: ${corpName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <button class="btn btn-teal btn-sm" style="margin-bottom:12px"
       onclick="openContractForm(${corpId},'${corpName.replace(/'/g,"\\'")}')">+ Kontrak Baru</button>
@@ -948,8 +948,8 @@ async function openContractForm(corpId, corpName) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📋 Kontrak Baru — ${corpName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Kontrak Baru — ${corpName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -989,7 +989,7 @@ async function openContractForm(corpId, corpName) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveContract(${corpId},'${corpName.replace(/'/g,"\\'")}')">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveContract(${corpId},'${corpName.replace(/'/g,"\\'")}')">Simpan</button>
     </div>`);
 }
 
@@ -1033,7 +1033,7 @@ async function renderConfigHealthFacility() {
     </div>
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="fac-q" placeholder="🔍 Cari nama fasilitas..." oninput="filterFacility()" style="flex:1">
+        <input class="table-search" id="fac-q" placeholder="Cari nama fasilitas..." oninput="filterFacility()" style="flex:1">
         <select class="table-filter" id="fac-type" onchange="filterFacility()">
           <option value="">Semua Tipe</option>
           ${['RS','Klinik','Dokter Praktik','Apotek'].map(t=>`<option>${t}</option>`).join('')}
@@ -1063,7 +1063,7 @@ function filterFacility() {
     (!q || (f.facility_name||'').toLowerCase().includes(q)) && (!tp||f.facility_type===tp));
   const el=document.getElementById('fac-tbody');
   if (!f.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">🏥</div>
+    el.innerHTML=`<div class="empty-state"><div class="ico"></div>
       <h3>Belum ada health facility</h3>
       <button class="btn btn-teal" style="margin-top:12px" onclick="openFacilityForm()">+ Tambah</button>
     </div>`; return;
@@ -1089,8 +1089,8 @@ function filterFacility() {
     <td><span style="background:${fa.is_active?'#E8F5E9':'#FFEBEE'};color:${fa.is_active?'#2E7D32':'#C62828'};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${fa.is_active?'Aktif':'Non-Aktif'}</span></td>
     <td>
       <div class="act-row">
-        <button class="act-btn edit" onclick="openFacilityForm(${fa.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteFacility(${fa.id})">🗑</button>
+        <button class="act-btn edit" onclick="openFacilityForm(${fa.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteFacility(${fa.id})">${icon('trash', 12)}</button>
       </div>
     </td>
   </tr>`).join('')}</tbody></table>`;
@@ -1104,8 +1104,8 @@ async function openFacilityForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Fasilitas':'🏥 Tambah Health Facility'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Fasilitas':'Tambah Health Facility'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1">
@@ -1165,7 +1165,7 @@ async function openFacilityForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveFacility(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveFacility(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -1196,7 +1196,7 @@ async function saveFacility(id) {
 
 async function deleteFacility(id) {
   if (!confirm('Hapus fasilitas ini?')) return;
-  try { await sbDelete('health_facilities',id); toast('🗑 Dihapus','info'); await loadFacilities(); }
+  try { await sbDelete('health_facilities',id); toast('Dihapus','info'); await loadFacilities(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -1208,7 +1208,7 @@ function exportPackagesCSV() {
     p.harga_normal||0,p.harga_korporat||0,p.hpp_total||0,p.tat_jam||4,p.is_active?'true':'false']);
   const csv=[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='packages_export.csv';a.click();toast('📥 Export berhasil','ok');
+  a.download='packages_export.csv';a.click();toast('Export berhasil','ok');
 }
 
 function exportCorporatesCSV() {
@@ -1218,5 +1218,5 @@ function exportCorporatesCSV() {
     c.pic_phone||'',c.pic_email||'',c.billing_type||'',c.payment_terms||30,c.status]);
   const csv=[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='corporates_export.csv';a.click();toast('📥 Export berhasil','ok');
+  a.download='corporates_export.csv';a.click();toast('Export berhasil','ok');
 }

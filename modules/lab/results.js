@@ -57,7 +57,7 @@ function renderResWorklist(patients){
     const crit=p.rows.some(isCriticalResult);
     return `<div onclick="selectResultPatient(${p.admission_id})"
       style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;${sel?'background:var(--mint);border-left:3px solid var(--teal)':'border-left:3px solid transparent'}">
-      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' 🚨':''}</div>
+      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' ':''}</div>
       <div style="font-size:10.5px;color:var(--gray);font-family:monospace">${p.mr_number||''} ${p.visit_number||''}</div>
       <div style="font-size:10px;color:${filled===p.rows.length?'#22C55E':'#F59E0B'};font-weight:700;margin-top:2px">${filled}/${p.rows.length} parameter</div>
     </div>`;
@@ -81,7 +81,7 @@ async function selectResultPatient(admId){
         ${_resAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_resAdm.patient_blood_type}</span>`:''}
         <div style="font-size:11px;color:var(--gray);font-family:monospace">${_resAdm.mr_number||''} · ${_resAdm.visit_number||''} · ${_resAdm.patient_gender==='F'?'Perempuan':'Laki-laki'}${_resAdm.patient_age?' · '+_resAdm.patient_age+' th':''}</div>
       </div>
-      <button class="btn btn-teal btn-sm" onclick="resSaveAll()">💾 Simpan Hasil</button>
+      <button class="btn btn-teal btn-sm" onclick="resSaveAll()">Simpan Hasil</button>
     </div>`;
 
   const groups={};
@@ -142,7 +142,7 @@ function resInterpret(input){
   if(norm&&!isNaN(num)){ if(num>norm.range_max) flag='H'; else if(num<norm.range_min) flag='L'; }
   const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
   const c=m?labColor(m.color_code):'#94A3B8';
-  flagCell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626">🚨</span>'
+  flagCell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626"></span>'
     : flag?`<span style="font-weight:800;color:${flag==='H'?'#EF4444':'#0EA5E9'}">${flag}</span>`
     : (m?`<span style="color:${c}">●</span>`:'');
   input.style.borderColor=c;
@@ -235,8 +235,8 @@ async function openResultEntry(admissionId, productId){
   const prodName=rows[0].product_name||'';
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">📝 Input Hasil — ${prodName}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Input Hasil — ${prodName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:var(--mint);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">
       <strong>${_reAdm.patient_name||rows[0].patient_name||''}</strong> · ${_reAdm.visit_number||rows[0].visit_number||''}
       · ${_reAdm.patient_gender||''} ${_reAdm.patient_age?_reAdm.patient_age+' th':''} · ${rows.length} parameter</div>
@@ -260,7 +260,7 @@ async function openResultEntry(admissionId, productId){
     </tbody></table></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveResultEntry()">💾 Simpan Semua</button>
+      <button class="btn btn-teal" onclick="saveResultEntry()">Simpan Semua</button>
     </div>`);
   document.querySelectorAll('#modal-box .re-val').forEach(inp=>{ if(inp.value.trim()) reInterpret(inp); });
 }
@@ -290,7 +290,7 @@ function reInterpret(input){
   if(!m){ cell.textContent='—'; cell.style.color='var(--gray)'; input.style.borderColor='var(--border)'; return; }
   const num=parseFloat(raw), c=labColor(m.color_code);
   const crit=(!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical';
-  cell.innerHTML=`<span style="color:${c};font-weight:700">${m.condition_name||m.interpretation||'—'}${crit?' 🚨':''}</span>`;
+  cell.innerHTML=`<span style="color:${c};font-weight:700">${m.condition_name||m.interpretation||'—'}${crit?' ':''}</span>`;
   input.style.borderColor=c;
 }
 
@@ -343,8 +343,8 @@ async function openResultForm(resultId=null, prefill=null){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📝 ${resultId?'Update':'Input'} Hasil Pemeriksaan</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${resultId?'Update':'Input'} Hasil Pemeriksaan</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <input type="hidden" id="rf-sample" value="${r.sample_id||''}">
     <div class="form-row">
@@ -371,7 +371,7 @@ async function openResultForm(resultId=null, prefill=null){
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveLabResult(${resultId||'null'})">💾 Simpan Hasil</button>
+      <button class="btn btn-teal" onclick="saveLabResult(${resultId||'null'})">Simpan Hasil</button>
     </div>`);
 
   // delta check untuk data prefill/edit
@@ -432,7 +432,7 @@ function interpretResult(val){
     <div style="background:${crit?'#FEF2F2':c+'15'};border:2px solid ${crit?'#DC2626':c+'40'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
       <div style="width:12px;height:12px;border-radius:50%;background:${crit?'#DC2626':c};flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:800;color:${crit?'#DC2626':c}">${crit?'🚨 NILAI KRITIS · ':''}${match.condition_name||match.interpretation||'—'}</div>
+        <div style="font-size:13px;font-weight:800;color:${crit?'#DC2626':c}">${crit?'NILAI KRITIS · ':''}${match.condition_name||match.interpretation||'—'}</div>
         ${match.description?`<div style="font-size:11px;color:var(--gray)">${match.description}</div>`:''}
         ${match.recommendation?`<div style="font-size:11px;color:${c};margin-top:2px">💡 ${match.recommendation}</div>`:''}
       </div>
@@ -449,7 +449,7 @@ async function showDeltaCheck(patientName, productId, excludeId=null){
     if(!p){ box.innerHTML=''; return; }
     box.innerHTML=`
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:#1E40AF">
-        📊 Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong>
+        Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong>
         <span style="color:#64748B">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
         <span id="rf-delta-arrow"></span>
       </div>`;

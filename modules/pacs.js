@@ -28,7 +28,7 @@ let _pacsImgEl = null, _pacsDragging = false, _pacsLast = null, _pacsMeasuring =
 async function openPacsUpload(orderId, accession) {
   openModal(`
     <div class="modal-header"><div class="modal-title">🖼️ Konsol Penerimaan PACS — ${accession}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Terima citra hasil ekspor dari alat (JPG/PNG). Berkas DICOM asli boleh
       disertakan agar dapat diunduh ke workstation. Setelah diterima, citra dapat
@@ -134,12 +134,12 @@ async function openPacsViewer(orderId, accession) {
   openModal(`
     <div class="modal-header" style="background:#0D1520;color:#fff;border-bottom-color:#243243">
       <div class="modal-title" style="color:#fff">🖼️ ${accession} — ${imgs.length} citra</div>
-      <button class="modal-close" style="color:#fff" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" style="color:#fff" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:#0D1520;margin:-16px -16px 0;padding:10px 16px;
       display:flex;gap:6px;flex-wrap:wrap;align-items:center;border-bottom:1px solid #243243">
-      <button class="btn btn-ghost btn-xs" style="color:#AEBDCC" onclick="pacsZoom(1.25)">🔍+</button>
-      <button class="btn btn-ghost btn-xs" style="color:#AEBDCC" onclick="pacsZoom(0.8)">🔍−</button>
+      <button class="btn btn-ghost btn-xs" style="color:#AEBDCC" onclick="pacsZoom(1.25)">+</button>
+      <button class="btn btn-ghost btn-xs" style="color:#AEBDCC" onclick="pacsZoom(0.8)">−</button>
       <button class="btn btn-ghost btn-xs" style="color:#AEBDCC" onclick="pacsResetView();pacsDraw()">⟲ Reset</button>
       <span style="width:1px;height:18px;background:#243243"></span>
       <label style="color:#7F8FA0;font-size:11px">Terang

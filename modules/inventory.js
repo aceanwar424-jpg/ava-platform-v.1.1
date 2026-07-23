@@ -166,7 +166,7 @@ function renderStockAlerts() {
     </div>`;
   if (expired.length) html += `
     <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
-      <div style="font-weight:700;color:#B91C1C;font-size:12.5px">⛔ ${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
+      <div style="font-weight:700;color:#B91C1C;font-size:12.5px">${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
       <div style="font-size:11px;color:#991B1B;margin-top:2px">
         ${expired.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}${expired.length>5?` +${expired.length-5} lainnya`:''}
       </div>
@@ -193,7 +193,7 @@ function filterInvItems() {
 
 function renderStockTable(data) {
   const el = document.getElementById('inv-tbody');
-  if (!data.length) { el.innerHTML = `<div class="empty-state"><div class="ico">📦</div><h3>Belum ada barang</h3><p>Klik "+ Tambah Barang" untuk mulai.</p></div>`; return; }
+  if (!data.length) { el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada barang</h3><p>Klik "+ Tambah Barang" untuk mulai.</p></div>`; return; }
   el.innerHTML = `<table><thead><tr>
     <th>Kode</th><th>Nama Barang</th><th>Kategori</th><th>Stok</th><th>Min/Max</th><th>Harga</th><th>Lokasi</th><th>Aksi</th>
   </tr></thead><tbody>${data.map(i=>{
@@ -213,8 +213,8 @@ function renderStockTable(data) {
       <td style="font-size:11px;color:var(--gray)">${i.location||'—'}</td>
       <td><div class="act-row">
         <button class="act-btn" onclick="adjustStock(${i.id},'${(i.item_name||'').replace(/'/g,"\\'")}',${i.stock_qty||0})" title="Adjust Stok">⚖️</button>
-        <button class="act-btn edit" onclick="openItemForm(${i.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteItem(${i.id})">🗑</button>
+        <button class="act-btn edit" onclick="openItemForm(${i.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteItem(${i.id})">${icon('trash', 12)}</button>
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -223,7 +223,7 @@ function renderStockTable(data) {
 function adjustStock(id, name, current) {
   openModal(`
     <div class="modal-header"><div class="modal-title">⚖️ Adjust Stok: ${name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Stok Saat Ini</label>
       <input type="number" value="${current}" disabled style="background:var(--bg2)"></div>
     <div class="form-group"><label>Stok Baru *</label>
@@ -232,7 +232,7 @@ function adjustStock(id, name, current) {
       <textarea id="adj-reason" rows="2" placeholder="Koreksi manual, barang rusak, dll"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveStockAdj(${id},${current})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveStockAdj(${id},${current})">Simpan</button>
     </div>`);
 }
 
@@ -255,8 +255,8 @@ async function openItemForm(id=null) {
   let it = {};
   if (id) { const d = await sbGet('inventory_items',`select=*&id=eq.${id}`); it=d[0]||{}; }
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit Barang':'➕ Tambah Barang'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id?'Edit Barang':'+ Tambah Barang'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Kode Barang</label>
         <input type="text" id="if-code" value="${it.item_code||'BRG-'+Date.now().toString().slice(-5)}"></div>
@@ -284,7 +284,7 @@ async function openItemForm(id=null) {
         <input type="number" id="if-max" value="${it.max_stock||0}"></div>
     </div>
     <div style="border-top:1px solid var(--border);margin:12px 0;padding-top:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:10px">📊 Parameter MRP</div>
+      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:10px">Parameter MRP</div>
       <div class="form-row">
         <div class="form-group"><label>Lead Time (hari)</label>
           <input type="number" id="if-leadtime" value="${it.lead_time_days||7}"></div>
@@ -304,7 +304,7 @@ async function openItemForm(id=null) {
       <textarea id="if-desc" rows="2">${it.description||''}</textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveItem(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveItem(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -352,7 +352,7 @@ async function saveItem(id) {
 
 async function deleteItem(id) {
   if (!confirm('Hapus barang ini? Histori ledger tetap tersimpan.')) return;
-  try { await sbDelete('inventory_items',id); toast('🗑 Barang dihapus','info'); await loadInventory(); }
+  try { await sbDelete('inventory_items',id); toast('Barang dihapus','info'); await loadInventory(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -426,7 +426,7 @@ function filterLedger() {
 
 function renderLedgerTable(data) {
   const el = document.getElementById('ledger-tbody');
-  if (!data.length) { el.innerHTML = `<div class="empty-state"><div class="ico">📜</div><h3>Belum ada pergerakan stok</h3></div>`; return; }
+  if (!data.length) { el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada pergerakan stok</h3></div>`; return; }
   const typeColor = {IN:'#22C55E', OUT:'#EF4444', ADJUST:'#F59E0B', TRANSFER:'#0EA5E9'};
   const typeLabel = {IN:'Masuk', OUT:'Keluar', ADJUST:'Adjustment', TRANSFER:'Transfer'};
   el.innerHTML = `<table><thead><tr>
@@ -459,7 +459,7 @@ function printStockLedgerPDF() {
       table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
       th{background:#f1f5f9}
     </style></head><body>
-    <h2>📜 Stock Ledger — OneLab Diagnostics</h2>
+    <h2>Stock Ledger — OneLab Diagnostics</h2>
     <div class="sub">Dicetak: ${new Date().toLocaleString('id-ID')} ${itemId?'· Filter: '+(invItems.find(i=>i.id==itemId)?.item_name||''):''}</div>
     <table><thead><tr><th>Tanggal</th><th>Barang</th><th>Tipe</th><th>Qty</th><th>Saldo</th><th>Ref</th><th>Oleh</th></tr></thead>
     <tbody>${filtered.map(l=>`<tr>
@@ -481,7 +481,7 @@ function renderPRList() {
     <div class="page-header" style="margin-bottom:14px">
       <div><p style="color:var(--text3);font-size:13px">Permintaan pengadaan barang dengan approval SPV → Manager → Head of Operations</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost" onclick="openBudgetManager()">💰 Pagu Anggaran</button>
+        <button class="btn btn-ghost" onclick="openBudgetManager()">Pagu Anggaran</button>
         <button class="btn btn-teal" onclick="openPRForm()">+ Buat PR</button>
       </div>
     </div>
@@ -514,8 +514,8 @@ function renderPRTable() {
       <td>${renderApprovalSteps(p)}</td>
       <td><span style="background:${col}20;color:${col};padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700">${p.status}</span></td>
       <td><div class="act-row">
-        <button class="act-btn" onclick="openPRDetail(${p.id})" title="Detail & Chat">👁️</button>
-        ${p.status==='Draft'?`<button class="act-btn edit" onclick="openPRForm(${p.id})">✏️</button>`:''}
+        <button class="act-btn" onclick="openPRDetail(${p.id})" title="Detail & Chat">${icon('file-text', 12)}</button>
+        ${p.status==='Draft'?`<button class="act-btn edit" onclick="openPRForm(${p.id})">${icon('edit', 12)}</button>`:''}
         ${p.status==='Approved'?`<button class="act-btn" onclick="convertPRtoPO(${p.id})" title="Buat PO" style="color:#06B6D4">📄</button>`:''}
       </div></td>
     </tr>`;
@@ -543,8 +543,8 @@ async function openPRForm(id=null) {
     prLineItems = (li||[]).map(x=>({...x}));
   }
   openModal(`
-    <div class="modal-header"><div class="modal-title">${id?'✏️ Edit PR':'🛒 Buat Purchase Request'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${id?'Edit PR':'🛒 Buat Purchase Request'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Tanggal Dibutuhkan</label>
         <input type="date" id="pf-needed" value="${p.needed_date||''}"></div>
@@ -571,7 +571,7 @@ async function openPRForm(id=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePR(${id||'null'})">📤 ${id?'Simpan':'Submit PR'}</button>
+      <button class="btn btn-teal" onclick="savePR(${id||'null'})">${id?'Simpan':'Submit PR'}</button>
     </div>`, 'wide');
   renderPRLineItemsTable();
 }
@@ -584,8 +584,8 @@ async function openBudgetManager() {
   catch(e) { toast('Tabel pagu belum ada — jalankan supabase_fase2.sql','warn'); return; }
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">💰 Pagu Anggaran — ${period}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Pagu Anggaran — ${period}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Pagu per divisi untuk periode berjalan. PR yang melampaui sisa pagu akan diberi peringatan
       saat disusun.
@@ -606,7 +606,7 @@ async function openBudgetManager() {
     </tbody></table>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveBudgets('${period}')">💾 Simpan Pagu</button>
+      <button class="btn btn-teal" onclick="saveBudgets('${period}')">Simpan Pagu</button>
     </div>`, 'wide');
 }
 
@@ -692,7 +692,7 @@ function renderPRLineItemsTable() {
       <td style="padding:4px"><input type="number" value="${it.unit_price||0}" style="width:90px;font-size:11px;padding:4px" oninput="updatePRItemField(${idx},'unit_price',this.value)"></td>
       <td style="padding:4px"><input type="number" value="${it.qty||1}" style="width:60px;font-size:11px;padding:4px" oninput="updatePRItemField(${idx},'qty',this.value)"></td>
       <td style="padding:4px;font-weight:700">${formatCurrency((it.unit_price||0)*(it.qty||0))}</td>
-      <td style="padding:4px"><button class="act-btn del" onclick="removePRLineItem(${idx})">✕</button></td>
+      <td style="padding:4px"><button class="act-btn del" onclick="removePRLineItem(${idx})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>`).join('')}</tbody></table>`;
   updatePRTotal();
 }
@@ -790,7 +790,7 @@ async function openPRDetail(id) {
 
   openModal(`
     <div class="modal-header"><div class="modal-title">🛒 ${p.pr_number}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;font-size:12.5px">
       <div><strong>Diminta oleh:</strong> ${p.requested_by||'—'}</div>
@@ -943,8 +943,8 @@ function renderPOTable() {
       <td style="font-size:11px;color:var(--gray)">${formatDateShort(po.order_date)}</td>
       <td><span style="background:${col}20;color:${col};padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700">${po.status}</span></td>
       <td><div class="act-row">
-        <button class="act-btn" onclick="openPODetail(${po.id})" title="Detail">👁️</button>
-        ${['Dikirim ke Vendor','Dikonfirmasi Vendor','Sebagian Diterima'].includes(po.status)?`<button class="act-btn" onclick="openReceivePO(${po.id})" title="Terima Barang" style="color:#22C55E">📥</button>`:''}
+        <button class="act-btn" onclick="openPODetail(${po.id})" title="Detail">${icon('file-text', 12)}</button>
+        ${['Dikirim ke Vendor','Dikonfirmasi Vendor','Sebagian Diterima'].includes(po.status)?`<button class="act-btn" onclick="openReceivePO(${po.id})" title="Terima Barang" style="color:#22C55E"></button>`:''}
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -956,7 +956,7 @@ async function convertPRtoPO(prId) {
   const items = await sbGet('pr_items',`select=*&pr_id=eq.${prId}`).catch(()=>[]);
   openModal(`
     <div class="modal-header"><div class="modal-title">📄 Buat PO dari ${pr.pr_number}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Supplier *</label>
       <select id="po-supplier">
         <option value="">-- Pilih Supplier --</option>
@@ -974,7 +974,7 @@ async function convertPRtoPO(prId) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePOFromPR(${prId})">📤 Buat PO</button>
+      <button class="btn btn-teal" onclick="savePOFromPR(${prId})">Buat PO</button>
     </div>`);
 }
 
@@ -1024,7 +1024,7 @@ async function openPODetail(id) {
   const po = poData?.[0]; if (!po) return;
   openModal(`
     <div class="modal-header"><div class="modal-title">📄 ${po.po_number}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:12.5px">
       <div><strong>Supplier:</strong> ${po.supplier_name}</div>
       <div><strong>Status:</strong> ${po.status}</div>
@@ -1043,7 +1043,7 @@ async function openPODetail(id) {
     <div style="text-align:right;font-weight:700;margin-top:10px">Total: ${formatCurrency(po.total_amount||0)}</div>
     ${po.status==='Draft'?`<div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-teal" onclick="markPOSent(${id})">📤 Tandai Dikirim ke Vendor</button>
+      <button class="btn btn-teal" onclick="markPOSent(${id})">Tandai Dikirim ke Vendor</button>
     </div>`:`<div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       ${(items||[]).some(it=>(it.qty_received||0)>0)?`<button class="btn btn-danger" onclick="openReturnForm(${id})">↩️ Retur ke Supplier</button>`:''}
@@ -1062,7 +1062,7 @@ async function openReturnForm(poId) {
   retLineItems = (items||[]).filter(it=>(it.qty_received||0)>0).map(it=>({...it, ret_qty:0}));
   openModal(`
     <div class="modal-header"><div class="modal-title">↩️ Retur ke Supplier — ${po.po_number}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Alasan Retur *</label>
       <select id="ret-reason"><option>Barang Rusak</option><option>Salah Kirim</option><option>Kadaluarsa</option><option>Tidak Sesuai Spesifikasi</option><option>Lainnya</option></select></div>
     <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
@@ -1124,8 +1124,8 @@ async function openReceivePO(id) {
   ]);
   const po = poData?.[0]; if (!po) return;
   openModal(`
-    <div class="modal-header"><div class="modal-title">📥 Terima Barang — ${po.po_number}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Terima Barang — ${po.po_number}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Isi qty yang benar-benar diterima fisik. Stok &amp; ledger akan terupdate otomatis.</div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:8px">Barang yang dilacak batch akan menampilkan kolom No. Batch &amp; Kedaluwarsa.</div>
     <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
@@ -1146,7 +1146,7 @@ async function openReceivePO(id) {
     }).join('')}</tbody></table>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveReceivePO(${id})">📥 Konfirmasi Terima</button>
+      <button class="btn btn-teal" onclick="saveReceivePO(${id})">Konfirmasi Terima</button>
     </div>`, 'wide');
 }
 
@@ -1221,7 +1221,7 @@ async function loadGoodsIssues() {
     const data = await sbGet('goods_issues','select=*&order=created_at.desc&limit=200');
     const list = Array.isArray(data)?data:[];
     const el = document.getElementById('gi-tbody');
-    if (!list.length) { el.innerHTML = `<div class="empty-state"><div class="ico">📤</div><h3>Belum ada Goods Issue</h3><p>Klik "+ Goods Issue" untuk mencatat pemakaian barang.</p></div>`; return; }
+    if (!list.length) { el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada Goods Issue</h3><p>Klik "+ Goods Issue" untuk mencatat pemakaian barang.</p></div>`; return; }
     el.innerHTML = `<table><thead><tr>
       <th>No. GI</th><th>Tanggal</th><th>Tujuan/Divisi</th><th>Keperluan</th><th>Item</th><th>Nilai</th><th>Oleh</th>
     </tr></thead><tbody>${list.map(g=>`<tr>
@@ -1241,8 +1241,8 @@ const GI_PURPOSES = ['Pemakaian Lab','Pemakaian MCU','Pemakaian Radiologi','Pema
 function openGoodsIssueForm() {
   giLineItems = [];
   openModal(`
-    <div class="modal-header"><div class="modal-title">📤 Goods Issue — Pengeluaran Barang</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Goods Issue — Pengeluaran Barang</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Tanggal</label><input type="date" id="gi-date" value="${new Date().toISOString().split('T')[0]}"></div>
       <div class="form-group"><label>Keperluan</label>
@@ -1261,7 +1261,7 @@ function openGoodsIssueForm() {
     <div class="form-group"><label>Catatan</label><textarea id="gi-notes" rows="2"></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveGoodsIssue()">📤 Proses Pengeluaran</button>
+      <button class="btn btn-teal" onclick="saveGoodsIssue()">Proses Pengeluaran</button>
     </div>`, 'wide');
   addGILineItem();
 }
@@ -1287,7 +1287,7 @@ function renderGILineItems() {
       <td style="padding:4px;text-align:center;color:${over?'#DC2626':'var(--gray)'}">${item?stock+' '+(item.unit||''):'—'}</td>
       <td style="padding:4px"><input type="number" min="0" value="${it.qty||0}" style="width:70px;font-size:11px;padding:4px;${over?'border-color:#DC2626':''}" oninput="updateGIItem(${idx},'qty',this.value)">${over?'<div style="font-size:9px;color:#DC2626">> stok</div>':''}</td>
       <td style="padding:4px;font-weight:700">${formatCurrency((item?.unit_price||0)*(it.qty||0))}</td>
-      <td style="padding:4px"><button class="act-btn del" onclick="removeGILineItem(${idx})">✕</button></td>
+      <td style="padding:4px"><button class="act-btn del" onclick="removeGILineItem(${idx})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>`;
   }).join('')}</tbody></table>`;
   updateGITotal();
@@ -1354,7 +1354,7 @@ async function loadOpnameList() {
 
 function renderOpnameTable() {
   const el = document.getElementById('opname-tbody');
-  if (!invOpnames.length) { el.innerHTML = `<div class="empty-state"><div class="ico">📋</div><h3>Belum ada sesi opname</h3></div>`; return; }
+  if (!invOpnames.length) { el.innerHTML = `<div class="empty-state"><div class="ico"></div><h3>Belum ada sesi opname</h3></div>`; return; }
   el.innerHTML = `<table><thead><tr>
     <th>No. Opname</th><th>Tipe</th><th>Periode</th><th>Dilakukan Oleh</th><th>Item Dicek</th><th>Total Selisih</th><th>Status</th><th>Aksi</th>
   </tr></thead><tbody>${invOpnames.map(o=>`
@@ -1367,7 +1367,7 @@ function renderOpnameTable() {
       <td style="font-size:12px;font-weight:700;color:${(o.total_selisih_value||0)<0?'#DC2626':'#16A34A'}">${formatCurrency(o.total_selisih_value||0)}</td>
       <td><span class="badge ${o.status==='Selesai'?'badge-teal':'badge-gray'}">${o.status}</span></td>
       <td><div class="act-row">
-        <button class="act-btn" onclick="openOpnameDetail(${o.id})" title="Detail">👁️</button>
+        <button class="act-btn" onclick="openOpnameDetail(${o.id})" title="Detail">${icon('file-text', 12)}</button>
         <button class="act-btn" onclick="printOpnamePDF(${o.id})" title="Print PDF">🖨</button>
       </div></td>
     </tr>`).join('')}</tbody></table>`;
@@ -1375,8 +1375,8 @@ function renderOpnameTable() {
 
 function openOpnameForm() {
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 Mulai Stock Opname</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">Mulai Stock Opname</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Tipe Opname</label>
       <select id="op-type"><option>Mingguan</option><option>Bulanan</option></select></div>
     <div class="form-group"><label>Label Periode</label>
@@ -1422,8 +1422,8 @@ async function openOpnameDetail(opnameId) {
   const o = oData?.[0]; if (!o) return;
   const isDraft = o.status==='Draft';
   openModal(`
-    <div class="modal-header"><div class="modal-title">📋 ${o.opname_number} — ${o.period_label}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${o.opname_number} — ${o.period_label}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <table style="width:100%;font-size:12px"><thead><tr style="background:var(--bg)">
       <th style="padding:5px;text-align:left">Barang</th><th style="padding:5px">Sistem</th><th style="padding:5px">Fisik</th><th style="padding:5px">Selisih</th>
     </tr></thead><tbody>${(items||[]).map(it=>`
@@ -1495,7 +1495,7 @@ async function printOpnamePDF(opnameId) {
       .sign{margin-top:40px;display:flex;justify-content:space-between}
       .sign div{width:200px;text-align:center;border-top:1px solid #333;padding-top:4px}
     </style></head><body>
-    <h2>📋 Stock Opname — ${o.opname_number}</h2>
+    <h2>Stock Opname — ${o.opname_number}</h2>
     <div class="sub">Periode: ${o.period_label} · Tipe: ${o.opname_type} · Oleh: ${o.conducted_by} · Status: ${o.status}</div>
     <table><thead><tr><th>Kode</th><th>Nama Barang</th><th class="c">Sistem</th><th class="c">Fisik</th><th class="c">Selisih</th><th class="r">Nilai Selisih</th></tr></thead>
     <tbody>${(items||[]).map(it=>`<tr>
@@ -1529,7 +1529,7 @@ function renderMRPDashboard() {
       <div style="font-size:13px;color:var(--text3);max-width:70%">
         Reorder Point = (Pemakaian/Bulan ÷ 30 × Lead Time) + Safety Stock. Kolom <b>In-Transit</b> = qty PO yang belum diterima.
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="recomputeUsageFromHistory()">🔄 Hitung Pemakaian dari Histori (90 hari)</button>
+      <button class="btn btn-ghost btn-sm" onclick="recomputeUsageFromHistory()">Hitung Pemakaian dari Histori (90 hari)</button>
     </div>
     <div class="table-wrap">
       <table><thead><tr>
@@ -1594,7 +1594,7 @@ async function generatePRFromMRP() {
   }));
   openModal(`
     <div class="modal-header"><div class="modal-title">🛒 Buat PR dari Rekomendasi MRP</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-row">
       <div class="form-group"><label>Tanggal Dibutuhkan</label><input type="date" id="pf-needed" value=""></div>
       <div class="form-group"><label>Divisi</label><input type="text" id="pf-div" value="Operasional Lab"></div>
@@ -1605,7 +1605,7 @@ async function generatePRFromMRP() {
     <div style="text-align:right;font-weight:700;margin-top:8px;font-size:13px">Total: <span id="pr-items-total" style="color:var(--teal)">Rp 0</span></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePR(null)">📤 Submit PR</button>
+      <button class="btn btn-teal" onclick="savePR(null)">Submit PR</button>
     </div>`, 'wide');
   renderPRLineItemsTable();
 }
@@ -1663,7 +1663,7 @@ function renderInvReport() {
 
     <div class="card" style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div class="card-title">💰 Valuasi Stok per Kategori</div>
+        <div class="card-title">Valuasi Stok per Kategori</div>
         <button class="btn btn-ghost btn-sm" onclick="exportInvValuation()">⬇️ CSV</button>
       </div>
       ${Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`
@@ -1745,7 +1745,7 @@ async function openTransferForm() {
   }
   openModal(`
     <div class="modal-header"><div class="modal-title">⇄ Pindah Barang Antar Lokasi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Barang *</label>
       <select id="tf-item" onchange="loadTransferStock()">
         <option value="">-- Pilih barang --</option>
@@ -1819,7 +1819,7 @@ async function renderRecipeTab() {
     </div>
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="rec-q" placeholder="🔍 Cari nama tes..." oninput="renderRecipeTable()">
+        <input class="table-search" id="rec-q" placeholder="Cari nama tes..." oninput="renderRecipeTable()">
       </div>
       <div id="rec-tbody"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
@@ -1857,7 +1857,7 @@ function renderRecipeTable() {
   if (q) ids = ids.filter(pid => (recProducts.find(p=>String(p.id)===String(pid))?.nama_tes||'').toLowerCase().includes(q));
 
   if (!ids.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🧪</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>${recRecipes.length?'Tidak ada hasil':'Belum ada resep BHP'}</h3>
       <p>Selama belum ada resep, pemakaian reagen tidak tercatat dan MRP tidak akurat.</p>
       <button class="btn btn-teal" style="margin-top:10px" onclick="openRecipeForm()">+ Tambah Resep</button></div>`;
@@ -1883,7 +1883,7 @@ function renderRecipeTable() {
       }).join('')}</td>
       <td style="font-weight:700">${formatCurrency(cost)}</td>
       <td><div class="act-row">
-        <button class="act-btn edit" onclick="openRecipeForm(${pid})">✏️</button>
+        <button class="act-btn edit" onclick="openRecipeForm(${pid})">${icon('edit', 12)}</button>
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -1897,8 +1897,8 @@ async function openRecipeForm(productId=null) {
     : [{ item_id:'', qty_per_test:1 }];
 
   openModal(`
-    <div class="modal-header"><div class="modal-title">🧪 ${productId?'Ubah':'Tambah'} Resep BHP</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div class="modal-header"><div class="modal-title">${productId?'Ubah':'Tambah'} Resep BHP</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Tes / Layanan *</label>
       <select id="rec-prod" ${productId?'disabled style="background:var(--bg2)"':''}>
         <option value="">-- Pilih tes --</option>
@@ -1915,7 +1915,7 @@ async function openRecipeForm(productId=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveRecipe(${productId||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveRecipe(${productId||'null'})">Simpan</button>
     </div>`, 'wide');
   renderRecLines();
 }
@@ -1937,7 +1937,7 @@ function renderRecLines() {
       <td style="padding:3px;width:90px"><input type="number" step="0.001" min="0" value="${l.qty_per_test}"
         onchange="updateRecLine(${i},'qty_per_test',this.value)" style="width:80px;font-size:11px;padding:4px"></td>
       <td style="padding:3px;width:110px;text-align:right">${formatCurrency((it?.unit_price||0)*(l.qty_per_test||0))}</td>
-      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeRecLine(${i})">✕</button></td>
+      <td style="padding:3px;width:30px"><button class="act-btn del" onclick="removeRecLine(${i})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>`;
   }).join('')}</tbody></table>`;
   const total = recLines.reduce((s,l)=>{ const it=invItems.find(x=>String(x.id)===String(l.item_id)); return s+(it?.unit_price||0)*(l.qty_per_test||0); },0);
@@ -1990,10 +1990,10 @@ function renderSupplierList() {
       <td><div style="font-weight:600;color:var(--navy)">${s.supplier_name}</div><div style="font-size:11px;color:var(--gray)">${s.address||''}</div></td>
       <td><div style="font-size:12px">${s.contact_name||'—'}</div><div style="font-size:11px;color:var(--gray)">${s.phone||''}</div></td>
       <td style="font-size:12px">${s.item_categories||'—'}</td>
-      <td>${'⭐'.repeat(Math.min(5,parseInt(s.rating)||0))||'—'}</td>
+      <td>${''.repeat(Math.min(5,parseInt(s.rating)||0))||'—'}</td>
       <td><div class="act-row">
-        <button class="act-btn edit" onclick="openSupplierForm(${s.id})">✏️</button>
-        <button class="act-btn del" onclick="deleteSupplier(${s.id})">🗑</button>
+        <button class="act-btn edit" onclick="openSupplierForm(${s.id})">${icon('edit', 12)}</button>
+        <button class="act-btn del" onclick="deleteSupplier(${s.id})">${icon('trash', 12)}</button>
       </div></td>
     </tr>`).join('')}</tbody></table>`;
 }
@@ -2003,8 +2003,8 @@ async function openSupplierForm(id=null) {
   if (id) { const d = await sbGet('suppliers',`select=*&id=eq.${id}`); s=d[0]||{}; }
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Supplier':'🏭 Tambah Supplier'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Supplier':'🏭 Tambah Supplier'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1">
@@ -2029,7 +2029,7 @@ async function openSupplierForm(id=null) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveSupplier(${id||'null'})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveSupplier(${id||'null'})">Simpan</button>
     </div>`);
 }
 
@@ -2055,6 +2055,6 @@ async function saveSupplier(id) {
 }
 async function deleteSupplier(id) {
   if (!confirm('Hapus supplier?')) return;
-  try { await sbDelete('suppliers',id); toast('🗑 Dihapus','info'); await loadInventory(); renderSupplierList(); }
+  try { await sbDelete('suppliers',id); toast('Dihapus','info'); await loadInventory(); renderSupplierList(); }
   catch(e) { toast('❌ '+e.message,'err'); }
 }

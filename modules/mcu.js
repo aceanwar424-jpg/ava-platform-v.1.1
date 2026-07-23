@@ -15,7 +15,7 @@ const MCU_PHASES = [
 ];
 
 const MCU_STAGES = {
-  S01:{ id:'S01', no:1,  phase:'F1', name:'Discovery & Kebutuhan Klien',          pic:'Sales/AM',      icon:'🔍', form:'F-01-B2B',
+  S01:{ id:'S01', no:1,  phase:'F1', name:'Discovery & Kebutuhan Klien',          pic:'Sales/AM',      icon:'', form:'F-01-B2B',
     fields:['nama_perusahaan','industri_klien','pic_klien_nama_jabatan','pic_klien_kontak','sales_pic_internal',
       'target_peserta','kapasitas_per_hari','durasi_hari','preferensi_tanggal_1','waktu_pelaksanaan','lokasi_pelaksanaan','alamat_lokasi',
       'tujuan_mcu','jenis_parameter','fasilitas_dibutuhkan','kebutuhan_khusus_medis','emergency_support',
@@ -31,7 +31,7 @@ const MCU_STAGES = {
       'parameter_belum_ada','status_mapping_final','parameter_risiko_tinggi','potensi_kendala','mitigasi_kendala','validasi_pj_medis'],
     gate:['f01_done','signoff_pj_medis'],
     gateLabel:'F-01 selesai + Sign-off PJ Medis + Admin Project' },
-  S03:{ id:'S03', no:3,  phase:'F1', name:'Pra-Kalkulasi & Approval Harga (RAB)', pic:'Sales + Finance', icon:'💰', form:'F-03-B2B',
+  S03:{ id:'S03', no:3,  phase:'F1', name:'Pra-Kalkulasi & Approval Harga (RAB)', pic:'Sales + Finance', icon:'', form:'F-03-B2B',
     fields:['nama_klien_s03','estimasi_peserta_s03','estimasi_peserta_per_hari','durasi_kegiatan_s03','lokasi_pelaksanaan_s03',
       'jenis_pelaksanaan_s03','mg_s03','harga_jual_per_pax','total_nilai_proyek_s03','estimasi_pph23','skema_addon','skema_pembayaran_s03',
       'tingkat_risiko_s03','faktor_risiko_s03','catatan_mitigasi_risiko','status_form_s03',
@@ -40,14 +40,14 @@ const MCU_STAGES = {
         .flatMap(k=>['best','normal','worst'].map(s=>`skenario_${k}_${s}`))],
     gate:['f02_done','rab_exists'],
     gateLabel:'F-02 selesai + RAB sudah diisi & disetujui Head of Operations' },
-  S04:{ id:'S04', no:4,  phase:'F1', name:'Penguncian Order MCU (F-05)',          pic:'Sales + SPV',   icon:'🔒', form:'F-05-B2B',
+  S04:{ id:'S04', no:4,  phase:'F1', name:'Penguncian Order MCU (F-05)',          pic:'Sales + SPV',   icon:'', form:'F-05-B2B',
     fields:['no_po_kontrak','status_order_s04','pic_finance_klien','total_estimasi_peserta_s04','minimum_guarantee',
       'jenis_pelaksanaan_s04','tanggal_pelaksanaan_s04','durasi_kegiatan_s04','batas_manifest','total_nilai_proyek_s04',
       'termin_pembayaran','skema_pembayaran','mg_dasar_tagihan','ketentuan_addon','harga_per_peserta','sla_hasil_kontraktual',
       'laporan_individu','metode_pengiriman_s04','status_order_final','signed_by_sales','signed_by_spv'],
     gate:['f03_approved','signed_by_sales','signed_by_spv'],
     gateLabel:'F-03 disetujui + F-05 ditandatangani Sales & SPV Project' },
-  S05:{ id:'S05', no:5,  phase:'F1', name:'Technical Meeting & Site Survey',      pic:'Sales + SPV',   icon:'📋', form:'F-TM-B2B',
+  S05:{ id:'S05', no:5,  phase:'F1', name:'Technical Meeting & Site Survey',      pic:'Sales + SPV',   icon:'', form:'F-TM-B2B',
     fields:['hari_tanggal_survey','waktu_pelaksanaan_tm','alamat_lokasi_onsite','pic_klien_tm','tim_survei_onelab',
       'suhu_status','suhu_catatan','listrik_status','listrik_catatan','toilet_status','toilet_catatan',
       'akses_logistik_status','akses_logistik_catatan','alur_ruangan_status','alur_ruangan_catatan','internet_status_tm','internet_catatan',
@@ -56,14 +56,14 @@ const MCU_STAGES = {
       'temuan_site','catatan_tm','signed_tm'],
     gate:['f05_locked'],
     gateLabel:'F-05 sudah dikunci (kedua tanda tangan terpenuhi)' },
-  S06:{ id:'S06', no:6,  phase:'F1', name:'Handover Project ke SPV Project',      pic:'Sales → SPV',   icon:'🤝', form:'F-06-B2B',
+  S06:{ id:'S06', no:6,  phase:'F1', name:'Handover Project ke SPV Project',      pic:'Sales → SPV',   icon:'', form:'F-06-B2B',
     fields:[...[1,2,3,4,5,6,7].flatMap(n=>[`syarat${n}`,`syarat${n}_ket`]), ...[1,2,3,4,5,6,7,8].map(n=>`dok${n}`),
       'pic_spv_project','no_hp_pic','dokter_umum_qty','dokter_spesialis_jenis','analis_lab_qty','radiografer_qty',
       'admin_registrasi_qty','pic_admin_project','tingkat_risiko_s06','kesiapan_logistik','catatan_khusus_sales',
       'catatan_handover','signed_handover_sales','signed_handover_spv'],
     gate:['f05_done','7_syarat_handover'],
     gateLabel:'F-05 selesai + 7 syarat handover F-06 terpenuhi + tanda tangan kedua pihak' },
-  S07:{ id:'S07', no:7,  phase:'F2', name:'Konfigurasi Sistem & Distribusi F-OPS-02', pic:'SPV + IT Ops', icon:'⚙️', form:'F-OPS-02',
+  S07:{ id:'S07', no:7,  phase:'F2', name:'Konfigurasi Sistem & Distribusi F-OPS-02', pic:'SPV + IT Ops', icon:'', form:'F-OPS-02',
     fields:['parameter_sistem','konfirmasi_it_ops','master_data_ready'],
     gate:['f06_done'],
     gateLabel:'F-06 Handover selesai & ditandatangani' },
@@ -71,20 +71,20 @@ const MCU_STAGES = {
     fields:['file_peserta_upload','jumlah_peserta_final','status_cleansing','validasi_admin','validasi_spv'],
     gate:['s07_done'],
     gateLabel:'S07 selesai + Master Data divalidasi Admin Project & SPV' },
-  S09:{ id:'S09', no:9,  phase:'F2', name:'Pengajuan & Approval Dana Kas Gantung', pic:'SPV + Finance', icon:'💵', form:'F-OPS-01',
+  S09:{ id:'S09', no:9,  phase:'F2', name:'Pengajuan & Approval Dana Kas Gantung', pic:'SPV + Finance', icon:'', form:'F-OPS-01',
     fields:['no_order_s09','spv_pemohon','admin_project_s09','tanggal_pengajuan_s09',
       'metode_pencairan','nama_bank_cabang','no_rekening_s09','nama_pemilik_rekening',
       'plafon_f03','pengajuan_sekarang','selisih_plafon','status_plafon',
       'rab_ops_total','pengajuan_dana','approval_finance','dana_cair'],
     gate:['s07_done'],
     gateLabel:'S07/S08 paralel selesai + Finance verifikasi & cairkan dana' },
-  S10:{ id:'S10', no:10, phase:'F2', name:'Persiapan Logistik, Alat & BMHP',     pic:'SPV + PIC BMHP', icon:'📦', form:'F-OPS-02 + F-CKL-01',
+  S10:{ id:'S10', no:10, phase:'F2', name:'Persiapan Logistik, Alat & BMHP',     pic:'SPV + PIC BMHP', icon:'', form:'F-OPS-02 + F-CKL-01',
     fields:['total_peserta_final_s10','estimasi_durasi_s10','teknisi_pemeriksa','baterai_power_status',
       'kabel_aksesoris_status','sertifikat_kalibrasi_status','uji_koneksi_lis','alat_cadangan_status','keputusan_keberangkatan',
       'catatan_teknis_kerusakan','list_bmhp','function_test_result','kalibrasi_status','bmhp_terkemas'],
     gate:['s09_done'],
     gateLabel:'S09 approved + Semua alat LAYAK di F-CKL-01 + BMHP terkemas' },
-  S11:{ id:'S11', no:11, phase:'F2', name:'Penugasan SDM (F-OPS-03)',             pic:'Admin + SPV',   icon:'👥', form:'F-OPS-03',
+  S11:{ id:'S11', no:11, phase:'F2', name:'Penugasan SDM (F-OPS-03)',             pic:'Admin + SPV',   icon:'', form:'F-OPS-03',
     fields:['no_order_s11','spv_project_s11','admin_project_s11',
       ...['registrasi','fisik_tensi','lab_flebotomi','dokter','ekg_penunjang','checkout'].flatMap(k=>[`rasio_${k}_jml`,`rasio_${k}_kap`,`rasio_${k}_ket`]),
       'list_personel','peran_personel','konfirmasi_personel','akses_sistem_diberikan'],
@@ -107,7 +107,7 @@ const MCU_STAGES = {
       'total_hadir','total_unreg','log_unreg_notes','catatan_eksepsi','jam_selesai_layanan'],
     gate:['s13_done'],
     gateLabel:'S13 selesai + Semua peserta sudah Checkout' },
-  S15:{ id:'S15', no:15, phase:'F3', name:'Rekonsiliasi Total & Penerbitan BAST', pic:'SPV + Klien',   icon:'📝', form:'F-OPS-06',
+  S15:{ id:'S15', no:15, phase:'F3', name:'Rekonsiliasi Total & Penerbitan BAST', pic:'SPV + Klien',   icon:'', form:'F-OPS-06',
     fields:['spv_project_s15','pic_klien_s15','total_nilai_addon_s15',
       ...[1,2,3,4,5].map(n=>`rekon${n}_status`),
       'total_terdaftar','total_hadir_bast','total_tidak_hadir','total_unregistered','dasar_tagihan_awal','deviasi_notes','signed_by_spv_bast','signed_by_klien','signed_klien_jabatan'],
@@ -127,7 +127,7 @@ const MCU_STAGES = {
       'laporan_harian','manifest_sampel','log_addon','dokumen_fisik_diterima','admin_konfirmasi'],
     gate:['s15_done'],
     gateLabel:'S15 selesai + Admin Project konfirmasi terima semua dokumen fisik' },
-  S17:{ id:'S17', no:17, phase:'F4', name:'Konsolidasi Master Data & Generate Hasil', pic:'Admin + IT Ops', icon:'🔄', form:'F-19',
+  S17:{ id:'S17', no:17, phase:'F4', name:'Konsolidasi Master Data & Generate Hasil', pic:'Admin + IT Ops', icon:'', form:'F-19',
     fields:['sumber_internal_status','sumber_vendor_status','sumber_bast_status','sumber_addon_status','sumber_unreg_status',
       'dedup_nik_status','standarisasi_nama_status','format_nik_status','format_tgl_lahir_status','validasi_unreg_konsolidasi',
       'masterdata_approved_admin','masterdata_approved_spv',
@@ -142,7 +142,7 @@ const MCU_STAGES = {
       'cek_identitas','cek_parameter','cek_vendor','error_list_l1','resolved_l1','signoff_qc_l1'],
     gate:['s17_done'],
     gateLabel:'S17 selesai + Tidak ada error administratif ATAU semua error resolved' },
-  S19:{ id:'S19', no:19, phase:'F4', name:'QC Layer 2 — Teknis/Analis',           pic:'Analis/Lab PIC', icon:'🔬', form:'F-027 L2',
+  S19:{ id:'S19', no:19, phase:'F4', name:'QC Layer 2 — Teknis/Analis',           pic:'Analis/Lab PIC', icon:'', form:'F-027 L2',
     fields:['qc2_null_value','qc2_delta_check','qc2_critical_value_flag','qc2_resampling_kesesuaian','qc2_alat_validasi','qc2_unit_satuan',
       'null_value_check','critical_value_flag','catatan_teknis','signoff_qc_l2'],
     gate:['s18_done'],
@@ -153,7 +153,7 @@ const MCU_STAGES = {
       'review_dokter','kesimpulan_fit','kesimpulan_fwn','kesimpulan_unfit','catatan_medis','signoff_qc_l3','data_locked'],
     gate:['s19_done'],
     gateLabel:'S19 selesai + Semua peserta punya kesimpulan + Dokter approve digital' },
-  S21:{ id:'S21', no:21, phase:'F4', name:'QC Layer 4 — Produksi PDF & Locking', pic:'Admin Project', icon:'📊', form:'F-027 L4',
+  S21:{ id:'S21', no:21, phase:'F4', name:'QC Layer 4 — Produksi PDF & Locking', pic:'Admin Project', icon:'', form:'F-027 L4',
     fields:['qc4_layout_visual','qc4_lampiran_ekg_rontgen','qc4_enkripsi_password','qc4_text_rendering','qc4_narasi_dokter_lengkap',
       'pdf_individu_count','rekap_kolektif_status','executive_summary_status','re_open_data_log',
       'pdf_generated','placeholder_incomplete','admin_finalize','signoff_qc_l4'],
@@ -180,7 +180,7 @@ const MCU_STAGES = {
       'final_format_validation','paket_laporan','serah_terima_sales','kirim_ke_klien','client_receipt_confirmed_at'],
     gate:['s22_done'],
     gateLabel:'S22 selesai (paralel S23) + Klien konfirmasi penerimaan laporan' },
-  S25:{ id:'S25', no:25, phase:'F5', name:'Penerbitan Invoice',                   pic:'Finance',       icon:'🧾', form:'F-Faktur',
+  S25:{ id:'S25', no:25, phase:'F5', name:'Penerbitan Invoice',                   pic:'Finance',       icon:'', form:'F-Faktur',
     fields:['nomor_invoice','nilai_invoice','tanggal_invoice','deadline_bayar','npwp_klien_status','rekening_tujuan_invoice','ar_register_updated'],
     gate:['s23_done','s24_done','all_deviasi_resolved','f020_3_ttd'],
     gateLabel:'S23+S24 selesai + Semua deviasi resolved + F-020 sudah 3 tanda tangan' },
@@ -189,12 +189,12 @@ const MCU_STAGES = {
       'ar_register','aging_status','follow_up_notes'],
     gate:['s25_done'],
     gateLabel:'S25 selesai + Invoice sudah dikirim ke klien' },
-  S27:{ id:'S27', no:27, phase:'F5', name:'Verifikasi Pembayaran & PPh 23',       pic:'Finance',       icon:'💰', form:'F-032',
+  S27:{ id:'S27', no:27, phase:'F5', name:'Verifikasi Pembayaran & PPh 23',       pic:'Finance',       icon:'', form:'F-032',
     fields:['jenis_pph','tarif_pph','potongan_pajak_rp','nilai_cair_netto','no_seri_bukti_potong','tgl_terima_bukti_potong',
       'bukti_transfer','nominal_bayar','tanggal_bayar','pph23_status','invoice_status_lunas'],
     gate:['s26_done'],
     gateLabel:'S26 selesai + Pembayaran masuk terverifikasi' },
-  S28:{ id:'S28', no:28, phase:'F5', name:'Laporan Realisasi RAB & Gross Margin', pic:'SPV + Finance', icon:'📋', form:'F-031',
+  S28:{ id:'S28', no:28, phase:'F5', name:'Laporan Realisasi RAB & Gross Margin', pic:'SPV + Finance', icon:'', form:'F-031',
     fields:['target_margin_pct',
       'rev_paket_utama_plan','rev_paket_utama_aktual','rev_addon_plan','rev_addon_aktual','total_revenue_plan','total_revenue_aktual',
       'cogs_bmhp_plan','cogs_bmhp_aktual','cogs_fee_medis_plan','cogs_fee_medis_aktual',
@@ -216,7 +216,7 @@ const MCU_STAGES = {
       'tanggal_evaluasi','peserta_evaluasi','temuan_evaluasi','cap_terdokumentasi','signoff_evaluasi'],
     gate:['s24_done'],
     gateLabel:'S24 selesai (trigger pertama) — berjalan paralel dengan FASE 5' },
-  S31:{ id:'S31', no:31, phase:'F6', name:'Survei Kepuasan Klien (NPS)',          pic:'Sales/AM',      icon:'⭐', form:'F-KPK-01',
+  S31:{ id:'S31', no:31, phase:'F6', name:'Survei Kepuasan Klien (NPS)',          pic:'Sales/AM',      icon:'', form:'F-KPK-01',
     fields:['nps_score','feedback_klien','response_received','tanggal_survey'],
     gate:['s24_done'],
     gateLabel:'S24 selesai + Sales kirim kuesioner (maks H+3) + Response atau deadline H+14' },
@@ -734,8 +734,8 @@ function renderMCUList(projects) {
           ${p.value?`<div style="font-size:13px;font-weight:800;color:var(--teal)">${formatCurrency(p.value)}</div>`:''}
           ${p.rab_total?`<div style="font-size:11px;color:var(--text3)">RAB: ${formatCurrency(p.rab_total)}</div>`:''}
           <div style="display:flex;gap:5px;margin-top:8px;justify-content:flex-end;flex-wrap:wrap">
-            <button class="btn btn-ghost btn-xs" onclick="openMCUDetail(${p.id})">📋 Detail</button>
-            <button class="btn btn-outline btn-xs" onclick="openMCUForm(${p.id})">✏️</button>
+            <button class="btn btn-ghost btn-xs" onclick="openMCUDetail(${p.id})">Detail</button>
+            <button class="btn btn-outline btn-xs" onclick="openMCUForm(${p.id})">${icon('edit', 12)}</button>
           </div>
         </div>
       </div>
@@ -766,8 +766,8 @@ async function openMCUForm(id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Project MCU':'🏥 Buat Project MCU Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Project MCU':'Buat Project MCU Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="status-box status-warn" style="margin-bottom:14px;font-size:12.5px">
@@ -841,7 +841,7 @@ async function openMCUForm(id=null) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveMCU(${id||'null'})">
-        ${id?'💾 Simpan':'🏥 Buat Project → Lanjut ke RAB'}
+        ${id?'Simpan':'Buat Project → Lanjut ke RAB'}
       </button>
     </div>`);
 
@@ -993,14 +993,14 @@ async function openRABModal(projectId) {
   openModal(`
     <div class="modal-header">
       <div>
-        <div class="modal-title">💰 RAB — ${p.project_name}</div>
+        <div class="modal-title">RAB — ${p.project_name}</div>
         <div style="font-size:11.5px;color:var(--text3)">
           ${peserta} peserta · ${getSLACategory(peserta)} · SLA Prep H-${getSLAPrep(peserta)}
         </div>
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-outline btn-sm" onclick="printRAB(${projectId})">🖨 Print</button>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
 
@@ -1029,7 +1029,7 @@ async function openRABModal(projectId) {
 
     <!-- BAGIAN 2: PARAMETER PROJECT -->
     <div style="background:var(--bg2);border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
-      <div style="font-weight:700;font-size:12px;color:var(--text);margin-bottom:10px">⚙️ STEP 2 — Parameter Project</div>
+      <div style="font-weight:700;font-size:12px;color:var(--text);margin-bottom:10px">STEP 2 — Parameter Project</div>
       <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
         <div>
           <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:3px">Jumlah Peserta</label>
@@ -1059,9 +1059,9 @@ async function openRABModal(projectId) {
     <!-- BAGIAN 3: BIAYA OPERASIONAL (TEMPLATE) -->
     <div style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-weight:700;font-size:12px;color:var(--text)">📦 STEP 3 — Biaya Operasional (Template)</div>
+        <div style="font-weight:700;font-size:12px;color:var(--text)">STEP 3 — Biaya Operasional (Template)</div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-ghost btn-xs" onclick="rabToggleMode()">🔄 <span id="rab-mode-lbl">Mode Realisasi</span></button>
+          <button class="btn btn-ghost btn-xs" onclick="rabToggleMode()"><span id="rab-mode-lbl">Mode Realisasi</span></button>
         </div>
       </div>
       <div id="rab-ops-table" style="max-height:35vh;overflow-y:auto;border-radius:var(--r);border:1px solid var(--border)"></div>
@@ -1070,7 +1070,7 @@ async function openRABModal(projectId) {
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Kembali</button>
       <button class="btn btn-outline btn-sm" onclick="printRAB(${projectId})">🖨 Print RAB</button>
-      <button class="btn btn-teal" onclick="saveRAB(${projectId})">💾 Simpan & Kunci ke Project</button>
+      <button class="btn btn-teal" onclick="saveRAB(${projectId})">Simpan & Kunci ke Project</button>
     </div>`,'wide');
 
   rabRenderTests();
@@ -1149,7 +1149,7 @@ function rabRenderTests() {
             <td style="padding:6px 10px;text-align:right;font-weight:700;color:var(--teal)">${formatCurrency(totalHPP)}</td>
             <td style="padding:6px;text-align:center">
               <button onclick="rabParams.selectedTests.splice(${i},1);rabRenderTests();rabRecalc()" 
-                class="act-btn del" style="padding:3px 7px">✕</button>
+                class="act-btn del" style="padding:3px 7px" style="font-size:10.5px;font-weight:700"></button>
             </td>
           </tr>`;
         }).join('')}
@@ -1284,7 +1284,7 @@ function rabRecalc() {
     <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-top:6px;
       padding:8px 10px;background:rgba(8,145,178,.06);border-radius:6px">
       <span>🧬 HPP Tes: <strong style="color:var(--teal)">${formatCurrency(hppTests)}</strong></span>
-      <span>📦 HPP Ops: <strong style="color:var(--text)">${formatCurrency(hppOps)}</strong></span>
+      <span>HPP Ops: <strong style="color:var(--text)">${formatCurrency(hppOps)}</strong></span>
       <span style="font-weight:700;color:var(--teal)">= HPP Total: ${formatCurrency(hppTotal)}</span>
       <span>👤 Per Peserta: <strong>${formatCurrency(hppPerPes)}</strong></span>
     </div>`;
@@ -1297,12 +1297,12 @@ function rabRecalc() {
     <!-- Row 1: Summary utama -->
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px">
       ${[
-        {label:'Total Pengeluaran (HPP)',val:formatCurrency(hppTotal), color:'#EF4444',sub:'Plan total cost',      icon:'📤'},
-        {label:'Total Pemasukan',        val:formatCurrency(hargaJual),color:'#0891B2',sub:'Harga jual project',   icon:'📥'},
+        {label:'Total Pengeluaran (HPP)',val:formatCurrency(hppTotal), color:'#EF4444',sub:'Plan total cost',      icon:''},
+        {label:'Total Pemasukan',        val:formatCurrency(hargaJual),color:'#0891B2',sub:'Harga jual project',   icon:''},
         {label:'Gross Margin',           val:formatCurrency(grossMargin),color:'#22C55E',sub:`${grossMarginPct}% dari revenue`,icon:'📈'},
         {label:'Harga per Peserta',      val:formatCurrency(hargaPerPes),color:'#7C3AED',sub:'Harga jual/orang',  icon:'👤'},
-        {label:'Nilai MG (${mg} peserta)',val:formatCurrency(mgValue),  color:'#F59E0B',sub:'Minimum guarantee',  icon:'🔒'},
-        {label:isActual?'HPP Aktual':'HPP Plan',val:formatCurrency(isActual?hppActual:hppTotal),color:isActual&&hppActual>hargaJual?'#EF4444':'#6B7280',sub:isActual?'Realisasi biaya':'Estimasi biaya',icon:isActual?'🔄':'📋'},
+        {label:'Nilai MG (${mg} peserta)',val:formatCurrency(mgValue),  color:'#F59E0B',sub:'Minimum guarantee',  icon:''},
+        {label:isActual?'HPP Aktual':'HPP Plan',val:formatCurrency(isActual?hppActual:hppTotal),color:isActual&&hppActual>hargaJual?'#EF4444':'#6B7280',sub:isActual?'Realisasi biaya':'Estimasi biaya',icon:isActual?'':''},
       ].map(k=>`
         <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;border-top:3px solid ${k.color}">
           <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${k.icon} ${k.label}</div>
@@ -1317,7 +1317,7 @@ function rabRecalc() {
       <!-- Breakdown Scheme -->
       <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:12px">
         <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">
-          📅 Breakdown per Fase Biaya
+          Breakdown per Fase Biaya
         </div>
         ${Object.entries(byScheme).map(([scheme,val])=>{
           const pct = hppOps > 0 ? Math.round(val/hppOps*100) : 0;
@@ -1376,7 +1376,7 @@ function rabRecalc() {
     <!-- Row 3: Fee Margin -->
     <div style="background:linear-gradient(135deg,#0891B2,#0E7490);border-radius:var(--r);padding:12px 16px;color:#fff">
       <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;opacity:.8">
-        💰 Analisis Margin & Fee
+        Analisis Margin & Fee
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
         ${[
@@ -1575,7 +1575,7 @@ async function printRAB(projectId) {
       .sign{margin-top:40px;display:flex;justify-content:space-between}
       .sign div{width:200px;text-align:center;border-top:1px solid #333;padding-top:4px}
     </style></head><body>
-    <h2>💰 RAB (Rencana Anggaran Biaya) — ${p.project_name}</h2>
+    <h2>RAB (Rencana Anggaran Biaya) — ${p.project_name}</h2>
     <div class="sub">${p.partner_name||'—'} · ${peserta} peserta · ${days} hari · Dicetak: ${new Date().toLocaleString('id-ID')}</div>
 
     <div class="summary">
@@ -1633,7 +1633,7 @@ async function openMCUDetail(id) {
   openModal(`
     <div class="modal-header">
       <div>
-        <div class="modal-title">🏥 ${p.project_name}</div>
+        <div class="modal-title">${p.project_name}</div>
         <div style="font-size:11.5px;color:var(--text3)">
           ${p.partner_name||'—'} · ${p.project_type||'MCU'} · ${p.target_participants||0} peserta
           ${p.sla_category?`· ${p.sla_category}`:''}
@@ -1641,9 +1641,9 @@ async function openMCUDetail(id) {
         </div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-teal btn-sm" onclick="closeModalForce();setTimeout(()=>openRABModal(${id}),100)">💰 RAB</button>
-        <button class="btn btn-outline btn-sm" onclick="closeModalForce();setTimeout(()=>openMCUForm(${id}),100)">✏️ Edit</button>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="btn btn-teal btn-sm" onclick="closeModalForce();setTimeout(()=>openRABModal(${id}),100)">RAB</button>
+        <button class="btn btn-outline btn-sm" onclick="closeModalForce();setTimeout(()=>openMCUForm(${id}),100)">Edit</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
 
@@ -1715,10 +1715,10 @@ async function openMCUDetail(id) {
                       PIC: ${stage.pic} · ${stage.form}
                       ${stepData.done_by?` · ${stepData.done_by}`:''} ${stepData.done_date?`· ${formatDateShort(stepData.done_date)}`:''}
                     </div>
-                    ${isActive&&hasIssue?`<div style="font-size:10.5px;color:#DC2626;margin-top:3px">⛔ ${gateUnmet[0]}</div>`:''}
+                    ${isActive&&hasIssue?`<div style="font-size:10.5px;color:#DC2626;margin-top:3px">${gateUnmet[0]}</div>`:''}
                   </div>
                   <div style="font-size:10px;white-space:nowrap;text-align:right">
-                    ${isDone?'<span class="badge badge-green" style="font-size:10px">✅ Done</span>':isActive?`<span class="badge ${hasIssue?'badge-red':'badge-teal'}" style="font-size:10px">${hasIssue?'⛔ Blocked':'🔵 Aktif'}</span>`:'<span style="color:var(--text3);font-size:11px">⚪</span>'}
+                    ${isDone?'<span class="badge badge-green" style="font-size:10px">✅ Done</span>':isActive?`<span class="badge ${hasIssue?'badge-red':'badge-teal'}" style="font-size:10px">${hasIssue?'Blocked':'🔵 Aktif'}</span>`:'<span style="color:var(--text3);font-size:11px">⚪</span>'}
                   </div>
                 </div>`;
             }).join('')}
@@ -1730,7 +1730,7 @@ async function openMCUDetail(id) {
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
       ${curNo<=31?`
         <button class="btn btn-outline btn-sm" onclick="openStepForm(${id},'S${String(curNo).padStart(2,'0')}')">
-          📝 Isi Form ${`S${String(curNo).padStart(2,'0')}`}
+          Isi Form ${`S${String(curNo).padStart(2,'0')}`}
         </button>
         <button class="btn btn-teal" onclick="advanceMCUStep(${id})">
           ▶ Lanjut ke ${`S${String(Math.min(curNo+1,31)).padStart(2,'0')}`}
@@ -1793,17 +1793,17 @@ async function openStepForm(projectId, stageId) {
           ${phase?.label||''} · Form: ${stage.form} · PIC: ${stage.pic}
         </div>
       </div>
-      <button class="modal-close" onclick="closeModalForce();openMCUDetail(${projectId})">✕</button>
+      <button class="modal-close" onclick="closeModalForce();openMCUDetail(${projectId})" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     ${gateUnmet.length?`
     <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
-      <div style="font-weight:700;color:#DC2626;margin-bottom:6px">⛔ Gate Condition Belum Terpenuhi</div>
+      <div style="font-weight:700;color:#DC2626;margin-bottom:6px">Gate Condition Belum Terpenuhi</div>
       ${gateUnmet.map(g=>`<div style="font-size:12.5px;color:#DC2626;margin-bottom:4px">• ${g}</div>`).join('')}
       <div style="font-size:11.5px;color:#9CA3AF;margin-top:8px">Anda masih bisa melihat & mengisi form ini, namun tidak bisa menandai sebagai Done.</div>
     </div>`:''}
 
-    ${isLocked?`<div class="status-box status-warn" style="margin-bottom:14px;font-size:12px">🔒 F-05 sudah dikunci. Data ini READ-ONLY. Perubahan hanya via Form Addendum.</div>`:''}
+    ${isLocked?`<div class="status-box status-warn" style="margin-bottom:14px;font-size:12px">F-05 sudah dikunci. Data ini READ-ONLY. Perubahan hanya via Form Addendum.</div>`:''}
 
     ${renderStageForm(stage, merged, p, isLocked)}
 
@@ -1826,7 +1826,7 @@ async function openStepForm(projectId, stageId) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce();openMCUDetail(${projectId})">Kembali</button>
-      ${!isLocked?`<button class="btn btn-teal" onclick="saveStepForm(${projectId},'${stageId}')">💾 Simpan</button>`:''}
+      ${!isLocked?`<button class="btn btn-teal" onclick="saveStepForm(${projectId},'${stageId}')">Simpan</button>`:''}
       ${gateUnmet.length===0&&!isLocked?`<button class="btn btn-accent" onclick="markStageDone(${projectId},'${stageId}')">✅ Tandai Done & Lanjut</button>`:''}
     </div>`,'wide');
 
@@ -1965,7 +1965,7 @@ function renderDynTable(key) {
                 oninput="dynTableUpdateField('${key}',${idx},'${c.key}',this.value)"></td>`;
             }).join('')}
             <td style="padding:3px;text-align:center">
-              <button type="button" class="act-btn del" style="padding:2px 6px" onclick="dynTableRemoveRow('${key}',${idx})">✕</button>
+              <button type="button" class="act-btn del" style="padding:2px 6px" onclick="dynTableRemoveRow('${key}',${idx})" style="font-size:10.5px;font-weight:700"></button>
             </td>
           </tr>`).join('')}
       </tbody>
@@ -2321,7 +2321,7 @@ function renderStageForm(stage, data, project, readOnly) {
 
     S04: ()=>`
       <div class="status-box status-warn" style="margin-bottom:12px;font-size:12px">
-        🔒 Setelah kedua tanda tangan → F-05 DIKUNCI. Data tidak bisa diubah kecuali via Addendum.
+        Setelah kedua tanda tangan → F-05 DIKUNCI. Data tidak bisa diubah kecuali via Addendum.
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin:4px 0">A. Informasi Utama Kontrak</div>
       <div class="form-row">
@@ -2984,7 +2984,7 @@ function renderStageForm(stage, data, project, readOnly) {
 
     S14: ()=>`
       <div class="status-box status-ok" style="margin-bottom:12px;font-size:12px">
-        📋 Data dari Master Peserta (S08): <strong>${val('total_terdaftar')||project.target_participants||'—'}</strong> terdaftar
+        Data dari Master Peserta (S08): <strong>${val('total_terdaftar')||project.target_participants||'—'}</strong> terdaftar
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin:4px 0">Log Peserta per Stasiun (C. F-CKL-03)</div>
       ${!readOnly?dynTableWidget('tbl_s14_peserta',[
@@ -3047,7 +3047,7 @@ function renderStageForm(stage, data, project, readOnly) {
 
     S15: ()=>`
       <div class="status-box status-ok" style="margin-bottom:12px;font-size:12px">
-        📋 Data dari Master Peserta (S08): <strong>${val('total_terdaftar')||project.target_participants||'—'}</strong> terdaftar
+        Data dari Master Peserta (S08): <strong>${val('total_terdaftar')||project.target_participants||'—'}</strong> terdaftar
       </div>
       <div class="form-row">
         <div class="form-group"><label>SPV Project (OneLab)</label><input type="text" id="sf_spv_project_s15" value="${val('spv_project_s15')||project.pic_spv||''}" ${ro}></div>
@@ -3310,7 +3310,7 @@ function renderStageForm(stage, data, project, readOnly) {
 
     S18: ()=>`
       <div class="status-box status-info" style="margin-bottom:12px;font-size:11.5px">
-        🔒 QC berlapis bersifat SEKUENSIAL — tidak ada lapisan yang boleh dilompati.
+        QC berlapis bersifat SEKUENSIAL — tidak ada lapisan yang boleh dilompati.
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin:4px 0">Layer 1: Administratif — 7 Item Wajib</div>
       ${[
@@ -3388,7 +3388,7 @@ function renderStageForm(stage, data, project, readOnly) {
       <div class="form-group"><label>Jumlah Unfit</label><input type="number" id="sf_jumlah_kesimpulan_unfit" value="${val('jumlah_kesimpulan_unfit')}" ${ro}></div>
 
       <div class="status-box status-err" style="margin:10px 0;font-size:11.5px">
-        🚨 Protokol Critical Value — WAJIB sebelum laporan dikirim, notifikasi maks 1×24 jam sejak diketahui.
+        Protokol Critical Value — WAJIB sebelum laporan dikirim, notifikasi maks 1×24 jam sejak diketahui.
       </div>
       <div class="form-row">
         <div class="form-group"><label>Nilai Kritis Terkonfirmasi Klinis</label>
@@ -3588,7 +3588,7 @@ function renderStageForm(stage, data, project, readOnly) {
       </div>
 
       <div class="status-box status-ok" style="margin:14px 0 12px;font-size:12px">
-        📋 Dasar tagihan awal (dari BAST S15): <strong>${formatCurrency(parseFloat(val('dasar_tagihan_awal')||project.dasar_tagihan_bast||0))}</strong>
+        Dasar tagihan awal (dari BAST S15): <strong>${formatCurrency(parseFloat(val('dasar_tagihan_awal')||project.dasar_tagihan_bast||0))}</strong>
       </div>
       <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin:14px 0 4px">Penyesuaian Deviasi (F-019 → F-020)</div>
       <div class="form-row">
@@ -4080,7 +4080,7 @@ async function saveStepForm(projectId, stageId) {
     if (formData.f05_locked === 'true' && formData.signed_by_sales && formData.signed_by_spv) {
       projUpdate.f05_locked = true;
       projUpdate.f05_signed_at = new Date().toISOString();
-      toast('🔒 F-05 dikunci! Data order tidak bisa diubah lagi.','warn',4000);
+      toast('F-05 dikunci! Data order tidak bisa diubah lagi.','warn',4000);
     }
   }
   if (stageId === 'S06') {
@@ -4142,7 +4142,7 @@ async function markStageDone(projectId, stageId) {
   // Final gate check
   const unmet = checkGate(stage, p, stepsArr||[]);
   if (unmet.length) {
-    toast('⛔ ' + unmet[0],'err',5000);
+    toast('' + unmet[0],'err',5000);
     return;
   }
 

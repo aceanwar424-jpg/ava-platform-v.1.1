@@ -11,11 +11,11 @@ const MOOD_LABELS     = ['','Exhausted','Okay','Good','Great'];
 const LINK_TYPES = {
   'gdoc':   { icon:'📄', label:'Google Doc' },
   'gdrive': { icon:'📁', label:'Google Drive' },
-  'gsheet': { icon:'📊', label:'Google Sheet' },
+  'gsheet': { icon:'', label:'Google Sheet' },
   'notion': { icon:'📓', label:'Notion' },
   'figma':  { icon:'🎨', label:'Figma' },
   'wa':     { icon:'💬', label:'WhatsApp' },
-  'link':   { icon:'🔗', label:'Link Lain' },
+  'link':   { icon:'', label:'Link Lain' },
 };
 
 function detectLinkType(url) {
@@ -68,7 +68,7 @@ async function renderTaskManagement(view='mytasks') {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📋 Task Management</h1>
+        <h1>Task Management</h1>
         <p>Alokasi task harian berdasarkan kapasitas shift — Primary & Secondary</p>
       </div>
       <div class="btn-row">
@@ -79,10 +79,10 @@ async function renderTaskManagement(view='mytasks') {
 
     <!-- Nav tabs -->
     <div class="ms-topbar" style="margin-bottom:18px">
-      <button class="ms-tab ${view==='mytasks'?'active':''}" onclick="renderTaskManagement('mytasks')">📋 My Tasks</button>
-      <button class="ms-tab ${view==='team'?'active':''}"    onclick="renderTaskManagement('team')">👥 Team Board</button>
-      <button class="ms-tab ${view==='logbook'?'active':''}" onclick="renderTaskManagement('logbook')">📝 Logbook</button>
-      <button class="ms-tab ${view==='weekly'?'active':''}"  onclick="renderTaskManagement('weekly')">📊 Weekly Summary</button>
+      <button class="ms-tab ${view==='mytasks'?'active':''}" onclick="renderTaskManagement('mytasks')">My Tasks</button>
+      <button class="ms-tab ${view==='team'?'active':''}"    onclick="renderTaskManagement('team')">Team Board</button>
+      <button class="ms-tab ${view==='logbook'?'active':''}" onclick="renderTaskManagement('logbook')">Logbook</button>
+      <button class="ms-tab ${view==='weekly'?'active':''}"  onclick="renderTaskManagement('weekly')">Weekly Summary</button>
     </div>
 
     <div id="task-main-area">
@@ -222,7 +222,7 @@ function renderMyTasks() {
       display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer"
       onclick="renderTaskManagement('logbook')">
       <div style="color:#fff">
-        <div style="font-weight:700;font-size:13px">📝 Isi Daily Logbook</div>
+        <div style="font-weight:700;font-size:13px">Isi Daily Logbook</div>
         <div style="font-size:11.5px;opacity:.8">Rekap aktivitas hari ini sebelum EOD</div>
       </div>
       <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">
@@ -239,7 +239,7 @@ function renderTaskCards(tasks, type) {
     </div>`;
   }
   const STATUS_COLOR = {Todo:'#94A3B8',InProgress:'#0891B2',Done:'#22C55E',Blocked:'#EF4444',CarryOver:'#F59E0B'};
-  const STATUS_ICON  = {Todo:'⬜',InProgress:'🔵',Done:'✅',Blocked:'🚫',CarryOver:'🔄'};
+  const STATUS_ICON  = {Todo:'⬜',InProgress:'🔵',Done:'✅',Blocked:'🚫',CarryOver:''};
 
   return tasks.map(t=>`
     <div style="background:#fff;border:1.5px solid ${t.status==='Done'?'#BBF7D0':t.status==='Blocked'?'#FECACA':'var(--border)'};
@@ -263,7 +263,7 @@ function renderTaskCards(tasks, type) {
           <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;align-items:center">
             <span style="font-size:11px;color:var(--text3)">📁 ${t.category||'Admin'}</span>
             <span style="font-size:11px;color:var(--text3)">⏱ ${t.alokasi_jam||1}j plan${t.actual_jam?` · ${t.actual_jam}j aktual`:''}</span>
-            ${t.carry_over_from?`<span class="badge badge-gold" style="font-size:10px">🔄 Carry-over</span>`:''}
+            ${t.carry_over_from?`<span class="badge badge-gold" style="font-size:10px">Carry-over</span>`:''}
             ${t.priority==='High'||t.priority==='Critical'?`<span class="badge badge-red" style="font-size:10px">❗ ${t.priority}</span>`:''}
             <span style="font-size:11px;background:${STATUS_COLOR[t.status]||'var(--bg2)'}20;
               color:${STATUS_COLOR[t.status]||'var(--text3)'};padding:1px 7px;border-radius:10px;font-weight:600">
@@ -274,7 +274,7 @@ function renderTaskCards(tasks, type) {
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div onclick="event.stopPropagation()" style="display:flex;gap:4px">
-            <button class="act-btn edit" onclick="openTaskForm(${t.id})" title="Edit">✏️</button>
+            <button class="act-btn edit" onclick="openTaskForm(${t.id})" title="Edit">${icon('edit', 12)}</button>
             ${t.status!=='Done'?`<button class="act-btn" onclick="event.stopPropagation();markTaskDone(${t.id})" 
               style="color:#22C55E" title="Selesai">✅</button>`:''}
           </div>
@@ -286,7 +286,7 @@ function renderTaskCards(tasks, type) {
           <a href="${l.url}" target="_blank" onclick="event.stopPropagation()"
             style="display:flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;
               border-radius:6px;background:var(--bg2);color:var(--teal);text-decoration:none;border:1px solid var(--border)">
-            ${LINK_TYPES[l.type]?.icon||'🔗'} ${l.label||l.url.slice(0,30)}
+            ${LINK_TYPES[l.type]?.icon||''} ${l.label||l.url.slice(0,30)}
           </a>`).join('')}
       </div>`:''}
     </div>`).join('');
@@ -310,10 +310,10 @@ function showOverdueTasksModal() {
   openModal(`
     <div class="modal-header">
       <div class="modal-title">⚠️ ${overdue.length} Task Overdue</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      <button class="btn btn-teal btn-sm" onclick="rescheduleAllOverdue()">📅 Pindahkan Semua ke Hari Ini</button>
+      <button class="btn btn-teal btn-sm" onclick="rescheduleAllOverdue()">Pindahkan Semua ke Hari Ini</button>
     </div>
     <div style="max-height:55vh;overflow-y:auto">
       ${overdue.map(t=>`
@@ -327,7 +327,7 @@ function showOverdueTasksModal() {
             </div>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="rescheduleOverdueTask(${t.id})">→ Hari Ini</button>
-          <button class="btn btn-ghost btn-sm" onclick="closeModalForce();openTaskForm(${t.id})">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="closeModalForce();openTaskForm(${t.id})">${icon('edit', 12)}</button>
         </div>`).join('')}
     </div>
     <div class="modal-footer">
@@ -374,7 +374,7 @@ function renderTeamBoard() {
   const canSeeTeam = isSpv();
 
   if (!canSeeTeam) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🔒</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Akses Terbatas</h3><p>Team Board hanya bisa diakses SPV dan Manager.</p></div>`;
     return;
   }
@@ -468,7 +468,7 @@ function filterTeamDay(emp, date) {
   const dateLabel = new Date(date+'T00:00:00').toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
   el.innerHTML = `
     <div class="card">
-      <div class="card-title" style="margin-bottom:12px">📋 ${emp} — ${dateLabel}</div>
+      <div class="card-title" style="margin-bottom:12px">${emp} — ${dateLabel}</div>
       ${tasks.length ? renderTaskCards(tasks,'ALL') : '<div style="color:var(--text3);font-size:13px">Tidak ada task</div>'}
       <div style="margin-top:10px">
         <button class="btn btn-teal btn-sm" onclick="openTaskForm(null,'PRIMARY','${date}','${emp}')">+ Assign Task ke ${emp.split(' ')[0]}</button>
@@ -512,7 +512,7 @@ async function renderLogbook() {
     ${log.status?`
     <div style="background:${ {Draft:'#F1F5F9',Submitted:'#EFF6FF',Approved:'#DCFCE7',Revision:'#FEF3C7'}[log.status]||'var(--bg2)'};
       border-radius:var(--r);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
-      <span style="font-size:20px">${{Draft:'📝',Submitted:'⏳',Approved:'✅',Revision:'⚠️'}[log.status]}</span>
+      <span style="font-size:20px">${{Draft:'',Submitted:'⏳',Approved:'✅',Revision:'⚠️'}[log.status]}</span>
       <div>
         <div style="font-weight:700;font-size:13px">Status Logbook: ${log.status}</div>
         ${log.spv_notes?`<div style="font-size:12px;color:var(--text3);margin-top:2px">Catatan SPV: ${log.spv_notes}</div>`:''}
@@ -526,7 +526,7 @@ async function renderLogbook() {
         {icon:'✅', val:doneTasks.length, label:'Task Done',     color:'#22C55E'},
         {icon:'⏳', val:pendTasks.length, label:'Task Pending',  color:'#F59E0B'},
         {icon:'⏱', val:totPlan.toFixed(1)+'j', label:'Jam Plan',color:'#0891B2'},
-        {icon:'⚡', val:totActual.toFixed(1)+'j',label:'Jam Aktual',color:'#7C3AED'},
+        {icon:'', val:totActual.toFixed(1)+'j',label:'Jam Aktual',color:'#7C3AED'},
       ].map(k=>`
         <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);
           padding:10px 12px;border-top:3px solid ${k.color};text-align:center">
@@ -538,7 +538,7 @@ async function renderLogbook() {
 
     <!-- Form logbook -->
     <div class="card" style="margin-bottom:14px">
-      <div class="card-title" style="margin-bottom:14px">📝 Daily Log</div>
+      <div class="card-title" style="margin-bottom:14px">Daily Log</div>
 
       <div class="form-group">
         <label>Apa yang saya kerjakan hari ini?</label>
@@ -557,7 +557,7 @@ async function renderLogbook() {
       ${pendTasks.length?`
       <div style="background:#FFF7ED;border-radius:var(--r);padding:12px;margin-bottom:14px">
         <div style="font-weight:700;font-size:12px;color:#C2410C;margin-bottom:8px">
-          🔄 Task Pending — akan di-carry-over ke besok (${pendTasks.length} task)
+          Task Pending — akan di-carry-over ke besok (${pendTasks.length} task)
         </div>
         ${pendTasks.map(t=>`
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:12.5px">
@@ -609,15 +609,15 @@ async function renderLogbook() {
     <!-- Logbook actions -->
     ${!isLocked?`
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-ghost btn-sm" onclick="saveLogbook('${today}','Draft')">💾 Simpan Draft</button>
-      <button class="btn btn-teal" onclick="submitLogbook('${today}')">📤 Submit ke SPV</button>
+      <button class="btn btn-ghost btn-sm" onclick="saveLogbook('${today}','Draft')">Simpan Draft</button>
+      <button class="btn btn-teal" onclick="submitLogbook('${today}')">Submit ke SPV</button>
     </div>`:`
     <div class="status-box status-ok">✅ Logbook sudah disetujui SPV. Tidak bisa diubah lagi.</div>`}
 
     <!-- SPV: logbook pending review -->
     ${isSpvUser?`
     <div style="margin-top:20px">
-      <div class="card-title" style="margin-bottom:12px">👥 Logbook Tim — Perlu Review</div>
+      <div class="card-title" style="margin-bottom:12px">Logbook Tim — Perlu Review</div>
       <div id="spv-logbook-list"><div class="spinner"></div></div>
     </div>`:''}`;
 
@@ -775,7 +775,7 @@ async function renderWeeklySummary() {
   const isManagerUser = isManager();
 
   if (!isManagerUser) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🔒</div>
+    el.innerHTML = `<div class="empty-state"><div class="ico"></div>
       <h3>Akses Terbatas</h3><p>Weekly Summary hanya untuk Manager & Admin.</p></div>`;
     return;
   }
@@ -811,7 +811,7 @@ async function renderWeeklySummary() {
       </div>
 
       ${Object.keys(empGroups).length===0?`
-        <div class="empty-state"><div class="ico">📊</div>
+        <div class="empty-state"><div class="ico"></div>
           <h3>Belum ada data minggu ini</h3>
           <p>Data muncul setelah SPV menyetujui logbook anggota tim.</p>
         </div>`
@@ -884,8 +884,8 @@ async function openTaskForm(id=null, defaultType='PRIMARY', defaultDate=null, de
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📋 ${id?'Edit Task':'Task Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Task':'Task Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-group">
@@ -959,15 +959,15 @@ async function openTaskForm(id=null, defaultType='PRIMARY', defaultDate=null, de
 
     <!-- Links section -->
     <div class="form-group">
-      <label>🔗 Links & Referensi</label>
+      <label>Links & Referensi</label>
       <div id="tf-links-list">
         ${links.map((l,i)=>`
           <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center" id="tf-link-row-${i}">
-            <span style="font-size:16px">${LINK_TYPES[l.type]?.icon||'🔗'}</span>
+            <span style="font-size:16px">${LINK_TYPES[l.type]?.icon||''}</span>
             <input type="text" value="${l.label||''}" placeholder="Label" style="width:120px;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px">
             <input type="url" value="${l.url}" placeholder="https://..." style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px"
               oninput="autoDetectLinkType(this,${i})">
-            <button onclick="document.getElementById('tf-link-row-${i}').remove()" class="act-btn del">✕</button>
+            <button onclick="document.getElementById('tf-link-row-${i}').remove()" class="act-btn del" style="font-size:10.5px;font-weight:700"></button>
           </div>`).join('')}
         <div id="tf-links-extra"></div>
       </div>
@@ -976,8 +976,8 @@ async function openTaskForm(id=null, defaultType='PRIMARY', defaultDate=null, de
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      ${id?`<button class="btn btn-danger btn-sm" onclick="deleteTask(${id})">🗑 Hapus</button>`:''}
-      <button class="btn btn-teal" onclick="saveTask(${id||'null'})">💾 Simpan Task</button>
+      ${id?`<button class="btn btn-danger btn-sm" onclick="deleteTask(${id})">Hapus</button>`:''}
+      <button class="btn btn-teal" onclick="saveTask(${id||'null'})">Simpan Task</button>
     </div>`);
 
   // Kapasitas hint
@@ -993,18 +993,18 @@ function addLinkRow() {
   const i = `new_${++linkRowCount}`;
   el.insertAdjacentHTML('beforeend',`
     <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center" id="tf-link-row-${i}">
-      <span style="font-size:16px" id="tf-link-icon-${i}">🔗</span>
+      <span style="font-size:16px" id="tf-link-icon-${i}"></span>
       <input type="text" id="tf-link-label-${i}" placeholder="Label" style="width:120px;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px">
       <input type="url" id="tf-link-url-${i}" placeholder="https://..." style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px"
         oninput="autoDetectIcon('tf-link-icon-${i}',this.value)">
-      <button onclick="document.getElementById('tf-link-row-${i}').remove()" class="act-btn del">✕</button>
+      <button onclick="document.getElementById('tf-link-row-${i}').remove()" class="act-btn del" style="font-size:10.5px;font-weight:700"></button>
     </div>`);
 }
 
 function autoDetectIcon(iconElId, url) {
   const t = detectLinkType(url);
   const el = document.getElementById(iconElId);
-  if (el) el.textContent = LINK_TYPES[t]?.icon||'🔗';
+  if (el) el.textContent = LINK_TYPES[t]?.icon||'';
 }
 
 function updateCapacityHint() {
@@ -1104,8 +1104,8 @@ async function openTaskDetail(id) {
         <div style="font-size:11.5px;color:var(--text3)">${t.category||'Admin'} · ${t.type} · ${t.assigned_to||'—'}</div>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-outline btn-sm" onclick="closeModalForce();openTaskForm(${id})">✏️ Edit</button>
-        <button class="modal-close" onclick="closeModalForce()">✕</button>
+        <button class="btn btn-outline btn-sm" onclick="closeModalForce();openTaskForm(${id})">Edit</button>
+        <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
 
@@ -1120,24 +1120,24 @@ async function openTaskDetail(id) {
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;font-size:12.5px">
       ${[
-        ['📅 Due Date', t.due_date||(t.due_time?'—':'—')],
+        ['Due Date', t.due_date||(t.due_time?'—':'—')],
         ['⏱ Alokasi', `${t.alokasi_jam||1}j plan · ${t.actual_jam||0}j aktual`],
         ['👤 Assigned To', t.assigned_to||'—'],
         ['👤 Assigned By', t.assigned_by||'—'],
-        ['🔄 Carry-over', t.carry_over_count?`${t.carry_over_count}x`:'—'],
+        ['Carry-over', t.carry_over_count?`${t.carry_over_count}x`:'—'],
         ['🏷 Tags', t.tags||'—'],
       ].map(([l,v])=>`<div><span style="color:var(--text3)">${l}: </span><strong>${v}</strong></div>`).join('')}
     </div>
 
     ${t._links?.length?`
     <div style="margin-bottom:14px">
-      <div style="font-weight:700;font-size:12px;margin-bottom:8px">🔗 Links</div>
+      <div style="font-weight:700;font-size:12px;margin-bottom:8px">Links</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
         ${t._links.map(l=>`
           <a href="${l.url}" target="_blank" style="display:flex;align-items:center;gap:5px;
             padding:5px 10px;border-radius:6px;background:var(--bg2);color:var(--teal);
             text-decoration:none;border:1px solid var(--border);font-size:12px">
-            ${LINK_TYPES[l.type]?.icon||'🔗'} ${l.label||l.url.slice(0,40)}
+            ${LINK_TYPES[l.type]?.icon||''} ${l.label||l.url.slice(0,40)}
           </a>`).join('')}
       </div>
     </div>`:''}
@@ -1151,12 +1151,12 @@ async function openTaskDetail(id) {
         </button>`).join('')}
     </div>
 
-    ${t.carry_over_note?`<div class="status-box status-warn" style="margin-bottom:14px;font-size:12px">🔄 ${t.carry_over_note}</div>`:''}
+    ${t.carry_over_note?`<div class="status-box status-warn" style="margin-bottom:14px;font-size:12px">${t.carry_over_note}</div>`:''}
 
     <!-- Activity log -->
     ${tlogs?.length?`
     <div style="margin-top:14px">
-      <div style="font-weight:700;font-size:12px;margin-bottom:8px">📋 Activity Log</div>
+      <div style="font-weight:700;font-size:12px;margin-bottom:8px">Activity Log</div>
       ${tlogs.map(l=>`
         <div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">
           <span style="color:var(--text3)">${l.created_at?.slice(0,16)||'—'}</span>
@@ -1200,7 +1200,7 @@ async function deleteTask(id) {
   if (!confirm('Hapus task ini?')) return;
   try {
     await sbDelete('tasks',id);
-    toast('🗑 Task dihapus','info');
+    toast('Task dihapus','info');
     closeModalForce();
     await loadTaskData();
     renderMyTasks();

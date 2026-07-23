@@ -5,7 +5,7 @@
 // ═══════════════════════════════════════════
 
 const PAYMENT_METHODS = [
-  {id:'cash',    label:'Cash',              icon:'💵'},
+  {id:'cash',    label:'Cash',              icon:''},
   {id:'debit',   label:'Kartu Debit',       icon:'💳'},
   {id:'credit',  label:'Kartu Kredit',      icon:'💳'},
   {id:'transfer',label:'Transfer Bank',     icon:'🏦'},
@@ -14,9 +14,9 @@ const PAYMENT_METHODS = [
   {id:'gopay',   label:'GoPay',             icon:'💚'},
   {id:'dana',    label:'DANA',              icon:'💙'},
   {id:'xendit',  label:'Xendit/VA',         icon:'🔵'},
-  {id:'bpjs',    label:'BPJS Kesehatan',    icon:'🏥'},
+  {id:'bpjs',    label:'BPJS Kesehatan',    icon:''},
   {id:'corporate',label:'Tagihan Korporat', icon:'🏢'},
-  {id:'voucher', label:'Voucher',           icon:'🎟'},
+  {id:'voucher', label:'Voucher',           icon:''},
 ];
 
 const TXN_TYPES = ['Payment','Refund','Cancellation','Corporate Bill'];
@@ -51,7 +51,7 @@ async function renderCashier() {
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div style="font-size:13px;font-weight:700;color:var(--navy)">⏳ Antrian Pembayaran</div>
-        <button class="btn btn-ghost btn-sm" onclick="loadCashierQueue()">🔄 Refresh</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadCashierQueue()">Refresh</button>
       </div>
       <div id="cashier-queue">
         <div class="loading-row"><div class="spinner"></div></div>
@@ -61,7 +61,7 @@ async function renderCashier() {
     <!-- Transaction History -->
     <div class="table-wrap">
       <div class="table-toolbar">
-        <input class="table-search" id="cash-q" placeholder="🔍 Cari no. transaksi, nama pasien..."
+        <input class="table-search" id="cash-q" placeholder="Cari no. transaksi, nama pasien..."
           oninput="filterCashier()" style="flex:1">
         <select class="table-filter" id="cash-type" onchange="filterCashier()">
           <option value="">Semua Tipe</option>
@@ -131,12 +131,12 @@ function renderCashierKPI() {
   const nonCash    = totalIn - cashTotal;
 
   el.innerHTML=[
-    {icon:'💰',val:formatCurrency(totalIn),  label:'Total Revenue',   color:'#22C55E'},
-    {icon:'💵',val:formatCurrency(cashTotal),label:'Cash',            color:'#0EA5E9'},
+    {icon:'',val:formatCurrency(totalIn),  label:'Total Revenue',   color:'#22C55E'},
+    {icon:'',val:formatCurrency(cashTotal),label:'Cash',            color:'#0EA5E9'},
     {icon:'📱',val:formatCurrency(nonCash),  label:'Non-Cash',        color:'#8B5CF6'},
-    {icon:'🔄',val:refunds.length,           label:'Refund',          color:'#F59E0B'},
+    {icon:'',val:refunds.length,           label:'Refund',          color:'#F59E0B'},
     {icon:'🏢',val:corpBills.length,         label:'Tagihan Korporat',color:'#F97316'},
-    {icon:'📋',val:payments.length,          label:'Transaksi',       color:'#0A2342'},
+    {icon:'',val:payments.length,          label:'Transaksi',       color:'#0A2342'},
   ].map(k=>`
     <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:18px">${k.icon}</div>
@@ -159,7 +159,7 @@ function renderCashierTable(data) {
   const el=document.getElementById('cashier-tbody'); if (!el) return;
   if (!data.length) {
     el.innerHTML=`<div class="empty-state" style="padding:40px">
-      <div class="ico">💰</div>
+      <div class="ico"></div>
       <h3>${cashierAll.length?'Tidak ada hasil':'Belum ada transaksi hari ini'}</h3>
     </div>`; return;
   }
@@ -169,7 +169,7 @@ function renderCashierTable(data) {
     <th>Metode</th><th>Total</th><th>Kasir</th><th>Waktu</th><th>Aksi</th>
   </tr></thead><tbody>
   ${data.map(t=>{
-    const pm=PAYMENT_METHODS.find(m=>m.id===t.payment_method)||{icon:'💰',label:t.payment_method||'—'};
+    const pm=PAYMENT_METHODS.find(m=>m.id===t.payment_method)||{icon:'',label:t.payment_method||'—'};
     const tc=typeColors[t.transaction_type]||'#94A3B8';
     return `<tr>
       <td style="font-family:monospace;font-size:11px;font-weight:700">${t.transaction_number||'—'}</td>
@@ -185,7 +185,7 @@ function renderCashierTable(data) {
       <td>
         <div class="act-row">
           <button class="act-btn" onclick="printReceipt(${t.id})" title="Print Struk">🖨</button>
-          ${t.transaction_type==='Payment'?`<button class="act-btn del" onclick="openRefundForm(${t.id})" title="Refund">🔄</button>`:''}
+          ${t.transaction_type==='Payment'?`<button class="act-btn del" onclick="openRefundForm(${t.id})" title="Refund"></button>`:''}
         </div>
       </td>
     </tr>`;
@@ -209,8 +209,8 @@ async function openPaymentForm(admissionId=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">💰 Transaksi Pembayaran</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Transaksi Pembayaran</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div class="form-row">
@@ -278,7 +278,7 @@ async function openPaymentForm(admissionId=null) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="processPayment('${txnNum}','${user}')">💰 Proses Pembayaran</button>
+      <button class="btn btn-teal" onclick="processPayment('${txnNum}','${user}')">Proses Pembayaran</button>
     </div>`);
 
   // Auto-select cash
@@ -410,8 +410,8 @@ async function openRefundForm(txnId) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🔄 Refund — ${t.patient_name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Refund — ${t.patient_name}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:#FFF8E1;border-radius:8px;padding:12px;margin-bottom:14px">
       <div>Transaksi: <strong>${t.transaction_number}</strong></div>
@@ -438,7 +438,7 @@ async function openRefundForm(txnId) {
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-danger" onclick="processRefund(${txnId})">🔄 Proses Refund</button>
+      <button class="btn btn-danger" onclick="processRefund(${txnId})">Proses Refund</button>
     </div>`);
 }
 
@@ -491,7 +491,7 @@ async function printReceipt(txnId) {
 
   const orgName = localStorage.getItem('ol_org_name')||'OneLab Diagnostics';
   const orgAddr = localStorage.getItem('ol_org_addr')||'';
-  const pm      = PAYMENT_METHODS.find(m=>m.id===t.payment_method)||{icon:'💰',label:t.payment_method||'—'};
+  const pm      = PAYMENT_METHODS.find(m=>m.id===t.payment_method)||{icon:'',label:t.payment_method||'—'};
 
   const w=window.open('','_blank','width=400,height:600');
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -541,8 +541,8 @@ async function openCashierReport() {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📊 Laporan Kasir — ${today}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Laporan Kasir — ${today}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
       <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center">
@@ -560,7 +560,7 @@ async function openCashierReport() {
     </div>
     <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">Per Metode Pembayaran</div>
     ${Object.entries(byMethod).map(([method,amount])=>{
-      const pm=PAYMENT_METHODS.find(m=>m.id===method)||{icon:'💰',label:method};
+      const pm=PAYMENT_METHODS.find(m=>m.id===method)||{icon:'',label:method};
       return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border)">
         <span>${pm.icon} ${pm.label}</span>
         <span style="font-weight:700">${formatCurrency(amount)}</span>
@@ -613,7 +613,7 @@ async function openShiftPanel() {
   if (activeShift) { openCloseShiftForm(); return; }
   openModal(`
     <div class="modal-header"><div class="modal-title">🔐 Buka Shift Kas</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div class="form-group"><label>Kasir</label>
       <input type="text" id="sh-name" value="${getUserName?getUserName():''}"></div>
     <div class="form-group"><label>Saldo Awal Laci (Rp)</label>
@@ -642,7 +642,7 @@ function openCloseShiftForm() {
   if (!activeShift) { toast('Tidak ada shift terbuka','warn'); return; }
   openModal(`
     <div class="modal-header"><div class="modal-title">🔐 Tutup Shift — ${activeShift.cashier_name||''}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="font-size:12.5px;color:var(--text3);margin-bottom:12px">
       Dibuka ${activeShift.opened_at?new Date(activeShift.opened_at).toLocaleString('id-ID'):''}
       · saldo awal ${formatCurrency(activeShift.opening_balance||0)}

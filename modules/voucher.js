@@ -36,7 +36,7 @@ async function renderVoucher(){
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchVoucherTab('campaigns',this)">🎯 Campaign</button>
-      <button class="tab-btn" onclick="switchVoucherTab('vouchers',this)">🎟 Daftar Voucher</button>
+      <button class="tab-btn" onclick="switchVoucherTab('vouchers',this)">Daftar Voucher</button>
     </div>
 
     <div id="campaigns-tab">
@@ -48,7 +48,7 @@ async function renderVoucher(){
     <div id="vouchers-tab" style="display:none">
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input class="table-search" id="vc-search" placeholder="🔍 Cari kode, nama penerima..."
+          <input class="table-search" id="vc-search" placeholder="Cari kode, nama penerima..."
             oninput="filterVouchers(this.value)">
           <select class="table-filter" id="vc-campaign" onchange="filterVouchers()">
             <option value="">Semua Campaign</option>
@@ -111,8 +111,8 @@ function renderCampaigns(){
             <div style="font-size:12px;color:var(--gray);margin-top:2px">${c.description||''}</div>
           </div>
           <div style="display:flex;gap:4px">
-            <button class="act-btn edit" onclick="openCampaignForm(${c.id})">✏️</button>
-            <button class="act-btn del" onclick="deleteCampaign(${c.id},'${(c.campaign_name||'').replace(/'/g,"\\'")}')">🗑</button>
+            <button class="act-btn edit" onclick="openCampaignForm(${c.id})">${icon('edit', 12)}</button>
+            <button class="act-btn del" onclick="deleteCampaign(${c.id},'${(c.campaign_name||'').replace(/'/g,"\\'")}')">${icon('trash', 12)}</button>
           </div>
         </div>
 
@@ -129,7 +129,7 @@ function renderCampaigns(){
 
         <div class="btn-row">
           <button class="btn btn-teal btn-sm" style="flex:1" onclick="openGenerateModal(${c.id})">
-            🎟 Generate Voucher
+            Generate Voucher
           </button>
           <button class="btn btn-outline btn-sm" onclick="viewCampaignVouchers(${c.id})">
             Lihat Voucher
@@ -150,8 +150,8 @@ async function openCampaignForm(id=null){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'✏️ Edit Campaign':'🎯 Buat Campaign Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">${id?'Edit Campaign':'🎯 Buat Campaign Baru'}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="form-group">
       <label>Nama Campaign *</label>
@@ -215,7 +215,7 @@ async function openCampaignForm(id=null){
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveCampaign(${id||'null'})">
-        ${id?'💾 Simpan':'🎯 Buat Campaign'}
+        ${id?'Simpan':'🎯 Buat Campaign'}
       </button>
     </div>`);
 }
@@ -223,11 +223,11 @@ async function openCampaignForm(id=null){
 function getDefaultWATemplate(){
   return `Halo {NAMA} 👋
 
-Berikut voucher skrining kesehatan Anda dari *OneLab Diagnostics* 🏥
+Berikut voucher skrining kesehatan Anda dari *OneLab Diagnostics* 
 
-🎟 *Kode Voucher:* {KODE}
-💰 *Diskon:* {DISKON}
-📋 *Layanan:* {LAYANAN}
+*Kode Voucher:* {KODE}
+*Diskon:* {DISKON}
+*Layanan:* {LAYANAN}
 ⏰ *Berlaku s/d:* {BERLAKU}
 
 Booking & Info:
@@ -270,7 +270,7 @@ async function deleteCampaign(id, name){
   if(!confirm(`Hapus campaign "${name}"?\nSemua voucher dalam campaign ini akan dihapus.`)) return;
   try {
     await sbDelete('voucher_campaigns',id);
-    toast('🗑 Campaign dihapus','info');
+    toast('Campaign dihapus','info');
     await loadCampaigns();
   } catch(e){ toast('❌ '+e.message,'err'); }
 }
@@ -290,8 +290,8 @@ async function openGenerateModal(campaignId){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🎟 Generate Voucher — ${c.campaign_name}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Generate Voucher — ${c.campaign_name}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <div style="background:var(--lgray);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--gray)">
@@ -341,7 +341,7 @@ async function openGenerateModal(campaignId){
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" id="btn-gen" onclick="generateVouchers(${campaignId})">
-        🎟 Generate Voucher
+        Generate Voucher
       </button>
     </div>`);
 
@@ -470,7 +470,7 @@ function renderVoucherTable(data){
   const tbl=document.getElementById('vouchers-table');
   if(!tbl) return;
   if(!data.length){
-    tbl.innerHTML=`<div class="empty-state"><div class="ico">🎟</div><h3>Belum ada voucher</h3><p>Pilih campaign dan klik "Generate Voucher".</p></div>`;
+    tbl.innerHTML=`<div class="empty-state"><div class="ico"></div><h3>Belum ada voucher</h3><p>Pilih campaign dan klik "Generate Voucher".</p></div>`;
     return;
   }
   tbl.innerHTML=`
@@ -495,9 +495,9 @@ function renderVoucherTable(data){
             <td style="font-size:12px;color:var(--gray)">${exp}</td>
             <td>
               <div class="act-row">
-                <button class="act-btn" onclick="openVoucherDesign(${v.id})" title="Lihat & Share">👁</button>
-                <button class="act-btn wa" onclick="shareVoucherWA(${v.id})" title="Share WA">💬</button>
-                <button class="act-btn del" onclick="cancelVoucher(${v.id})">✕</button>
+                <button class="act-btn" onclick="openVoucherDesign(${v.id})" title="Lihat & Share">${icon('file-text', 12)}</button>
+                <button class="act-btn wa" onclick="shareVoucherWA(${v.id})" title="Share WA" style="font-size:10.5px;font-weight:700">WA</button>
+                <button class="act-btn del" onclick="cancelVoucher(${v.id})" style="font-size:10.5px;font-weight:700"></button>
               </div>
             </td>
           </tr>`;
@@ -507,7 +507,7 @@ function renderVoucherTable(data){
     ${data.length>100?`<div style="padding:12px 16px;font-size:12px;color:var(--gray)">Menampilkan 100 dari ${data.length} voucher</div>`:''}
     <div style="padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border)">
       <button class="btn btn-outline btn-sm" onclick="bulkShareWA()">💬 Share WA Terpilih</button>
-      <button class="btn btn-ghost btn-sm" onclick="exportVouchersCSV()">📥 Export CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="exportVouchersCSV()">Export CSV</button>
       <button class="btn btn-ghost btn-sm" onclick="printVouchersBatch()">🖨 Print Batch</button>
     </div>`;
 }
@@ -527,8 +527,8 @@ async function openVoucherDesign(voucherId){
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🎟 Voucher ${v.code}</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
+      <div class="modal-title">Voucher ${v.code}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
     <!-- Voucher Design -->
@@ -611,7 +611,7 @@ async function shareVoucherWA(id, recipientName='', phone=''){
   const name = recipientName || v.recipient_name || 'Bapak/Ibu';
   const ph = phone || v.recipient_phone || '';
 
-  let msg = (c.wa_template || `Halo {NAMA},\n\n🎟 Kode Voucher: *{KODE}*\n💰 Diskon: {DISKON}\n📋 Layanan: {LAYANAN}\n⏰ Berlaku: {BERLAKU}`);
+  let msg = (c.wa_template || `Halo {NAMA},\n\nKode Voucher: *{KODE}*\nDiskon: {DISKON}\nLayanan: {LAYANAN}\n⏰ Berlaku: {BERLAKU}`);
   msg = msg.replace(/{NAMA}/g, name)
            .replace(/{KODE}/g, v.code||'')
            .replace(/{DISKON}/g, discText)
@@ -706,7 +706,7 @@ function exportVouchersCSV(){
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
   a.download=`Vouchers_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.csv`;
-  a.click(); toast('📥 CSV diunduh','ok');
+  a.click(); toast('CSV diunduh','ok');
 }
 
 function toggleAllVoucherChk(checked){
