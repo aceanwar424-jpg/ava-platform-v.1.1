@@ -247,7 +247,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     <style>
       @page{ 
         size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
-        margin: ${isTemplate ? '0' : '10mm 10mm 12mm 10mm'}; 
+        margin: ${isTemplate ? '0' : '10mm 10mm 45mm 10mm'}; 
       }
       *{box-sizing:border-box}
       body{
@@ -346,7 +346,10 @@ async function printLabReport(patientName, visitNumber, sampleRows){
           right: ${pRight};
           margin: 0;
         ` : `
-          margin-top: 25px;
+          position: fixed;
+          bottom: 10mm;
+          left: 10mm;
+          right: 10mm;
         `}
       }
       .signs{display:flex;justify-content:flex-end;margin-top:10px}
