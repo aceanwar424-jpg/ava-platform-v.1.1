@@ -1002,7 +1002,6 @@ function setPatSearchField(f) {
   const res=document.getElementById('pat-search-results');
   if(res) res.innerHTML='<div style="padding:20px;text-align:center;color:var(--gray)">Ketik untuk mencari…</div>';
 }
-
 async function searchPatientDB(q) {
   q=(q||'').trim();
   const el=document.getElementById('pat-search-results'); if(!el) return;
@@ -1019,7 +1018,20 @@ async function searchPatientDB(q) {
   try {
     const rows=await sbGet('admissions',`select=${cols}&${filter}&order=created_at.desc&limit=40`)||[];
     const seen={}, uniq=[];
-    for(const r of rows){ const key=r.mr_number||r.patient_id_number||`${r.patient_name}|${r.patient_dob}`; if(seen[key]) continue; seen[key]=1; uniq.push(r); }
+    for(const r of rows){
+      const key=r.mr_number||r.patient_id_number||`${r.patient_name}|${r.patient_dob}`;
+      if(seen[key]) {
+        const existing = seen[key];
+        cols.split(',').forEach(col => {
+          if ((existing[col] === null || existing[col] === undefined || existing[col] === '') && r[col] !== null && r[col] !== undefined && r[col] !== '') {
+            existing[col] = r[col];
+          }
+        });
+        continue;
+      }
+      seen[key]=r;
+      uniq.push(r);
+    }
     _patSearchResults=uniq;
     if(!uniq.length){ el.innerHTML='<div style="padding:20px;text-align:center;color:var(--gray)">Tidak ditemukan — lanjutkan isi sebagai pasien baru.</div>'; return; }
     el.innerHTML=uniq.map((r,i)=>`
@@ -1035,17 +1047,56 @@ async function searchPatientDB(q) {
 async function pickPatient(i) {
   const p=_patSearchResults[i]; if(!p) return;
   const set=(id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
-  const sel=(id,v)=>{ const el=document.getElementById(id); if(el&&v) el.value=v; };
-  set('af-name',p.patient_name); set('af-salutation',p.patient_salutation);
-  sel('af-gender',p.patient_gender);
-  set('af-dob',p.patient_dob); set('af-age',p.patient_age);
-  set('af-pob',p.patient_place_of_birth); set('af-cob',p.patient_country_of_birth);
-  set('af-phone',p.patient_phone); set('af-email',p.patient_email);
-  sel('af-bloodtype',p.patient_blood_type); sel('af-marital',p.patient_marital_status); sel('af-religion',p.patient_religion);
-  set('af-ethnicity',p.patient_ethnicity);
-  set('af-postal',p.patient_postal_code); set('af-subdistrict',p.patient_subdistrict);
-  set('af-district',p.patient_district); set('af-city',p.patient_city); set('af-province',p.patient_province);
-  set('af-address',p.patient_address);
+  const sel=(id,v)=>{
+    const el=document.getElementById(id);
+    if(el&&v) {
+      let found = false;
+      for (let opt of el.options) {
+        if (opt.value === v || opt.text === v) {
+          el.value = opt.value;
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        for (let opt of el.options) {
+          if (opt.value.toLowerCase() === v.toLowerCase() || opt.value.toLowerCase().startsWith(v.toLowerCase())) {
+            el.value = opt.value;
+            break;
+          }
+        }
+      }
+    }
+  };
+
+  set('af-name', p.patient_name);
+  set('af-salutation', p.patient_salutation);
+  
+  // Normalize gender value
+  let gen = p.patient_gender || '';
+  if (gen.toLowerCase().startsWith('l') || gen.toLowerCase().startsWith('m')) gen = 'M';
+  else if (gen.toLowerCase().startsWith('p') || gen.toLowerCase().startsWith('f')) gen = 'F';
+  sel('af-gender', gen);
+
+  set('af-dob', p.patient_dob);
+  set('af-age', p.patient_age);
+  set('af-pob', p.patient_place_of_birth);
+  set('af-cob', p.patient_country_of_birth);
+  set('af-phone', p.patient_phone);
+  set('af-email', p.patient_email);
+  
+  sel('af-bloodtype', p.patient_blood_type);
+  sel('af-marital', p.patient_marital_status);
+  sel('af-religion', p.patient_religion);
+  
+  set('af-ethnicity', p.patient_ethnicity);
+  set('af-postal', p.patient_postal_code);
+  set('af-subdistrict', p.patient_subdistrict);
+  set('af-district', p.patient_district);
+  set('af-city', p.patient_city);
+  set('af-province', p.patient_province);
+  set('af-address', p.patient_address);
+
   if(p.patient_category){ const rb=document.querySelector(`input[name="af-category"][value="${p.patient_category}"]`); if(rb) rb.checked=true; }
   // ── MR dipakai ulang (kunci: MR unik per pasien) ──
   if(p.mr_number) sel('af-mr',p.mr_number);
