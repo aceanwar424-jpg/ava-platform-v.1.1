@@ -12,7 +12,8 @@
 //   lab/qc.js          · Quality Control & manajemen analyzer
 // ═══════════════════════════════════════════════════════════════
 
-const LAB_TABS = ['checkin','worklist','result','validation','approval','report','qc','integrasi'];
+// Worklist & TAT dihapus — fungsinya menyatu ke Check-in (satu tabel + detail TAT).
+const LAB_TABS = ['checkin','result','validation','approval','report','qc','integrasi'];
 
 // State bersama (dibaca/ditulis lintas sub-modul)
 let labSamples  = [];
@@ -23,7 +24,12 @@ let _prodCache  = null; // cache master products (untuk TAT target & dropdown)
 // Peta warna interpretasi (green/yellow/orange/red)
 const LAB_COLORS = { green:'#22C55E', yellow:'#F59E0B', orange:'#F97316', red:'#EF4444', gray:'#94A3B8' };
 function labColor(code){ return LAB_COLORS[code] || LAB_COLORS.gray; }
-function labUser(){ return (typeof getUserName==='function') ? getUserName() : 'User'; }
+// Nama pelaku untuk jejak TAT — pakai ALIAS bila di-set, jika tidak nama lengkap.
+function labUser(){
+  const al = window.currentUser?.profile?.alias;
+  if (al && String(al).trim()) return String(al).trim();
+  return (typeof getUserName==='function') ? getUserName() : 'User';
+}
 
 // Master catatan validator / analis
 const LAB_NOTE_PRESETS = [
@@ -254,7 +260,6 @@ function injectLisStyle(){
 // ═══════════════════════════════════════════════════════════════
 const LAB_TAB_META = {
   checkin:    { label:'Penerimaan Sampel', ico:'' },
-  worklist:   { label:'Worklist & TAT',    ico:'' },
   result:     { label:'Input Hasil',       ico:'' },
   validation: { label:'Validasi',          ico:'✅' },
   approval:   { label:'Approval',          ico:'🔏' },
@@ -290,7 +295,7 @@ async function renderLab(tab='checkin'){
 
   // Render HANYA tab yang diminta.
   ({
-    checkin:renderCheckinTab, worklist:renderWorklistTab, result:renderResultTab,
+    checkin:renderCheckinTab, result:renderResultTab,
     validation:renderValidationTab, approval:renderApprovalTab, report:renderReportTab, qc:renderQCTab,
     integrasi:renderAnalyzerHub,
   }[tab] || renderCheckinTab)();
@@ -314,8 +319,8 @@ async function labCategorySummary(containerId){
 
   const cards=[
     {icon:'',val:pending,   label:'Sampel Pending',color:'#F59E0B',tab:'checkin'},
-    {icon:'⚗️',val:inProc,    label:'Diproses',      color:'#0EA5E9',tab:'worklist'},
-    {icon:'⏰',val:overdue,   label:'TAT Terlambat', color:'#EF4444',tab:'worklist'},
+    {icon:'⚗️',val:inProc,    label:'Diproses',      color:'#0EA5E9',tab:'checkin'},
+    {icon:'⏰',val:overdue,   label:'TAT Terlambat', color:'#EF4444',tab:'checkin'},
     {icon:'',val:draftRes,  label:'Draft Hasil',   color:'#8B5CF6',tab:'result'},
     {icon:'',val:critical,  label:'Nilai Kritis',  color:'#DC2626',tab:'validation'},
     {icon:'✅',val:validated, label:'Tervalidasi',   color:'#22C55E',tab:'approval'},
@@ -364,8 +369,8 @@ function renderLabKPI(){
 
   el.innerHTML=[
     {icon:'',val:pending,   label:'Sampel Pending', color:'#F59E0B', tab:'checkin'},
-    {icon:'⚗️',val:inProc,    label:'Diproses',       color:'#0EA5E9', tab:'worklist'},
-    {icon:'⏰',val:overdue,   label:'TAT Terlambat',  color:'#EF4444', tab:'worklist'},
+    {icon:'⚗️',val:inProc,    label:'Diproses',       color:'#0EA5E9', tab:'checkin'},
+    {icon:'⏰',val:overdue,   label:'TAT Terlambat',  color:'#EF4444', tab:'checkin'},
     {icon:'',val:draftRes,  label:'Draft Hasil',    color:'#8B5CF6', tab:'result'},
     {icon:'',val:critical,  label:'Nilai Kritis',   color:'#DC2626', tab:'validation'},
     {icon:'✅',val:validated, label:'Tervalidasi',    color:'#22C55E', tab:'approval'},

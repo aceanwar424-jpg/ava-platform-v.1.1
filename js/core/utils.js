@@ -106,10 +106,42 @@ function timeAgo(d) {
 
 
 function getUserName() {
-  return window.currentUser?.profile?.full_name 
+  return window.currentUser?.profile?.full_name
       || window.currentUser?.user_metadata?.full_name
-      || window.currentUser?.email?.split('@')[0] 
+      || window.currentUser?.email?.split('@')[0]
       || 'User';
+}
+// Alias (nama singkat/inisial) untuk jejak TAT. Fallback ke potongan nama.
+function getUserAlias() {
+  const al = window.currentUser?.profile?.alias;
+  if (al && String(al).trim()) return String(al).trim();
+  return getUserName();
+}
+// Modal atur alias sendiri (dipanggil dari dropdown user).
+function openAliasModal() {
+  const cur = window.currentUser?.profile?.alias || '';
+  openModal(`
+    <div class="modal-header"><div class="modal-title">Atur Alias</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
+      Alias singkat dipakai pada jejak TAT lab (mis. siapa yang menerima, menginput, memvalidasi). Contoh: <b>ADA</b>, <b>dr. Sari</b>.</div>
+    <div class="form-group"><label>Alias</label>
+      <input type="text" id="alias-input" maxlength="24" value="${String(cur).replace(/"/g,'&quot;')}" placeholder="mis. ADA"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveMyAlias()">Simpan</button>
+    </div>`);
+}
+async function saveMyAlias() {
+  const v = (document.getElementById('alias-input')?.value || '').trim();
+  try {
+    await sbRpc('set_my_alias', { p_alias: v });
+    if (window.currentUser) { window.currentUser.profile = window.currentUser.profile || {}; window.currentUser.profile.alias = v || null; }
+    toast('Alias tersimpan', 'ok');
+    closeModalForce();
+  } catch (e) {
+    toast('Gagal menyimpan alias: ' + (e.message || e), 'err');
+  }
 }
 function getUserRole() {
   let role = window.currentUser?.profile?.role 

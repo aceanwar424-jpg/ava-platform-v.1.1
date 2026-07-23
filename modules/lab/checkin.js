@@ -16,17 +16,16 @@ const SAMPLE_REJECT_REASONS = [
 
 function renderCheckinTab(){
   const el=document.getElementById('lab-checkin'); if(!el) return;
-  const pending=labSamples.filter(s=>['Pending','Rejected'].includes(s.status));
 
-  // Daftar tunggu — dikelompokkan per pasien (status check-in s/d selesai)
-  const byPat={};
-  labSamples.forEach(s=>{
-    const k=s.admission_id||s.visit_number||s.patient_name;
-    if(!byPat[k]) byPat[k]={admission_id:s.admission_id,patient_name:s.patient_name,
-      visit_number:s.visit_number,mr:s.mr_number,samples:[]};
-    byPat[k].samples.push(s);
+  // Satu tabel terpadu untuk SEMUA sampel (seperti tabel bawah dulu).
+  // Urut: yang butuh aksi dulu (Pending/Ditolak), lalu proses, lalu selesai.
+  const order={Pending:0,Rejected:1,'In Process':2,Done:3};
+  const samples=(labSamples||[]).slice().sort((a,b)=>{
+    const oa=order[a.status]??9, ob=order[b.status]??9;
+    if(oa!==ob) return oa-ob;
+    return new Date(b.received_at||b.created_at||0)-new Date(a.received_at||a.created_at||0);
   });
-  const wait=Object.values(byPat);
+  const pendCount=samples.filter(s=>s.status==='Pending').length;
 
   el.innerHTML=`
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
@@ -37,55 +36,108 @@ function renderCheckinTab(){
     </div>
     <div id="lab-pending-labels"></div>
 
-    <div class="lis-title">Daftar Tunggu Pasien — check-in s/d selesai</div>
+    <div class="lis-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>Daftar Sampel — check-in s/d selesai</span>
+      ${pendCount?`<button class="btn btn-teal btn-xs" onclick="processAllPending()">Proses Semua Pending (${pendCount})</button>`:''}
+    </div>
     <div class="table-wrap"><table><thead><tr>
-      <th>MR / Kunjungan</th><th>Pasien</th><th>Sampel</th><th>Pending</th><th>Proses</th><th>Selesai</th><th>Progress</th><th>Aksi</th>
+      <th>Barcode</th><th>Pasien</th><th>Sampel</th><th>Jam Diterima</th><th>Status</th><th>Aksi</th><th style="width:56px;text-align:center">Detail</th>
     </tr></thead><tbody>
-    ${wait.length ? wait.map(p=>{
-      const total=p.samples.length;
-      const pend=p.samples.filter(s=>s.status==='Pending').length;
-      const proc=p.samples.filter(s=>s.status==='In Process').length;
-      const done=p.samples.filter(s=>s.status==='Done').length;
-      const rej =p.samples.filter(s=>s.status==='Rejected').length;
-      const pct=Math.round(done/Math.max(1,total)*100);
+    ${samples.length?samples.map(s=>{
+      const st=checkinSampleStatus(s);
+      const jam=s.received_at||s.collected_at;
       return `<tr>
-        <td style="font-family:monospace;font-size:11px">${p.mr||'—'}<div style="color:var(--gray)">${p.visit_number||''}</div></td>
-        <td style="font-weight:600">${p.patient_name||'—'}</td>
-        <td style="font-size:11px;color:var(--gray)">${total} sampel${rej?` · ${rej} ditolak`:''}</td>
-        <td style="text-align:center">${pend?`<span class="lis-badge warn">${pend}</span>`:'—'}</td>
-        <td style="text-align:center">${proc?`<span class="lis-badge info">${proc}</span>`:'—'}</td>
-        <td style="text-align:center">${done?`<span class="lis-badge ok">${done}</span>`:'—'}</td>
-        <td><div class="lis-bar"><span style="width:${pct}%"></span></div></td>
-        <td><div class="act-row">
-          ${pend?`<button class="btn btn-teal btn-xs" onclick="processAllForPatient(${p.admission_id})">Proses Semua</button>`:''}
-          <button class="btn btn-outline btn-xs" onclick="goInputResult(${p.admission_id})">Input Hasil</button>
-        </div></td>
-      </tr>`;
-    }).join('') : `<tr><td colspan="8" style="text-align:center;padding:26px;color:var(--gray)">Belum ada sampel. Scan barcode untuk check-in.</td></tr>`}
-    </tbody></table></div>
-
-    ${pending.length?`
-    <div class="lis-title">Sampel Pending — perlu diproses / ditolak</div>
-    <div class="table-wrap"><table><thead><tr>
-      <th>Barcode</th><th>Pasien</th><th>Tes</th><th>Sampel</th><th>Terima</th><th>Status</th><th>Aksi</th>
-    </tr></thead><tbody>
-    ${pending.map(s=>`<tr>
-      <td style="font-family:monospace;font-size:11.5px;font-weight:700">${s.barcode||'—'}</td>
-      <td><div style="font-weight:600">${s.patient_name||'—'}</div><div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
-      <td style="font-size:12px">${s.product_name||'—'}</td>
-      <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
-      <td style="font-size:11px;color:var(--gray)">${s.received_at?new Date(s.received_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):'—'}</td>
-      <td>${s.status==='Rejected'
-        ? `<span title="${s.rejection_reason||''}" class="lis-badge" style="background:#FFEBEE;color:#C62828">Ditolak</span>`
-        : `<span class="lis-badge warn">Pending</span>`}</td>
-      <td><div class="act-row">
-        ${s.status==='Pending'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
-          <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>`
-          :`<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>`}
-      </div></td>
-    </tr>`).join('')}
-    </tbody></table></div>`:''}`;
+        <td style="font-family:monospace;font-size:11.5px;font-weight:700">${s.barcode||'—'}</td>
+        <td><div style="font-weight:600">${s.patient_name||'—'}</div><div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
+        <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
+        <td style="font-size:11px;color:var(--gray)">${jam?new Date(jam).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
+        <td><span class="lis-badge" style="background:${st.bg};color:${st.color}"${s.status==='Rejected'&&s.rejection_reason?` title="${s.rejection_reason.replace(/"/g,'&quot;')}"`:''}>${st.label}</span></td>
+        <td><div class="act-row">${checkinActions(s)}</div></td>
+        <td style="text-align:center"><button class="btn btn-ghost btn-xs" onclick="toggleCheckinDetail(${s.id})" id="cd-btn-${s.id}">▸</button></td>
+      </tr>
+      <tr id="cd-row-${s.id}" style="display:none"><td colspan="7" style="background:var(--lgray);padding:0"><div id="cd-body-${s.id}" style="padding:12px 16px"></div></td></tr>`;
+    }).join(''):`<tr><td colspan="7" style="text-align:center;padding:26px;color:var(--gray)">Belum ada sampel. Scan barcode untuk check-in.</td></tr>`}
+    </tbody></table></div>`;
   loadPendingLabels();
+}
+
+// Status gabungan sampel (pra-analitik + progres hasil).
+function checkinSampleStatus(s){
+  if(s.status==='Rejected') return {label:'Ditolak',bg:'#FFEBEE',color:'#C62828'};
+  const rs=labResults.filter(r=>r.sample_id==s.id);
+  if(rs.some(r=>r.status==='Approved'||r.status==='Released')) return {label:'Selesai',bg:'#DCFCE7',color:'#166534'};
+  if(rs.some(r=>r.status==='Validated'))                       return {label:'Tervalidasi',bg:'#E0F2FE',color:'#0369A1'};
+  if(rs.some(r=>r.result_value))                                return {label:'Input Hasil',bg:'#EDE9FE',color:'#6D28D9'};
+  if(s.status==='In Process')                                   return {label:'Proses',bg:'#E0F2FE',color:'#0369A1'};
+  return {label:'Pending',bg:'#FEF3C7',color:'#92400E'};
+}
+
+function checkinActions(s){
+  if(s.status==='Rejected') return `<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>`;
+  if(s.status==='Pending')  return `<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
+    <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>`;
+  const rs=labResults.filter(r=>r.sample_id==s.id);
+  if(rs.some(r=>r.status==='Approved'||r.status==='Released')) return `<span style="font-size:11px;color:var(--gray)">selesai</span>`;
+  if(rs.some(r=>r.status==='Validated'))                       return `<button class="btn btn-outline btn-xs" onclick="switchLabTab('approval')">Approval →</button>`;
+  return `<button class="btn btn-outline btn-xs" onclick="goInputResult(${s.admission_id})">Input Hasil</button>`;
+}
+
+// Proses semua sampel Pending (lintas pasien).
+async function processAllPending(){
+  const ss=labSamples.filter(s=>s.status==='Pending');
+  if(!ss.length){ toast('Tidak ada sampel pending','warn'); return; }
+  for(const s of ss){ await sbPatch('lab_samples',s.id,{status:'In Process',received_at:new Date().toISOString()}).catch(()=>{}); }
+  toast(`${ss.length} sampel diproses`,'ok');
+  await loadLabSamples(); renderCheckinTab(); renderLabKPI();
+}
+
+// Buka/tutup baris detail: daftar tes + riwayat TAT.
+function toggleCheckinDetail(sid){
+  const row=document.getElementById(`cd-row-${sid}`), btn=document.getElementById(`cd-btn-${sid}`);
+  if(!row) return;
+  if(row.style.display!=='none'){ row.style.display='none'; if(btn) btn.textContent='▸'; return; }
+  row.style.display=''; if(btn) btn.textContent='▾';
+  const s=labSamples.find(x=>x.id==sid)||{};
+  const body=document.getElementById(`cd-body-${sid}`); if(body) body.innerHTML=checkinDetailHtml(s);
+}
+
+function checkinDetailHtml(s){
+  let list=labResults.filter(r=>r.sample_id==s.id);
+  if(!list.length) list=labResults.filter(r=>r.admission_id==s.admission_id && r.product_id==s.product_id);
+  const pick=(fn,last)=>{ const v=list.map(fn).filter(Boolean).sort(); return last?v.slice(-1)[0]:v[0]; };
+  const enteredRow=list.find(r=>r.entered_at)||{};
+  const validRow  =list.find(r=>r.validated_at)||{};
+  const apprRow   =list.find(r=>r.approved_at||r.released_at)||{};
+  const fmt=t=>t?new Date(t).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+  const steps=[
+    {ic:'📥',label:'Diterima', at:s.received_at||s.collected_at, by:s.collected_by},
+    {ic:'📝',label:'Input Hasil', at:pick(r=>r.entered_at), by:enteredRow.entered_by},
+    {ic:'✅',label:'Validasi', at:pick(r=>r.validated_at), by:validRow.validated_by},
+    {ic:'🔏',label:'Selesai', at:pick(r=>r.approved_at||r.released_at,true), by:apprRow.approved_by||apprRow.released_by},
+  ];
+  const testRows=list.length? list.map(r=>`<tr>
+      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7">${r.item_name||r.product_name||'—'}</td>
+      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7;font-weight:700">${r.result_value||'—'} ${r.unit||''}</td>
+      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7;color:var(--gray);font-size:11px">${r.interpretation||r.condition_name||''}</td>
+    </tr>`).join('') : `<tr><td colspan="3" style="padding:6px 8px;color:var(--gray)">Belum ada parameter.</td></tr>`;
+  return `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Daftar Tes — ${s.product_name||''}</div>
+        <table style="width:100%;font-size:12px;border-collapse:collapse"><tbody>${testRows}</tbody></table>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Riwayat TAT</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          ${steps.map(st=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px">
+            <span style="width:18px">${st.ic}</span>
+            <span style="width:84px;color:var(--gray)">${st.label}</span>
+            <span style="font-weight:600;min-width:96px">${fmt(st.at)}</span>
+            ${st.by?`<span style="color:var(--teal);font-weight:700">· ${st.by}</span>`:''}
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
 }
 
 // Proses semua sampel Pending milik satu pasien
