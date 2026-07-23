@@ -19,6 +19,7 @@
 // ══════════════════════════════════════════════════════════════════════
 'use strict';
 const net = require('net');
+const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
@@ -28,6 +29,7 @@ try { CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf
 const SUPABASE_URL = process.env.SUPABASE_URL || CFG.supabase_url || 'https://rmyqzyfvlmjxtatpctks.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || CFG.supabase_key || '';
 const REFRESH_MS   = (CFG.refresh_seconds || 60) * 1000;
+const STATUS_PORT  = CFG.status_port || 9999;
 if (!SUPABASE_KEY) { console.error('❌ SUPABASE_KEY belum diset (env atau config.json). Berhenti.'); process.exit(1); }
 
 const HDR = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
@@ -36,7 +38,14 @@ async function rpc(fn, args) {
   if (!r.ok) throw new Error(`RPC ${fn} HTTP ${r.status}`);
   return r.json();
 }
-const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
+
+// ── Status hidup (dipakai halaman status lokal http://localhost:PORT) ──
+const STATE = { started: new Date(), devices: new Map(), logs: [] };
+function pushLog(line) { STATE.logs.push(line); if (STATE.logs.length > 250) STATE.logs.shift(); }
+const log = (...a) => {
+  const line = new Date().toISOString().slice(11, 19) + ' ' + a.map(x => typeof x === 'string' ? x : JSON.stringify(x)).join(' ');
+  console.log(line); pushLog(line);
+};
 
 // ── Kode kontrol protokol ─────────────────────────────────────────────
 const ENQ = 0x05, ACK = 0x06, NAK = 0x15, STX = 0x02, ETX = 0x03, ETB = 0x17, EOT = 0x04, CR = 0x0D, LF = 0x0A;
@@ -48,6 +57,8 @@ async function ingest(analyzer, protocol, raw, direction) {
     const res = await rpc('analyzer_ingest', { analyzer_code: analyzer.code, analyzer_id: analyzer.id,
       protocol, raw_text: raw, direction: direction || 'IN' });
     log(`  ⇢ ingest ${analyzer.name} (${protocol}, ${raw.length}b) id=${res && res.id}`);
+    const d = STATE.devices.get(analyzer.id);
+    if (d && (direction || 'IN') === 'IN') { d.msgCount++; d.lastMsgAt = new Date(); }
   } catch (e) { log(`  ⚠ ingest gagal (${analyzer.name}): ${e.message}`); }
 }
 
@@ -168,20 +179,25 @@ const bound = new Map(); // id -> server/socket
 function bindAnalyzer(a) {
   if (bound.has(a.id)) return;
   if (!a.port) { log(`⚠ ${a.name}: port kosong — dilewati`); return; }
+  const dev = { name: a.name, code: a.code, mode: a.mode || 'server', ip: a.ip, port: a.port,
+    protocol: a.protocol, direction: a.direction, connected: false, connectedFrom: null,
+    msgCount: 0, lastMsgAt: null, boundAt: new Date() };
+  STATE.devices.set(a.id, dev);
   if ((a.mode || 'server') === 'server') {
     const server = net.createServer((sock) => {
       log(`🔌 ${a.name}: alat terhubung dari ${sock.remoteAddress}`);
+      dev.connected = true; dev.connectedFrom = sock.remoteAddress;
       attachHandler(sock, a);
-      sock.on('close', () => log(`⏻ ${a.name}: koneksi ditutup`));
+      sock.on('close', () => { log(`⏻ ${a.name}: koneksi ditutup`); dev.connected = false; dev.connectedFrom = null; });
     });
     server.on('error', (e) => log(`❌ ${a.name} server error: ${e.message}`));
     server.listen(a.port, () => log(`🟢 ${a.name}: LISTEN :${a.port} (${a.protocol}, ${a.direction}) — isi IP PC ini + port ${a.port} di alat`));
     bound.set(a.id, server);
   } else {
     const connect = () => {
-      const sock = net.connect(a.port, a.ip, () => log(`🟢 ${a.name}: CONNECT ${a.ip}:${a.port} (${a.protocol})`));
+      const sock = net.connect(a.port, a.ip, () => { log(`🟢 ${a.name}: CONNECT ${a.ip}:${a.port} (${a.protocol})`); dev.connected = true; });
       attachHandler(sock, a);
-      sock.on('close', () => { log(`⏻ ${a.name}: putus — reconnect 5s`); setTimeout(connect, 5000); });
+      sock.on('close', () => { log(`⏻ ${a.name}: putus — reconnect 5s`); dev.connected = false; setTimeout(connect, 5000); });
       sock.on('error', () => {});
     };
     connect();
