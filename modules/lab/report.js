@@ -150,6 +150,23 @@ const LAB_REPORT_DEFAULTS = {
   show_loinc:false, show_method:false, show_flag_legend:true, show_qr:false, paper:'A4',
   sign1_role:'Diperiksa oleh (Analis)', sign2_role:'Divalidasi oleh', sign3_role:'Disetujui oleh (Dokter PJ)',
   sign1_name:'', sign2_name:'', sign3_name:'',
+  show_sign1:true, show_sign2:true, show_sign3:true,
+  
+  // Layout Advanced
+  bg_image_url: '',
+  paper_width: '210mm',
+  paper_height: '297mm',
+  margin_top: '20mm',
+  margin_bottom: '20mm',
+  margin_left: '15mm',
+  margin_right: '15mm',
+  hide_default_header: false,
+  hide_default_footer: false,
+  patient_info_y: '55mm',
+  table_y: '90mm',
+  table_font_size: '12px',
+  show_test_code: false,
+  signature_y: '20mm',
 };
 function labReportCfg(){
   try { return Object.assign({}, LAB_REPORT_DEFAULTS, JSON.parse(localStorage.getItem('ol_lab_report_cfg')||'{}')); }
@@ -170,12 +187,37 @@ function printLabReport(patientName, visitNumber, sampleRows){
 
   const contact=[cfg.phone?'☎ '+cfg.phone:'',cfg.email||'',cfg.website||''].filter(Boolean).join(' · ');
   const w=window.open('','_blank','width=920,height=760');
+  
+  // Hitung padding/margin
+  const pTop = cfg.bg_image_url ? (cfg.margin_top || '20mm') : '22px';
+  const pBottom = cfg.bg_image_url ? (cfg.margin_bottom || '20mm') : '22px';
+  const pLeft = cfg.bg_image_url ? (cfg.margin_left || '15mm') : '22px';
+  const pRight = cfg.bg_image_url ? (cfg.margin_right || '15mm') : '22px';
+
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hasil Lab — ${patientName}</title>
     <style>
-      @page{ size:${cfg.paper||'A4'}; margin:14mm 12mm; }
+      @page{ 
+        size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
+        margin: ${cfg.bg_image_url ? '0' : '14mm 12mm'}; 
+      }
       *{box-sizing:border-box}
-      body{font-family:Arial,Helvetica,sans-serif;font-size:12.5px;color:#1A2B3C;margin:0;padding:22px}
-      .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid ${hc};padding-bottom:12px;margin-bottom:14px;gap:16px}
+      body{
+        font-family:Arial,Helvetica,sans-serif;
+        font-size:12.5px;
+        color:#1A2B3C;
+        margin:0;
+        padding: ${pTop} ${pRight} ${pBottom} ${pLeft};
+        ${cfg.bg_image_url ? `width: ${cfg.paper_width || '210mm'}; height: ${cfg.paper_height || '297mm'}; position: relative;` : ''}
+      }
+      .header{
+        display:${cfg.hide_default_header ? 'none' : 'flex'};
+        justify-content:space-between;
+        align-items:flex-start;
+        border-bottom:3px solid ${hc};
+        padding-bottom:12px;
+        margin-bottom:14px;
+        gap:16px;
+      }
       .brand{display:flex;gap:12px;align-items:center}
       .brand img{max-height:56px;max-width:150px;object-fit:contain}
       .brand h2{color:${hc};margin:0;font-size:19px;font-weight:800}
@@ -184,24 +226,48 @@ function printLabReport(patientName, visitNumber, sampleRows){
       .doc-title{text-align:right}
       .doc-title .t{font-size:16px;font-weight:800;color:${hc}}
       .doc-title .d{font-size:11px;color:#546E7A}
-      .pinfo{background:#F4F7FA;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;margin-bottom:14px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px}
+      
+      .pinfo{
+        background:#F4F7FA;
+        border:1px solid #e2e8f0;
+        border-radius:8px;
+        padding:10px 14px;
+        margin-bottom:14px;
+        display:grid;
+        grid-template-columns:2fr 1fr 1fr 1fr;
+        gap:6px;
+        ${cfg.bg_image_url && cfg.patient_info_y ? `position: absolute; top: ${cfg.patient_info_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
+      }
       .pinfo span{font-size:9px;color:#546E7A;text-transform:uppercase;letter-spacing:.04em}
       .pinfo strong{font-size:12.5px}
+      
+      .results-container {
+        ${cfg.bg_image_url && cfg.table_y ? `position: absolute; top: ${cfg.table_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : ''}
+      }
+      
       table{width:100%;border-collapse:collapse;margin-bottom:4px}
       th{background:${hc};color:#fff;padding:6px 9px;text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.02em}
-      td{padding:5px 9px;border-bottom:1px solid #edf1f5;font-size:12px}
+      td{padding:5px 9px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '12px'}}
       .cat{background:${ac}18;color:${ac};font-weight:800;padding:5px 10px;font-size:11.5px;margin-top:12px;border-left:3px solid ${ac}}
       .flag{font-weight:800}.crit{color:#DC2626}
       .legend{font-size:9.5px;color:#94A3B8;margin-top:8px}
-      .footer{margin-top:30px;border-top:1px solid #e2e8f0;padding-top:12px}
+      
+      .footer{
+        border-top:${cfg.hide_default_footer ? 'none' : '1px solid #e2e8f0'};
+        padding-top:12px;
+        ${cfg.bg_image_url && cfg.signature_y ? `position: absolute; bottom: ${cfg.signature_y}; left: ${pLeft}; right: ${pRight}; margin: 0;` : 'margin-top: 30px;'}
+      }
       .signs{display:flex;justify-content:space-between;gap:20px;margin-top:16px}
       .signs > div{flex:1;font-size:11px}
       .signs .line{margin-top:44px;border-top:1px solid #94A3B8;padding-top:3px}
       .signs em{color:#546E7A}
-      .disc{margin-top:16px;font-size:9.5px;color:#94A3B8;line-height:1.4}
+      .disc{display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:16px;font-size:9.5px;color:#94A3B8;line-height:1.4}
       @media print{ .noprint{display:none} body{padding:0} }
     </style></head><body>
-    <button class="noprint" onclick="window.print()" style="position:fixed;top:14px;right:14px;padding:8px 18px;background:${hc};color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
+    <button class="noprint" onclick="window.print()" style="position:fixed;top:14px;right:14px;padding:8px 18px;background:${hc};color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:9999">🖨 Print</button>
+    
+    ${cfg.bg_image_url ? `<div class="print-bg-template" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('${cfg.bg_image_url}');background-size:100% 100%;background-repeat:no-repeat;z-index:-9999;pointer-events:none"></div>` : ''}
+    
     <div class="header">
       <div class="brand">
         ${cfg.logo_url?`<img src="${cfg.logo_url}" alt="logo">`:''}
@@ -223,16 +289,20 @@ function printLabReport(patientName, visitNumber, sampleRows){
       <div><span>No. Kunjungan</span><br><strong>${first.visit_number||'—'}</strong></div>
       <div><span>Tgl Rilis</span><br><strong>${first.released_at||first.approved_at?new Date(first.released_at||first.approved_at).toLocaleDateString('id-ID'):new Date().toLocaleDateString('id-ID')}</strong></div>
     </div>
-    ${Object.entries(byCat).map(([cat,rows])=>`
-      <div class="cat">${cat}</div>
-      <table><thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Flag</th><th>Satuan</th><th>Rentang Normal</th><th>Interpretasi</th>${cfg.show_loinc?'<th>LOINC</th>':''}</tr></thead>
-      <tbody>${_labPrintCatRows(rows, cfg)}</tbody></table>`).join('')}
-    ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · = nilai kritis</div>`:''}
+    
+    <div class="results-container">
+      ${Object.entries(byCat).map(([cat,rows])=>`
+        <div class="cat">${cat}</div>
+        <table><thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Flag</th><th>Satuan</th><th>Rentang Normal</th><th>Interpretasi</th>${cfg.show_loinc?'<th>LOINC</th>':''}</tr></thead>
+        <tbody>${_labPrintCatRows(rows, cfg)}</tbody></table>`).join('')}
+      ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · = nilai kritis</div>`:''}
+    </div>
+    
     <div class="footer">
       <div class="signs">
-        <div><div>${cfg.sign1_role}:</div><div class="line"><em>${cfg.sign1_name||first.entered_by||'—'}</em></div></div>
-        <div style="text-align:center"><div>${cfg.sign2_role}:</div><div class="line"><em>${cfg.sign2_name||first.validated_by||'—'}</em></div></div>
-        <div style="text-align:right"><div>${cfg.sign3_role}:</div><div class="line"><em>${cfg.sign3_name||first.approved_by||'—'}</em></div></div>
+        ${cfg.show_sign1 !== false ? `<div><div>${cfg.sign1_role}:</div><div class="line"><em>${cfg.sign1_name||first.entered_by||'—'}</em></div></div>` : ''}
+        ${cfg.show_sign2 !== false ? `<div style="text-align:center"><div>${cfg.sign2_role}:</div><div class="line"><em>${cfg.sign2_name||first.validated_by||'—'}</em></div></div>` : ''}
+        ${cfg.show_sign3 !== false ? `<div style="text-align:right"><div>${cfg.sign3_role}:</div><div class="line"><em>${cfg.sign3_name||first.approved_by||'—'}</em></div></div>` : ''}
       </div>
       ${cfg.footer_note?`<div class="disc">${cfg.footer_note}</div>`:''}
       <div class="disc" style="text-align:center">Dokumen digenerate elektronik oleh ${cfg.org_name||'OneLab'} · ${new Date().toLocaleString('id-ID')}</div>
@@ -248,7 +318,15 @@ function _labPrintRow(r, indent, cfg){
   const crit=isCriticalResult(r);
   const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
             :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
-  const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}</span>`:`<strong>${r.product_name||'—'}</strong>`;
+            
+  let codeStr = '';
+  if (cfg.show_test_code) {
+    const p = labProduct(r.product_id);
+    const code = p ? (p.kode_internal || p.host_code || '') : '';
+    if (code) codeStr = ` <span style="font-size:10px;color:#64748b;font-family:monospace">[${code}]</span>`;
+  }
+  
+  const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}${codeStr}</span>`:`<strong>${r.product_name||'—'}${codeStr}</strong>`;
   const span=cfg.show_loinc?7:6;
   return `<tr>
     <td>${name}${cfg.show_method&&r.method?`<div style="font-size:9px;color:#94A3B8">${r.method}</div>`:''}</td>
