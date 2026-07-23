@@ -371,11 +371,42 @@ function renderServiceLines() {
           <tr style="border-bottom:1px solid var(--border)">
             <td style="padding:3px">
               ${row.pkg_name?`<div style="font-size:9px;color:var(--teal);font-weight:700;margin-bottom:2px">🗂️ ${row.pkg_name}</div>`:''}
-              <select onchange="selectServiceLineProduct(${i},this)" style="font-size:11px;padding:3px;width:100%">
-                <option value="">-- Pilih Tes/Layanan --</option>
-                ${admMasterProducts.map(pr=>`<option value="${pr.id}" data-price="${pr.harga_normal||0}" data-name="${pr.nama_tes}"
-                  ${row.product_id==pr.id?'selected':''}>[${pr.kode_internal||'—'}] ${pr.nama_tes}${pr.is_panel?' 🧬 Panel':''}</option>`).join('')}
-              </select>
+              <div class="custom-select-wrapper" style="position:relative;width:100%">
+                <input type="text" 
+                       class="custom-select-input" 
+                       id="service-input-${i}" 
+                       value="${row.product_id ? getProductNameById(row.product_id) : ''}" 
+                       placeholder="Ketik nama tes..." 
+                       onfocus="showServiceDropdown(${i})" 
+                       onblur="hideServiceDropdown(${i})"
+                       oninput="filterServiceDropdown(${i}, this.value)"
+                       style="font-size:11px;padding:4px;width:100%;border:1px solid var(--border);border-radius:4px;background:#fff"
+                       autocomplete="off">
+                <div class="custom-select-list" 
+                     id="service-list-${i}" 
+                     style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:4px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+                  <div class="custom-select-option" 
+                       onclick="selectServiceProduct(${i}, '', 0, '')"
+                       style="padding:6px 10px;cursor:pointer;font-size:11px;color:var(--text-muted);border-bottom:1px solid #f1f5f9;text-align:left">
+                    -- Pilih Tes/Layanan --
+                  </div>
+                  ${admMasterProducts.map(pr => {
+                    const label = `[${pr.kode_internal || '—'}] ${pr.nama_tes}${pr.is_panel ? ' 🧬 Panel' : ''}`;
+                    return `
+                    <div class="custom-select-option service-opt-${i}" 
+                         data-id="${pr.id}"
+                         data-price="${pr.harga_normal || 0}"
+                         data-name="${pr.nama_tes}"
+                         data-label="${label.toLowerCase()}"
+                         onclick="selectServiceProduct(${i}, ${pr.id}, ${pr.harga_normal || 0}, '${pr.nama_tes.replace(/'/g, "\\'")}')"
+                         style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #f1f5f9;text-align:left;${row.product_id == pr.id ? 'background:#e2e8f0;font-weight:700' : ''}"
+                         onmouseover="this.style.background='#f1f5f9'"
+                         onmouseout="if(${row.product_id != pr.id}) this.style.background='none'; else this.style.background='#e2e8f0'">
+                      ${label}
+                    </div>`;
+                  }).join('')}
+                </div>
+              </div>
             </td>
             <td style="padding:3px">
               <select onchange="updateServiceLine(${i},'priority',this.value)" style="font-size:11px;padding:3px;width:100%">
@@ -1368,4 +1399,42 @@ async function reprintSampleLabels(admissionId) {
     }));
     if (typeof printLabBarcodes === 'function') printLabBarcodes(withTests);
   } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ── CUSTOM SEARCHABLE DROPDOWN HELPERS ─────────────────────────────────
+function getProductNameById(id) {
+  const pr = admMasterProducts.find(x => String(x.id) === String(id));
+  return pr ? `[${pr.kode_internal || '—'}] ${pr.nama_tes}` : '';
+}
+function showServiceDropdown(i) {
+  const el = document.getElementById(`service-list-${i}`);
+  if (el) {
+    el.style.display = 'block';
+    filterServiceDropdown(i, ''); // Reset filter
+  }
+}
+function hideServiceDropdown(i) {
+  setTimeout(() => {
+    const el = document.getElementById(`service-list-${i}`);
+    if (el) el.style.display = 'none';
+  }, 250);
+}
+function filterServiceDropdown(i, q) {
+  q = (q || '').toLowerCase().trim();
+  const opts = document.querySelectorAll(`.service-opt-${i}`);
+  opts.forEach(opt => {
+    const label = opt.dataset.label || '';
+    if (!q || label.includes(q)) {
+      opt.style.display = 'block';
+    } else {
+      opt.style.display = 'none';
+    }
+  });
+}
+function selectServiceProduct(i, id, price, name) {
+  if (!admFormState.serviceLines[i]) return;
+  admFormState.serviceLines[i].product_id = id ? parseInt(id) : null;
+  admFormState.serviceLines[i].name = name || '';
+  admFormState.serviceLines[i].unit_price = price || 0;
+  renderServiceLines();
 }
