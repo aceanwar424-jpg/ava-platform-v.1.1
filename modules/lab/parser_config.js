@@ -372,6 +372,7 @@ async function lpcSaveHostMap(){
     if(dr){ try{ await sbPatch('lab_results', dr.id, { host_code:j.code }); dr.host_code=j.code; okD++; }catch(e){} }
   }
   toast(`✅ Host code: ${okT} parameter (template) · ${okD} draft sampel ini`,'ok',6000);
+  try{ if(typeof _itemsCache!=='undefined') _itemsCache={}; }catch(e){}   // paksa muat ulang master parameter
   try{ if(typeof loadLabResults==='function') await loadLabResults(); }catch(e){}
   closeModalForce(); renderParserConfig(_lpcAid);
 }

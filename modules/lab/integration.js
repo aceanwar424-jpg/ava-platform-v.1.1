@@ -60,8 +60,17 @@ async function aiComputeMatches(sampleId, text, entriesOverride){
   if(!drafts.length && s.admission_id){
     drafts=await sbGet('lab_results',`select=*&admission_id=eq.${s.admission_id}&product_id=eq.${s.product_id}&status=eq.Draft&order=id.asc`).catch(()=>[]);
   }
-  const keyOf=d=>[d.host_code, d.item_code, d.loinc_code, (!d.product_item_id?prod.host_code:null), (!d.product_item_id?prod.kode_internal:null)]
-    .filter(Boolean).map(x=>String(x).toLowerCase());
+  // Master parameter (product_items) — memuat host_code yang dipetakan lewat
+  // Peta Host Code / master, meski baris draft belum menyalinnya.
+  let itemsById={};
+  try{ if(typeof labProductItems==='function') (await labProductItems(s.product_id)||[]).forEach(it=>{ itemsById[it.id]=it; }); }catch(e){}
+  const keyOf=d=>{
+    const it = d.product_item_id ? itemsById[d.product_item_id] : null;
+    return [d.host_code, d.item_code, d.loinc_code,
+            it&&it.host_code, it&&it.code, it&&it.loinc_code,
+            (!d.product_item_id?prod.host_code:null), (!d.product_item_id?prod.kode_internal:null)]
+      .filter(Boolean).map(x=>String(x).toLowerCase());
+  };
 
   const matches=[]; const used=new Set();
   entries.forEach(e=>{
