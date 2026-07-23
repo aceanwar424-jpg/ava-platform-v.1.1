@@ -390,13 +390,19 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     </div>
     
     <div class="footer">
-      <div class="signs">
-        <div>
+      <div class="signs" style="display:flex;justify-content:flex-end;margin-top:10px">
+        <div style="width: 200px; font-size:11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
           <div>${cfg.sign3_role || 'Penanggung Jawab'}:</div>
-          <div class="line">${cfg.sign3_name || first.approved_by || '—'}</div>
+          <div style="margin: 4px 0;">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('https://apps.avahealth.sbs/track.html?visit=' + first.visit_number)}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
+          </div>
+          <div class="line" style="width: 100%; border-top:1px solid #000; padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
         </div>
       </div>
-      <div class="disc" style="display:block;margin-top:16px;font-size:10px;color:#000;border-top:1px dashed #000;padding-top:6px">
+      
+      ${cfg.footer_note ? `<div style="font-size:10px;color:#000;margin-top:12px;line-height:1.4">${cfg.footer_note}</div>` : ''}
+      
+      <div class="disc" style="display:block;margin-top:14px;font-size:10px;color:#000;border-top:1px dashed #000;padding-top:6px">
         <div style="display:flex;justify-content:space-between">
           <span><strong>Validator:</strong> ${validator}</span>
           <span><strong>Approval:</strong> ${approver}</span>
