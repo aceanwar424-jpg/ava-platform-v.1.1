@@ -387,10 +387,26 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     </div>
     
     <div class="results-container">
-      ${Object.entries(byCat).map(([cat,rows])=>`
-        <div class="cat">${cat}</div>
-        <table style="width:100%;margin-top:6px"><thead><tr><th>Pemeriksaan</th><th>Hasil</th><th>Satuan</th><th>Nilai Rujukan</th>${cfg.show_loinc?'<th>LOINC</th>':''}</tr></thead>
-        <tbody>${_labPrintCatRows(rows, cfg)}</tbody></table>`).join('')}
+      <table style="width:100%;margin-top:6px">
+        <thead>
+          <tr>
+            <th>Pemeriksaan</th>
+            <th>Hasil</th>
+            <th>Satuan</th>
+            <th>Nilai Rujukan</th>
+            <th>Keterangan</th>
+            ${cfg.show_loinc?'<th>LOINC</th>':''}
+          </tr>
+        </thead>
+        <tbody>
+          ${Object.entries(byCat).map(([cat,rows])=>`
+            <tr class="cat-row">
+              <td colspan="${cfg.show_loinc?6:5}" style="background:#f1f5f9;font-weight:800;font-size:11.5px;padding:6px 10px;border-bottom:1px solid #cbd5e1;color:${hc}">${cat.toUpperCase()}</td>
+            </tr>
+            ${_labPrintCatRows(rows, cfg)}
+          `).join('')}
+        </tbody>
+      </table>
       ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · * = nilai kritis</div>`:''}
     </div>
     
@@ -434,7 +450,6 @@ function _labPrintRow(r, indent, cfg){
   }
   
   const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}${codeStr}</span>`:`<strong>${r.product_name||'—'}${codeStr}</strong>`;
-  const span=cfg.show_loinc?5:4;
   
   // Format Nilai Rujukan
   let refRange = '—';
@@ -451,13 +466,14 @@ function _labPrintRow(r, indent, cfg){
     <td><strong style="color:${col};font-size:13px">${r.result_value||'—'}</strong>${flag ? ` <span style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'};font-weight:800;font-size:11px;margin-left:4px">${flag}</span>` : ''}</td>
     <td style="color:#546E7A">${r.unit||'—'}</td>
     <td style="color:#546E7A">${refRange}</td>
+    <td style="color:#546E7A;font-size:11px;font-style:italic">${r.notes||'—'}</td>
     ${cfg.show_loinc?`<td style="color:#94A3B8;font-family:monospace;font-size:10px">${r.loinc_code||'—'}</td>`:''}
-  </tr>${r.notes?`<tr><td colspan="${span}" style="padding:2px 10px 6px ${indent?'26px':'10px'};font-size:10.5px;color:#7A5B00;font-style:italic">Catatan: ${r.notes}</td></tr>`:''}`;
+  </tr>`;
 }
 // Kelompokkan hasil dalam 1 kategori per tes; panel diberi sub-header + analit terindent
 function _labPrintCatRows(rows, cfg){
   cfg=cfg||{};
-  const span=cfg.show_loinc?5:4;
+  const span=cfg.show_loinc?6:5;
   const byProd={};
   rows.forEach(r=>{ const k=r.product_name||'—'; (byProd[k]=byProd[k]||[]).push(r); });
   return Object.entries(byProd).map(([prod,prows])=>{
