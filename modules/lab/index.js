@@ -259,8 +259,8 @@ function injectLisStyle(){
 // dirender SATU tab yang diminta, dengan judul & tautan kembali ke indeks.
 // ═══════════════════════════════════════════════════════════════
 const LAB_TAB_META = {
-  checkin:    { label:'Penerimaan Sampel', ico:'' },
-  result:     { label:'Input Hasil',       ico:'' },
+  checkin:    { label:'Penerimaan Sampel', ico:'🧪' },
+  result:     { label:'Input Hasil',       ico:'📝' },
   validation: { label:'Validasi',          ico:'✅' },
   approval:   { label:'Approval',          ico:'🔏' },
   report:     { label:'Rekam Medis Lab',   ico:'📁' },
@@ -274,13 +274,24 @@ async function renderLab(tab='checkin'){
   const meta = LAB_TAB_META[tab] || { label:'LIS', ico:'' };
   document.getElementById('main-content').innerHTML = `
     <div id="lab-shell" class="lis">
-      <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center">
+      <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:12px">
           <button class="btn btn-ghost btn-sm" onclick="openCategory('lab')" title="Kembali ke daftar menu LIS">← Menu LIS</button>
           <div><h1 style="margin:0">${meta.ico} ${meta.label}</h1>
             <span class="lis-sub">Laboratory Information System</span></div>
         </div>
         <span id="lab-date-badge" class="lis-date"></span>
+      </div>
+
+      <div class="lab-sub-nav" style="display:flex;gap:4px;background:#f8fafc;padding:4px;border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap">
+        ${Object.entries(LAB_TAB_META).map(([key, m]) => `
+          <button class="nav-tab-btn" onclick="switchLabTab('${key}')"
+            style="padding:6px 14px;border:none;background:${tab === key ? 'var(--teal)' : 'transparent'};
+            color:${tab === key ? '#fff' : 'var(--text3)'};font-weight:${tab === key ? '700' : '600'};
+            font-size:12px;border-radius:8px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:4px">
+            <span>${m.ico}</span> <span>${m.label}</span>
+          </button>
+        `).join('')}
       </div>
 
       <div id="lab-critical-banner"></div>

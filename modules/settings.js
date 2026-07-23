@@ -121,6 +121,13 @@ async function renderSettings() {
           </div>
         </div>
 
+        <!-- Lab Barcode Migration Tool -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">🧪 Lab Barcode Migration Tool</div>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Perbarui barcode pasien hari ini secara massal ke format terbaru: <strong>YYYYDDMMxxxx</strong> (misal 202623070001).</p>
+          <button class="btn btn-teal btn-sm" onclick="runBarcodeMigrationToday()">Update Barcode Hari Ini</button>
+        </div>
+
       </div>
     </div>`;
 
@@ -636,4 +643,39 @@ function resetAllRolePages() {
   toast('↩ Semua role direset ke default', 'info');
   renderRoleMenuConfig();
   applyRoleMenu();
+}
+
+async function runBarcodeMigrationToday() {
+  if (!confirm('Apakah Anda yakin ingin memigrasi seluruh barcode lab hari ini (23 Juli 2026) ke format YYYYDDMMxxxx kronologis?')) return;
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    toast('⏳ Membaca sampel hari ini...', 'info', 2000);
+    // Fetch all today's samples
+    const samples = await sbGet('lab_samples', `select=*&created_at=gte.${today}T00:00:00Z&order=created_at.asc`);
+    if (!samples || !samples.length) {
+      toast('⚠️ Tidak ada sampel hari ini yang ditemukan.', 'warn', 4000);
+      return;
+    }
+    
+    // YYYYDDMM prefix
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const prefix = `${yyyy}${dd}${mm}`; // e.g. "20262307"
+
+    let seq = 1;
+    let updated = 0;
+    for (const s of samples) {
+      const newBarcode = `${prefix}${String(seq).padStart(4, '0')}`;
+      await sbPatch('lab_samples', s.id, { barcode: newBarcode });
+      seq++;
+      updated++;
+    }
+    
+    toast(`✅ Berhasil memperbarui ${updated} barcode ke format kronologis ${prefix}xxxx!`, 'ok', 5000);
+    if (typeof labRefresh === 'function') labRefresh();
+  } catch (e) {
+    toast(`❌ Migrasi gagal: ${e.message}`, 'err', 6000);
+  }
 }
