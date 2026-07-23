@@ -14,11 +14,12 @@ const SAMPLE_REJECT_REASONS = [
   'Kontaminasi','Sampel bocor / tumpah','Melewati batas waktu stabilitas',
 ];
 
+let _ciSel = null;   // sampel terpilih untuk panel detail (split kanan)
+
 function renderCheckinTab(){
   const el=document.getElementById('lab-checkin'); if(!el) return;
 
-  // Satu tabel terpadu untuk SEMUA sampel (seperti tabel bawah dulu).
-  // Urut: yang butuh aksi dulu (Pending/Ditolak), lalu proses, lalu selesai.
+  // Satu daftar untuk SEMUA sampel. Urut: yang butuh aksi dulu, lalu selesai.
   const order={Pending:0,Rejected:1,'In Process':2,Done:3};
   const samples=(labSamples||[]).slice().sort((a,b)=>{
     const oa=order[a.status]??9, ob=order[b.status]??9;
@@ -26,6 +27,7 @@ function renderCheckinTab(){
     return new Date(b.received_at||b.created_at||0)-new Date(a.received_at||a.created_at||0);
   });
   const pendCount=samples.filter(s=>s.status==='Pending').length;
+  if(!samples.some(s=>s.id==_ciSel)) _ciSel = samples.length?samples[0].id:null;
 
   el.innerHTML=`
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
@@ -40,25 +42,34 @@ function renderCheckinTab(){
       <span>Daftar Sampel — check-in s/d selesai</span>
       ${pendCount?`<button class="btn btn-teal btn-xs" onclick="processAllPending()">Proses Semua Pending (${pendCount})</button>`:''}
     </div>
-    <div class="table-wrap"><table><thead><tr>
-      <th>Barcode</th><th>Pasien</th><th>Sampel</th><th>Jam Diterima</th><th>Status</th><th>Aksi</th><th style="width:56px;text-align:center">Detail</th>
-    </tr></thead><tbody>
-    ${samples.length?samples.map(s=>{
-      const st=checkinSampleStatus(s);
-      const jam=s.received_at||s.collected_at;
-      return `<tr>
-        <td style="font-family:monospace;font-size:11.5px;font-weight:700">${s.barcode||'—'}</td>
-        <td><div style="font-weight:600">${s.patient_name||'—'}</div><div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
-        <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
-        <td style="font-size:11px;color:var(--gray)">${jam?new Date(jam).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
-        <td><span class="lis-badge" style="background:${st.bg};color:${st.color}"${s.status==='Rejected'&&s.rejection_reason?` title="${s.rejection_reason.replace(/"/g,'&quot;')}"`:''}>${st.label}</span></td>
-        <td><div class="act-row">${checkinActions(s)}</div></td>
-        <td style="text-align:center"><button class="btn btn-ghost btn-xs" onclick="toggleCheckinDetail(${s.id})" id="cd-btn-${s.id}">▸</button></td>
-      </tr>
-      <tr id="cd-row-${s.id}" style="display:none"><td colspan="7" style="background:var(--lgray);padding:0"><div id="cd-body-${s.id}" style="padding:12px 16px"></div></td></tr>`;
-    }).join(''):`<tr><td colspan="7" style="text-align:center;padding:26px;color:var(--gray)">Belum ada sampel. Scan barcode untuk check-in.</td></tr>`}
-    </tbody></table></div>`;
+    ${samples.length?`
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 372px;gap:14px;align-items:start">
+      <div class="table-wrap" style="max-height:648px;overflow:auto;margin:0">
+        <table style="margin:0"><thead><tr>
+          <th>Barcode</th><th>Pasien</th><th>Sampel</th><th>Jam Diterima</th><th>Status</th><th>Aksi</th>
+        </tr></thead><tbody>
+        ${samples.map(s=>{
+          const st=checkinSampleStatus(s);
+          const jam=s.received_at||s.collected_at;
+          const sel=s.id==_ciSel;
+          return `<tr class="ci-row" data-id="${s.id}" onclick="selectCheckinSample(${s.id})"
+            style="cursor:pointer;transition:background .15s;${sel?'background:var(--mint);box-shadow:inset 3px 0 0 var(--teal)':''}"
+            onmouseover="if(this.dataset.id!=='${_ciSel}')this.style.background='var(--lgray)'"
+            onmouseout="if(this.dataset.id!=='${_ciSel}')this.style.background=''">
+            <td style="font-family:monospace;font-size:11.5px;font-weight:700">${s.barcode||'—'}</td>
+            <td><div style="font-weight:600">${s.patient_name||'—'}</div><div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
+            <td style="font-size:11px;color:var(--gray)">${s.sampel_type||'—'}</td>
+            <td style="font-size:11px;color:var(--gray)">${jam?new Date(jam).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
+            <td><span class="lis-badge" style="background:${st.bg};color:${st.color}"${s.status==='Rejected'&&s.rejection_reason?` title="${s.rejection_reason.replace(/"/g,'&quot;')}"`:''}>${st.label}</span></td>
+            <td onclick="event.stopPropagation()"><div class="act-row">${checkinActions(s)}</div></td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>
+      <div id="ci-detail" style="position:sticky;top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:calc(100vh - 130px);overflow-y:auto;box-shadow:var(--shadow-sm,0 1px 3px rgba(0,0,0,.06))"></div>
+    </div>`:`<div class="empty-state"><div class="ico">🧪</div><h3>Belum ada sampel</h3><p>Scan barcode untuk check-in.</p></div>`}`;
   loadPendingLabels();
+  if(samples.length && _ciSel!=null) renderCheckinDetail(_ciSel);
 }
 
 // Status gabungan sampel (pra-analitik + progres hasil).
@@ -91,51 +102,72 @@ async function processAllPending(){
   await loadLabSamples(); renderCheckinTab(); renderLabKPI();
 }
 
-// Buka/tutup baris detail: daftar tes + riwayat TAT.
-function toggleCheckinDetail(sid){
-  const row=document.getElementById(`cd-row-${sid}`), btn=document.getElementById(`cd-btn-${sid}`);
-  if(!row) return;
-  if(row.style.display!=='none'){ row.style.display='none'; if(btn) btn.textContent='▸'; return; }
-  row.style.display=''; if(btn) btn.textContent='▾';
-  const s=labSamples.find(x=>x.id==sid)||{};
-  const body=document.getElementById(`cd-body-${sid}`); if(body) body.innerHTML=checkinDetailHtml(s);
+// Pilih sampel → sorot baris + render panel detail kanan (tanpa expand).
+function selectCheckinSample(sid){
+  _ciSel=sid;
+  document.querySelectorAll('#lab-checkin .ci-row').forEach(tr=>{
+    const on = tr.dataset.id==String(sid);
+    tr.style.background = on?'var(--mint)':'';
+    tr.style.boxShadow = on?'inset 3px 0 0 var(--teal)':'';
+  });
+  renderCheckinDetail(sid);
 }
 
-function checkinDetailHtml(s){
+// Panel detail: identitas + daftar tes + riwayat TAT (timeline vertikal).
+function renderCheckinDetail(sid){
+  const panel=document.getElementById('ci-detail'); if(!panel) return;
+  const s=labSamples.find(x=>x.id==sid);
+  if(!s){ panel.innerHTML='<div style="padding:26px;text-align:center;color:var(--gray);font-size:12px">Pilih sampel di kiri.</div>'; return; }
+  const st=checkinSampleStatus(s);
   let list=labResults.filter(r=>r.sample_id==s.id);
   if(!list.length) list=labResults.filter(r=>r.admission_id==s.admission_id && r.product_id==s.product_id);
   const pick=(fn,last)=>{ const v=list.map(fn).filter(Boolean).sort(); return last?v.slice(-1)[0]:v[0]; };
-  const enteredRow=list.find(r=>r.entered_at)||{};
-  const validRow  =list.find(r=>r.validated_at)||{};
-  const apprRow   =list.find(r=>r.approved_at||r.released_at)||{};
-  const fmt=t=>t?new Date(t).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+  const fmt=t=>t?new Date(t).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):null;
+  const eRow=list.find(r=>r.entered_at)||{}, vRow=list.find(r=>r.validated_at)||{}, aRow=list.find(r=>r.approved_at||r.released_at)||{};
   const steps=[
-    {ic:'📥',label:'Diterima', at:s.received_at||s.collected_at, by:s.collected_by},
-    {ic:'📝',label:'Input Hasil', at:pick(r=>r.entered_at), by:enteredRow.entered_by},
-    {ic:'✅',label:'Validasi', at:pick(r=>r.validated_at), by:validRow.validated_by},
-    {ic:'🔏',label:'Selesai', at:pick(r=>r.approved_at||r.released_at,true), by:apprRow.approved_by||apprRow.released_by},
+    {label:'Diterima',    at:s.received_at||s.collected_at,          by:s.collected_by,                         c:'#F59E0B'},
+    {label:'Input Hasil', at:pick(r=>r.entered_at),                  by:eRow.entered_by,                        c:'#8B5CF6'},
+    {label:'Validasi',    at:pick(r=>r.validated_at),                by:vRow.validated_by,                      c:'#0EA5E9'},
+    {label:'Selesai',     at:pick(r=>r.approved_at||r.released_at,1), by:aRow.approved_by||aRow.released_by,     c:'#22C55E'},
   ];
-  const testRows=list.length? list.map(r=>`<tr>
-      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7">${r.item_name||r.product_name||'—'}</td>
-      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7;font-weight:700">${r.result_value||'—'} ${r.unit||''}</td>
-      <td style="padding:3px 8px;border-bottom:1px solid #eef2f7;color:var(--gray);font-size:11px">${r.interpretation||r.condition_name||''}</td>
-    </tr>`).join('') : `<tr><td colspan="3" style="padding:6px 8px;color:var(--gray)">Belum ada parameter.</td></tr>`;
-  return `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Daftar Tes — ${s.product_name||''}</div>
-        <table style="width:100%;font-size:12px;border-collapse:collapse"><tbody>${testRows}</tbody></table>
+  const testRows = list.length ? list.map(r=>`
+    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+      <div style="min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--navy)">${r.item_name||r.product_name||'—'}</div>
+        ${(r.interpretation||r.condition_name)?`<div style="font-size:10.5px;color:var(--gray)">${r.interpretation||r.condition_name}</div>`:''}
       </div>
-      <div>
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:6px">Riwayat TAT</div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          ${steps.map(st=>`<div style="display:flex;align-items:center;gap:8px;font-size:12px">
-            <span style="width:18px">${st.ic}</span>
-            <span style="width:84px;color:var(--gray)">${st.label}</span>
-            <span style="font-weight:600;min-width:96px">${fmt(st.at)}</span>
-            ${st.by?`<span style="color:var(--teal);font-weight:700">· ${st.by}</span>`:''}
-          </div>`).join('')}
+      <div style="font-size:12.5px;font-weight:800;white-space:nowrap;color:${r.result_value?labColor(r.color_code):'#94A3B8'}">${r.result_value||'—'} <span style="font-size:10px;color:var(--gray);font-weight:600">${r.unit||''}</span></div>
+    </div>`).join('') : '<div style="font-size:12px;color:var(--gray);padding:8px 0">Belum ada parameter.</div>';
+
+  panel.innerHTML=`
+    <div style="padding:14px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg,#F8FAFC,#fff)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div style="min-width:0">
+          <div style="font-size:15px;font-weight:800;color:var(--navy)">${s.patient_name||'—'}</div>
+          <div style="font-size:11px;color:var(--gray);font-family:monospace">${s.barcode||''}</div>
+          <div style="font-size:11px;color:var(--gray);font-family:monospace">${s.visit_number||''}${s.sampel_type?' · '+s.sampel_type:''}</div>
         </div>
+        <span class="lis-badge" style="background:${st.bg};color:${st.color};flex:0 0 auto">${st.label}</span>
+      </div>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="font-size:10.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Daftar Tes · ${s.product_name||''}</div>
+      ${testRows}
+    </div>
+    <div style="padding:2px 16px 16px">
+      <div style="font-size:10.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Riwayat TAT</div>
+      <div style="padding-left:2px">
+        ${steps.map((sp,i)=>{
+          const done=!!sp.at;
+          return `<div style="display:flex;gap:10px;position:relative;padding-bottom:${i<steps.length-1?'14px':'0'}">
+            ${i<steps.length-1?`<div style="position:absolute;left:5px;top:14px;bottom:0;width:2px;background:${done?sp.c:'#e5e7eb'}"></div>`:''}
+            <div style="width:12px;height:12px;border-radius:50%;flex:0 0 auto;margin-top:2px;background:${done?sp.c:'#fff'};border:2px solid ${done?sp.c:'#cbd5e1'}"></div>
+            <div style="min-width:0;flex:1">
+              <div style="font-size:12px;font-weight:700;color:${done?'var(--navy)':'#94A3B8'}">${sp.label}</div>
+              <div style="font-size:11px;color:var(--gray)">${fmt(sp.at)||'—'}${sp.by?` · <span style="color:var(--teal);font-weight:700">${sp.by}</span>`:''}</div>
+            </div>
+          </div>`;
+        }).join('')}
       </div>
     </div>`;
 }
