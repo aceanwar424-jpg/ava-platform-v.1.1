@@ -54,12 +54,33 @@ const VT = 0x0B, FS = 0x1C; // HL7 MLLP
 // Kirim pesan mentah ke Supabase (non-fatal bila gagal — jangan putus koneksi alat)
 async function ingest(analyzer, protocol, raw, direction) {
   try {
-    const res = await rpc('analyzer_ingest', { analyzer_code: analyzer.code, analyzer_id: analyzer.id,
-      protocol, raw_text: raw, direction: direction || 'IN' });
+    // FIX: Bungkus payload di dalam kunci 'p' (SQL RPC public.analyzer_ingest(p JSONB))
+    const res = await rpc('analyzer_ingest', {
+      p: {
+        analyzer_code: analyzer.code,
+        analyzer_id: analyzer.id,
+        protocol,
+        raw_text: raw,
+        direction: direction || 'IN'
+      }
+    });
     log(`  ⇢ ingest ${analyzer.name} (${protocol}, ${raw.length}b) id=${res && res.id}`);
     const d = STATE.devices.get(analyzer.id);
-    if (d && (direction || 'IN') === 'IN') { d.msgCount++; d.lastMsgAt = new Date(); d.lastRaw = String(raw).slice(0, 4000); }
-  } catch (e) { log(`  ⚠ ingest gagal (${analyzer.name}): ${e.message}`); }
+    if (d && (direction || 'IN') === 'IN') {
+      d.msgCount++;
+      d.lastMsgAt = new Date();
+      d.lastRaw = String(raw).slice(0, 4000);
+      d.lastError = null;
+      d.lastErrorAt = null;
+    }
+  } catch (e) {
+    log(`  ⚠ ingest gagal (${analyzer.name}): ${e.message}`);
+    const d = STATE.devices.get(analyzer.id);
+    if (d) {
+      d.lastError = `ingest gagal: ${e.message}`;
+      d.lastErrorAt = new Date();
+    }
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -117,7 +138,14 @@ function attachHandler(socket, analyzer) {
       buf = buf.slice(1); advanced = true;
     }
   });
-  socket.on('error', (e) => log(`  ⚠ socket ${analyzer.name}: ${e.message}`));
+  socket.on('error', (e) => {
+    log(`  ⚠ socket ${analyzer.name}: ${e.message}`);
+    const d = STATE.devices.get(analyzer.id);
+    if (d) {
+      d.lastError = `socket error: ${e.message}`;
+      d.lastErrorAt = new Date();
+    }
+  });
 }
 
 // HL7 ACK minimal (MSH + MSA|AA) dibungkus MLLP
@@ -181,24 +209,39 @@ function bindAnalyzer(a) {
   if (!a.port) { log(`⚠ ${a.name}: port kosong — dilewati`); return; }
   const dev = { name: a.name, code: a.code, mode: a.mode || 'server', ip: a.ip, port: a.port,
     protocol: a.protocol, direction: a.direction, connected: false, connectedFrom: null,
-    msgCount: 0, lastMsgAt: null, boundAt: new Date() };
+    msgCount: 0, lastMsgAt: null, lastError: null, lastErrorAt: null, boundAt: new Date() };
   STATE.devices.set(a.id, dev);
   if ((a.mode || 'server') === 'server') {
     const server = net.createServer((sock) => {
       log(`🔌 ${a.name}: alat terhubung dari ${sock.remoteAddress}`);
       dev.connected = true; dev.connectedFrom = sock.remoteAddress;
+      dev.lastError = null;
+      dev.lastErrorAt = null;
       attachHandler(sock, a);
       sock.on('close', () => { log(`⏻ ${a.name}: koneksi ditutup`); dev.connected = false; dev.connectedFrom = null; });
     });
-    server.on('error', (e) => log(`❌ ${a.name} server error: ${e.message}`));
+    server.on('error', (e) => {
+      log(`❌ ${a.name} server error: ${e.message}`);
+      dev.lastError = `server error: ${e.message}`;
+      dev.lastErrorAt = new Date();
+    });
     server.listen(a.port, () => log(`🟢 ${a.name}: LISTEN :${a.port} (${a.protocol}, ${a.direction}) — isi IP PC ini + port ${a.port} di alat`));
     bound.set(a.id, server);
   } else {
     const connect = () => {
-      const sock = net.connect(a.port, a.ip, () => { log(`🟢 ${a.name}: CONNECT ${a.ip}:${a.port} (${a.protocol})`); dev.connected = true; });
+      const sock = net.connect(a.port, a.ip, () => {
+        log(`🟢 ${a.name}: CONNECT ${a.ip}:${a.port} (${a.protocol})`);
+        dev.connected = true;
+        dev.lastError = null;
+        dev.lastErrorAt = null;
+      });
       attachHandler(sock, a);
       sock.on('close', () => { log(`⏻ ${a.name}: putus — reconnect 5s`); dev.connected = false; setTimeout(connect, 5000); });
-      sock.on('error', () => {});
+      sock.on('error', (e) => {
+        log(`❌ ${a.name} connect error: ${e.message}`);
+        dev.lastError = `connect error: ${e.message}`;
+        dev.lastErrorAt = new Date();
+      });
     };
     connect();
     bound.set(a.id, true);
@@ -214,55 +257,108 @@ async function loadAndBind() {
   if (!cfgList.length && !bound.size) log('ℹ Belum ada alat dengan IP+port+integrasi aktif. Set di OneLab → master Alat.');
 }
 
-// ══════════════════════════════════════════════════════════════════════
-// Halaman status lokal — http://localhost:PORT (hanya 127.0.0.1, demi PDP:
-// log dapat memuat barcode pasien; hanya bisa dibuka DI PC connector).
-// ══════════════════════════════════════════════════════════════════════
+// ── Status HTML lokal monitor ─────────────────────────────────────────
 const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>OneLab Connector — Status</title>
 <style>
- *{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#0b1220;color:#e2e8f0;padding:16px}
- h1{font-size:16px;font-weight:800}.sub{font-size:12px;color:#94a3b8;margin-bottom:14px}
- .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:16px}
- .dev{background:#131c2e;border:1px solid #1e293b;border-radius:10px;padding:12px}
- .dev h3{font-size:13px;font-weight:700}.dev .meta{font-size:11px;color:#94a3b8;margin-top:3px;line-height:1.6}
- .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
- .on{background:#22c55e}.off{background:#64748b}
- .bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
- button{background:#0e7c86;color:#fff;border:0;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer}
- button.ghost{background:#1e293b}
- pre{background:#060a14;border:1px solid #1e293b;border-radius:10px;padding:12px;font-size:11.5px;line-height:1.55;max-height:46vh;overflow:auto;white-space:pre-wrap}
- .empty{color:#64748b;font-size:12px;padding:14px;text-align:center}
+  :root {
+    --bg-dark: #0A1120;
+    --card-bg: #131E35;
+    --border: #1E2E4E;
+    --text-main: #E2E8F0;
+    --text-muted: #94A3B8;
+    --teal: #14B8A6;
+    --red: #F87171;
+    --orange: #FB923C;
+    --yellow: #FBBF24;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg-dark);color:var(--text-main);padding:24px}
+  .container{max-width:960px;margin:0 auto}
+  h1{font-size:20px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+  .sub{font-size:12.5px;color:var(--text-muted);margin-bottom:20px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px}
+  .dev{background:var(--card-bg);border:1px solid var(--border);border-radius:12px;padding:16px;box-shadow:0 4px 20px rgba(0,0,0,0.15)}
+  .dev-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:10px}
+  .dev h3{font-size:14.5px;font-weight:700;flex:1}
+  .dev .meta{font-size:11.5px;color:var(--text-muted);line-height:1.7}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+  .on{background:#22c55e;box-shadow:0 0 8px #22c55e}
+  .off{background:#64748b}
+  .err-badge{background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:var(--red);border-radius:8px;padding:8px 10px;font-size:11px;margin-top:10px;line-height:1.45}
+  .bar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+  button{background:var(--teal);color:#fff;border:0;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:opacity 0.15s}
+  button:hover{opacity:0.9}
+  .log-container{margin-top:16px}
+  pre{background:#060a14;border:1px solid var(--border);border-radius:12px;padding:14px;font-family:'Consolas',monospace;font-size:11.5px;line-height:1.6;max-height:450px;overflow:auto;white-space:pre-wrap}
+  .empty{color:var(--text-muted);font-size:12.5px;padding:24px;text-align:center;background:var(--card-bg);border:1px solid var(--border);border-radius:12px}
+  .log-err{color:var(--red);font-weight:600}
+  .log-warn{color:var(--yellow)}
+  .log-success{color:#34d399}
 </style></head><body>
- <h1>🔬 OneLab Connector</h1>
- <div class="sub" id="sub">memuat…</div>
- <div class="bar">
-   <button onclick="reload()">↻ Muat ulang config</button>
-   <span style="font-size:11px;color:#64748b">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
- </div>
- <div class="grid" id="devs"></div>
- <div style="font-size:12px;font-weight:700;margin-bottom:6px">Log</div>
- <pre id="log">…</pre>
+<div class="container">
+  <h1>OneLab Connector</h1>
+  <div class="sub" id="sub">memuat…</div>
+  <div class="bar">
+    <button onclick="reload()">Muat ulang config</button>
+    <span style="font-size:11.5px;color:var(--text-muted)">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
+  </div>
+  <div class="grid" id="devs"></div>
+  <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Log Aktivitas (Live)</div>
+  <pre id="log">…</pre>
+</div>
 <script>
- function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
- async function tick(){
-   try{
-     const r=await fetch('/api/status'); const s=await r.json();
-     const up=Math.round((Date.now()-new Date(s.started).getTime())/1000);
-     document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat';
-     document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
-       const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
-       return '<div class="dev"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+esc(d.name||'?')+'</h3>'+
-         '<div class="meta">'+(d.mode==='server'?('LISTEN :'+d.port):('CONNECT '+esc(d.ip||'')+':'+d.port))+' · '+esc(d.protocol||'')+' · '+esc(d.direction||'')+'<br>'+
-         'Pesan: <b>'+d.msgCount+'</b> · terakhir '+seen+(d.connectedFrom?'<br>dari '+esc(d.connectedFrom):'')+'</div>'+
-         (d.lastRaw?'<details style="margin-top:6px"><summary style="cursor:pointer;font-size:11px;color:#38bdf8">lihat kiriman mentah terakhir</summary><pre style="max-height:180px;margin-top:6px">'+esc(d.lastRaw)+'</pre></details>':'')+
-         '</div>';
-     }).join('') : '<div class="empty">Belum ada alat. Set IP/port + aktifkan integrasi di OneLab → master Alat.</div>';
-     document.getElementById('log').textContent = (s.logs||[]).join('\\n');
-   }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }
- }
- async function reload(){ await fetch('/reload',{method:'POST'}); setTimeout(tick,300); }
- tick(); setInterval(tick,3000);
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+  async function tick(){
+    try{
+      const r=await fetch('/api/status'); const s=await r.json();
+      const up=Math.round((Date.now()-new Date(s.started).getTime())/1000);
+      document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat aktif';
+      
+      document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
+        const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
+        const errTime=d.lastErrorAt?new Date(d.lastErrorAt).toLocaleTimeString('id-ID'):'';
+        
+        let errHtml = '';
+        if (d.lastError) {
+          errHtml = '<div class="err-badge"><b>⚠️ Error Terakhir:</b><br>' + esc(d.lastError) + (errTime ? ' (' + errTime + ')' : '') + '</div>';
+        }
+        
+        return '<div class="dev">' +
+          '<div class="dev-header"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+esc(d.name||'?')+'</h3><span style="font-size:11px;color:var(--text-muted)">'+esc(d.protocol||'')+'</span></div>'+
+          '<div class="meta">'+
+            'Mode: <b>'+(d.mode==='server'?'Server (LISTEN)':'Client (CONNECT)')+'</b><br>'+
+            'Koneksi: <b>'+(d.mode==='server'?('Port :'+d.port):('Target '+esc(d.ip||'')+':'+d.port))+'</b><br>'+
+            'Arah: <b>'+(d.direction==='twoway'?'2 Arah (Host-Query)':'1 Arah (Masuk saja)')+'</b><br>'+
+            'Pesan Sukses: <b style="color:var(--teal)">'+d.msgCount+'</b> · terakhir '+seen +
+            (d.connectedFrom?'<br>Connected from: <code>'+esc(d.connectedFrom)+'</code>':'')+'</div>'+
+          errHtml +
+          (d.lastRaw?'<details style="margin-top:10px"><summary style="cursor:pointer;font-size:11px;color:#14B8A6">Lihat pesan mentah terakhir</summary><pre style="max-height:150px;margin-top:6px;font-size:10.5px;background:#090d16;padding:8px">'+esc(d.lastRaw)+'</pre></details>':'')+
+          '</div>';
+      }).join('') : '<div class="empty">Belum ada alat terdaftar. Set IP/port & aktifkan integrasi di OneLab → master Alat.</div>';
+      
+      // Highlight logs
+      const logText = (s.logs||[]).map(l => {
+        const lower = l.toLowerCase();
+        if (lower.includes('gagal') || lower.includes('error') || lower.includes('❌')) {
+          return '<span class="log-err">' + esc(l) + '</span>';
+        }
+        if (lower.includes('warning') || lower.includes('⚠') || lower.includes('putus')) {
+          return '<span class="log-warn">' + esc(l) + '</span>';
+        }
+        if (lower.includes('connect') || lower.includes('listen') || lower.includes('terhubung') || lower.includes('🟢')) {
+          return '<span class="log-success">' + esc(l) + '</span>';
+        }
+        return esc(l);
+      }).join('\\n');
+      
+      const logEl = document.getElementById('log');
+      logEl.innerHTML = logText;
+      logEl.scrollTop = logEl.scrollHeight; // Auto scroll to bottom
+    }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }
+  }
+  async function reload(){ await fetch('/reload',{method:'POST'}); setTimeout(tick,300); }
+  tick(); setInterval(tick,3000);
 </script></body></html>`;
 
 function startStatusServer() {
@@ -280,7 +376,7 @@ function startStatusServer() {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
     res.end(STATUS_HTML);
   });
-  server.on('error', (e) => log(`⚠ status server: ${e.message}`));
+  server.on('error', (e) => log(`⚠ status server: e.message`));
   server.listen(STATUS_PORT, '127.0.0.1', () => log(`🖥  Status lokal: http://localhost:${STATUS_PORT}`));
 }
 
