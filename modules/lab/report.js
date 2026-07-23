@@ -247,7 +247,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     <style>
       @page{ 
         size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
-        margin: ${isTemplate ? '0' : '10mm 10mm 45mm 10mm'}; 
+        margin: 0; 
       }
       *{box-sizing:border-box}
       body{
@@ -255,12 +255,10 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         font-size:11.5px;
         color:#1A2B3C;
         margin:0;
-        padding: ${isTemplate ? `${pTop} ${pRight} ${pBottom} ${pLeft}` : '0'};
-        ${isTemplate ? `
-          position: relative;
-          width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
-          height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
-        ` : ''}
+        padding: ${isTemplate ? `${pTop} ${pRight} ${pBottom} ${pLeft}` : '10mm 10mm 15mm 10mm'};
+        position: relative;
+        width: ${cfg.paper === 'Custom' ? cfg.paper_width : (cfg.paper === 'A5' ? '148mm' : cfg.paper === 'Letter' ? '215.9mm' : '210mm')};
+        min-height: ${cfg.paper === 'Custom' ? cfg.paper_height : (cfg.paper === 'A5' ? '210mm' : cfg.paper === 'Letter' ? '279.4mm' : '297mm')};
       }
       .header{
         display:${cfg.hide_default_header ? 'none' : 'flex'};
@@ -338,19 +336,11 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .legend{font-size:9px;color:#000;margin-top:6px}
       
       .footer{
+        position: absolute; 
+        bottom: ${isTemplate ? pBottom : '15mm'}; 
+        left: ${isTemplate ? pLeft : '10mm'}; 
+        right: ${isTemplate ? pRight : '10mm'};
         page-break-inside: avoid;
-        ${isTemplate ? `
-          position: absolute; 
-          bottom: ${pBottom}; 
-          left: ${pLeft}; 
-          right: ${pRight};
-          margin: 0;
-        ` : `
-          position: fixed;
-          bottom: 10mm;
-          left: 10mm;
-          right: 10mm;
-        `}
       }
       .signs{display:flex;justify-content:flex-end;margin-top:10px}
       .signs > div{width: 220px; font-size:11px; text-align: center;}
