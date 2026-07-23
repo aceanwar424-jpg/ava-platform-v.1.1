@@ -8,6 +8,8 @@
 let _wlSelPatient = null;
 let _wlStatusFilter = 'ALL';
 let _wlSearchQuery = '';
+let _wlAdm = {};       // identitas pasien terpilih (gender/umur untuk interpretasi)
+let _wlNotes = {};     // catatan per hasil (rid -> teks) sebelum disimpan
 
 function getWorklistPatientsData() {
   const patientMap = {};
@@ -184,115 +186,194 @@ function renderWorklistTab(){
     </div>
 
     ${patients.length ? `
-    <div style="display:grid;grid-template-columns:1fr 340px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
-      <!-- Kolom Kiri: Daftar Pasien & Status -->
-      <div style="border-right:1px solid var(--border);overflow-y:auto;max-height:650px">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <thead>
-            <tr style="background:#0A2342;color:#fff;position:sticky;top:0;z-index:1;font-size:11px;text-transform:uppercase">
-              <th style="padding:7px 10px;text-align:left">No. Visit / RM</th>
-              <th style="padding:7px 10px;text-align:left">Pasien</th>
-              <th style="padding:7px 10px;text-align:left">Status Pasien</th>
-              <th style="padding:7px 10px;text-align:left">Test &amp; Status</th>
-              <th style="padding:7px 10px;text-align:left">TAT</th>
-              <th style="padding:7px 10px;text-align:center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${patients.map(p => {
-              const sel = p.admission_id == _wlSelPatient;
-              return `
-              <tr onclick="selectWorklistPatient(${p.admission_id})"
-                style="cursor:pointer;border-bottom:1px solid #f1f5f9;${sel?'background:var(--mint)':''}">
-                <td style="padding:8px 10px;font-family:monospace;font-weight:700">${p.visit_number||'—'}
-                  <div style="font-size:10px;color:var(--gray)">${p.mr_number||''}</div></td>
-                <td style="padding:8px 10px;font-weight:700;color:var(--navy)">${p.patient_name||'—'}</td>
-                <td style="padding:8px 10px">${wlStatusBadge(p.patientStatus)}</td>
-                <td style="padding:8px 10px">
-                  <div style="display:flex;gap:4px;flex-wrap:wrap">
-                    ${p.tests.map(t => `<span title="${t.product_name}: ${t.status}" style="font-size:10px">${wlStatusBadge(t.status)} <span style="color:var(--navy);font-weight:600">${t.product_name}</span></span>`).join('<span style="color:#cbd5e1">|</span>')}
-                  </div>
-                </td>
-                <td style="padding:8px 10px">${tatBadge(p.tests[0]||{})}</td>
-                <td style="padding:8px 10px;text-align:center">
-                  <button class="btn btn-teal btn-xs" onclick="event.stopPropagation();selectWorklistPatient(${p.admission_id})">Detail →</button>
-                </td>
-              </tr>`;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Kolom Kanan: Detail Test Dipesan & Status Per-Test -->
-      <div id="wl-right-panel" style="background:#F8FAFC;padding:14px;overflow-y:auto;max-height:650px">
-      </div>
-    </div>` : `
+    <div style="display:grid;grid-template-columns:230px 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
+      <div id="wl-list" style="border-right:1px solid var(--border);overflow-y:auto;max-height:660px;background:var(--lgray)"></div>
+      <div id="wl-work" style="overflow-y:auto;max-height:660px;min-width:0"></div>
+    </div>
+    <datalist id="wl-note-presets">${LAB_NOTE_PRESETS.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('')}</datalist>
+    ` : `
     <div class="empty-state" style="padding:40px;background:#fff;border-radius:10px;border:1px solid var(--border)">
       <h3>Worklist Kosong</h3>
       <p style="color:var(--gray);font-size:12px">Belum ada order pasien atau sampel yang sesuai dengan filter.</p>
     </div>`}
   `;
 
-  if(_wlSelPatient != null) renderWorklistRightPanel(_wlSelPatient);
+  if(patients.length){
+    renderWlList(patients);
+    if(_wlSelPatient != null) renderWlWork(_wlSelPatient);
+  }
 }
 
 function selectWorklistPatient(admId) {
   _wlSelPatient = admId;
-  renderWorklistTab();
+  renderWlList(getWorklistPatientsData());
+  renderWlWork(admId);
 }
 
-function renderWorklistRightPanel(admId) {
-  const panel = document.getElementById('wl-right-panel'); if(!panel) return;
-  const patients = getWorklistPatientsData();
-  const p = patients.find(x => x.admission_id == admId);
-  if(!p) {
-    panel.innerHTML = `<div style="color:var(--gray);font-size:12px;text-align:center;padding:30px">Pilih pasien di sebelah kiri untuk melihat daftar test yang dipesan.</div>`;
-    return;
-  }
+// ── Kolom kiri: daftar pasien minimal (Lab No + Nama + status) ──
+function renderWlList(patients){
+  const el=document.getElementById('wl-list'); if(!el) return;
+  el.innerHTML = patients.map(p=>{
+    const sel = p.admission_id == _wlSelPatient;
+    return `<div onclick="selectWorklistPatient(${p.admission_id})"
+      style="padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;${sel?'background:var(--mint);border-left:3px solid var(--teal)':'border-left:3px solid transparent'}">
+      <div style="font-size:10.5px;color:var(--gray);font-family:monospace">${p.visit_number||'—'}${p.mr_number?' · '+p.mr_number:''}</div>
+      <div style="font-weight:700;font-size:13px;color:var(--navy);margin:1px 0 3px">${p.patient_name||'—'}</div>
+      ${wlStatusBadge(p.patientStatus)}
+    </div>`;
+  }).join('') || '<div style="padding:16px;text-align:center;color:var(--gray);font-size:12px">Tidak ada pasien</div>';
+}
 
-  panel.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:12px">
-      <div style="font-size:14px;font-weight:800;color:var(--navy)">${p.patient_name||'—'}</div>
-      <div style="font-size:11px;color:var(--gray);font-family:monospace;margin-top:2px">${p.mr_number||''} · ${p.visit_number||''}</div>
-      <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--gray);font-weight:600">Status Pasien:</span>
-        ${wlStatusBadge(p.patientStatus)}
+// ── Kolom tengah: area kerja (tes collapsible + input + rujukan + flag + catatan) ──
+async function renderWlWork(admId){
+  const work=document.getElementById('wl-work'); if(!work) return;
+  const p=getWorklistPatientsData().find(x=>x.admission_id==admId);
+  if(!p){ work.innerHTML='<div style="color:var(--gray);font-size:12px;text-align:center;padding:34px">Pilih pasien di kiri.</div>'; return; }
+  work.innerHTML='<div class="loading-row"><div class="spinner"></div></div>';
+
+  const prodIds=[...new Set(p.tests.map(t=>t.product_id).filter(Boolean))];
+  await Promise.all(prodIds.map(pid=>labLoadRR(pid)));
+  const admD=await sbGet('admissions',`select=patient_name,patient_gender,patient_age,patient_blood_type,mr_number,visit_number&id=eq.${admId}`).catch(()=>[]);
+  _wlAdm=admD?.[0]||{};
+
+  work.innerHTML=`
+    <div style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <span style="font-size:15px;font-weight:800;color:var(--navy)">${_wlAdm.patient_name||p.patient_name||''}</span>
+        ${_wlAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_wlAdm.patient_blood_type}</span>`:''}
+        <div style="font-size:11px;color:var(--gray);font-family:monospace">${_wlAdm.mr_number||p.mr_number||''} · ${_wlAdm.visit_number||p.visit_number||''}${_wlAdm.patient_age?' · '+_wlAdm.patient_age+' th':''} · ${_wlAdm.patient_gender==='F'?'P':'L'}</div>
       </div>
+      <div id="wl-actions"></div>
     </div>
+    <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+      ${p.tests.map(t=>wlTestCard(t)).join('')}
+    </div>`;
 
-    <div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">
-      Daftar Test Dipesan &amp; Status (${p.tests.length})
+  renderWlActions(p);
+  document.querySelectorAll('#wl-work .wl-val').forEach(inp=>{ if(inp.value.trim()) wlInterpret(inp); });
+}
+
+// Satu tes/panel = kartu collapsible; klik untuk buka daftar parameter.
+function wlTestCard(t){
+  const rows=(t.results||[]).slice().sort((a,b)=>(a.id||0)-(b.id||0));
+  const editable = t.status==='Pending' || t.status==='Enter Result';
+  const stColor = t.status==='Approve'?'#22C55E':t.status==='Validate'?'#0EA5E9':t.status==='Enter Result'?'#8B5CF6':'#F59E0B';
+  return `<details ${editable?'open':''} style="background:#fff;border:1px solid var(--border);border-left:4px solid ${stColor};border-radius:8px;overflow:hidden">
+    <summary style="cursor:pointer;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:12.5px;font-weight:700;color:var(--navy)">${t.product_name||'—'}
+        <span style="font-size:10px;color:var(--gray);font-weight:400">· ${rows.length} parameter</span></span>
+      ${wlStatusBadge(t.status)}
+    </summary>
+    <div style="border-top:1px solid #f1f5f9;overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:var(--lgray);color:var(--gray);font-size:10px;text-transform:uppercase">
+          <th style="padding:5px 10px;text-align:left">Parameter</th>
+          <th style="padding:5px 8px;text-align:left;width:100px">Rujukan</th>
+          <th style="padding:5px 8px;text-align:left;width:118px">Hasil</th>
+          <th style="padding:5px 4px;width:30px">Flag</th>
+          <th style="padding:5px 8px;text-align:left;width:160px">Catatan</th>
+        </tr></thead><tbody>
+        ${rows.length?rows.map(r=>wlParamRow(r,editable)).join(''):`<tr><td colspan="5" style="padding:8px 10px;color:var(--gray)">Belum ada parameter (sampel belum masuk).</td></tr>`}
+      </tbody></table>
     </div>
+  </details>`;
+}
 
-    <div style="display:flex;flex-direction:column;gap:8px">
-      ${p.tests.map(t => {
-        return `
-        <div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${t.status==='Approve'?'#22C55E':t.status==='Validate'?'#0EA5E9':t.status==='Enter Result'?'#8B5CF6':'#F59E0B'};border-radius:8px;padding:10px 12px">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <div>
-              <div style="font-size:12.5px;font-weight:700;color:var(--navy)">${t.product_name||'—'}</div>
-              <div style="font-size:10.5px;color:var(--gray);font-family:monospace;margin-top:2px">
-                Barcode: ${t.barcode||'—'} · Sampel: ${t.sampel_type||'—'}
-              </div>
-            </div>
-            ${wlStatusBadge(t.status)}
-          </div>
+function wlParamRow(r, editable){
+  const pid=r.product_id, itemId=r.product_item_id||null;
+  const rr=(_rrCache[pid]||[]).filter(x=> itemId?(x.product_item_id==itemId||x.product_item_id==null):x.product_item_id==null);
+  const norm=rr.find(x=>x.value_type!=='qualitative'&&x.condition_type==='normal'&&x.range_min!=null&&x.range_max!=null);
+  const refTxt=norm?`${norm.range_min}–${norm.range_max}`:(rr.filter(x=>x.value_type==='qualitative').map(x=>x.condition_name).join('/')||'—');
+  const name=r.item_name||r.product_name||'—';
+  const noteVal=(_wlNotes[r.id]!=null?_wlNotes[r.id]:(r.notes||''));
+  const valCell = editable
+    ? `<input type="text" class="wl-val" data-rid="${r.id}" data-item="${itemId||''}" data-prod="${pid}" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="wlInterpret(this)" style="width:104px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px">`
+    : `<span style="font-weight:700">${r.result_value||'—'} ${r.unit||''}</span>`;
+  const noteCell = editable
+    ? `<input list="wl-note-presets" class="wl-note" value="${String(noteVal).replace(/"/g,'&quot;')}" placeholder="catatan…" oninput="_wlNotes[${r.id}]=this.value" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:5px">`
+    : (noteVal?`<span style="font-size:11px;color:var(--gray)">${noteVal}</span>`:'<span style="color:var(--gray)">—</span>');
+  return `<tr>
+    <td style="padding:4px 10px;border-bottom:1px solid #f5f7fa">${name}${r.unit?` <span style="font-size:9.5px;color:var(--gray)">${r.unit}</span>`:''}</td>
+    <td style="padding:4px 8px;border-bottom:1px solid #f5f7fa;color:var(--gray);font-size:11px">${refTxt}</td>
+    <td style="padding:4px 8px;border-bottom:1px solid #f5f7fa">${valCell}</td>
+    <td style="padding:4px 4px;border-bottom:1px solid #f5f7fa;text-align:center" class="wl-flag"></td>
+    <td style="padding:4px 8px;border-bottom:1px solid #f5f7fa">${noteCell}</td>
+  </tr>`;
+}
 
-          ${t.resultVal ? `<div style="font-size:11.5px;color:var(--teal);font-weight:700;margin-top:6px;background:#F0FDF4;padding:4px 8px;border-radius:4px;display:inline-block">Hasil: ${t.resultVal}</div>` : ''}
+function wlInterpret(input){
+  const tr=input.closest('tr'); const cell=tr.querySelector('.wl-flag'); if(!cell) return;
+  const pid=input.dataset.prod, itemId=input.dataset.item?parseInt(input.dataset.item):null;
+  const raw=input.value.trim();
+  const rr=(_rrCache[pid]||[]).filter(x=> itemId?(x.product_item_id==itemId||x.product_item_id==null):x.product_item_id==null);
+  if(raw===''){ cell.innerHTML=''; input.style.borderColor='var(--border)'; return; }
+  const m=matchRefRange(rr, raw, _wlAdm.patient_gender, _wlAdm.patient_age);
+  const num=parseFloat(raw);
+  const norm=rr.find(x=>x.condition_type==='normal'&&x.range_min!=null&&x.range_max!=null);
+  let flag=''; if(norm&&!isNaN(num)){ if(num>norm.range_max)flag='H'; else if(num<norm.range_min)flag='L'; }
+  const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
+  const c=m?labColor(m.color_code):'#94A3B8';
+  cell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626" title="Nilai kritis">!!</span>'
+    : flag?`<span style="font-weight:800;color:${flag==='H'?'#EF4444':'#0EA5E9'}">${flag}</span>`
+    : (m?`<span style="color:${c}">●</span>`:'');
+  input.style.borderColor=c;
+}
 
-          <div style="margin-top:8px;display:flex;justify-content:flex-end">
-            ${t.status === 'Pending' || t.status === 'Enter Result' ? `
-              <button class="btn btn-teal btn-xs" onclick="openResultEntry(${p.admission_id}, ${t.product_id})">Input Hasil</button>
-            ` : t.status === 'Validate' ? `
-              <button class="btn btn-ghost btn-xs" style="color:#0369A1;border-color:#0369A1" onclick="switchLabTab('validation')">Ke Validasi →</button>
-            ` : `
-              <button class="btn btn-ghost btn-xs" style="color:#166534;border-color:#166534" onclick="switchLabTab('approval')">Ke Approval →</button>
-            `}
-          </div>
-        </div>`;
-      }).join('')}
-    </div>
-  `;
+// Bilah aksi bawah header: Simpan (jika masih entry) + Validasi + Approve.
+function renderWlActions(p){
+  const box=document.getElementById('wl-actions'); if(!box) return;
+  const allRows = p.tests.flatMap(t=>t.results||[]);
+  const hasEntry       = allRows.some(r=>r.status==='Draft');                       // masih ada draft utk diisi/simpan
+  const hasFilledDraft = allRows.some(r=>r.status==='Draft' && r.result_value);     // draft terisi → siap divalidasi
+  const hasValidated   = allRows.some(r=>r.status==='Validated');                    // tervalidasi → siap approve
+  let b='';
+  if(hasEntry) b+=`<button class="btn btn-teal btn-sm" onclick="wlSaveResults(${p.admission_id})">Simpan Hasil</button>`;
+  if(hasFilledDraft) b+=`<button class="btn btn-sm" style="background:#0369A1;color:#fff;border-color:#0369A1" onclick="wlValidate(${p.admission_id})">Validasi</button>`;
+  if(hasValidated) b+=`<button class="btn btn-sm" style="background:#166534;color:#fff;border-color:#166534" onclick="wlApprove(${p.admission_id})">Approve &amp; Rilis</button>`;
+  box.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap">${b||'<span style="font-size:11px;color:var(--gray)">Semua hasil sudah dirilis</span>'}</div>`;
+}
+
+// Simpan semua nilai yang diketik (draft) + interpretasi + catatan.
+async function wlSaveResults(admId){
+  const inputs=[...document.querySelectorAll('#wl-work .wl-val')];
+  let ok=0, changed=0;
+  for(const inp of inputs){
+    const rid=inp.dataset.rid; const r=labResults.find(x=>x.id==rid); if(!r) continue;
+    const val=inp.value.trim();
+    const noteChanged=(_wlNotes[rid]!==undefined && (_wlNotes[rid]||'')!==(r.notes||''));
+    if(val===(r.result_value||'') && !noteChanged) continue;   // tak berubah
+    changed++;
+    const pid=inp.dataset.prod, itemId=inp.dataset.item?parseInt(inp.dataset.item):null;
+    const rr=(_rrCache[pid]||[]).filter(x=> itemId?(x.product_item_id==itemId||x.product_item_id==null):x.product_item_id==null);
+    const num=parseFloat(val);
+    const m=matchRefRange(rr, val, _wlAdm.patient_gender, _wlAdm.patient_age);
+    const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
+    const payload={
+      result_value:val||null, result_numeric:isNaN(num)?null:num,
+      ref_range_id:m?.id||null, normal_min:m?.range_min??null, normal_max:m?.range_max??null,
+      critical_low:m?.critical_low??null, critical_high:m?.critical_high??null,
+      interpretation:m?.interpretation||m?.condition_name||null, color_code:m?.color_code||'green',
+      condition_name:m?.condition_name||null, condition_type:m?.condition_type||null,
+      is_critical:crit, status:'Draft', updated_at:new Date().toISOString(),
+    };
+    if(_wlNotes[rid]!==undefined) payload.notes=_wlNotes[rid]||null;
+    if(val && !r.entered_at){ payload.entered_by=labUser(); payload.entered_at=new Date().toISOString(); }
+    try{ await sbPatch('lab_results',rid,payload); ok++; }catch(e){}
+  }
+  if(!changed){ toast('Tidak ada perubahan','warn'); return; }
+  _wlNotes={};
+  toast(`${ok} hasil disimpan`,'ok');
+  await labRefresh();
+}
+
+// Validasi / Approve satu pasien — pakai ulang fungsi bersama, lalu refresh worklist.
+async function wlValidate(admId){
+  if(typeof validatePatientResults==='function'){ await validatePatientResults(admId); }
+  renderWorklistTab();
+}
+async function wlApprove(admId){
+  if(typeof approvePatientResults==='function'){ await approvePatientResults(admId); }
+  renderWorklistTab();
 }
 
 // Buka input hasil per-tes
