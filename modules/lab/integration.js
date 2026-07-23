@@ -43,8 +43,8 @@ function parseAnalyzerFeed(text){
 
 // Cocokkan entri terhadap draft parameter sampel. Dipakai oleh jalur manual &
 // otomatis. Mengembalikan {entries, matches, sample, prod, matched}.
-async function aiComputeMatches(sampleId, text){
-  const entries=parseAnalyzerFeed(text);
+async function aiComputeMatches(sampleId, text, entriesOverride){
+  const entries=(entriesOverride&&entriesOverride.length)?entriesOverride:parseAnalyzerFeed(text);
   const s=labSamples.find(x=>x.id==sampleId)||{};
   const prod=(typeof labProduct==='function'?labProduct(s.product_id):null)||{};
   let drafts=labResults.filter(r=>r.admission_id==s.admission_id && r.product_id==s.product_id && r.status==='Draft');
@@ -198,6 +198,7 @@ async function renderAnalyzerHub(){
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-ghost btn-sm" onclick="renderAnalyzerHub()">↻ Segarkan</button>
+        <button class="btn btn-ghost btn-sm" onclick="typeof renderParserConfig==='function'&&renderParserConfig()">⚙️ Config Parser</button>
         <button class="btn btn-ghost btn-sm" onclick="openAnalyzerIntake()">Tempel Manual</button>
       </div>
     </div>
