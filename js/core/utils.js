@@ -29,19 +29,7 @@ function closeModal(e) {
 
 // Category helpers
 function catIcon(cat) {
-  if (!cat) return '📍';
-  const c = cat.toLowerCase();
-  if (c.includes('apotek')) return '💊';
-  if (c.includes('klinik')) return '🏥';
-  if (c.includes('dokter')) return '👨‍⚕️';
-  if (c.includes('puskesmas')) return '🏨';
-  if (c.includes('rumah sakit')) return '🏦';
-  if (c.includes('perusahaan') || c.includes('sme') || c.includes('pabrik')) return '🏢';
-  if (c.includes('komunitas') || c.includes('masjid')) return '👥';
-  if (c.includes('sekolah') || c.includes('kampus')) return '🎓';
-  if (c.includes('gym') || c.includes('sport') || c.includes('yoga') || c.includes('golf')) return '🏋️';
-  if (c.includes('lab')) return '🔬';
-  return '📍';
+  return '';
 }
 
 function statusColor(status) {

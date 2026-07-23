@@ -31,13 +31,13 @@ async function renderPartners(params={}) {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>🤝 Partner Database</h1>
+        <h1>Partner Database</h1>
         <p>Hitlist, pipeline progress, dan visualisasi lokasi peta semua mitra OneLab</p>
       </div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" id="btn-view-toggle" onclick="togglePView()">📊 Pipeline (Kanban)</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPartnerCSV()">📥 Export</button>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('import')">📥 Import Excel</button>
+        <button class="btn btn-ghost btn-sm" id="btn-view-toggle" onclick="togglePView()">${icon('kanban', 13)} Pipeline (Kanban)</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPartnerCSV()">${icon('download', 13)} Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('import')">${icon('upload', 13)} Import Excel</button>
         <button class="btn btn-teal" onclick="openPartnerForm()">+ Tambah Partner</button>
       </div>
     </div>
@@ -45,7 +45,7 @@ async function renderPartners(params={}) {
     <!-- Pipeline bar thick -->
     <div class="card" style="padding:16px 20px;margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div class="card-title">📊 Sales Pipeline</div>
+        <div class="card-title">Sales Pipeline</div>
         <div id="pipeline-total" style="font-size:12px;color:var(--text3)"></div>
       </div>
       <div id="pipeline-bar" style="display:flex;gap:2px;height:28px;border-radius:var(--r);overflow:hidden;margin-bottom:10px"></div>
@@ -57,7 +57,7 @@ async function renderPartners(params={}) {
       <div class="table-wrap">
         <div class="table-toolbar">
           <input class="table-search" id="ps-q" placeholder="Cari nama, PIC, alamat, kode..."
-            oninput="psSearch(this.value)">
+             oninput="psSearch(this.value)">
           <select class="table-filter" id="ps-cat" onchange="psFilter()">
             <option value="">Semua Kategori</option>
             ${PARTNER_CATEGORIES.map(c=>`<option value="${c}">${c}</option>`).join('')}
@@ -83,7 +83,7 @@ async function renderPartners(params={}) {
       <div class="card" style="padding:16px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
           <div class="card-title" style="display:flex;align-items:center;gap:8px">
-            <span>🗺️ Sebaran Mitra di Peta</span>
+            <span>Sebaran Mitra di Peta</span>
             <span id="pmap-stats-badge" class="badge badge-teal" style="font-size:11px">0 lokasi terpetakan</span>
           </div>
           <div id="pmap-unmapped-info" style="font-size:12px;color:var(--gray)"></div>
@@ -199,7 +199,7 @@ function renderPTable() {
   if(!filtered.length){
     document.getElementById('partner-tbody').innerHTML=`
       <div class="empty-state">
-        <div class="ico">🤝</div>
+        <div class="ico">${icon('users', 32)}</div>
         <h3>${PS.all.length?'Tidak ada hasil':'Belum ada partner'}</h3>
         <p>${PS.all.length?'Coba ubah filter.':'Klik "+ Tambah Partner" atau import dari Maps.'}</p>
       </div>`;
@@ -228,7 +228,7 @@ function renderPTable() {
               <div class="td-name">${p.partner_name||'—'}</div>
               <div class="td-sub">${p.address||''}</div>
             </td>
-            <td><span class="badge ${catBadge(p.category)}" style="font-size:11px">${catIcon(p.category)} ${p.category||'—'}</span></td>
+            <td><span class="badge ${catBadge(p.category)}" style="font-size:11px">${p.category||'—'}</span></td>
             <td>
               <div style="font-size:13px">${p.pic_name||'—'}</div>
               ${p.phone?`<div class="td-phone" style="font-size:11px">${p.phone}</div>`:''}
@@ -245,11 +245,11 @@ function renderPTable() {
             </td>
             <td>
               <div class="act-row">
-                ${wu?`<button class="act-btn wa" onclick="window.open('${wu}','_blank')" title="WA">💬</button>`:''}
-                ${mu?`<button class="act-btn maps" onclick="window.open('${mu}','_blank')" title="Maps">🗺</button>`:''}
-                <button class="act-btn" onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')">🤝</button>
-                <button class="act-btn edit" onclick="openPartnerForm(${p.id})">✏️</button>
-                <button class="act-btn del" onclick="deletePartner(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')">🗑</button>
+                ${wu?`<button class="act-btn wa" onclick="window.open('${wu}','_blank')" title="WA" style="font-size:10.5px;font-weight:700">WA</button>`:''}
+                ${mu?`<button class="act-btn maps" onclick="window.open('${mu}','_blank')" title="Maps">${icon('map', 12)}</button>`:''}
+                <button class="act-btn" onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" title="Kerjasama">${icon('briefcase', 12)}</button>
+                <button class="act-btn edit" onclick="openPartnerForm(${p.id})">${icon('edit', 12)}</button>
+                <button class="act-btn del" onclick="deletePartner(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')">${icon('trash', 12)}</button>
               </div>
             </td>
           </tr>`;
@@ -285,9 +285,9 @@ function renderKanban() {
             <div style="background:${col}12;border-radius:6px;padding:8px 10px;margin-bottom:5px;cursor:pointer;border-left:3px solid ${col}"
               onclick="openPartnerForm(${p.id})">
               <div style="font-size:12px;font-weight:700;color:var(--navy)">${p.partner_name||'—'}</div>
-              <div style="font-size:11px;color:var(--gray)">${catIcon(p.category)} ${p.category||''}</div>
-              ${p.pic_name?`<div style="font-size:11px;color:var(--gray)">👤 ${p.pic_name}</div>`:''}
-              ${p.assigned_name?`<div style="font-size:10px;color:var(--teal)">📋 ${p.assigned_name}</div>`:''}
+              <div style="font-size:11px;color:var(--gray)">${p.category||''}</div>
+              ${p.pic_name?`<div style="font-size:11px;color:var(--gray);display:flex;align-items:center;gap:4px">${icon('user', 10)} ${p.pic_name}</div>`:''}
+              ${p.assigned_name?`<div style="font-size:10px;color:var(--teal);display:flex;align-items:center;gap:4px;margin-top:2px">${icon('briefcase', 10)} ${p.assigned_name}</div>`:''}
             </div>`).join('')||
           `<div style="text-align:center;padding:16px;color:#ccc;font-size:11px">Kosong</div>`}
         </div>
@@ -302,21 +302,21 @@ function togglePView() {
     document.getElementById('pv-table').style.display = 'none';
     document.getElementById('pv-kanban').style.display = 'block';
     document.getElementById('pv-map').style.display = 'none';
-    if (btn) btn.textContent = '🗺️ Map View';
+    if (btn) btn.innerHTML = `${icon('map', 13)} Map View`;
     renderKanban();
   } else if (PS.view === 'kanban') {
     PS.view = 'map';
     document.getElementById('pv-table').style.display = 'none';
     document.getElementById('pv-kanban').style.display = 'none';
     document.getElementById('pv-map').style.display = 'block';
-    if (btn) btn.textContent = '📋 Table View';
+    if (btn) btn.innerHTML = `${icon('list', 13)} Table View`;
     renderPMap();
   } else {
     PS.view = 'table';
     document.getElementById('pv-table').style.display = 'block';
     document.getElementById('pv-kanban').style.display = 'none';
     document.getElementById('pv-map').style.display = 'none';
-    if (btn) btn.textContent = '📊 Pipeline (Kanban)';
+    if (btn) btn.innerHTML = `${icon('kanban', 13)} Pipeline (Kanban)`;
     renderPTable();
   }
 }
@@ -337,10 +337,9 @@ async function renderPMap() {
     if (!key) {
       mapCanvas.innerHTML = `
         <div style="text-align:center;padding:30px">
-          <div style="font-size:36px;margin-bottom:8px">🔑</div>
           <div style="font-weight:700;font-size:15px;color:var(--navy);margin-bottom:4px">Google Maps API Key Belum Diset</div>
-          <div style="font-size:12px;color:var(--gray);margin-bottom:12px">Buka menu 🗺️ Maps Prospecting untuk memasukkan API Key</div>
-          <button class="btn btn-teal btn-sm" onclick="navigate('maps')">🗺️ Ke Maps Prospecting</button>
+          <div style="font-size:12px;color:var(--gray);margin-bottom:12px">Buka menu Maps Prospecting untuk memasukkan API Key</div>
+          <button class="btn btn-teal btn-sm" onclick="navigate('maps')">Ke Maps Prospecting</button>
         </div>`;
       return;
     }
@@ -699,11 +698,11 @@ async function savePartner(id) {
         await logActivity('create','partners', res[0].id,
           `Partner baru ditambahkan oleh ${user}`, name);
       }
-      toast('✅ Partner ditambahkan','ok');
+      toast('Partner ditambahkan','ok');
     }
     closeModalForce();
     await loadPartners();
-  } catch(e){ toast('❌ '+e.message,'err'); }
+  } catch(e){ toast(e.message,'err'); }
 }
 
 async function deletePartner(id, name) {
@@ -713,13 +712,14 @@ async function deletePartner(id, name) {
     await sbDelete('partners', id);
     await logActivity('delete','partners', id,
       `Partner dihapus oleh ${user}`, name);
-    toast(`🗑 "${name}" dihapus`,'info');
+    toast(`"${name}" dihapus`,'info');
     await loadPartners();
-  } catch(e){ toast('❌ '+e.message,'err'); }
+  } catch(e){ toast(e.message,'err'); }
 }
 
 // ── Deals Overlay (TERPISAH dari modal utama) ─────
 // Pakai overlay sendiri agar tidak konflik dengan modal
+// Tambah parameter style dan icon
 function showDealsOverlay(partnerId, partnerName) {
   // Tutup modal utama kalau masih terbuka
   document.getElementById('modal-overlay')?.classList.remove('open');
@@ -742,13 +742,13 @@ function showDealsOverlay(partnerId, partnerName) {
         display:flex;align-items:center;justify-content:space-between;
         position:sticky;top:0;background:#fff;z-index:10;border-radius:14px 14px 0 0">
         <div>
-          <div style="font-size:16px;font-weight:800;color:var(--navy)">🤝 Output Kerjasama</div>
+          <div style="font-size:16px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:6px">${icon('briefcase', 16)} Output Kerjasama</div>
           <div style="font-size:12px;color:var(--gray);margin-top:2px">${partnerName}</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
           <button class="btn btn-teal btn-sm"
             onclick="openDealForm(${partnerId},null,'${partnerName.replace(/'/g,"\\'")}')">
-            ➕ Tambah Output
+            Tambah Output
           </button>
           <button onclick="document.getElementById('deals-overlay').remove()"
             style="background:var(--lgray);border:none;border-radius:50%;width:30px;height:30px;
@@ -777,6 +777,7 @@ function showDealsOverlay(partnerId, partnerName) {
 }
 
 // ── Export CSV ────────────────────────────────────
+// Remove emoji in download alert
 function exportPartnerCSV() {
   const data = PS.filtered.length ? PS.filtered : PS.all;
   if(!data.length){ toast('Tidak ada data','warn'); return; }
@@ -793,5 +794,5 @@ function exportPartnerCSV() {
   a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
   a.download = `Partners_${new Date().toLocaleDateString('id-ID').replace(/\//g,'-')}.csv`;
   a.click();
-  toast('📥 CSV diunduh','ok');
+  toast('CSV diunduh','ok');
 }

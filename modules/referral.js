@@ -215,11 +215,11 @@ function refPaintKpi() {
 // ══════════════════════════════════════════════════════════════
 function refViewTracking() {
   if (!refTests.length) {
-    return `<div class="empty-state"><div class="ico">📤</div>
+    return `<div class="empty-state"><div class="ico">${icon('upload', 32)}</div>
       <h3>Belum ada pemeriksaan yang dirujuk</h3>
       <p>Kirim pemeriksaan yang tidak dikerjakan sendiri ke laboratorium rekanan
          agar statusnya terlacak.</p>
-      <button class="btn btn-teal" style="margin-top:10px" onclick="refOpenSendForm()">📤 Kirim Pemeriksaan</button>
+      <button class="btn btn-teal" style="margin-top:10px" onclick="refOpenSendForm()">Kirim Pemeriksaan</button>
     </div>`;
   }
 
@@ -280,7 +280,7 @@ function refViewTracking() {
 // ══════════════════════════════════════════════════════════════
 function refViewLabs() {
   if (!refLabs.length) {
-    return `<div class="empty-state"><div class="ico">🏥</div>
+    return `<div class="empty-state"><div class="ico">${icon('hospital', 32)}</div>
       <h3>Belum ada lab rekanan</h3>
       <p>Daftarkan laboratorium rekanan lebih dulu sebelum mengirim pemeriksaan.</p>
       <button class="btn btn-teal" style="margin-top:10px" onclick="refOpenLabForm()">+ Lab Rekanan</button>
@@ -318,7 +318,7 @@ function refOpenLabForm(id) {
   const l = id ? (refLabs.find(x => String(x.id) === String(id)) || {}) : {};
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">🏥 ${id ? 'Ubah' : 'Tambah'} Lab Rekanan</div>
+      <div class="modal-title">${id ? 'Ubah' : 'Tambah'} Lab Rekanan</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
     <div class="form-group"><label>Nama Laboratorium *</label>
@@ -335,7 +335,7 @@ function refOpenLabForm(id) {
       <textarea id="ref-lf-notes" rows="2" placeholder="Kesepakatan harga, jadwal kurir, dll">${refEsc(l.notes || '')}</textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="refSaveLab(${id || 0})">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="refSaveLab(${id || 0})">Simpan</button>
     </div>`);
 }
 
@@ -407,7 +407,7 @@ async function refOpenSendForm() {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">📤 Kirim Pemeriksaan ke Lab Rekanan</div>
+      <div class="modal-title">Kirim Pemeriksaan ke Lab Rekanan</div>
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
 
@@ -457,7 +457,7 @@ async function refOpenSendForm() {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="refSaveSend()">📤 Kirim</button>
+      <button class="btn btn-teal" onclick="refSaveSend()">Kirim</button>
     </div>`, 'wide');
 
   refPreviewMargin();
@@ -713,7 +713,7 @@ function refViewMargin() {
   const rows = refTests.filter(t => refInPeriod(t) && t.status !== 'Dibatalkan');
 
   if (!rows.length) {
-    return `<div class="empty-state"><div class="ico">📊</div>
+    return `<div class="empty-state"><div class="ico">${icon('bar-chart', 32)}</div>
       <h3>Tidak ada rujukan pada ${refPeriodLabel()}</h3>
       <p>Ganti periode di atas untuk melihat bulan lain.</p></div>`;
   }

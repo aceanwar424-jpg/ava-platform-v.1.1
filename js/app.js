@@ -117,18 +117,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // ── Global helpers shared across modules ──────────
 function catIcon(cat){
-  if(!cat) return '📍';
-  cat=cat.toLowerCase();
-  if(cat.includes('apotek')) return '💊';
-  if(cat.includes('klinik')) return '🏥';
-  if(cat.includes('dokter')) return '👨‍⚕️';
-  if(cat.includes('puskesmas')) return '🏨';
-  if(cat.includes('rumah sakit')) return '🏦';
-  if(cat.includes('perusahaan')||cat.includes('sme')) return '🏢';
-  if(cat.includes('komunitas')) return '👥';
-  if(cat.includes('sekolah')||cat.includes('kampus')) return '🎓';
-  if(cat.includes('gym')||cat.includes('sport')) return '🏋️';
-  return '📍';
+  return '';
 }
 
 function statusBadgeClass(status){

@@ -24,7 +24,18 @@ Alat Lab ──TCP(ASTM/HL7)──► OneLab Connector (PC di lab) ──HTTPS�
    cd connector
    node onelab-connector.js
    ```
-4. Terminal akan menampilkan: `🟢 <alat>: LISTEN :<port>`.
+4. Terminal akan menampilkan: `🟢 <alat>: LISTEN :<port>` dan `🖥  Status lokal: http://localhost:9999`.
+
+## Halaman status lokal (di PC connector)
+Buka **http://localhost:9999** di PC connector untuk memantau tanpa membaca terminal:
+- daftar alat + indikator 🟢 tersambung / ⚪ belum,
+- jumlah pesan & waktu pesan terakhir per alat,
+- log langsung (auto-refresh 3 dtk),
+- tombol **Muat ulang config** (menarik alat baru dari OneLab tanpa restart).
+
+Hanya bisa dibuka **di PC connector** (`127.0.0.1`) — log bisa memuat identitas
+pasien, jadi sengaja tidak diekspos ke jaringan. Ganti port lewat `status_port` di `config.json`.
+Manajemen penuh (status semua alat, pesan masuk, terapkan hasil) tetap di **OneLab → LIS → Integrasi Alat**.
 
 ## Konfigurasi alat (di OneLab, bukan di sini)
 Isi di master Alat OneLab per analyzer:

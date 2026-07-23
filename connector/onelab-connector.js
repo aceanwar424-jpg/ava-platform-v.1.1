@@ -214,10 +214,78 @@ async function loadAndBind() {
   if (!cfgList.length && !bound.size) log('ℹ Belum ada alat dengan IP+port+integrasi aktif. Set di OneLab → master Alat.');
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// Halaman status lokal — http://localhost:PORT (hanya 127.0.0.1, demi PDP:
+// log dapat memuat barcode pasien; hanya bisa dibuka DI PC connector).
+// ══════════════════════════════════════════════════════════════════════
+const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>OneLab Connector — Status</title>
+<style>
+ *{box-sizing:border-box;margin:0;padding:0}body{font-family:system-ui,Segoe UI,Roboto,sans-serif;background:#0b1220;color:#e2e8f0;padding:16px}
+ h1{font-size:16px;font-weight:800}.sub{font-size:12px;color:#94a3b8;margin-bottom:14px}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-bottom:16px}
+ .dev{background:#131c2e;border:1px solid #1e293b;border-radius:10px;padding:12px}
+ .dev h3{font-size:13px;font-weight:700}.dev .meta{font-size:11px;color:#94a3b8;margin-top:3px;line-height:1.6}
+ .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+ .on{background:#22c55e}.off{background:#64748b}
+ .bar{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+ button{background:#0e7c86;color:#fff;border:0;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer}
+ button.ghost{background:#1e293b}
+ pre{background:#060a14;border:1px solid #1e293b;border-radius:10px;padding:12px;font-size:11.5px;line-height:1.55;max-height:46vh;overflow:auto;white-space:pre-wrap}
+ .empty{color:#64748b;font-size:12px;padding:14px;text-align:center}
+</style></head><body>
+ <h1>🔬 OneLab Connector</h1>
+ <div class="sub" id="sub">memuat…</div>
+ <div class="bar">
+   <button onclick="reload()">↻ Muat ulang config</button>
+   <span style="font-size:11px;color:#64748b">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
+ </div>
+ <div class="grid" id="devs"></div>
+ <div style="font-size:12px;font-weight:700;margin-bottom:6px">Log</div>
+ <pre id="log">…</pre>
+<script>
+ async function tick(){
+   try{
+     const r=await fetch('/api/status'); const s=await r.json();
+     const up=Math.round((Date.now()-new Date(s.started).getTime())/1000);
+     document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat';
+     document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
+       const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
+       return '<div class="dev"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+(d.name||'?')+'</h3>'+
+         '<div class="meta">'+(d.mode==='server'?('LISTEN :'+d.port):('CONNECT '+(d.ip||'')+':'+d.port))+' · '+(d.protocol||'')+' · '+(d.direction||'')+'<br>'+
+         'Pesan: <b>'+d.msgCount+'</b> · terakhir '+seen+(d.connectedFrom?'<br>dari '+d.connectedFrom:'')+'</div></div>';
+     }).join('') : '<div class="empty">Belum ada alat. Set IP/port + aktifkan integrasi di OneLab → master Alat.</div>';
+     document.getElementById('log').textContent = (s.logs||[]).join('\\n');
+   }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }
+ }
+ async function reload(){ await fetch('/reload',{method:'POST'}); setTimeout(tick,300); }
+ tick(); setInterval(tick,3000);
+</script></body></html>`;
+
+function startStatusServer() {
+  const server = http.createServer((req, res) => {
+    if (req.url.startsWith('/api/status')) {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        started: STATE.started, supabase: SUPABASE_URL,
+        devices: [...STATE.devices.entries()].map(([id, d]) => ({ id, ...d })),
+        logs: STATE.logs.slice(-120),
+      }));
+      return;
+    }
+    if (req.url === '/reload' && req.method === 'POST') { loadAndBind(); res.writeHead(200); res.end('ok'); return; }
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(STATUS_HTML);
+  });
+  server.on('error', (e) => log(`⚠ status server: ${e.message}`));
+  server.listen(STATUS_PORT, '127.0.0.1', () => log(`🖥  Status lokal: http://localhost:${STATUS_PORT}`));
+}
+
 // ── Main ──────────────────────────────────────────────────────────────
 (async () => {
   log('══ OneLab Connector ══');
   log(`Supabase: ${SUPABASE_URL}`);
+  startStatusServer();
   await loadAndBind();
   setInterval(loadAndBind, REFRESH_MS); // pungut alat baru tiap menit (restart utk ubah alat yang sudah bind)
 })();

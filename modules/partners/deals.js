@@ -106,8 +106,8 @@ function renderDealsList(partnerId, deals) {
             </div>
           </div>
           <div style="display:flex;gap:4px;flex-shrink:0">
-            <button class="act-btn edit" onclick="openDealForm(${d.partner_id},${d.id})">✏️</button>
-            <button class="act-btn del" onclick="deleteDeal(${d.id},${d.partner_id})">🗑</button>
+            <button class="act-btn edit" onclick="openDealForm(${d.partner_id},${d.id})">${icon('edit', 12)}</button>
+            <button class="act-btn del" onclick="deleteDeal(${d.id},${d.partner_id})">${icon('trash', 12)}</button>
           </div>
         </div>
 
@@ -122,7 +122,7 @@ function renderDealsList(partnerId, deals) {
           ${d.description?`<div style="font-size:12px;color:var(--gray);margin-bottom:8px">${d.description}</div>`:''}
           ${d.next_action?`
             <div style="background:#FFF8E1;border-radius:6px;padding:8px 10px;font-size:12px;color:#5D4037;margin-bottom:8px">
-              ⚡ <strong>Next Action:</strong> ${d.next_action}
+              <strong>Next Action:</strong> ${d.next_action}
               ${d.next_action_date?` — <strong>${formatDateShort(d.next_action_date)}</strong>`:''}
             </div>`:''}
 
@@ -130,18 +130,18 @@ function renderDealsList(partnerId, deals) {
           <div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border)">
             ${dt.nextModule==='mou'?`
               <button class="btn btn-outline btn-sm" onclick="openMOUFromDeal(${d.id},${d.partner_id},'${(d.deal_name||'').replace(/'/g,"\\'")}')">
-                📜 Buat MOU
+                Buat MOU
               </button>`:
             dt.nextModule==='project'?`
               <button class="btn btn-outline btn-sm" onclick="openProjectFromDeal(${d.id},${d.partner_id},'${(d.deal_name||'').replace(/'/g,"\\'")}')">
-                📋 Buat Project
+                Buat Project
               </button>`:''}
             <button class="btn btn-ghost btn-sm" onclick="openDealForm(${d.partner_id},${d.id})">
-              ✏️ Edit Detail
+              Edit Detail
             </button>
             ${d.status==='Active'?`
               <button class="btn btn-ghost btn-sm" onclick="completeDeal(${d.id},${d.partner_id})" style="color:var(--teal)">
-                ✅ Selesai
+                Selesai
               </button>`:''}
           </div>
         </div>
@@ -163,7 +163,7 @@ async function openDealForm(partnerId, dealId=null, partnerNameHint='') {
   overlay.innerHTML = `
     <div style="background:#fff;border-radius:14px;max-width:540px;width:100%;padding:22px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <div style="font-size:16px;font-weight:800;color:var(--navy)">${dealId?'✏️ Edit Output Kerjasama':'➕ Tambah Output Kerjasama'}</div>
+        <div style="font-size:16px;font-weight:800;color:var(--navy)">${dealId?'Edit Output Kerjasama':'Tambah Output Kerjasama'}</div>
         <button onclick="document.getElementById('deal-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray)">✕</button>
       </div>
 
