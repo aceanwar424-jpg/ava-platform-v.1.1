@@ -196,6 +196,16 @@ async function printLabReport(patientName, visitNumber, sampleRows){
     console.error('Failed to load admission details:', e);
   }
 
+  // Pre-load the QR image to cache it before showing print preview
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURIComponent('https://apps.avahealth.sbs/track.html?visit=' + first.visit_number);
+  const img = new Image();
+  img.src = qrUrl;
+  await new Promise((resolve) => {
+    img.onload = resolve;
+    img.onerror = resolve;
+    setTimeout(resolve, 1500); // 1.5 seconds max timeout
+  });
+
   // Demografik & Fallbacks
   const dob = adm?.patient_dob || '';
   const age = adm?.patient_age || first.patient_age || '';
@@ -408,6 +418,11 @@ async function printLabReport(patientName, visitNumber, sampleRows){
             ${_labPrintCatRows(rows, cfg)}
           `).join('')}
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="${cfg.show_loinc?6:5}" style="height:48mm;border:none;padding:0;background:none"></td>
+          </tr>
+        </tfoot>
       </table>
       ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · * = nilai kritis</div>`:''}
     </div>
@@ -417,7 +432,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         <div style="width: 200px; font-size:11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
           <div>${cfg.sign3_role || 'Penanggung Jawab'}:</div>
           <div style="margin: 4px 0;">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent('https://apps.avahealth.sbs/track.html?visit=' + first.visit_number)}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
+            <img src="${qrUrl}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
           </div>
           <div class="line" style="width: 100%; border-top:1px solid #000; padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
         </div>
