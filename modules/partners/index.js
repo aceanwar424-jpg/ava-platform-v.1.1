@@ -322,12 +322,10 @@ function togglePView() {
 }
 
 // ── Map View ──────────────────────────────────────
-async function loadMapsApiKey() {
-  try {
-    const d = await sbGet('settings','select=value&key=eq.maps_api_key');
-    return d?.[0]?.value || localStorage.getItem('ol_maps_key') || '';
-  } catch(e) { return localStorage.getItem('ol_maps_key') || ''; }
-}
+// loadMapsApiKey() didefinisikan di modules/maps/index.js (sumber tunggal).
+// Dulu disalin di sini juga — deklarasi rangkap yang identik. Karena kedua modul
+// selalu dimuat saat startup, cukup satu definisi; salinan di sini dihapus agar
+// tidak menjadi fungsi global ganda.
 
 async function renderPMap() {
   const mapCanvas = document.getElementById('partner-map-canvas');
