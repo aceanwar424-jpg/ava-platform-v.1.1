@@ -41,11 +41,16 @@ async function renderQCTab(){
         const due=a.kalibrasi_berikutnya&&new Date(a.kalibrasi_berikutnya)<=new Date(today.getTime()+7*864e5);
         const overdue=a.kalibrasi_berikutnya&&new Date(a.kalibrasi_berikutnya)<today;
         const st={Aktif:'#22C55E',Maintenance:'#F59E0B',Rusak:'#EF4444'}[a.status]||'#94A3B8';
+        const online=a.last_seen_at&&(Date.now()-new Date(a.last_seen_at).getTime())<3e5;
         return `<tr>
           <td><div style="font-weight:600">${a.nama_alat}</div><div style="font-size:10px;color:var(--gray)">${a.merk||''} ${a.model||''}</div></td>
           <td style="font-size:12px">${a.kategori||'—'}</td>
           <td style="font-size:12px">${a.lokasi||'—'}</td>
-          <td style="font-size:11px">${a.integrasi_aktif?`<span class="badge badge-teal">${a.integrasi_protocol||'ON'}</span>`:'<span class="badge badge-gray">Manual</span>'}</td>
+          <td style="font-size:11px">${a.integrasi_aktif
+            ? `<span class="badge badge-teal">${a.integrasi_protocol||'ON'}</span>`
+              +(a.ip_address?`<div style="font-size:10px;color:var(--gray);margin-top:2px">${a.ip_address}:${a.tcp_port||'—'} · ${a.conn_mode||'server'}${a.conn_direction==='twoway'?' · 2-arah':''}</div>`:'')
+              +`<div style="font-size:10px;margin-top:1px;color:${online?'#16a34a':'#94a3b8'}">${online?'🟢 online':(a.last_seen_at?'⚪ '+new Date(a.last_seen_at).toLocaleTimeString('id-ID'):'⚪ belum ada data')}</div>`
+            : '<span class="badge badge-gray">Manual</span>'}</td>
           <td style="font-size:12px;color:${overdue?'#EF4444':due?'#F59E0B':'var(--gray)'};font-weight:${due||overdue?'700':'400'}">
             ${a.kalibrasi_berikutnya?new Date(a.kalibrasi_berikutnya).toLocaleDateString('id-ID'):'—'}${overdue?' ⚠️':due?' 🔧':''}</td>
           <td><span style="background:${st}20;color:${st};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${a.status||'—'}</span></td>
@@ -118,10 +123,25 @@ async function openAnalyzerForm(){
       <div class="form-group"><label>Status</label>
         <select id="az-status"><option>Aktif</option><option>Maintenance</option><option>Rusak</option></select></div>
     </div>
-    <div class="form-group"><label><input type="checkbox" id="az-integ"> Integrasi analyzer aktif (HL7/ASTM)</label></div>
+    <div class="form-group"><label><input type="checkbox" id="az-integ" onchange="var c=document.getElementById('az-conn');if(c)c.style.display=this.checked?'block':'none'"> Integrasi analyzer aktif (via OneLab Connector)</label></div>
+    <div id="az-conn" style="display:none;border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:6px;background:var(--bg2)">
+      <div class="form-row">
+        <div class="form-group"><label>Protokol</label>
+          <select id="az-proto"><option>ASTM</option><option>HL7</option><option>POCT</option></select></div>
+        <div class="form-group"><label>Mode Koneksi</label>
+          <select id="az-mode"><option value="server">server — alat konek ke PC connector</option><option value="client">client — PC connector konek ke alat</option></select></div>
+        <div class="form-group"><label>Arah</label>
+          <select id="az-dir"><option value="oneway">1 arah — hasil masuk saja</option><option value="twoway">2 arah — + kirim order ke alat</option></select></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>IP Address</label><input id="az-ip" placeholder="192.168.1.50"></div>
+        <div class="form-group"><label>Port TCP</label><input type="number" id="az-port" placeholder="9100"></div>
+      </div>
+      <div class="form-hint" style="color:var(--gray)">Mode <b>server</b>: isi <b>IP PC connector</b> di sini, lalu di menu alat isi IP PC yang sama + port ini. Mode <b>client</b>: isi <b>IP & port alat</b>. Cari IP PC: <code>ipconfig</code>.</div>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAnalyzer()">💾 Simpan</button>
+      <button class="btn btn-teal" onclick="saveAnalyzer()">Simpan</button>
     </div>`);
 }
 
@@ -138,7 +158,11 @@ async function saveAnalyzer(){
       kalibrasi_berikutnya:document.getElementById('az-kalib').value||null,
       status:document.getElementById('az-status').value,
       integrasi_aktif:document.getElementById('az-integ').checked,
-      integrasi_protocol:document.getElementById('az-integ').checked?'HL7':null,
+      integrasi_protocol:document.getElementById('az-integ').checked?(document.getElementById('az-proto')?.value||'ASTM'):null,
+      ip_address:document.getElementById('az-integ').checked?(document.getElementById('az-ip')?.value.trim()||null):null,
+      tcp_port:document.getElementById('az-integ').checked?(parseInt(document.getElementById('az-port')?.value)||null):null,
+      conn_mode:document.getElementById('az-mode')?.value||'server',
+      conn_direction:document.getElementById('az-dir')?.value||'oneway',
     });
     toast('✅ Analyzer tersimpan','ok'); closeModalForce(); renderQCTab();
   } catch(e){ toast('❌ '+e.message,'err'); }

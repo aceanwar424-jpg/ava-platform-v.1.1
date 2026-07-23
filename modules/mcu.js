@@ -589,14 +589,18 @@ let rabParams   = {};   // { peserta, days, margin, selectedTests, items }
 // ══════════════════════════════════════════════════════════════
 async function renderMCU() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div>
-        <h1>🏥 Project MCU</h1>
-        <p>Manajemen project MCU korporat B2B — 6 Fase, 31 Tahapan, Gate System</p>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('mcu')" title="Kembali ke daftar menu MCU">← Menu MCU</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Project MCU Korporat</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Manajemen project MCU B2B · 6 Fase · 31 Tahapan · Gate System</span>
+        </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderMCU()">↻ Refresh</button>
-        <button class="btn btn-teal" onclick="openMCUForm()">+ Buat Project MCU</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="mcu-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderMCU()">Refresh</button>
+        <button class="btn btn-teal btn-sm" onclick="openMCUForm()">+ Buat Project MCU</button>
       </div>
     </div>
 
@@ -604,8 +608,8 @@ async function renderMCU() {
       ${[1,2,3,4,5,6].map(()=>`<div class="kpi-card"><div class="kpi-icon" style="background:var(--bg2)"><div class="spinner" style="width:16px;height:16px;border-width:2px"></div></div><div><div class="kpi-val">—</div><div class="kpi-label">Memuat...</div></div></div>`).join('')}
     </div>
 
-    <div class="table-wrap">
-      <div class="table-toolbar">
+    <div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:hidden">
+      <div class="table-toolbar" style="padding:10px;background:#f8fafc;border-bottom:1px solid #d3dae1;display:flex;gap:8px">
         <input class="table-search" id="mcu-q" placeholder="Cari project, partner..."
           oninput="mcuFilter.search=this.value.toLowerCase();filterMCU()" style="flex:1">
         <select class="table-filter" id="mcu-status" onchange="mcuFilter.status=this.value;filterMCU()">
@@ -619,6 +623,9 @@ async function renderMCU() {
       </div>
       <div id="mcu-list"><div class="loading-row"><div class="spinner"></div></div></div>
     </div>`;
+
+  const badge = document.getElementById('mcu-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   mcuProjects = [];
   await loadMCUProjects();
@@ -646,19 +653,18 @@ function renderMCUKPI() {
   const totalRAB= mcuProjects.reduce((s,p)=>s+(p.rab_total||0),0);
 
   const kpis = [
-    {icon:'📁', val:total,               label:'Total Project', color:'#0891B2'},
-    {icon:'🔥', val:aktif,               label:'Aktif',         color:'#EF4444'},
-    {icon:'📋', val:plan,                label:'Planning',      color:'#8B5CF6'},
-    {icon:'✅', val:selesai,             label:'Selesai',       color:'#22C55E'},
-    {icon:'💰', val:formatCurrency(totalVal), label:'Total Nilai', color:'#F59E0B'},
-    {icon:'📊', val:formatCurrency(totalRAB), label:'Total RAB',   color:'#06B6D4'},
+    {val:total,               label:'Total Project', color:'#0891B2'},
+    {val:aktif,               label:'Project Aktif', color:'#EF4444'},
+    {val:plan,                label:'Planning',      color:'#8B5CF6'},
+    {val:selesai,             label:'Selesai',       color:'#22C55E'},
+    {val:formatCurrency(totalVal), label:'Total Nilai', color:'#F59E0B'},
+    {val:formatCurrency(totalRAB), label:'Total RAB',   color:'#06B6D4'},
   ];
   el.innerHTML = kpis.map(k=>`
-    <div class="kpi-card" style="border-top:3px solid ${k.color}">
-      <div class="kpi-icon" style="background:${k.color}18;font-size:20px">${k.icon}</div>
+    <div class="kpi-card" style="border-top:3px solid ${k.color};padding:12px;background:#fff;border-radius:8px;box-shadow:var(--shadow-xs)">
       <div>
-        <div class="kpi-val" style="font-size:${typeof k.val==='string'&&k.val.length>8?'13px':'20px'}">${k.val}</div>
-        <div class="kpi-label">${k.label}</div>
+        <div class="kpi-val" style="font-size:${typeof k.val==='string'&&k.val.length>10?'12.5px':'18px'};font-weight:800;color:var(--navy);margin-bottom:3px">${k.val}</div>
+        <div class="kpi-label" style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">${k.label}</div>
       </div>
     </div>`).join('');
 }
@@ -676,7 +682,6 @@ function renderMCUList(projects) {
   const el = document.getElementById('mcu-list'); if (!el) return;
   if (!projects.length) {
     el.innerHTML = `<div class="empty-state">
-      <div class="ico">🏥</div>
       <h3>${mcuProjects.length ? 'Tidak ada hasil filter' : 'Belum ada Project MCU'}</h3>
       <p>Klik "+ Buat Project MCU" untuk memulai.</p>
       <button class="btn btn-teal" style="margin-top:14px" onclick="openMCUForm()">+ Buat Project MCU</button>
@@ -702,16 +707,16 @@ function renderMCUList(projects) {
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px">
             <span style="font-weight:800;font-size:14px;color:var(--text);cursor:pointer"
-              onclick="openMCUDetail(${p.id})">${p.project_name}</span>
-            <span style="background:${sc}20;color:${sc};font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px">${p.status}</span>
+               onclick="openMCUDetail(${p.id})">${p.project_name}</span>
+            <span style="background:${sc}15;color:${sc};border:1px solid ${sc}35;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:4px">${p.status}</span>
             ${p.project_type&&p.project_type!=='MCU'?`<span class="badge badge-gray" style="font-size:10px">${p.project_type}</span>`:''}
             ${p.f05_locked?'<span class="badge badge-teal" style="font-size:10px">F-05 Locked</span>':''}
           </div>
           <div style="font-size:12px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px">
-            ${p.partner_name?`<span>🤝 ${p.partner_name}</span>`:''}
-            ${peserta?`<span>👥 ${peserta} peserta · ${getSLACategory(peserta)}</span>`:''}
-            ${p.tanggal_pelaksanaan?`<span>📅 ${formatDateShort(p.tanggal_pelaksanaan)}</span>`:''}
-            ${daysToSLA!==null?`<span style="color:${daysToSLA<3?'#EF4444':daysToSLA<7?'#F59E0B':'var(--text3)'}">⏱ SLA prep: ${daysToSLA>0?daysToSLA+'h lagi':'LEWAT'}</span>`:''}
+            ${p.partner_name?`<span>Klien: ${p.partner_name}</span>`:''}
+            ${peserta?`<span>${peserta} peserta · ${getSLACategory(peserta)}</span>`:''}
+            ${p.tanggal_pelaksanaan?`<span>Jadwal: ${formatDateShort(p.tanggal_pelaksanaan)}</span>`:''}
+            ${daysToSLA!==null?`<span style="color:${daysToSLA<3?'#EF4444':daysToSLA<7?'#F59E0B':'var(--text3)'}">SLA prep: ${daysToSLA>0?daysToSLA+'h lagi':'LEWAT'}</span>`:''}
           </div>
           <div style="display:flex;align-items:center;gap:10px">
             <div style="flex:1;height:8px;background:var(--bg2);border-radius:8px;overflow:hidden;cursor:pointer"

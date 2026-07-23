@@ -16,10 +16,10 @@
 // ═══════════════════════════════════════════════════════════════
 
 const INP_BED_STATUS = {
-  'Kosong':      { c: '#15803D', bg: '#E8F5EC', ico: '🛏' },
-  'Terisi':      { c: '#0E7C86', bg: '#E6F2F3', ico: '🧑' },
-  'Dibersihkan': { c: '#B45309', bg: '#FBF1E4', ico: '🧹' },
-  'Perbaikan':   { c: '#B91C1C', bg: '#FBEAEA', ico: '🔧' },
+  'Kosong':      { c: '#15803D', bg: '#E8F5EC' },
+  'Terisi':      { c: '#0E7C86', bg: '#E6F2F3' },
+  'Dibersihkan': { c: '#B45309', bg: '#FBF1E4' },
+  'Perbaikan':   { c: '#B91C1C', bg: '#FBEAEA' },
 };
 
 const INP_STAY_STATUS = {
@@ -194,7 +194,7 @@ function inpPaintBoard() {
   const el = document.getElementById('inp-content'); if (!el) return;
 
   if (!inpBeds.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🛏</div>
+    el.innerHTML = `<div class="empty-state">
       <h3>Belum ada tempat tidur</h3>
       <p>Buat bangsal dan tempat tidurnya pada tab Ruang &amp; Tarif.</p>
       <button class="btn btn-teal" style="margin-top:10px" onclick="inpSwitchTab('master')">Buka Ruang &amp; Tarif</button></div>`;
@@ -267,7 +267,7 @@ function inpBedCardHtml(b) {
   return `
     <div style="border:1.5px solid ${st.c}33;background:${st.bg};border-radius:10px;padding:10px 11px">
       <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:13px">${st.ico}</span>
+        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${st.c};margin-right:2px"></span>
         <span style="font-weight:800;font-size:12.5px;color:${st.c}">${inpEsc(b.room_no || '')}${b.room_no ? '-' : ''}${inpEsc(b.bed_no)}</span>
         <span style="margin-left:auto;font-size:10px;font-weight:700;color:${st.c};
           background:#ffffffaa;padding:2px 6px;border-radius:4px">${inpEsc(b.class_code || '-')}</span>
@@ -299,7 +299,7 @@ function inpPaintStays() {
       onclick="inpFilterStay('${f}')">${f}</button>`).join('')}</div>`;
 
   if (!list.length) {
-    el.innerHTML = head + `<div class="empty-state"><div class="ico">🧑‍⚕️</div>
+    el.innerHTML = head + `<div class="empty-state">
       <h3>Tidak ada pasien pada status ini</h3>
       <button class="btn btn-teal" style="margin-top:10px" onclick="inpOpenAdmitForm()">+ Admisi Rawat Inap</button></div>`;
     return;

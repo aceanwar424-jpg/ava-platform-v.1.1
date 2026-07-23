@@ -7,14 +7,22 @@ let mrPatients = [], mrActivePatient = null;
 
 async function renderMedRecord() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Rekam Medis</h1>
-        <p>Rekam medis gabungan per pasien — anamnesa, lab, radiologi, EKG, semua dalam satu</p></div>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('medrecord')" title="Kembali ke daftar menu Rekam Medis">← Menu Rekam Medis</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rekam Medis</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Rekam medis gabungan per pasien — anamnesa, lab, radiologi, EKG, semua dalam satu</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="mr-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+      </div>
     </div>
 
     <!-- Search Patient -->
     <div class="card" style="margin-bottom:16px;padding:16px">
-      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">🔍 Cari Pasien</div>
+      <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px">Cari Pasien</div>
       <div style="display:flex;gap:8px">
         <input class="table-search" id="mr-search" placeholder="Nama pasien, no. KTP, no. HP..."
           oninput="searchPatientMR(this.value)" style="flex:1">
@@ -26,10 +34,12 @@ async function renderMedRecord() {
     <!-- Patient Record -->
     <div id="mr-content">
       <div style="text-align:center;padding:60px 20px;color:var(--gray)">
-        <div style="font-size:48px">📋</div>
         <div style="font-size:14px;margin-top:12px">Cari dan pilih pasien untuk melihat rekam medisnya</div>
       </div>
     </div>`;
+
+  const badge = document.getElementById('mr-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
 
 async function searchPatientMR(q) {

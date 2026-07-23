@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Portal Nakes — OneLab Home Care</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#eef2f7;color:#0f172a;-webkit-tap-highlight-color:transparent}
+  .wrap{max-width:520px;margin:0 auto;padding:14px}
+  .top{background:linear-gradient(120deg,#0b1526,#0f2038);color:#fff;border-radius:14px;padding:16px;margin-bottom:12px}
+  .top h1{font-size:16px;font-weight:800}
+  .top p{font-size:12px;color:#9db4d0;margin-top:2px}
+  .share{display:flex;align-items:center;gap:10px;margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 12px}
+  .share .lbl{flex:1;font-size:12.5px}
+  .toggle{width:52px;height:28px;border-radius:99px;background:#334155;position:relative;cursor:pointer;transition:.2s;flex:0 0 auto}
+  .toggle.on{background:#14b8a6}
+  .toggle .dot{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+  .toggle.on .dot{left:27px}
+  .status{font-size:11.5px;color:#cfe0f2;margin-top:6px;min-height:15px}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:13px 14px;margin-bottom:10px}
+  .card .svc{font-size:11px;font-weight:700;color:#0e7c86;text-transform:uppercase;letter-spacing:.04em}
+  .card h3{font-size:15px;font-weight:800;margin:2px 0 3px}
+  .card .meta{font-size:12px;color:#64748b;line-height:1.5}
+  .card .addr{font-size:12.5px;color:#0f172a;margin-top:6px;background:#f8fafc;border:1px solid #eef2f7;border-radius:8px;padding:8px 10px}
+  .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn{flex:1;min-width:120px;text-align:center;text-decoration:none;font-size:13px;font-weight:700;padding:10px;border-radius:9px;border:1px solid transparent;cursor:pointer}
+  .btn-nav{background:#14b8a6;color:#fff}
+  .btn-call{background:#eef2f7;color:#0f172a;border-color:#cbd5e1}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:99px;background:#eef2f7;color:#334155;margin-left:6px}
+  #msg{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;text-align:center;color:#64748b;font-size:13px}
+  .empty{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:26px;text-align:center;color:#64748b;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>🏠 Portal Nakes</h1>
+    <p id="staff-name">Memuat…</p>
+    <div class="share">
+      <div class="lbl">Bagikan Lokasi Live<div style="font-size:10.5px;color:#9db4d0">admin &amp; pasien melihat posisi Anda</div></div>
+      <div class="toggle" id="tg" onclick="toggleShare()"><div class="dot"></div></div>
+    </div>
+    <div class="status" id="share-status">Aktifkan saat berangkat ke pasien.</div>
+  </div>
+  <div id="msg"></div>
+  <div id="orders"></div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
+const HDR = { apikey:SUPABASE_KEY, Authorization:`Bearer ${SUPABASE_KEY}`, 'Content-Type':'application/json' };
+const token = new URLSearchParams(location.search).get('t') || '';
+let _watchId = null, _sharing = false;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function showMsg(t){ const m=document.getElementById('msg'); m.style.display='block'; m.textContent=t; }
+async function rpc(fn,args){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`,{method:'POST',headers:HDR,body:JSON.stringify(args||{})});
+  if(!r.ok){ let d=null; try{d=await r.json();}catch(_){}
+    throw new Error((d&&(d.message||d.hint))||('RPC '+fn+' gagal ('+r.status+')')); }
+  return r.json();
+}
+
+function orderCard(o){
+  const jam = [o.scheduled_date, o.scheduled_time].filter(Boolean).join(' ');
+  const hasGeo = o.lat!=null && o.lng!=null;
+  const nav = hasGeo
+    ? `https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.patient_address||'')}`;
+  return `<div class="card">
+    <div class="svc">${esc(o.service_type||'Home Care')} <span class="badge">${esc(o.status||'')}</span></div>
+    <h3>${esc(o.patient_name||'—')}</h3>
+    <div class="meta">${esc(o.order_number||'')}${jam?' · '+esc(jam):''}</div>
+    <div class="addr">📍 ${esc(o.patient_address||'(alamat belum diisi)')}</div>
+    <div class="row">
+      <a class="btn btn-nav" href="${nav}" target="_blank" rel="noopener">🧭 Navigasi</a>
+      ${o.patient_phone?`<a class="btn btn-call" href="tel:${esc(o.patient_phone)}">📞 Telepon</a>`:''}
+    </div>
+  </div>`;
+}
+
+async function load(){
+  if(!token){ showMsg('Link tidak lengkap. Minta admin mengirim ulang link portal nakes Anda.'); return; }
+  let d;
+  try{ d = await rpc('homecare_staff_portal',{p_token:token}); }
+  catch(e){ showMsg('❌ '+e.message); return; }
+  if(!d){ showMsg('Link tidak valid. Hubungi admin.'); return; }
+  document.getElementById('staff-name').textContent = d.staff_name || 'Nakes';
+  const orders = d.orders || [];
+  document.getElementById('orders').innerHTML = orders.length
+    ? orders.map(orderCard).join('')
+    : `<div class="empty">Belum ada order yang ditugaskan. Nyalakan "Bagikan Lokasi" saat menuju pasien.</div>`;
+}
+
+function toggleShare(){ _sharing ? stopShare() : startShare(); }
+function startShare(){
+  const st=document.getElementById('share-status'), tg=document.getElementById('tg');
+  if(!navigator.geolocation){ st.textContent='❌ Perangkat tak mendukung GPS'; return; }
+  st.textContent='⏳ Meminta izin lokasi…';
+  _watchId = navigator.geolocation.watchPosition(async pos=>{
+    const lat=pos.coords.latitude, lng=pos.coords.longitude;
+    try{ await rpc('homecare_staff_track',{p_token:token,p_lat:lat,p_lng:lng});
+      st.innerHTML=`📡 Terkirim: ${lat.toFixed(5)}, ${lng.toFixed(5)} · ${new Date().toLocaleTimeString('id-ID')}`; }
+    catch(e){ st.textContent='❌ '+e.message; }
+  }, err=>{ st.textContent='❌ '+err.message; stopShare(); },
+     {enableHighAccuracy:true, maximumAge:8000, timeout:20000});
+  _sharing=true; tg.classList.add('on');
+}
+function stopShare(){
+  if(_watchId!=null){ navigator.geolocation.clearWatch(_watchId); _watchId=null; }
+  _sharing=false; document.getElementById('tg').classList.remove('on');
+  document.getElementById('share-status').textContent='⏹ Berhenti berbagi lokasi.';
+}
+
+load();
+// Segarkan daftar order tiap 60 detik (jadwal bisa berubah dari admin).
+setInterval(load, 60000);
+</script>
+</body>
+</html>

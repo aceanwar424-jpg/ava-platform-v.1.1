@@ -182,7 +182,7 @@ function applyAdmFilter() {
 function renderAdmList(data) {
   const el = document.getElementById('adm-list');
   if (!data.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">📋</div>
+    el.innerHTML=`<div class="empty-state">
       <h3>${admAll.length?'Tidak ada hasil':'Belum ada kunjungan hari ini'}</h3>
       <button class="btn btn-teal" style="margin-top:12px" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
     </div>`; return;
@@ -199,13 +199,13 @@ function renderAdmList(data) {
         <div style="font-size:10.5px;color:var(--gray)">${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' th':''} ${a.patient_phone?'· '+a.patient_phone:''}</div></td>
       <td style="font-size:12px">${a.package_name||'Layanan Individual'}</td>
       <td style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</td>
-      <td><span style="background:${st.color}20;color:${st.color};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">${st.icon} ${a.status}</span></td>
+      <td><span style="background:${st.color}15;color:${st.color};border:1px solid ${st.color}35;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap">${a.status}</span></td>
       <td style="text-align:right"><div style="font-weight:700;color:var(--navy)">${formatCurrency(a.net_amount||0)}</div>
         <div style="font-size:10px;color:${a.payment_status==='Paid'?'#22C55E':'#F59E0B'}">${a.payment_status||'Unpaid'}</div></td>
       <td><div class="act-row" style="flex-wrap:nowrap">
-        ${['Registered','Anamnesa'].includes(a.status)?`<button class="btn btn-teal btn-xs" title="Buka Anamnesa" onclick="navigate('anamnesa')">🩺</button>`:''}
-        ${a.package_id?`<button class="act-btn" title="Cetak Ulang Barcode" onclick="reprintSampleLabels(${a.id})">🏷️</button>`:''}
-        <button class="act-btn edit" onclick="openAdmissionForm(${a.id})">✏️</button>
+        ${['Registered','Anamnesa'].includes(a.status)?`<button class="btn btn-teal btn-xs" title="Buka Anamnesa" onclick="navigate('anamnesa')" style="padding:2px 6px">${svgIcon('stethoscope',13,'#fff')} Anamnesa</button>`:''}
+        ${a.package_id?`<button class="act-btn" title="Cetak Ulang Barcode" onclick="reprintSampleLabels(${a.id})" style="padding:2px">${svgIcon('print',13,'var(--teal)')}</button>`:''}
+        <button class="act-btn edit" onclick="openAdmissionForm(${a.id})" style="padding:2px">${svgIcon('edit',13,'var(--navy)')}</button>
         ${a.payment_status!=='Paid'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>`:''}
       </div></td>
     </tr>`;

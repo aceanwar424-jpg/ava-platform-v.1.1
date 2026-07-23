@@ -88,7 +88,7 @@ function renderAnamnesaList() {
   const data = anamAll.filter(a=>!q ||
     `${a.patient_name||''} ${a.visit_number||''} ${a.mr_number||''}`.toLowerCase().includes(q));
   if (!data.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">🩺</div>
+    el.innerHTML = `<div class="empty-state">
       <h3>${anamAll.length?'Tidak ada hasil':'Belum ada antrian anamnesa'}</h3></div>`; return;
   }
   const stColor = {Registered:'#F59E0B', Anamnesa:'#8B5CF6', Lab:'#0EA5E9'};
@@ -104,7 +104,7 @@ function renderAnamnesaList() {
         <div style="font-size:10.5px;color:var(--gray)">${a.patient_gender||''} ${a.patient_age?'· '+a.patient_age+' th':''} ${a.patient_phone?'· '+a.patient_phone:''}</div></td>
       <td style="font-size:12px">${anamServicesSummary(a)}</td>
       <td style="font-size:11px;color:var(--gray)">${a.visit_type||'Walk-in'}</td>
-      <td><span style="background:${c}20;color:${c};padding:2px 9px;border-radius:9px;font-size:11px;font-weight:700;white-space:nowrap">${stLabel}</span></td>
+      <td><span style="background:${c}15;color:${c};border:1px solid ${c}35;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap">${stLabel}</span></td>
       <td><div class="act-row" style="flex-wrap:nowrap">
         <button class="btn btn-teal btn-xs" onclick="openExamination(${a.id})">${svgIcon('eye',13)} Examination</button>
         <button class="act-btn" title="Cetak Barcode" onclick="printAnamnesaLabels(${a.id})">${svgIcon('print',14)}</button>

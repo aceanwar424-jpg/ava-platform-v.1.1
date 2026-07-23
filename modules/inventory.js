@@ -36,29 +36,37 @@ function tierPassed(status) { return status==='Approved' || status==='Skip'; }
 
 async function renderInventory(initialTab='stock') {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>📦 Inventory &amp; Logistik</h1>
-        <p style="color:var(--text3);font-size:13px">Stok, Purchase Request/Order, Stock Opname, dan MRP</p></div>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('inventory')" title="Kembali ke daftar menu Inventory">← Menu Inventory</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Inventory &amp; Logistik</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Stok, Purchase Request/Order, Stock Opname, dan MRP</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="inv-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+      </div>
     </div>
 
     <div class="tabs" id="inv-tabs">
-      <button class="tab-btn active" onclick="switchInvTab('stock',this)">📦 Stok Barang</button>
-      <button class="tab-btn" onclick="switchInvTab('pr',this)">🛒 Purchase Request</button>
-      <button class="tab-btn" onclick="switchInvTab('po',this)">📄 Purchase Order</button>
-      <button class="tab-btn" onclick="switchInvTab('issue',this)">📤 Goods Issue</button>
-      <button class="tab-btn" onclick="switchInvTab('opname',this)">📋 Stock Opname</button>
-      <button class="tab-btn" onclick="switchInvTab('ledger',this)">📜 Stock Ledger</button>
-      <button class="tab-btn" onclick="switchInvTab('mrp',this)">📊 MRP</button>
-      <button class="tab-btn" onclick="switchInvTab('report',this)">📈 Laporan</button>
-      <button class="tab-btn" onclick="switchInvTab('supplier',this)">🏭 Supplier</button>
-      <button class="tab-btn" onclick="switchInvTab('recipe',this)">🧪 Resep BHP</button>
+      <button class="tab-btn active" onclick="switchInvTab('stock',this)">Stok Barang</button>
+      <button class="tab-btn" onclick="switchInvTab('pr',this)">Purchase Request</button>
+      <button class="tab-btn" onclick="switchInvTab('po',this)">Purchase Order</button>
+      <button class="tab-btn" onclick="switchInvTab('issue',this)">Goods Issue</button>
+      <button class="tab-btn" onclick="switchInvTab('opname',this)">Stock Opname</button>
+      <button class="tab-btn" onclick="switchInvTab('ledger',this)">Stock Ledger</button>
+      <button class="tab-btn" onclick="switchInvTab('mrp',this)">MRP</button>
+      <button class="tab-btn" onclick="switchInvTab('report',this)">Laporan</button>
+      <button class="tab-btn" onclick="switchInvTab('supplier',this)">Supplier</button>
+      <button class="tab-btn" onclick="switchInvTab('recipe',this)">Resep BHP</button>
     </div>
 
     <div id="inv-stock">
       <div id="inv-stock-alerts"></div>
       <div class="table-wrap">
         <div class="table-toolbar">
-          <input class="table-search" id="inv-q" placeholder="🔍 Cari nama/kode barang..." oninput="filterInvItems()">
+          <input class="table-search" id="inv-q" placeholder="Cari nama/kode barang..." oninput="filterInvItems()">
           <select class="table-filter" id="inv-cat" onchange="filterInvItems()">
             <option value="">Semua Kategori</option>
             ${INV_CATEGORIES.map(c=>`<option>${c}</option>`).join('')}
@@ -80,6 +88,10 @@ async function renderInventory(initialTab='stock') {
     <div id="inv-supplier" style="display:none"></div>
     <div id="inv-recipe" style="display:none"></div>
   `;
+
+  const badge = document.getElementById('inv-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
   await loadInventory();
   // Deep-link ke tab tertentu dari menu flyout (Fase 1)
   if (initialTab && initialTab!=='stock') {

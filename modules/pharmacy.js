@@ -98,36 +98,48 @@ function rxPaint() {
 // ══════════════════════════════════════════════════════════════
 function rxPaintPrescriptions(el) {
   if (!rxPrescriptions.length) {
-    el.innerHTML = `<div class="empty-state"><div class="ico">📋</div>
+    el.innerHTML = `<div class="empty-state">
       <h3>Belum ada resep</h3>
       <button class="btn btn-teal" style="margin-top:10px" onclick="rxOpenPrescriptionForm()">+ Resep Baru</button></div>`;
     return;
   }
-  el.innerHTML = `<div class="table-wrap"><table><thead><tr>
-    <th>No. Resep</th><th>Pasien</th><th>Dokter</th><th>Tanggal</th>
-    <th style="text-align:right">Nilai</th><th>Status</th><th>Aksi</th>
-  </tr></thead><tbody>${rxPrescriptions.map(p => {
-    const st = RX_STATUS[p.status] || RX_STATUS['Draft'];
-    const warn = p.allergy_warning || p.interaction_warning;
-    return `<tr>
-      <td><span style="font-family:ui-monospace,monospace;font-size:11.5px;color:var(--teal)">${p.rx_number || '—'}</span>
-        ${warn ? '<div style="font-size:10px;color:#B45309;font-weight:700">⚠ ada peringatan</div>' : ''}</td>
-      <td><div style="font-weight:600">${p.patient_name || '—'}</div>
-        <div style="font-size:11px;color:var(--gray)">${p.mr_number || ''}</div></td>
-      <td style="font-size:12.5px">${p.doctor_name || '—'}</td>
-      <td style="font-size:11.5px;color:var(--gray)">${p.rx_date ? formatDateShort(p.rx_date) : '—'}</td>
-      <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(p.total_amount)}</td>
-      <td><span style="background:${st.bg};color:${st.c};padding:3px 9px;border-radius:5px;
-        font-size:11px;font-weight:700">${p.status}</span></td>
-      <td><div class="act-row">
-        <button class="act-btn" onclick="rxOpenDetail(${p.id})" title="Rincian">👁️</button>
-        ${['Aktif', 'Sebagian'].includes(p.status)
-          ? `<button class="btn btn-teal btn-xs" onclick="rxOpenDispense(${p.id})">Serahkan</button>` : ''}
-        ${p.status === 'Aktif'
-          ? `<button class="act-btn del" onclick="rxAskCancel(${p.id})" title="Batalkan">✕</button>` : ''}
-      </div></td>
-    </tr>`;
-  }).join('')}</tbody></table></div>`;
+  el.innerHTML = `<div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:auto">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
+          <th style="padding:7px 10px;text-align:left">No. Resep</th>
+          <th style="padding:7px 10px;text-align:left">Pasien</th>
+          <th style="padding:7px 10px;text-align:left">Dokter</th>
+          <th style="padding:7px 10px;text-align:left">Tanggal</th>
+          <th style="padding:7px 10px;text-align:right">Nilai</th>
+          <th style="padding:7px 10px;text-align:left">Status</th>
+          <th style="padding:7px 10px;text-align:center">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>${rxPrescriptions.map(p => {
+        const st = RX_STATUS[p.status] || RX_STATUS['Draft'];
+        const warn = p.allergy_warning || p.interaction_warning;
+        return `<tr style="border-bottom:1px solid #f1f5f9">
+          <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${p.rx_number || '—'}</span>
+            ${warn ? '<div style="font-size:10px;color:#DC2626;font-weight:700">PERINGATAN ALERGI</div>' : ''}</td>
+          <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${p.patient_name || '—'}</div>
+            <div style="font-size:11px;color:var(--gray)">${p.mr_number || ''}</div></td>
+          <td style="padding:8px 10px;font-size:12.5px;font-weight:600">${p.doctor_name || '—'}</td>
+          <td style="padding:8px 10px;font-size:11.5px;color:var(--gray)">${p.rx_date ? formatDateShort(p.rx_date) : '—'}</td>
+          <td style="padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums;font-weight:700">${formatCurrency(p.total_amount)}</td>
+          <td style="padding:8px 10px"><span style="background:${st.c}15;color:${st.c};border:1px solid ${st.c}35;padding:2px 8px;border-radius:4px;
+            font-size:10.5px;font-weight:700">${p.status}</span></td>
+          <td style="padding:8px 10px;text-align:center"><div class="act-row" style="justify-content:center;gap:6px">
+            <button class="btn btn-ghost btn-xs" onclick="rxOpenDetail(${p.id})">Rincian</button>
+            ${['Aktif', 'Sebagian'].includes(p.status)
+              ? `<button class="btn btn-teal btn-xs" onclick="rxOpenDispense(${p.id})">Serahkan</button>` : ''}
+            ${p.status === 'Aktif'
+              ? `<button class="btn btn-ghost btn-xs" style="color:#DC2626;border-color:#DC2626" onclick="rxAskCancel(${p.id})">Batalkan</button>` : ''}
+          </div></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table>
+  </div>`;
 }
 
 async function rxOpenPrescriptionForm() {

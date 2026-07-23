@@ -35,14 +35,18 @@ async function renderReferral() {
   if (!refPeriod) refPeriod = new Date().toISOString().slice(0, 7);
 
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div>
-        <h1>Rujukan Lab Luar</h1>
-        <p>Pemeriksaan yang dikerjakan laboratorium rekanan — pengiriman, hasil, dan margin</p>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('referral')" title="Kembali ke daftar menu Rujukan">← Menu Rujukan</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rujukan Lab Luar</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pemeriksaan lab rekanan · pengiriman · hasil · margin</span>
+        </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="refOpenLabForm()">+ Lab Rekanan</button>
-        <button class="btn btn-teal" onclick="refOpenSendForm()">📤 Kirim Pemeriksaan</button>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="ref-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="refOpenLabForm()">+ Lab Rekanan</button>
+        <button class="btn btn-teal btn-sm" onclick="refOpenSendForm()">Kirim Pemeriksaan</button>
       </div>
     </div>
 
@@ -66,6 +70,9 @@ async function renderReferral() {
     </div>
 
     <div id="ref-content"><div class="loading-row"><div class="spinner"></div></div></div>`;
+
+  const badge = document.getElementById('ref-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   await refLoadAll();
 }

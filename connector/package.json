@@ -1,0 +1,12 @@
+{
+  "name": "onelab-connector",
+  "version": "1.0.0",
+  "description": "Jembatan alat lab (ASTM/HL7 TCP) ↔ OneLab Supabase. Jalankan di PC LAN lab.",
+  "main": "onelab-connector.js",
+  "scripts": {
+    "start": "node onelab-connector.js"
+  },
+  "engines": { "node": ">=18" },
+  "license": "UNLICENSED",
+  "private": true
+}

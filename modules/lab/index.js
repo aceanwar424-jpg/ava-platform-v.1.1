@@ -12,7 +12,7 @@
 //   lab/qc.js          · Quality Control & manajemen analyzer
 // ═══════════════════════════════════════════════════════════════
 
-const LAB_TABS = ['checkin','worklist','result','validation','approval','report','qc'];
+const LAB_TABS = ['checkin','worklist','result','validation','approval','report','qc','integrasi'];
 
 // State bersama (dibaca/ditulis lintas sub-modul)
 let labSamples  = [];
@@ -260,6 +260,7 @@ const LAB_TAB_META = {
   approval:   { label:'Approval',          ico:'🔏' },
   report:     { label:'Rekam Medis Lab',   ico:'📁' },
   qc:         { label:'QC & Analyzer',     ico:'🎛️' },
+  integrasi:  { label:'Integrasi Alat',    ico:'🔌' },
 };
 
 async function renderLab(tab='checkin'){
@@ -291,6 +292,7 @@ async function renderLab(tab='checkin'){
   ({
     checkin:renderCheckinTab, worklist:renderWorklistTab, result:renderResultTab,
     validation:renderValidationTab, approval:renderApprovalTab, report:renderReportTab, qc:renderQCTab,
+    integrasi:renderAnalyzerHub,
   }[tab] || renderCheckinTab)();
 }
 
@@ -318,6 +320,7 @@ async function labCategorySummary(containerId){
     {icon:'🚨',val:critical,  label:'Nilai Kritis',  color:'#DC2626',tab:'validation'},
     {icon:'✅',val:validated, label:'Tervalidasi',   color:'#22C55E',tab:'approval'},
     {icon:'📤',val:released,  label:'Released',       color:'#0A2342',tab:'report'},
+    {icon:'🔌',val:'',        label:'Integrasi Alat', color:'#0E7C86',tab:'integrasi'},
   ];
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px">
     ${cards.map(k=>`

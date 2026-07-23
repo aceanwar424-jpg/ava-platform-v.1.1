@@ -126,7 +126,7 @@ function paintRIS() {
           <td style="padding:8px 10px"><div style="font-size:12.5px;font-weight:600">${o.procedure_name || '—'}</div>
             <div style="font-size:11px;color:var(--gray)">${o.modality_code || ''}</div></td>
           <td style="padding:8px 10px;font-size:11.5px;color:var(--gray)">${o.scheduled_at ? new Date(o.scheduled_at).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—'}</td>
-          <td style="padding:8px 10px"><span style="background:${st.bg};color:${st.c};padding:3px 9px;border-radius:4px;
+          <td style="padding:8px 10px"><span style="background:${st.bg};color:${st.c};border:1px solid ${st.c}35;padding:2px 8px;border-radius:4px;
             font-size:11px;font-weight:700">${o.status}</span></td>
           <td style="padding:8px 10px;text-align:center"><div class="act-row" style="justify-content:center;flex-wrap:wrap">
             ${o.status === 'Dijadwalkan' ? `<button class="btn btn-teal btn-xs" onclick="risOpenSendDevice(${o.id})">Kirim ke Alat</button>` : ''}

@@ -46,15 +46,21 @@ function hcCommissionPct(staffId, serviceType) {
 
 async function renderHomeCare() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Home Care</h1>
-        <p>Manajemen order layanan kunjungan rumah — jadwal, nakes, billing</p></div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderHCLiveMap()">🗺️ Peta Live</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderHCStaff()">👥 Master Nakes</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderHCTariff()">🏷️ Master Tarif</button>
-        <button class="btn btn-ghost btn-sm" onclick="renderHCReport()">📊 Laporan</button>
-        <button class="btn btn-teal" onclick="openHCForm()">+ Order Baru</button>
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('homecare')" title="Kembali ke daftar menu Home Care">← Menu Home Care</button>
+        <div>
+          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Home Care</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Manajemen order layanan kunjungan rumah · jadwal · nakes · billing</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="hc-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCLiveMap()">Peta Live</button>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCStaff()">Master Nakes</button>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCTariff()">Master Tarif</button>
+        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCReport()">Laporan</button>
+        <button class="btn btn-teal btn-sm" onclick="openHCForm()">+ Order Baru</button>
       </div>
     </div>
 
@@ -67,13 +73,13 @@ async function renderHomeCare() {
     <div class="tabs" id="hc-tabs" style="margin-bottom:14px">
       <button class="tab-btn active" onclick="filterHCStatus('',this)">Semua</button>
       ${Object.entries(HC_STATUS).map(([s,v])=>
-        `<button class="tab-btn" onclick="filterHCStatus('${s}',this)">${v.icon} ${s}</button>`
+        `<button class="tab-btn" onclick="filterHCStatus('${s}',this)">${s}</button>`
       ).join('')}
     </div>
 
     <!-- Search -->
     <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <input class="table-search" id="hc-q" placeholder="🔍 Cari nama pasien, nakes, layanan..."
+      <input class="table-search" id="hc-q" placeholder="Cari nama pasien, nakes, layanan..."
         oninput="applyHCFilter()" style="flex:1">
       <input type="date" class="table-filter" id="hc-date" onchange="applyHCFilter()">
     </div>
@@ -81,6 +87,9 @@ async function renderHomeCare() {
     <div id="hc-list">
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
+
+  const badge = document.getElementById('hc-date-badge');
+  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   await loadHCOrders();
 }
@@ -1157,6 +1166,10 @@ function showNakesDetail(name, ids) {
 // ══════════════════════════════════════════════════════════════
 async function renderHCStaff() {
   document.getElementById('main-content').innerHTML = `
+    <style>
+      @keyframes hcLivePulse{0%{box-shadow:0 0 0 0 rgba(20,184,166,.6)}70%{box-shadow:0 0 0 5px rgba(20,184,166,0)}100%{box-shadow:0 0 0 0 rgba(20,184,166,0)}}
+      .hc-live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#0f766e;margin-right:5px;vertical-align:middle;animation:hcLivePulse 1.4s infinite}
+    </style>
     <div class="page-header">
       <div><h1>👥 Master Nakes</h1><p>Tenaga kesehatan Home Care — kompetensi, wilayah, komisi</p></div>
       <div class="btn-row">
@@ -1167,25 +1180,88 @@ async function renderHCStaff() {
     <div class="table-wrap"><div id="hcs-tbody"><div class="loading-row"><div class="spinner"></div></div></div></div>`;
   await loadHCMasters(true);
   renderHCStaffTable();
+  // Auto-refresh badge lokasi tiap 30 dtk selama halaman Master Nakes terbuka.
+  clearInterval(window._hcStaffTimer);
+  window._hcStaffTimer = setInterval(async () => {
+    if (!document.getElementById('hcs-tbody')) { clearInterval(window._hcStaffTimer); return; }
+    await loadHCMasters(true);
+    renderHCStaffTable();
+  }, 30000);
+}
+
+// Badge status berbagi lokasi berdasarkan location_updated_at.
+//  < 5 mnt = LIVE (hijau berkedip) · < 60 mnt = baru saja · lainnya = offline/belum.
+function hcLocBadge(s) {
+  const ts = s.location_updated_at ? new Date(s.location_updated_at).getTime() : 0;
+  if (!ts || (s.current_lat==null && s.current_lng==null))
+    return `<span class="badge badge-gray" style="font-size:10.5px">Offline</span>`;
+  const mins = (Date.now() - ts) / 60000;
+  if (mins < 5)
+    return `<span class="badge badge-teal" style="font-size:10.5px" title="${new Date(ts).toLocaleString('id-ID')}">
+      <span class="hc-live-dot"></span>LIVE</span>`;
+  const ago = mins < 60 ? Math.round(mins)+' mnt lalu'
+            : mins < 1440 ? Math.round(mins/60)+' jam lalu'
+            : Math.round(mins/1440)+' hari lalu';
+  return `<span class="badge badge-gray" style="font-size:10.5px" title="${new Date(ts).toLocaleString('id-ID')}">◷ ${ago}</span>`;
 }
 
 function renderHCStaffTable() {
   const el = document.getElementById('hcs-tbody'); if (!el) return;
   if (!hcStaff.length) { el.innerHTML = `<div class="empty-state"><div class="ico">👥</div><h3>Belum ada Nakes</h3><p>Klik "+ Tambah Nakes".</p></div>`; return; }
   el.innerHTML = `<table><thead><tr>
-    <th>Nama</th><th>Peran</th><th>Kompetensi</th><th>Wilayah</th><th>Komisi</th><th>Status</th><th>Aksi</th>
+    <th>Nama</th><th>Peran</th><th>Kompetensi</th><th>Wilayah</th><th>Komisi</th><th>Lokasi</th><th>Status</th><th>Aksi</th>
   </tr></thead><tbody>${hcStaff.map(s=>`<tr>
     <td><div style="font-weight:600;color:var(--navy)">${s.staff_name||'—'}</div><div style="font-size:11px;color:var(--gray)">${s.phone||''}</div></td>
     <td style="font-size:12px">${s.role_title||'—'}</td>
     <td style="font-size:11px;color:var(--gray)">${s.competencies||'—'}</td>
     <td style="font-size:11px;color:var(--gray)">${s.coverage_area||'—'}</td>
     <td style="text-align:center;font-weight:700">${s.commission_pct!=null?s.commission_pct+'%':'—'}</td>
+    <td>${hcLocBadge(s)}</td>
     <td><span class="badge ${s.is_active!==false?'badge-teal':'badge-gray'}">${s.is_active!==false?'Aktif':'Nonaktif'}</span></td>
     <td><div class="act-row">
+      <button class="act-btn" title="Link Portal Nakes" onclick="hcStaffLink(${s.id})">🔗</button>
       <button class="act-btn edit" onclick="openHCStaffForm(${s.id})">✏️</button>
       <button class="act-btn del" onclick="deleteHCStaff(${s.id})">🗑</button>
     </div></td>
   </tr>`).join('')}</tbody></table>`;
+}
+
+// Ambil/buat token portal nakes, tampilkan link siap-kirim (WhatsApp).
+async function hcStaffLink(staffId) {
+  const s = hcStaff.find(x=>x.id===staffId) || {};
+  let tok;
+  try {
+    tok = await sbRpc('homecare_staff_ensure_token', { p_staff_id: staffId });
+  } catch(e) {
+    alert('Gagal membuat link: ' + (e.message||e) + '\n\nPastikan supabase_homecare_nakes.sql sudah dijalankan.');
+    return;
+  }
+  if (typeof tok === 'string') tok = tok.replace(/^"|"$/g,'');
+  const base = location.origin + location.pathname.replace(/[^/]*$/, '');
+  const url  = base + 'nakes.html?t=' + tok;
+  const wa   = (s.phone||'').replace(/[^0-9]/g,'').replace(/^0/,'62');
+  const waMsg = encodeURIComponent(`Halo ${s.staff_name||''}, ini link Portal Nakes Home Care Anda (order & berbagi lokasi):\n${url}`);
+  openModal(`
+    <div class="modal-header"><div class="modal-title">🔗 Link Portal Nakes</div>
+      <button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <div style="padding:4px 2px 8px">
+      <div style="font-size:13px;color:var(--gray);margin-bottom:6px">Kirim link ini ke <b>${s.staff_name||'nakes'}</b>. Nakes cukup buka di HP — tanpa login. Link berisi token rahasia, jangan disebar.</div>
+      <div class="form-group"><label>Link Portal</label>
+        <input type="text" id="hcs-link" value="${url}" readonly onclick="this.select()" style="font-size:12px"></div>
+      <div class="btn-row" style="gap:8px;flex-wrap:wrap">
+        <button class="btn btn-teal btn-sm" onclick="hcCopyLink()">📋 Salin Link</button>
+        ${wa?`<a class="btn btn-ghost btn-sm" href="https://wa.me/${wa}?text=${waMsg}" target="_blank" rel="noopener">💬 Kirim via WhatsApp</a>`:''}
+        <a class="btn btn-ghost btn-sm" href="${url}" target="_blank" rel="noopener">🔎 Pratinjau</a>
+      </div>
+    </div>`);
+}
+function hcCopyLink() {
+  const el = document.getElementById('hcs-link'); if (!el) return;
+  el.select();
+  navigator.clipboard?.writeText(el.value).then(
+    ()=>{ if (typeof toast==='function') toast('Link disalin'); else el.style.background='#dcfce7'; },
+    ()=>{ document.execCommand('copy'); }
+  );
 }
 
 async function openHCStaffForm(id=null) {

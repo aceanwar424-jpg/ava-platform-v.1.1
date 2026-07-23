@@ -75,6 +75,24 @@ Urutan ini **wajib dipatuhi** karena fase berikutnya memakai fungsi dari fase se
 `supabase_crm.sql` (pipeline & pendapatan) ·
 `supabase_assets.sql` (aset tetap, penyusutan & jadwal kalibrasi)
 
+### 7. `07_lanjutan/` — penyempurnaan alur (verifikasi 23 Juli 2026)
+
+Diverifikasi lewat REST (objek benar-benar ada di DB), bukan catatan:
+
+| Berkas | Verifikasi | Isi |
+|---|---|---|
+| `supabase_lab_panel_conclusion.sql` | tabel `lab_panel_conclusions` → 200 | Kesimpulan klinis tingkat panel (mis. dislipidemia) di layar Approval |
+| `supabase_agentic_doc_sign.sql` | `agentic_doc_review_data/_signatures` balas JSON | RPC QMS: TTD, no. dokumen, publish, hapus template, riwayat chat editor AI |
+| `supabase_agentic_overlap.sql` | `agentic_overlap_status`/`_scan_semantic` jalan | Deteksi tumpang-tindih antar-SOP (leksikal Jaccard + semantik pgvector) |
+| `supabase_agentic_rag.sql` | `agentic_rag_status` → `{docs_total:37}` | RAG "Tanya Dokumen": chunk + embedding pgvector 768-dim (butuh extension `vector` + edge fn `embed`) |
+| `supabase_homecare_maps.sql` | `homecare_ensure_token` balas token | Kolom lat/lng, pelacakan lokasi nakes & pasien |
+| `supabase_homecare_nakes.sql` | kolom `access_token` 200 + `homecare_staff_portal` jalan | Portal nakes lewat token (`nakes.html?t=…`) — order + berbagi lokasi tanpa login |
+| `supabase_ris_modality_worklist.sql` | kolom `device_name` dll → 200 | Langkah "kirim ke antrian alat" + konsol penerimaan PACS di RIS |
+
+> Prasyarat RAG di luar SQL: `CREATE EXTENSION vector` sudah aktif, dan edge
+> function `supabase/functions/embed` sudah di-deploy. Status `docs_indexed:0`
+> berarti struktur siap tetapi belum ada dokumen yang diindeks.
+
 ---
 
 ## Prasyarat antar berkas
