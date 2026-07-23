@@ -90,6 +90,7 @@ function agDocsSubBar(nDocs){
     ['registry', icon('layers',13)+' Registry ('+nDocs+')'],
     ['upload',   icon('upload',13)+' Unggah Dokumen'],
     ['template', icon('file-check',13)+' Template'],
+    ['tanya',    icon('sparkles',13)+' Tanya Dokumen'],
   ];
   return '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">' +
     items.map(function(it){
@@ -168,6 +169,8 @@ function renderAgDocsTab(el){
       <div class="loading-row"><div class="spinner"></div></div>
     </div>` : ''}
 
+    ${_agDocsSub==='tanya' ? `<div id="ag-rag-sec"></div>` : ''}
+
     ${_agDocsSub==='registry' ? `
     ${missing.length ? `
     <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
@@ -221,7 +224,8 @@ function renderAgDocsTab(el){
     drop.addEventListener('drop', e=>agIngestFiles(e.dataTransfer.files));
   }
   // Panel template dokumen (fungsi global dari org.js) — tempat unggah master .docx
-  if(typeof agRenderTemplates==='function') agRenderTemplates();
+  if(_agDocsSub==='template' && typeof agRenderTemplates==='function') agRenderTemplates();
+  if(_agDocsSub==='tanya' && typeof agRagRenderSection==='function') agRagRenderSection('ag-rag-sec');
 }
 
 // Proses banyak file → buat task DOC_INGEST per file (file terakhir bawa enqueue_gap)
