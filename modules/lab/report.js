@@ -345,13 +345,11 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .flag{font-weight:800}.crit{color:#DC2626}
       .legend{font-size:9px;color:#000;margin-top:6px}
       
-      .footer{
-        position: absolute; 
-        bottom: ${isTemplate ? pBottom : '15mm'}; 
-        left: ${isTemplate ? pLeft : '10mm'}; 
-        right: ${isTemplate ? pRight : '10mm'};
-        page-break-inside: avoid;
-      }
+      /* tfoot berulang otomatis di dasar tiap halaman cetak (running footer) */
+      tfoot{display:table-footer-group}
+      tfoot td{border:none;padding:0}
+      .run-footer{padding-top:6px}
+      .sign-cell{border:none;padding-top:10px}
       .signs{display:flex;justify-content:flex-end;margin-top:10px}
       .signs > div{width: 220px; font-size:11px; text-align: center;}
       .signs .line{border-top:1px solid #000;padding-top:3px;font-weight:bold;}
@@ -417,37 +415,38 @@ async function printLabReport(patientName, visitNumber, sampleRows){
             </tr>
             ${_labPrintCatRows(rows, cfg)}
           `).join('')}
+          <tr class="sign-row"><td class="sign-cell" colspan="${cfg.show_loinc?6:5}">
+            <div class="signs" style="display:flex;justify-content:flex-end;margin-top:10px">
+              <div style="width: 200px; font-size:11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                <div>${cfg.sign3_role || 'Penanggung Jawab'}:</div>
+                <div style="margin: 4px 0;">
+                  <img src="${qrUrl}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
+                </div>
+                <div class="line" style="width: 100%; border-top:1px solid #000; padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
+              </div>
+            </div>
+          </td></tr>
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="${cfg.show_loinc?6:5}" style="height:48mm;border:none;padding:0;background:none"></td>
+            <td colspan="${cfg.show_loinc?6:5}">
+              <div class="run-footer">
+                ${cfg.footer_note ? `<div style="font-size:10px;color:#000;margin-top:8px;line-height:1.4">${cfg.footer_note}</div>` : ''}
+                <div class="disc" style="display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:8px;font-size:10px;color:#000;border-top:1px dashed #000;padding-top:6px">
+                  <div style="display:flex;justify-content:space-between">
+                    <span><strong>Validator:</strong> ${validator}</span>
+                    <span><strong>Approval:</strong> ${approver}</span>
+                    <span>Dokumen elektronik valid tanpa ttd basah · Dicetak: ${new Date().toLocaleString('id-ID')}</span>
+                  </div>
+                </div>
+              </div>
+            </td>
           </tr>
         </tfoot>
       </table>
       ${cfg.show_flag_legend?`<div class="legend">Keterangan: H = di atas rentang normal · L = di bawah rentang normal · * = nilai kritis</div>`:''}
     </div>
     
-    <div class="footer">
-      <div class="signs" style="display:flex;justify-content:flex-end;margin-top:10px">
-        <div style="width: 200px; font-size:11px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-          <div>${cfg.sign3_role || 'Penanggung Jawab'}:</div>
-          <div style="margin: 4px 0;">
-            <img src="${qrUrl}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
-          </div>
-          <div class="line" style="width: 100%; border-top:1px solid #000; padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
-        </div>
-      </div>
-      
-      ${cfg.footer_note ? `<div style="font-size:10px;color:#000;margin-top:12px;line-height:1.4">${cfg.footer_note}</div>` : ''}
-      
-      <div class="disc" style="display:block;margin-top:14px;font-size:10px;color:#000;border-top:1px dashed #000;padding-top:6px">
-        <div style="display:flex;justify-content:space-between">
-          <span><strong>Validator:</strong> ${validator}</span>
-          <span><strong>Approval:</strong> ${approver}</span>
-          <span>Dokumen elektronik valid tanpa ttd basah · Dicetak: ${new Date().toLocaleString('id-ID')}</span>
-        </div>
-      </div>
-    </div>
     </body></html>`);
   w.document.close();
 }
