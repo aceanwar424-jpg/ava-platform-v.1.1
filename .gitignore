@@ -1,0 +1,2 @@
+# graphify generated knowledge graph (rebuild with: python -m graphify extract . --code-only)
+graphify-out/
