@@ -456,46 +456,90 @@ function renderCorpTable(data) {
 
 let _corpFormId = null, _corpFormName = '';
 
-// Style bersama untuk Corporate Account Form & Profil Karyawan (scoped .corp-acct)
 function _caStyleTag() {
   return `<style>
-      .corp-acct{ --ca-line:var(--border); color:#1e293b; font-size:13px; }
-      .corp-acct .ca-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--ca-line); }
-      .corp-acct .ca-title{ font-size:17px; font-weight:800; color:var(--navy); letter-spacing:-.01em; }
-      .corp-acct .ca-sub{ font-size:12px; color:var(--text3); margin-top:3px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-      .corp-acct .ca-chip{ font-family:ui-monospace,monospace; font-size:11px; font-weight:600; background:var(--bg2); color:var(--text3); padding:2px 8px; border-radius:6px; }
-      .corp-acct .ca-badge{ font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:99px; }
-      .corp-acct .ca-x{ border:none; background:var(--bg2); width:30px; height:30px; border-radius:8px; color:var(--text3); font-size:15px; cursor:pointer; transition:background .15s,color .15s; flex-shrink:0; }
-      .corp-acct .ca-x:hover{ background:#e2e8f0; color:var(--navy); }
-      .corp-acct .ca-tabs{ display:flex; gap:2px; position:sticky; top:0; background:#fff; z-index:3; border-bottom:1px solid var(--ca-line); padding-top:12px; margin-bottom:18px; overflow-x:auto; }
-      .corp-acct .ca-tab{ display:inline-flex; align-items:center; gap:7px; padding:10px 15px; border:none; background:none; font:inherit; font-size:12.5px; font-weight:600; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; transition:color .15s,border-color .15s; }
-      .corp-acct .ca-tab svg{ opacity:.7; }
-      .corp-acct .ca-tab:hover{ color:var(--navy); }
-      .corp-acct .ca-tab.on{ color:var(--teal); border-bottom-color:var(--teal); }
-      .corp-acct .ca-tab.on svg{ opacity:1; }
-      .corp-acct .ca-card{ background:#fff; border:1px solid var(--ca-line); border-radius:12px; padding:16px 18px 4px; margin-bottom:14px; box-shadow:0 1px 2px rgba(11,31,58,.04); }
-      .corp-acct .ca-h{ font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.07em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-      .corp-acct .ca-h::before{ content:''; width:3px; height:13px; background:var(--teal); border-radius:2px; }
-      .corp-acct .ca-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px 14px; }
-      .corp-acct .ca-grid.two{ grid-template-columns:repeat(2,1fr); }
-      .corp-acct .fg{ display:flex; flex-direction:column; margin-bottom:13px; min-width:0; }
-      .corp-acct .fg.full{ grid-column:1/-1; }
-      .corp-acct .fg.sp2{ grid-column:span 2; }
-      .corp-acct .fg label{ font-size:11px; font-weight:600; color:var(--text3); margin-bottom:5px; }
-      .corp-acct input, .corp-acct select{ border:1px solid var(--ca-line); border-radius:8px; padding:9px 11px; font-size:13px; color:#1e293b; background:#fff; width:100%; transition:border-color .15s,box-shadow .15s; }
-      .corp-acct input::placeholder{ color:#a9b6c4; }
-      .corp-acct input:hover, .corp-acct select:hover{ border-color:#c3d0dc; }
-      .corp-acct input:focus, .corp-acct select:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(8,145,178,.14); }
-      .corp-acct input[readonly]{ background:var(--bg2); color:var(--text3); cursor:default; }
-      .corp-acct .ca-note{ display:flex; gap:10px; background:#ecfeff; border:1px solid #a5f3fc; border-radius:10px; padding:12px 14px; font-size:12px; line-height:1.5; color:#155e75; margin:4px 0 14px; }
-      .corp-acct .ca-note svg{ flex-shrink:0; margin-top:1px; }
-      .corp-acct .ca-empty{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:44px 20px; color:var(--text3); text-align:center; }
-      .corp-acct .ca-empty svg{ color:#cbd5e1; }
-      .corp-acct .ca-foot{ display:flex; justify-content:flex-end; gap:10px; position:sticky; bottom:0; background:#fff; padding-top:14px; margin-top:6px; border-top:1px solid var(--ca-line); }
-      .corp-acct .ca-h{ font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.07em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
-      .corp-acct .ca-h::before{ content:''; width:3px; height:13px; background:var(--teal); border-radius:2px; }
-    </style>`;
+    .corp-acct {
+      font-family: 'Outfit', sans-serif;
+      color: #1e293b;
+      font-size: 13px;
+    }
+    .corp-acct .tab-btn {
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #fff;
+      color: #0f2963;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .corp-acct .tab-btn:hover:not(:disabled) {
+      background: #f1f5f9;
+    }
+    .corp-acct .tab-btn.active {
+      background: #0f2963 !important;
+      color: #fff !important;
+      border-color: #0f2963 !important;
+    }
+    .corp-acct .tab-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .corp-acct .erp-form-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 12.5px;
+      border: 1px solid #cbd5e1;
+    }
+    .corp-acct .erp-form-table td {
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      vertical-align: middle;
+      background: #fff;
+    }
+    .corp-acct .erp-form-table .erp-label {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #0f2963;
+      width: 170px;
+      user-select: none;
+    }
+    .corp-acct .erp-form-table input[type="text"],
+    .corp-acct .erp-form-table input[type="email"],
+    .corp-acct .erp-form-table input[type="number"],
+    .corp-acct .erp-form-table input[type="date"],
+    .corp-acct .erp-form-table select,
+    .corp-acct .erp-form-table textarea {
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      padding: 6px 10px;
+      font-size: 12.5px;
+      width: 100%;
+      background: #fff;
+      box-sizing: border-box;
+      outline: none;
+    }
+    .corp-acct .erp-form-table input[readonly] {
+      background: #e2e8f0;
+      color: #475569;
+      cursor: not-allowed;
+    }
+    .corp-acct .erp-section-title {
+      background-color: #d9ebf7;
+      border: 1px solid #cbd5e1;
+      border-bottom: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #0f2963;
+      margin-top: 16px;
+      border-radius: 4px 4px 0 0;
+    }
+  </style>`;
 }
+
 
 async function renderCorporateDetail(id = null) {
   let c = {};
@@ -524,117 +568,312 @@ async function renderCorporateDetail(id = null) {
     ${_caStyleTag()}
     <div class="pro-shell corp-acct" style="max-width: 1200px; margin: 0 auto; padding: 10px;">
       
-      <!-- HEADER -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-        <div>
-          <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="margin-bottom: 8px;">&larr; Kembali ke Daftar</button>
-          <h1 style="margin:0; font-size: 20px; font-weight: 800; color: var(--navy)">
-            ${id ? esc(c.corporate_name) : 'Tambah Corporate Account Baru'}
-          </h1>
-          <div class="ca-sub" style="margin-top: 6px;">
-            <span class="ca-chip">${esc(kode)}</span>
-            ${c.industry ? `<span>${esc(c.industry)}</span>` : ''}
-            <span class="ca-badge" style="background:${stColor}1a; color:${stColor}; border:1px solid ${stColor}40">${statusVal}</span>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-ghost" onclick="navigate('corporate')">Batal</button>
-          <button class="btn btn-teal" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')">Simpan Perubahan</button>
-        </div>
+      <!-- Top Navigation Tabs Bar matching Virtu Digilab -->
+      <div style="display:flex; gap:20px; border-bottom:2px solid #cbd5e1; padding-bottom:6px; margin-bottom:12px;">
+        <span style="font-weight:700; color:#0f2963; text-transform:uppercase; font-size:13px; cursor:pointer;" onclick="navigate('corporate')">Configuration</span>
+        <span style="font-weight:700; color:var(--teal); text-transform:uppercase; font-size:13px; cursor:pointer;" onclick="navigate('corporate')">Corporate List</span>
       </div>
 
-      <!-- MAIN LAYOUT -->
-      <div style="display:grid; grid-template-columns: ${id ? '1.2fr 1fr' : '1fr'}; gap: 24px; align-items: start;">
+      <!-- Corporate Account Forms Title Banner with Close Button -->
+      <div style="background:#d9ebf7; border: 1px solid #b8d2e6; border-radius: 4px; padding:10px 16px; display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <span style="font-weight:700; color:#0f2963; font-size:14px;">Corporate Account Forms</span>
+        <button onclick="navigate('corporate')" style="background:#dc2626; color:#fff; border:none; border-radius:4px; width:22px; height:22px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:12px;">&times;</button>
+      </div>
+
+      <!-- Two-Column Workspace Layout -->
+      <div style="display:grid; grid-template-columns: 200px 1fr; gap: 20px; align-items: start;">
         
-        <!-- LEFT COLUMN: Profile & Account Info -->
-        <div style="display:flex; flex-direction:column; gap:16px">
+        <!-- Left Sidebar Tabs -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="tab-btn active" id="tab-btn-partner" onclick="switchCorpDetailTab('partner')">Business Partner</button>
+          <button class="tab-btn" id="tab-btn-info" onclick="switchCorpDetailTab('info')">Account Info</button>
+          <button class="tab-btn" id="tab-btn-employees" onclick="switchCorpDetailTab('employees')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Employee List</button>
+          <button class="tab-btn" id="tab-btn-import" onclick="switchCorpDetailTab('import')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Import Employee</button>
+        </div>
+
+        <!-- Right Side Panel Workspace -->
+        <div class="glass-card" style="padding:0; border: 1px solid #cbd5e1; border-radius:6px; background:#fff; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
           
-          <!-- CARD 1: Business Partner Info -->
-          <div class="card" style="padding: 20px;">
-            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Identitas Perusahaan</div>
-            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-              <div class="fg" style="grid-column: span 2;"><label>Nama Perusahaan *</label><input type="text" id="cf-name" value="${esc(c.corporate_name)}" placeholder="PT. ABC Tbk"></div>
-              <div class="fg"><label>Kode Corporate</label><input type="text" id="cf-kode" value="${esc(kode)}"></div>
-              <div class="fg"><label>Brand/Unit</label><input type="text" id="cf-brand" value="${esc(c.brand)}" placeholder="Nama brand/unit"></div>
-              <div class="fg"><label>Industri</label><input type="text" id="cf-industry" value="${esc(c.industry)}" placeholder="Healthcare..."></div>
-              <div class="fg"><label>Tipe</label><select id="cf-type">${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}</select></div>
-              <div class="fg"><label>Link ke Partner</label><select id="cf-partner">${partnerOpts}</select></div>
-              <div class="fg"><label>SAP ID</label><input type="text" id="cf-sapid" value="${esc(c.sap_id)}" placeholder="8000xxxxxx"></div>
-              <div class="fg"><label>SAP Relation</label><input type="text" id="cf-saprel" value="${esc(c.sap_relation)}" placeholder="TRADE THIRD PARTY"></div>
-              <div class="fg"><label>SAP Period Mulai</label><input type="date" id="cf-sapstart" value="${c.sap_period_start||''}"></div>
-              <div class="fg"><label>SAP Period Selesai</label><input type="date" id="cf-sapend" value="${c.sap_period_end||''}"></div>
-              <div class="fg"><label>Multinational</label><select id="cf-multi"><option value="false" ${sel(String(!!c.multinational),'false')}>No</option><option value="true" ${sel(String(!!c.multinational),'true')}>Yes</option></select></div>
-              <div class="fg"><label>Status</label><select id="cf-status">${['Aktif','Non-Aktif','Suspend'].map(s=>`<option ${sel(statusVal,s)}>${s}</option>`).join('')}</select></div>
+          <!-- ==================== TAB: BUSINESS PARTNER ==================== -->
+          <div class="tab-content" id="tab-content-partner" style="display:block;">
+            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Business Partner Data</div>
+            <div style="padding:16px;">
+              <table class="erp-form-table">
+                <tr>
+                  <td class="erp-label">Code</td>
+                  <td><input type="text" id="cf-code" value="${esc(kode)}" readonly></td>
+                  <td class="erp-label">SAP Relation *</td>
+                  <td><input type="text" id="cf-saprel" value="${esc(c.sap_relation)}" placeholder="TRADE THIRD PARTY"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">SAP ID</td>
+                  <td><input type="text" id="cf-sapid" value="${esc(c.sap_id)}" placeholder="8000020470"></td>
+                  <td class="erp-label">SAP Relation Period *</td>
+                  <td>
+                    <div style="display:flex; gap:6px; align-items:center;">
+                      <input type="date" id="cf-sapstart" value="${c.sap_period_start||''}">
+                      <span>-</span>
+                      <input type="date" id="cf-sapend" value="${c.sap_period_end||''}">
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Name *</td>
+                  <td><input type="text" id="cf-name" value="${esc(c.corporate_name)}" placeholder="Nama Perusahaan"></td>
+                  <td class="erp-label">Mobile Phone *</td>
+                  <td><input type="text" id="cf-phone" value="${esc(c.pic_phone)}" placeholder="08xxxxxxxxxx"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Type</td>
+                  <td>
+                    <select id="cf-type">
+                      ${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td class="erp-label">Email *</td>
+                  <td><input type="email" id="cf-email" value="${esc(c.pic_email)}" placeholder="hrd@perusahaan.com"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Brand</td>
+                  <td><input type="text" id="cf-brand" value="${esc(c.brand)}" placeholder="Nama brand/unit"></td>
+                  <td class="erp-label">Active</td>
+                  <td>
+                    <div style="display:flex; gap:16px; align-items:center;">
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-status-radio" value="Aktif" ${statusVal === 'Aktif' ? 'checked' : ''} style="width:auto; margin:0;"> Yes</label>
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-status-radio" value="Non-Aktif" ${statusVal !== 'Aktif' ? 'checked' : ''} style="width:auto; margin:0;"> No</label>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Link ke Partner</td>
+                  <td>
+                    <select id="cf-partner">${partnerOpts}</select>
+                  </td>
+                  <td class="erp-label">Multinational</td>
+                  <td>
+                    <div style="display:flex; gap:16px; align-items:center;">
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-multi-radio" value="true" ${c.multinational ? 'checked' : ''} style="width:auto; margin:0;"> Yes</label>
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-multi-radio" value="false" ${!c.multinational ? 'checked' : ''} style="width:auto; margin:0;"> No</label>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <div class="erp-section-title">Primary Address</div>
+              <table class="erp-form-table">
+                <tr>
+                  <td class="erp-label">Address *</td>
+                  <td><input type="text" id="cf-addr" value="${esc(c.address)}" placeholder="Jl. ..."></td>
+                  <td class="erp-label">City</td>
+                  <td><input type="text" id="cf-city" value="${esc(c.city)}" placeholder="Kota"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Sub District *</td>
+                  <td><input type="text" id="cf-subdist" value="${esc(c.subdistrict)}" placeholder="Kecamatan/Kelurahan"></td>
+                  <td class="erp-label">Province</td>
+                  <td><input type="text" id="cf-prov" value="${esc(c.province)}" placeholder="Provinsi"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">PIC Name</td>
+                  <td><input type="text" id="cf-pic" value="${esc(c.pic_name)}" placeholder="Nama PIC"></td>
+                  <td class="erp-label">Country</td>
+                  <td><input type="text" id="cf-country" value="${esc(c.country||'INDONESIA')}"></td>
+                </tr>
+              </table>
+              
+              <!-- Tab Action Footer -->
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid #cbd5e1; padding:6px 16px;"><span style="color:#dc2626;">&times;</span> Cancel</button>
+                <button class="btn btn-teal btn-sm" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')" style="display:flex; align-items:center; gap:6px; padding:6px 16px;">💾 Save</button>
+              </div>
             </div>
           </div>
 
-          <!-- CARD 2: Kontak & Alamat -->
-          <div class="card" style="padding: 20px;">
-            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Kontak &amp; Alamat Primer</div>
-            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-              <div class="fg"><label>Nama PIC</label><input type="text" id="cf-pic" value="${esc(c.pic_name)}" placeholder="Manager HRD..."></div>
-              <div class="fg"><label>No. HP PIC</label><input type="text" id="cf-phone" value="${esc(c.pic_phone)}" placeholder="08xxxxxxxxxx"></div>
-              <div class="fg" style="grid-column: span 2;"><label>Email PIC</label><input type="email" id="cf-email" value="${esc(c.pic_email)}" placeholder="hrd@perusahaan.com"></div>
-              <div class="fg" style="grid-column: span 2;"><label>Alamat Perusahaan</label><input type="text" id="cf-addr" value="${esc(c.address)}" placeholder="Jl. ..."></div>
-              <div class="fg"><label>Kelurahan / Kecamatan</label><input type="text" id="cf-subdist" value="${esc(c.subdistrict)}"></div>
-              <div class="fg"><label>Kota</label><input type="text" id="cf-city" value="${esc(c.city)}"></div>
-              <div class="fg"><label>Provinsi</label><input type="text" id="cf-prov" value="${esc(c.province)}"></div>
-              <div class="fg"><label>Negara</label><input type="text" id="cf-country" value="${esc(c.country||'INDONESIA')}"></div>
+          <!-- ==================== TAB: ACCOUNT INFO ==================== -->
+          <div class="tab-content" id="tab-content-info" style="display:none;">
+            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Tax Information</div>
+            <div style="padding:16px;">
+              <table class="erp-form-table">
+                <tr>
+                  <td class="erp-label">NPWP *</td>
+                  <td><input type="text" id="cf-npwp" value="${esc(c.npwp)}" placeholder="00.000.000.0-000.000"></td>
+                  <td class="erp-label">Tax Type *</td>
+                  <td>
+                    <select id="cf-taxtype">
+                      ${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Address *</td>
+                  <td><input type="text" id="cf-taxaddr" value="${esc(c.tax_address)}" placeholder="Alamat Pajak"></td>
+                  <td class="erp-label">Tax Office</td>
+                  <td><input type="text" id="cf-taxoffice" value="${esc(c.tax_office)}" placeholder="KPP Pratama ..."></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Registered at</td>
+                  <td><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></td>
+                  <td class="erp-label">PPh 23 *</td>
+                  <td>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-pph23-radio" value="true" ${c.pph23 ? 'checked' : ''} style="width:auto; margin:0;"> Yes</label>
+                      <label style="display:flex; align-items:center; gap:4px; font-weight:normal; margin:0;"><input type="radio" name="cf-pph23-radio" value="false" ${!c.pph23 ? 'checked' : ''} style="width:auto; margin:0;"> No</label>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <div class="erp-section-title">Bank Information</div>
+              <table class="erp-form-table">
+                <thead>
+                  <tr style="background: #f1f5f9; font-weight: 700; text-align: center;">
+                    <td style="padding:6px; border:1px solid #cbd5e1; width: 80px;">Primary</td>
+                    <td style="padding:6px; border:1px solid #cbd5e1;">Name</td>
+                    <td style="padding:6px; border:1px solid #cbd5e1;">Branch</td>
+                    <td style="padding:6px; border:1px solid #cbd5e1;">Account Number</td>
+                    <td style="padding:6px; border:1px solid #cbd5e1;">Account Name</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="padding:4px; border:1px solid #cbd5e1; text-align:center;"><input type="checkbox" checked disabled style="width:auto; margin:0;"></td>
+                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Cabang" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}" placeholder="No Rekening" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}" placeholder="Atas Nama" style="border:none; padding:4px; width:100%;"></td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div class="erp-section-title">Service Rate &amp; Contract Information</div>
+              <table class="erp-form-table">
+                <tr>
+                  <td class="erp-label">Billing Type</td>
+                  <td>
+                    <select id="cf-billing">
+                      ${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}
+                    </select>
+                  </td>
+                  <td class="erp-label">Payment Terms (days)</td>
+                  <td><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Credit Limit (Rp)</td>
+                  <td><input type="number" id="cf-credit" value="${c.credit_limit||0}"></td>
+                  <td class="erp-label">Discount Type</td>
+                  <td>
+                    <select id="cf-disc-type">
+                      <option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option>
+                      <option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option>
+                      <option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option>
+                    </select>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="erp-label">Discount Value</td>
+                  <td colspan="3"><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></td>
+                </tr>
+              </table>
+
+              <!-- Contracts and Packages List -->
+              ${id ? `
+                <div style="margin-top: 24px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; border-bottom:1px solid #cbd5e1; padding-bottom:8px;">
+                    <h5 style="margin:0; font-size:14px; font-weight:700; color:#0f2963;">Daftar Kontrak &amp; Paket</h5>
+                    <button class="btn btn-teal btn-xs" onclick="openInlineContractForm(${id}, '${esc(c.corporate_name)}')">+ Kontrak Baru</button>
+                  </div>
+                  
+                  <div id="inline-contract-form-container" style="display:none; background: #f8fafc; padding: 14px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 14px;"></div>
+                  
+                  <div id="corporate-detail-contracts-list">
+                    <div class="loading-row"><div class="spinner"></div></div>
+                  </div>
+                </div>
+              ` : ''}
+
+              <!-- Tab Action Footer -->
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid #cbd5e1; padding:6px 16px;"><span style="color:#dc2626;">&times;</span> Cancel</button>
+                <button class="btn btn-teal btn-sm" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')" style="display:flex; align-items:center; gap:6px; padding:6px 16px;">💾 Save</button>
+              </div>
             </div>
           </div>
 
-          <!-- CARD 3: Billing & Keuangan -->
-          <div class="card" style="padding: 20px;">
-            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Billing &amp; Keuangan</div>
-            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-              <div class="fg"><label>Tipe Billing</label><select id="cf-billing">${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}</select></div>
-              <div class="fg"><label>Payment Terms (hari)</label><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></div>
-              <div class="fg"><label>Credit Limit (Rp)</label><input type="number" id="cf-credit" value="${c.credit_limit||0}"></div>
-              <div class="fg"><label>Tipe Diskon</label><select id="cf-disc-type"><option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option><option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option><option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option></select></div>
-              <div class="fg"><label>Nilai Diskon</label><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></div>
+          <!-- ==================== TAB: EMPLOYEE LIST ==================== -->
+          <div class="tab-content" id="tab-content-employees" style="display:none; padding:16px;">
+            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none; display:flex; justify-content:space-between; align-items:center;">
+              <span>Employee List</span>
+              <div id="erp-cemp-badges" style="display:flex; gap:6px;"></div>
+            </div>
+            
+            <div style="display:flex; gap:8px; margin: 12px 0;">
+              <input class="table-search" id="erp-cemp-q" placeholder="Cari nama, NIK..." oninput="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', this.value, document.getElementById('erp-cemp-status').value)" style="flex:1; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
+              <select class="table-filter" id="erp-cemp-status" onchange="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', document.getElementById('erp-cemp-q').value, this.value)" style="width: 140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                <option value="">Semua Status</option>
+                <option value="Aktif">Aktif</option>
+                <option value="Non-Aktif">Non-Aktif</option>
+              </select>
+              <button class="btn btn-teal btn-sm" onclick="openCorpEmpForm(${id}, '${esc(c.corporate_name)}')" style="padding:8px 16px;">➕ Add</button>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid #cbd5e1;">
+                <thead>
+                  <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1;">
+                    <th style="padding:10px; text-align:center; width: 140px;">Action</th>
+                    <th style="padding:10px; text-align:left;">Name</th>
+                    <th style="padding:10px; text-align:left;">Employee Number (NIK)</th>
+                    <th style="padding:10px; text-align:left;">Department</th>
+                    <th style="padding:10px; text-align:left;">Paket MCU</th>
+                    <th style="padding:10px; text-align:center; width:100px;">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="erp-cemp-tbody">
+                  <!-- Dinamis load via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
+              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+              <button class="btn btn-teal btn-sm" onclick="scheduleMcuBooking(${id},'${esc(c.corporate_name).replace(/'/g,"\\'")}')" style="color:#fff; padding:8px 16px;">
+                📅 Jadwalkan MCU → Booking
+              </button>
             </div>
           </div>
 
-          <!-- CARD 4: Perpajakan & Bank -->
-          <div class="card" style="padding: 20px;">
-            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Informasi Pajak &amp; Bank</div>
-            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-              <div class="fg"><label>NPWP</label><input type="text" id="cf-npwp" value="${esc(c.npwp)}" placeholder="00.000.000.0-000.000"></div>
-              <div class="fg"><label>Tipe Pajak</label><select id="cf-taxtype">${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}</select></div>
-              <div class="fg"><label>PPh 23</label><select id="cf-pph23"><option value="false" ${sel(String(!!c.pph23),'false')}>No</option><option value="true" ${sel(String(!!c.pph23),'true')}>Yes</option></select></div>
-              <div class="fg"><label>Registered At</label><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></div>
-              <div class="fg" style="grid-column: span 2;"><label>Alamat Pajak</label><input type="text" id="cf-taxaddr" value="${esc(c.tax_address)}"></div>
-              <div class="fg" style="grid-column: span 2;"><label>KPP (Tax Office)</label><input type="text" id="cf-taxoffice" value="${esc(c.tax_office)}" placeholder="KPP Pratama ..."></div>
-              <div class="fg"><label>Nama Bank</label><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA"></div>
-              <div class="fg"><label>Cabang Bank</label><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Jakarta"></div>
-              <div class="fg"><label>No. Rekening</label><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}"></div>
-              <div class="fg"><label>Atas Nama Rekening</label><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}"></div>
+          <!-- ==================== TAB: IMPORT EMPLOYEE ==================== -->
+          <div class="tab-content" id="tab-content-import" style="display:none; padding:16px;">
+            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Import Data Employee</div>
+            
+            <div style="background:#FFF8E1; border-radius:8px; padding:12px; margin: 14px 0; font-size:12px; color:#b7791f; border: 1px solid #fef3c7;">
+              ⚠️ Format CSV yang didukung: <strong>nama,nik,departemen,gender(M/F),tanggal_lahir,phone,email</strong>
+            </div>
+
+            <table class="erp-form-table">
+              <tr>
+                <td class="erp-label">Company Name</td>
+                <td><input type="text" value="${esc(c.corporate_name)}" readonly></td>
+              </tr>
+              <tr>
+                <td class="erp-label">Upload File</td>
+                <td>
+                  <input type="file" id="erp-cemp-csv" accept=".csv" onchange="previewCSVImportInline(this, ${id})" style="padding:4px;">
+                </td>
+              </tr>
+            </table>
+
+            <div id="erp-csv-preview" style="max-height:220px; overflow-y:auto; margin-top:14px; border:1px solid #cbd5e1; border-radius:6px; display:none;"></div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
+              <button class="btn btn-ghost btn-sm" onclick="clearImportInline()" style="border:1px solid #cbd5e1;">Clear</button>
+              <button class="btn btn-sm" onclick="downloadTemplateKaryawan()" style="border:1px solid #cbd5e1;">📋 Download Template</button>
+              <button class="btn btn-teal btn-sm" id="erp-csv-import-btn" onclick="processCSVImportInline(${id})" disabled>💾 Load File</button>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="border:1px solid #cbd5e1;">Cancel</button>
             </div>
           </div>
 
         </div>
-
-        <!-- RIGHT COLUMN: Contracts & Packages (Only visible if corporate exists) -->
-        ${id ? `
-          <div style="display:flex; flex-direction:column; gap:16px">
-            
-            <div class="card" style="padding: 20px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 0;">Daftar Kontrak &amp; Paket</div>
-                <button class="btn btn-teal btn-xs" onclick="openInlineContractForm(${id}, '${esc(c.corporate_name)}')">+ Kontrak Baru</button>
-              </div>
-              
-              <!-- Inline Contract Form Container -->
-              <div id="inline-contract-form-container" style="display:none; background: var(--bg2); padding: 14px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 14px;"></div>
-              
-              <!-- Contracts List -->
-              <div id="corporate-detail-contracts-list">
-                <div class="loading-row"><div class="spinner"></div></div>
-              </div>
-            </div>
-
-          </div>
-        ` : ''}
 
       </div>
       
@@ -645,26 +884,233 @@ async function renderCorporateDetail(id = null) {
   }
 }
 
+// Global Tab switcher for Corporate Config Details
+window.switchCorpDetailTab = function(tabId) {
+  document.querySelectorAll('.corp-acct .tab-content').forEach(el => {
+    el.style.display = 'none';
+  });
+  document.querySelectorAll('.corp-acct .tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+
+  const activeContent = document.getElementById(`tab-content-${tabId}`);
+  if (activeContent) activeContent.style.display = 'block';
+
+  const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Trigger content loader on tab switch
+  if (tabId === 'employees') {
+    const corpName = document.getElementById('cf-name')?.value || 'Corporate';
+    const match = document.getElementById('tab-btn-employees')?.getAttribute('onclick')?.match(/\d+/);
+    const corpId = match ? parseInt(match[0]) : null;
+    if (corpId) {
+      loadTabCorpEmployees(corpId, corpName);
+    }
+  }
+};
+
+// Global Employee List loader for erp-style tab inside Corporate Config
+window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statusFilter = '') {
+  const tbody = document.getElementById('erp-cemp-tbody');
+  const countBadgeContainer = document.getElementById('erp-cemp-badges');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text3);"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+
+  try {
+    let url = `select=*&corporate_id=eq.${corpId}&order=full_name.asc`;
+    if (statusFilter) {
+      url += `&status=eq.${statusFilter}`;
+    }
+    const [emps, pkgs] = await Promise.all([
+      sbGet('corporate_employees', url).catch(() => []),
+      sbGet('packages', 'select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(() => [])
+    ]);
+
+    let filtered = emps || [];
+    if (query) {
+      const q = query.toLowerCase().trim();
+      filtered = filtered.filter(e => 
+        (e.full_name || '').toLowerCase().includes(q) ||
+        (e.employee_id || '').toLowerCase().includes(q) ||
+        (e.department || '').toLowerCase().includes(q)
+      );
+    }
+
+    const activeCount = emps.filter(e => e.status === 'Aktif').length;
+    const inactiveCount = emps.filter(e => e.status === 'Non-Aktif').length;
+    const assignedCount = emps.filter(e => e.package_id).length;
+    const bookedCount = emps.filter(e => e.booking_admission_id).length;
+
+    if (countBadgeContainer) {
+      countBadgeContainer.innerHTML = `
+        <span class="badge badge-green">${activeCount} Aktif</span>
+        <span class="badge badge-gray">${inactiveCount} Non-Aktif</span>
+        <span class="badge" style="background:#EEF2FF;color:#3730A3; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${assignedCount} Berpaket</span>
+        <span class="badge" style="background:#E0F2FE;color:#0369A1; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${bookedCount} Booking</span>
+      `;
+    }
+
+    if (!filtered.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text3);">Belum ada karyawan.</td></tr>`;
+      return;
+    }
+
+    const pkgOpts = (empPkgId) => `<option value="">— pilih paket —</option>` +
+      (pkgs||[]).map(p=>`<option value="${p.id}" ${p.id===empPkgId?'selected':''}>${p.nama_paket}</option>`).join('');
+
+    const esc = s => String(s || '').replace(/"/g, '&quot;');
+    const partnerEsc = corpName.replace(/'/g, "\\'");
+
+    tbody.innerHTML = filtered.map((e, idx) => {
+      const nm = e.full_name || '—';
+      const department = e.department || '—';
+      const employee_id = e.employee_id || '—';
+      return `
+        <tr style="border-bottom:1px solid #cbd5e1;">
+          <td style="padding:8px; text-align:center;">
+            <div style="display:flex; gap:6px; justify-content:center;">
+              <button class="act-btn edit" onclick="openCorpEmpForm(${corpId},'${partnerEsc}',${e.id})" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; cursor:pointer; background:#fff;">Edit</button>
+              <button class="act-btn del" onclick="deleteCorpEmp(${e.id},${corpId},'${partnerEsc}')" style="padding:4px 8px; border-radius:4px; border:1px solid #ef4444; color:#ef4444; cursor:pointer; background:#fff;">Delete</button>
+            </div>
+          </td>
+          <td style="padding:8px; font-weight:600;">${nm}</td>
+          <td style="padding:8px; font-family:monospace;">${employee_id}</td>
+          <td style="padding:8px;">${department}</td>
+          <td style="padding:8px;">
+            ${e.booking_admission_id
+              ? `<span style="font-size:11.5px;font-weight:600;color:var(--navy);">${e.package_name||'—'}</span> <span title="Sudah booking, terkunci">🔒</span>`
+              : `<select onchange="assignEmpPackage(${e.id},this,${corpId},'${partnerEsc}')" style="font-size:11.5px;padding:2px 4px; border:1px solid #cbd5e1; border-radius:4px;">${pkgOpts(e.package_id)}</select>`}
+          </td>
+          <td style="padding:8px; text-align:center;">
+            <span style="background:${e.status==='Aktif'?'#E8F5E9':'#F1F5F9'};
+              color:${e.status==='Aktif'?'#2E7D32':'#546E7A'};
+              padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700">
+              ${e.status||'Non-Aktif'}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat data: ${e.message}</td></tr>`;
+  }
+};
+
+// Global CSV Import Helpers for inline ERP tab
+let inlineCsvRows = [];
+
+window.previewCSVImportInline = function(input, corpId) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split('\n').filter(l=>l.trim());
+    inlineCsvRows = lines.slice(1).map(l => {
+      const [name,nik,dept,gender,dob,phone,email] = l.split(',').map(v=>v.trim().replace(/"/g,''));
+      return {name,nik,dept,gender,dob,phone,email};
+    }).filter(r=>r.name);
+
+    const el = document.getElementById('erp-csv-preview');
+    if (el) {
+      el.style.display = 'block';
+      el.innerHTML = `
+        <div style="font-size:12px;color:var(--gray);padding:8px;border-bottom:1px solid #cbd5e1;background:#f8fafc;">${inlineCsvRows.length} data ditemukan</div>
+        <table style="width:100%;font-size:11px;border-collapse:collapse">
+          <thead><tr style="background:#f1f5f9;border-bottom:1px solid #cbd5e1;">
+            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">Nama</th>
+            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">NIK</th>
+            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">Dept</th>
+            <th style="padding:6px;text-align:left;">Gender</th>
+          </tr></thead>
+          <tbody>
+            ${inlineCsvRows.slice(0,5).map(r=>`<tr style="border-bottom:1px solid #cbd5e1">
+              <td style="padding:6px;border-right:1px solid #cbd5e1;">${r.name}</td>
+              <td style="padding:6px;font-family:monospace;border-right:1px solid #cbd5e1;">${r.nik||'—'}</td>
+              <td style="padding:6px;border-right:1px solid #cbd5e1;">${r.dept||'—'}</td>
+              <td style="padding:6px;">${r.gender||'—'}</td>
+            </tr>`).join('')}
+            ${inlineCsvRows.length>5?`<tr><td colspan="4" style="padding:6px;text-align:center;color:var(--gray);background:#f8fafc;">...dan ${inlineCsvRows.length-5} lainnya</td></tr>`:''}
+          </tbody>
+        </table>`;
+    }
+
+    const btn = document.getElementById('erp-csv-import-btn');
+    if (btn) btn.disabled = false;
+  };
+  reader.readAsText(file);
+};
+
+window.processCSVImportInline = async function(corpId) {
+  if (!inlineCsvRows.length) { toast('Tidak ada data','err'); return; }
+  const btn = document.getElementById('erp-csv-import-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
+  const user = getUserName?getUserName():'User';
+  let added = 0;
+  for (const row of inlineCsvRows) {
+    if (!row.name) continue;
+    try {
+      await sbPost('corporate_employees',{
+        corporate_id: corpId,
+        full_name:    row.name,
+        employee_id:  row.nik||null,
+        department:   row.dept||null,
+        gender:       row.gender||null,
+        birth_date:   row.dob||null,
+        phone:        row.phone||null,
+        email:        row.email||null,
+        status:       'Non-Aktif',
+        updated_at:   new Date().toISOString(),
+      });
+      added++;
+    } catch(e){}
+  }
+  toast(`✅ ${added} karyawan berhasil diimport`,'ok');
+  clearImportInline();
+  switchCorpDetailTab('employees');
+};
+
+window.clearImportInline = function() {
+  const fileInput = document.getElementById('erp-cemp-csv');
+  if (fileInput) fileInput.value = '';
+  const previewDiv = document.getElementById('erp-csv-preview');
+  if (previewDiv) {
+    previewDiv.innerHTML = '';
+    previewDiv.style.display = 'none';
+  }
+  const btn = document.getElementById('erp-csv-import-btn');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = '💾 Load File';
+  }
+  inlineCsvRows = [];
+};
+
 async function saveCorpDetail(id, defaultKode) {
   const name = document.getElementById('cf-name')?.value.trim();
   if (!name) { toast('Nama perusahaan wajib diisi', 'err'); return; }
 
   const v = id => { const el = document.getElementById(id); return el ? (el.value.trim() || null) : null; };
   const user = getUserName ? getUserName() : 'User';
+  
+  const statusVal = document.querySelector('input[name="cf-status-radio"]:checked')?.value || 'Aktif';
+  const multinationalVal = document.querySelector('input[name="cf-multi-radio"]:checked')?.value === 'true';
+  const pph23Val = document.querySelector('input[name="cf-pph23-radio"]:checked')?.value === 'true';
 
   const payload = {
     corporate_name: name,
-    kode_corp: v('cf-kode') || defaultKode,
+    kode_corp: v('cf-code') || defaultKode,
     brand: v('cf-brand'),
     industry: v('cf-industry'),
     company_type: v('cf-type') || 'COMPANY',
     partner_id: parseInt(v('cf-partner')) || null,
     sap_id: v('cf-sapid'),
     sap_relation: v('cf-saprel'),
-    sap_period_start: v('cf-sapstart'),
-    sap_period_end: v('cf-sapend'),
-    multinational: v('cf-multi') === 'true',
-    status: v('cf-status') || 'Aktif',
+    sap_period_start: v('cf-sapstart') || null,
+    sap_period_end: v('cf-sapend') || null,
+    multinational: multinationalVal,
+    status: statusVal,
     
     pic_name: v('cf-pic'),
     pic_phone: v('cf-phone'),
@@ -683,9 +1129,9 @@ async function saveCorpDetail(id, defaultKode) {
     
     npwp: v('cf-npwp'),
     tax_type: v('cf-taxtype') || 'BUSINESS',
-    pph23: v('cf-pph23') === 'true',
+    pph23: pph23Val,
     tax_address: v('cf-taxaddr'),
-    tax_registered_at: v('cf-taxreg'),
+    tax_registered_at: v('cf-taxreg') || null,
     tax_office: v('cf-taxoffice'),
     
     bank_name: v('cf-bank'),
@@ -1203,7 +1649,9 @@ async function saveCorpEmp(corpId, id) {
     if (id) { await sbPatch('corporate_employees',id,payload); toast('✅ Diupdate','ok'); }
     else    { await sbPost('corporate_employees',payload);    toast('✅ Karyawan ditambahkan','ok'); }
     closeModalForce();
-    // Refresh corporate list without closing
+    if (document.getElementById('erp-cemp-tbody')) {
+      loadTabCorpEmployees(corpId, corpName);
+    }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
@@ -1212,14 +1660,18 @@ async function deleteCorpEmp(id, corpId, corpName) {
   try {
     await sbDelete('corporate_employees',id);
     toast('Dihapus','info');
-    await openCorpEmployees(corpId, corpName);
+    if (document.getElementById('erp-cemp-tbody')) {
+      loadTabCorpEmployees(corpId, corpName);
+    } else {
+      await openCorpEmployees(corpId, corpName);
+    }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
 // Assign paket ke SATU karyawan (inline dropdown di tabel).
 async function assignEmpPackage(empId, sel, corpId, corpName) {
   const pkgId = parseInt(sel.value) || null;
-  const pkgName = sel.selectedOptions?.[0]?.dataset?.name || null;
+  const pkgName = sel.selectedOptions?.[0]?.dataset?.name || sel.selectedOptions?.[0]?.textContent || null;
   const user = getUserName ? getUserName() : 'User';
   try {
     await sbPatch('corporate_employees', empId, {
@@ -1230,7 +1682,11 @@ async function assignEmpPackage(empId, sel, corpId, corpName) {
       updated_at:   new Date().toISOString(),
     });
     toast(pkgId ? `✅ Paket: ${pkgName}` : 'Paket dilepas', 'ok', 2000);
-    await openCorpEmployees(corpId, corpName);
+    if (document.getElementById('erp-cemp-tbody')) {
+      loadTabCorpEmployees(corpId, corpName);
+    } else {
+      await openCorpEmployees(corpId, corpName);
+    }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
