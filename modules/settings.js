@@ -1,155 +1,255 @@
-async function renderSettings() {
+async function renderSettings(activeTab = 'general') {
   const role = getUserRole();
   const isSuperAdmin = role === 'super_admin';
 
   document.getElementById('main-content').innerHTML = `
+    <style>
+      .settings-layout {
+        display: flex;
+        gap: 24px;
+        min-height: 76vh;
+        align-items: stretch;
+        background: #fff;
+        border-radius: var(--r-md);
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .settings-sidebar {
+        width: 240px;
+        background: var(--bg);
+        border-right: 1px solid var(--border);
+        padding: 20px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex-shrink: 0;
+      }
+      .settings-sidebar-header {
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 12px 10px;
+      }
+      .settings-sub-tab {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 14px;
+        background: none;
+        border: none;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text2);
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .settings-sub-tab:hover {
+        background: var(--border);
+        color: var(--navy);
+      }
+      .settings-sub-tab.active {
+        background: var(--navy);
+        color: #fff;
+      }
+      .settings-content {
+        flex: 1;
+        padding: 24px 28px;
+        overflow-y: auto;
+      }
+    </style>
+
     <div class="page-header">
-      <div><h1>Pengaturan</h1><p>Konfigurasi sistem, pengguna, dan koneksi</p></div>
-    </div>
-
-    <div class="tabs" id="set-tabs">
-      <button class="tab-btn active" onclick="switchSetTab('general',this)">Umum</button>
-      <button class="tab-btn" onclick="switchSetTab('rolemenu',this)">🔐 Akses Menu</button>
-      <button class="tab-btn" onclick="switchSetTab('activity',this)">Log Aktivitas</button>
-      <button class="tab-btn" onclick="switchSetTab('data',this)">🗄 Data</button>
-      <button class="tab-btn" onclick="switchSetTab('masterdata',this)">Master Data</button>
-      ${isSuperAdmin ? `<button class="tab-btn" onclick="switchSetTab('admin',this)">🛠 Admin Tools</button>` : ''}
-    </div>
-
-    <div id="set-general">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px">
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px">Supabase</div>
-          <div class="form-group">
-            <label>Project URL</label>
-            <input value="${SUPABASE_URL}" readonly style="background:var(--lgray);font-size:12px">
-          </div>
-          <div id="set-conn" class="status-box status-info" style="margin-bottom:10px">Memeriksa...</div>
-          <button class="btn btn-teal btn-sm" onclick="checkSetConn()">Cek</button>
-        </div>
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px">Google Maps API</div>
-          <div class="form-group">
-            <label>API Key</label>
-            <input type="password" id="set-maps-key" value="${localStorage.getItem('ol_maps_key')||''}" placeholder="AIza...">
-          </div>
-          <div class="btn-row">
-            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('set-maps-key').type=document.getElementById('set-maps-key').type==='password'?'text':'password'">${icon('file-text', 12)}</button>
-            <button class="btn btn-teal btn-sm" onclick="saveSetMapsKey()">Simpan</button>
-          </div>
-        </div>
-        <div class="card" style="grid-column:1/-1">
-          <div class="card-title" style="margin-bottom:14px">Statistik Database</div>
-          <div id="set-stats" class="loading-row"><div class="spinner"></div></div>
-        </div>
+      <div>
+        <h1>Pusat Pengaturan &amp; Konfigurasi</h1>
+        <p>Kelola pengaturan sistem, pengguna, cetakan, dan keamanan platform</p>
       </div>
     </div>
 
-    <!-- Pengguna lama dipindah ke User Management (menu Konfigurasi → User Management) -->
-
-    <div id="set-rolemenu" style="display:none">
-      <div id="set-rolemenu-content"></div>
-    </div>
-
-    <div id="set-activity" style="display:none">
-      <div class="table-wrap">
-        <div class="table-toolbar">
-          <span style="font-size:13px;font-weight:700;color:var(--navy)">Log Aktivitas</span>
-        </div>
-        <div id="set-activity-list" class="loading-row"><div class="spinner"></div></div>
+    <div class="settings-layout">
+      <!-- LEFT SIDEBAR -->
+      <div class="settings-sidebar">
+        <div class="settings-sidebar-header">Pengaturan Sistem</div>
+        <button class="settings-sub-tab ${activeTab === 'general' ? 'active' : ''}" data-tab="general" onclick="switchSettingsTab('general')">⚙️ Umum &amp; API Key</button>
+        <button class="settings-sub-tab ${activeTab === 'pdf' ? 'active' : ''}" data-tab="pdf" onclick="switchSettingsTab('pdf')">🖨️ Layout Cetak PDF</button>
+        
+        <div class="settings-sidebar-header" style="margin-top: 14px">Hak Akses &amp; User</div>
+        ${isSuperAdmin ? `<button class="settings-sub-tab ${activeTab === 'users' ? 'active' : ''}" data-tab="users" onclick="switchSettingsTab('users')">👥 User Management</button>` : ''}
+        <button class="settings-sub-tab ${activeTab === 'rolemenu' ? 'active' : ''}" data-tab="rolemenu" onclick="switchSettingsTab('rolemenu')">🔐 Akses Menu</button>
+        
+        <div class="settings-sidebar-header" style="margin-top: 14px">Data &amp; Log</div>
+        <button class="settings-sub-tab ${activeTab === 'masterdata' ? 'active' : ''}" data-tab="masterdata" onclick="switchSettingsTab('masterdata')">🗄️ Master Data Hub</button>
+        <button class="settings-sub-tab ${activeTab === 'data' ? 'active' : ''}" data-tab="data" onclick="switchSettingsTab('data')">🗃️ Data &amp; Bulk Upload</button>
+        <button class="settings-sub-tab ${activeTab === 'activity' ? 'active' : ''}" data-tab="activity" onclick="switchSettingsTab('activity')">📜 Log Aktivitas (Audit)</button>
       </div>
-    </div>
 
-    <div id="set-data" style="display:none">
-      <div class="card" style="max-width:500px">
-        <div class="card-title" style="margin-bottom:14px;color:var(--danger)">⚠️ Manajemen Data</div>
-        <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Tindakan berikut tidak dapat dibatalkan. Lakukan dengan hati-hati.</p>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <button class="btn btn-danger btn-sm" onclick="exportAllData()">Export Semua Data (Backup)</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="set-masterdata" style="display:none">
-      <div id="masterdata-content" class="loading-row"><div class="spinner"></div></div>
-    </div>
-
-    <div id="set-admin" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px">
-
-        <!-- User & Role -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px">👤 User & Role Management</div>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Kelola akun, role, dan hak akses semua pengguna platform.</p>
-          <button class="btn btn-teal" onclick="navigate('users')">🔑 Buka User Management</button>
-        </div>
-
-        <!-- Bulk Delete -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px;color:var(--danger)">Bulk Delete</div>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Hapus massal data untuk reset atau pembersihan. Tidak bisa dibatalkan.</p>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('partners')">Hapus Semua Partner</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('partner_deals')">Hapus Semua Kerjasama</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('vouchers')">Hapus Semua Voucher</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('voucher_campaigns')">Hapus Semua Campaign</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('marketing_templates')">Hapus Semua Template</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('outgoing_letters')">Hapus Arsip Surat</button>
-            <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('activity_logs')">Bersihkan Activity Log</button>
-          </div>
-        </div>
-
-        <!-- Reset Password -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px">Keamanan</div>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Info akun aktif dan koneksi Supabase.</p>
-          <div style="font-size:12px;background:var(--lgray);border-radius:8px;padding:10px 12px;margin-bottom:10px">
-            <div><strong>User ID:</strong> <span id="admin-uid" style="color:var(--teal)">—</span></div>
-            <div style="margin-top:4px"><strong>Role:</strong> <span id="admin-role" style="color:var(--navy)">—</span></div>
-            <div style="margin-top:4px"><strong>Email:</strong> <span id="admin-email" style="color:var(--gray)">—</span></div>
-          </div>
-        </div>
-
-        <!-- Email Confirmation Fix -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px">Quick Fix SQL</div>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:10px">SQL siap pakai untuk fix umum. Copy dan jalankan di Supabase SQL Editor.</p>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('confirm_email')">Fix Email Confirmation</button>
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('disable_rls')">Disable RLS semua tabel</button>
-            <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">Check semua tabel</button>
-          </div>
-        </div>
-
-        <!-- Lab Barcode Migration Tool -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px">🧪 Lab Barcode Migration Tool</div>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:14px">Perbarui barcode pasien hari ini secara massal ke format terbaru: <strong>YYYYDDMMxxxx</strong> (misal 202623070001).</p>
-          <button class="btn btn-teal btn-sm" onclick="runBarcodeMigrationToday()">Update Barcode Hari Ini</button>
-        </div>
-
+      <!-- RIGHT CONTENT PANEL -->
+      <div class="settings-content" id="settings-content-panel">
+        <!-- Rendered dynamically -->
       </div>
     </div>`;
 
-  checkSetConn();
-  loadSetStats();
-  if (isSuperAdmin) loadAdminInfo();
+  await renderSettingsTabContent(activeTab);
 }
 
-function switchSetTab(tab, btn) {
-  document.querySelectorAll('#set-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  if (tab === 'rolemenu') { ['general','activity','data','masterdata','admin'].forEach(t=>{const d=document.getElementById('set-'+t);if(d)d.style.display='none';}); document.getElementById('set-rolemenu').style.display=''; renderRoleMenuConfig(); return; }
-  ['general','activity','data','admin','masterdata'].forEach(t=>{
-    const el = document.getElementById(`set-${t}`);
-    if (el) el.style.display = t===tab?'block':'none';
+async function switchSettingsTab(tab) {
+  document.querySelectorAll('.settings-sidebar .settings-sub-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab') === tab);
   });
-  document.getElementById('set-rolemenu').style.display='none';
-  if(tab==='activity') loadSetActivity();
-  if(tab==='masterdata') renderMasterData().then(html=>{
-    const el=document.getElementById('masterdata-content');
-    if(el) el.innerHTML=html;
-  });
+  await renderSettingsTabContent(tab);
+}
+
+async function renderSettingsTabContent(tab) {
+  const panel = document.getElementById('settings-content-panel');
+  if (!panel) return;
+  panel.innerHTML = '<div class="loading-row"><div class="spinner"></div> Memuat pengaturan...</div>';
+
+  const role = getUserRole();
+  const isSuperAdmin = role === 'super_admin';
+
+  switch (tab) {
+    case 'general':
+      panel.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:800px">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Supabase Connection</div>
+            <div class="form-group">
+              <label>Project URL</label>
+              <input value="${SUPABASE_URL}" readonly style="background:var(--bg2);font-size:12px">
+            </div>
+            <div id="set-conn" class="status-box status-info" style="margin-bottom:10px">Memeriksa...</div>
+            <button class="btn btn-teal btn-sm" onclick="checkSetConn()">Cek Koneksi</button>
+          </div>
+          <div class="card">
+            <div class="card-title" style="margin-bottom:14px">Google Maps API</div>
+            <div class="form-group">
+              <label>API Key</label>
+              <input type="password" id="set-maps-key" value="${localStorage.getItem('ol_maps_key')||''}" placeholder="AIza...">
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-ghost btn-sm" onclick="document.getElementById('set-maps-key').type=document.getElementById('set-maps-key').type==='password'?'text':'password'">Show Key</button>
+              <button class="btn btn-teal btn-sm" onclick="saveSetMapsKey()">Simpan</button>
+            </div>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <div class="card-title" style="margin-bottom:14px">Statistik Database</div>
+            <div id="set-stats" class="loading-row"><div class="spinner"></div></div>
+          </div>
+          
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Keamanan Akun</div>
+            <div style="font-size:12px;background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:10px">
+              <div><strong>User ID:</strong> <span id="admin-uid" style="color:var(--teal)">—</span></div>
+              <div style="margin-top:4px"><strong>Role:</strong> <span id="admin-role" style="color:var(--navy)">—</span></div>
+              <div style="margin-top:4px"><strong>Email:</strong> <span id="admin-email" style="color:var(--text3)">—</span></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px">Quick Fix SQL</div>
+            <p style="font-size:13px;color:var(--text3);margin-bottom:10px">SQL siap pakai untuk fix umum. Copy dan jalankan di Supabase SQL Editor.</p>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('confirm_email')">Fix Email Confirmation</button>
+              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('disable_rls')">Disable RLS semua tabel</button>
+              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">Check semua tabel</button>
+            </div>
+          </div>
+          
+          <div class="card" style="grid-column: 1/-1">
+            <div class="card-title" style="margin-bottom:12px">🧪 Lab Barcode Migration Tool</div>
+            <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Perbarui barcode pasien hari ini secara massal ke format terbaru: <strong>YYYYDDMMxxxx</strong> (misal 202623070001).</p>
+            <button class="btn btn-teal btn-sm" onclick="runBarcodeMigrationToday()">Update Barcode Hari Ini</button>
+          </div>
+        </div>`;
+      checkSetConn();
+      loadSetStats();
+      loadAdminInfo();
+      break;
+
+    case 'pdf':
+      if (typeof renderLabReportConfig === 'function') {
+        renderLabReportConfig('settings-content-panel');
+      } else {
+        panel.innerHTML = `<div class="status-box status-err">Error: Modul PDF tidak termuat</div>`;
+      }
+      break;
+
+    case 'users':
+      if (isSuperAdmin && typeof renderUsers === 'function') {
+        await renderUsers('settings-content-panel');
+      } else {
+        panel.innerHTML = `<div class="status-box status-err">Akses Ditolak: Hanya Super Admin yang bisa mengelola user.</div>`;
+      }
+      break;
+
+    case 'rolemenu':
+      panel.innerHTML = `
+        <div id="set-rolemenu">
+          <div id="set-rolemenu-content"></div>
+        </div>`;
+      renderRoleMenuConfig();
+      break;
+
+    case 'masterdata':
+      if (typeof renderConfigHome === 'function') {
+        renderConfigHome('settings-content-panel');
+      } else {
+        panel.innerHTML = `<div class="status-box status-err">Error: Modul Master Data Hub tidak termuat</div>`;
+      }
+      break;
+
+    case 'data':
+      panel.innerHTML = `
+        <div style="display:grid;grid-template-columns: 1fr 1.5fr; gap: 24px;">
+          <!-- Left side: backup & delete tools -->
+          <div style="display:flex; flex-direction:column; gap: 16px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:14px;color:var(--danger)">⚠️ Manajemen Data</div>
+              <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Tindakan berikut tidak dapat dibatalkan. Lakukan dengan hati-hati.</p>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button class="btn btn-danger btn-sm" onclick="exportAllData()">Export Semua Data (Backup CSV)</button>
+              </div>
+            </div>
+            ${isSuperAdmin ? `
+              <div class="card">
+                <div class="card-title" style="margin-bottom:12px;color:var(--danger)">Bulk Delete (Reset Data)</div>
+                <p style="font-size:13px;color:var(--text3);margin-bottom:14px">Hapus massal data untuk reset atau pembersihan. Tidak bisa dibatalkan.</p>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('partners')">Hapus Semua Partner</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('partner_deals')">Hapus Semua Kerjasama</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('vouchers')">Hapus Semua Voucher</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('voucher_campaigns')">Hapus Semua Campaign</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('marketing_templates')">Hapus Semua Template</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('outgoing_letters')">Hapus Arsip Surat</button>
+                  <button class="btn btn-danger btn-sm" onclick="bulkDeleteTable('activity_logs')">Bersihkan Activity Log</button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+          
+          <!-- Right side: Bulk Upload -->
+          <div id="bulk-upload-subpanel"></div>
+        </div>`;
+      if (typeof renderImportExcel === 'function') {
+        renderImportExcel('bulk-upload-subpanel');
+      }
+      break;
+
+    case 'activity':
+      panel.innerHTML = `
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <span style="font-size:13px;font-weight:700;color:var(--navy)">Log Aktivitas</span>
+          </div>
+          <div id="set-activity-list" class="loading-row"><div class="spinner"></div></div>
+        </div>`;
+      loadSetActivity();
+      break;
+  }
 }
 
 async function checkSetConn() {

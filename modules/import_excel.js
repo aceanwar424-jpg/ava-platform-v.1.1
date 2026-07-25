@@ -215,8 +215,20 @@ const IMPORT_TEMPLATES = {
 };
 
 // ── Main Render ───────────────────────────────────────
-function renderImportExcel() {
-  document.getElementById('main-content').innerHTML = `
+function renderImportExcel(targetId = 'main-content') {
+  const isSettingsSub = targetId !== 'main-content';
+
+  const headerHtml = isSettingsSub ? `
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size:16px; font-weight:800; color:var(--navy)">Bulk Upload</h2>
+        <p style="font-size:12px; color:var(--text3)">Upload massal data via template Excel (CSV)</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="downloadAllTemplates()">⬇️ Templates</button>
+      </div>
+    </div>
+  ` : `
     <div class="page-header">
       <div>
         <h1>Bulk Upload — Config Master</h1>
@@ -226,26 +238,25 @@ function renderImportExcel() {
         <button class="btn btn-ghost btn-sm" onclick="downloadAllTemplates()">⬇️ Semua Template (XLSX)</button>
       </div>
     </div>
+  `;
 
+  document.getElementById(targetId).innerHTML = `
+    ${headerHtml}
     <!-- Template cards -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px;margin-bottom:24px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px">
       ${Object.entries(IMPORT_TEMPLATES).map(([key, tpl]) => `
-        <div class="card" style="border-top:3px solid var(--teal)">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-            <span style="font-size:26px">${tpl.icon}</span>
+        <div class="card" style="border-top:3px solid var(--teal); padding: 12px 16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <span style="font-size:20px">${tpl.icon}</span>
             <div>
-              <div style="font-weight:800;font-size:14px;color:var(--text)">${tpl.label}</div>
-              <div style="font-size:11px;color:var(--text3)">${tpl.columns.length} kolom · tabel: <code>${tpl.table}</code></div>
+              <div style="font-weight:800;font-size:13px;color:var(--text)">${tpl.label}</div>
+              <div style="font-size:10px;color:var(--text3)">${tpl.columns.length} kol · <code>${tpl.table}</code></div>
             </div>
           </div>
-          ${tpl.note ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:12px">${tpl.note}</div>` : ''}
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-outline btn-sm" style="flex:1" onclick="downloadTemplate('${key}')">
-              ⬇️ Download Template
-            </button>
-            <button class="btn btn-teal btn-sm" style="flex:1" onclick="openImportModal('${key}')">
-              ⬆️ Import Excel
-            </button>
+          ${tpl.note ? `<div class="status-box status-warn" style="margin-bottom:8px;font-size:11px;padding:6px">${tpl.note}</div>` : ''}
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-outline btn-xs" style="flex:1" onclick="downloadTemplate('${key}')">Templates</button>
+            <button class="btn btn-teal btn-xs" style="flex:1" onclick="openImportModal('${key}')">Import</button>
           </div>
         </div>`).join('')}
     </div>

@@ -5,11 +5,24 @@
 // key 'ol_lab_report_cfg' (dibaca oleh labReportCfg() di lab/report.js).
 // ═══════════════════════════════════════════════════════════════
 
-function renderLabReportConfig(){
+function renderLabReportConfig(targetId = 'main-content'){
   const cfg = (typeof labReportCfg=== 'function') ? labReportCfg() : {};
   const g=(k,d)=> (cfg[k]!=null?cfg[k]:(d!=null?d:''));
   const chk=(k)=> cfg[k]?'checked':'';
-  document.getElementById('main-content').innerHTML = `
+  const isSettingsSub = targetId !== 'main-content';
+
+  const headerHtml = isSettingsSub ? `
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size:16px; font-weight:800; color:var(--navy)">🖨️ Setting Hasil PDF</h2>
+        <p style="font-size:12px; color:var(--text3)">Pengaturan kop, logo, tanda tangan, dan kustomisasi kertas cetak hasil laboratorium</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm" onclick="previewLabReport()">Preview</button>
+        <button class="btn btn-teal btn-sm" onclick="saveLabReportCfg()">Simpan</button>
+      </div>
+    </div>
+  ` : `
     <div class="page-header">
       <div><h1>🖨️ Setting Hasil PDF</h1>
         <p>Kop surat, logo, kontak, akreditasi, tanda tangan &amp; opsi penyelarasan tata letak cetak hasil lab</p></div>
@@ -18,6 +31,10 @@ function renderLabReportConfig(){
         <button class="btn btn-teal" onclick="saveLabReportCfg()">Simpan</button>
       </div>
     </div>
+  `;
+
+  document.getElementById(targetId).innerHTML = `
+    ${headerHtml}
 
     <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:16px;align-items:start">
       

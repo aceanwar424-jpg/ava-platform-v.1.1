@@ -63,9 +63,9 @@ function navigate(page, params={}) {
     case 'admission':   renderAdmission();              break;
     case 'lab':         renderLab(params.tab||'checkin'); break;
     case 'product':     renderConfigProduct();          break;
-    case 'config':      renderConfigHome();              break;
+    case 'config':      renderSettings('masterdata');   break;
     case 'refrange':    renderConfigRefRange();          break;
-    case 'labreport':   renderLabReportConfig();          break;
+    case 'labreport':   renderSettings('pdf');          break;
     case 'corporate':   renderConfigCorporate();        break;
     case 'radiology':   renderRIS();                    break;
     case 'radiology-old':renderRadiology();             break;
@@ -87,9 +87,9 @@ function navigate(page, params={}) {
     case 'package':     renderConfigPackage();          break;
     case 'family':      renderConfigFamily();            break;
     case 'anamnesa':    renderAnamnesa();               break;
-    case 'import':      renderImportExcel();            break;
-    case 'settings':    renderSettings();               break;
-    case 'users':       renderUsers();                  break;
+    case 'import':      renderSettings('data');         break;
+    case 'settings':    renderSettings(params.tab || 'general'); break;
+    case 'users':       renderSettings('users');        break;
     default:
       document.getElementById('main-content').innerHTML = `
         <div class="empty-state" style="min-height:70vh">

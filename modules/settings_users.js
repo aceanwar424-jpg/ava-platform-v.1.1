@@ -222,16 +222,28 @@ function canAccess(page) {
 }
 
 // ── Render User Management ────────────────
-async function renderUsers() {
+async function renderUsers(targetId = 'main-content') {
   if (getUserRole() !== 'super_admin') {
-    document.getElementById('main-content').innerHTML = `
+    document.getElementById(targetId).innerHTML = `
       <div class="empty-state" style="min-height:60vh">
         <div class="ico"></div><h3>Akses Ditolak</h3>
         <p>Hanya Super Admin yang bisa mengelola user.</p>
       </div>`; return;
   }
 
-  document.getElementById('main-content').innerHTML = `
+  const isSettingsSub = targetId !== 'main-content';
+
+  const headerHtml = isSettingsSub ? `
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size:16px; font-weight:800; color:var(--navy)">👥 User Management</h2>
+        <p style="font-size:12px; color:var(--text3)">Kelola akun, role, dan hak akses semua pengguna platform</p>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-teal btn-sm" onclick="openInviteUserForm()">+ Tambah User</button>
+      </div>
+    </div>
+  ` : `
     <div class="page-header">
       <div><h1>User Management</h1>
         <p>Kelola akses dan role setiap pengguna platform</p></div>
@@ -239,12 +251,16 @@ async function renderUsers() {
         <button class="btn btn-teal" onclick="openInviteUserForm()">+ Tambah User</button>
       </div>
     </div>
+  `;
+
+  document.getElementById(targetId).innerHTML = `
+    ${headerHtml}
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
       ${Object.entries(ROLES).map(([k,r])=>`
         <div style="padding:5px 10px;background:#fff;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:6px">
           <div style="width:8px;height:8px;border-radius:2px;background:${r.color}"></div>
           <span style="font-size:11px;font-weight:600;color:var(--navy)">${r.label}</span>
-          <span style="font-size:10px;color:var(--gray)">— ${r.desc}</span>
+          <span style="font-size:10px;color:var(--text3)">— ${r.desc}</span>
         </div>`).join('')}
     </div>
     <div class="table-wrap">

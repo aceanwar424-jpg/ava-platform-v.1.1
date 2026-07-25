@@ -751,8 +751,8 @@ const FLYOUT_MENUS = {
     label: 'Konfigurasi',
     icon: 'settings',
     items: [
-      {page:'config', icon:'home', label:'Configuration Home', action:"navigate('config')"},
-      {page:'users', icon:'user', label:'User Management', action:"navigate('users')", adminOnly:true},
+      {page:'settings', icon:'settings', label:'Pusat Pengaturan', action:"navigate('settings',{tab:'general'})"},
+      {page:'users', icon:'user', label:'User Management', action:"navigate('settings',{tab:'users'})", adminOnly:true},
       {page:'audit', icon:'scroll', label:'Jejak Audit', action:"navigate('audit')", adminOnly:true},
       {page:'product', icon:'dna', label:'Master Tes / Produk', action:"navigate('product')"},
       {page:'refrange', icon:'bar-chart', label:'Reference Range', action:"navigate('refrange')"},
@@ -760,9 +760,8 @@ const FLYOUT_MENUS = {
       {page:'corporate', icon:'building-2', label:'Corporate', action:"navigate('corporate')"},
       {page:'family', icon:'users-round', label:'Family Registry', action:"navigate('family')"},
       {page:'analyzer', icon:'sliders', label:'Master Alat (Analyzer)', action:"navigate('lab',{tab:'qc'})"},
-      {page:'labreport', icon:'printer', label:'Setting Hasil PDF', action:"navigate('labreport')"},
-      {page:'import', icon:'upload', label:'Bulk Upload', action:"navigate('import')"},
-      {page:'settings', icon:'settings', label:'Pengaturan', action:"navigate('settings')"},
+      {page:'labreport', icon:'printer', label:'Setting Hasil PDF', action:"navigate('settings',{tab:'pdf'})"},
+      {page:'import', icon:'upload', label:'Bulk Upload / Impor', action:"navigate('settings',{tab:'data'})"},
     ]
   },
 };
