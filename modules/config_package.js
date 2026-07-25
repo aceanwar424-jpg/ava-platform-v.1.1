@@ -469,150 +469,193 @@ async function openCorpForm(id=null) {
   } catch(e){}
 
   const kode = `CORP-${Date.now().toString().slice(-5)}`;
-  const chk = v => v ? 'checked' : '';
   const sel = (a,b) => a===b ? 'selected' : '';
-  const tab = (key,label) => `<button type="button" id="ctab-btn-${key}" onclick="switchCorpTab('${key}')" style="padding:8px 14px;border:none;background:none;border-bottom:2px solid transparent;font-size:12px;font-weight:700;color:var(--gray);cursor:pointer">${label}</button>`;
-  const needSaved = `<div style="padding:30px;text-align:center;color:var(--gray)"><div style="font-size:28px">💾</div>Simpan data corporate dulu sebelum mengelola karyawan.</div>`;
+  const esc = s => String(s||'').replace(/"/g,'&quot;');
+  const statusVal = c.status || 'Aktif';
+  const stColor = statusVal==='Aktif' ? '#059669' : statusVal==='Suspend' ? '#DC2626' : '#64748B';
+  const ICON = {
+    bp:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg>',
+    acc: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>',
+    emp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    imp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
+  };
+  const tab = (key,label) => `<button type="button" class="ca-tab" id="ctab-btn-${key}" onclick="switchCorpTab('${key}')">${ICON[key]}<span>${label}</span></button>`;
+  const needSaved = `<div class="ca-empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><p>Simpan data corporate dulu untuk mengelola karyawan.</p></div>`;
 
   openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${id?'Corporate Account — '+(c.corporate_name||''):'🏢 Corporate Account Baru'}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
-
-    <div style="display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:14px">
-      ${tab('bp','Business Partner')}${tab('acc','Account Info')}${tab('emp','Employee List')}${tab('imp','Import Employee')}
-    </div>
-
-    <!-- ═══ TAB: BUSINESS PARTNER ═══ -->
-    <div id="ctab-bp">
-      <div class="form-row">
-        <div class="form-group"><label>Kode Corporate</label><input type="text" id="cf-kode" value="${c.kode_corp||kode}"></div>
-        <div class="form-group"><label>SAP ID</label><input type="text" id="cf-sapid" value="${c.sap_id||''}" placeholder="8000xxxxxx"></div>
-        <div class="form-group"><label>Tipe</label>
-          <select id="cf-type">${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}</select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="grid-column:1/3"><label>Nama Perusahaan *</label><input type="text" id="cf-name" value="${c.corporate_name||''}" placeholder="PT. ABC Tbk"></div>
-        <div class="form-group"><label>Brand</label><input type="text" id="cf-brand" value="${c.brand||''}" placeholder="Nama brand/unit"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>Industri</label><input type="text" id="cf-industry" value="${c.industry||''}" placeholder="Healthcare, Manufaktur..."></div>
-        <div class="form-group"><label>Link ke Partner DB</label><select id="cf-partner">${partnerOpts}</select></div>
-        <div class="form-group"><label>Multinational</label>
-          <select id="cf-multi"><option value="false" ${sel(String(!!c.multinational),'false')}>No</option><option value="true" ${sel(String(!!c.multinational),'true')}>Yes</option></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label>SAP Relation</label><input type="text" id="cf-saprel" value="${c.sap_relation||''}" placeholder="TRADE THIRD PARTY"></div>
-        <div class="form-group"><label>SAP Period Mulai</label><input type="date" id="cf-sapstart" value="${c.sap_period_start||''}"></div>
-        <div class="form-group"><label>SAP Period Selesai</label><input type="date" id="cf-sapend" value="${c.sap_period_end||''}"></div>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding:12px 0;margin:8px 0">
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Kontak & PIC</div>
-        <div class="form-row">
-          <div class="form-group"><label>Nama PIC</label><input type="text" id="cf-pic" value="${c.pic_name||''}" placeholder="Manager HRD..."></div>
-          <div class="form-group"><label>Mobile Phone</label><input type="text" id="cf-phone" value="${c.pic_phone||''}" placeholder="08xxxxxxxxxx"></div>
-          <div class="form-group"><label>Email</label><input type="email" id="cf-email" value="${c.pic_email||''}" placeholder="hrd@perusahaan.com"></div>
-        </div>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding:12px 0;margin:8px 0">
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Alamat Primer</div>
-        <div class="form-row">
-          <div class="form-group" style="grid-column:1/-1"><label>Alamat</label><input type="text" id="cf-addr" value="${c.address||''}" placeholder="Jl. ..."></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Sub District</label><input type="text" id="cf-subdist" value="${c.subdistrict||''}"></div>
-          <div class="form-group"><label>Kota</label><input type="text" id="cf-city" value="${c.city||''}"></div>
-          <div class="form-group"><label>Provinsi</label><input type="text" id="cf-prov" value="${c.province||''}"></div>
-          <div class="form-group"><label>Negara</label><input type="text" id="cf-country" value="${c.country||'INDONESIA'}"></div>
-        </div>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding:12px 0;margin:8px 0">
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Billing & Diskon</div>
-        <div class="form-row">
-          <div class="form-group"><label>Tipe Billing</label><select id="cf-billing">${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}</select></div>
-          <div class="form-group"><label>Payment Terms (hari)</label><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></div>
-          <div class="form-group"><label>Credit Limit (Rp)</label><input type="number" id="cf-credit" value="${c.credit_limit||0}"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Tipe Diskon</label>
-            <select id="cf-disc-type"><option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option><option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option><option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option></select>
+    <style>
+      .corp-acct{ --ca-line:var(--border); color:#1e293b; font-size:13px; }
+      .corp-acct .ca-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--ca-line); }
+      .corp-acct .ca-title{ font-size:17px; font-weight:800; color:var(--navy); letter-spacing:-.01em; }
+      .corp-acct .ca-sub{ font-size:12px; color:var(--text3); margin-top:3px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+      .corp-acct .ca-chip{ font-family:ui-monospace,monospace; font-size:11px; font-weight:600; background:var(--bg2); color:var(--text3); padding:2px 8px; border-radius:6px; }
+      .corp-acct .ca-badge{ font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:99px; }
+      .corp-acct .ca-x{ border:none; background:var(--bg2); width:30px; height:30px; border-radius:8px; color:var(--text3); font-size:15px; cursor:pointer; transition:background .15s,color .15s; flex-shrink:0; }
+      .corp-acct .ca-x:hover{ background:#e2e8f0; color:var(--navy); }
+      .corp-acct .ca-tabs{ display:flex; gap:2px; position:sticky; top:0; background:#fff; z-index:3; border-bottom:1px solid var(--ca-line); padding-top:12px; margin-bottom:18px; overflow-x:auto; }
+      .corp-acct .ca-tab{ display:inline-flex; align-items:center; gap:7px; padding:10px 15px; border:none; background:none; font:inherit; font-size:12.5px; font-weight:600; color:var(--text3); cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; transition:color .15s,border-color .15s; }
+      .corp-acct .ca-tab svg{ opacity:.7; }
+      .corp-acct .ca-tab:hover{ color:var(--navy); }
+      .corp-acct .ca-tab.on{ color:var(--teal); border-bottom-color:var(--teal); }
+      .corp-acct .ca-tab.on svg{ opacity:1; }
+      .corp-acct .ca-card{ background:#fff; border:1px solid var(--ca-line); border-radius:12px; padding:16px 18px 4px; margin-bottom:14px; box-shadow:0 1px 2px rgba(11,31,58,.04); }
+      .corp-acct .ca-h{ font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.07em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+      .corp-acct .ca-h::before{ content:''; width:3px; height:13px; background:var(--teal); border-radius:2px; }
+      .corp-acct .ca-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px 14px; }
+      .corp-acct .ca-grid.two{ grid-template-columns:repeat(2,1fr); }
+      .corp-acct .fg{ display:flex; flex-direction:column; margin-bottom:13px; min-width:0; }
+      .corp-acct .fg.full{ grid-column:1/-1; }
+      .corp-acct .fg.sp2{ grid-column:span 2; }
+      .corp-acct .fg label{ font-size:11px; font-weight:600; color:var(--text3); margin-bottom:5px; }
+      .corp-acct input, .corp-acct select{ border:1px solid var(--ca-line); border-radius:8px; padding:9px 11px; font-size:13px; color:#1e293b; background:#fff; width:100%; transition:border-color .15s,box-shadow .15s; }
+      .corp-acct input::placeholder{ color:#a9b6c4; }
+      .corp-acct input:hover, .corp-acct select:hover{ border-color:#c3d0dc; }
+      .corp-acct input:focus, .corp-acct select:focus{ outline:none; border-color:var(--teal); box-shadow:0 0 0 3px rgba(8,145,178,.14); }
+      .corp-acct input[readonly]{ background:var(--bg2); color:var(--text3); cursor:default; }
+      .corp-acct .ca-note{ display:flex; gap:10px; background:#ecfeff; border:1px solid #a5f3fc; border-radius:10px; padding:12px 14px; font-size:12px; line-height:1.5; color:#155e75; margin:4px 0 14px; }
+      .corp-acct .ca-note svg{ flex-shrink:0; margin-top:1px; }
+      .corp-acct .ca-empty{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:44px 20px; color:var(--text3); text-align:center; }
+      .corp-acct .ca-empty svg{ color:#cbd5e1; }
+      .corp-acct .ca-foot{ display:flex; justify-content:flex-end; gap:10px; position:sticky; bottom:0; background:#fff; padding-top:14px; margin-top:6px; border-top:1px solid var(--ca-line); }
+      .corp-acct .ca-btn{ display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; transition:background .15s,box-shadow .15s,opacity .15s; }
+      .corp-acct .ca-btn.ghost{ background:#fff; border-color:var(--ca-line); color:var(--text3); }
+      .corp-acct .ca-btn.ghost:hover{ background:var(--bg2); color:var(--navy); }
+      .corp-acct .ca-btn.primary{ background:var(--teal); color:#fff; box-shadow:0 1px 2px rgba(8,145,178,.3); }
+      .corp-acct .ca-btn.primary:hover{ background:#0779a1; }
+      .corp-acct .ca-btn:disabled{ opacity:.5; cursor:not-allowed; }
+      .corp-acct .ca-drop{ border:1.5px dashed #c3d0dc; border-radius:10px; padding:18px; text-align:center; transition:border-color .15s,background .15s; }
+      .corp-acct .ca-drop:hover{ border-color:var(--teal); background:#f8fdff; }
+      @media (max-width:620px){ .corp-acct .ca-grid, .corp-acct .ca-grid.two{ grid-template-columns:1fr; } .corp-acct .fg.sp2{ grid-column:auto; } }
+      @media (prefers-reduced-motion:reduce){ .corp-acct *{ transition:none !important; } }
+    </style>
+    <div class="corp-acct">
+      <div class="ca-head">
+        <div>
+          <div class="ca-title">${id ? esc(c.corporate_name) : 'Corporate Account Baru'}</div>
+          <div class="ca-sub">
+            <span class="ca-chip">${esc(c.kode_corp||kode)}</span>
+            ${c.industry?`<span>${esc(c.industry)}</span>`:''}
+            <span class="ca-badge" style="background:${stColor}1a;color:${stColor}">${statusVal}</span>
           </div>
-          <div class="form-group"><label>Nilai Diskon</label><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></div>
-          <div class="form-group"><label>Status (Active)</label><select id="cf-status">${['Aktif','Non-Aktif','Suspend'].map(s=>`<option ${sel(c.status||'Aktif',s)}>${s}</option>`).join('')}</select></div>
+        </div>
+        <button class="ca-x" onclick="closeModalForce()" aria-label="Tutup">&times;</button>
+      </div>
+
+      <div class="ca-tabs">
+        ${tab('bp','Business Partner')}${tab('acc','Account Info')}${tab('emp','Employee List')}${tab('imp','Import Employee')}
+      </div>
+
+      <!-- BUSINESS PARTNER -->
+      <div id="ctab-bp">
+        <div class="ca-card">
+          <div class="ca-h">Identitas</div>
+          <div class="ca-grid">
+            <div class="fg"><label>Kode Corporate</label><input type="text" id="cf-kode" value="${esc(c.kode_corp||kode)}"></div>
+            <div class="fg"><label>SAP ID</label><input type="text" id="cf-sapid" value="${esc(c.sap_id)}" placeholder="8000xxxxxx"></div>
+            <div class="fg"><label>Tipe</label><select id="cf-type">${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}</select></div>
+            <div class="fg sp2"><label>Nama Perusahaan *</label><input type="text" id="cf-name" value="${esc(c.corporate_name)}" placeholder="PT. ABC Tbk"></div>
+            <div class="fg"><label>Brand</label><input type="text" id="cf-brand" value="${esc(c.brand)}" placeholder="Nama brand/unit"></div>
+            <div class="fg"><label>Industri</label><input type="text" id="cf-industry" value="${esc(c.industry)}" placeholder="Healthcare..."></div>
+            <div class="fg"><label>Link ke Partner</label><select id="cf-partner">${partnerOpts}</select></div>
+            <div class="fg"><label>Multinational</label><select id="cf-multi"><option value="false" ${sel(String(!!c.multinational),'false')}>No</option><option value="true" ${sel(String(!!c.multinational),'true')}>Yes</option></select></div>
+            <div class="fg"><label>SAP Relation</label><input type="text" id="cf-saprel" value="${esc(c.sap_relation)}" placeholder="TRADE THIRD PARTY"></div>
+            <div class="fg"><label>SAP Period Mulai</label><input type="date" id="cf-sapstart" value="${c.sap_period_start||''}"></div>
+            <div class="fg"><label>SAP Period Selesai</label><input type="date" id="cf-sapend" value="${c.sap_period_end||''}"></div>
+          </div>
+        </div>
+
+        <div class="ca-card">
+          <div class="ca-h">Kontak & PIC</div>
+          <div class="ca-grid">
+            <div class="fg"><label>Nama PIC</label><input type="text" id="cf-pic" value="${esc(c.pic_name)}" placeholder="Manager HRD..."></div>
+            <div class="fg"><label>Mobile Phone</label><input type="text" id="cf-phone" value="${esc(c.pic_phone)}" placeholder="08xxxxxxxxxx"></div>
+            <div class="fg"><label>Email</label><input type="email" id="cf-email" value="${esc(c.pic_email)}" placeholder="hrd@perusahaan.com"></div>
+          </div>
+        </div>
+
+        <div class="ca-card">
+          <div class="ca-h">Alamat Primer</div>
+          <div class="ca-grid">
+            <div class="fg full"><label>Alamat</label><input type="text" id="cf-addr" value="${esc(c.address)}" placeholder="Jl. ..."></div>
+            <div class="fg"><label>Sub District</label><input type="text" id="cf-subdist" value="${esc(c.subdistrict)}"></div>
+            <div class="fg"><label>Kota</label><input type="text" id="cf-city" value="${esc(c.city)}"></div>
+            <div class="fg"><label>Provinsi</label><input type="text" id="cf-prov" value="${esc(c.province)}"></div>
+            <div class="fg"><label>Negara</label><input type="text" id="cf-country" value="${esc(c.country||'INDONESIA')}"></div>
+          </div>
+        </div>
+
+        <div class="ca-card">
+          <div class="ca-h">Billing & Diskon</div>
+          <div class="ca-grid">
+            <div class="fg"><label>Tipe Billing</label><select id="cf-billing">${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}</select></div>
+            <div class="fg"><label>Payment Terms (hari)</label><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></div>
+            <div class="fg"><label>Credit Limit (Rp)</label><input type="number" id="cf-credit" value="${c.credit_limit||0}"></div>
+            <div class="fg"><label>Tipe Diskon</label><select id="cf-disc-type"><option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option><option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option><option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option></select></div>
+            <div class="fg"><label>Nilai Diskon</label><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></div>
+            <div class="fg"><label>Status</label><select id="cf-status">${['Aktif','Non-Aktif','Suspend'].map(s=>`<option ${sel(statusVal,s)}>${s}</option>`).join('')}</select></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ═══ TAB: ACCOUNT INFO ═══ -->
-    <div id="ctab-acc" style="display:none">
-      <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Tax Information</div>
-      <div class="form-row">
-        <div class="form-group"><label>NPWP</label><input type="text" id="cf-npwp" value="${c.npwp||''}" placeholder="00.000.000.0-000.000"></div>
-        <div class="form-group"><label>Tax Type</label><select id="cf-taxtype">${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}</select></div>
-        <div class="form-group"><label>PPh 23</label><select id="cf-pph23"><option value="false" ${sel(String(!!c.pph23),'false')}>No</option><option value="true" ${sel(String(!!c.pph23),'true')}>Yes</option></select></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="grid-column:1/3"><label>Alamat Pajak</label><input type="text" id="cf-taxaddr" value="${c.tax_address||''}"></div>
-        <div class="form-group"><label>Registered at</label><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="grid-column:1/-1"><label>Tax Office (KPP)</label><input type="text" id="cf-taxoffice" value="${c.tax_office||''}" placeholder="KPP Pratama ..."></div>
-      </div>
-
-      <div style="border-top:1px solid var(--border);padding:12px 0;margin:8px 0">
-        <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Bank Information (Primary)</div>
-        <div class="form-row">
-          <div class="form-group"><label>Nama Bank</label><input type="text" id="cf-bank" value="${c.bank_name||''}" placeholder="BCA"></div>
-          <div class="form-group"><label>Cabang</label><input type="text" id="cf-bankbranch" value="${c.bank_branch||''}" placeholder="Jakarta"></div>
+      <!-- ACCOUNT INFO -->
+      <div id="ctab-acc" style="display:none">
+        <div class="ca-card">
+          <div class="ca-h">Tax Information</div>
+          <div class="ca-grid">
+            <div class="fg"><label>NPWP</label><input type="text" id="cf-npwp" value="${esc(c.npwp)}" placeholder="00.000.000.0-000.000"></div>
+            <div class="fg"><label>Tax Type</label><select id="cf-taxtype">${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}</select></div>
+            <div class="fg"><label>PPh 23</label><select id="cf-pph23"><option value="false" ${sel(String(!!c.pph23),'false')}>No</option><option value="true" ${sel(String(!!c.pph23),'true')}>Yes</option></select></div>
+            <div class="fg sp2"><label>Alamat Pajak</label><input type="text" id="cf-taxaddr" value="${esc(c.tax_address)}"></div>
+            <div class="fg"><label>Registered at</label><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></div>
+            <div class="fg full"><label>Tax Office (KPP)</label><input type="text" id="cf-taxoffice" value="${esc(c.tax_office)}" placeholder="KPP Pratama ..."></div>
+          </div>
         </div>
-        <div class="form-row">
-          <div class="form-group"><label>No. Rekening</label><input type="text" id="cf-bankacc" value="${c.bank_account_number||''}"></div>
-          <div class="form-group" style="grid-column:2/-1"><label>Atas Nama</label><input type="text" id="cf-bankname" value="${c.bank_account_name||''}"></div>
+        <div class="ca-card">
+          <div class="ca-h">Bank Information (Primary)</div>
+          <div class="ca-grid two">
+            <div class="fg"><label>Nama Bank</label><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA"></div>
+            <div class="fg"><label>Cabang</label><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Jakarta"></div>
+            <div class="fg"><label>No. Rekening</label><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}"></div>
+            <div class="fg"><label>Atas Nama</label><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}"></div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ═══ TAB: EMPLOYEE LIST ═══ -->
-    <div id="ctab-emp" style="display:none">
-      ${id ? `<div style="padding:20px;text-align:center">
-        <p style="color:var(--gray);margin-bottom:14px">Kelola daftar karyawan, assign paket, dan jadwalkan MCU.</p>
-        <button class="btn btn-teal" onclick="openCorpEmployees(${id},'${(c.corporate_name||'').replace(/'/g,"\\'")}')">👥 Buka Kelola Karyawan</button>
-      </div>` : needSaved}
-    </div>
+      <!-- EMPLOYEE LIST -->
+      <div id="ctab-emp" style="display:none">
+        ${id ? `<div class="ca-card"><div class="ca-h">Karyawan MCU</div>
+          <div style="padding:8px 0 16px;text-align:center">
+            <p style="color:var(--text3);margin-bottom:14px;font-size:12.5px">Kelola daftar karyawan, assign paket, dan jadwalkan MCU.</p>
+            <button type="button" class="ca-btn primary" style="margin:0 auto" onclick="openCorpEmployees(${id},'${esc(c.corporate_name).replace(/'/g,"\\'")}')">${ICON.emp} Buka Kelola Karyawan</button>
+          </div></div>` : needSaved}
+      </div>
 
-    <!-- ═══ TAB: IMPORT EMPLOYEE ═══ -->
-    <div id="ctab-imp" style="display:none">
-      ${id ? `
-      <div class="form-row">
-        <div class="form-group" style="grid-column:1/-1"><label>Company Name</label>
-          <input type="text" value="${c.corporate_name||''}" readonly style="background:#f1f5f9">
-        </div>
+      <!-- IMPORT EMPLOYEE -->
+      <div id="ctab-imp" style="display:none">
+        ${id ? `
+        <div class="ca-card">
+          <div class="ca-h">Import Karyawan</div>
+          <div class="ca-grid two"><div class="fg full"><label>Company Name</label><input type="text" value="${esc(c.corporate_name)}" readonly></div></div>
+          <div class="ca-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Import langsung ke <strong>${esc(c.corporate_name)}</strong> — tak perlu kolom Kode Corporate. Kolom dikenali: Nama, NIK, Departemen, Jenis Kelamin, Tgl Lahir, No HP, Email.</span>
+          </div>
+          <div class="ca-drop">
+            <input type="file" id="cf-imp-file" accept=".csv" onchange="previewCorpImport(this)" style="font-size:12.5px">
+          </div>
+          <div id="cf-imp-preview" style="max-height:220px;overflow-y:auto;margin:12px 0 4px"></div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;padding-bottom:6px">
+            <button type="button" class="ca-btn ghost" onclick="downloadCorpImportTemplate()">Download Template</button>
+            <button type="button" class="ca-btn primary" id="cf-imp-btn" onclick="loadCorpImport(${id})" disabled>Load File</button>
+          </div>
+        </div>` : needSaved}
       </div>
-      <div style="background:#EEF2FF;border-radius:8px;padding:12px;margin:8px 0;font-size:12px;line-height:1.5">
-        Import langsung ke <strong>${c.corporate_name||''}</strong> — tidak perlu kolom Kode Corporate,
-        perusahaan sudah dikunci ke form ini. Kolom dikenali: Nama, NIK, Departemen, Jenis Kelamin, Tgl Lahir, No HP, Email.
-      </div>
-      <div class="form-group">
-        <label>Upload File (.csv)</label>
-        <input type="file" id="cf-imp-file" accept=".csv" onchange="previewCorpImport(this)">
-      </div>
-      <div id="cf-imp-preview" style="max-height:220px;overflow-y:auto;margin-top:10px"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-        <button class="btn btn-ghost btn-sm" onclick="downloadCorpImportTemplate()">⬇️ Download Template</button>
-        <button class="btn btn-teal btn-sm" id="cf-imp-btn" onclick="loadCorpImport(${id})" disabled>Load File</button>
-      </div>` : needSaved}
-    </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveCorp(${id||'null'})">💾 Simpan</button>
-    </div>`);
+      <div class="ca-foot">
+        <button type="button" class="ca-btn ghost" onclick="closeModalForce()">Batal</button>
+        <button type="button" class="ca-btn primary" onclick="saveCorp(${id||'null'})">Simpan</button>
+      </div>
+    </div>`, 'wide');
 
   switchCorpTab('bp');
 }
@@ -623,7 +666,7 @@ function switchCorpTab(key) {
     const panel = document.getElementById('ctab-'+k);
     const btn = document.getElementById('ctab-btn-'+k);
     if (panel) panel.style.display = k===key ? '' : 'none';
-    if (btn) { btn.style.color = k===key ? 'var(--navy)' : 'var(--gray)'; btn.style.borderBottomColor = k===key ? 'var(--teal)' : 'transparent'; }
+    if (btn) btn.classList.toggle('on', k===key);
   });
 }
 
@@ -766,28 +809,34 @@ async function loadCorpImport(corpId) {
   if (!_corpImportRows.length) { toast('Tidak ada data','warn'); return; }
   const btn = document.getElementById('cf-imp-btn');
   if (btn) { btn.disabled = true; btn.textContent = '⏳ Import...'; }
-  let ok = 0, err = 0;
+  let ok = 0, err = 0, firstErr = '';
   for (const r of _corpImportRows) {
     try {
+      // Hanya kolom yang pasti ada (samakan dengan saveCorpEmp yang sudah bekerja).
       await sbPost('corporate_employees', {
-        corporate_id:   corpId,
-        corporate_name: _corpFormName || null,
-        full_name:      r.full_name,
-        employee_id:    r.employee_id,
-        department:     r.department,
-        gender:         r.gender,
-        birth_date:     r.birth_date,
-        phone:          r.phone,
-        email:          r.email,
-        status:         'Non-Aktif',
-        updated_at:     new Date().toISOString(),
+        corporate_id: corpId,
+        full_name:    r.full_name,
+        employee_id:  r.employee_id,
+        department:   r.department,
+        gender:       r.gender,
+        birth_date:   r.birth_date,
+        phone:        r.phone,
+        email:        r.email,
+        status:       'Non-Aktif',
+        updated_at:   new Date().toISOString(),
       });
       ok++;
-    } catch(e) { err++; console.error('[loadCorpImport]', r.full_name, e); }
+    } catch(e) { err++; if (!firstErr) firstErr = e.message; console.error('[loadCorpImport]', r.full_name, e); }
   }
-  toast(`✅ ${ok} karyawan diimport${err?`, ${err} gagal`:''}`, err?'warn':'ok', 5000);
-  _corpImportRows = [];
-  closeModalForce();
+  if (btn) { btn.disabled = false; btn.textContent = 'Load File'; }
+  if (ok) {
+    toast(`✅ ${ok} karyawan diimport${err?`, ${err} gagal`:''}`, err?'warn':'ok', 5000);
+    _corpImportRows = [];
+    closeModalForce();
+  } else {
+    // Semua gagal → tampilkan sebab asli agar bisa ditelusuri
+    toast(`❌ Semua gagal. Sebab: ${firstErr||'tidak diketahui'}`, 'err', 9000);
+  }
 }
 
 function downloadCorpImportTemplate() {
