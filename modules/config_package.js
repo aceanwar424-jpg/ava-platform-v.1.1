@@ -602,11 +602,19 @@ async function deleteCorp(id) {
 // CORPORATE: Employee/Participant Management
 // ══════════════════════════════════════════
 async function openCorpEmployees(corpId, corpName) {
-  const emps = await sbGet('corporate_employees',
-    `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]);
+  const [emps, pkgs] = await Promise.all([
+    sbGet('corporate_employees', `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]),
+    sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(()=>[]),
+  ]);
 
   const active   = (emps||[]).filter(e=>e.status==='Aktif').length;
   const inactive = (emps||[]).filter(e=>e.status==='Non-Aktif').length;
+  const booked   = (emps||[]).filter(e=>e.booking_admission_id).length;
+  const assigned = (emps||[]).filter(e=>e.package_id).length;
+
+  // Opsi <select> paket, dipakai inline per baris
+  const pkgOpts = (empPkgId) => `<option value="">— pilih paket —</option>` +
+    (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===empPkgId?'selected':''}>${p.nama_paket}</option>`).join('');
 
   openModal(`
     <div class="modal-header">
@@ -614,6 +622,8 @@ async function openCorpEmployees(corpId, corpName) {
       <div style="display:flex;gap:6px;align-items:center">
         <span class="badge badge-green">${active} Aktif</span>
         <span class="badge badge-gray">${inactive} Non-Aktif</span>
+        <span class="badge" style="background:#EEF2FF;color:#3730A3">${assigned} Berpaket</span>
+        <span class="badge" style="background:#E0F2FE;color:#0369A1">${booked} Booking</span>
         <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
@@ -636,7 +646,7 @@ async function openCorpEmployees(corpId, corpName) {
             <th style="padding:6px 10px;text-align:left">Nama</th>
             <th style="padding:6px 10px;text-align:left">NIK/ID</th>
             <th style="padding:6px 10px;text-align:left">Departemen</th>
-            <th style="padding:6px 10px;text-align:left">Tgl Lahir</th>
+            <th style="padding:6px 10px;text-align:left">Paket MCU</th>
             <th style="padding:6px 10px;text-align:left">Status</th>
             <th style="padding:6px 10px">Aksi</th>
           </tr></thead>
@@ -645,7 +655,11 @@ async function openCorpEmployees(corpId, corpName) {
               <td style="padding:6px 10px;font-weight:600">${e.full_name||'—'}</td>
               <td style="padding:6px 10px;font-family:monospace;font-size:11px">${e.employee_id||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${e.department||'—'}</td>
-              <td style="padding:6px 10px;color:var(--gray)">${e.birth_date||'—'}</td>
+              <td style="padding:6px 10px">
+                ${e.booking_admission_id
+                  ? `<span style="font-size:11px;font-weight:600">${e.package_name||'—'}</span> <span title="Sudah booking, terkunci">🔒</span>`
+                  : `<select onchange="assignEmpPackage(${e.id},this,${corpId},'${corpName.replace(/'/g,"\\'")}')" style="font-size:11px;padding:2px 4px;max-width:150px">${pkgOpts(e.package_id)}</select>`}
+              </td>
               <td style="padding:6px 10px">
                 <span style="background:${e.status==='Aktif'?'#E8F5E9':'#F1F5F9'};
                   color:${e.status==='Aktif'?'#2E7D32':'#546E7A'};
@@ -672,8 +686,8 @@ async function openCorpEmployees(corpId, corpName) {
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
-      <button class="btn btn-teal btn-sm" onclick="activateAllCorpEmps(${corpId},'${corpName.replace(/'/g,"\'")}')" style="color:#fff">
-        ✅ Aktifkan Semua untuk MCU
+      <button class="btn btn-teal btn-sm" onclick="scheduleMcuBooking(${corpId},'${corpName.replace(/'/g,"\\'")}')" style="color:#fff">
+        📅 Jadwalkan MCU → Booking
       </button>
     </div>`);
 }
@@ -778,6 +792,7 @@ async function saveCorpEmp(corpId, id) {
     email:        document.getElementById('cef-email').value.trim()||null,
     status:       document.getElementById('cef-status').value,
     package_id:   parseInt(document.getElementById('cef-package').value)||null,
+    package_name: (document.getElementById('cef-package')?.selectedOptions?.[0]?.textContent||'').trim()||null,
     notes:        document.getElementById('cef-notes').value.trim()||null,
     updated_at:   new Date().toISOString(),
   };
@@ -799,16 +814,130 @@ async function deleteCorpEmp(id, corpId, corpName) {
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
-async function activateAllCorpEmps(corpId, corpName) {
-  if (!confirm('Aktifkan semua karyawan terdaftar untuk MCU?\nStatus akan berubah dari Non-Aktif → Aktif')) return;
+// Assign paket ke SATU karyawan (inline dropdown di tabel).
+async function assignEmpPackage(empId, sel, corpId, corpName) {
+  const pkgId = parseInt(sel.value) || null;
+  const pkgName = sel.selectedOptions?.[0]?.dataset?.name || null;
+  const user = getUserName ? getUserName() : 'User';
   try {
-    // Update all non-active employees of this corporate
+    await sbPatch('corporate_employees', empId, {
+      package_id:   pkgId,
+      package_name: pkgId ? pkgName : null,
+      assigned_by:  user,
+      assigned_at:  new Date().toISOString(),
+      updated_at:   new Date().toISOString(),
+    });
+    toast(pkgId ? `✅ Paket: ${pkgName}` : 'Paket dilepas', 'ok', 2000);
+    await openCorpEmployees(corpId, corpName);
+  } catch(e) { toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Jadwalkan MCU → buat baris admissions (booking) per karyawan.
+// Hanya karyawan yang SUDAH berpaket & BELUM pernah dibooking.
+// Inilah sambungan rantai: config paket → list booking admisi.
+// ══════════════════════════════════════════════════════════════
+async function scheduleMcuBooking(corpId, corpName) {
+  const emps = await sbGet('corporate_employees',
+    `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]);
+  const eligible = (emps||[]).filter(e => e.package_id && !e.booking_admission_id);
+  const noPkg    = (emps||[]).filter(e => !e.package_id && !e.booking_admission_id).length;
+
+  if (!eligible.length) {
+    toast(`Tidak ada karyawan siap booking.${noPkg?` ${noPkg} karyawan belum di-assign paket.`:''}`, 'warn', 6000);
+    return;
+  }
+  const today = new Date().toISOString().slice(0,10);
+
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Jadwalkan MCU — ${corpName}</div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
+    </div>
+    <div style="background:#EEF2FF;border-radius:8px;padding:12px;margin-bottom:14px;font-size:12px;line-height:1.5">
+      <strong>${eligible.length} karyawan</strong> siap dibuatkan booking.
+      ${noPkg?`<br><span style="color:#B45309">⚠️ ${noPkg} karyawan dilewati (belum di-assign paket).</span>`:''}
+    </div>
+    <div class="form-group">
+      <label>Tanggal MCU *</label>
+      <input type="date" id="mcu-date" value="${today}" min="${today}">
+    </div>
+    <div style="max-height:220px;overflow-y:auto;margin-top:10px;border:1px solid var(--border);border-radius:6px">
+      <table style="width:100%;font-size:11.5px;border-collapse:collapse">
+        <thead><tr style="background:var(--lgray)">
+          <th style="padding:5px 8px;text-align:left">Nama</th>
+          <th style="padding:5px 8px;text-align:left">Paket</th>
+        </tr></thead>
+        <tbody>${eligible.map(e=>`<tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:5px 8px;font-weight:600">${e.full_name||'—'}</td>
+          <td style="padding:5px 8px;color:#3730A3">${e.package_name||'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="createCorpBookings(${corpId},'${corpName.replace(/'/g,"\\'")}')" style="color:#fff">
+        Buat ${eligible.length} Booking
+      </button>
+    </div>`);
+}
+
+async function createCorpBookings(corpId, corpName) {
+  const mcuDate = document.getElementById('mcu-date')?.value;
+  if (!mcuDate) { toast('Pilih tanggal MCU dulu','err'); return; }
+  const user = getUserName ? getUserName() : 'User';
+
+  try {
+    // Diskon korporat untuk isi scheme_discount di admisi
+    const corp = (await sbGet('corporates', `select=discount_type,discount_value&id=eq.${corpId}`).catch(()=>[]))?.[0] || {};
     const emps = await sbGet('corporate_employees',
-      `select=id&corporate_id=eq.${corpId}&status=eq.Non-Aktif`);
-    for (const e of (emps||[])) {
-      await sbPatch('corporate_employees',e.id,{status:'Aktif',updated_at:new Date().toISOString()});
+      `select=*&corporate_id=eq.${corpId}&package_id=not.is.null&booking_admission_id=is.null`);
+
+    if (!emps || !emps.length) { toast('Tidak ada karyawan untuk dibooking','warn'); return; }
+
+    const dateTag = mcuDate.replace(/-/g,'');
+    let made = 0;
+    for (let i = 0; i < emps.length; i++) {
+      const e = emps[i];
+      const rnd = (Date.now().toString().slice(-4)) + i;
+      const payload = {
+        visit_number:      `VISIT-${dateTag}-${rnd}`,
+        mr_number:         `MR-${Date.now().toString().slice(-6)}${i}`,
+        visit_type:        'Project MCU',
+        visit_date:        mcuDate,
+        patient_name:      e.full_name,
+        patient_gender:    e.gender || null,
+        patient_dob:       e.birth_date || null,
+        patient_phone:     e.phone || null,
+        patient_email:     e.email || null,
+        patient_id_number: e.employee_id || null,
+        package_id:        e.package_id,
+        package_name:      e.package_name || null,
+        corporate_id:      corpId,
+        corporate_employee_id: e.id,
+        discount_scheme:   'corporate',
+        scheme_ref_id:     corpId,
+        scheme_name:       corpName,
+        scheme_discount:   0,   // dihitung ulang di admisi saat service line diisi
+        payment_status:    'Unpaid',
+        status:            'Booking',
+        registered_by:     user,
+        updated_at:        new Date().toISOString(),
+      };
+      try {
+        const created = await sbPost('admissions', payload);
+        const admId = created?.[0]?.id || created?.id;
+        await sbPatch('corporate_employees', e.id, {
+          status:               'Aktif',
+          mcu_date:             mcuDate,
+          booking_admission_id: admId || null,
+          updated_at:           new Date().toISOString(),
+        });
+        made++;
+      } catch(err){ console.error('[createCorpBookings] gagal untuk', e.full_name, err); }
     }
-    toast(`✅ ${(emps||[]).length} karyawan diaktifkan`,'ok');
+    toast(`✅ ${made} booking dibuat untuk ${mcuDate}`, 'ok', 4000);
+    closeModalForce();
     await openCorpEmployees(corpId, corpName);
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
