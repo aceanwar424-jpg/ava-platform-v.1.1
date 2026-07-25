@@ -1177,34 +1177,22 @@
             <div class="stat-card">
               <span class="stat-icon">👥</span>
               <h4>Total Karyawan</h4>
-              <p id="c-stat-total">150 Orang</p>
+              <p id="c-stat-total">0 Orang</p>
             </div>
             <div class="stat-card">
               <span class="stat-icon">✅</span>
               <h4>Selesai MCU</h4>
-              <p id="c-stat-mcu">120 Orang</p>
+              <p id="c-stat-mcu">0 Orang</p>
             </div>
           </div>
 
-          <div class="glass-card progress-card" style="margin-bottom: 20px;">
+          <div class="glass-card progress-card" style="margin-bottom: 24px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
               <span>Progres Proyek MCU</span>
-              <span id="c-progress-txt">80%</span>
+              <span id="c-progress-txt">0%</span>
             </div>
             <div class="progress-bar-bg">
-              <div class="progress-bar-fill" id="c-progress-bar" style="width: 80%;"></div>
-            </div>
-          </div>
-
-          <!-- Kemitraan & Benefit Perusahaan -->
-          <div class="section-title">Kemitraan & Benefit Cashback</div>
-          <div class="glass-card wallet-card" style="margin-bottom:24px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(13, 148, 136, 0.1) 100%); border: 1px solid rgba(20, 184, 166, 0.2);">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div>
-                <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">Akumulasi Reward Cashback</p>
-                <strong id="c-cashback-balance" style="font-size:22px; color:var(--teal); font-weight:800;">Rp 4.500.000</strong>
-              </div>
-              <button class="btn btn-sm btn-teal" onclick="openClaimCashbackModal()" style="margin:0; font-size:11px;">Klaim Cashback</button>
+              <div class="progress-bar-fill" id="c-progress-bar" style="width: 0%;"></div>
             </div>
           </div>
 
@@ -1235,31 +1223,12 @@
           <div class="quick-stats" style="margin-bottom: 24px;">
             <div class="mini-stat-card card-fit">
               <h5>Fit to Work</h5>
-              <span id="c-stat-fit">105</span>
+              <span id="c-stat-fit">0</span>
             </div>
             <div class="mini-stat-card card-unfit">
               <h5>Unfit / Review</h5>
-              <span id="c-stat-unfit">15</span>
+              <span id="c-stat-unfit">0</span>
             </div>
-          </div>
-
-          <div class="section-title">Billing & Invoice Korporat</div>
-          <div class="glass-card invoice-widget" style="margin-bottom: 24px;">
-            <div class="invoice-list-mini" id="corp-invoice-list-mini">
-              <!-- Rendered dynamically -->
-            </div>
-            <button class="btn btn-sm btn-primary" onclick="openCorpBillingModal()" style="width:100%; margin-top:12px;">Kelola &amp; Bayar Invoice</button>
-          </div>
-
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div class="section-title" style="margin-bottom:0;">Daftar Peserta MCU</div>
-            <div style="display:flex; gap:6px;">
-              <button class="btn btn-sm" onclick="scheduleMcuBookingPortal()" style="margin:0; font-size:11px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:#fff;">📅 Jadwalkan Massal</button>
-              <button class="btn btn-sm btn-teal" onclick="openAddEmployeeModal()" style="margin:0; font-size:11px;">➕ Daftarkan Pasien</button>
-            </div>
-          </div>
-          <div class="corporate-list" id="corporate-list-container">
-            <!-- Dinamis via JS -->
           </div>
         </div>
 
@@ -1333,6 +1302,50 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- ──────── VIEW: KELOLA KARYAWAN ──────── -->
+      <div id="corporate-employees-view" class="view-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <h4 style="margin:0;">Daftar Peserta MCU</h4>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-sm" onclick="scheduleMcuBookingPortal()" style="margin:0; font-size:11px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:#38bdf8;">📅 Jadwalkan Massal</button>
+            <button class="btn btn-sm btn-teal" onclick="openAddEmployeeModal()" style="margin:0; font-size:11px;">➕ Daftarkan Pasien</button>
+          </div>
+        </div>
+        <div class="glass-card" style="margin-bottom:16px; padding:12px; background:rgba(255,255,255,0.02); border:1px solid var(--border);">
+          <input type="text" placeholder="Cari nama karyawan atau NIK..." oninput="filterEmployeePortal(this.value)" style="width:100%; padding:10px 14px; border-radius:8px; border:1px solid var(--border); background:rgba(0,0,0,0.2); color:#fff; font-size:13px; outline:none;">
+        </div>
+        <div class="corporate-list" id="corporate-list-container">
+          <!-- Dinamis via JS -->
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: BILLING & INVOICE ──────── -->
+      <div id="corporate-billing-view" class="view-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h4 style="margin:0;">Billing &amp; Invoice Korporat</h4>
+          <button class="btn btn-sm btn-teal" onclick="openCorpBillingModal()" style="margin:0; font-size:11px;">Kelola &amp; Bayar Invoice</button>
+        </div>
+        <div class="glass-card invoice-widget" style="margin-bottom: 24px; padding:20px;">
+          <div class="invoice-list-mini" id="corp-invoice-list-mini">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ──────── VIEW: KLAIM CASHBACK ──────── -->
+      <div id="corporate-cashback-view" class="view-panel">
+        <h4 style="margin-bottom:16px;">Kemitraan &amp; Benefit Cashback</h4>
+        <div class="glass-card wallet-card" style="padding:24px; background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(13, 148, 136, 0.1) 100%); border: 1px solid rgba(20, 184, 166, 0.2);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Akumulasi Reward Cashback</p>
+              <strong id="c-cashback-balance" style="font-size:24px; color:var(--teal); font-weight:800;">Rp 4.500.000</strong>
+            </div>
+            <button class="btn btn-sm btn-teal" onclick="openClaimCashbackModal()" style="margin:0;">Klaim Cashback</button>
+          </div>
+        </div>
       </div>
 
       <!-- ──────── VIEW: FASKES REFERRAL ──────── -->

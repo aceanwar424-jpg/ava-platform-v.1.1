@@ -166,6 +166,7 @@ function updateUIWithDBData() {
 let currentRole = 'patient';
 let currentPhase = 'fase1';
 let currentUsername = '';
+let currentUserEmail = '';
 let currentUserProfile = null;
 let corporates = [];                 // diisi dari corporate_employees (real)
 let currentCorporateId = null;       // corporate yang diwakili user login
@@ -278,9 +279,9 @@ function renderSidebarMenu() {
   } else if (currentRole === 'corporate') {
     navContainer.innerHTML = `
       <a class="sidebar-link active" onclick="showView('corporate-view', 'Corporate MCU')">📊 Ringkasan Proyek</a>
-      <a class="sidebar-link" onclick="openAddEmployeeModal()">➕ Tambah Karyawan</a>
-      <a class="sidebar-link" onclick="openCorpBillingModal()">💳 Kelola Invoice</a>
-      <a class="sidebar-link" onclick="openClaimCashbackModal()">💰 Klaim Cashback</a>
+      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Kelola Karyawan')">👥 Kelola Karyawan</a>
+      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Billing &amp; Invoice')">💳 Billing &amp; Invoice</a>
+      <a class="sidebar-link" onclick="showView('corporate-cashback-view', 'Klaim Cashback')">💰 Klaim Cashback</a>
     `;
   } else if (currentRole === 'referral') {
     navContainer.innerHTML = `
@@ -1012,7 +1013,7 @@ function openMemberModal() {
 
   if (!modal) return;
 
-  const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+  const isSuperAdmin = (currentUserEmail === 'aceanwar424@gmail.com');
   const nameToDisplay = isSuperAdmin ? 'Ace' : (currentUsername || 'Ace');
 
   if (titleEl) titleEl.textContent = `Halo, ${nameToDisplay}`;
@@ -1104,7 +1105,7 @@ function openProfileModal() {
 
   if (!modal) return;
 
-  const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+  const isSuperAdmin = (currentUserEmail === 'aceanwar424@gmail.com');
   const finalName = isSuperAdmin ? 'Ace Darojatun Anwar' : (currentUsername || 'Budi Santoso');
   const finalEmail = isSuperAdmin ? 'aceanwar424@gmail.com' : `${finalName.toLowerCase().replace(/\s+/g, '')}@email.com`;
 
@@ -1131,7 +1132,7 @@ async function loadCorporateData() {
   if (typeof sbGet !== 'function') { if (container) container.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Backend belum tersambung.</p>'; return; }
 
   try {
-    const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+    const isSuperAdmin = (currentUserEmail === 'aceanwar424@gmail.com');
     // 1) corporate_id dari profil akun; superadmin/demo → picker semua corporate
     let corpId = currentUserProfile?.corporate_id || null;
     if (!corpId) {
@@ -1171,11 +1172,11 @@ function empStatusBadge(e) {
   return { txt:'Terdaftar', bg:'rgba(148,163,184,0.15)', col:'#94a3b8' };
 }
 
-async function renderCorporateList() {
+async function renderCorporateList(data = corporates) {
   const container = document.getElementById('corporate-list-container');
   if (!container) return;
-  if (!corporates.length) {
-    container.innerHTML = '<p style="padding:16px;color:var(--text-muted);text-align:center">Belum ada karyawan terdaftar. Klik "Daftarkan Pasien".</p>';
+  if (!data.length) {
+    container.innerHTML = '<p style="padding:16px;color:var(--text-muted);text-align:center">Tidak ada karyawan terdaftar.</p>';
     updateCorporateStats(); return;
   }
 
@@ -1214,7 +1215,7 @@ async function renderCorporateList() {
       (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===sel?'selected':''}>${p.nama_paket}</option>`).join('');
   };
 
-  container.innerHTML = corporates.map(e => {
+  container.innerHTML = data.map(e => {
     const b = empStatusBadge(e);
     const nm = e.full_name || '—';
     const sub = [(e.employee_id||('#'+e.id)), (e.package_name||'Belum ada paket')].join(' • ');
@@ -1241,6 +1242,20 @@ async function renderCorporateList() {
   }).join('');
 
   updateCorporateStats();
+}
+
+function filterEmployeePortal(query) {
+  const q = String(query || '').toLowerCase().trim();
+  if (!q) {
+    renderCorporateList(corporates);
+    return;
+  }
+  const filtered = corporates.filter(e => 
+    (e.full_name || '').toLowerCase().includes(q) || 
+    (e.employee_id || '').toLowerCase().includes(q) || 
+    (e.department || '').toLowerCase().includes(q)
+  );
+  renderCorporateList(filtered);
 }
 
 function updateCorporateStats() {
@@ -1277,14 +1292,47 @@ async function openAddEmployeeModal() {
   const today = new Date().toISOString().slice(0,10);
   const md = document.getElementById('corp-emp-mcudate'); if (md){ md.value=today; md.min=today; }
 
-  // Isi dropdown paket dari Supabase
+  // Isi dropdown paket dari Supabase (terbatas pada paket kontrak)
   const pkgSel = document.getElementById('corp-emp-package');
   if (pkgSel) {
     pkgSel.innerHTML = '<option value="">— pilih paket —</option>';
     try {
-      const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket');
-      (pkgs||[]).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nama_paket; pkgSel.appendChild(o); });
-    } catch(e){}
+      // 1) Ambil list kontrak aktif corporate untuk mendapatkan list paket yang diperbolehkan
+      let allowedPkgIds = [];
+      const contracts = await sbGet('corporate_contracts', `select=packages,status&corporate_id=eq.${currentCorporateId}`).catch(()=>[]);
+      (contracts || []).forEach(ct => {
+        if (ct.status === 'Active' && ct.packages) {
+          try {
+            const parsed = JSON.parse(ct.packages);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(id => {
+                if (!allowedPkgIds.includes(parseInt(id))) allowedPkgIds.push(parseInt(id));
+              });
+            }
+          } catch(e) {}
+        }
+      });
+
+      // 2) Muat detail paket yang diperbolehkan saja
+      if (allowedPkgIds.length > 0) {
+        const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
+        const pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
+        (pkgs||[]).forEach(p=>{
+          const o = document.createElement('option');
+          o.value = p.id;
+          o.textContent = p.nama_paket;
+          pkgSel.appendChild(o);
+        });
+      } else {
+        const o = document.createElement('option');
+        o.value = "";
+        o.textContent = "— hubungi admin untuk aktivasi paket kontrak —";
+        o.disabled = true;
+        pkgSel.appendChild(o);
+      }
+    } catch(e){
+      console.error(e);
+    }
   }
   modal.classList.add('open');
 }
@@ -1826,6 +1874,7 @@ async function handleLogin(event) {
 
   // Continue login flow
   currentUsername = finalUsername;
+  currentUserEmail = usernameInput;
   currentRole = finalRole;
   if (!currentUserProfile) {
     currentUserProfile = { id: 'mock', full_name: finalUsername };
