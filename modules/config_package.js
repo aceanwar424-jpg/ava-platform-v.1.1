@@ -338,7 +338,7 @@ async function renderConfigCorporate() {
         <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()">Health Facility</button>
         <button class="btn btn-teal" onclick="navigate('import')">Import</button>
         <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()">Export</button>
-        <button class="btn btn-teal" onclick="openCorpForm()">+ Tambah Corporate</button>
+        <button class="btn btn-teal" onclick="renderCorporateDetail()">+ Tambah Corporate</button>
       </div>
     </div>
 
@@ -414,7 +414,7 @@ function renderCorpTable(data) {
   if (!data.length) {
     el.innerHTML=`<div class="empty-state"><div class="ico">🏢</div>
       <h3>${corpAll.length?'Tidak ada hasil':'Belum ada data corporate'}</h3>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="openCorpForm()">+ Tambah Corporate</button>
+      <button class="btn btn-teal" style="margin-top:12px" onclick="renderCorporateDetail()">+ Tambah Corporate</button>
     </div>`; return;
   }
 
@@ -446,9 +446,8 @@ function renderCorpTable(data) {
       <td><span style="background:${sc}20;color:${sc};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${c.status||'—'}</span></td>
       <td>
         <div class="act-row">
-          <button class="act-btn edit" onclick="openCorpForm(${c.id})">${icon('edit', 12)}</button>
-          <button class="act-btn" onclick="openCorpContracts(${c.id},'${(c.corporate_name||'').replace(/'/g,"\\'")}')"></button>
-          <button class="act-btn del" onclick="deleteCorp(${c.id})">${icon('trash', 12)}</button>
+          <button class="act-btn edit" onclick="renderCorporateDetail(${c.id})" title="Detail & Edit Corporate">${icon('edit', 12)}</button>
+          <button class="act-btn del" onclick="deleteCorp(${c.id})" title="Hapus Corporate">${icon('trash', 12)}</button>
         </div>
       </td>
     </tr>`;
@@ -493,427 +492,383 @@ function _caStyleTag() {
       .corp-acct .ca-empty{ display:flex; flex-direction:column; align-items:center; gap:12px; padding:44px 20px; color:var(--text3); text-align:center; }
       .corp-acct .ca-empty svg{ color:#cbd5e1; }
       .corp-acct .ca-foot{ display:flex; justify-content:flex-end; gap:10px; position:sticky; bottom:0; background:#fff; padding-top:14px; margin-top:6px; border-top:1px solid var(--ca-line); }
-      .corp-acct .ca-btn{ display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:1px solid transparent; transition:background .15s,box-shadow .15s,opacity .15s; }
-      .corp-acct .ca-btn.ghost{ background:#fff; border-color:var(--ca-line); color:var(--text3); }
-      .corp-acct .ca-btn.ghost:hover{ background:var(--bg2); color:var(--navy); }
-      .corp-acct .ca-btn.primary{ background:var(--teal); color:#fff; box-shadow:0 1px 2px rgba(8,145,178,.3); }
-      .corp-acct .ca-btn.primary:hover{ background:#0779a1; }
-      .corp-acct .ca-btn:disabled{ opacity:.5; cursor:not-allowed; }
-      .corp-acct .ca-drop{ border:1.5px dashed #c3d0dc; border-radius:10px; padding:18px; text-align:center; transition:border-color .15s,background .15s; }
-      .corp-acct .ca-drop:hover{ border-color:var(--teal); background:#f8fdff; }
-      @media (max-width:620px){ .corp-acct .ca-grid, .corp-acct .ca-grid.two{ grid-template-columns:1fr; } .corp-acct .fg.sp2{ grid-column:auto; } }
-      @media (prefers-reduced-motion:reduce){ .corp-acct *{ transition:none !important; } }
+      .corp-acct .ca-h{ font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:.07em; margin-bottom:14px; display:flex; align-items:center; gap:8px; }
+      .corp-acct .ca-h::before{ content:''; width:3px; height:13px; background:var(--teal); border-radius:2px; }
     </style>`;
 }
 
-async function openCorpForm(id=null, initialTab='bp') {
-  let c={};
-  if (id) { const d=await sbGet('corporates',`select=*&id=eq.${id}`); c=d[0]||{}; }
-  _corpFormId = id; _corpFormName = c.corporate_name || '';
+async function renderCorporateDetail(id = null) {
+  let c = {};
+  if (id) {
+    try {
+      const d = await sbGet('corporates', `select=*&id=eq.${id}`);
+      c = d?.[0] || {};
+    } catch(e) {
+      toast('❌ Gagal memuat data corporate: ' + e.message, 'err');
+    }
+  }
+  
+  const kode = c.kode_corp || `CORP-${Date.now().toString().slice(-5)}`;
+  const sel = (a, b) => a === b ? 'selected' : '';
+  const esc = s => String(s || '').replace(/"/g, '&quot;');
+  const statusVal = c.status || 'Aktif';
+  const stColor = statusVal === 'Aktif' ? '#059669' : statusVal === 'Suspend' ? '#DC2626' : '#64748B';
 
   let partnerOpts = '<option value="">-- Link ke Partner (opsional) --</option>';
   try {
-    const pts=await sbGet('partners','select=id,partner_name&status=eq.Aktif&order=partner_name&limit=200');
-    partnerOpts+=(pts||[]).map(p=>`<option value="${p.id}" ${c.partner_id==p.id?'selected':''}>${p.partner_name}</option>`).join('');
-  } catch(e){}
+    const pts = await sbGet('partners', 'select=id,partner_name&status=eq.Aktif&order=partner_name&limit=200');
+    partnerOpts += (pts || []).map(p => `<option value="${p.id}" ${c.partner_id == p.id ? 'selected' : ''}>${p.partner_name}</option>`).join('');
+  } catch (e) {}
 
-  const kode = `CORP-${Date.now().toString().slice(-5)}`;
-  const sel = (a,b) => a===b ? 'selected' : '';
-  const esc = s => String(s||'').replace(/"/g,'&quot;');
-  const statusVal = c.status || 'Aktif';
-  const stColor = statusVal==='Aktif' ? '#059669' : statusVal==='Suspend' ? '#DC2626' : '#64748B';
-  const ICON = {
-    bp:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg>',
-    acc: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>',
-    emp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    imp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
-  };
-  const tab = (key,label) => `<button type="button" class="ca-tab" id="ctab-btn-${key}" onclick="switchCorpTab('${key}')">${ICON[key]}<span>${label}</span></button>`;
-  const needSaved = `<div class="ca-empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><p>Simpan data corporate dulu untuk mengelola karyawan.</p></div>`;
-
-  openModal(`${_caStyleTag()}
-    <div class="corp-acct">
-      <div class="ca-head">
+  document.getElementById('main-content').innerHTML = `
+    ${_caStyleTag()}
+    <div class="pro-shell corp-acct" style="max-width: 1200px; margin: 0 auto; padding: 10px;">
+      
+      <!-- HEADER -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
         <div>
-          <div class="ca-title">${id ? esc(c.corporate_name) : 'Corporate Account Baru'}</div>
-          <div class="ca-sub">
-            <span class="ca-chip">${esc(c.kode_corp||kode)}</span>
-            ${c.industry?`<span>${esc(c.industry)}</span>`:''}
-            <span class="ca-badge" style="background:${stColor}1a;color:${stColor}">${statusVal}</span>
+          <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="margin-bottom: 8px;">&larr; Kembali ke Daftar</button>
+          <h1 style="margin:0; font-size: 20px; font-weight: 800; color: var(--navy)">
+            ${id ? esc(c.corporate_name) : 'Tambah Corporate Account Baru'}
+          </h1>
+          <div class="ca-sub" style="margin-top: 6px;">
+            <span class="ca-chip">${esc(kode)}</span>
+            ${c.industry ? `<span>${esc(c.industry)}</span>` : ''}
+            <span class="ca-badge" style="background:${stColor}1a; color:${stColor}; border:1px solid ${stColor}40">${statusVal}</span>
           </div>
         </div>
-        <button class="ca-x" onclick="closeModalForce()" aria-label="Tutup">&times;</button>
-      </div>
-
-      <div class="ca-tabs">
-        ${tab('bp','Business Partner')}${tab('acc','Account Info')}${tab('emp','Employee List')}${tab('imp','Import Employee')}
-      </div>
-
-      <!-- BUSINESS PARTNER -->
-      <div id="ctab-bp">
-        <div class="ca-card">
-          <div class="ca-h">Identitas</div>
-          <div class="ca-grid">
-            <div class="fg"><label>Kode Corporate</label><input type="text" id="cf-kode" value="${esc(c.kode_corp||kode)}"></div>
-            <div class="fg"><label>SAP ID</label><input type="text" id="cf-sapid" value="${esc(c.sap_id)}" placeholder="8000xxxxxx"></div>
-            <div class="fg"><label>Tipe</label><select id="cf-type">${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}</select></div>
-            <div class="fg sp2"><label>Nama Perusahaan *</label><input type="text" id="cf-name" value="${esc(c.corporate_name)}" placeholder="PT. ABC Tbk"></div>
-            <div class="fg"><label>Brand</label><input type="text" id="cf-brand" value="${esc(c.brand)}" placeholder="Nama brand/unit"></div>
-            <div class="fg"><label>Industri</label><input type="text" id="cf-industry" value="${esc(c.industry)}" placeholder="Healthcare..."></div>
-            <div class="fg"><label>Link ke Partner</label><select id="cf-partner">${partnerOpts}</select></div>
-            <div class="fg"><label>Multinational</label><select id="cf-multi"><option value="false" ${sel(String(!!c.multinational),'false')}>No</option><option value="true" ${sel(String(!!c.multinational),'true')}>Yes</option></select></div>
-            <div class="fg"><label>SAP Relation</label><input type="text" id="cf-saprel" value="${esc(c.sap_relation)}" placeholder="TRADE THIRD PARTY"></div>
-            <div class="fg"><label>SAP Period Mulai</label><input type="date" id="cf-sapstart" value="${c.sap_period_start||''}"></div>
-            <div class="fg"><label>SAP Period Selesai</label><input type="date" id="cf-sapend" value="${c.sap_period_end||''}"></div>
-          </div>
-        </div>
-
-        <div class="ca-card">
-          <div class="ca-h">Kontak & PIC</div>
-          <div class="ca-grid">
-            <div class="fg"><label>Nama PIC</label><input type="text" id="cf-pic" value="${esc(c.pic_name)}" placeholder="Manager HRD..."></div>
-            <div class="fg"><label>Mobile Phone</label><input type="text" id="cf-phone" value="${esc(c.pic_phone)}" placeholder="08xxxxxxxxxx"></div>
-            <div class="fg"><label>Email</label><input type="email" id="cf-email" value="${esc(c.pic_email)}" placeholder="hrd@perusahaan.com"></div>
-          </div>
-        </div>
-
-        <div class="ca-card">
-          <div class="ca-h">Alamat Primer</div>
-          <div class="ca-grid">
-            <div class="fg full"><label>Alamat</label><input type="text" id="cf-addr" value="${esc(c.address)}" placeholder="Jl. ..."></div>
-            <div class="fg"><label>Sub District</label><input type="text" id="cf-subdist" value="${esc(c.subdistrict)}"></div>
-            <div class="fg"><label>Kota</label><input type="text" id="cf-city" value="${esc(c.city)}"></div>
-            <div class="fg"><label>Provinsi</label><input type="text" id="cf-prov" value="${esc(c.province)}"></div>
-            <div class="fg"><label>Negara</label><input type="text" id="cf-country" value="${esc(c.country||'INDONESIA')}"></div>
-          </div>
-        </div>
-
-        <div class="ca-card">
-          <div class="ca-h">Billing & Diskon</div>
-          <div class="ca-grid">
-            <div class="fg"><label>Tipe Billing</label><select id="cf-billing">${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}</select></div>
-            <div class="fg"><label>Payment Terms (hari)</label><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></div>
-            <div class="fg"><label>Credit Limit (Rp)</label><input type="number" id="cf-credit" value="${c.credit_limit||0}"></div>
-            <div class="fg"><label>Tipe Diskon</label><select id="cf-disc-type"><option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option><option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option><option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option></select></div>
-            <div class="fg"><label>Nilai Diskon</label><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></div>
-            <div class="fg"><label>Status</label><select id="cf-status">${['Aktif','Non-Aktif','Suspend'].map(s=>`<option ${sel(statusVal,s)}>${s}</option>`).join('')}</select></div>
-          </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-ghost" onclick="navigate('corporate')">Batal</button>
+          <button class="btn btn-teal" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')">Simpan Perubahan</button>
         </div>
       </div>
 
-      <!-- ACCOUNT INFO -->
-      <div id="ctab-acc" style="display:none">
-        <div class="ca-card">
-          <div class="ca-h">Tax Information</div>
-          <div class="ca-grid">
-            <div class="fg"><label>NPWP</label><input type="text" id="cf-npwp" value="${esc(c.npwp)}" placeholder="00.000.000.0-000.000"></div>
-            <div class="fg"><label>Tax Type</label><select id="cf-taxtype">${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}</select></div>
-            <div class="fg"><label>PPh 23</label><select id="cf-pph23"><option value="false" ${sel(String(!!c.pph23),'false')}>No</option><option value="true" ${sel(String(!!c.pph23),'true')}>Yes</option></select></div>
-            <div class="fg sp2"><label>Alamat Pajak</label><input type="text" id="cf-taxaddr" value="${esc(c.tax_address)}"></div>
-            <div class="fg"><label>Registered at</label><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></div>
-            <div class="fg full"><label>Tax Office (KPP)</label><input type="text" id="cf-taxoffice" value="${esc(c.tax_office)}" placeholder="KPP Pratama ..."></div>
+      <!-- MAIN LAYOUT -->
+      <div style="display:grid; grid-template-columns: ${id ? '1.2fr 1fr' : '1fr'}; gap: 24px; align-items: start;">
+        
+        <!-- LEFT COLUMN: Profile & Account Info -->
+        <div style="display:flex; flex-direction:column; gap:16px">
+          
+          <!-- CARD 1: Business Partner Info -->
+          <div class="card" style="padding: 20px;">
+            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Identitas Perusahaan</div>
+            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div class="fg" style="grid-column: span 2;"><label>Nama Perusahaan *</label><input type="text" id="cf-name" value="${esc(c.corporate_name)}" placeholder="PT. ABC Tbk"></div>
+              <div class="fg"><label>Kode Corporate</label><input type="text" id="cf-kode" value="${esc(kode)}"></div>
+              <div class="fg"><label>Brand/Unit</label><input type="text" id="cf-brand" value="${esc(c.brand)}" placeholder="Nama brand/unit"></div>
+              <div class="fg"><label>Industri</label><input type="text" id="cf-industry" value="${esc(c.industry)}" placeholder="Healthcare..."></div>
+              <div class="fg"><label>Tipe</label><select id="cf-type">${['COMPANY','GOVERNMENT','INSURANCE','INDIVIDUAL'].map(t=>`<option ${sel(c.company_type||'COMPANY',t)}>${t}</option>`).join('')}</select></div>
+              <div class="fg"><label>Link ke Partner</label><select id="cf-partner">${partnerOpts}</select></div>
+              <div class="fg"><label>SAP ID</label><input type="text" id="cf-sapid" value="${esc(c.sap_id)}" placeholder="8000xxxxxx"></div>
+              <div class="fg"><label>SAP Relation</label><input type="text" id="cf-saprel" value="${esc(c.sap_relation)}" placeholder="TRADE THIRD PARTY"></div>
+              <div class="fg"><label>SAP Period Mulai</label><input type="date" id="cf-sapstart" value="${c.sap_period_start||''}"></div>
+              <div class="fg"><label>SAP Period Selesai</label><input type="date" id="cf-sapend" value="${c.sap_period_end||''}"></div>
+              <div class="fg"><label>Multinational</label><select id="cf-multi"><option value="false" ${sel(String(!!c.multinational),'false')}>No</option><option value="true" ${sel(String(!!c.multinational),'true')}>Yes</option></select></div>
+              <div class="fg"><label>Status</label><select id="cf-status">${['Aktif','Non-Aktif','Suspend'].map(s=>`<option ${sel(statusVal,s)}>${s}</option>`).join('')}</select></div>
+            </div>
           </div>
-        </div>
-        <div class="ca-card">
-          <div class="ca-h">Bank Information (Primary)</div>
-          <div class="ca-grid two">
-            <div class="fg"><label>Nama Bank</label><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA"></div>
-            <div class="fg"><label>Cabang</label><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Jakarta"></div>
-            <div class="fg"><label>No. Rekening</label><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}"></div>
-            <div class="fg"><label>Atas Nama</label><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}"></div>
+
+          <!-- CARD 2: Kontak & Alamat -->
+          <div class="card" style="padding: 20px;">
+            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Kontak &amp; Alamat Primer</div>
+            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div class="fg"><label>Nama PIC</label><input type="text" id="cf-pic" value="${esc(c.pic_name)}" placeholder="Manager HRD..."></div>
+              <div class="fg"><label>No. HP PIC</label><input type="text" id="cf-phone" value="${esc(c.pic_phone)}" placeholder="08xxxxxxxxxx"></div>
+              <div class="fg" style="grid-column: span 2;"><label>Email PIC</label><input type="email" id="cf-email" value="${esc(c.pic_email)}" placeholder="hrd@perusahaan.com"></div>
+              <div class="fg" style="grid-column: span 2;"><label>Alamat Perusahaan</label><input type="text" id="cf-addr" value="${esc(c.address)}" placeholder="Jl. ..."></div>
+              <div class="fg"><label>Kelurahan / Kecamatan</label><input type="text" id="cf-subdist" value="${esc(c.subdistrict)}"></div>
+              <div class="fg"><label>Kota</label><input type="text" id="cf-city" value="${esc(c.city)}"></div>
+              <div class="fg"><label>Provinsi</label><input type="text" id="cf-prov" value="${esc(c.province)}"></div>
+              <div class="fg"><label>Negara</label><input type="text" id="cf-country" value="${esc(c.country||'INDONESIA')}"></div>
+            </div>
           </div>
+
+          <!-- CARD 3: Billing & Keuangan -->
+          <div class="card" style="padding: 20px;">
+            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Billing &amp; Keuangan</div>
+            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div class="fg"><label>Tipe Billing</label><select id="cf-billing">${['Invoice','Prepaid','Credit'].map(b=>`<option ${sel(c.billing_type||'Invoice',b)}>${b}</option>`).join('')}</select></div>
+              <div class="fg"><label>Payment Terms (hari)</label><input type="number" id="cf-terms" value="${c.payment_terms||30}" min="0"></div>
+              <div class="fg"><label>Credit Limit (Rp)</label><input type="number" id="cf-credit" value="${c.credit_limit||0}"></div>
+              <div class="fg"><label>Tipe Diskon</label><select id="cf-disc-type"><option value="none" ${sel(c.discount_type||'none','none')}>Tidak Ada</option><option value="percent" ${sel(c.discount_type,'percent')}>Persen (%)</option><option value="fixed" ${sel(c.discount_type,'fixed')}>Nominal (Rp)</option></select></div>
+              <div class="fg"><label>Nilai Diskon</label><input type="number" id="cf-disc-val" value="${c.discount_value||0}"></div>
+            </div>
+          </div>
+
+          <!-- CARD 4: Perpajakan & Bank -->
+          <div class="card" style="padding: 20px;">
+            <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 16px;">Informasi Pajak &amp; Bank</div>
+            <div class="ca-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div class="fg"><label>NPWP</label><input type="text" id="cf-npwp" value="${esc(c.npwp)}" placeholder="00.000.000.0-000.000"></div>
+              <div class="fg"><label>Tipe Pajak</label><select id="cf-taxtype">${['BUSINESS','PERSONAL','GOVERNMENT'].map(t=>`<option ${sel(c.tax_type||'BUSINESS',t)}>${t}</option>`).join('')}</select></div>
+              <div class="fg"><label>PPh 23</label><select id="cf-pph23"><option value="false" ${sel(String(!!c.pph23),'false')}>No</option><option value="true" ${sel(String(!!c.pph23),'true')}>Yes</option></select></div>
+              <div class="fg"><label>Registered At</label><input type="date" id="cf-taxreg" value="${c.tax_registered_at||''}"></div>
+              <div class="fg" style="grid-column: span 2;"><label>Alamat Pajak</label><input type="text" id="cf-taxaddr" value="${esc(c.tax_address)}"></div>
+              <div class="fg" style="grid-column: span 2;"><label>KPP (Tax Office)</label><input type="text" id="cf-taxoffice" value="${esc(c.tax_office)}" placeholder="KPP Pratama ..."></div>
+              <div class="fg"><label>Nama Bank</label><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA"></div>
+              <div class="fg"><label>Cabang Bank</label><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Jakarta"></div>
+              <div class="fg"><label>No. Rekening</label><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}"></div>
+              <div class="fg"><label>Atas Nama Rekening</label><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}"></div>
+            </div>
+          </div>
+
         </div>
-      </div>
 
-      <!-- EMPLOYEE LIST -->
-      <div id="ctab-emp" style="display:none">
-        ${id ? `<div id="ctab-emp-list"><div class="ca-empty"><p>Memuat karyawan…</p></div></div>` : needSaved}
-      </div>
-
-      <!-- IMPORT EMPLOYEE -->
-      <div id="ctab-imp" style="display:none">
+        <!-- RIGHT COLUMN: Contracts & Packages (Only visible if corporate exists) -->
         ${id ? `
-        <div class="ca-card">
-          <div class="ca-h">Import Karyawan</div>
-          <div class="ca-grid two"><div class="fg full"><label>Company Name</label><input type="text" value="${esc(c.corporate_name)}" readonly></div></div>
-          <div class="ca-note">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
-            <span>Import langsung ke <strong>${esc(c.corporate_name)}</strong> — tak perlu kolom Kode Corporate. Kolom dikenali: Nama, NIK, Departemen, Jenis Kelamin, Tgl Lahir, No HP, Email.</span>
+          <div style="display:flex; flex-direction:column; gap:16px">
+            
+            <div class="card" style="padding: 20px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                <div class="ca-h" style="font-size:12px; font-weight:800; color:var(--teal); margin-bottom: 0;">Daftar Kontrak &amp; Paket</div>
+                <button class="btn btn-teal btn-xs" onclick="openInlineContractForm(${id}, '${esc(c.corporate_name)}')">+ Kontrak Baru</button>
+              </div>
+              
+              <!-- Inline Contract Form Container -->
+              <div id="inline-contract-form-container" style="display:none; background: var(--bg2); padding: 14px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 14px;"></div>
+              
+              <!-- Contracts List -->
+              <div id="corporate-detail-contracts-list">
+                <div class="loading-row"><div class="spinner"></div></div>
+              </div>
+            </div>
+
           </div>
-          <div class="ca-drop">
-            <input type="file" id="cf-imp-file" accept=".csv" onchange="previewCorpImport(this)" style="font-size:12.5px">
-          </div>
-          <div id="cf-imp-preview" style="max-height:220px;overflow-y:auto;margin:12px 0 4px"></div>
-          <div style="display:flex;gap:8px;justify-content:flex-end;padding-bottom:6px">
-            <button type="button" class="ca-btn ghost" onclick="downloadCorpImportTemplate()">Download Template</button>
-            <button type="button" class="ca-btn primary" id="cf-imp-btn" onclick="loadCorpImport(${id})" disabled>Load File</button>
-          </div>
-        </div>` : needSaved}
+        ` : ''}
+
       </div>
+      
+    </div>`;
 
-      <div class="ca-foot">
-        <button type="button" class="ca-btn ghost" onclick="closeModalForce()">Batal</button>
-        <button type="button" class="ca-btn primary" onclick="saveCorp(${id||'null'})">Simpan</button>
-      </div>
-    </div>`, 'wide');
-
-  switchCorpTab(initialTab);
-  if (id) renderCorpEmpTab(id);   // isi tab Employee List secara async
-}
-
-// Ganti tab aktif di Corporate Account Form
-function switchCorpTab(key) {
-  ['bp','acc','emp','imp'].forEach(k => {
-    const panel = document.getElementById('ctab-'+k);
-    const btn = document.getElementById('ctab-btn-'+k);
-    if (panel) panel.style.display = k===key ? '' : 'none';
-    if (btn) btn.classList.toggle('on', k===key);
-  });
-}
-
-// No. RM unik untuk karyawan (seperti pasien biasa)
-function genEmpMR() {
-  return 'MR-' + Date.now().toString().slice(-8) + Math.floor(Math.random()*90+10);
-}
-
-// ── Employee List tab: render daftar karyawan inline (klik → profil) ──
-async function renderCorpEmpTab(corpId) {
-  const box = document.getElementById('ctab-emp-list');
-  if (!box) return;
-  const emps = await sbGet('corporate_employees',
-    `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]);
-
-  const total = (emps||[]).length;
-  const booked = (emps||[]).filter(e=>e.booking_admission_id).length;
-  const assigned = (emps||[]).filter(e=>e.package_id).length;
-  const cn = (_corpFormName||'').replace(/'/g,"\\'");
-
-  const badge = (e) => e.booking_admission_id
-    ? '<span class="cel-b" style="background:rgba(14,165,233,.14);color:#0369A1">Booking</span>'
-    : e.status==='Aktif'
-      ? '<span class="cel-b" style="background:rgba(5,150,105,.14);color:#059669">Aktif</span>'
-      : '<span class="cel-b" style="background:rgba(100,116,139,.14);color:#64748B">Terdaftar</span>';
-
-  box.innerHTML = `
-    <style>
-      .cel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-      .cel-stats{display:flex;gap:6px}
-      .cel-stat{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--text3)}
-      .cel-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s}
-      .cel-row:hover{border-color:var(--teal);box-shadow:0 1px 6px rgba(8,145,178,.1);background:#f8fdff}
-      .cel-av{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
-      .cel-main{flex:1;min-width:0}
-      .cel-nm{font-weight:700;font-size:13px;color:#1e293b}
-      .cel-sub{font-size:11.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-      .cel-mr{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--teal);font-weight:600}
-      .cel-b{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
-      .cel-chev{color:#cbd5e1;flex-shrink:0}
-    </style>
-    <div class="cel-head">
-      <div class="cel-stats">
-        <span class="cel-stat">${total} Total</span>
-        <span class="cel-stat">${assigned} Berpaket</span>
-        <span class="cel-stat">${booked} Booking</span>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button type="button" class="ca-btn ghost" onclick="switchCorpTab('imp')">Import</button>
-        <button type="button" class="ca-btn ghost" onclick="scheduleMcuBooking(${corpId},'${cn}')">Jadwalkan MCU</button>
-        <button type="button" class="ca-btn primary" onclick="openCorpEmpProfile(null,${corpId})">+ Tambah</button>
-      </div>
-    </div>
-    ${total ? `<div style="max-height:52vh;overflow-y:auto;padding-right:2px">
-      ${(emps||[]).map(e=>`
-        <div class="cel-row" onclick="openCorpEmpProfile(${e.id},${corpId})">
-          <div class="cel-av">${(e.full_name||'?')[0].toUpperCase()}</div>
-          <div class="cel-main">
-            <div class="cel-nm">${e.full_name||'—'}</div>
-            <div class="cel-sub">${[e.employee_id, e.department, e.package_name].filter(Boolean).join(' · ')||'—'}</div>
-            ${e.mr_number?`<div class="cel-mr">${e.mr_number}</div>`:''}
-          </div>
-          ${badge(e)}
-          <svg class="cel-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-        </div>`).join('')}
-    </div>` : `<div class="ca-empty"><p>Belum ada karyawan. Klik "+ Tambah" atau Import.</p></div>`}`;
-}
-
-// ── Profil karyawan = profil pasien (field lengkap) + MR unik, tertaut corporate ──
-async function openCorpEmpProfile(empId, corpId) {
-  let e = {};
-  if (empId) { const d = await sbGet('corporate_employees',`select=*&id=eq.${empId}`).catch(()=>[]); e = d?.[0]||{}; }
-  // Pastikan No. RM: pasien lama pakai yang ada, jika kosong buatkan + simpan.
-  if (empId && !e.mr_number) {
-    e.mr_number = genEmpMR();
-    try { await sbPatch('corporate_employees', empId, { mr_number: e.mr_number, updated_at: new Date().toISOString() }); } catch(_){}
+  if (id) {
+    await loadCorporateDetailContracts(id, c.corporate_name);
   }
-  const mr = e.mr_number || genEmpMR();   // untuk karyawan baru, MR final di-generate saat simpan
-  const sel = (a,b)=>a===b?'selected':'';
-  const esc = s => String(s||'').replace(/"/g,'&quot;');
-  let pkgOpts = '<option value="">— pilih paket —</option>';
-  try {
-    const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket');
-    pkgOpts += (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${esc(p.nama_paket)}" ${sel(e.package_id,p.id)}>${p.nama_paket}</option>`).join('');
-  } catch(_){}
+}
 
-  openModal(`${_caStyleTag()}
-    <div class="corp-acct">
-      <div class="ca-head">
-        <div>
-          <div class="ca-title">${empId ? esc(e.full_name)||'Profil Karyawan' : 'Karyawan Baru'}</div>
-          <div class="ca-sub">
-            <span class="ca-chip">${esc(mr)}</span>
-            <span>${esc(_corpFormName)}</span>
-            ${e.booking_admission_id?'<span class="ca-badge" style="background:rgba(14,165,233,.14);color:#0369A1">Sudah Booking</span>':''}
+async function saveCorpDetail(id, defaultKode) {
+  const name = document.getElementById('cf-name')?.value.trim();
+  if (!name) { toast('Nama perusahaan wajib diisi', 'err'); return; }
+
+  const v = id => { const el = document.getElementById(id); return el ? (el.value.trim() || null) : null; };
+  const user = getUserName ? getUserName() : 'User';
+
+  const payload = {
+    corporate_name: name,
+    kode_corp: v('cf-kode') || defaultKode,
+    brand: v('cf-brand'),
+    industry: v('cf-industry'),
+    company_type: v('cf-type') || 'COMPANY',
+    partner_id: parseInt(v('cf-partner')) || null,
+    sap_id: v('cf-sapid'),
+    sap_relation: v('cf-saprel'),
+    sap_period_start: v('cf-sapstart'),
+    sap_period_end: v('cf-sapend'),
+    multinational: v('cf-multi') === 'true',
+    status: v('cf-status') || 'Aktif',
+    
+    pic_name: v('cf-pic'),
+    pic_phone: v('cf-phone'),
+    pic_email: v('cf-email'),
+    address: v('cf-addr'),
+    subdistrict: v('cf-subdist'),
+    city: v('cf-city'),
+    province: v('cf-prov'),
+    country: v('cf-country') || 'INDONESIA',
+    
+    billing_type: v('cf-billing') || 'Invoice',
+    payment_terms: parseInt(v('cf-terms')) || 30,
+    credit_limit: parseFloat(v('cf-credit')) || 0,
+    discount_type: v('cf-disc-type') || 'none',
+    discount_value: parseFloat(v('cf-disc-val')) || 0,
+    
+    npwp: v('cf-npwp'),
+    tax_type: v('cf-taxtype') || 'BUSINESS',
+    pph23: v('cf-pph23') === 'true',
+    tax_address: v('cf-taxaddr'),
+    tax_registered_at: v('cf-taxreg'),
+    tax_office: v('cf-taxoffice'),
+    
+    bank_name: v('cf-bank'),
+    bank_branch: v('cf-bankbranch'),
+    bank_account_number: v('cf-bankacc'),
+    bank_account_name: v('cf-bankname'),
+    
+    created_by: user,
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    if (id) {
+      await sbPatch('corporates', id, payload);
+      toast('✅ Data corporate berhasil diperbarui', 'ok');
+    } else {
+      payload.created_at = new Date().toISOString();
+      await sbPost('corporates', payload);
+      toast('✅ Corporate baru berhasil ditambahkan', 'ok');
+    }
+    navigate('corporate');
+  } catch(e) {
+    toast('❌ ' + e.message, 'err');
+  }
+}
+
+async function loadCorporateDetailContracts(corpId, corpName) {
+  const el = document.getElementById('corporate-detail-contracts-list');
+  if (!el) return;
+  
+  try {
+    const [contracts, pkgs] = await Promise.all([
+      sbGet('corporate_contracts', `select=*&corporate_id=eq.${corpId}&order=created_at.desc`),
+      sbGet('packages', 'select=id,nama_paket').catch(() => [])
+    ]);
+    
+    if (!contracts || !contracts.length) {
+      el.innerHTML = `<div style="color:var(--text3);font-size:13px;padding:20px;text-align:center;">Belum ada kontrak. Klik "+ Kontrak Baru" untuk membuat.</div>`;
+      return;
+    }
+    
+    // Create a map of packageId -> packageName
+    const pkgMap = {};
+    (pkgs || []).forEach(p => { pkgMap[p.id] = p.nama_paket; });
+
+    const now = new Date().toISOString().split('T')[0];
+    const esc = s => String(s || '').replace(/"/g, '&quot;');
+
+    el.innerHTML = (contracts || []).map(ct => {
+      const isExpired = ct.end_date && ct.end_date < now;
+      const daysLeft = ct.end_date ? Math.ceil((new Date(ct.end_date) - new Date()) / 86400000) : null;
+      
+      // Parse packages array
+      let allowedPkgs = [];
+      try {
+        if (ct.packages) {
+          const parsed = JSON.parse(ct.packages);
+          if (Array.isArray(parsed)) {
+            allowedPkgs = parsed.map(id => pkgMap[id]).filter(Boolean);
+          }
+        }
+      } catch(err) {
+        console.error("Failed to parse contract packages", err);
+      }
+
+      return `
+        <div class="card" style="margin-bottom:12px; border-left:4px solid ${ct.status==='Active'?'#22C55E':isExpired?'#EF4444':'#94A3B8'}; padding: 14px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start">
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:13px; font-weight:700; color:var(--navy);">${ct.contract_number||'—'} · ${ct.contract_type||'—'}</div>
+              <div style="font-size:11px; color:var(--text3); margin-top:2px;">
+                📅 ${ct.start_date?formatDateShort(ct.start_date):''} s/d ${ct.end_date?formatDateShort(ct.end_date):'—'}
+              </div>
+              <div style="font-size:12px; margin-top:8px">
+                Peserta: <strong>${ct.used_peserta||0}/${ct.max_peserta||0}</strong> &nbsp;·&nbsp;
+                Nilai: <strong>${formatCurrency(ct.nilai_kontrak||0)}</strong>
+              </div>
+              
+              <!-- Paket Kontrak -->
+              <div style="margin-top: 8px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--navy); display:block; margin-bottom: 2px;">Paket Tersedia:</span>
+                <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                  ${allowedPkgs.map(pName => `<span style="background:var(--bg2); border: 1px solid var(--border); border-radius:4px; padding:2px 6px; font-size:10.5px; color:var(--teal); font-weight:600;">${esc(pName)}</span>`).join('') || '<span style="font-size:11px; color:var(--gray);">— tidak ada paket —</span>'}
+                </div>
+              </div>
+
+              ${ct.notes ? `<p style="font-size:11.5px; color:var(--text3); margin-top: 8px; background:var(--bg2); padding:6px 8px; border-radius:6px; margin-bottom: 0;">📝 ${esc(ct.notes)}</p>` : ''}
+            </div>
+            <div style="text-align:right; margin-left: 12px; flex-shrink:0;">
+              <span style="background:${ct.status==='Active'?'#E8F5E9':'#FFEBEE'}; color:${ct.status==='Active'?'#2E7D32':'#C62828'}; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700">${ct.status}</span>
+              ${daysLeft!==null ? `<div style="font-size:10px; color:${daysLeft<30?'#EF4444':'var(--text3)'}; margin-top:4px">${daysLeft>0?daysLeft+' hari lagi':'Expired'}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div class="status-box status-err">❌ Gagal memuat kontrak: ${e.message}</div>`;
+  }
+}
+
+async function openInlineContractForm(corpId, corpName) {
+  const container = document.getElementById('inline-contract-form-container');
+  if (!container) return;
+  
+  container.style.display = 'block';
+  container.innerHTML = '<div class="loading-row"><div class="spinner"></div></div>';
+
+  try {
+    const pkgs = await sbGet('packages', 'select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(() => []);
+    const today = new Date().toISOString().split('T')[0];
+    const nextYear = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
+    const esc = s => String(s || '').replace(/"/g, '&quot;');
+
+    container.innerHTML = `
+      <div style="font-weight:700; font-size:13px; color:var(--navy); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span>Kontrak &amp; Paket Baru</span>
+        <button class="btn btn-ghost btn-xs" onclick="document.getElementById('inline-contract-form-container').style.display='none'" style="margin:0;">&times;</button>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="fg"><label>No. Kontrak</label><input type="text" id="ctf-num" value="CTR-${Date.now().toString().slice(-5)}" placeholder="CTR-001"></div>
+        <div class="fg"><label>Tipe Kontrak</label>
+          <select id="ctf-type">
+            ${['MCU Tahunan','Per Event','On-demand','Retainer'].map(t=>`<option>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="fg"><label>Tanggal Mulai</label><input type="date" id="ctf-start" value="${today}"></div>
+        <div class="fg"><label>Tanggal Berakhir</label><input type="date" id="ctf-end" value="${nextYear}"></div>
+        <div class="fg"><label>Max Peserta</label><input type="number" id="ctf-max" value="100"></div>
+        <div class="fg"><label>Nilai Kontrak (Rp)</label><input type="number" id="ctf-nilai" value="50000000"></div>
+        
+        <!-- Packages Checklist -->
+        <div class="fg" style="grid-column: span 2;">
+          <label style="font-weight:700; margin-bottom: 6px;">Pilih Paket MCU yang Tersedia dalam Kontrak ini</label>
+          <div style="max-height: 120px; overflow-y: auto; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            ${(pkgs || []).map(p => `
+              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: #000;">
+                <input type="checkbox" name="ctf-pkgs" value="${p.id}" style="width: auto; margin:0;">
+                <span>${esc(p.nama_paket)}</span>
+              </label>
+            `).join('') || '<div style="color:var(--gray); font-size:11px;">Tidak ada paket aktif. Buat paket dulu di menu Konfigurasi Paket.</div>'}
           </div>
         </div>
-        <button class="ca-x" onclick="openCorpForm(${corpId},'emp')" aria-label="Kembali">&larr;</button>
-      </div>
 
-      <div class="ca-card">
-        <div class="ca-h">Identitas Pasien</div>
-        <div class="ca-grid">
-          <div class="fg"><label>Salutasi</label><select id="ep-sal"><option value=""></option>${['Tn.','Ny.','Nn.','An.'].map(s=>`<option ${sel(e.salutation,s)}>${s}</option>`).join('')}</select></div>
-          <div class="fg sp2"><label>Nama Lengkap *</label><input id="ep-name" value="${esc(e.full_name)}" placeholder="Sesuai KTP"></div>
-          <div class="fg"><label>Jenis Kelamin</label><select id="ep-gender"><option value="M" ${sel(e.gender||'M','M')}>Laki-laki</option><option value="F" ${sel(e.gender,'F')}>Perempuan</option></select></div>
-          <div class="fg"><label>Tanggal Lahir</label><input type="date" id="ep-dob" value="${e.birth_date||''}"></div>
-          <div class="fg"><label>Tempat Lahir</label><input id="ep-pob" value="${esc(e.place_of_birth)}"></div>
-          <div class="fg"><label>Gol. Darah</label><select id="ep-blood"><option value=""></option>${['A','B','AB','O'].map(b=>`<option ${sel(e.blood_type,b)}>${b}</option>`).join('')}</select></div>
-          <div class="fg"><label>Status Kawin</label><select id="ep-marital"><option value=""></option>${['Belum Menikah','Menikah','Cerai'].map(m=>`<option ${sel(e.marital_status,m)}>${m}</option>`).join('')}</select></div>
-          <div class="fg"><label>Agama</label><input id="ep-religion" value="${esc(e.religion)}"></div>
-          <div class="fg"><label>Jenis Identitas</label><select id="ep-idtype">${['KTP','Paspor','SIM','KITAS'].map(t=>`<option ${sel(e.id_type||'KTP',t)}>${t}</option>`).join('')}</select></div>
-          <div class="fg"><label>No. Identitas (KTP)</label><input id="ep-idnum" value="${esc(e.id_number)}"></div>
-          <div class="fg"><label>No. Karyawan (NIK)</label><input id="ep-empid" value="${esc(e.employee_id)}"></div>
-        </div>
+        <div class="fg" style="grid-column: span 2;"><label>Catatan</label><textarea id="ctf-notes" rows="2" style="border:1px solid var(--border); border-radius:8px; padding:8px; font-size:13px; width:100%;"></textarea></div>
       </div>
-
-      <div class="ca-card">
-        <div class="ca-h">Kontak & Alamat</div>
-        <div class="ca-grid">
-          <div class="fg"><label>No. HP</label><input id="ep-phone" value="${esc(e.phone)}" placeholder="08xxxxxxxxxx"></div>
-          <div class="fg sp2"><label>Email</label><input type="email" id="ep-email" value="${esc(e.email)}"></div>
-          <div class="fg full"><label>Alamat</label><input id="ep-addr" value="${esc(e.address)}"></div>
-          <div class="fg"><label>Kelurahan</label><input id="ep-subdist" value="${esc(e.subdistrict)}"></div>
-          <div class="fg"><label>Kota</label><input id="ep-city" value="${esc(e.city)}"></div>
-          <div class="fg"><label>Provinsi</label><input id="ep-prov" value="${esc(e.province)}"></div>
-          <div class="fg"><label>Kode Pos</label><input id="ep-postal" value="${esc(e.postal_code)}"></div>
-        </div>
-      </div>
-
-      <div class="ca-card">
-        <div class="ca-h">Data Korporat & MCU</div>
-        <div class="ca-grid">
-          <div class="fg"><label>Departemen</label><input id="ep-dept" value="${esc(e.department)}"></div>
-          <div class="fg"><label>Paket MCU</label><select id="ep-package" ${e.booking_admission_id?'disabled':''}>${pkgOpts}</select></div>
-          <div class="fg"><label>Tanggal MCU</label><input type="date" id="ep-mcudate" value="${e.mcu_date||''}"></div>
-          <div class="fg"><label>Status</label><select id="ep-status">${['Non-Aktif','Aktif'].map(s=>`<option ${sel(e.status||'Non-Aktif',s)}>${s}</option>`).join('')}</select></div>
-        </div>
-      </div>
-
-      <div class="ca-foot">
-        <button type="button" class="ca-btn ghost" onclick="openCorpForm(${corpId},'emp')">&larr; Kembali</button>
-        <button type="button" class="ca-btn primary" onclick="saveCorpEmpProfile(${empId||'null'},${corpId},'${esc(mr)}')">Simpan Profil</button>
-      </div>
-    </div>`, 'wide');
-  switchCorpTab('bp'); // no-op untuk profil (tak ada tab), aman
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('inline-contract-form-container').style.display='none'">Batal</button>
+        <button class="btn btn-teal btn-sm" onclick="saveInlineContract(${corpId}, '${esc(corpName)}')">Simpan Kontrak</button>
+      </div>`;
+  } catch(e) {
+    container.innerHTML = `<div class="status-box status-err">❌ Gagal memuat form: ${e.message}</div>`;
+  }
 }
 
-async function saveCorpEmpProfile(empId, corpId, mr) {
-  const v = id => (document.getElementById(id)?.value||'').trim()||null;
-  const name = v('ep-name');
-  if (!name) { toast('Nama wajib diisi','err'); return; }
-  const pkgSel = document.getElementById('ep-package');
+async function saveInlineContract(corpId, corpName) {
+  const user = getUserName ? getUserName() : 'User';
+  const pkgEls = document.querySelectorAll('input[name="ctf-pkgs"]:checked');
+  const packageIds = Array.from(pkgEls).map(el => parseInt(el.value));
+
   const payload = {
-    corporate_id:   corpId,
-    full_name:      name,
-    salutation:     v('ep-sal'),
-    gender:         document.getElementById('ep-gender')?.value || null,
-    birth_date:     v('ep-dob'),
-    place_of_birth: v('ep-pob'),
-    blood_type:     v('ep-blood'),
-    marital_status: v('ep-marital'),
-    religion:       v('ep-religion'),
-    id_type:        document.getElementById('ep-idtype')?.value || 'KTP',
-    id_number:      v('ep-idnum'),
-    employee_id:    v('ep-empid'),
-    phone:          v('ep-phone'),
-    email:          v('ep-email'),
-    address:        v('ep-addr'),
-    subdistrict:    v('ep-subdist'),
-    city:           v('ep-city'),
-    province:       v('ep-prov'),
-    postal_code:    v('ep-postal'),
-    department:     v('ep-dept'),
-    package_id:     parseInt(pkgSel?.value)||null,
-    package_name:   pkgSel && pkgSel.value ? (pkgSel.selectedOptions[0]?.dataset.name||null) : null,
-    mcu_date:       v('ep-mcudate'),
-    status:         document.getElementById('ep-status')?.value || 'Non-Aktif',
-    mr_number:      mr,
-    updated_at:     new Date().toISOString(),
-  };
-  try {
-    if (empId) await sbPatch('corporate_employees', empId, payload);
-    else       await sbPost('corporate_employees', payload);
-    toast('✅ Profil karyawan disimpan','ok');
-    openCorpForm(corpId, 'emp');   // kembali ke tab Employee List (ter-refresh)
-  } catch(err) { toast('❌ '+err.message,'err',7000); }
-}
-
-async function saveCorp(id) {
-  const name = document.getElementById('cf-name').value.trim();
-  if (!name) { toast('Nama perusahaan wajib diisi','err'); return; }
-  const user=getUserName?getUserName():'User';
-
-  const v  = (id, def=null) => { const el=document.getElementById(id); return el ? (el.value.trim()||def) : def; };
-  const vn = (id, def=0)    => { const el=document.getElementById(id); return el ? (parseFloat(el.value)||def) : def; };
-
-  const payload={
-    kode_corp:       v('cf-kode'),
-    corporate_name:  name,
-    sap_id:          v('cf-sapid'),
-    company_type:    v('cf-type','COMPANY'),
-    brand:           v('cf-brand'),
-    industry:        v('cf-industry'),
-    partner_id:      parseInt(document.getElementById('cf-partner')?.value)||null,
-    multinational:   document.getElementById('cf-multi')?.value === 'true',
-    sap_relation:    v('cf-saprel'),
-    sap_period_start: v('cf-sapstart'),
-    sap_period_end:  v('cf-sapend'),
-    pic_name:        v('cf-pic'),
-    pic_phone:       v('cf-phone'),
-    pic_email:       v('cf-email'),
-    address:         v('cf-addr'),
-    subdistrict:     v('cf-subdist'),
-    city:            v('cf-city'),
-    province:        v('cf-prov'),
-    country:         v('cf-country','INDONESIA'),
-    // Tax
-    npwp:            v('cf-npwp'),
-    tax_address:     v('cf-taxaddr'),
-    tax_registered_at: v('cf-taxreg'),
-    tax_type:        v('cf-taxtype','BUSINESS'),
-    tax_office:      v('cf-taxoffice'),
-    pph23:           document.getElementById('cf-pph23')?.value === 'true',
-    // Bank
-    bank_name:           v('cf-bank'),
-    bank_branch:         v('cf-bankbranch'),
-    bank_account_number: v('cf-bankacc'),
-    bank_account_name:   v('cf-bankname'),
-    // Billing
-    billing_type:    v('cf-billing','Invoice'),
-    payment_terms:   parseInt(document.getElementById('cf-terms')?.value)||30,
-    credit_limit:    vn('cf-credit'),
-    discount_type:   v('cf-disc-type','none'),
-    discount_value:  vn('cf-disc-val'),
-    status:          v('cf-status','Aktif'),
+    corporate_id:    corpId,
+    corporate_name:  corpName,
+    contract_number: document.getElementById('ctf-num').value.trim(),
+    contract_type:   document.getElementById('ctf-type').value,
+    start_date:      document.getElementById('ctf-start').value||null,
+    end_date:        document.getElementById('ctf-end').value||null,
+    max_peserta:     parseInt(document.getElementById('ctf-max').value)||0,
+    used_peserta:    0,
+    nilai_kontrak:   parseFloat(document.getElementById('ctf-nilai').value)||0,
+    packages:        JSON.stringify(packageIds),
+    status:          'Active',
+    notes:           document.getElementById('ctf-notes').value.trim()||null,
     created_by:      user,
     updated_at:      new Date().toISOString(),
   };
-
   try {
-    if (id) { await sbPatch('corporates',id,payload); toast('✅ Corporate diupdate','ok'); }
-    else    { await sbPost('corporates',payload);    toast('✅ Corporate ditambahkan','ok'); }
-    closeModalForce();
-    await loadCorporates();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+    await sbPost('corporate_contracts', payload);
+    toast('✅ Kontrak berhasil dibuat', 'ok');
+    document.getElementById('inline-contract-form-container').style.display = 'none';
+    await loadCorporateDetailContracts(corpId, corpName);
+  } catch(e) {
+    toast('❌ ' + e.message, 'err');
+  }
 }
 
 // ══════════════════════════════════════════════════════════════

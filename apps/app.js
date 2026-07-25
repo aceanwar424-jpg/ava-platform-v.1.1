@@ -1179,10 +1179,40 @@ async function renderCorporateList() {
     updateCorporateStats(); return;
   }
 
-  // Opsi paket untuk assign inline
-  const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(()=>[]);
-  const pkgOptions = (sel) => `<option value="">— assign paket —</option>` +
-    (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===sel?'selected':''}>${p.nama_paket}</option>`).join('');
+  // 1) Ambil list kontrak aktif corporate untuk mendapatkan list paket yang diperbolehkan
+  let allowedPkgIds = [];
+  try {
+    const contracts = await sbGet('corporate_contracts', `select=packages,status&corporate_id=eq.${currentCorporateId}`).catch(()=>[]);
+    (contracts || []).forEach(ct => {
+      if (ct.status === 'Active' && ct.packages) {
+        try {
+          const parsed = JSON.parse(ct.packages);
+          if (Array.isArray(parsed)) {
+            parsed.forEach(id => {
+              if (!allowedPkgIds.includes(parseInt(id))) allowedPkgIds.push(parseInt(id));
+            });
+          }
+        } catch(e) {}
+      }
+    });
+  } catch(e) {
+    console.error("Gagal memuat paket kontrak", e);
+  }
+
+  // 2) Muat detail paket yang diperbolehkan saja
+  let pkgs = [];
+  if (allowedPkgIds.length > 0) {
+    const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
+    pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
+  }
+
+  const pkgOptions = (sel) => {
+    if (allowedPkgIds.length === 0) {
+      return `<option value="">— hubungi admin untuk aktivasi paket kontrak —</option>`;
+    }
+    return `<option value="">— assign paket —</option>` +
+      (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===sel?'selected':''}>${p.nama_paket}</option>`).join('');
+  };
 
   container.innerHTML = corporates.map(e => {
     const b = empStatusBadge(e);
