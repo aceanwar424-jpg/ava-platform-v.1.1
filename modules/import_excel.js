@@ -639,15 +639,20 @@ async function doImport(key) {
 async function _importCorpEmployees(parsed, user, callback) {
   let ok = 0, err = 0, errMsgs = [];
 
-  // Build corp code → id map
-  const corps = await sbGet('corporates','select=id,kode_corp').catch(()=>[]);
+  // Build corp code → id map (normalisasi: trim + lowercase agar toleran)
+  const corps = await sbGet('corporates','select=id,kode_corp,corporate_name').catch(()=>[]);
+  const norm = v => String(v ?? '').trim().toLowerCase();
   const corpMap = {};
-  (corps||[]).forEach(c => corpMap[c.kode_corp] = c.id);
+  (corps||[]).forEach(c => { if (c.kode_corp) corpMap[norm(c.kode_corp)] = c.id; });
+  const availCodes = (corps||[]).map(c => c.kode_corp).filter(Boolean);
 
   for (const row of parsed) {
     try {
-      const corpId = corpMap[row['_kode_corp']];
-      if (!corpId) throw new Error(`Kode corporate "${row['_kode_corp']}" tidak ditemukan`);
+      const corpId = corpMap[norm(row['_kode_corp'])];
+      if (!corpId) throw new Error(
+        `Kode corporate "${row['_kode_corp']}" tidak ada di tabel corporates. ` +
+        `Kode tersedia: ${availCodes.length ? availCodes.join(', ') : '(belum ada corporate sama sekali — buat dulu di Config Corporate)'}`
+      );
 
       const payload = {
         corporate_id: corpId,
