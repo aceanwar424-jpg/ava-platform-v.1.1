@@ -957,18 +957,27 @@ function updateLoginFormUI(role) {
   const labelEl = document.getElementById('username-label');
   const inputEl = document.getElementById('username');
   const footerEl = document.getElementById('login-footer-desc');
+  const corpCodeGroup = document.getElementById('corp-code-group');
+  const corpCodeInput = document.getElementById('login-corp-code');
 
   if (!formTitleEl || !labelEl || !inputEl || !footerEl) return;
 
   // Clear inputs on role change
   inputEl.value = '';
   document.getElementById('password').value = '';
+  if (corpCodeInput) {
+    corpCodeInput.value = '';
+    corpCodeInput.required = false;
+  }
+  if (corpCodeGroup) corpCodeGroup.style.display = 'none';
 
   if (role === 'corporate') {
     formTitleEl.textContent = 'Portal Kemitraan Corporate';
-    labelEl.textContent = 'ID Kemitraan / Email Perusahaan';
-    inputEl.placeholder = 'Contoh: MITRA-0293 atau email kantor';
+    labelEl.textContent = 'Email Perusahaan / PIC';
+    inputEl.placeholder = 'Contoh: email kantor atau PIC';
     footerEl.innerHTML = 'Pengajuan mitra baru? Hubungi <a href="#">Tim Marketing</a>';
+    if (corpCodeGroup) corpCodeGroup.style.display = 'block';
+    if (corpCodeInput) corpCodeInput.required = true;
   } else if (role === 'referral') {
     formTitleEl.textContent = 'Portal Faskes Referral';
     labelEl.textContent = 'NPA ID / Email Faskes';
@@ -1826,6 +1835,45 @@ async function handleLogin(event) {
   let finalUsername = usernameInput;
   let finalRole = selectedRole;
   let profileData = null;
+
+  // Verify Corporate Code if role is corporate
+  if (selectedRole === 'corporate') {
+    const corpCode = document.getElementById('login-corp-code')?.value.trim();
+    const isSuperAdmin = (usernameInput === 'aceanwar424@gmail.com');
+    if (!corpCode && !isSuperAdmin) {
+      alert('Kode Corporate wajib diisi.');
+      return;
+    }
+    if (corpCode) {
+      try {
+        const corps = await sbGet('corporates', `select=id,corporate_name,kode_corp,status&kode_corp=eq.${corpCode}`);
+        if (!corps || !corps.length) {
+          alert('Kode Corporate tidak terdaftar atau tidak valid.');
+          return;
+        }
+        const activeCorp = corps[0];
+        if (activeCorp.status !== 'Aktif') {
+          alert('Akun Corporate ini sedang dinonaktifkan atau ditangguhkan. Hubungi admin OneLab.');
+          return;
+        }
+        currentCorporateId = activeCorp.id;
+        currentCorporateName = activeCorp.corporate_name;
+        console.log("Connected to Corporate:", currentCorporateName, "ID:", currentCorporateId);
+      } catch(err) {
+        alert('Gagal memverifikasi Kode Corporate: ' + err.message);
+        return;
+      }
+    } else if (isSuperAdmin) {
+      // Default to first active corporate
+      try {
+        const allCorps = await sbGet('corporates','select=id,corporate_name,status&status=eq.Aktif&limit=1');
+        if (allCorps && allCorps.length) {
+          currentCorporateId = allCorps[0].id;
+          currentCorporateName = allCorps[0].corporate_name;
+        }
+      } catch(e) {}
+    }
+  }
 
   // Try real Supabase auth if password is provided
   if (passwordInput && typeof sbAccessToken === 'function') {

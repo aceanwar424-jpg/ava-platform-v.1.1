@@ -587,8 +587,6 @@ async function renderCorporateDetail(id = null) {
         <div style="display:flex; flex-direction:column; gap:8px;">
           <button class="tab-btn active" id="tab-btn-partner" onclick="switchCorpDetailTab('partner')">Business Partner</button>
           <button class="tab-btn" id="tab-btn-info" onclick="switchCorpDetailTab('info')">Account Info</button>
-          <button class="tab-btn" id="tab-btn-employees" onclick="switchCorpDetailTab('employees')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Employee List</button>
-          <button class="tab-btn" id="tab-btn-import" onclick="switchCorpDetailTab('import')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Import Employee</button>
         </div>
 
         <!-- Right Side Panel Workspace -->
@@ -796,80 +794,6 @@ async function renderCorporateDetail(id = null) {
                 <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid #cbd5e1; padding:6px 16px;"><span style="color:#dc2626;">&times;</span> Cancel</button>
                 <button class="btn btn-teal btn-sm" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')" style="display:flex; align-items:center; gap:6px; padding:6px 16px;">💾 Save</button>
               </div>
-            </div>
-          </div>
-
-          <!-- ==================== TAB: EMPLOYEE LIST ==================== -->
-          <div class="tab-content" id="tab-content-employees" style="display:none; padding:16px;">
-            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none; display:flex; justify-content:space-between; align-items:center;">
-              <span>Employee List</span>
-              <div id="erp-cemp-badges" style="display:flex; gap:6px;"></div>
-            </div>
-            
-            <div style="display:flex; gap:8px; margin: 12px 0;">
-              <input class="table-search" id="erp-cemp-q" placeholder="Cari nama, NIK..." oninput="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', this.value, document.getElementById('erp-cemp-status').value)" style="flex:1; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
-              <select class="table-filter" id="erp-cemp-status" onchange="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', document.getElementById('erp-cemp-q').value, this.value)" style="width: 140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
-                <option value="">Semua Status</option>
-                <option value="Aktif">Aktif</option>
-                <option value="Non-Aktif">Non-Aktif</option>
-              </select>
-              <button class="btn btn-teal btn-sm" onclick="openCorpEmpForm(${id}, '${esc(c.corporate_name)}')" style="padding:8px 16px;">➕ Add</button>
-            </div>
-
-            <div style="overflow-x:auto;">
-              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid #cbd5e1;">
-                <thead>
-                  <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1;">
-                    <th style="padding:10px; text-align:center; width: 140px;">Action</th>
-                    <th style="padding:10px; text-align:left;">Name</th>
-                    <th style="padding:10px; text-align:left;">Employee Number (NIK)</th>
-                    <th style="padding:10px; text-align:left;">Department</th>
-                    <th style="padding:10px; text-align:left;">Paket MCU</th>
-                    <th style="padding:10px; text-align:center; width:100px;">Status</th>
-                  </tr>
-                </thead>
-                <tbody id="erp-cemp-tbody">
-                  <!-- Dinamis load via JS -->
-                </tbody>
-              </table>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
-              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
-              <button class="btn btn-teal btn-sm" onclick="scheduleMcuBooking(${id},'${esc(c.corporate_name).replace(/'/g,"\\'")}')" style="color:#fff; padding:8px 16px;">
-                📅 Jadwalkan MCU → Booking
-              </button>
-            </div>
-          </div>
-
-          <!-- ==================== TAB: IMPORT EMPLOYEE ==================== -->
-          <div class="tab-content" id="tab-content-import" style="display:none; padding:16px;">
-            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Import Data Employee</div>
-            
-            <div style="background:#FFF8E1; border-radius:8px; padding:12px; margin: 14px 0; font-size:12px; color:#b7791f; border: 1px solid #fef3c7;">
-              ⚠️ Format CSV yang didukung: <strong>nama,nik,departemen,gender(M/F),tanggal_lahir,phone,email</strong>
-            </div>
-
-            <table class="erp-form-table">
-              <tr>
-                <td class="erp-label">Company Name</td>
-                <td><input type="text" value="${esc(c.corporate_name)}" readonly></td>
-              </tr>
-              <tr>
-                <td class="erp-label">Upload File</td>
-                <td>
-                  <input type="file" id="erp-cemp-csv" accept=".csv" onchange="previewCSVImportInline(this, ${id})" style="padding:4px;">
-                </td>
-              </tr>
-            </table>
-
-            <div id="erp-csv-preview" style="max-height:220px; overflow-y:auto; margin-top:14px; border:1px solid #cbd5e1; border-radius:6px; display:none;"></div>
-
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
-              <button class="btn btn-ghost btn-sm" onclick="clearImportInline()" style="border:1px solid #cbd5e1;">Clear</button>
-              <button class="btn btn-sm" onclick="downloadTemplateKaryawan()" style="border:1px solid #cbd5e1;">📋 Download Template</button>
-              <button class="btn btn-teal btn-sm" id="erp-csv-import-btn" onclick="processCSVImportInline(${id})" disabled>💾 Load File</button>
-              <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="border:1px solid #cbd5e1;">Cancel</button>
             </div>
           </div>
 
