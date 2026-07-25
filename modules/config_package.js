@@ -457,33 +457,9 @@ function renderCorpTable(data) {
 
 let _corpFormId = null, _corpFormName = '';
 
-async function openCorpForm(id=null) {
-  let c={};
-  if (id) { const d=await sbGet('corporates',`select=*&id=eq.${id}`); c=d[0]||{}; }
-  _corpFormId = id; _corpFormName = c.corporate_name || '';
-
-  let partnerOpts = '<option value="">-- Link ke Partner (opsional) --</option>';
-  try {
-    const pts=await sbGet('partners','select=id,partner_name&status=eq.Aktif&order=partner_name&limit=200');
-    partnerOpts+=(pts||[]).map(p=>`<option value="${p.id}" ${c.partner_id==p.id?'selected':''}>${p.partner_name}</option>`).join('');
-  } catch(e){}
-
-  const kode = `CORP-${Date.now().toString().slice(-5)}`;
-  const sel = (a,b) => a===b ? 'selected' : '';
-  const esc = s => String(s||'').replace(/"/g,'&quot;');
-  const statusVal = c.status || 'Aktif';
-  const stColor = statusVal==='Aktif' ? '#059669' : statusVal==='Suspend' ? '#DC2626' : '#64748B';
-  const ICON = {
-    bp:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg>',
-    acc: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>',
-    emp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    imp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
-  };
-  const tab = (key,label) => `<button type="button" class="ca-tab" id="ctab-btn-${key}" onclick="switchCorpTab('${key}')">${ICON[key]}<span>${label}</span></button>`;
-  const needSaved = `<div class="ca-empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><p>Simpan data corporate dulu untuk mengelola karyawan.</p></div>`;
-
-  openModal(`
-    <style>
+// Style bersama untuk Corporate Account Form & Profil Karyawan (scoped .corp-acct)
+function _caStyleTag() {
+  return `<style>
       .corp-acct{ --ca-line:var(--border); color:#1e293b; font-size:13px; }
       .corp-acct .ca-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding-bottom:14px; border-bottom:1px solid var(--ca-line); }
       .corp-acct .ca-title{ font-size:17px; font-weight:800; color:var(--navy); letter-spacing:-.01em; }
@@ -527,7 +503,35 @@ async function openCorpForm(id=null) {
       .corp-acct .ca-drop:hover{ border-color:var(--teal); background:#f8fdff; }
       @media (max-width:620px){ .corp-acct .ca-grid, .corp-acct .ca-grid.two{ grid-template-columns:1fr; } .corp-acct .fg.sp2{ grid-column:auto; } }
       @media (prefers-reduced-motion:reduce){ .corp-acct *{ transition:none !important; } }
-    </style>
+    </style>`;
+}
+
+async function openCorpForm(id=null, initialTab='bp') {
+  let c={};
+  if (id) { const d=await sbGet('corporates',`select=*&id=eq.${id}`); c=d[0]||{}; }
+  _corpFormId = id; _corpFormName = c.corporate_name || '';
+
+  let partnerOpts = '<option value="">-- Link ke Partner (opsional) --</option>';
+  try {
+    const pts=await sbGet('partners','select=id,partner_name&status=eq.Aktif&order=partner_name&limit=200');
+    partnerOpts+=(pts||[]).map(p=>`<option value="${p.id}" ${c.partner_id==p.id?'selected':''}>${p.partner_name}</option>`).join('');
+  } catch(e){}
+
+  const kode = `CORP-${Date.now().toString().slice(-5)}`;
+  const sel = (a,b) => a===b ? 'selected' : '';
+  const esc = s => String(s||'').replace(/"/g,'&quot;');
+  const statusVal = c.status || 'Aktif';
+  const stColor = statusVal==='Aktif' ? '#059669' : statusVal==='Suspend' ? '#DC2626' : '#64748B';
+  const ICON = {
+    bp:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg>',
+    acc: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg>',
+    emp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    imp: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>',
+  };
+  const tab = (key,label) => `<button type="button" class="ca-tab" id="ctab-btn-${key}" onclick="switchCorpTab('${key}')">${ICON[key]}<span>${label}</span></button>`;
+  const needSaved = `<div class="ca-empty"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg><p>Simpan data corporate dulu untuk mengelola karyawan.</p></div>`;
+
+  openModal(`${_caStyleTag()}
     <div class="corp-acct">
       <div class="ca-head">
         <div>
@@ -623,11 +627,7 @@ async function openCorpForm(id=null) {
 
       <!-- EMPLOYEE LIST -->
       <div id="ctab-emp" style="display:none">
-        ${id ? `<div class="ca-card"><div class="ca-h">Karyawan MCU</div>
-          <div style="padding:8px 0 16px;text-align:center">
-            <p style="color:var(--text3);margin-bottom:14px;font-size:12.5px">Kelola daftar karyawan, assign paket, dan jadwalkan MCU.</p>
-            <button type="button" class="ca-btn primary" style="margin:0 auto" onclick="openCorpEmployees(${id},'${esc(c.corporate_name).replace(/'/g,"\\'")}')">${ICON.emp} Buka Kelola Karyawan</button>
-          </div></div>` : needSaved}
+        ${id ? `<div id="ctab-emp-list"><div class="ca-empty"><p>Memuat karyawan…</p></div></div>` : needSaved}
       </div>
 
       <!-- IMPORT EMPLOYEE -->
@@ -657,7 +657,8 @@ async function openCorpForm(id=null) {
       </div>
     </div>`, 'wide');
 
-  switchCorpTab('bp');
+  switchCorpTab(initialTab);
+  if (id) renderCorpEmpTab(id);   // isi tab Employee List secara async
 }
 
 // Ganti tab aktif di Corporate Account Form
@@ -668,6 +669,192 @@ function switchCorpTab(key) {
     if (panel) panel.style.display = k===key ? '' : 'none';
     if (btn) btn.classList.toggle('on', k===key);
   });
+}
+
+// No. RM unik untuk karyawan (seperti pasien biasa)
+function genEmpMR() {
+  return 'MR-' + Date.now().toString().slice(-8) + Math.floor(Math.random()*90+10);
+}
+
+// ── Employee List tab: render daftar karyawan inline (klik → profil) ──
+async function renderCorpEmpTab(corpId) {
+  const box = document.getElementById('ctab-emp-list');
+  if (!box) return;
+  const emps = await sbGet('corporate_employees',
+    `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]);
+
+  const total = (emps||[]).length;
+  const booked = (emps||[]).filter(e=>e.booking_admission_id).length;
+  const assigned = (emps||[]).filter(e=>e.package_id).length;
+  const cn = (_corpFormName||'').replace(/'/g,"\\'");
+
+  const badge = (e) => e.booking_admission_id
+    ? '<span class="cel-b" style="background:rgba(14,165,233,.14);color:#0369A1">Booking</span>'
+    : e.status==='Aktif'
+      ? '<span class="cel-b" style="background:rgba(5,150,105,.14);color:#059669">Aktif</span>'
+      : '<span class="cel-b" style="background:rgba(100,116,139,.14);color:#64748B">Terdaftar</span>';
+
+  box.innerHTML = `
+    <style>
+      .cel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+      .cel-stats{display:flex;gap:6px}
+      .cel-stat{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--bg2);color:var(--text3)}
+      .cel-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:border-color .15s,box-shadow .15s,background .15s}
+      .cel-row:hover{border-color:var(--teal);box-shadow:0 1px 6px rgba(8,145,178,.1);background:#f8fdff}
+      .cel-av{width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0}
+      .cel-main{flex:1;min-width:0}
+      .cel-nm{font-weight:700;font-size:13px;color:#1e293b}
+      .cel-sub{font-size:11.5px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .cel-mr{font-family:ui-monospace,monospace;font-size:10.5px;color:var(--teal);font-weight:600}
+      .cel-b{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+      .cel-chev{color:#cbd5e1;flex-shrink:0}
+    </style>
+    <div class="cel-head">
+      <div class="cel-stats">
+        <span class="cel-stat">${total} Total</span>
+        <span class="cel-stat">${assigned} Berpaket</span>
+        <span class="cel-stat">${booked} Booking</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="ca-btn ghost" onclick="switchCorpTab('imp')">Import</button>
+        <button type="button" class="ca-btn ghost" onclick="scheduleMcuBooking(${corpId},'${cn}')">Jadwalkan MCU</button>
+        <button type="button" class="ca-btn primary" onclick="openCorpEmpProfile(null,${corpId})">+ Tambah</button>
+      </div>
+    </div>
+    ${total ? `<div style="max-height:52vh;overflow-y:auto;padding-right:2px">
+      ${(emps||[]).map(e=>`
+        <div class="cel-row" onclick="openCorpEmpProfile(${e.id},${corpId})">
+          <div class="cel-av">${(e.full_name||'?')[0].toUpperCase()}</div>
+          <div class="cel-main">
+            <div class="cel-nm">${e.full_name||'—'}</div>
+            <div class="cel-sub">${[e.employee_id, e.department, e.package_name].filter(Boolean).join(' · ')||'—'}</div>
+            ${e.mr_number?`<div class="cel-mr">${e.mr_number}</div>`:''}
+          </div>
+          ${badge(e)}
+          <svg class="cel-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+        </div>`).join('')}
+    </div>` : `<div class="ca-empty"><p>Belum ada karyawan. Klik "+ Tambah" atau Import.</p></div>`}`;
+}
+
+// ── Profil karyawan = profil pasien (field lengkap) + MR unik, tertaut corporate ──
+async function openCorpEmpProfile(empId, corpId) {
+  let e = {};
+  if (empId) { const d = await sbGet('corporate_employees',`select=*&id=eq.${empId}`).catch(()=>[]); e = d?.[0]||{}; }
+  // Pastikan No. RM: pasien lama pakai yang ada, jika kosong buatkan + simpan.
+  if (empId && !e.mr_number) {
+    e.mr_number = genEmpMR();
+    try { await sbPatch('corporate_employees', empId, { mr_number: e.mr_number, updated_at: new Date().toISOString() }); } catch(_){}
+  }
+  const mr = e.mr_number || genEmpMR();   // untuk karyawan baru, MR final di-generate saat simpan
+  const sel = (a,b)=>a===b?'selected':'';
+  const esc = s => String(s||'').replace(/"/g,'&quot;');
+  let pkgOpts = '<option value="">— pilih paket —</option>';
+  try {
+    const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket');
+    pkgOpts += (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${esc(p.nama_paket)}" ${sel(e.package_id,p.id)}>${p.nama_paket}</option>`).join('');
+  } catch(_){}
+
+  openModal(`${_caStyleTag()}
+    <div class="corp-acct">
+      <div class="ca-head">
+        <div>
+          <div class="ca-title">${empId ? esc(e.full_name)||'Profil Karyawan' : 'Karyawan Baru'}</div>
+          <div class="ca-sub">
+            <span class="ca-chip">${esc(mr)}</span>
+            <span>${esc(_corpFormName)}</span>
+            ${e.booking_admission_id?'<span class="ca-badge" style="background:rgba(14,165,233,.14);color:#0369A1">Sudah Booking</span>':''}
+          </div>
+        </div>
+        <button class="ca-x" onclick="openCorpForm(${corpId},'emp')" aria-label="Kembali">&larr;</button>
+      </div>
+
+      <div class="ca-card">
+        <div class="ca-h">Identitas Pasien</div>
+        <div class="ca-grid">
+          <div class="fg"><label>Salutasi</label><select id="ep-sal"><option value=""></option>${['Tn.','Ny.','Nn.','An.'].map(s=>`<option ${sel(e.salutation,s)}>${s}</option>`).join('')}</select></div>
+          <div class="fg sp2"><label>Nama Lengkap *</label><input id="ep-name" value="${esc(e.full_name)}" placeholder="Sesuai KTP"></div>
+          <div class="fg"><label>Jenis Kelamin</label><select id="ep-gender"><option value="M" ${sel(e.gender||'M','M')}>Laki-laki</option><option value="F" ${sel(e.gender,'F')}>Perempuan</option></select></div>
+          <div class="fg"><label>Tanggal Lahir</label><input type="date" id="ep-dob" value="${e.birth_date||''}"></div>
+          <div class="fg"><label>Tempat Lahir</label><input id="ep-pob" value="${esc(e.place_of_birth)}"></div>
+          <div class="fg"><label>Gol. Darah</label><select id="ep-blood"><option value=""></option>${['A','B','AB','O'].map(b=>`<option ${sel(e.blood_type,b)}>${b}</option>`).join('')}</select></div>
+          <div class="fg"><label>Status Kawin</label><select id="ep-marital"><option value=""></option>${['Belum Menikah','Menikah','Cerai'].map(m=>`<option ${sel(e.marital_status,m)}>${m}</option>`).join('')}</select></div>
+          <div class="fg"><label>Agama</label><input id="ep-religion" value="${esc(e.religion)}"></div>
+          <div class="fg"><label>Jenis Identitas</label><select id="ep-idtype">${['KTP','Paspor','SIM','KITAS'].map(t=>`<option ${sel(e.id_type||'KTP',t)}>${t}</option>`).join('')}</select></div>
+          <div class="fg"><label>No. Identitas (KTP)</label><input id="ep-idnum" value="${esc(e.id_number)}"></div>
+          <div class="fg"><label>No. Karyawan (NIK)</label><input id="ep-empid" value="${esc(e.employee_id)}"></div>
+        </div>
+      </div>
+
+      <div class="ca-card">
+        <div class="ca-h">Kontak & Alamat</div>
+        <div class="ca-grid">
+          <div class="fg"><label>No. HP</label><input id="ep-phone" value="${esc(e.phone)}" placeholder="08xxxxxxxxxx"></div>
+          <div class="fg sp2"><label>Email</label><input type="email" id="ep-email" value="${esc(e.email)}"></div>
+          <div class="fg full"><label>Alamat</label><input id="ep-addr" value="${esc(e.address)}"></div>
+          <div class="fg"><label>Kelurahan</label><input id="ep-subdist" value="${esc(e.subdistrict)}"></div>
+          <div class="fg"><label>Kota</label><input id="ep-city" value="${esc(e.city)}"></div>
+          <div class="fg"><label>Provinsi</label><input id="ep-prov" value="${esc(e.province)}"></div>
+          <div class="fg"><label>Kode Pos</label><input id="ep-postal" value="${esc(e.postal_code)}"></div>
+        </div>
+      </div>
+
+      <div class="ca-card">
+        <div class="ca-h">Data Korporat & MCU</div>
+        <div class="ca-grid">
+          <div class="fg"><label>Departemen</label><input id="ep-dept" value="${esc(e.department)}"></div>
+          <div class="fg"><label>Paket MCU</label><select id="ep-package" ${e.booking_admission_id?'disabled':''}>${pkgOpts}</select></div>
+          <div class="fg"><label>Tanggal MCU</label><input type="date" id="ep-mcudate" value="${e.mcu_date||''}"></div>
+          <div class="fg"><label>Status</label><select id="ep-status">${['Non-Aktif','Aktif'].map(s=>`<option ${sel(e.status||'Non-Aktif',s)}>${s}</option>`).join('')}</select></div>
+        </div>
+      </div>
+
+      <div class="ca-foot">
+        <button type="button" class="ca-btn ghost" onclick="openCorpForm(${corpId},'emp')">&larr; Kembali</button>
+        <button type="button" class="ca-btn primary" onclick="saveCorpEmpProfile(${empId||'null'},${corpId},'${esc(mr)}')">Simpan Profil</button>
+      </div>
+    </div>`, 'wide');
+  switchCorpTab('bp'); // no-op untuk profil (tak ada tab), aman
+}
+
+async function saveCorpEmpProfile(empId, corpId, mr) {
+  const v = id => (document.getElementById(id)?.value||'').trim()||null;
+  const name = v('ep-name');
+  if (!name) { toast('Nama wajib diisi','err'); return; }
+  const pkgSel = document.getElementById('ep-package');
+  const payload = {
+    corporate_id:   corpId,
+    full_name:      name,
+    salutation:     v('ep-sal'),
+    gender:         document.getElementById('ep-gender')?.value || null,
+    birth_date:     v('ep-dob'),
+    place_of_birth: v('ep-pob'),
+    blood_type:     v('ep-blood'),
+    marital_status: v('ep-marital'),
+    religion:       v('ep-religion'),
+    id_type:        document.getElementById('ep-idtype')?.value || 'KTP',
+    id_number:      v('ep-idnum'),
+    employee_id:    v('ep-empid'),
+    phone:          v('ep-phone'),
+    email:          v('ep-email'),
+    address:        v('ep-addr'),
+    subdistrict:    v('ep-subdist'),
+    city:           v('ep-city'),
+    province:       v('ep-prov'),
+    postal_code:    v('ep-postal'),
+    department:     v('ep-dept'),
+    package_id:     parseInt(pkgSel?.value)||null,
+    package_name:   pkgSel && pkgSel.value ? (pkgSel.selectedOptions[0]?.dataset.name||null) : null,
+    mcu_date:       v('ep-mcudate'),
+    status:         document.getElementById('ep-status')?.value || 'Non-Aktif',
+    mr_number:      mr,
+    updated_at:     new Date().toISOString(),
+  };
+  try {
+    if (empId) await sbPatch('corporate_employees', empId, payload);
+    else       await sbPost('corporate_employees', payload);
+    toast('✅ Profil karyawan disimpan','ok');
+    openCorpForm(corpId, 'emp');   // kembali ke tab Employee List (ter-refresh)
+  } catch(err) { toast('❌ '+err.message,'err',7000); }
 }
 
 async function saveCorp(id) {
