@@ -167,7 +167,10 @@ let currentRole = 'patient';
 let currentPhase = 'fase1';
 let currentUsername = '';
 let currentUserProfile = null;
-let corporates = [...MOCK_CORPORATES];
+let corporates = [];                 // diisi dari corporate_employees (real)
+let currentCorporateId = null;       // corporate yang diwakili user login
+let currentCorporateName = '';
+let allCorporatesForPicker = [];     // untuk superadmin memilih perusahaan
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
 let currentCalledQueue = 40; // Counter queue starts at A-040
@@ -177,10 +180,7 @@ let bookingCart = []; // List of selected items
 let corporateCashback = 4500000; // Rp 4.500.000
 let referralWallet = 330000; // Rp 330.000
 let selectedInvoiceId = null;
-let invoices = [
-  { id: 'INV-202607-001', name: 'MCU Tahunan Tahap 1', date: '19 Juli 2026', amount: 45000000, status: 'unpaid' },
-  { id: 'INV-202606-024', name: 'MCU Karyawan Baru', date: '24 Juni 2026', amount: 12500000, status: 'paid' }
-];
+let invoices = [];   // diisi dari tabel invoices (real) via loadInvoices()
 
 // Switch Screens (General routing: Login vs Dashboard)
 function showScreen(screenId) {
@@ -1125,28 +1125,85 @@ function seeReferralPackages() {
 }
 
 // --- CORPORATE EMPLOYEE CRUD & STATS UPDATES ---
-function renderCorporateList() {
+// ── Resolusi identitas corporate + muat data nyata ──────────────
+async function loadCorporateData() {
+  const container = document.getElementById('corporate-list-container');
+  if (typeof sbGet !== 'function') { if (container) container.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Backend belum tersambung.</p>'; return; }
+
+  try {
+    const isSuperAdmin = (currentUsername === 'aceanwar424@gmail.com');
+    // 1) corporate_id dari profil akun; superadmin/demo → picker semua corporate
+    let corpId = currentUserProfile?.corporate_id || null;
+    if (!corpId) {
+      allCorporatesForPicker = await sbGet('corporates','select=id,corporate_name,cashback_balance&status=eq.Aktif&order=corporate_name').catch(()=>[]);
+      if (isSuperAdmin || !currentUserProfile) {
+        corpId = allCorporatesForPicker?.[0]?.id || null;   // default perusahaan pertama
+      }
+    }
+    currentCorporateId = corpId;
+
+    if (!corpId) {
+      if (container) container.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Akun ini belum ditautkan ke perusahaan. Hubungi admin OneLab.</p>';
+      corporates = []; updateCorporateStats(); return;
+    }
+
+    // 2) info corporate + saldo cashback
+    const corp = (await sbGet('corporates', `select=id,corporate_name,cashback_balance&id=eq.${corpId}`).catch(()=>[]))?.[0] || {};
+    currentCorporateName = corp.corporate_name || 'Perusahaan';
+    corporateCashback = Number(corp.cashback_balance || 0);
+    const cbEl = document.getElementById('c-cashback-balance');
+    if (cbEl) cbEl.textContent = `Rp ${corporateCashback.toLocaleString('id-ID')}`;
+
+    // 3) roster karyawan nyata
+    corporates = await sbGet('corporate_employees',
+      `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]) || [];
+    renderCorporateList();
+    loadInvoices();   // invoice korporat nyata
+  } catch(e) {
+    if (container) container.innerHTML = `<p style="padding:16px;color:var(--error)">❌ ${e.message}</p>`;
+  }
+}
+
+// Status karyawan → badge (booking > aktif > terdaftar)
+function empStatusBadge(e) {
+  if (e.booking_admission_id) return { txt:'Booking', bg:'rgba(14,165,233,0.15)', col:'#38bdf8' };
+  if (e.status === 'Aktif')   return { txt:'Aktif',   bg:'rgba(34,197,94,0.15)',  col:'#4ade80' };
+  return { txt:'Terdaftar', bg:'rgba(148,163,184,0.15)', col:'#94a3b8' };
+}
+
+async function renderCorporateList() {
   const container = document.getElementById('corporate-list-container');
   if (!container) return;
+  if (!corporates.length) {
+    container.innerHTML = '<p style="padding:16px;color:var(--text-muted);text-align:center">Belum ada karyawan terdaftar. Klik "Daftarkan Pasien".</p>';
+    updateCorporateStats(); return;
+  }
 
-  container.innerHTML = corporates.map(emp => {
-    let badgeClass = 'badge-pending';
-    if (emp.status === 'fit') badgeClass = 'badge-fit';
-    if (emp.status === 'unfit') badgeClass = 'badge-unfit';
+  // Opsi paket untuk assign inline
+  const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(()=>[]);
+  const pkgOptions = (sel) => `<option value="">— assign paket —</option>` +
+    (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===sel?'selected':''}>${p.nama_paket}</option>`).join('');
 
+  container.innerHTML = corporates.map(e => {
+    const b = empStatusBadge(e);
+    const nm = e.full_name || '—';
+    const sub = [(e.employee_id||('#'+e.id)), (e.package_name||'Belum ada paket')].join(' • ');
+    const locked = !!e.booking_admission_id;
     return `
       <div class="list-row" style="align-items: center;">
-        <div class="list-row-avatar">${emp.name[0]}</div>
+        <div class="list-row-avatar">${nm[0]||'?'}</div>
         <div class="list-row-details">
-          <h5>${emp.name}</h5>
-          <p>${emp.id} &bull; ${emp.test}</p>
-          <p style="font-size:11px; margin-top:2px; color: var(--text-muted);">${emp.remark}</p>
+          <h5>${nm}</h5>
+          <p>${sub}</p>
+          ${e.mcu_date?`<p style="font-size:11px;margin-top:2px;color:var(--text-muted);">📅 MCU: ${e.mcu_date}</p>`:''}
         </div>
         <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
-          <span class="badge ${badgeClass}">${emp.status}</span>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-sm" onclick="openEmpMedrecModal('${emp.id}')" style="font-size:9px; padding:3px 6px; margin:0; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:white;">Medrec</button>
-            <button class="btn btn-sm btn-unfit" onclick="deleteEmployee('${emp.id}')" style="font-size:9px; padding:3px 6px; margin:0; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--error);">Hapus</button>
+          <span class="badge" style="background:${b.bg};color:${b.col}">${b.txt}</span>
+          <div style="display:flex; gap:6px; align-items:center;">
+            ${locked
+              ? `<span style="font-size:9px;color:var(--text-muted)">🔒 sudah booking</span>`
+              : `<select onchange="assignEmpPackagePortal(${e.id},this)" style="font-size:9px;padding:2px 4px;max-width:120px;background:rgba(255,255,255,0.05);color:#fff;border:1px solid var(--border);border-radius:4px">${pkgOptions(e.package_id)}</select>
+                 <button class="btn btn-sm btn-unfit" onclick="deleteEmployeePortal(${e.id})" style="font-size:9px; padding:3px 6px; margin:0; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:var(--error);">Hapus</button>`}
           </div>
         </div>
       </div>
@@ -1163,30 +1220,43 @@ function updateCorporateStats() {
   const unfitEl = document.getElementById('c-stat-unfit');
   const progressTxt = document.getElementById('c-progress-txt');
   const progressBar = document.getElementById('c-progress-bar');
-
   if (!totalEl) return;
 
-  const total = corporates.length;
-  const finished = corporates.filter(e => e.status !== 'pending').length;
-  const fit = corporates.filter(e => e.status === 'fit').length;
-  const unfit = corporates.filter(e => e.status === 'unfit').length;
-  const percent = total > 0 ? Math.round((finished / total) * 100) : 0;
+  const total  = corporates.length;
+  const booked = corporates.filter(e => e.booking_admission_id).length;
+  const assigned = corporates.filter(e => e.package_id).length;
+  const noPkg  = total - assigned;
+  const percent = total > 0 ? Math.round((booked / total) * 100) : 0;
 
   totalEl.textContent = `${total} Orang`;
-  mcuEl.textContent = `${finished} Orang`;
-  if (fitEl) fitEl.textContent = fit;
-  if (unfitEl) unfitEl.textContent = unfit;
+  mcuEl.textContent = `${booked} Orang`;
+  if (fitEl) fitEl.textContent = assigned;   // berpaket
+  if (unfitEl) unfitEl.textContent = noPkg;  // belum berpaket
   if (progressTxt) progressTxt.textContent = `${percent}%`;
   if (progressBar) progressBar.style.width = `${percent}%`;
 }
 
-function openAddEmployeeModal() {
+async function openAddEmployeeModal() {
   const modal = document.getElementById('add-employee-modal');
-  if (modal) {
-    document.getElementById('corp-emp-name').value = '';
-    document.getElementById('corp-emp-id').value = `EMP-00${corporates.length + 1}`;
-    modal.classList.add('open');
+  if (!modal) return;
+  if (!currentCorporateId) { alert('Akun belum ditautkan ke perusahaan. Hubungi admin OneLab.'); return; }
+
+  // Reset semua field
+  ['name','id','dept','dob','pob','phone','email','idnum','address','city','postal']
+    .forEach(k=>{ const el=document.getElementById('corp-emp-'+k); if(el) el.value=''; });
+  const today = new Date().toISOString().slice(0,10);
+  const md = document.getElementById('corp-emp-mcudate'); if (md){ md.value=today; md.min=today; }
+
+  // Isi dropdown paket dari Supabase
+  const pkgSel = document.getElementById('corp-emp-package');
+  if (pkgSel) {
+    pkgSel.innerHTML = '<option value="">— pilih paket —</option>';
+    try {
+      const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket');
+      (pkgs||[]).forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nama_paket; pkgSel.appendChild(o); });
+    } catch(e){}
   }
+  modal.classList.add('open');
 }
 
 function closeAddEmployeeModal() {
@@ -1194,35 +1264,164 @@ function closeAddEmployeeModal() {
   if (modal) modal.classList.remove('open');
 }
 
-function submitAddEmployeeForm(event) {
+// Daftarkan pasien (field lengkap) → roster corporate_employees + booking admissions.
+async function submitAddEmployeeForm(event) {
   event.preventDefault();
-  
-  const name = document.getElementById('corp-emp-name').value.trim();
-  const id = document.getElementById('corp-emp-id').value.trim();
-  const packageType = document.getElementById('corp-emp-package').value;
+  if (!currentCorporateId) { alert('Perusahaan belum teridentifikasi.'); return; }
+  const val = k => (document.getElementById('corp-emp-'+k)?.value || '').trim();
+  const name = val('name');
+  const pkgId = parseInt(val('package')) || null;
+  const mcuDate = val('mcudate');
+  if (!name) { alert('Nama wajib diisi'); return; }
+  if (!pkgId) { alert('Pilih paket MCU'); return; }
+  if (!mcuDate) { alert('Pilih tanggal MCU'); return; }
 
-  if (!name || !id) return;
+  const pkgSel = document.getElementById('corp-emp-package');
+  const pkgName = pkgSel?.selectedOptions?.[0]?.textContent || null;
+  const user = currentUsername || 'Portal Corporate';
+  const gender = val('gender') || null;
+  const stamp = Date.now().toString();
 
-  // Add new employee
-  corporates.push({
-    name: name,
-    id: id,
-    test: packageType,
-    status: 'pending',
-    remark: 'Proses Analisa Lab',
-    medrec: null
-  });
+  try {
+    // 1) roster karyawan
+    const empRow = await sbPost('corporate_employees', {
+      corporate_id:  currentCorporateId,
+      corporate_name: currentCorporateName,
+      full_name:     name,
+      employee_id:   val('id') || null,
+      department:    val('dept') || null,
+      gender,
+      birth_date:    val('dob') || null,
+      phone:         val('phone') || null,
+      email:         val('email') || null,
+      package_id:    pkgId,
+      package_name:  pkgName,
+      status:        'Aktif',
+      mcu_date:      mcuDate,
+      assigned_by:   user,
+      assigned_at:   new Date().toISOString(),
+      updated_at:    new Date().toISOString(),
+    });
+    const empId = empRow?.[0]?.id || empRow?.id;
 
-  renderCorporateList();
-  closeAddEmployeeModal();
-  alert(`Karyawan "${name}" berhasil didaftarkan ke program MCU.`);
+    // 2) booking admisi langsung (status Booking, field pasien lengkap)
+    const created = await sbPost('admissions', {
+      visit_number:      `VISIT-${mcuDate.replace(/-/g,'')}-${stamp.slice(-4)}`,
+      mr_number:         `MR-${stamp.slice(-8)}`,
+      visit_type:        'Project MCU',
+      visit_date:        mcuDate,
+      patient_name:      name,
+      patient_gender:    gender,
+      patient_dob:       val('dob') || null,
+      patient_place_of_birth: val('pob') || null,
+      patient_blood_type: val('blood') || null,
+      patient_marital_status: val('marital') || null,
+      patient_category:  val('category') || 'WNI',
+      patient_phone:     val('phone') || null,
+      patient_email:     val('email') || null,
+      patient_address:   val('address') || null,
+      patient_city:      val('city') || null,
+      patient_postal_code: val('postal') || null,
+      patient_id_type:   val('idtype') || 'KTP',
+      patient_id_number: val('idnum') || null,
+      package_id:        pkgId,
+      package_name:      pkgName,
+      corporate_id:      currentCorporateId,
+      corporate_employee_id: empId || null,
+      discount_scheme:   'corporate',
+      scheme_ref_id:     currentCorporateId,
+      scheme_name:       currentCorporateName,
+      payment_status:    'Unpaid',
+      status:            'Booking',
+      registered_by:     user,
+      updated_at:        new Date().toISOString(),
+    });
+    const admId = created?.[0]?.id || created?.id;
+
+    // 3) tautkan balik roster → booking (anti double-book)
+    if (empId && admId) {
+      await sbPatch('corporate_employees', empId, { booking_admission_id: admId, updated_at: new Date().toISOString() });
+    }
+
+    closeAddEmployeeModal();
+    await loadCorporateData();
+    alert(`✅ "${name}" terdaftar & booking MCU dibuat untuk ${mcuDate}.`);
+  } catch(e) { alert('❌ Gagal: ' + e.message); }
 }
 
-function deleteEmployee(empId) {
-  if (confirm('Apakah Anda yakin ingin menghapus karyawan ini dari daftar program MCU?')) {
-    corporates = corporates.filter(e => e.id !== empId);
-    renderCorporateList();
+// Assign paket ke satu karyawan (dropdown inline di roster portal).
+async function assignEmpPackagePortal(empId, sel) {
+  const pkgId = parseInt(sel.value) || null;
+  const pkgName = sel.selectedOptions?.[0]?.dataset?.name || null;
+  try {
+    await sbPatch('corporate_employees', empId, {
+      package_id: pkgId, package_name: pkgId ? pkgName : null,
+      assigned_by: currentUsername || 'Portal', assigned_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    });
+    await loadCorporateData();
+  } catch(e) { alert('❌ ' + e.message); }
+}
+
+async function deleteEmployeePortal(empId) {
+  if (!confirm('Hapus karyawan ini dari daftar? (booking yang sudah dibuat tidak ikut terhapus)')) return;
+  try { await sbDelete('corporate_employees', empId); await loadCorporateData(); }
+  catch(e) { alert('❌ ' + e.message); }
+}
+
+// Booking massal: semua karyawan berpaket yang BELUM dibooking → admissions.
+async function scheduleMcuBookingPortal() {
+  if (!currentCorporateId) { alert('Perusahaan belum teridentifikasi.'); return; }
+  const eligible = corporates.filter(e => e.package_id && !e.booking_admission_id);
+  const noPkg = corporates.filter(e => !e.package_id && !e.booking_admission_id).length;
+  if (!eligible.length) {
+    alert(`Tidak ada karyawan siap booking.${noPkg?`\n${noPkg} karyawan belum di-assign paket.`:''}`);
+    return;
   }
+  const today = new Date().toISOString().slice(0,10);
+  const mcuDate = prompt(`Jadwalkan MCU untuk ${eligible.length} karyawan berpaket.\nTanggal MCU (YYYY-MM-DD):`, today);
+  if (!mcuDate) return;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(mcuDate)) { alert('Format tanggal salah (YYYY-MM-DD).'); return; }
+
+  const user = currentUsername || 'Portal Corporate';
+  let made = 0;
+  for (let i = 0; i < eligible.length; i++) {
+    const e = eligible[i];
+    const stamp = Date.now().toString();
+    try {
+      const created = await sbPost('admissions', {
+        visit_number:      `VISIT-${mcuDate.replace(/-/g,'')}-${stamp.slice(-4)}${i}`,
+        mr_number:         `MR-${stamp.slice(-7)}${i}`,
+        visit_type:        'Project MCU',
+        visit_date:        mcuDate,
+        patient_name:      e.full_name,
+        patient_gender:    e.gender || null,
+        patient_dob:       e.birth_date || null,
+        patient_phone:     e.phone || null,
+        patient_email:     e.email || null,
+        patient_id_number: e.employee_id || null,
+        package_id:        e.package_id,
+        package_name:      e.package_name || null,
+        corporate_id:      currentCorporateId,
+        corporate_employee_id: e.id,
+        discount_scheme:   'corporate',
+        scheme_ref_id:     currentCorporateId,
+        scheme_name:       currentCorporateName,
+        payment_status:    'Unpaid',
+        status:            'Booking',
+        registered_by:     user,
+        updated_at:        new Date().toISOString(),
+      });
+      const admId = created?.[0]?.id || created?.id;
+      await sbPatch('corporate_employees', e.id, {
+        status: 'Aktif', mcu_date: mcuDate, booking_admission_id: admId || null,
+        updated_at: new Date().toISOString(),
+      });
+      made++;
+    } catch(err){ console.error('[scheduleMcuBookingPortal] gagal', e.full_name, err); }
+  }
+  await loadCorporateData();
+  alert(`✅ ${made} booking MCU dibuat untuk ${mcuDate}.`);
 }
 
 // --- EMPLOYEE MEDICAL RECORD DETAIL MODAL ---
@@ -1282,11 +1481,34 @@ function closeEmpMedrecModal() {
 }
 
 // --- CORPORATE INVOICES & BILLING PAYMENTS ---
+// Muat invoice korporat nyata → map ke bentuk yang dipakai renderInvoices.
+async function loadInvoices() {
+  if (!currentCorporateId || typeof sbGet !== 'function') { invoices = []; renderInvoices(); return; }
+  try {
+    const rows = await sbGet('invoices', `select=*&corporate_id=eq.${currentCorporateId}&order=invoice_date.desc`);
+    invoices = (rows||[]).map(r => ({
+      id:     r.invoice_number || ('INV-' + r.id),
+      name:   r.service_type || r.notes || 'Invoice Korporat',
+      date:   r.invoice_date || '',
+      amount: Number(r.total_amount || 0),
+      status: (r.status === 'Paid' || r.status === 'Lunas') ? 'paid' : 'unpaid',
+      _id:    r.id,
+    }));
+  } catch(e) { invoices = []; }
+  renderInvoices();
+}
+
 function renderInvoices() {
   const miniContainer = document.getElementById('corp-invoice-list-mini');
   const fullContainer = document.getElementById('corp-invoice-list-full');
 
   if (!miniContainer) return;
+  if (!invoices.length) {
+    miniContainer.innerHTML = '<p style="padding:10px;color:var(--text-muted);font-size:12px">Belum ada invoice.</p>';
+    const fc = document.getElementById('corp-invoice-list-full');
+    if (fc) fc.innerHTML = '<p style="padding:16px;color:var(--text-muted)">Belum ada invoice untuk perusahaan ini.</p>';
+    return;
+  }
 
   // Render mini dashboard widget
   miniContainer.innerHTML = invoices.map(inv => {
@@ -1343,7 +1565,7 @@ function openCorpBillingModal() {
   if (modal) {
     selectedInvoiceId = null;
     document.getElementById('payment-panel').style.display = 'none';
-    renderInvoices();
+    loadInvoices();
     modal.classList.add('open');
   }
 }
@@ -1406,22 +1628,30 @@ function closeClaimCashbackModal() {
   if (modal) modal.classList.remove('open');
 }
 
-function processClaimCashback() {
+async function processClaimCashback() {
+  if (!currentCorporateId) { alert('Perusahaan belum teridentifikasi.'); return; }
   if (corporateCashback <= 0) {
     alert('Tidak ada saldo cashback yang tersedia untuk diklaim.');
     closeClaimCashbackModal();
     return;
   }
-
   const amt = corporateCashback;
-  corporateCashback = 0;
-
-  // Update dashboard
-  const cbEl = document.getElementById('c-cashback-balance');
-  if (cbEl) cbEl.textContent = 'Rp 0';
-
-  closeClaimCashbackModal();
-  alert(`Klaim Cashback sebesar Rp ${amt.toLocaleString('id-ID')} berhasil dicairkan ke saldo deposit perusahaan!`);
+  try {
+    // Catat pengajuan klaim + nolkan saldo (menunggu persetujuan OneLab)
+    await sbPost('corporate_cashback_claims', {
+      corporate_id: currentCorporateId,
+      amount:       amt,
+      method:       'Transfer Bank',
+      status:       'Requested',
+      claimed_by:   currentUsername || 'Portal Corporate',
+    });
+    await sbPatch('corporates', currentCorporateId, { cashback_balance: 0 });
+    corporateCashback = 0;
+    const cbEl = document.getElementById('c-cashback-balance');
+    if (cbEl) cbEl.textContent = 'Rp 0';
+    closeClaimCashbackModal();
+    alert(`✅ Klaim cashback Rp ${amt.toLocaleString('id-ID')} diajukan. Menunggu persetujuan OneLab.`);
+  } catch(e) { alert('❌ Gagal mengajukan klaim: ' + e.message); }
 }
 
 // --- WITHDRAW REFERRAL COMMISSION FEE ---
@@ -1589,9 +1819,9 @@ async function handleLogin(event) {
     const cbEl = document.getElementById('c-cashback-balance');
     if (cbEl) cbEl.textContent = `Rp ${corporateCashback.toLocaleString('id-ID')}`;
 
-    renderCorporateList();
+    loadCorporateData();   // muat corporate_id, roster, cashback nyata
     renderInvoices();
-  } 
+  }
   else if (currentRole === 'referral') {
     avatarEl.textContent = 'R';
     avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';

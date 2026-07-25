@@ -1253,7 +1253,10 @@
 
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <div class="section-title" style="margin-bottom:0;">Daftar Peserta MCU</div>
-            <button class="btn btn-sm btn-teal" onclick="openAddEmployeeModal()" style="margin:0; font-size:11px;">➕ Tambah Karyawan</button>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-sm" onclick="scheduleMcuBookingPortal()" style="margin:0; font-size:11px; background:rgba(255,255,255,0.06); border:1px solid var(--border); color:#fff;">📅 Jadwalkan Massal</button>
+              <button class="btn btn-sm btn-teal" onclick="openAddEmployeeModal()" style="margin:0; font-size:11px;">➕ Daftarkan Pasien</button>
+            </div>
           </div>
           <div class="corporate-list" id="corporate-list-container">
             <!-- Dinamis via JS -->
@@ -1835,32 +1838,89 @@
 
     <!-- ════════════════════════ MODAL: TAMBAH KARYAWAN ════════════════════════ -->
     <div id="add-employee-modal" class="modal-overlay">
-      <div class="modal-box" style="max-width: 400px; text-align:left;">
-        <h3>Tambah Karyawan MCU</h3>
-        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px;">Daftarkan karyawan baru untuk mengikuti pengetesan MCU</p>
-        
+      <div class="modal-box" style="max-width: 580px; text-align:left; max-height:88vh; overflow-y:auto;">
+        <h3>Daftarkan Pasien (Karyawan MCU)</h3>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 18px;">Isi data pasien selengkap mungkin — kolom sama seperti registrasi admisi. Menyimpan langsung membuat booking MCU.</p>
+
         <form onsubmit="submitAddEmployeeForm(event)">
-          <div class="input-group">
-            <label for="corp-emp-name">Nama Karyawan</label>
-            <input type="text" id="corp-emp-name" placeholder="Nama Lengkap Karyawan" required>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="input-group" style="grid-column:1/-1">
+              <label for="corp-emp-name">Nama Lengkap *</label>
+              <input type="text" id="corp-emp-name" placeholder="Sesuai KTP" required>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-id">NIK / No. Karyawan</label>
+              <input type="text" id="corp-emp-id" placeholder="ID perusahaan">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-dept">Departemen</label>
+              <input type="text" id="corp-emp-dept" placeholder="Produksi, HRD…">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-gender">Jenis Kelamin</label>
+              <select id="corp-emp-gender"><option value="M">Laki-laki</option><option value="F">Perempuan</option></select>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-dob">Tanggal Lahir</label>
+              <input type="date" id="corp-emp-dob">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-pob">Tempat Lahir</label>
+              <input type="text" id="corp-emp-pob" placeholder="Kota kelahiran">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-blood">Gol. Darah</label>
+              <select id="corp-emp-blood"><option value="">—</option><option>A</option><option>B</option><option>AB</option><option>O</option></select>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-phone">No. HP</label>
+              <input type="text" id="corp-emp-phone" placeholder="08xxxxxxxxxx">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-email">Email</label>
+              <input type="email" id="corp-emp-email" placeholder="email@perusahaan.com">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-idtype">Jenis Identitas</label>
+              <select id="corp-emp-idtype"><option>KTP</option><option>Paspor</option><option>SIM</option><option>KITAS</option></select>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-idnum">No. Identitas</label>
+              <input type="text" id="corp-emp-idnum" placeholder="No. KTP/Paspor">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-marital">Status Perkawinan</label>
+              <select id="corp-emp-marital"><option value="">—</option><option>Belum Menikah</option><option>Menikah</option><option>Cerai</option></select>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-category">Kategori</label>
+              <select id="corp-emp-category"><option>WNI</option><option>WNA</option></select>
+            </div>
+            <div class="input-group" style="grid-column:1/-1">
+              <label for="corp-emp-address">Alamat</label>
+              <input type="text" id="corp-emp-address" placeholder="Alamat lengkap">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-city">Kota</label>
+              <input type="text" id="corp-emp-city" placeholder="Kota / Kabupaten">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-postal">Kode Pos</label>
+              <input type="text" id="corp-emp-postal" placeholder="00000">
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-package">Paket MCU *</label>
+              <select id="corp-emp-package" required style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;"></select>
+            </div>
+            <div class="input-group">
+              <label for="corp-emp-mcudate">Tanggal MCU *</label>
+              <input type="date" id="corp-emp-mcudate" required>
+            </div>
           </div>
-          <div class="input-group">
-            <label for="corp-emp-id">Nomor Karyawan (ID)</label>
-            <input type="text" id="corp-emp-id" placeholder="Contoh: EMP-006" required>
-          </div>
-          <div class="input-group">
-            <label for="corp-emp-package">Paket Pemeriksaan MCU</label>
-            <select id="corp-emp-package" style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px; color:#0f172a;">
-              <option value="Paket MCU Dasar">Paket MCU Dasar</option>
-              <option value="Paket MCU Eksekutif A">Paket MCU Eksekutif A</option>
-              <option value="Paket MCU Eksekutif B">Paket MCU Eksekutif B</option>
-              <option value="Paket MCU Driver">Paket MCU Driver</option>
-            </select>
-          </div>
-          
-          <div style="display:flex; gap:12px; margin-top:24px;">
+
+          <div style="display:flex; gap:12px; margin-top:22px;">
             <button type="button" class="btn btn-close" onclick="closeAddEmployeeModal()">Batal</button>
-            <button type="submit" class="btn btn-teal" style="margin-top:0;">Daftarkan</button>
+            <button type="submit" class="btn btn-teal" style="margin-top:0;">Simpan & Buat Booking</button>
           </div>
         </form>
       </div>
@@ -1981,6 +2041,6 @@
   </div>
 
   <script src="../js/core/api.js?v=20260719k"></script>
-  <script src="app.js?v=20260721n"></script>
+  <script src="app.js?v=20260725a"></script>
 </body>
 </html>
