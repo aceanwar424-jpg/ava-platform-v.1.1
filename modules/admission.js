@@ -1272,9 +1272,14 @@ async function saveAdmission(id) {
     closeModalForce();
     await loadAdmissions();
 
-    // Label sampel & barcode TIDAK dicetak di sini — semua kunjungan wajib
-    // lewat modul Anamnesa; barcode digenerate & dicetak di sana, lalu
-    // (jika ada tes lab) pasien dilempar ke Lab.
+    // Label KLINIK (identitas pasien) dicetak otomatis saat registrasi baru
+    // disimpan — untuk map berkas klinik & identifikasi. Ini BUKAN label lab.
+    // Label sampel/barcode lab tetap digenerate & dicetak di modul Anamnesa,
+    // lalu (jika ada tes lab) pasien dilempar ke Lab.
+    if (!id && admissionId && typeof printClinicLabel === 'function') {
+      try { printClinicLabel({ ...payload, id: admissionId }); }
+      catch(e){ console.error('[saveAdmission] printClinicLabel failed:', e); }
+    }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
