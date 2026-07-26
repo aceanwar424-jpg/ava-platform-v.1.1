@@ -1259,6 +1259,8 @@ async function renderBookExamination() {
   ]);
   const branches = (branchesRaw||[]).map(b=>b.name).filter(Boolean);
   const today = new Date().toISOString().slice(0,10);
+  const positions = [...new Set((emps||[]).map(e=>e.job_position).filter(Boolean))].sort();
+  const esc = s => String(s||'').replace(/"/g,'&quot;');
   box.innerHTML = `
     <div class="ci-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
@@ -1268,15 +1270,31 @@ async function renderBookExamination() {
       <div class="be-filters">
         <div><label>Branch</label><select id="be-branch">${branches.length?branches.map(b=>`<option>${b}</option>`).join(''):'<option>VIRTU DIGILAB NATIONAL RESEARCH CENTER</option>'}</select></div>
         <div><label>Book Date</label><input type="date" id="be-date" value="${today}" min="${today}"></div>
-        <div><label>Package</label><select id="be-package"><option value="">— pilih paket —</option>${(pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}">${p.nama_paket}</option>`).join('')}</select></div>
+        <div><label>Package</label><select id="be-package"><option value="">— pilih paket —</option>${(pkgs||[]).map(p=>`<option value="${p.id}" data-name="${esc(p.nama_paket)}">${p.nama_paket}</option>`).join('')}</select></div>
+      </div>
+      <div class="be-filters" style="margin-bottom:14px">
+        <div><label>Jenis Kelamin</label><select id="be-fgender" onchange="filterBookExam()"><option value="">Semua</option><option value="M">Male</option><option value="F">Female</option></select></div>
+        <div><label>Job Position</label><select id="be-fpos" onchange="filterBookExam()"><option value="">Semua Posisi</option>${positions.map(p=>`<option>${p}</option>`).join('')}</select></div>
+        <div><label>Cari</label><input type="text" id="be-fsearch" placeholder="Nama / No. karyawan…" oninput="filterBookExam()"></div>
       </div>
       <div style="overflow-x:auto"><table class="be-table">
         <thead><tr><th style="width:36px"><input type="checkbox" id="be-all" onclick="toggleAllBe(this)"></th><th>Employee No</th><th>Name</th><th>Department</th><th>Job Position</th></tr></thead>
-        <tbody>${(emps||[]).length ? (emps||[]).map(e=>`<tr><td><input type="checkbox" class="be-emp" value="${e.id}" data-name="${(e.full_name||'').replace(/"/g,'&quot;')}" data-nik="${e.id_number||e.employee_id||''}" data-dept="${(e.department||'').replace(/"/g,'&quot;')}"></td><td style="font-family:monospace">${e.employee_id||'—'}</td><td>${e.full_name||'—'}</td><td>${e.department||'—'}</td><td>${e.job_position||'—'}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:22px">Belum ada karyawan. Tambah via Master Employee.</td></tr>'}</tbody>
+        <tbody>${(emps||[]).length ? (emps||[]).map(e=>`<tr class="be-row" data-gender="${e.gender||''}" data-pos="${esc(e.job_position)}" data-search="${esc(((e.full_name||'')+' '+(e.employee_id||'')+' '+(e.department||'')).toLowerCase())}"><td><input type="checkbox" class="be-emp" value="${e.id}" data-name="${esc(e.full_name)}" data-nik="${e.id_number||e.employee_id||''}" data-dept="${esc(e.department)}"></td><td style="font-family:monospace">${e.employee_id||'—'}</td><td>${e.full_name||'—'}</td><td>${e.department||'—'}</td><td>${e.job_position||'—'}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:22px">Belum ada karyawan. Tambah via Master Employee.</td></tr>'}</tbody>
       </table></div>
     </div>`;
 }
-function toggleAllBe(cb) { document.querySelectorAll('.be-emp').forEach(x => x.checked = cb.checked); }
+function toggleAllBe(cb) { document.querySelectorAll('.be-emp').forEach(x => { if (x.closest('tr').style.display !== 'none') x.checked = cb.checked; }); }
+function filterBookExam() {
+  const g = document.getElementById('be-fgender')?.value || '';
+  const p = (document.getElementById('be-fpos')?.value || '').toLowerCase();
+  const s = (document.getElementById('be-fsearch')?.value || '').toLowerCase().trim();
+  document.querySelectorAll('.be-row').forEach(row => {
+    const okG = !g || row.dataset.gender === g;
+    const okP = !p || (row.dataset.pos||'').toLowerCase() === p;
+    const okS = !s || (row.dataset.search||'').includes(s);
+    row.style.display = (okG && okP && okS) ? '' : 'none';
+  });
+}
 
 async function submitExamBooking() {
   const checked = [...document.querySelectorAll('.be-emp:checked')];

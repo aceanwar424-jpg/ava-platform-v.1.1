@@ -1076,17 +1076,20 @@ async function renderCorporateDetail(id = null) {
             <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Corporate Users Settings</div>
             
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:16px;">
-              <span style="font-weight:700; color:#0f2963; font-size:12.5px; display:block; margin-bottom:6px;">Link Existing User Account</span>
-              <div style="display:flex; gap:8px;">
-                <select id="erp-corp-user-select" style="flex:1; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
-                  <!-- Dinamis load via JS -->
-                </select>
-                <select id="erp-corp-role-select" style="width:140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
-                  <option value="requestor">Requestor</option>
-                  <option value="approver">Approver</option>
-                  <option value="">None / View Only</option>
-                </select>
-                <button class="btn btn-teal btn-sm" onclick="linkUserToCorporate(${id})" style="padding:8px 16px; margin:0;">➕ Link User</button>
+              <span style="font-weight:700; color:#0f2963; font-size:12.5px; display:block; margin-bottom:6px;">Link Existing User Account / Employee</span>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <input type="text" id="erp-corp-user-search-q" placeholder="🔍 Ketik nama/email untuk mencari..." oninput="filterCorpUserSelect(this.value)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px; outline:none; width:100%;">
+                <div style="display:flex; gap:8px;">
+                  <select id="erp-corp-user-select" style="flex:1; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
+                    <!-- Dinamis load via JS -->
+                  </select>
+                  <select id="erp-corp-role-select" style="width:140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
+                    <option value="requestor">Requestor</option>
+                    <option value="approver" selected>Approver</option>
+                    <option value="">None / View Only</option>
+                  </select>
+                  <button class="btn btn-teal btn-sm" onclick="linkUserToCorporate(${id})" style="padding:8px 16px; margin:0;">➕ Link User</button>
+                </div>
               </div>
             </div>
 
@@ -1250,6 +1253,12 @@ window.loadTabCorpUsers = async function(corpId) {
       sbGet('corporate_employees', `select=id,full_name,email,phone&corporate_id=eq.${corpId}&order=full_name.asc`).catch(() => [])
     ]);
 
+    window.cachedCorpEmps = emps || [];
+    window.cachedUnlinkedUsers = (allUsers || []).filter(u => u.corporate_id !== corpId);
+
+    const searchInput = document.getElementById('erp-corp-user-search-q');
+    if (searchInput) searchInput.value = '';
+
     if (select) {
       let optionsHtml = '<option value="">-- Pilih Karyawan atau User Profile --</option>';
       
@@ -1261,7 +1270,7 @@ window.loadTabCorpUsers = async function(corpId) {
         optionsHtml += '</optgroup>';
       }
 
-      const unlinkedUsers = (allUsers || []).filter(u => u.corporate_id !== corpId);
+      const unlinkedUsers = window.cachedUnlinkedUsers;
       if (unlinkedUsers.length) {
         optionsHtml += '<optgroup label="User Profiles (Registered)">';
         unlinkedUsers.forEach(u => {
@@ -1300,6 +1309,49 @@ window.loadTabCorpUsers = async function(corpId) {
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat user: ${e.message}</td></tr>`;
   }
+};
+
+window.filterCorpUserSelect = function(query) {
+  const select = document.getElementById('erp-corp-user-select');
+  if (!select) return;
+  
+  const q = (query || '').toLowerCase().trim();
+  const emps = window.cachedCorpEmps || [];
+  const unlinkedUsers = window.cachedUnlinkedUsers || [];
+  
+  let filteredEmps = emps;
+  let filteredUsers = unlinkedUsers;
+  
+  if (q) {
+    filteredEmps = emps.filter(e => 
+      (e.full_name || '').toLowerCase().includes(q) || 
+      (e.email || '').toLowerCase().includes(q)
+    );
+    filteredUsers = unlinkedUsers.filter(u => 
+      (u.full_name || '').toLowerCase().includes(q) || 
+      (u.email || '').toLowerCase().includes(q)
+    );
+  }
+  
+  let optionsHtml = '<option value="">-- Pilih Karyawan atau User Profile --</option>';
+  
+  if (filteredEmps.length) {
+    optionsHtml += '<optgroup label="Daftar Karyawan">';
+    filteredEmps.forEach(e => {
+      optionsHtml += `<option value="emp_${e.id}">${e.full_name} (${e.email || 'No Email'}) [Karyawan]</option>`;
+    });
+    optionsHtml += '</optgroup>';
+  }
+  
+  if (filteredUsers.length) {
+    optionsHtml += '<optgroup label="User Profiles (Registered)">';
+    filteredUsers.forEach(u => {
+      optionsHtml += `<option value="usr_${u.id}">${u.full_name} (${u.email || 'No Email'}) [User]</option>`;
+    });
+    optionsHtml += '</optgroup>';
+  }
+  
+  select.innerHTML = optionsHtml;
 };
 
 window.linkUserToCorporate = async function(corpId) {
