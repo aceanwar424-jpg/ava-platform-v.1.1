@@ -1365,7 +1365,6 @@ window.linkUserToCorporate = async function(corpId) {
       const userId = selectedVal.slice(4);
       await sbPatch('user_profiles', userId, {
         corporate_id: corpId,
-        corporate_name: corpName,
         corp_role: corpRole,
         updated_at: new Date().toISOString()
       });
@@ -1389,7 +1388,6 @@ window.linkUserToCorporate = async function(corpId) {
       if (userProfile) {
         await sbPatch('user_profiles', userProfile.id, {
           corporate_id: corpId,
-          corporate_name: corpName,
           corp_role: corpRole,
           updated_at: new Date().toISOString()
         });
@@ -1403,7 +1401,6 @@ window.linkUserToCorporate = async function(corpId) {
           phone: emp.phone,
           role: 'corporate',
           corporate_id: corpId,
-          corporate_name: corpName,
           corp_role: corpRole,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -1435,7 +1432,6 @@ window.unlinkUserFromCorporate = async function(userId, corpId) {
   try {
     await sbPatch('user_profiles', userId, {
       corporate_id: null,
-      corporate_name: null,
       corp_role: null,
       updated_at: new Date().toISOString()
     });
