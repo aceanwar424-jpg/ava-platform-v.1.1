@@ -113,7 +113,7 @@ async function renderAdmission() {
       <select class="table-filter" id="adm-type" onchange="admFilter.type=this.value;applyAdmFilter()">
         <option value="">Semua Tipe</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option>
       </select>
-      <input type="date" class="table-filter" id="adm-date" onchange="applyAdmFilter()" value="${new Date().toISOString().split('T')[0]}">
+      <input type="date" class="table-filter" id="adm-date" onchange="loadAdmissions()" value="${new Date().toISOString().split('T')[0]}">
     </div>
 
     <div id="adm-list"><div class="loading-row"><div class="spinner"></div></div></div>
