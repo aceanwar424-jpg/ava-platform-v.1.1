@@ -827,7 +827,6 @@ async function renderCorporateDetail(id = null) {
                     <th style="padding:10px; text-align:left;">Name</th>
                     <th style="padding:10px; text-align:left;">Employee Number (NIK)</th>
                     <th style="padding:10px; text-align:left;">Department</th>
-                    <th style="padding:10px; text-align:left;">Paket MCU</th>
                     <th style="padding:10px; text-align:center; width:100px;">Status</th>
                   </tr>
                 </thead>
@@ -977,11 +976,6 @@ window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statu
           <td style="padding:8px; font-weight:600;">${nm}</td>
           <td style="padding:8px; font-family:monospace;">${employee_id}</td>
           <td style="padding:8px;">${department}</td>
-          <td style="padding:8px;">
-            ${e.booking_admission_id
-              ? `<span style="font-size:11.5px;font-weight:600;color:var(--navy);">${e.package_name||'—'}</span> <span title="Sudah booking, terkunci">🔒</span>`
-              : `<select onchange="assignEmpPackage(${e.id},this,${corpId},'${partnerEsc}')" style="font-size:11.5px;padding:2px 4px; border:1px solid #cbd5e1; border-radius:4px;">${pkgOpts(e.package_id)}</select>`}
-          </td>
           <td style="padding:8px; text-align:center;">
             <span style="background:${e.status==='Aktif'?'#E8F5E9':'#F1F5F9'};
               color:${e.status==='Aktif'?'#2E7D32':'#546E7A'};
@@ -1549,81 +1543,60 @@ async function openCorpEmpForm(corpId, corpName, id=null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id?'Edit':'+ Tambah'} Karyawan — ${corpName}</div>
+      <div class="modal-title" style="font-size:16px; font-weight:700; color:#0f2963;">${id?'Edit Karyawan':'Add New Employee'} — ${corpName}</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div class="form-row">
+    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px 0;">
       <div class="form-group" style="grid-column:1/-1">
-        <label>Nama Lengkap *</label>
-        <input type="text" id="cef-name" value="${e.full_name||''}" placeholder="Nama sesuai KTP">
+        <label style="font-weight:600; color:#0f2963;">Nama Lengkap *</label>
+        <input type="text" id="cef-name" value="${e.full_name||''}" placeholder="Nama sesuai KTP" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>NIK / ID Karyawan</label>
-        <input type="text" id="cef-id" value="${e.employee_id||''}" placeholder="NIK perusahaan">
+        <label style="font-weight:600; color:#0f2963;">NIK / ID Karyawan</label>
+        <input type="text" id="cef-id" value="${e.employee_id||''}" placeholder="NIK perusahaan" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>Departemen / Divisi</label>
-        <input type="text" id="cef-dept" value="${e.department||''}" placeholder="HRD, Produksi...">
+        <label style="font-weight:600; color:#0f2963;">Departemen / Divisi</label>
+        <input type="text" id="cef-dept" value="${e.department||''}" placeholder="HRD, Produksi..." style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>Jenis Kelamin</label>
-        <select id="cef-gender">
+        <label style="font-weight:600; color:#0f2963;">Jenis Kelamin</label>
+        <select id="cef-gender" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
           <option value="M" ${(e.gender||'M')==='M'?'selected':''}>Laki-laki</option>
           <option value="F" ${e.gender==='F'?'selected':''}>Perempuan</option>
         </select>
       </div>
       <div class="form-group">
-        <label>Tanggal Lahir</label>
-        <input type="date" id="cef-dob" value="${e.birth_date||''}">
+        <label style="font-weight:600; color:#0f2963;">Tanggal Lahir</label>
+        <input type="date" id="cef-dob" value="${e.birth_date||''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>No. HP</label>
-        <input type="text" id="cef-phone" value="${e.phone||''}" placeholder="08xxxxxxxxxx">
+        <label style="font-weight:600; color:#0f2963;">No. HP</label>
+        <input type="text" id="cef-phone" value="${e.phone||''}" placeholder="08xxxxxxxxxx" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="cef-email" value="${e.email||''}" placeholder="email@perusahaan.com">
+        <label style="font-weight:600; color:#0f2963;">Email</label>
+        <input type="email" id="cef-email" value="${e.email||''}" placeholder="email@perusahaan.com" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
       <div class="form-group">
-        <label>Status</label>
-        <select id="cef-status">
+        <label style="font-weight:600; color:#0f2963;">Status</label>
+        <select id="cef-status" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
           <option value="Non-Aktif" ${(e.status||'Non-Aktif')==='Non-Aktif'?'selected':''}>Non-Aktif (Terdaftar)</option>
           <option value="Aktif" ${e.status==='Aktif'?'selected':''}>Aktif (Sudah Booking)</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Paket MCU</label>
-        <select id="cef-package">
-          <option value="">-- Pilih Paket (opsional) --</option>
-        </select>
+      <div class="form-group" style="grid-column:1/-1">
+        <label style="font-weight:600; color:#0f2963;">Catatan Medis / Kondisi Khusus</label>
+        <input type="text" id="cef-notes" value="${e.notes||''}" placeholder="Alergi, kondisi khusus..." style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
       </div>
     </div>
-    <div class="form-group">
-      <label>Catatan Medis / Kondisi Khusus</label>
-      <input type="text" id="cef-notes" value="${e.notes||''}" placeholder="Alergi, kondisi khusus...">
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveCorpEmp(${corpId},${id||'null'})">Simpan</button>
+    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #cbd5e1; padding-top:12px;">
+      <button class="btn btn-ghost" onclick="closeModalForce()" style="border:1px solid #cbd5e1; padding:6px 16px;">Batal</button>
+      <button class="btn btn-teal" onclick="saveCorpEmp(${corpId},${id||'null'},'${corpName.replace(/'/g,"\\'")}')" style="padding:6px 20px;">Simpan</button>
     </div>`);
-
-  // Load packages
-  try {
-    const pkgs = await sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket');
-    const sel  = document.getElementById('cef-package');
-    if (sel) {
-      (pkgs||[]).forEach(p=>{
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.nama_paket;
-        if (p.id === e.package_id) opt.selected = true;
-        sel.appendChild(opt);
-      });
-    }
-  } catch(err){}
 }
 
-async function saveCorpEmp(corpId, id) {
+async function saveCorpEmp(corpId, id, corpName) {
   const name = document.getElementById('cef-name').value.trim();
   if (!name) { toast('Nama wajib diisi','err'); return; }
   const user = getUserName?getUserName():'User';
@@ -1638,8 +1611,6 @@ async function saveCorpEmp(corpId, id) {
     phone:        document.getElementById('cef-phone').value.trim()||null,
     email:        document.getElementById('cef-email').value.trim()||null,
     status:       document.getElementById('cef-status').value,
-    package_id:   parseInt(document.getElementById('cef-package').value)||null,
-    package_name: (document.getElementById('cef-package')?.selectedOptions?.[0]?.textContent||'').trim()||null,
     notes:        document.getElementById('cef-notes').value.trim()||null,
     updated_at:   new Date().toISOString(),
   };

@@ -277,11 +277,18 @@ function renderSidebarMenu() {
       <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">👤 My Profile</a>
     `;
   } else if (currentRole === 'corporate') {
+    const I = {
+      dash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+      users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+      bill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
+      cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+    };
     navContainer.innerHTML = `
-      <a class="sidebar-link active" onclick="showView('corporate-view', 'Corporate MCU')">📊 Ringkasan Proyek</a>
-      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Kelola Karyawan')">👥 Kelola Karyawan</a>
-      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Billing &amp; Invoice')">💳 Billing &amp; Invoice</a>
-      <a class="sidebar-link" onclick="showView('corporate-cashback-view', 'Klaim Cashback')">💰 Klaim Cashback</a>
+      <div class="sidebar-section">Perusahaan</div>
+      <a class="sidebar-link active" onclick="showView('corporate-view', 'Corporate MCU')">${I.dash}<span>Ringkasan Proyek</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Kelola Karyawan')">${I.users}<span>Kelola Karyawan</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Billing &amp; Invoice')">${I.bill}<span>Billing &amp; Invoice</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-cashback-view', 'Klaim Cashback')">${I.cash}<span>Klaim Cashback</span></a>
     `;
   } else if (currentRole === 'referral') {
     navContainer.innerHTML = `
