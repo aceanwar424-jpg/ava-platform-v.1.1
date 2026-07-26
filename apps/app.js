@@ -1413,41 +1413,8 @@ async function renderCorporateList(data = corporates) {
     updateCorporateStats(); return;
   }
 
-  // 1) Ambil list kontrak aktif corporate untuk mendapatkan list paket yang diperbolehkan
-  let allowedPkgIds = [];
-  try {
-    const contracts = await sbGet('corporate_contracts', `select=packages,status&corporate_id=eq.${currentCorporateId}`).catch(()=>[]);
-    (contracts || []).forEach(ct => {
-      if (ct.status === 'Active' && ct.packages) {
-        try {
-          const parsed = JSON.parse(ct.packages);
-          if (Array.isArray(parsed)) {
-            parsed.forEach(id => {
-              if (!allowedPkgIds.includes(parseInt(id))) allowedPkgIds.push(parseInt(id));
-            });
-          }
-        } catch(e) {}
-      }
-    });
-  } catch(e) {
-    console.error("Gagal memuat paket kontrak", e);
-  }
-
-  // 2) Muat detail paket yang diperbolehkan saja
-  let pkgs = [];
-  if (allowedPkgIds.length > 0) {
-    const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
-    pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
-  }
-
-  const pkgOptions = (sel) => {
-    if (allowedPkgIds.length === 0) {
-      return `<option value="">— hubungi admin untuk aktivasi paket kontrak —</option>`;
-    }
-    return `<option value="">— assign paket —</option>` +
-      (pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}" ${p.id===sel?'selected':''}>${p.nama_paket}</option>`).join('');
-  };
-
+  // Master Employee = data karyawan murni. Paket TIDAK di sini —
+  // paket ditentukan saat Book Examination & tampil di Examination History.
   container.innerHTML = `
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12.5px; border:none; font-family:'Outfit', sans-serif;">
@@ -1460,7 +1427,6 @@ async function renderCorporateList(data = corporates) {
             <th style="padding:12px 10px;">Gender</th>
             <th style="padding:12px 10px;">Department</th>
             <th style="padding:12px 10px;">Job Position</th>
-            <th style="padding:12px 10px;">Paket MCU</th>
             <th style="padding:12px 10px; text-align:center;">Status</th>
           </tr>
         </thead>
@@ -1471,14 +1437,7 @@ async function renderCorporateList(data = corporates) {
             const empNum = e.employee_id || '—';
             const dept = e.department || '—';
             
-            // Extract position from e.notes if present (e.g. "Position: Supervisor, Level: STAFF")
-            let position = '—';
-            if (e.notes && e.notes.includes('Position:')) {
-              const match = e.notes.match(/Position:\s*([^,]+)/);
-              if (match) position = match[1];
-            }
-
-            const locked = !!e.booking_admission_id;
+            const position = e.job_position || '—';
             const genderTxt = e.gender === 'F' ? 'Female' : e.gender === 'M' ? 'Male' : '—';
             
             return `
@@ -1495,11 +1454,6 @@ async function renderCorporateList(data = corporates) {
                 <td style="padding:10px 8px; color:#475569;">${genderTxt}</td>
                 <td style="padding:10px 8px; color:#475569;">${dept}</td>
                 <td style="padding:10px 8px; color:#475569;">${position}</td>
-                <td style="padding:10px 8px;">
-                  ${locked
-                    ? `<span style="font-weight:600; color:#0f2963; font-size:11.5px;">${e.package_name || '—'}</span> <span title="Locked (Admission Created)">🔒</span>`
-                    : `<select onchange="assignEmpPackagePortal(${e.id},this)" style="font-size:11.5px; padding:4px; border:1px solid #cbd5e1; border-radius:4px; max-width:140px; background:#fff; color:#0f172a;">${pkgOptions(e.package_id)}</select>`}
-                </td>
                 <td style="padding:10px 8px; text-align:center;">
                   <span class="badge" style="background:${b.bg}; color:${b.col}; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${b.txt}</span>
                 </td>

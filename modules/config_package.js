@@ -1244,13 +1244,33 @@ window.loadTabCorpUsers = async function(corpId) {
   tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text3);"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
 
   try {
-    const linkedUsers = await sbGet('user_profiles', `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(() => []);
-    const allCorpUsers = await sbGet('user_profiles', `select=*&role=eq.corporate&order=full_name.asc`).catch(() => []);
-    const unlinkedUsers = allCorpUsers.filter(u => u.corporate_id !== corpId);
+    const [linkedUsers, allUsers, emps] = await Promise.all([
+      sbGet('user_profiles', `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(() => []),
+      sbGet('user_profiles', `select=*&order=full_name.asc`).catch(() => []),
+      sbGet('corporate_employees', `select=id,full_name,email,phone&corporate_id=eq.${corpId}&order=full_name.asc`).catch(() => [])
+    ]);
 
     if (select) {
-      select.innerHTML = '<option value="">-- Pilih User Profile untuk ditautkan --</option>' +
-        unlinkedUsers.map(u => `<option value="${u.id}">${u.full_name} (${u.email || 'No Email'}) [${u.corporate_name || 'Unlinked'}]</option>`).join('');
+      let optionsHtml = '<option value="">-- Pilih Karyawan atau User Profile --</option>';
+      
+      if (emps && emps.length) {
+        optionsHtml += '<optgroup label="Daftar Karyawan">';
+        emps.forEach(e => {
+          optionsHtml += `<option value="emp_${e.id}">${e.full_name} (${e.email || 'No Email'}) [Karyawan]</option>`;
+        });
+        optionsHtml += '</optgroup>';
+      }
+
+      const unlinkedUsers = (allUsers || []).filter(u => u.corporate_id !== corpId);
+      if (unlinkedUsers.length) {
+        optionsHtml += '<optgroup label="User Profiles (Registered)">';
+        unlinkedUsers.forEach(u => {
+          optionsHtml += `<option value="usr_${u.id}">${u.full_name} (${u.email || 'No Email'}) [User]</option>`;
+        });
+        optionsHtml += '</optgroup>';
+      }
+      
+      select.innerHTML = optionsHtml;
     }
 
     if (!linkedUsers.length) {
@@ -1283,19 +1303,62 @@ window.loadTabCorpUsers = async function(corpId) {
 };
 
 window.linkUserToCorporate = async function(corpId) {
-  const userId = document.getElementById('erp-corp-user-select')?.value;
+  const selectedVal = document.getElementById('erp-corp-user-select')?.value;
   const corpRole = document.getElementById('erp-corp-role-select')?.value || null;
   const corpName = window.currentDetailCorpName || 'Corporate';
-  if (!userId) { toast('Silakan pilih user profile terlebih dahulu', 'err'); return; }
+  if (!selectedVal) { toast('Silakan pilih karyawan atau user terlebih dahulu', 'err'); return; }
 
   try {
-    await sbPatch('user_profiles', userId, {
-      corporate_id: corpId,
-      corporate_name: corpName,
-      corp_role: corpRole,
-      updated_at: new Date().toISOString()
-    });
-    toast('✅ User berhasil ditautkan ke corporate', 'ok');
+    if (selectedVal.startsWith('usr_')) {
+      const userId = selectedVal.slice(4);
+      await sbPatch('user_profiles', userId, {
+        corporate_id: corpId,
+        corporate_name: corpName,
+        corp_role: corpRole,
+        updated_at: new Date().toISOString()
+      });
+      toast('✅ User berhasil ditautkan ke corporate', 'ok');
+    } else if (selectedVal.startsWith('emp_')) {
+      const empId = parseInt(selectedVal.slice(4));
+      const empData = await sbGet('corporate_employees', `select=*&id=eq.${empId}`);
+      const emp = empData?.[0];
+      if (!emp) { toast('Karyawan tidak ditemukan', 'err'); return; }
+
+      let userProfile = null;
+      if (emp.email) {
+        const matchingProfs = await sbGet('user_profiles', `select=*&email=eq.${emp.email}`);
+        userProfile = matchingProfs?.[0];
+      }
+      if (!userProfile) {
+        const matchingProfs = await sbGet('user_profiles', `select=*&full_name=eq.${emp.full_name}`);
+        userProfile = matchingProfs?.[0];
+      }
+
+      if (userProfile) {
+        await sbPatch('user_profiles', userProfile.id, {
+          corporate_id: corpId,
+          corporate_name: corpName,
+          corp_role: corpRole,
+          updated_at: new Date().toISOString()
+        });
+        toast(`✅ Akun login ${userProfile.full_name} ditautkan sebagai ${corpRole || 'none'}`, 'ok');
+      } else {
+        const newUuid = 'c' + Math.random().toString(36).substring(2, 15) + '-0000-0000-0000-000000000000';
+        await sbPost('user_profiles', {
+          id: newUuid,
+          full_name: emp.full_name,
+          email: emp.email,
+          phone: emp.phone,
+          role: 'corporate',
+          corporate_id: corpId,
+          corporate_name: corpName,
+          corp_role: corpRole,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+        toast(`✅ User profile baru dibuat & ditautkan untuk ${emp.full_name}`, 'ok');
+      }
+    }
     loadTabCorpUsers(corpId);
   } catch(e) {
     toast('❌ Gagal menautkan: ' + e.message, 'err');
