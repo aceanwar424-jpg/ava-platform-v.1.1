@@ -1765,8 +1765,12 @@ async function openAddEmployeeModal() {
           try {
             const parsed = JSON.parse(ct.packages);
             if (Array.isArray(parsed)) {
-              parsed.forEach(id => {
-                if (!allowedPkgIds.includes(parseInt(id))) allowedPkgIds.push(parseInt(id));
+              parsed.forEach(item => {
+                const id = typeof item === 'object' && item !== null ? item.id : item;
+                const intId = parseInt(id);
+                if (!isNaN(intId) && !allowedPkgIds.includes(intId)) {
+                  allowedPkgIds.push(intId);
+                }
               });
             }
           } catch(e) {}

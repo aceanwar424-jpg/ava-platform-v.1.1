@@ -1837,7 +1837,17 @@ async function loadCorporateDetailContracts(corpId, corpName) {
         if (ct.packages) {
           const parsed = JSON.parse(ct.packages);
           if (Array.isArray(parsed)) {
-            allowedPkgs = parsed.map(id => pkgMap[id]).filter(Boolean);
+            allowedPkgs = parsed.map(item => {
+              const id = typeof item === 'object' && item !== null ? item.id : item;
+              const name = pkgMap[id];
+              if (!name) return null;
+              
+              if (typeof item === 'object' && item !== null && item.discount_type !== 'none' && item.discount_value > 0) {
+                const discText = item.discount_type === 'percent' ? `${item.discount_value}%` : `Rp ${formatCurrency(item.discount_value).replace('Rp', '').trim()}`;
+                return `${name} (Disc ${discText})`;
+              }
+              return name;
+            }).filter(Boolean);
           }
         }
       } catch(err) {
@@ -1892,6 +1902,28 @@ async function openInlineContractForm(corpId, corpName) {
     const nextYear = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
     const esc = s => String(s || '').replace(/"/g, '&quot;');
 
+    // Global toggle helper functions for package checklist rows
+    window.toggleCtfPkgRow = function(id, checked) {
+      const typeSel = document.getElementById(`ctf-pkg-disctype-${id}`);
+      const valInp = document.getElementById(`ctf-pkg-discval-${id}`);
+      if (typeSel && valInp) {
+        typeSel.disabled = !checked;
+        typeSel.style.background = checked ? '#ffffff' : '#f8fafc';
+        valInp.disabled = !checked || typeSel.value === 'none';
+        valInp.style.background = (!checked || typeSel.value === 'none') ? '#f8fafc' : '#ffffff';
+      }
+    };
+
+    window.updateCtfPkgValPlaceholder = function(id, type) {
+      const valInp = document.getElementById(`ctf-pkg-discval-${id}`);
+      if (valInp) {
+        valInp.disabled = type === 'none';
+        valInp.style.background = type === 'none' ? '#f8fafc' : '#ffffff';
+        valInp.placeholder = type === 'percent' ? '%' : type === 'nominal' ? 'Rp' : '0';
+        if (type === 'none') valInp.value = '';
+      }
+    };
+
     container.innerHTML = `
       <div style="font-weight:700; font-size:13px; color:var(--navy); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
         <span>Kontrak &amp; Paket Baru</span>
@@ -1909,20 +1941,45 @@ async function openInlineContractForm(corpId, corpName) {
         <div class="fg"><label>Max Peserta</label><input type="number" id="ctf-max" value="100"></div>
         <div class="fg"><label>Nilai Kontrak (Rp)</label><input type="number" id="ctf-nilai" value="50000000"></div>
         
-        <!-- Packages Checklist -->
+        <!-- Packages Checklist with custom discount scheme -->
         <div class="fg" style="grid-column: span 2;">
-          <label style="font-weight:700; margin-bottom: 6px;">Pilih Paket MCU yang Tersedia dalam Kontrak ini</label>
-          <div style="max-height: 120px; overflow-y: auto; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
-            ${(pkgs || []).map(p => `
-              <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: #000;">
-                <input type="checkbox" name="ctf-pkgs" value="${p.id}" style="width: auto; margin:0;">
-                <span>${esc(p.nama_paket)}</span>
-              </label>
-            `).join('') || '<div style="color:var(--gray); font-size:11px;">Tidak ada paket aktif. Buat paket dulu di menu Konfigurasi Paket.</div>'}
+          <label style="font-weight:700; margin-bottom: 6px;">Pilih Paket MCU &amp; Atur Skema Diskon</label>
+          <div style="max-height: 180px; overflow-y: auto; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 8px; box-sizing: border-box;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
+              <thead>
+                <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
+                  <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 45%;">Nama Paket</th>
+                  <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 30%;">Skema Diskon</th>
+                  <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 25%;">Nilai Diskon</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${(pkgs || []).map(p => `
+                  <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 6px 4px;">
+                      <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: #000; margin: 0;">
+                        <input type="checkbox" class="ctf-pkg-cb" value="${p.id}" onchange="toggleCtfPkgRow(${p.id}, this.checked)" style="width: auto; margin:0;">
+                        <span style="font-weight: 600;">${esc(p.nama_paket)}</span>
+                      </label>
+                    </td>
+                    <td style="padding: 6px 4px;">
+                      <select id="ctf-pkg-disctype-${p.id}" disabled onchange="updateCtfPkgValPlaceholder(${p.id}, this.value)" style="padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; width: 100%; background: #f8fafc; color:#0f172a; box-sizing: border-box;">
+                        <option value="none">Tanpa Diskon</option>
+                        <option value="percent">Persentase (%)</option>
+                        <option value="nominal">Fix Rate (Rp)</option>
+                      </select>
+                    </td>
+                    <td style="padding: 6px 4px;">
+                      <input type="number" id="ctf-pkg-discval-${p.id}" disabled placeholder="0" style="padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; width: 100%; text-align: right; background: #f8fafc; color:#0f172a; box-sizing: border-box;">
+                    </td>
+                  </tr>
+                `).join('') || '<tr><td colspan="3" style="color:var(--gray); font-size:11px; text-align:center; padding: 12px 0;">Tidak ada paket aktif. Buat paket dulu.</td></tr>'}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div class="fg" style="grid-column: span 2;"><label>Catatan</label><textarea id="ctf-notes" rows="2" style="border:1px solid var(--border); border-radius:8px; padding:8px; font-size:13px; width:100%;"></textarea></div>
+        <div class="fg" style="grid-column: span 2;"><label>Catatan</label><textarea id="ctf-notes" rows="2" style="border:1px solid var(--border); border-radius:8px; padding:8px; font-size:13px; width:100%; box-sizing:border-box;"></textarea></div>
       </div>
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('inline-contract-form-container').style.display='none'">Batal</button>
@@ -1935,8 +1992,19 @@ async function openInlineContractForm(corpId, corpName) {
 
 async function saveInlineContract(corpId, corpName) {
   const user = getUserName ? getUserName() : 'User';
-  const pkgEls = document.querySelectorAll('input[name="ctf-pkgs"]:checked');
-  const packageIds = Array.from(pkgEls).map(el => parseInt(el.value));
+  const cbEls = document.querySelectorAll('.ctf-pkg-cb:checked');
+  
+  const packageConfigs = Array.from(cbEls).map(cb => {
+    const id = parseInt(cb.value);
+    const discType = document.getElementById(`ctf-pkg-disctype-${id}`)?.value || 'none';
+    const discVal = parseFloat(document.getElementById(`ctf-pkg-discval-${id}`)?.value) || 0;
+    
+    return {
+      id: id,
+      discount_type: discType,
+      discount_value: discVal
+    };
+  });
 
   const payload = {
     corporate_id:    corpId,
@@ -1948,7 +2016,7 @@ async function saveInlineContract(corpId, corpName) {
     max_peserta:     parseInt(document.getElementById('ctf-max').value)||0,
     used_peserta:    0,
     nilai_kontrak:   parseFloat(document.getElementById('ctf-nilai').value)||0,
-    packages:        JSON.stringify(packageIds),
+    packages:        JSON.stringify(packageConfigs),
     status:          'Active',
     notes:           document.getElementById('ctf-notes').value.trim()||null,
     created_by:      user,
