@@ -1393,22 +1393,7 @@ window.linkUserToCorporate = async function(corpId) {
         });
         toast(`✅ Akun login ${userProfile.full_name} ditautkan sebagai ${corpRole || 'none'}`, 'ok');
       } else {
-        const newUuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-          const r = Math.random() * 16 | 0;
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        });
-        await sbPost('user_profiles', {
-          id: newUuid,
-          full_name: emp.full_name,
-          email: emp.email,
-          phone: emp.phone,
-          role: 'corporate',
-          corporate_id: corpId,
-          corp_role: corpRole,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        });
-        toast(`✅ User profile baru dibuat & ditautkan untuk ${emp.full_name}`, 'ok');
+        toast(`⚠️ Akun login untuk ${emp.full_name} (${emp.email || 'tanpa email'}) belum terdaftar. Silakan minta karyawan tersebut melakukan pendaftaran akun terlebih dahulu di halaman login.`, 'err', 8000);
       }
     }
     loadTabCorpUsers(corpId);
