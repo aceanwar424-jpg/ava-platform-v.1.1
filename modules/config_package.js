@@ -1193,15 +1193,66 @@ window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statu
 // Global CSV Import Helpers for inline ERP tab
 let inlineCsvRows = [];
 
+window.downloadTemplateKaryawan = function() {
+  const headers = [
+    'first_name', 'last_name', 'nik', 'department', 'level', 'job_position',
+    'gender', 'birth_date', 'place_of_birth', 'blood_type', 'marital_status',
+    'phone', 'email', 'id_type', 'id_number', 'country_of_birth',
+    'address', 'city', 'subdistrict', 'district', 'province', 'postal_code',
+    'citizenship', 'package_name'
+  ];
+  const sampleRow = [
+    'Andi', 'Firmansyah', 'QH-0039', 'Gizi', 'STAFF', 'Nutritional Officer',
+    'M', '1975-10-03', 'Jakarta', 'O', 'Married', '81904966319', 'andi.firmansyah@queenhealth.co.id',
+    'KTP', '3171010310750001', 'INDONESIA', 'Jl. Tebet Barat No. 12', 'Jakarta Selatan', 'Tebet', 'Tebet', 'DKI Jakarta', '12810',
+    'WNI', 'Paket Gold'
+  ];
+  
+  const csvContent = "\uFEFF" + [headers.join(','), sampleRow.join(',')].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "template_import_karyawan.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 window.previewCSVImportInline = function(input, corpId) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     const lines = e.target.result.split('\n').filter(l=>l.trim());
     inlineCsvRows = lines.slice(1).map(l => {
-      const [name,nik,dept,gender,dob,phone,email] = l.split(',').map(v=>v.trim().replace(/"/g,''));
-      return {name,nik,dept,gender,dob,phone,email};
-    }).filter(r=>r.name);
+      const parts = l.split(',').map(v=>v.trim().replace(/"/g,''));
+      return {
+        first_name: parts[0],
+        last_name: parts[1],
+        nik: parts[2],
+        dept: parts[3],
+        level: parts[4],
+        job: parts[5],
+        gender: parts[6],
+        dob: parts[7],
+        pob: parts[8],
+        blood: parts[9],
+        marital: parts[10],
+        phone: parts[11],
+        email: parts[12],
+        id_type: parts[13],
+        id_number: parts[14],
+        country_of_birth: parts[15],
+        address: parts[16],
+        city: parts[17],
+        subdistrict: parts[18],
+        district: parts[19],
+        province: parts[20],
+        postal: parts[21],
+        citizenship: parts[22],
+        package_name: parts[23]
+      };
+    }).filter(r => r.first_name);
 
     const el = document.getElementById('erp-csv-preview');
     if (el) {
@@ -1217,7 +1268,7 @@ window.previewCSVImportInline = function(input, corpId) {
           </tr></thead>
           <tbody>
             ${inlineCsvRows.slice(0,5).map(r=>`<tr style="border-bottom:1px solid #cbd5e1">
-              <td style="padding:6px;border-right:1px solid #cbd5e1;">${r.name}</td>
+              <td style="padding:6px;border-right:1px solid #cbd5e1;font-weight:600;">${r.first_name} ${r.last_name||''}</td>
               <td style="padding:6px;font-family:monospace;border-right:1px solid #cbd5e1;">${r.nik||'—'}</td>
               <td style="padding:6px;border-right:1px solid #cbd5e1;">${r.dept||'—'}</td>
               <td style="padding:6px;">${r.gender||'—'}</td>
@@ -1238,21 +1289,46 @@ window.processCSVImportInline = async function(corpId) {
   const btn = document.getElementById('erp-csv-import-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Loading...'; }
   const user = getUserName?getUserName():'User';
+  const corpName = window.currentDetailCorpName || 'Corporate';
   let added = 0;
+
+  let allPkgs = [];
+  try {
+    allPkgs = await sbGet('packages', 'select=id,nama_paket&is_active=eq.true');
+  } catch(e){}
+
   for (const row of inlineCsvRows) {
-    if (!row.name) continue;
+    if (!row.first_name) continue;
+    
+    let pkgId = null;
+    let resolvedPkgName = null;
+    if (row.package_name) {
+      const matchPkg = allPkgs.find(p => p.nama_paket.toLowerCase().trim() === row.package_name.toLowerCase().trim());
+      if (matchPkg) {
+        pkgId = matchPkg.id;
+        resolvedPkgName = matchPkg.nama_paket;
+      }
+    }
+
+    const full_name = [row.first_name, row.last_name].filter(Boolean).join(' ');
+    const notes = (row.job || row.level) ? `Position: ${row.job || '—'}, Level: ${row.level || '—'}` : null;
+
     try {
       await sbPost('corporate_employees',{
-        corporate_id: corpId,
-        full_name:    row.name,
-        employee_id:  row.nik||null,
-        department:   row.dept||null,
-        gender:       row.gender||null,
-        birth_date:   row.dob||null,
-        phone:        row.phone||null,
-        email:        row.email||null,
-        status:       'Non-Aktif',
-        updated_at:   new Date().toISOString(),
+        corporate_id:   corpId,
+        corporate_name: corpName,
+        full_name,
+        employee_id:    row.nik||null,
+        department:     row.dept||null,
+        gender:         row.gender||'M',
+        birth_date:     row.dob||null,
+        phone:          row.phone||null,
+        email:          row.email||null,
+        status:         'Non-Aktif',
+        package_id:     pkgId,
+        package_name:   resolvedPkgName,
+        notes,
+        updated_at:     new Date().toISOString(),
       });
       added++;
     } catch(e){}

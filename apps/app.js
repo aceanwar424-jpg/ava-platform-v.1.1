@@ -171,6 +171,7 @@ let currentUserProfile = null;
 let corporates = [];                 // diisi dari corporate_employees (real)
 let currentCorporateId = null;       // corporate yang diwakili user login
 let currentCorporateName = '';
+let currentCorpRole = null;          // 'requestor' | 'approver' | null (superadmin/keduanya)
 let allCorporatesForPicker = [];     // untuk superadmin memilih perusahaan
 let referrals = [...MOCK_REFERRALS];
 let queueSimulatorInterval = null;
@@ -213,6 +214,11 @@ function showView(viewId, viewTitle) {
   // Display active panel
   const target = document.getElementById(viewId);
   if (target) target.classList.add('active');
+
+  // Render on demand untuk view alur pemeriksaan
+  if (viewId === 'book-examination-view') renderBookExamination();
+  else if (viewId === 'examination-approval-view') renderExamApproval();
+  else if (viewId === 'examination-history-view') renderExamHistory();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -278,17 +284,24 @@ function renderSidebarMenu() {
     `;
   } else if (currentRole === 'corporate') {
     const I = {
-      dash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+      home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>',
       users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-      bill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>',
-      cash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>',
+      book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>',
+      approve: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1z"/><path d="m9 14 2 2 4-4"/></svg>',
+      history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>',
+      deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
     };
+    const isSA = (currentUserEmail === 'aceanwar424@gmail.com');
+    const canRequest = isSA || !currentCorpRole || currentCorpRole === 'requestor';
+    const canApprove = isSA || !currentCorpRole || currentCorpRole === 'approver';
     navContainer.innerHTML = `
-      <div class="sidebar-section">Perusahaan</div>
-      <a class="sidebar-link active" onclick="showView('corporate-view', 'Corporate MCU')">${I.dash}<span>Ringkasan Proyek</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Kelola Karyawan')">${I.users}<span>Kelola Karyawan</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Billing &amp; Invoice')">${I.bill}<span>Billing &amp; Invoice</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-cashback-view', 'Klaim Cashback')">${I.cash}<span>Klaim Cashback</span></a>
+      <div class="sidebar-section">Company</div>
+      <a class="sidebar-link active" onclick="showView('corporate-view', 'Home')">${I.home}<span>Home</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Employee</span></a>
+      ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Book Examination</span></a>` : ''}
+      ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Examination Approval</span></a>` : ''}
+      <a class="sidebar-link" onclick="showView('examination-history-view', 'Examination History')">${I.history}<span>Examination History</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit &amp; Transaction</span></a>
     `;
   } else if (currentRole === 'referral') {
     navContainer.innerHTML = `
@@ -1364,15 +1377,66 @@ window.toggleBulkUploadPanel = function() {
   }
 };
 
+window.downloadTemplateKaryawan = function() {
+  const headers = [
+    'first_name', 'last_name', 'nik', 'department', 'level', 'job_position',
+    'gender', 'birth_date', 'place_of_birth', 'blood_type', 'marital_status',
+    'phone', 'email', 'id_type', 'id_number', 'country_of_birth',
+    'address', 'city', 'subdistrict', 'district', 'province', 'postal_code',
+    'citizenship', 'package_name'
+  ];
+  const sampleRow = [
+    'Andi', 'Firmansyah', 'QH-0039', 'Gizi', 'STAFF', 'Nutritional Officer',
+    'M', '1975-10-03', 'Jakarta', 'O', 'Married', '81904966319', 'andi.firmansyah@queenhealth.co.id',
+    'KTP', '3171010310750001', 'INDONESIA', 'Jl. Tebet Barat No. 12', 'Jakarta Selatan', 'Tebet', 'Tebet', 'DKI Jakarta', '12810',
+    'WNI', 'Paket Gold'
+  ];
+  
+  const csvContent = "\uFEFF" + [headers.join(','), sampleRow.join(',')].join('\n');
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "template_import_karyawan.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 window.previewPortalCSV = function(input) {
   const file = input.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
     const lines = e.target.result.split('\n').filter(l => l.trim());
     portalCsvRows = lines.slice(1).map(l => {
-      const [name, nik, dept, gender, dob, phone, email, package_name] = l.split(',').map(v => v.trim().replace(/"/g,''));
-      return { name, nik, dept, gender, dob, phone, email, package_name };
-    }).filter(r => r.name);
+      const parts = l.split(',').map(v => v.trim().replace(/"/g,''));
+      return {
+        first_name: parts[0],
+        last_name: parts[1],
+        nik: parts[2],
+        dept: parts[3],
+        level: parts[4],
+        job: parts[5],
+        gender: parts[6],
+        dob: parts[7],
+        pob: parts[8],
+        blood: parts[9],
+        marital: parts[10],
+        phone: parts[11],
+        email: parts[12],
+        id_type: parts[13],
+        id_number: parts[14],
+        country_of_birth: parts[15],
+        address: parts[16],
+        city: parts[17],
+        subdistrict: parts[18],
+        district: parts[19],
+        province: parts[20],
+        postal: parts[21],
+        citizenship: parts[22],
+        package_name: parts[23]
+      };
+    }).filter(r => r.first_name);
 
     const el = document.getElementById('portal-csv-preview');
     if (el) {
@@ -1392,7 +1456,7 @@ window.previewPortalCSV = function(input) {
           <tbody>
             ${portalCsvRows.slice(0, 5).map(r => `
               <tr style="border-bottom:1px solid #cbd5e1;">
-                <td style="padding:6px; border-right:1px solid #cbd5e1; font-weight:600;">${r.name}</td>
+                <td style="padding:6px; border-right:1px solid #cbd5e1; font-weight:600;">${r.first_name} ${r.last_name||''}</td>
                 <td style="padding:6px; border-right:1px solid #cbd5e1; font-family:monospace;">${r.nik || '—'}</td>
                 <td style="padding:6px; border-right:1px solid #cbd5e1;">${r.dept || '—'}</td>
                 <td style="padding:6px; border-right:1px solid #cbd5e1;">${r.gender || '—'}</td>
@@ -1424,7 +1488,7 @@ window.uploadPortalCSV = async function() {
   } catch(e){}
 
   for (const row of portalCsvRows) {
-    if (!row.name) continue;
+    if (!row.first_name) continue;
     
     let pkgId = null;
     let resolvedPkgName = null;
@@ -1436,20 +1500,24 @@ window.uploadPortalCSV = async function() {
       }
     }
 
+    const full_name = [row.first_name, row.last_name].filter(Boolean).join(' ');
+    const notes = (row.job || row.level) ? `Position: ${row.job || '—'}, Level: ${row.level || '—'}` : null;
+
     try {
       await sbPost('corporate_employees', {
         corporate_id:   currentCorporateId,
         corporate_name: currentCorporateName,
-        full_name:      row.name,
+        full_name,
         employee_id:    row.nik || null,
         department:     row.dept || null,
-        gender:         row.gender || null,
+        gender:         row.gender || 'M',
         birth_date:     row.dob || null,
         phone:          row.phone || null,
         email:          row.email || null,
         status:         'Non-Aktif',
         package_id:     pkgId,
         package_name:   resolvedPkgName,
+        notes,
         updated_at:     new Date().toISOString()
       });
       added++;
@@ -2269,7 +2337,8 @@ async function handleLogin(event) {
           currentUserProfile = profileData;
           finalUsername = profileData.full_name || authData.user.email;
           finalRole = selectedRole || profileData.role || 'patient';
-          console.log("Logged in user:", finalUsername, "with role:", finalRole);
+          currentCorpRole = profileData.corp_role || null;   // requestor | approver | null
+          console.log("Logged in user:", finalUsername, "role:", finalRole, "corp_role:", currentCorpRole);
         }
       } else {
         alert(`Gagal Login Supabase: ${authData.error_description || authData.msg || 'Cek kembali email & password Anda.'}`);
