@@ -1393,7 +1393,10 @@ window.linkUserToCorporate = async function(corpId) {
         });
         toast(`✅ Akun login ${userProfile.full_name} ditautkan sebagai ${corpRole || 'none'}`, 'ok');
       } else {
-        const newUuid = 'c' + Math.random().toString(36).substring(2, 15) + '-0000-0000-0000-000000000000';
+        const newUuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+          const r = Math.random() * 16 | 0;
+          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
         await sbPost('user_profiles', {
           id: newUuid,
           full_name: emp.full_name,
