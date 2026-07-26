@@ -542,11 +542,14 @@ function _caStyleTag() {
 
 
 async function renderCorporateDetail(id = null) {
+  window.currentDetailCorpId = id;
+  window.currentDetailCorpName = 'Corporate';
   let c = {};
   if (id) {
     try {
       const d = await sbGet('corporates', `select=*&id=eq.${id}`);
       c = d?.[0] || {};
+      window.currentDetailCorpName = c.corporate_name;
     } catch(e) {
       toast('❌ Gagal memuat data corporate: ' + e.message, 'err');
     }
@@ -834,11 +837,8 @@ async function renderCorporateDetail(id = null) {
               </table>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
+            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
               <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
-              <button class="btn btn-teal btn-sm" onclick="scheduleMcuBooking(${id},'${esc(c.corporate_name).replace(/'/g,"\\'")}')" style="color:#fff; padding:8px 16px;">
-                📅 Jadwalkan MCU → Booking
-              </button>
             </div>
           </div>
 
@@ -901,9 +901,8 @@ window.switchCorpDetailTab = function(tabId) {
 
   // Trigger content loader on tab switch
   if (tabId === 'employees') {
-    const corpName = document.getElementById('cf-name')?.value || 'Corporate';
-    const match = document.getElementById('tab-btn-employees')?.getAttribute('onclick')?.match(/\d+/);
-    const corpId = match ? parseInt(match[0]) : null;
+    const corpId = window.currentDetailCorpId;
+    const corpName = window.currentDetailCorpName || 'Corporate';
     if (corpId) {
       loadTabCorpEmployees(corpId, corpName);
     }
