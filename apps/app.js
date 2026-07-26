@@ -1142,8 +1142,11 @@ async function loadCorporateData() {
 
   try {
     const isSuperAdmin = (currentUserEmail === 'aceanwar424@gmail.com');
-    // 1) corporate_id dari profil akun; superadmin/demo → picker semua corporate
-    let corpId = currentUserProfile?.corporate_id || null;
+    // Prioritas resolusi corporate_id:
+    //  1) currentCorporateId yang sudah diverifikasi saat login via Kode Corporate,
+    //  2) corporate_id dari profil akun (tautan user_profiles),
+    //  3) superadmin/demo → perusahaan pertama yang aktif.
+    let corpId = currentCorporateId || currentUserProfile?.corporate_id || null;
     if (!corpId) {
       allCorporatesForPicker = await sbGet('corporates','select=id,corporate_name,cashback_balance&status=eq.Aktif&order=corporate_name').catch(()=>[]);
       if (isSuperAdmin || !currentUserProfile) {
