@@ -838,6 +838,7 @@ async function renderCorporateDetail(id = null) {
 
             <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
               <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+            </div>
           </div>
 
           <!-- ==================== TAB: EMPLOYEE FORM (INLINE EDITOR) ==================== -->

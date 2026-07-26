@@ -1178,10 +1178,51 @@ async function loadCorporateData() {
     corporates = await sbGet('corporate_employees',
       `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(()=>[]) || [];
     renderCorporateList();
-    loadInvoices();   // invoice korporat nyata
+    loadInvoices();          // invoice korporat nyata
+    renderCorporateHome();   // isi kartu Corporate Info (Home)
   } catch(e) {
     if (container) container.innerHTML = `<p style="padding:16px;color:var(--error)">❌ ${e.message}</p>`;
   }
+}
+
+// Isi kartu Corporate Info (Home) dari data corporate nyata
+async function renderCorporateHome() {
+  if (!currentCorporateId || typeof sbGet !== 'function') return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val || val === 0) ? val : '—'; };
+  let c = {};
+  try { c = (await sbGet('corporates', `select=*&id=eq.${currentCorporateId}`))?.[0] || {}; } catch(e) { return; }
+  // Corporate Info
+  set('ci-name', c.corporate_name);
+  set('ci-addr', c.address);
+  set('ci-region', [c.subdistrict, c.city, c.province].filter(Boolean).join(', '));
+  set('ci-phone', c.pic_phone);
+  set('ci-email', c.pic_email);
+  set('ci-acct', c.kode_corp);
+  set('ci-sap', c.sap_id);
+  set('ci-tax', c.npwp);
+  // Contact Info
+  set('ci-pic', c.pic_name);
+  set('ci-c-phone', c.pic_phone);
+  set('ci-c-email', c.pic_email);
+  set('ci-industry', c.industry);
+  set('ci-status', c.status);
+  // Account Info
+  set('ci-bank', c.bank_name);
+  set('ci-branch', c.bank_branch);
+  set('ci-bankacc', c.bank_account_number);
+  set('ci-bankname', c.bank_account_name);
+  set('ci-billing', c.billing_type);
+  set('ci-terms', c.payment_terms ? c.payment_terms + ' hari' : null);
+  set('ci-cashback', 'Rp ' + Number(c.cashback_balance || 0).toLocaleString('id-ID'));
+}
+
+// Ganti tab kartu Corporate Info (Corporate / Contact / Account)
+function switchCiTab(tab, btn) {
+  document.querySelectorAll('.ci-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.ci-body[data-ci]').forEach(b => {
+    b.style.display = b.getAttribute('data-ci') === tab ? '' : 'none';
+  });
 }
 
 // Status karyawan → badge (booking > aktif > terdaftar)

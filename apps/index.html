@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260726a">
+  <link rel="stylesheet" href="style.css?v=20260726b">
 </head>
 <body>
   <div class="app-container">
@@ -1175,63 +1175,88 @@
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
       <div id="corporate-view" class="view-panel">
         
-        <!-- C - FASE 1: DIGITAL HOSPITAL -->
+        <!-- C - HOME: CORPORATE INFO (DIGILAB style) -->
         <div id="c-fase1-panel" class="phase-panel active">
-          <div class="quick-stats">
-            <div class="stat-card">
-              <span class="stat-icon">👥</span>
-              <h4>Total Karyawan</h4>
-              <p id="c-stat-total">0 Orang</p>
-            </div>
-            <div class="stat-card">
-              <span class="stat-icon">✅</span>
-              <h4>Selesai MCU</h4>
-              <p id="c-stat-mcu">0 Orang</p>
-            </div>
-          </div>
 
-          <div class="glass-card progress-card" style="margin-bottom: 24px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
-              <span>Progres Proyek MCU</span>
-              <span id="c-progress-txt">0%</span>
+          <!-- Corporate Info card with tabs -->
+          <div class="ci-card">
+            <div class="ci-tabs">
+              <button class="ci-tab active" onclick="switchCiTab('info', this)">Corporate Info</button>
+              <button class="ci-tab" onclick="switchCiTab('contact', this)">Contact Info</button>
+              <button class="ci-tab" onclick="switchCiTab('account', this)">Account Info</button>
             </div>
-            <div class="progress-bar-bg">
-              <div class="progress-bar-fill" id="c-progress-bar" style="width: 0%;"></div>
-            </div>
-          </div>
 
-          <!-- Wellness Chart (Pure SVG) -->
-          <div class="glass-card chart-card" style="margin-bottom: 24px;">
-            <div class="chart-header">
-              <h4>Analisis Kesehatan Karyawan</h4>
+            <div class="ci-body" data-ci="info">
+              <div class="ci-col-left">
+                <div class="ci-nm" id="ci-name">—</div>
+                <div class="ci-ln" id="ci-addr">—</div>
+                <div class="ci-ln" id="ci-region">—</div>
+                <div class="ci-line"><span class="k">Phone</span><span class="v" id="ci-phone">—</span></div>
+                <div class="ci-line"><span class="k">Email</span><span class="v" id="ci-email">—</span></div>
+              </div>
+              <div class="ci-col-right">
+                <div class="ci-line"><span class="k">Account Number</span><span class="v" id="ci-acct">—</span></div>
+                <div class="ci-line"><span class="k">SAP BP ID</span><span class="v" id="ci-sap">—</span></div>
+                <div class="ci-line"><span class="k">Company Tax No</span><span class="v" id="ci-tax">—</span></div>
+                <div class="ci-line"><span class="k">Currency</span><span class="v">IDR</span></div>
+              </div>
             </div>
-            <div class="chart-content">
-              <svg width="120" height="120" viewBox="0 0 42 42" class="donut-chart">
-                <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="transparent"></circle>
-                <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#cbd5e1" stroke-width="4"></circle>
-                <circle class="donut-segment segment-fit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--teal)" stroke-width="4" stroke-dasharray="70 30" stroke-dashoffset="25"></circle>
-                <circle class="donut-segment segment-unfit" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--error)" stroke-width="4" stroke-dasharray="20 80" stroke-dashoffset="55"></circle>
-                <circle class="donut-segment segment-pending" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="var(--warning)" stroke-width="4" stroke-dasharray="10 90" stroke-dashoffset="35"></circle>
-                <text x="50%" y="55%" class="donut-text" text-anchor="middle" fill="#0f2963" font-size="8" font-weight="800">70%</text>
-                <text x="50%" y="67%" class="donut-subtext" text-anchor="middle" fill="var(--text-muted)" font-size="3" font-weight="600">FIT</text>
-              </svg>
-              <div class="chart-legend">
-                <div class="legend-item"><span class="legend-dot dot-fit"></span> <span>Fit to Work (70%)</span></div>
-                <div class="legend-item"><span class="legend-dot dot-unfit"></span> <span>Unfit/Review (20%)</span></div>
-                <div class="legend-item"><span class="legend-dot dot-pending"></span> <span>Pending (10%)</span></div>
+
+            <div class="ci-body" data-ci="contact" style="display:none">
+              <div class="ci-col-left">
+                <div class="ci-line"><span class="k">Nama PIC</span><span class="v" id="ci-pic">—</span></div>
+                <div class="ci-line"><span class="k">Phone</span><span class="v" id="ci-c-phone">—</span></div>
+                <div class="ci-line"><span class="k">Email</span><span class="v" id="ci-c-email">—</span></div>
+              </div>
+              <div class="ci-col-right">
+                <div class="ci-line"><span class="k">Industri</span><span class="v" id="ci-industry">—</span></div>
+                <div class="ci-line"><span class="k">Status</span><span class="v" id="ci-status">—</span></div>
+              </div>
+            </div>
+
+            <div class="ci-body" data-ci="account" style="display:none">
+              <div class="ci-col-left">
+                <div class="ci-line"><span class="k">Bank</span><span class="v" id="ci-bank">—</span></div>
+                <div class="ci-line"><span class="k">Cabang</span><span class="v" id="ci-branch">—</span></div>
+                <div class="ci-line"><span class="k">No. Rekening</span><span class="v" id="ci-bankacc">—</span></div>
+                <div class="ci-line"><span class="k">Atas Nama</span><span class="v" id="ci-bankname">—</span></div>
+              </div>
+              <div class="ci-col-right">
+                <div class="ci-line"><span class="k">Tipe Billing</span><span class="v" id="ci-billing">—</span></div>
+                <div class="ci-line"><span class="k">Payment Terms</span><span class="v" id="ci-terms">—</span></div>
+                <div class="ci-line"><span class="k">Saldo Cashback</span><span class="v" id="ci-cashback">—</span></div>
               </div>
             </div>
           </div>
 
-          <div class="section-title">Status Kesehatan Karyawan</div>
-          <div class="quick-stats" style="margin-bottom: 24px;">
-            <div class="mini-stat-card card-fit">
-              <h5>Fit to Work</h5>
-              <span id="c-stat-fit">0</span>
+          <!-- Summary stats (data nyata) -->
+          <div class="ci-summary">
+            <div class="ci-stat">
+              <div class="ci-ic" style="background:rgba(15,41,99,.1);color:var(--primary)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+              <div><h4>Total Karyawan</h4><div class="ci-big" id="c-stat-total">0 Orang</div></div>
             </div>
-            <div class="mini-stat-card card-unfit">
-              <h5>Unfit / Review</h5>
-              <span id="c-stat-unfit">0</span>
+            <div class="ci-stat">
+              <div class="ci-ic" style="background:rgba(22,163,74,.12);color:var(--success)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg></div>
+              <div><h4>Sudah Booking MCU</h4><div class="ci-big" id="c-stat-mcu">0 Orang</div></div>
+            </div>
+            <div class="ci-stat">
+              <div class="ci-ic" style="background:rgba(20,184,166,.12);color:var(--teal)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12.01l8.73-5.05"/></svg></div>
+              <div><h4>Sudah Berpaket</h4><div class="ci-big" id="c-stat-fit">0</div></div>
+            </div>
+            <div class="ci-stat">
+              <div class="ci-ic" style="background:rgba(234,88,12,.12);color:var(--warning)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div><h4>Belum Berpaket</h4><div class="ci-big" id="c-stat-unfit">0</div></div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="glass-card" style="margin-bottom: 20px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; font-weight:600;">
+              <span>Progres Booking MCU</span>
+              <span id="c-progress-txt">0%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="c-progress-bar" style="width: 0%;"></div>
             </div>
           </div>
         </div>
@@ -2184,6 +2209,6 @@
   </div>
 
   <script src="../js/core/api.js?v=20260719k"></script>
-  <script src="app.js?v=20260726a"></script>
+  <script src="app.js?v=20260726b"></script>
 </body>
 </html>
