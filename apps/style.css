@@ -2074,3 +2074,25 @@ th {
 }
 
 
+
+/* ══════════ Corporate Home — Corporate Info card (DIGILAB style) ══════════ */
+.ci-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 20px; }
+.ci-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); padding: 0 10px; overflow-x: auto; }
+.ci-tab { padding: 15px 20px; border: none; background: none; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; transition: color .18s ease, border-color .18s ease; }
+.ci-tab:hover { color: var(--primary); }
+.ci-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
+.ci-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 48px; padding: 22px 26px; }
+.ci-nm { font-size: 15px; font-weight: 800; color: var(--primary); padding: 6px 0; }
+.ci-ln { font-size: 13px; color: var(--text-main); padding: 5px 0; line-height: 1.4; }
+.ci-line { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 9px 0; border-bottom: 1px solid #f1f5f9; }
+.ci-col-left .ci-line { border-bottom: 1px solid #f1f5f9; }
+.ci-line:last-child { border-bottom: none; }
+.ci-line .k { color: var(--teal); font-weight: 700; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; }
+.ci-line .v { color: var(--text-main); font-weight: 600; font-size: 13px; text-align: right; }
+.ci-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 20px; }
+.ci-stat { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 18px 20px; display: flex; align-items: center; gap: 14px; }
+.ci-stat .ci-ic { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ci-stat .ci-ic svg { width: 22px; height: 22px; }
+.ci-stat h4 { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 3px; }
+.ci-stat .ci-big { font-size: 22px; font-weight: 800; color: var(--primary); }
+@media (max-width: 720px) { .ci-body { grid-template-columns: 1fr; gap: 2px; } }

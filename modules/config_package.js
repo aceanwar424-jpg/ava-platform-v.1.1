@@ -838,6 +838,203 @@ async function renderCorporateDetail(id = null) {
 
             <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
               <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+          </div>
+
+          <!-- ==================== TAB: EMPLOYEE FORM (INLINE EDITOR) ==================== -->
+          <div class="tab-content" id="tab-content-employee-form" style="display:none; padding:16px;">
+            <div class="erp-section-title" id="cef-title" style="margin-top:0; border-top:none; border-left:none; border-right:none; display:flex; justify-content:space-between; align-items:center;">
+              <span>Employee Forms</span>
+            </div>
+            
+            <div style="padding:12px 0;">
+              <!-- Identity Documents Grid -->
+              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:#fff; overflow:hidden;">
+                <div style="background:#f1f5f9; padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#0f2963;">
+                  <span>Identity Documents</span>
+                  <button class="btn btn-teal btn-xs" style="padding:4px 10px; font-size:11px; margin:0;" onclick="addIdentityDocRow()">➕ Add</button>
+                </div>
+                <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                  <thead>
+                    <tr style="background:#f8fafc; border-bottom:1px solid #cbd5e1;">
+                      <th style="padding:8px; width:60px; text-align:center;">Primary</th>
+                      <th style="padding:8px; width:80px; text-align:center;">Action</th>
+                      <th style="padding:8px; text-align:left;">ID</th>
+                      <th style="padding:8px; text-align:left;">ID Number</th>
+                      <th style="padding:8px; text-align:left;">Issuer Country</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cef-docs-tbody">
+                    <tr>
+                      <td style="padding:8px; text-align:center;"><input type="checkbox" id="cef-doc-primary" checked></td>
+                      <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:#ef4444; border:1px solid #fecaca; background:#fff; padding:2px 6px; margin:0;">Delete</button></td>
+                      <td style="padding:8px;">
+                        <select id="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+                          <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
+                        </select>
+                      </td>
+                      <td style="padding:8px;"><input type="text" id="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+                      <td style="padding:8px;"><input type="text" id="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Personal Data Section -->
+              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:#fff; overflow:hidden;">
+                <div style="background:#f1f5f9; padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; font-size:12.5px; color:#0f2963;">Personal Data</div>
+                <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Employee Number *</label>
+                    <input type="text" id="cef-id" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Date Of Birth / Age *</label>
+                    <input type="date" id="cef-dob" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Department *</label>
+                    <input type="text" id="cef-dept" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Place Of Birth *</label>
+                    <input type="text" id="cef-pob" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Level *</label>
+                    <select id="cef-level" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option>STAFF</option><option>SUPERVISOR</option><option>MANAGER</option><option>DIRECTOR</option>
+                    </select>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Blood Type *</label>
+                    <select id="cef-blood" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option value="">—</option><option>A</option><option>B</option><option>AB</option><option>O</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Name *</label>
+                    <div style="display:flex; gap:8px;">
+                      <input type="text" id="cef-firstname" placeholder="First Name" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                      <input type="text" id="cef-lastname" placeholder="Last Name" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    </div>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Marital Status *</label>
+                    <select id="cef-marital" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option value="">—</option><option>Single</option><option>Married</option><option>Divorced</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Job Position *</label>
+                    <input type="text" id="cef-job" placeholder="Supervisor, Manager..." style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Religion</label>
+                    <select id="cef-religion" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option value="">—</option><option>Islam</option><option>Kristen Protestan</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Khonghucu</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Email *</label>
+                    <input type="email" id="cef-email" placeholder="email@perusahaan.com" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Ethnic *</label>
+                    <input type="text" id="cef-ethnic" value="JAWA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Gender *</label>
+                    <select id="cef-gender" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option value="M">Male</option><option value="F">Female</option>
+                    </select>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Country of Birth *</label>
+                    <input type="text" id="cef-country" value="INDONESIA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Mobile Phone *</label>
+                    <div style="display:flex; gap:4px;">
+                      <select id="cef-phonecode" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;"><option>+62</option><option>+1</option><option>+65</option></select>
+                      <input type="text" id="cef-phone" placeholder="8xxxxxxxx" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    </div>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Citizenship Category</label>
+                    <div style="display:flex; gap:12px; font-size:12px;">
+                      <label style="display:flex; align-items:center; gap:4px; cursor:pointer;"><input type="radio" name="cef-citizenship" value="WNI" checked> WNI</label>
+                      <label style="display:flex; align-items:center; gap:4px; cursor:pointer;"><input type="radio" name="cef-citizenship" value="WNA"> WNA</label>
+                    </div>
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Status *</label>
+                    <select id="cef-status" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:#fff; color:#0f172a;">
+                      <option value="Non-Aktif">Non-Aktif (Terdaftar)</option>
+                      <option value="Aktif">Aktif</option>
+                    </select>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Special Notes</label>
+                    <input type="text" id="cef-notes" placeholder="Alergi, kondisi khusus..." style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Primary Address Section -->
+              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:#fff; overflow:hidden;">
+                <div style="background:#f1f5f9; padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; font-size:12.5px; color:#0f2963;">Primary Address</div>
+                <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                  
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:start; grid-row: span 2;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963; margin-top:6px;">Address *</label>
+                    <textarea id="cef-address" placeholder="Alamat Lengkap" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; height:80px; resize:none;"></textarea>
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">City *</label>
+                    <input type="text" id="cef-city" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Province *</label>
+                    <input type="text" id="cef-province" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Sub District *</label>
+                    <input type="text" id="cef-subdistrict" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Country *</label>
+                    <input type="text" id="cef-address-country" value="INDONESIA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">District *</label>
+                    <input type="text" id="cef-district" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+                  <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
+                    <label style="font-weight:600; font-size:11.5px; color:#0f2963;">Postal Code *</label>
+                    <input type="text" id="cef-postal" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Form Action Footer -->
+            <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #cbd5e1; padding-top:14px; margin-top:12px;">
+              <button class="btn btn-ghost btn-sm" onclick="closeCorpEmpFormInline()" style="border:1px solid #cbd5e1; padding:6px 16px;">Cancel</button>
+              <button class="btn btn-teal btn-sm" id="cef-submit-btn" onclick="saveCorpEmpInline()" style="padding:6px 20px; margin:0;">💾 Save</button>
             </div>
           </div>
 
@@ -1533,97 +1730,204 @@ async function openCorpEmployees(corpId, corpName) {
     </div>`);
 }
 
-async function openCorpEmpForm(corpId, corpName, id=null) {
-  let e = {};
-  if (id) {
-    const d = await sbGet('corporate_employees',`select=*&id=eq.${id}`);
-    e = d[0]||{};
+window.addIdentityDocRow = function() {
+  const tbody = document.getElementById('cef-docs-tbody');
+  if (!tbody) return;
+  const tr = document.createElement('tr');
+  tr.style.borderBottom = '1px solid #cbd5e1';
+  tr.innerHTML = `
+    <td style="padding:8px; text-align:center;"><input type="checkbox" class="cef-doc-primary" onclick="onlyOnePrimaryDoc(this)"></td>
+    <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:#ef4444; border:1px solid #fecaca; background:#fff; padding:2px 6px; margin:0;" onclick="this.closest('tr').remove()">Delete</button></td>
+    <td style="padding:8px;">
+      <select class="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+        <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
+      </select>
+    </td>
+    <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+    <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+  `;
+  tbody.appendChild(tr);
+};
+
+window.onlyOnePrimaryDoc = function(chk) {
+  if (chk.checked) {
+    document.querySelectorAll('.cef-doc-primary').forEach(c => {
+      if (c !== chk) c.checked = false;
+    });
   }
-  const user = getUserName?getUserName():'User';
+};
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title" style="font-size:16px; font-weight:700; color:#0f2963;">${id?'Edit Karyawan':'Add New Employee'} — ${corpName}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
-    <div class="form-row" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px 0;">
-      <div class="form-group" style="grid-column:1/-1">
-        <label style="font-weight:600; color:#0f2963;">Nama Lengkap *</label>
-        <input type="text" id="cef-name" value="${e.full_name||''}" placeholder="Nama sesuai KTP" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">NIK / ID Karyawan</label>
-        <input type="text" id="cef-id" value="${e.employee_id||''}" placeholder="NIK perusahaan" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">Departemen / Divisi</label>
-        <input type="text" id="cef-dept" value="${e.department||''}" placeholder="HRD, Produksi..." style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">Jenis Kelamin</label>
-        <select id="cef-gender" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-          <option value="M" ${(e.gender||'M')==='M'?'selected':''}>Laki-laki</option>
-          <option value="F" ${e.gender==='F'?'selected':''}>Perempuan</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">Tanggal Lahir</label>
-        <input type="date" id="cef-dob" value="${e.birth_date||''}" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">No. HP</label>
-        <input type="text" id="cef-phone" value="${e.phone||''}" placeholder="08xxxxxxxxxx" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">Email</label>
-        <input type="email" id="cef-email" value="${e.email||''}" placeholder="email@perusahaan.com" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-      <div class="form-group">
-        <label style="font-weight:600; color:#0f2963;">Status</label>
-        <select id="cef-status" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-          <option value="Non-Aktif" ${(e.status||'Non-Aktif')==='Non-Aktif'?'selected':''}>Non-Aktif (Terdaftar)</option>
-          <option value="Aktif" ${e.status==='Aktif'?'selected':''}>Aktif (Sudah Booking)</option>
-        </select>
-      </div>
-      <div class="form-group" style="grid-column:1/-1">
-        <label style="font-weight:600; color:#0f2963;">Catatan Medis / Kondisi Khusus</label>
-        <input type="text" id="cef-notes" value="${e.notes||''}" placeholder="Alergi, kondisi khusus..." style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:6px 10px;">
-      </div>
-    </div>
-    <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #cbd5e1; padding-top:12px;">
-      <button class="btn btn-ghost" onclick="closeModalForce()" style="border:1px solid #cbd5e1; padding:6px 16px;">Batal</button>
-      <button class="btn btn-teal" onclick="saveCorpEmp(${corpId},${id||'null'},'${corpName.replace(/'/g,"\\'")}')" style="padding:6px 20px;">Simpan</button>
-    </div>`);
-}
+window.closeCorpEmpFormInline = function() {
+  const formTab = document.getElementById('tab-content-employee-form');
+  const listTab = document.getElementById('tab-content-employees');
+  if (formTab) formTab.style.display = 'none';
+  if (listTab) listTab.style.display = 'block';
+  delete window.cefEditingId;
+};
 
-async function saveCorpEmp(corpId, id, corpName) {
-  const name = document.getElementById('cef-name').value.trim();
-  if (!name) { toast('Nama wajib diisi','err'); return; }
-  const user = getUserName?getUserName():'User';
+window.openCorpEmpForm = async function(corpId, corpName, id=null) {
+  const listTab = document.getElementById('tab-content-employees');
+  const formTab = document.getElementById('tab-content-employee-form');
+  if (listTab) listTab.style.display = 'none';
+  if (formTab) formTab.style.display = 'block';
+
+  window.cefEditingId = id;
+  
+  const titleSpan = document.querySelector('#cef-title span');
+  if (titleSpan) titleSpan.textContent = id ? `Edit Karyawan — ${corpName}` : `Add New Employee — ${corpName}`;
+
+  const setV = (k, v) => { const el = document.getElementById('cef-'+k); if (el) el.value = v || ''; };
+  setV('id', '');
+  setV('dob', '');
+  setV('dept', '');
+  setV('pob', '');
+  setV('level', 'STAFF');
+  setV('blood', '');
+  setV('firstname', '');
+  setV('lastname', '');
+  setV('marital', '');
+  setV('job', '');
+  setV('religion', '');
+  setV('email', '');
+  setV('ethnic', 'JAWA');
+  setV('gender', 'M');
+  setV('country', 'INDONESIA');
+  setV('phonecode', '+62');
+  setV('phone', '');
+  setV('status', 'Non-Aktif');
+  setV('notes', '');
+
+  setV('address', '');
+  setV('city', '');
+  setV('province', '');
+  setV('subdistrict', '');
+  setV('address-country', 'INDONESIA');
+  setV('district', '');
+  setV('postal', '');
+
+  const tbody = document.getElementById('cef-docs-tbody');
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr style="border-bottom:1px solid #cbd5e1;">
+        <td style="padding:8px; text-align:center;"><input type="checkbox" class="cef-doc-primary" checked onclick="onlyOnePrimaryDoc(this)"></td>
+        <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:#ef4444; border:1px solid #fecaca; background:#fff; padding:2px 6px; margin:0;" onclick="this.closest('tr').remove()">Delete</button></td>
+        <td style="padding:8px;">
+          <select class="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+            <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
+          </select>
+        </td>
+        <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+        <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+      </tr>
+    `;
+  }
+
+  if (id) {
+    try {
+      const data = await sbGet('corporate_employees', `select=*&id=eq.${id}`);
+      const e = data?.[0];
+      if (e) {
+        setV('id', e.employee_id);
+        setV('dob', e.birth_date);
+        setV('dept', e.department);
+        setV('email', e.email);
+        setV('status', e.status || 'Non-Aktif');
+
+        let first = e.full_name || '';
+        let last = '';
+        const parts = first.trim().split(/\s+/);
+        if (parts.length > 1) {
+          first = parts[0];
+          last = parts.slice(1).join(' ');
+        }
+        setV('firstname', first);
+        setV('lastname', last);
+
+        if (e.phone) {
+          if (e.phone.startsWith('+62')) {
+            setV('phonecode', '+62');
+            setV('phone', e.phone.slice(3));
+          } else {
+            setV('phonecode', '+62');
+            setV('phone', e.phone);
+          }
+        }
+
+        if (e.notes) {
+          setV('notes', e.notes);
+          const pMatch = e.notes.match(/Position:\s*([^,]+)/);
+          if (pMatch) setV('job', pMatch[1]);
+          const lMatch = e.notes.match(/Level:\s*([^,]+)/);
+          if (lMatch) setV('level', lMatch[1]);
+        }
+
+        const docNumInput = document.querySelector('.cef-doc-num');
+        if (docNumInput) docNumInput.value = e.employee_id || '';
+      }
+    } catch(err) {
+      toast('Gagal memuat data karyawan: ' + err.message, 'err');
+    }
+  }
+};
+
+window.saveCorpEmpInline = async function() {
+  const corpId = window.currentDetailCorpId;
+  const corpName = window.currentDetailCorpName || 'Corporate';
+  if (!corpId) { toast('Error: ID corporate tidak teridentifikasi.', 'err'); return; }
+
+  const val = k => (document.getElementById('cef-'+k)?.value || '').trim();
+  const firstName = val('firstname');
+  const lastName = val('lastname');
+  const name = [firstName, lastName].filter(Boolean).join(' ');
+
+  if (!firstName) { toast('First Name wajib diisi', 'err'); return; }
+
+  const phoneCode = val('phonecode');
+  const phoneNum = val('phone');
+  const fullPhone = phoneNum ? (phoneCode + phoneNum) : null;
+
+  const job = val('job');
+  const level = val('level');
+  let notesStr = val('notes');
+  if (job || level) {
+    notesStr = `Position: ${job || '—'}, Level: ${level || '—'}`;
+  }
 
   const payload = {
     corporate_id: corpId,
+    corporate_name: corpName,
     full_name:    name,
-    employee_id:  document.getElementById('cef-id').value.trim()||null,
-    department:   document.getElementById('cef-dept').value.trim()||null,
-    gender:       document.getElementById('cef-gender').value,
-    birth_date:   document.getElementById('cef-dob').value||null,
-    phone:        document.getElementById('cef-phone').value.trim()||null,
-    email:        document.getElementById('cef-email').value.trim()||null,
-    status:       document.getElementById('cef-status').value,
-    notes:        document.getElementById('cef-notes').value.trim()||null,
+    employee_id:  val('id') || null,
+    department:   val('dept') || null,
+    gender:       val('gender') || 'M',
+    birth_date:   val('dob') || null,
+    phone:        fullPhone,
+    email:        val('email') || null,
+    status:       val('status') || 'Non-Aktif',
+    notes:        notesStr || null,
     updated_at:   new Date().toISOString(),
   };
 
+  const btn = document.getElementById('cef-submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Saving...'; }
+
   try {
-    if (id) { await sbPatch('corporate_employees',id,payload); toast('✅ Diupdate','ok'); }
-    else    { await sbPost('corporate_employees',payload);    toast('✅ Karyawan ditambahkan','ok'); }
-    closeModalForce();
-    if (document.getElementById('erp-cemp-tbody')) {
-      loadTabCorpEmployees(corpId, corpName);
+    if (window.cefEditingId) {
+      await sbPatch('corporate_employees', window.cefEditingId, payload);
+      toast('✅ Karyawan berhasil diupdate', 'ok');
+    } else {
+      await sbPost('corporate_employees', payload);
+      toast('✅ Karyawan berhasil ditambahkan', 'ok');
     }
-  } catch(e) { toast('❌ '+e.message,'err'); }
-}
+
+    closeCorpEmpFormInline();
+    loadTabCorpEmployees(corpId, corpName);
+  } catch(e) {
+    toast('❌ Gagal menyimpan: ' + e.message, 'err');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Save'; }
+  }
+};
 
 async function deleteCorpEmp(id, corpId, corpName) {
   if (!confirm('Hapus data karyawan ini?')) return;
