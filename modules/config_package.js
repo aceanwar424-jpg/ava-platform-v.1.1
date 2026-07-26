@@ -1393,7 +1393,24 @@ window.linkUserToCorporate = async function(corpId) {
         });
         toast(`✅ Akun login ${userProfile.full_name} ditautkan sebagai ${corpRole || 'none'}`, 'ok');
       } else {
-        toast(`⚠️ Akun login untuk ${emp.full_name} (${emp.email || 'tanpa email'}) belum terdaftar. Silakan minta karyawan tersebut melakukan pendaftaran akun terlebih dahulu di halaman login.`, 'err', 8000);
+        const defaultPassword = 'UserOneLab123!';
+        const targetEmail = emp.email || `${emp.full_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@queenhealth.co.id`;
+        
+        try {
+          await sbRpc('create_auth_user', {
+            p_email: targetEmail,
+            p_password: defaultPassword,
+            p_full_name: emp.full_name,
+            p_phone: emp.phone || '',
+            p_role: 'corporate',
+            p_corporate_id: corpId,
+            p_corp_role: corpRole
+          });
+          toast(`✅ Akun login otomatis dibuat & ditautkan untuk ${emp.full_name}. Password: ${defaultPassword}`, 'ok', 7000);
+        } catch (rpcErr) {
+          console.error(rpcErr);
+          toast(`⚠️ Pembuatan akun otomatis gagal. Silakan jalankan file SQL 'supabase_create_user_rpc.sql' di SQL Editor Supabase terlebih dahulu untuk mengaktifkan fitur ini.`, 'err', 10000);
+        }
       }
     }
     loadTabCorpUsers(corpId);
