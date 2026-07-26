@@ -331,35 +331,105 @@ async function deletePackage(id) {
 // ══════════════════════════════════════════
 async function renderConfigCorporate() {
   document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div><h1>Corporate Management</h1>
-        <p>Manajemen klien korporat — kontrak, billing, limit kredit</p></div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()">Health Facility</button>
-        <button class="btn btn-teal" onclick="navigate('import')">Import</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()">Export</button>
-        <button class="btn btn-teal" onclick="renderCorporateDetail()">+ Tambah Corporate</button>
+    <style>
+      .premium-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 14px 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all 0.2s ease;
+      }
+      .premium-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.03), 0 4px 6px -2px rgba(0,0,0,0.01);
+      }
+      .premium-icon-wrap {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: white;
+      }
+      .premium-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #ffffff;
+      }
+      .premium-table th {
+        background: #0f2963;
+        color: white;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 2px solid #cbd5e1;
+      }
+      .premium-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 12.5px;
+      }
+      .premium-table tbody tr:hover {
+        background-color: #f8fafc;
+      }
+      .premium-badge {
+        padding: 4px 8px;
+        border-radius: 99px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: inline-block;
+      }
+    </style>
+    <div class="page-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+      <div>
+        <h1 style="font-size: 20px; font-weight: 800; color: #0f2963; margin: 0; letter-spacing: -0.02em;">Corporate Management</h1>
+        <p style="font-size: 12.5px; color: #64748b; margin-top: 4px; margin-bottom: 0;">Manajemen klien korporat — kontrak, billing, limit kredit</p>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; display:flex; align-items:center; gap:6px;">🏢 Health Facility</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('import')" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; display:flex; align-items:center; gap:6px;">📥 Import</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:#ffffff; color:#475569; display:flex; align-items:center; gap:6px;">📤 Export</button>
+        <button class="btn btn-teal btn-sm" onclick="renderCorporateDetail()" style="padding: 8px 16px; font-size:12.5px; font-weight:700; border-radius:8px; background:linear-gradient(135deg, #0f2963, #14b8a6); border:none; color:white; display:flex; align-items:center; gap:6px; cursor:pointer;">➕ Tambah Corporate</button>
       </div>
     </div>
 
     <!-- KPI -->
-    <div id="corp-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:16px">
+    <div id="corp-kpi" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:14px; margin-bottom:20px;">
       <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
     </div>
 
-    <div class="table-wrap">
-      <div class="table-toolbar">
-        <input class="table-search" id="corp-q" placeholder="Cari nama perusahaan..." oninput="filterCorp()" style="flex:1">
-        <select class="table-filter" id="corp-status" onchange="filterCorp()">
-          <option value="">Semua</option>
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+      <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+        <div style="position:relative; flex:1; min-width:240px;">
+          <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:14px;">🔍</span>
+          <input type="text" class="table-search" id="corp-q" placeholder="Cari nama perusahaan..." oninput="filterCorp()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid #cbd5e1; border-radius:8px; outline:none; font-size:12.5px; color:#0f172a; box-sizing:border-box;">
+        </div>
+        <select class="table-filter" id="corp-status" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid #cbd5e1; border-radius:8px; outline:none; background:#ffffff; font-size:12.5px; color:#0f172a;">
+          <option value="">Semua Status</option>
           <option>Aktif</option><option>Non-Aktif</option><option>Suspend</option>
         </select>
-        <select class="table-filter" id="corp-billing" onchange="filterCorp()">
+        <select class="table-filter" id="corp-billing" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid #cbd5e1; border-radius:8px; outline:none; background:#ffffff; font-size:12.5px; color:#0f172a;">
           <option value="">Semua Billing</option>
           <option>Invoice</option><option>Prepaid</option><option>Credit</option>
         </select>
       </div>
-      <div id="corp-tbody">
+      
+      <div id="corp-tbody" style="overflow-x:auto;">
         <div class="loading-row"><div class="spinner"></div></div>
       </div>
     </div>`;
@@ -385,16 +455,25 @@ function renderCorpKPI() {
   const active  = corpAll.filter(c=>c.status==='Aktif').length;
   const credit  = corpAll.filter(c=>c.billing_type==='Credit');
   const totCred = credit.reduce((s,c)=>s+(c.credit_limit||0),0);
-  el.innerHTML = [
-    {label:'Total Corporate', val:corpAll.length,      color:'#0A2342'},
-    {label:'Aktif',           val:active,              color:'#22C55E'},
-    {label:'Total Credit Limit', val:formatCurrency(totCred), color:'#8B5CF6'},
-    {label:'Invoice Client', val:corpAll.filter(c=>c.billing_type==='Invoice').length, color:'#0EA5E9'},
-  ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
-      <div style="font-size:14px;font-weight:800;color:${k.color}">${k.val}</div>
-      <div style="font-size:10px;color:var(--gray)">${k.label}</div>
-    </div>`).join('');
+  
+  const kpis = [
+    { label: 'Total Corporate', val: corpAll.length, icon: '🏢', gradient: 'linear-gradient(135deg, #3b82f6, #1d4ed8)', shadowColor: 'rgba(59, 130, 246, 0.2)' },
+    { label: 'Corporate Aktif', val: active, icon: '✅', gradient: 'linear-gradient(135deg, #10b981, #047857)', shadowColor: 'rgba(16, 185, 129, 0.2)' },
+    { label: 'Total Credit Limit', val: formatCurrency(totCred), icon: '💳', gradient: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', shadowColor: 'rgba(139, 92, 246, 0.2)' },
+    { label: 'Invoice Client', val: corpAll.filter(c=>c.billing_type==='Invoice').length, icon: '🧾', gradient: 'linear-gradient(135deg, #0ea5e9, #0369a1)', shadowColor: 'rgba(14, 165, 233, 0.2)' }
+  ];
+
+  el.innerHTML = kpis.map(k => `
+    <div class="premium-card">
+      <div class="premium-icon-wrap" style="background: ${k.gradient}; box-shadow: 0 4px 10px ${k.shadowColor}">
+        ${k.icon}
+      </div>
+      <div>
+        <div style="font-size: 16px; font-weight: 800; color: #0f172a; line-height: 1.2;">${k.val}</div>
+        <div style="font-size: 10px; color: #64748b; font-weight: 600; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.02em;">${k.label}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function filterCorp() {
@@ -411,47 +490,91 @@ function filterCorp() {
 
 function renderCorpTable(data) {
   const el=document.getElementById('corp-tbody');
+  if (!el) return;
   if (!data.length) {
-    el.innerHTML=`<div class="empty-state"><div class="ico">🏢</div>
-      <h3>${corpAll.length?'Tidak ada hasil':'Belum ada data corporate'}</h3>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="renderCorporateDetail()">+ Tambah Corporate</button>
+    el.innerHTML=`<div class="empty-state" style="text-align:center; padding:40px; background:#f8fafc; border-radius:12px; border:2px dashed #cbd5e1;">
+      <div style="font-size:40px; margin-bottom:12px;">🏢</div>
+      <h3 style="margin:0 0 6px 0; color:#1e293b;">${corpAll.length ? 'Tidak ada hasil pencarian' : 'Belum ada data corporate'}</h3>
+      <p style="color:#64748b; font-size:12.5px; margin:0 0 16px 0;">Silakan tambah data corporate baru di atas.</p>
+      <button class="btn btn-teal" onclick="renderCorporateDetail()" style="padding:8px 16px; border-radius:6px; background:#14b8a6; border:none; color:white; font-weight:600; cursor:pointer;">➕ Tambah Corporate</button>
     </div>`; return;
   }
 
-  el.innerHTML=`<table><thead><tr>
-    <th>Perusahaan</th><th>PIC</th><th>Billing</th>
-    <th>Diskon</th><th>Credit Limit</th><th>Status</th><th>Aksi</th>
-  </tr></thead><tbody>
-  ${data.map(c=>{
-    const stColors={Aktif:'#22C55E','Non-Aktif':'#EF4444',Suspend:'#F59E0B'};
-    const sc=stColors[c.status]||'#94A3B8';
-    return `<tr>
-      <td>
-        <div style="font-weight:700;color:var(--navy)">${c.corporate_name||'—'}</div>
-        ${c.kode_corp?`<div style="font-size:10px;color:var(--gray);font-family:monospace">${c.kode_corp}</div>`:''}
-        ${c.industry?`<div style="font-size:11px;color:var(--gray)">${c.industry}</div>`:''}
-      </td>
-      <td>
-        <div style="font-size:12px">${c.pic_name||'—'}</div>
-        ${c.pic_phone?`<div style="font-size:11px;color:var(--teal)">${c.pic_phone}</div>`:''}
-      </td>
-      <td>
-        <span class="badge badge-navy">${c.billing_type||'Invoice'}</span>
-        ${c.payment_terms?`<div style="font-size:10px;color:var(--gray)">NET ${c.payment_terms} hari</div>`:''}
-      </td>
-      <td style="font-size:12px">
-        ${c.discount_type!=='none'?`${c.discount_value}${c.discount_type==='percent'?'%':' Rp'}`:'-'}
-      </td>
-      <td style="font-size:12px;font-weight:600">${c.credit_limit?formatCurrency(c.credit_limit):'-'}</td>
-      <td><span style="background:${sc}20;color:${sc};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${c.status||'—'}</span></td>
-      <td>
-        <div class="act-row">
-          <button class="act-btn edit" onclick="renderCorporateDetail(${c.id})" title="Detail & Edit Corporate">${icon('edit', 12)}</button>
-          <button class="act-btn del" onclick="deleteCorp(${c.id})" title="Hapus Corporate">${icon('trash', 12)}</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('')}</tbody></table>`;
+  el.innerHTML=`<table class="premium-table">
+    <thead>
+      <tr>
+        <th style="width:30%;">Perusahaan</th>
+        <th style="width:20%;">PIC &amp; Kontak</th>
+        <th style="width:15%;">Tipe Billing</th>
+        <th style="width:10%;">Diskon</th>
+        <th style="width:15%;">Credit Limit</th>
+        <th style="width:10%;">Status</th>
+        <th style="width:10%; text-align:center;">Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${data.map(c => {
+        const stColors = {
+          'Aktif': { text: '#047857', bg: '#d1fae5' },
+          'Non-Aktif': { text: '#b91c1c', bg: '#fee2e2' },
+          'Suspend': { text: '#b45309', bg: '#fef3c7' }
+        };
+        const sc = stColors[c.status] || { text: '#475569', bg: '#f1f5f9' };
+        
+        const billColors = {
+          'Invoice': { text: '#0369a1', bg: '#e0f2fe' },
+          'Prepaid': { text: '#047857', bg: '#d1fae5' },
+          'Credit': { text: '#6d28d9', bg: '#f3e8ff' }
+        };
+        const bc = billColors[c.billing_type || 'Invoice'] || { text: '#475569', bg: '#f1f5f9' };
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight: 700; color: #0f2963; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                🏢 ${c.corporate_name || '—'}
+              </div>
+              <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center; flex-wrap: wrap;">
+                ${c.kode_corp ? `<span style="font-family: monospace; font-size: 10px; background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;">${c.kode_corp}</span>` : ''}
+                ${c.industry ? `<span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${c.industry}</span>` : ''}
+              </div>
+            </td>
+            <td>
+              <div style="font-weight: 600; color: #1e293b;">${c.pic_name || '—'}</div>
+              ${c.pic_phone ? `<div style="font-size: 11.5px; color: #0d9488; font-weight:500; margin-top: 2px;">📞 ${c.pic_phone}</div>` : ''}
+            </td>
+            <td>
+              <span class="premium-badge" style="background: ${bc.bg}; color: ${bc.text};">${c.billing_type || 'Invoice'}</span>
+              ${c.payment_terms ? `<div style="font-size: 11px; color: #64748b; margin-top: 4px;">NET ${c.payment_terms} Hari</div>` : ''}
+            </td>
+            <td>
+              <span style="font-weight: 600; color: #0f172a;">
+                ${c.discount_type !== 'none' && c.discount_type ? `${c.discount_value}${c.discount_type === 'percent' ? '%' : ' Rp'}` : '—'}
+              </span>
+            </td>
+            <td>
+              <span style="font-weight: 700; color: #475569;">
+                ${c.credit_limit ? formatCurrency(c.credit_limit) : '—'}
+              </span>
+            </td>
+            <td>
+              <span class="premium-badge" style="background: ${sc.bg}; color: ${sc.text};">${c.status || '—'}</span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
+                <button onclick="renderCorporateDetail(${c.id})" title="Detail &amp; Edit" style="width:28px; height:28px; border-radius:6px; border:1px solid #bfdbfe; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
+                  ${icon('edit', 12)}
+                </button>
+                <button onclick="deleteCorp(${c.id})" title="Hapus" style="width:28px; height:28px; border-radius:6px; border:1px solid #fecaca; background:#fef2f2; color:#dc2626; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
+                  ${icon('trash', 12)}
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('')}
+    </tbody>
+  </table>`;
 }
 
 let _corpFormId = null, _corpFormName = '';
