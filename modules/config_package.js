@@ -592,6 +592,7 @@ async function renderCorporateDetail(id = null) {
           <button class="tab-btn" id="tab-btn-info" onclick="switchCorpDetailTab('info')">Account Info</button>
           <button class="tab-btn" id="tab-btn-employees" onclick="switchCorpDetailTab('employees')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Employee List</button>
           <button class="tab-btn" id="tab-btn-import" onclick="switchCorpDetailTab('import')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Import Employee</button>
+          <button class="tab-btn" id="tab-btn-users" onclick="switchCorpDetailTab('users')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Corporate Users</button>
         </div>
 
         <!-- Right Side Panel Workspace -->
@@ -1070,6 +1071,47 @@ async function renderCorporateDetail(id = null) {
             </div>
           </div>
 
+          <!-- ==================== TAB: CORPORATE USERS ==================== -->
+          <div class="tab-content" id="tab-content-users" style="display:none; padding:16px;">
+            <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Corporate Users Settings</div>
+            
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:16px;">
+              <span style="font-weight:700; color:#0f2963; font-size:12.5px; display:block; margin-bottom:6px;">Link Existing User Account</span>
+              <div style="display:flex; gap:8px;">
+                <select id="erp-corp-user-select" style="flex:1; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
+                  <!-- Dinamis load via JS -->
+                </select>
+                <select id="erp-corp-role-select" style="width:140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; color:#0f172a; font-size:12.5px;">
+                  <option value="requestor">Requestor</option>
+                  <option value="approver">Approver</option>
+                  <option value="">None / View Only</option>
+                </select>
+                <button class="btn btn-teal btn-sm" onclick="linkUserToCorporate(${id})" style="padding:8px 16px; margin:0;">➕ Link User</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid #cbd5e1;">
+                <thead>
+                  <tr style="background:#f1f5f9; border-bottom:2px solid #cbd5e1;">
+                    <th style="padding:10px; text-align:left;">Name</th>
+                    <th style="padding:10px; text-align:left;">Email</th>
+                    <th style="padding:10px; text-align:left;">Phone</th>
+                    <th style="padding:10px; text-align:left; width:180px;">Role in Corporate</th>
+                    <th style="padding:10px; text-align:center; width:100px;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="erp-cusers-tbody">
+                  <!-- Dinamis load via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
+              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+            </div>
+          </div>
+
         </div>
 
       </div>
@@ -1102,6 +1144,11 @@ window.switchCorpDetailTab = function(tabId) {
     const corpName = window.currentDetailCorpName || 'Corporate';
     if (corpId) {
       loadTabCorpEmployees(corpId, corpName);
+    }
+  } else if (tabId === 'users') {
+    const corpId = window.currentDetailCorpId;
+    if (corpId) {
+      loadTabCorpUsers(corpId);
     }
   }
 };
@@ -1187,6 +1234,100 @@ window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statu
 
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat data: ${e.message}</td></tr>`;
+  }
+};
+window.loadTabCorpUsers = async function(corpId) {
+  const tbody = document.getElementById('erp-cusers-tbody');
+  const select = document.getElementById('erp-corp-user-select');
+  if (!tbody) return;
+
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text3);"><div class="spinner" style="margin:0 auto;"></div></td></tr>`;
+
+  try {
+    const linkedUsers = await sbGet('user_profiles', `select=*&corporate_id=eq.${corpId}&order=full_name.asc`).catch(() => []);
+    const allCorpUsers = await sbGet('user_profiles', `select=*&role=eq.corporate&order=full_name.asc`).catch(() => []);
+    const unlinkedUsers = allCorpUsers.filter(u => u.corporate_id !== corpId);
+
+    if (select) {
+      select.innerHTML = '<option value="">-- Pilih User Profile untuk ditautkan --</option>' +
+        unlinkedUsers.map(u => `<option value="${u.id}">${u.full_name} (${u.email || 'No Email'}) [${u.corporate_name || 'Unlinked'}]</option>`).join('');
+    }
+
+    if (!linkedUsers.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text3);">Belum ada user corporate yang ditautkan. Silakan tautkan di atas.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = linkedUsers.map(u => {
+      return `
+        <tr style="border-bottom:1px solid #cbd5e1;">
+          <td style="padding:10px 8px; font-weight:600; color:#0f2963;">${u.full_name || '—'}</td>
+          <td style="padding:10px 8px; color:#475569;">${u.email || '—'}</td>
+          <td style="padding:10px 8px; color:#475569;">${u.phone || '—'}</td>
+          <td style="padding:10px 8px;">
+            <select onchange="updateUserCorpRole('${u.id}', this.value, ${corpId})" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px; background:#fff; color:#0f172a; font-size:12px;">
+              <option value="requestor" ${u.corp_role === 'requestor' ? 'selected' : ''}>Requestor</option>
+              <option value="approver" ${u.corp_role === 'approver' ? 'selected' : ''}>Approver</option>
+              <option value="" ${!u.corp_role ? 'selected' : ''}>None / View Only</option>
+            </select>
+          </td>
+          <td style="padding:10px 8px; text-align:center;">
+            <button class="btn btn-unfit btn-xs" style="color:#ef4444; border:1px solid #fecaca; background:#fff; padding:4px 8px; margin:0;" onclick="unlinkUserFromCorporate('${u.id}', ${corpId})">Unlink</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:#ef4444;">Gagal memuat user: ${e.message}</td></tr>`;
+  }
+};
+
+window.linkUserToCorporate = async function(corpId) {
+  const userId = document.getElementById('erp-corp-user-select')?.value;
+  const corpRole = document.getElementById('erp-corp-role-select')?.value || null;
+  const corpName = window.currentDetailCorpName || 'Corporate';
+  if (!userId) { toast('Silakan pilih user profile terlebih dahulu', 'err'); return; }
+
+  try {
+    await sbPatch('user_profiles', userId, {
+      corporate_id: corpId,
+      corporate_name: corpName,
+      corp_role: corpRole,
+      updated_at: new Date().toISOString()
+    });
+    toast('✅ User berhasil ditautkan ke corporate', 'ok');
+    loadTabCorpUsers(corpId);
+  } catch(e) {
+    toast('❌ Gagal menautkan: ' + e.message, 'err');
+  }
+};
+
+window.updateUserCorpRole = async function(userId, corpRole, corpId) {
+  try {
+    await sbPatch('user_profiles', userId, {
+      corp_role: corpRole || null,
+      updated_at: new Date().toISOString()
+    });
+    toast('✅ Peran corporate berhasil diperbarui', 'ok');
+    loadTabCorpUsers(corpId);
+  } catch(e) {
+    toast('❌ Gagal memperbarui peran: ' + e.message, 'err');
+  }
+};
+
+window.unlinkUserFromCorporate = async function(userId, corpId) {
+  if (!confirm('Apakah Anda yakin ingin melepas tautan user ini dari corporate?')) return;
+  try {
+    await sbPatch('user_profiles', userId, {
+      corporate_id: null,
+      corporate_name: null,
+      corp_role: null,
+      updated_at: new Date().toISOString()
+    });
+    toast('✅ Tautan user berhasil dilepas', 'ok');
+    loadTabCorpUsers(corpId);
+  } catch(e) {
+    toast('❌ Gagal melepas tautan: ' + e.message, 'err');
   }
 };
 

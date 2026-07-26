@@ -1238,6 +1238,166 @@ function switchCiTab(tab, btn) {
   });
 }
 
+// ══════════════════════════════════════════════════════════════
+// ALUR PEMERIKSAAN — Requestor (Book) → Approver (Approval) → History
+// ══════════════════════════════════════════════════════════════
+function genBatchCode() {
+  const d = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const rnd = Math.random().toString(36).slice(2,6).toUpperCase();
+  const seq = Math.floor(Math.random()*9000+1000);
+  return `${rnd}.${d}.${seq}`;
+}
+
+// ── Book Examination (Requestor) ──
+async function renderBookExamination() {
+  const box = document.getElementById('book-exam-content');
+  if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
+  const [emps, pkgs, branchesRaw] = await Promise.all([
+    sbGet('corporate_employees', `select=*&corporate_id=eq.${currentCorporateId}&order=full_name.asc`).catch(()=>[]),
+    sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(()=>[]),
+    sbGet('branches','select=name&order=name').catch(()=>[]),
+  ]);
+  const branches = (branchesRaw||[]).map(b=>b.name).filter(Boolean);
+  const today = new Date().toISOString().slice(0,10);
+  box.innerHTML = `
+    <div class="ci-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+        <h3 style="margin:0">Book Examination</h3>
+        <button class="btn btn-sm btn-teal" style="margin:0;width:auto" onclick="submitExamBooking()">Submit Request</button>
+      </div>
+      <div class="be-filters">
+        <div><label>Branch</label><select id="be-branch">${branches.length?branches.map(b=>`<option>${b}</option>`).join(''):'<option>VIRTU DIGILAB NATIONAL RESEARCH CENTER</option>'}</select></div>
+        <div><label>Book Date</label><input type="date" id="be-date" value="${today}" min="${today}"></div>
+        <div><label>Package</label><select id="be-package"><option value="">— pilih paket —</option>${(pkgs||[]).map(p=>`<option value="${p.id}" data-name="${(p.nama_paket||'').replace(/"/g,'&quot;')}">${p.nama_paket}</option>`).join('')}</select></div>
+      </div>
+      <div style="overflow-x:auto"><table class="be-table">
+        <thead><tr><th style="width:36px"><input type="checkbox" id="be-all" onclick="toggleAllBe(this)"></th><th>Employee No</th><th>Name</th><th>Department</th><th>Job Position</th></tr></thead>
+        <tbody>${(emps||[]).length ? (emps||[]).map(e=>`<tr><td><input type="checkbox" class="be-emp" value="${e.id}" data-name="${(e.full_name||'').replace(/"/g,'&quot;')}" data-nik="${e.id_number||e.employee_id||''}" data-dept="${(e.department||'').replace(/"/g,'&quot;')}"></td><td style="font-family:monospace">${e.employee_id||'—'}</td><td>${e.full_name||'—'}</td><td>${e.department||'—'}</td><td>${e.job_position||'—'}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:22px">Belum ada karyawan. Tambah via Master Employee.</td></tr>'}</tbody>
+      </table></div>
+    </div>`;
+}
+function toggleAllBe(cb) { document.querySelectorAll('.be-emp').forEach(x => x.checked = cb.checked); }
+
+async function submitExamBooking() {
+  const checked = [...document.querySelectorAll('.be-emp:checked')];
+  if (!checked.length) { alert('Pilih minimal 1 karyawan.'); return; }
+  const branch = document.getElementById('be-branch')?.value || null;
+  const date = document.getElementById('be-date')?.value;
+  const pkgSel = document.getElementById('be-package');
+  const pkgId = parseInt(pkgSel?.value) || null;
+  const pkgName = pkgSel && pkgSel.value ? (pkgSel.selectedOptions[0]?.dataset.name || null) : null;
+  if (!date) { alert('Pilih tanggal.'); return; }
+  if (!pkgId) { alert('Pilih paket MCU.'); return; }
+  const batch = genBatchCode();
+  const user = currentUsername || 'Requestor';
+  let ok = 0;
+  for (const c of checked) {
+    try {
+      await sbPost('corp_exam_requests', {
+        corporate_id: currentCorporateId, booking_batch: batch, branch, book_date: date,
+        type_of_test: 'MCU', package_id: pkgId, package_name: pkgName,
+        corporate_employee_id: parseInt(c.value), patient_name: c.dataset.name,
+        patient_id_number: c.dataset.nik || null, department: c.dataset.dept || null,
+        exam_status: 'Requested', requested_by: user,
+      });
+      ok++;
+    } catch(e) { console.error('[submitExamBooking]', e); }
+  }
+  alert(`✅ ${ok} permintaan dikirim (batch ${batch}).\nMenunggu approval Manager.`);
+  showView('examination-history-view', 'Examination History');
+}
+
+// ── Examination Approval (Approver) ──
+async function renderExamApproval() {
+  const box = document.getElementById('exam-approval-content');
+  if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
+  const reqs = await sbGet('corp_exam_requests', `select=*&corporate_id=eq.${currentCorporateId}&exam_status=eq.Requested&order=requested_at.desc`).catch(()=>[]);
+  box.innerHTML = `
+    <div class="ci-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
+        <h3 style="margin:0">Examination Approval</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" style="margin:0;width:auto;background:#fee2e2;color:#dc2626" onclick="bulkApprove(false)">Reject All</button>
+          <button class="btn btn-sm" style="margin:0;width:auto;background:#d1fae5;color:#065f46" onclick="bulkApprove(true)">Approve All</button>
+          <button class="btn btn-sm btn-primary" style="margin:0;width:auto" onclick="saveExamApproval()">Save Data</button>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">Centang yang <b>ditolak</b> + isi alasan. Yang tidak dicentang otomatis <b>disetujui</b>.</p>
+      ${(reqs||[]).length ? `<div style="overflow-x:auto"><table class="be-table">
+        <thead><tr><th style="width:44px">Tolak</th><th style="min-width:150px">Alasan Penolakan</th><th>Patient ID</th><th>Name</th><th>Department</th><th>Type</th><th>Item</th></tr></thead>
+        <tbody>${reqs.map(r=>`<tr>
+          <td><input type="checkbox" class="ap-rej" data-id="${r.id}"></td>
+          <td><input type="text" class="ap-reason" data-id="${r.id}" placeholder="alasan…" style="width:100%;font-size:11.5px;padding:5px 7px;border:1px solid var(--border);border-radius:6px"></td>
+          <td style="font-family:monospace;font-size:11px">${r.patient_id_number||'—'}</td>
+          <td>${r.patient_name||'—'}</td><td>${r.department||'—'}</td><td>${r.type_of_test||'MCU'}</td><td>${r.package_name||'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>` : '<div style="text-align:center;color:var(--text-muted);padding:26px">Tidak ada permintaan menunggu approval.</div>'}
+    </div>`;
+}
+function bulkApprove(approve) { document.querySelectorAll('.ap-rej').forEach(x => x.checked = !approve); }
+
+async function saveExamApproval() {
+  const rows = [...document.querySelectorAll('.ap-rej')];
+  if (!rows.length) return;
+  // Validasi alasan untuk yang ditolak
+  for (const cb of rows) {
+    if (cb.checked) {
+      const reason = document.querySelector(`.ap-reason[data-id="${cb.dataset.id}"]`)?.value.trim();
+      if (!reason) { alert('Isi alasan untuk setiap karyawan yang ditolak.'); return; }
+    }
+  }
+  const user = currentUsername || 'Manager';
+  const now = new Date().toISOString();
+  let app = 0, rej = 0;
+  for (const cb of rows) {
+    const id = parseInt(cb.dataset.id);
+    try {
+      if (cb.checked) {
+        const reason = document.querySelector(`.ap-reason[data-id="${cb.dataset.id}"]`)?.value.trim();
+        await sbPatch('corp_exam_requests', id, { exam_status: 'Rejected', reject_reason: reason, approved_by: user, approved_at: now, updated_at: now });
+        rej++;
+      } else {
+        // Disetujui → buat admissions (masuk pipeline lab)
+        const r = (await sbGet('corp_exam_requests', `select=*&id=eq.${id}`))?.[0] || {};
+        const stamp = Date.now().toString();
+        const created = await sbPost('admissions', {
+          visit_number: `VISIT-${(r.book_date||'').replace(/-/g,'')}-${stamp.slice(-4)}`,
+          mr_number: `MR-${stamp.slice(-8)}`, visit_type: 'Project MCU', visit_date: r.book_date,
+          patient_name: r.patient_name, patient_id_number: r.patient_id_number,
+          package_id: r.package_id, package_name: r.package_name,
+          corporate_id: currentCorporateId, corporate_employee_id: r.corporate_employee_id,
+          discount_scheme: 'corporate', scheme_ref_id: currentCorporateId, scheme_name: currentCorporateName,
+          payment_status: 'Unpaid', status: 'Booking', registered_by: user, updated_at: now,
+        });
+        const admId = created?.[0]?.id || created?.id;
+        await sbPatch('corp_exam_requests', id, { exam_status: 'Approved', approved_by: user, approved_at: now, admission_id: admId || null, updated_at: now });
+        app++;
+      }
+    } catch(e) { console.error('[saveExamApproval]', e); }
+  }
+  alert(`✅ ${app} disetujui, ${rej} ditolak.`);
+  renderExamApproval();
+}
+
+// ── Examination History ──
+async function renderExamHistory() {
+  const box = document.getElementById('exam-history-content');
+  if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
+  const reqs = await sbGet('corp_exam_requests', `select=*&corporate_id=eq.${currentCorporateId}&order=requested_at.desc&limit=500`).catch(()=>[]);
+  const badge = s => {
+    const m = { Requested:['#b45309','#fef3c7'], Approved:['#065f46','#d1fae5'], Rejected:['#991b1b','#fee2e2'] };
+    const c = m[s] || ['#475569','#f1f5f9'];
+    return `<span style="background:${c[1]};color:${c[0]};font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px">${s==='Approved'?'Approved by Manager':s}</span>`;
+  };
+  box.innerHTML = `<div class="ci-card" style="padding:20px 22px">
+    <h3 style="margin:0 0 14px">Examination History</h3>
+    ${(reqs||[]).length ? `<div style="overflow-x:auto"><table class="be-table">
+      <thead><tr><th>Booking Date</th><th>Batch</th><th>Branch</th><th>Name</th><th>Type</th><th>Item</th><th>Status</th></tr></thead>
+      <tbody>${reqs.map(r=>`<tr><td>${r.book_date||'—'}</td><td style="font-family:monospace;font-size:10.5px">${r.booking_batch||'—'}</td><td>${r.branch||'—'}</td><td>${r.patient_name||'—'}</td><td>${r.type_of_test||'MCU'}</td><td>${r.package_name||'—'}</td><td>${badge(r.exam_status)}${r.reject_reason?`<div style="font-size:10px;color:#dc2626;margin-top:3px">${r.reject_reason}</div>`:''}</td></tr>`).join('')}</tbody>
+    </table></div>` : '<div style="text-align:center;color:var(--text-muted);padding:26px">Belum ada riwayat pemeriksaan.</div>'}
+  </div>`;
+}
+
 // Status karyawan → badge (booking > aktif > terdaftar)
 function empStatusBadge(e) {
   if (e.booking_admission_id) return { txt:'Booking', bg:'rgba(14,165,233,0.15)', col:'#38bdf8' };
