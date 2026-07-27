@@ -1259,7 +1259,7 @@ async function renderBookExamination() {
   ]);
   const branches = (branchesRaw||[]).map(b=>b.name).filter(Boolean);
   const today = new Date().toISOString().slice(0,10);
-  const positions = [...new Set((emps||[]).map(e=>e.job_position).filter(Boolean))].sort();
+  const positions = [...new Set((emps||[]).map(e=>empPosition(e)).filter(p=>p&&p!=='—'))].sort();
   const esc = s => String(s||'').replace(/"/g,'&quot;');
   box.innerHTML = `
     <div class="ci-card" style="padding:20px 22px">
@@ -1279,7 +1279,7 @@ async function renderBookExamination() {
       </div>
       <div style="overflow-x:auto"><table class="be-table">
         <thead><tr><th style="width:36px"><input type="checkbox" id="be-all" onclick="toggleAllBe(this)"></th><th>Employee No</th><th>Name</th><th>Department</th><th>Job Position</th></tr></thead>
-        <tbody>${(emps||[]).length ? (emps||[]).map(e=>`<tr class="be-row" data-gender="${e.gender||''}" data-pos="${esc(e.job_position)}" data-search="${esc(((e.full_name||'')+' '+(e.employee_id||'')+' '+(e.department||'')).toLowerCase())}"><td><input type="checkbox" class="be-emp" value="${e.id}" data-name="${esc(e.full_name)}" data-nik="${e.id_number||e.employee_id||''}" data-dept="${esc(e.department)}"></td><td style="font-family:monospace">${e.employee_id||'—'}</td><td>${e.full_name||'—'}</td><td>${e.department||'—'}</td><td>${e.job_position||'—'}</td></tr>`).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:22px">Belum ada karyawan. Tambah via Master Employee.</td></tr>'}</tbody>
+        <tbody>${(emps||[]).length ? (emps||[]).map(e=>{const pos=empPosition(e);return `<tr class="be-row" data-gender="${e.gender||''}" data-pos="${esc(pos)}" data-search="${esc(((e.full_name||'')+' '+(e.employee_id||'')+' '+(e.department||'')).toLowerCase())}"><td><input type="checkbox" class="be-emp" value="${e.id}" data-name="${esc(e.full_name)}" data-nik="${e.id_number||e.employee_id||''}" data-dept="${esc(e.department)}"></td><td style="font-family:monospace">${e.employee_id||'—'}</td><td>${e.full_name||'—'}</td><td>${e.department||'—'}</td><td>${pos}</td></tr>`}).join('') : '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:22px">Belum ada karyawan. Tambah via Master Employee.</td></tr>'}</tbody>
       </table></div>
     </div>`;
 }
@@ -1455,7 +1455,7 @@ async function renderCorporateList(data = corporates) {
             const empNum = e.employee_id || '—';
             const dept = e.department || '—';
             
-            const position = e.job_position || '—';
+            const position = empPosition(e);
             const genderTxt = e.gender === 'F' ? 'Female' : e.gender === 'M' ? 'Male' : '—';
             
             return `
@@ -1735,14 +1735,11 @@ async function openAddEmployeeModal() {
   const title = document.querySelector('#add-employee-modal h3');
   if (title) title.textContent = 'Add New Employee';
   const submitBtn = document.querySelector('#add-employee-modal button[type="submit"]');
-  if (submitBtn) submitBtn.textContent = 'Save & Create Booking';
+  if (submitBtn) submitBtn.textContent = 'Save Employee';
 
-  // Reset all fields
+  // Reset all fields (data karyawan murni — tanpa paket)
   ['firstname','lastname','id','dept','job','phone','email','idnum','pob','dob','country']
     .forEach(k=>{ const el=document.getElementById('corp-emp-'+k); if(el) el.value=''; });
-  
-  const today = new Date().toISOString().slice(0,10);
-  const md = document.getElementById('corp-emp-mcudate'); if (md){ md.value=today; md.min=today; }
 
   // Set defaults
   const ctry = document.getElementById('corp-emp-country'); if (ctry) ctry.value = 'INDONESIA';
@@ -1753,50 +1750,6 @@ async function openAddEmployeeModal() {
   const gender = document.getElementById('corp-emp-gender'); if (gender) gender.value = 'M';
   const primaryCh = document.getElementById('corp-emp-primary'); if (primaryCh) primaryCh.checked = true;
 
-  // Isi dropdown paket dari Supabase (terbatas pada paket kontrak)
-  const pkgSel = document.getElementById('corp-emp-package');
-  if (pkgSel) {
-    pkgSel.innerHTML = '<option value="">— pilih paket —</option>';
-    try {
-      let allowedPkgIds = [];
-      const contracts = await sbGet('corporate_contracts', `select=packages,status&corporate_id=eq.${currentCorporateId}`).catch(()=>[]);
-      (contracts || []).forEach(ct => {
-        if (ct.status === 'Active' && ct.packages) {
-          try {
-            const parsed = JSON.parse(ct.packages);
-            if (Array.isArray(parsed)) {
-              parsed.forEach(item => {
-                const id = typeof item === 'object' && item !== null ? item.id : item;
-                const intId = parseInt(id);
-                if (!isNaN(intId) && !allowedPkgIds.includes(intId)) {
-                  allowedPkgIds.push(intId);
-                }
-              });
-            }
-          } catch(e) {}
-        }
-      });
-
-      if (allowedPkgIds.length > 0) {
-        const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
-        const pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
-        (pkgs||[]).forEach(p=>{
-          const o = document.createElement('option');
-          o.value = p.id;
-          o.textContent = p.nama_paket;
-          pkgSel.appendChild(o);
-        });
-      } else {
-        const o = document.createElement('option');
-        o.value = "";
-        o.textContent = "— hubungi admin untuk aktivasi paket kontrak —";
-        o.disabled = true;
-        pkgSel.appendChild(o);
-      }
-    } catch(e){
-      console.error(e);
-    }
-  }
   modal.classList.add('open');
 }
 
@@ -1850,11 +1803,18 @@ window.editEmployeePortal = async function(id) {
     }
     
     if (e.notes) {
-      const pMatch = e.notes.match(/Position:\s*([^,]+)/);
-      if (pMatch) setV('job', pMatch[1]);
-      
-      const lMatch = e.notes.match(/Level:\s*([^,]+)/);
-      if (lMatch) setV('level', lMatch[1]);
+      const pMatch = e.notes.match(/Position:\s*([^,·]+)/);
+      if (pMatch && pMatch[1].trim() !== '—') setV('job', pMatch[1].trim());
+
+      const lMatch = e.notes.match(/Level:\s*([^,·]+)/);
+      if (lMatch && lMatch[1].trim() !== '—') setV('level', lMatch[1].trim());
+
+      const bMatch = e.notes.match(/Blood:\s*([^·]+)/);
+      if (bMatch) setV('blood', bMatch[1].trim());
+      const mMatch = e.notes.match(/Marital:\s*([^·]+)/);
+      if (mMatch) setV('marital', mMatch[1].trim());
+      const pobMatch = e.notes.match(/POB:\s*([^·]+)/);
+      if (pobMatch) setV('pob', pobMatch[1].trim());
     }
     
     const pkgSel = document.getElementById('corp-emp-package');
@@ -1875,137 +1835,59 @@ async function submitAddEmployeeForm(event) {
   event.preventDefault();
   if (!currentCorporateId) { alert('Perusahaan belum teridentifikasi.'); return; }
   const val = k => (document.getElementById('corp-emp-'+k)?.value || '').trim();
-  
+
   const firstName = val('firstname');
   const lastName = val('lastname');
   const name = [firstName, lastName].filter(Boolean).join(' ');
-  
-  const pkgId = parseInt(val('package')) || null;
-  const mcuDate = val('mcudate');
   if (!firstName) { alert('First Name wajib diisi'); return; }
-  if (!pkgId) { alert('Pilih paket MCU'); return; }
-  if (!mcuDate) { alert('Pilih tanggal MCU'); return; }
 
-  const pkgSel = document.getElementById('corp-emp-package');
-  const pkgName = pkgSel?.selectedOptions?.[0]?.textContent || null;
-  const user = currentUsername || 'Portal Corporate';
-  const gender = val('gender') || null;
-  const stamp = Date.now().toString();
+  const gender = val('gender') || 'M';
+  const phone = val('phone') ? ((val('phonecode') || '') + val('phone')) : null;
+
+  // Field ekstra di-pack ke notes (format sama dgn config corporate agar interoperable).
+  const parts = [];
+  if (val('job') || val('level')) parts.push(`Position: ${val('job')||'—'}, Level: ${val('level')||'—'}`);
+  if (val('blood')) parts.push(`Blood: ${val('blood')}`);
+  if (val('marital')) parts.push(`Marital: ${val('marital')}`);
+  if (val('idtype') || val('idnum')) parts.push(`ID: ${val('idtype')||'KTP'} ${val('idnum')||''}`.trim());
+  if (val('pob')) parts.push(`POB: ${val('pob')}`);
+  const notesStr = parts.join(' · ') || null;
+
+  // Data karyawan MURNI — hanya kolom yang pasti ada di tabel (tanpa paket / booking).
+  const payload = {
+    corporate_id:   currentCorporateId,
+    corporate_name: currentCorporateName,
+    full_name:      name,
+    employee_id:    val('id') || null,
+    department:     val('dept') || null,
+    gender,
+    birth_date:     val('dob') || null,
+    phone,
+    email:          val('email') || null,
+    notes:          notesStr,
+    updated_at:     new Date().toISOString(),
+  };
 
   const editId = event.target.dataset.editId;
-
   try {
     if (editId) {
-      // 1) roster update
-      await sbPatch('corporate_employees', editId, {
-        full_name:     name,
-        employee_id:   val('id') || null,
-        department:    val('dept') || null,
-        gender,
-        birth_date:    val('dob') || null,
-        phone:         (val('phonecode') + val('phone')) || null,
-        email:         val('email') || null,
-        package_id:    pkgId,
-        package_name:  pkgName,
-        mcu_date:      mcuDate,
-        updated_at:    new Date().toISOString(),
-        notes:         val('job') ? `Position: ${val('job')}, Level: ${val('level')}` : null
-      });
-
-      // Fetch employee row to see linked admission
-      const empData = await sbGet('corporate_employees', `select=booking_admission_id&id=eq.${editId}`);
-      const linkAdm = empData?.[0]?.booking_admission_id;
-      
-      // 2) linked admission update if exists
-      if (linkAdm) {
-        await sbPatch('admissions', linkAdm, {
-          patient_name:      name,
-          patient_gender:    gender,
-          patient_dob:       val('dob') || null,
-          patient_place_of_birth: val('pob') || null,
-          patient_blood_type: val('blood') || null,
-          patient_marital_status: val('marital') || null,
-          patient_category:  val('category') || 'WNI',
-          patient_phone:     (val('phonecode') + val('phone')) || null,
-          patient_email:     val('email') || null,
-          patient_id_type:   val('idtype') || 'KTP',
-          patient_id_number: val('idnum') || null,
-          package_id:        pkgId,
-          package_name:      pkgName,
-          visit_date:        mcuDate,
-          updated_at:        new Date().toISOString()
-        });
-      }
-
-      closeAddEmployeeModal();
-      await loadCorporateData();
-      alert(`✅ Data "${name}" berhasil diupdate.`);
-      return;
+      await sbPatch('corporate_employees', editId, payload);
+      alert(`✅ Data "${name}" diupdate.`);
+    } else {
+      payload.status = 'Aktif';
+      await sbPost('corporate_employees', payload);
+      alert(`✅ Karyawan "${name}" ditambahkan.`);
     }
-
-    // 1) roster karyawan baru
-    const empRow = await sbPost('corporate_employees', {
-      corporate_id:  currentCorporateId,
-      corporate_name: currentCorporateName,
-      full_name:     name,
-      employee_id:   val('id') || null,
-      department:    val('dept') || null,
-      gender,
-      birth_date:    val('dob') || null,
-      phone:         (val('phonecode') + val('phone')) || null,
-      email:         val('email') || null,
-      package_id:    pkgId,
-      package_name:  pkgName,
-      status:        'Aktif',
-      mcu_date:      mcuDate,
-      assigned_by:   user,
-      assigned_at:   new Date().toISOString(),
-      updated_at:    new Date().toISOString(),
-      notes:         val('job') ? `Position: ${val('job')}, Level: ${val('level')}` : null
-    });
-    const empId = empRow?.[0]?.id || empRow?.id;
-
-    // 2) booking admisi langsung (status Booking, field pasien lengkap)
-    const created = await sbPost('admissions', {
-      visit_number:      `VISIT-${mcuDate.replace(/-/g,'')}-${stamp.slice(-4)}`,
-      mr_number:         `MR-${stamp.slice(-8)}`,
-      visit_type:        'Project MCU',
-      visit_date:        mcuDate,
-      patient_name:      name,
-      patient_gender:    gender,
-      patient_dob:       val('dob') || null,
-      patient_place_of_birth: val('pob') || null,
-      patient_blood_type: val('blood') || null,
-      patient_marital_status: val('marital') || null,
-      patient_category:  val('category') || 'WNI',
-      patient_phone:     (val('phonecode') + val('phone')) || null,
-      patient_email:     val('email') || null,
-      patient_address:   null,
-      patient_city:      val('pob') || null,
-      patient_postal_code: null,
-      patient_id_type:   val('idtype') || 'KTP',
-      patient_id_number: val('idnum') || null,
-      package_id:        pkgId,
-      package_name:      pkgName,
-      corporate_id:      currentCorporateId,
-      corporate_employee_id: empId || null,
-      discount_scheme:   'corporate',
-      scheme_ref_id:     currentCorporateId,
-      scheme_name:       currentCorporateName,
-      payment_status:    'Unpaid',
-      status:            'Booking',
-      registered_by:     user,
-      updated_at:        new Date().toISOString(),
-    });
-    const admId = created?.[0]?.id || created?.id;
-
-    // 3) tautkan balik roster → booking (anti double-book)
-    if (empId && admId) {
-      await sbPatch('corporate_employees', empId, { booking_admission_id: admId, updated_at: new Date().toISOString() });
-    }
-
     closeAddEmployeeModal();
+    await loadCorporateData();
   } catch(e) { alert('❌ Gagal: ' + e.message); }
+}
+
+// Ambil Job Position dari kolom (jika ada) atau dari notes (format config).
+function empPosition(e) {
+  if (e.job_position) return e.job_position;
+  if (e.notes) { const m = e.notes.match(/Position:\s*([^,·]+)/); if (m && m[1].trim() !== '—') return m[1].trim(); }
+  return '—';
 }
 
 // Assign paket ke satu karyawan (dropdown inline di roster portal).

@@ -31,7 +31,7 @@ async function renderConfigPackage() {
 
 async function loadPackages() {
   try {
-    const data = await sbGet('packages','select=*&order=kategori_paket.asc,nama_paket.asc');
+    const data = await sbGet('packages','select=*&corporate_id=is.null&order=kategori_paket.asc,nama_paket.asc');
     pkgAll = Array.isArray(data) ? data : [];
     renderPkgKPI();
     renderPkgList();
@@ -1894,10 +1894,8 @@ async function openInlineContractForm(corpId, corpName) {
   if (!container) return;
   
   container.style.display = 'block';
-  container.innerHTML = '<div class="loading-row"><div class="spinner"></div></div>';
-
   try {
-    const pkgs = await sbGet('packages', 'select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(() => []);
+    const pkgs = await sbGet('packages', `select=id,nama_paket,corporate_id&is_active=eq.true&or=(corporate_id.is.null,corporate_id.eq.${corpId})&order=nama_paket`).catch(() => []);
     const today = new Date().toISOString().split('T')[0];
     const nextYear = new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0];
     const esc = s => String(s || '').replace(/"/g, '&quot;');
@@ -1943,7 +1941,10 @@ async function openInlineContractForm(corpId, corpName) {
         
         <!-- Packages Checklist with custom discount scheme -->
         <div class="fg" style="grid-column: span 2;">
-          <label style="font-weight:700; margin-bottom: 6px;">Pilih Paket MCU &amp; Atur Skema Diskon</label>
+          <label style="font-weight:700; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Pilih Paket MCU &amp; Atur Skema Diskon</span>
+            <button type="button" class="btn btn-teal btn-xs" onclick="openCustomPackageModal(${corpId}, '${esc(corpName)}')" style="margin:0; padding:2px 8px; font-size:11px;">➕ Buat Paket Kustom</button>
+          </label>
           <div style="max-height: 180px; overflow-y: auto; background: #ffffff; border: 1px solid var(--border); border-radius: 8px; padding: 8px; box-sizing: border-box;">
             <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
               <thead>
@@ -3005,4 +3006,166 @@ function exportCorporatesCSV() {
   const csv=[h,...r].map(row=>row.map(v=>`"${v}"`).join(',')).join('\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
   a.download='corporates_export.csv';a.click();toast('Export berhasil','ok');
+}
+
+// ── CUSTOM CORPORATE PACKAGE CREATOR (SCHEMA 2) ──
+async function openCustomPackageModal(corpId, corpName) {
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Buat Paket Kustom — ${corpName}</div>
+      <button class="modal-close" onclick="closeModalForce()"></button>
+    </div>
+    <div style="padding:10px 0; max-height: 70vh; overflow-y: auto;">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-weight:700;">Nama Paket Kustom</label>
+        <input type="text" id="cp-name" placeholder="Contoh: Paket Khusus Queen Health" style="width:100%; box-sizing:border-box;">
+      </div>
+      <div class="form-row" style="margin-bottom:12px; display:flex; gap:10px;">
+        <div class="form-group" style="flex:1;">
+          <label style="font-weight:700;">Harga Paket (Rp)</label>
+          <input type="number" id="cp-price" value="500000" placeholder="0" style="width:100%; box-sizing:border-box;">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label style="font-weight:700;">TAT (Jam)</label>
+          <input type="number" id="cp-tat" value="24" placeholder="24" style="width:100%; box-sizing:border-box;">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="font-weight:700;">Deskripsi Paket</label>
+        <textarea id="cp-desc" rows="2" placeholder="Deskripsi paket kustom..." style="width:100%; box-sizing:border-box; border:1px solid var(--border); border-radius:8px; padding:8px; font-size:13px;"></textarea>
+      </div>
+      
+      <!-- Products Checklist -->
+      <div class="form-group">
+        <label style="font-weight:700; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center;">
+          <span>Pilih Pemeriksaan / Tes Laboratorium</span>
+          <input type="text" id="cp-prod-search" placeholder="Cari tes..." oninput="filterCustomPkgProds(this.value)" style="width:160px; padding:4px 8px; font-size:11.5px; border:1px solid #cbd5e1; border-radius:4px;">
+        </label>
+        <div id="cp-prods-list" style="max-height: 180px; overflow-y: auto; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; box-sizing:border-box;">
+          <div class="loading-row"><div class="spinner"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="margin-top:16px;">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="saveCustomPackage(${corpId}, '${corpName.replace(/'/g, "\\'")}')">Simpan Paket Kustom</button>
+    </div>
+  `);
+
+  try {
+    const prods = await sbGet('products', 'select=id,nama_tes,kode_internal,kategori&is_active=eq.true&order=kategori,nama_tes').catch(() => []);
+    window.customPkgProducts = prods;
+    renderCustomPkgProds(prods);
+  } catch(e) {
+    document.getElementById('cp-prods-list').innerHTML = `<div style="color:red; font-size:12px; padding:10px;">❌ Gagal memuat tes: ${e.message}</div>`;
+  }
+}
+
+function renderCustomPkgProds(prods) {
+  const el = document.getElementById('cp-prods-list');
+  if (!el) return;
+  if (!prods.length) {
+    el.innerHTML = `<div style="color:var(--gray); font-size:12px; padding:10px; text-align:center;">Tidak ada pemeriksaan aktif</div>`;
+    return;
+  }
+
+  // Group by category
+  const grouped = {};
+  prods.forEach(p => {
+    const cat = p.kategori || 'Lainnya';
+    grouped[cat] = grouped[cat] || [];
+    grouped[cat].push(p);
+  });
+
+  el.innerHTML = Object.entries(grouped).map(([cat, items]) => `
+    <div class="cp-prod-cat-group" style="margin-bottom:10px;">
+      <div style="font-size:10.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px; border-bottom:1px solid #e2e8f0; padding-bottom:2px;">${cat}</div>
+      <div style="display:grid; grid-template-columns: 1fr; gap:6px; padding-left:4px;">
+        ${items.map(p => `
+          <label class="cp-prod-item" data-name="${p.nama_tes.toLowerCase()}" data-code="${(p.kode_internal||'').toLowerCase()}" style="display:flex; align-items:center; gap:8px; font-weight:normal; font-size:12px; cursor:pointer; color:#334155; margin:0;">
+            <input type="checkbox" class="cp-prod-cb" value="${p.id}" data-name="${p.nama_tes}" style="width:auto; margin:0;">
+            <span>${p.nama_tes} ${p.kode_internal ? `<span style="color:#94a3b8; font-size:10.5px;">(${p.kode_internal})</span>` : ''}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `).map(h => h.trim()).join('');
+}
+
+function filterCustomPkgProds(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('.cp-prod-item').forEach(el => {
+    const name = el.getAttribute('data-name') || '';
+    const code = el.getAttribute('data-code') || '';
+    const match = name.includes(q) || code.includes(q);
+    el.style.display = match ? 'flex' : 'none';
+  });
+  
+  // Hide empty category headers
+  document.querySelectorAll('.cp-prod-cat-group').forEach(grp => {
+    const visibleItems = grp.querySelectorAll('.cp-prod-item');
+    let hasVisible = false;
+    visibleItems.forEach(item => {
+      if (item.style.display !== 'none') hasVisible = true;
+    });
+    grp.style.display = hasVisible || !q ? 'block' : 'none';
+  });
+}
+
+async function saveCustomPackage(corpId, corpName) {
+  const name = document.getElementById('cp-name').value.trim();
+  const price = parseFloat(document.getElementById('cp-price').value) || 0;
+  const tat = parseInt(document.getElementById('cp-tat').value) || 24;
+  const desc = document.getElementById('cp-desc').value.trim();
+  const user = getUserName ? getUserName() : 'User';
+
+  if (!name) { toast('Nama paket kustom harus diisi', 'warn'); return; }
+
+  const cbEls = document.querySelectorAll('.cp-prod-cb:checked');
+  if (!cbEls.length) { toast('Pilih minimal 1 jenis pemeriksaan', 'warn'); return; }
+
+  try {
+    // 1. Insert package
+    const pkgPayload = {
+      kode_paket: `PKG-CORP-${corpId}-${Date.now().toString().slice(-4)}`,
+      nama_paket: name,
+      kategori_paket: 'MCU Korporat',
+      target_segment: 'Korporat',
+      harga_normal: price,
+      harga_korporat: price,
+      deskripsi: desc || null,
+      tat_jam: tat,
+      corporate_id: corpId,
+      is_active: true,
+      created_by: user,
+      updated_at: new Date().toISOString()
+    };
+
+    const newPkg = await sbPost('packages', pkgPayload);
+    const newPkgId = newPkg.id;
+
+    // 2. Insert package items
+    const itemPayloads = Array.from(cbEls).map(cb => ({
+      package_id: newPkgId,
+      product_id: parseInt(cb.value),
+      product_name: cb.getAttribute('data-name')
+    }));
+
+    await Promise.all(itemPayloads.map(payload => sbPost('package_items', payload)));
+
+    toast('✅ Paket kustom berhasil dibuat', 'ok');
+    closeModalForce();
+
+    // 3. Reload inline contract form with the new package checked
+    await openInlineContractForm(corpId, corpName);
+    
+    // Auto check the newly created package in the contract form
+    const newPkgCb = document.querySelector(`.ctf-pkg-cb[value="${newPkgId}"]`);
+    if (newPkgCb) {
+      newPkgCb.checked = true;
+      toggleCtfPkgRow(newPkgId, true);
+    }
+  } catch(e) {
+    toast('❌ ' + e.message, 'err');
+  }
 }
