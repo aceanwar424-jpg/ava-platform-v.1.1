@@ -1540,7 +1540,7 @@ async function renderAccountStatement() {
   if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
   const invs = await sbGet('invoices', `select=*&corporate_id=eq.${currentCorporateId}&order=invoice_date.asc&limit=1000`).catch(()=>[]);
   const fmt = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
-  const isPaid = i => i.status === 'Paid' || i.status === 'Lunas';
+  const isPaid = i => ['Paid','Lunas','Dibayar'].includes(i.status);
   const totalBill = (invs||[]).reduce((s,i)=>s+Number(i.total_amount||0),0);
   const totalPaid = (invs||[]).filter(isPaid).reduce((s,i)=>s+Number(i.total_amount||0),0);
   const outstanding = totalBill - totalPaid;

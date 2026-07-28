@@ -27,6 +27,7 @@ Anchor = **nama fungsi**, bukan nomor baris (baris cepat bergeser). Grep nama fu
 | Config corporate (admin) | `modules/config_package.js` | `openCorpForm` (multi-tab), `openCorpEmployees`, `saveCorpEmpInline`, `_caStyleTag` |
 | Import karyawan (admin, 9-kolom) | `modules/import_excel.js` | `_importCorpEmployees`, `IMPORT_TEMPLATES` |
 | Admisi (registrasi pasien) | `modules/admission.js` | `saveAdmission`, `renderAdmList`, `computeAdmBill`, `addPackageLines` (urai paket→services) |
+| Finance / Invoice | `modules/finance.js` | `renderFinance`, `saveInvoice`, `loadInvoices`, `openCorpMcuInvoicing`+`generateBatchInvoice` (invoice MCU korporat per batch → link `corp_exam_requests.invoice_id`) |
 | Admisi — no-show & backfill | `modules/admission.js` | `sweepNoShowBookings` (auto-cancel 1×24j), `backfillBookingServices` + `buildServicesFromPkg` (lengkapi paket booking lama) — dipanggil 1×/sesi di `loadAdmissions` |
 | Portal — buat admisi dari booking | `apps/app.js` | `buildPackageServices` (urai paket→services+total), dipakai `saveExamApproval` & `scheduleMcuBookingPortal` |
 | Anamnesa → barcode lab | `modules/anamnesa.js` | `ensureSampleLabels`, `printAnamnesaLabels` |

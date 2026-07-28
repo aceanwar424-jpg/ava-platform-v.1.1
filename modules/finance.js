@@ -11,6 +11,7 @@ async function renderFinance() {
       <div><h1>Finance & Billing</h1>
         <p>Invoice, pembayaran, laporan keuangan, dan komisi sales</p></div>
       <div class="btn-row">
+        <button class="btn btn-ghost" onclick="openCorpMcuInvoicing()">🏢 Invoice MCU Korporat</button>
         <button class="btn btn-teal" onclick="openInvoiceForm()">+ Buat Invoice</button>
       </div>
     </div>
@@ -299,6 +300,79 @@ async function deleteInvoice(id) {
   if(!confirm('Hapus invoice ini?')) return;
   try { await sbDelete('invoices',id); toast('Invoice dihapus','info'); await loadInvoices(); }
   catch(e){ toast('❌ '+e.message,'err'); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// Invoice MCU Korporat per BATCH: agregasi peserta batch yang sudah
+// Approved & belum ditagih → 1 invoice. Tautkan corp_exam_requests.invoice_id.
+// ══════════════════════════════════════════════════════════════
+async function openCorpMcuInvoicing() {
+  openModal(`<div class="modal-header"><div class="modal-title">Invoice MCU Korporat — per Batch</div>
+    <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+    <div id="cmi-body" style="padding:6px 0;max-height:60vh;overflow:auto"><div class="loading-row"><div class="spinner"></div></div></div>`, 'wide');
+  try {
+    const reqs = await sbGet('corp_exam_requests',
+      `select=id,corporate_id,booking_batch,admission_id&exam_status=eq.Approved&invoice_id=is.null&limit=2000`).catch(()=>[]);
+    const body = document.getElementById('cmi-body');
+    if (!reqs || !reqs.length) { body.innerHTML = '<p style="padding:24px;text-align:center;color:var(--gray)">Tidak ada batch approved yang belum ditagih.</p>'; return; }
+
+    const corpIds = [...new Set(reqs.map(r=>r.corporate_id).filter(Boolean))];
+    const corps = corpIds.length ? await sbGet('corporates', `select=id,corporate_name&id=in.(${corpIds.join(',')})`).catch(()=>[]) : [];
+    const corpMap = {}; (corps||[]).forEach(c=>corpMap[c.id]=c.corporate_name);
+
+    // net_amount per admisi
+    const admIds = reqs.map(r=>r.admission_id).filter(Boolean);
+    const admMap = {};
+    for (let i=0;i<admIds.length;i+=100){ const chunk=admIds.slice(i,i+100); if(!chunk.length) break;
+      const a=await sbGet('admissions',`select=id,net_amount&id=in.(${chunk.join(',')})`).catch(()=>[]);
+      (a||[]).forEach(x=>admMap[x.id]=Number(x.net_amount||0)); }
+
+    const groups = {};
+    reqs.forEach(r=>{ const k=r.corporate_id+'|'+r.booking_batch;
+      (groups[k]=groups[k]||{corporate_id:r.corporate_id,batch:r.booking_batch,ids:[]}); if(r.admission_id) groups[k].ids.push(r.admission_id); });
+    const rows = Object.values(groups).map(g=>({ ...g, count:g.ids.length,
+      total:g.ids.reduce((s,id)=>s+(admMap[id]||0),0), name:corpMap[g.corporate_id]||('Corp #'+g.corporate_id) }));
+
+    body.innerHTML = `<table style="width:100%;font-size:12.5px;border-collapse:collapse">
+      <thead><tr style="background:var(--lgray);text-align:left">
+        <th style="padding:8px 10px">Corporate</th><th style="padding:8px 10px">Batch</th>
+        <th style="padding:8px 10px;text-align:center">Peserta</th><th style="padding:8px 10px;text-align:right">Total</th><th style="padding:8px 10px"></th></tr></thead>
+      <tbody>${rows.map(r=>`<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 10px;font-weight:600">${r.name}</td>
+        <td style="padding:8px 10px;font-family:monospace;font-size:11px">${r.batch||'—'}</td>
+        <td style="padding:8px 10px;text-align:center">${r.count}</td>
+        <td style="padding:8px 10px;text-align:right;font-weight:700">${formatCurrency(r.total)}</td>
+        <td style="padding:8px 10px;text-align:right"><button class="btn btn-teal btn-sm" onclick="generateBatchInvoice('${(r.batch||'').replace(/'/g,"\\'")}',${r.corporate_id})">Buat Invoice</button></td>
+      </tr>`).join('')}</tbody></table>`;
+  } catch(e){ const b=document.getElementById('cmi-body'); if(b) b.innerHTML = `<p style="padding:24px;color:var(--error)">❌ ${e.message}</p>`; }
+}
+
+async function generateBatchInvoice(batch, corpId) {
+  try {
+    const reqs = await sbGet('corp_exam_requests',
+      `select=id,admission_id&exam_status=eq.Approved&invoice_id=is.null&corporate_id=eq.${corpId}&booking_batch=eq.${encodeURIComponent(batch)}`).catch(()=>[]);
+    if (!reqs || !reqs.length) { toast('Batch sudah ditagih / kosong','warn'); return; }
+    const admIds = reqs.map(r=>r.admission_id).filter(Boolean);
+    let subtotal = 0;
+    for (let i=0;i<admIds.length;i+=100){ const chunk=admIds.slice(i,i+100); if(!chunk.length) break;
+      const a=await sbGet('admissions',`select=net_amount&id=in.(${chunk.join(',')})`).catch(()=>[]);
+      (a||[]).forEach(x=>subtotal+=Number(x.net_amount||0)); }
+    const today = new Date().toISOString().slice(0,10);
+    const due = new Date(Date.now()+30*864e5).toISOString().slice(0,10);
+    const inv = await sbPost('invoices', {
+      invoice_number: `INV-${today.replace(/-/g,'')}-${Date.now().toString().slice(-5)}`,
+      invoice_date: today, corporate_id: corpId, service_type: 'MCU Korporat',
+      notes: `MCU Batch ${batch} — ${admIds.length} peserta`,
+      subtotal, discount: 0, ppn_percent: 0, total_amount: subtotal,
+      status: 'Draft', due_date: due, created_by_name: getUserName?getUserName():'User',
+      updated_at: new Date().toISOString(),
+    });
+    const invId = inv?.[0]?.id || inv?.id;
+    for (const r of reqs) { await sbPatch('corp_exam_requests', r.id, { invoice_id: invId||null, updated_at: new Date().toISOString() }); }
+    toast(`✅ Invoice batch ${batch} dibuat (${formatCurrency(subtotal)})`, 'ok', 4000);
+    closeModalForce();
+    await loadInvoices();
+  } catch(e){ toast('❌ '+e.message,'err',6000); }
 }
 
 async function loadPayments() {
