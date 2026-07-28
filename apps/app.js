@@ -219,6 +219,8 @@ function showView(viewId, viewTitle) {
   if (viewId === 'book-examination-view') renderBookExamination();
   else if (viewId === 'examination-approval-view') renderExamApproval();
   else if (viewId === 'examination-history-view') renderExamHistory();
+  else if (viewId === 'corp-results-view') renderCorporateResults();
+  else if (viewId === 'corp-statement-view') renderAccountStatement();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -289,6 +291,8 @@ function renderSidebarMenu() {
       book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>',
       approve: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1z"/><path d="m9 14 2 2 4-4"/></svg>',
       history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>',
+      result: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg>',
+      stmt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>',
       deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
     };
     const isSA = (currentUserEmail === 'aceanwar424@gmail.com');
@@ -301,6 +305,8 @@ function renderSidebarMenu() {
       ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Book Examination</span></a>` : ''}
       ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Examination Approval</span></a>` : ''}
       <a class="sidebar-link" onclick="showView('examination-history-view', 'Examination History')">${I.history}<span>Examination History</span></a>
+      <a class="sidebar-link" onclick="showView('corp-results-view', 'Hasil MCU')">${I.result}<span>Hasil MCU</span></a>
+      <a class="sidebar-link" onclick="showView('corp-statement-view', 'Account Statement')">${I.stmt}<span>Account Statement</span></a>
       <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit &amp; Transaction</span></a>
     `;
   } else if (currentRole === 'referral') {
@@ -1248,6 +1254,33 @@ function genBatchCode() {
   return `${rnd}.${d}.${seq}`;
 }
 
+// Urai paket → service lines (format sama dgn admission.js addPackageLines) + total.
+// Dipakai saat membuat admissions dari booking korporat supaya tab Services terisi
+// (paket otomatis terurai jadi tes komponen dgn harga per-tes) & tagihan tidak Rp 0.
+async function buildPackageServices(pkgId) {
+  if (!pkgId) return { services: null, gross: 0, net: 0 };
+  let pkg = null, items = [];
+  try { pkg = (await sbGet('packages', `select=id,nama_paket,harga_normal,harga_korporat&id=eq.${pkgId}`))?.[0] || null; } catch(e){}
+  try { items = await sbGet('package_items', `select=*,products(id,nama_tes,harga_normal,is_panel)&package_id=eq.${pkgId}`) || []; } catch(e){}
+  if (!pkg) return { services: null, gross: 0, net: 0 };
+  const pkgPrice = parseFloat(pkg.harga_korporat || pkg.harga_normal || 0);
+  if (!items.length) {
+    // Paket tanpa rincian tes → 1 baris di harga paket
+    const lines = [{ product_id: null, name: `[PAKET] ${pkg.nama_paket}`, priority: '-', unit_price: pkgPrice, discount_pct: 0, discount_idr: 0 }];
+    return { services: JSON.stringify(lines), gross: Math.round(pkgPrice), net: Math.round(pkgPrice) };
+  }
+  const sumInd = items.reduce((s,it)=>s+(parseFloat(it.products?.harga_normal||0)*(it.qty||1)),0);
+  const bundlePct = (pkgPrice>0 && sumInd>pkgPrice) ? Math.round((1-pkgPrice/sumInd)*10000)/100 : 0;
+  const lines = items.map(it => ({
+    product_id: it.products?.id || it.product_id || null,
+    name: it.products?.nama_tes || it.product_name || '',
+    priority: '-', unit_price: parseFloat(it.products?.harga_normal||0),
+    discount_pct: bundlePct, discount_idr: 0,
+  }));
+  const net = bundlePct ? Math.round(pkgPrice) : Math.round(sumInd);
+  return { services: JSON.stringify(lines), gross: Math.round(sumInd), net };
+}
+
 // ── Book Examination (Requestor) ──
 async function renderBookExamination() {
   const box = document.getElementById('book-exam-content');
@@ -1378,6 +1411,7 @@ async function saveExamApproval() {
         // Disetujui → buat admissions (masuk pipeline lab)
         const r = (await sbGet('corp_exam_requests', `select=*&id=eq.${id}`))?.[0] || {};
         const stamp = Date.now().toString();
+        const svc = await buildPackageServices(r.package_id);   // urai paket → services + total
         const created = await sbPost('admissions', {
           visit_number: `VISIT-${(r.book_date||'').replace(/-/g,'')}-${stamp.slice(-4)}`,
           mr_number: `MR-${stamp.slice(-8)}`, visit_type: 'Project MCU', visit_date: r.book_date,
@@ -1385,6 +1419,9 @@ async function saveExamApproval() {
           package_id: r.package_id, package_name: r.package_name,
           corporate_id: currentCorporateId, corporate_employee_id: r.corporate_employee_id,
           discount_scheme: 'corporate', scheme_ref_id: currentCorporateId, scheme_name: currentCorporateName,
+          services: svc.services,
+          gross_amount: svc.gross, total_amount: svc.gross,
+          discount_amount: Math.max(0, svc.gross - svc.net), net_amount: svc.net,
           payment_status: 'Unpaid', status: 'Booking', registered_by: user, updated_at: now,
         });
         const admId = created?.[0]?.id || created?.id;
@@ -1414,6 +1451,99 @@ async function renderExamHistory() {
       <tbody>${reqs.map(r=>`<tr><td>${r.book_date||'—'}</td><td style="font-family:monospace;font-size:10.5px">${r.booking_batch||'—'}</td><td>${r.branch||'—'}</td><td>${r.patient_name||'—'}</td><td>${r.type_of_test||'MCU'}</td><td>${r.package_name||'—'}</td><td>${badge(r.exam_status)}${r.reject_reason?`<div style="font-size:10px;color:#dc2626;margin-top:3px">${r.reject_reason}</div>`:''}</td></tr>`).join('')}</tbody>
     </table></div>` : '<div style="text-align:center;color:var(--text-muted);padding:26px">Belum ada riwayat pemeriksaan.</div>'}
   </div>`;
+}
+
+// ── CSV helper (untuk "tarik data") ──
+function downloadCsv(filename, headerArr, rows) {
+  const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const csv = '﻿' + [headerArr.map(esc).join(','), ...rows.map(r=>r.map(esc).join(','))].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── Hasil MCU per corporate ──
+let _corpResults = [];
+async function renderCorporateResults() {
+  const box = document.getElementById('corp-results-content');
+  if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
+  const adms = await sbGet('admissions', `select=id,patient_name,visit_date,package_name&corporate_id=eq.${currentCorporateId}&order=visit_date.desc&limit=1000`).catch(()=>[]);
+  const admMap = {}; (adms||[]).forEach(a=>admMap[a.id]=a);
+  const ids = (adms||[]).map(a=>a.id);
+  let results = [];
+  for (let i = 0; i < ids.length; i += 100) {
+    const chunk = ids.slice(i, i+100);
+    if (!chunk.length) break;
+    const r = await sbGet('lab_results', `select=admission_id,patient_name,product_name,result_value,unit,normal_min,normal_max,interpretation,color_code&admission_id=in.(${chunk.join(',')})`).catch(()=>[]);
+    results = results.concat(r||[]);
+  }
+  _corpResults = (results||[]).map(r => ({
+    patient: r.patient_name || admMap[r.admission_id]?.patient_name || '—',
+    date: admMap[r.admission_id]?.visit_date || '',
+    package: admMap[r.admission_id]?.package_name || '',
+    test: r.product_name || '', value: r.result_value || '', unit: r.unit || '',
+    ref: (r.normal_min!=null && r.normal_max!=null) ? `${r.normal_min}–${r.normal_max}` : '',
+    interp: r.interpretation || '', color: r.color_code || '',
+  }));
+  const rowsHtml = _corpResults.map(r => `<tr>
+    <td>${r.patient}</td><td>${r.date}</td><td>${r.test}</td>
+    <td style="font-weight:700;color:${r.color==='red'?'#dc2626':r.color==='green'?'#059669':'inherit'}">${r.value}</td>
+    <td>${r.unit}</td><td>${r.ref}</td><td>${r.interp}</td></tr>`).join('');
+  box.innerHTML = `<div class="ci-card" style="padding:20px 22px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+      <div><h3 style="margin:0">Hasil MCU — ${_corpResults.length} hasil</h3><p style="font-size:11px;color:var(--text-muted)">${(adms||[]).length} kunjungan karyawan</p></div>
+      <button class="btn btn-sm btn-teal" style="margin:0;width:auto" onclick="exportCorporateResults()">⬇ Tarik Data (CSV)</button>
+    </div>
+    ${_corpResults.length ? `<div style="overflow-x:auto"><table class="be-table">
+      <thead><tr><th>Pasien</th><th>Tanggal</th><th>Tes</th><th>Hasil</th><th>Satuan</th><th>Rujukan</th><th>Interpretasi</th></tr></thead>
+      <tbody>${rowsHtml}</tbody></table></div>` : '<div style="text-align:center;color:var(--text-muted);padding:26px">Belum ada hasil MCU.</div>'}
+  </div>`;
+}
+function exportCorporateResults() {
+  if (!_corpResults.length) { alert('Tidak ada data untuk ditarik.'); return; }
+  downloadCsv(`hasil_mcu_${(currentCorporateName||'corp').replace(/\s+/g,'_')}.csv`,
+    ['Pasien','Tanggal','Paket','Tes','Hasil','Satuan','Rujukan','Interpretasi'],
+    _corpResults.map(r => [r.patient, r.date, r.package, r.test, r.value, r.unit, r.ref, r.interp]));
+}
+
+// ── Account Statement (invoice keseluruhan + saldo berjalan) ──
+let _corpStmt = [];
+async function renderAccountStatement() {
+  const box = document.getElementById('corp-statement-content');
+  if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
+  const invs = await sbGet('invoices', `select=*&corporate_id=eq.${currentCorporateId}&order=invoice_date.asc&limit=1000`).catch(()=>[]);
+  const fmt = n => 'Rp ' + Number(n||0).toLocaleString('id-ID');
+  const isPaid = i => i.status === 'Paid' || i.status === 'Lunas';
+  const totalBill = (invs||[]).reduce((s,i)=>s+Number(i.total_amount||0),0);
+  const totalPaid = (invs||[]).filter(isPaid).reduce((s,i)=>s+Number(i.total_amount||0),0);
+  const outstanding = totalBill - totalPaid;
+  let bal = 0;
+  _corpStmt = (invs||[]).map(i => {
+    const amt = Number(i.total_amount||0); const paid = isPaid(i);
+    bal += paid ? 0 : amt;
+    return { date: i.invoice_date||'', no: i.invoice_number||('INV-'+i.id), desc: i.service_type||i.notes||'Invoice', debit: amt, credit: paid?amt:0, status: paid?'Lunas':'Belum Bayar', balance: bal };
+  });
+  const stat = (label,val,col) => `<div class="ci-stat"><div><h4>${label}</h4><div class="ci-big" style="color:${col}">${fmt(val)}</div></div></div>`;
+  box.innerHTML = `<div class="ci-summary" style="margin-bottom:16px">
+      ${stat('Total Ditagih', totalBill, 'var(--primary)')}
+      ${stat('Total Dibayar', totalPaid, '#059669')}
+      ${stat('Outstanding', outstanding, outstanding>0?'#dc2626':'#059669')}
+    </div>
+    <div class="ci-card" style="padding:20px 22px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <h3 style="margin:0">Account Statement</h3>
+        <button class="btn btn-sm btn-teal" style="margin:0;width:auto" onclick="exportAccountStatement()">⬇ Tarik Statement (CSV)</button>
+      </div>
+      ${_corpStmt.length ? `<div style="overflow-x:auto"><table class="be-table">
+        <thead><tr><th>Tanggal</th><th>No. Invoice</th><th>Keterangan</th><th style="text-align:right">Tagihan</th><th style="text-align:right">Dibayar</th><th>Status</th><th style="text-align:right">Saldo</th></tr></thead>
+        <tbody>${_corpStmt.map(r=>`<tr><td>${r.date}</td><td style="font-family:monospace">${r.no}</td><td>${r.desc}</td><td style="text-align:right">${fmt(r.debit)}</td><td style="text-align:right;color:#059669">${r.credit?fmt(r.credit):'—'}</td><td>${r.status}</td><td style="text-align:right;font-weight:700">${fmt(r.balance)}</td></tr>`).join('')}</tbody></table></div>` : '<div style="text-align:center;color:var(--text-muted);padding:26px">Belum ada invoice untuk perusahaan ini.</div>'}
+    </div>`;
+}
+function exportAccountStatement() {
+  if (!_corpStmt.length) { alert('Tidak ada data untuk ditarik.'); return; }
+  downloadCsv(`account_statement_${(currentCorporateName||'corp').replace(/\s+/g,'_')}.csv`,
+    ['Tanggal','No Invoice','Keterangan','Tagihan','Dibayar','Status','Saldo Berjalan'],
+    _corpStmt.map(r => [r.date, r.no, r.desc, r.debit, r.credit, r.status, r.balance]));
 }
 
 // Status karyawan → badge (booking > aktif > terdaftar)
@@ -1930,6 +2060,7 @@ async function scheduleMcuBookingPortal() {
     const e = eligible[i];
     const stamp = Date.now().toString();
     try {
+      const svc = await buildPackageServices(e.package_id);   // urai paket → services + total
       const created = await sbPost('admissions', {
         visit_number:      `VISIT-${mcuDate.replace(/-/g,'')}-${stamp.slice(-4)}${i}`,
         mr_number:         `MR-${stamp.slice(-7)}${i}`,
@@ -1943,6 +2074,9 @@ async function scheduleMcuBookingPortal() {
         patient_id_number: e.employee_id || null,
         package_id:        e.package_id,
         package_name:      e.package_name || null,
+        services:          svc.services,
+        gross_amount:      svc.gross, total_amount: svc.gross,
+        discount_amount:   Math.max(0, svc.gross - svc.net), net_amount: svc.net,
         corporate_id:      currentCorporateId,
         corporate_employee_id: e.id,
         discount_scheme:   'corporate',
