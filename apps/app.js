@@ -1285,11 +1285,38 @@ async function buildPackageServices(pkgId) {
 async function renderBookExamination() {
   const box = document.getElementById('book-exam-content');
   if (!box || !currentCorporateId) { if (box) box.innerHTML = '<div class="ci-card" style="padding:24px;color:var(--text-muted)">Perusahaan belum teridentifikasi.</div>'; return; }
-  const [emps, pkgs, branchesRaw] = await Promise.all([
+  
+  // Fetch employees and branches
+  const [emps, branchesRaw] = await Promise.all([
     sbGet('corporate_employees', `select=*&corporate_id=eq.${currentCorporateId}&order=full_name.asc`).catch(()=>[]),
-    sbGet('packages','select=id,nama_paket&is_active=eq.true&order=nama_paket').catch(()=>[]),
     sbGet('branches','select=name&order=name').catch(()=>[]),
   ]);
+
+  // Load packages from corporate active contracts
+  let allowedPkgIds = [];
+  const contracts = await sbGet('corporate_contracts', `select=packages,status&corporate_id=eq.${currentCorporateId}`).catch(()=>[]);
+  (contracts || []).forEach(ct => {
+    if (ct.status === 'Active' && ct.packages) {
+      try {
+        const parsed = JSON.parse(ct.packages);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(item => {
+            const id = typeof item === 'object' && item !== null ? item.id : item;
+            const intId = parseInt(id);
+            if (!isNaN(intId) && !allowedPkgIds.includes(intId)) {
+              allowedPkgIds.push(intId);
+            }
+          });
+        }
+      } catch(e) {}
+    }
+  });
+
+  let pkgs = [];
+  if (allowedPkgIds.length > 0) {
+    const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
+    pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
+  }
   const branches = (branchesRaw||[]).map(b=>b.name).filter(Boolean);
   const today = new Date().toISOString().slice(0,10);
   const positions = [...new Set((emps||[]).map(e=>empPosition(e)).filter(p=>p&&p!=='—'))].sort();
@@ -1568,7 +1595,7 @@ async function renderCorporateList(data = corporates) {
       <table style="width:100%; border-collapse:collapse; font-size:12.5px; border:none; font-family:'Outfit', sans-serif;">
         <thead>
           <tr style="background:#f8fafc; color:#0f2963; font-weight:700; border-bottom:2px solid #cbd5e1; text-align:left;">
-            <th style="padding:12px 10px; text-align:center; width:80px;">Actions</th>
+            <th style="padding:12px 10px; text-align:center; width:100px;">Actions</th>
             <th style="padding:12px 10px;">Employee Number</th>
             <th style="padding:12px 10px;">Name</th>
             <th style="padding:12px 10px;">Last MCU</th>
@@ -1592,6 +1619,7 @@ async function renderCorporateList(data = corporates) {
               <tr style="border-bottom:1px solid #cbd5e1; background:#fff;">
                 <td style="padding:10px 8px; text-align:center;">
                   <div style="display:flex; gap:6px; justify-content:center;">
+                    <button onclick="openEmpMedrecModal(${e.id})" style="border:none; background:none; cursor:pointer; color:#0d9488; font-size:13px;" title="Lihat Hasil MCU / EHR">📋</button>
                     <button onclick="editEmployeePortal(${e.id})" style="border:none; background:none; cursor:pointer; color:#0f2963; font-size:13px;" title="Edit Employee">✏️</button>
                     <button onclick="deleteEmployeePortal(${e.id})" style="border:none; background:none; cursor:pointer; color:#ef4444; font-size:13px;" title="Delete Employee">🗑️</button>
                   </div>
@@ -1850,6 +1878,25 @@ function updateCorporateStats() {
   const percent = total > 0 ? Math.round(((bookedNoResult + bookedWithResult) / total) * 100) : 0;
   if (progressTxt) progressTxt.textContent = `${percent}%`;
   if (progressBar) progressBar.style.width = `${percent}%`;
+
+  // Update cohort visual indicators
+  const fitPct = total > 0 ? Math.round((fitCount / total) * 100) : 0;
+  const notePct = total > 0 ? Math.round((noteCount / total) * 100) : 0;
+  const unfitPct = total > 0 ? Math.round((unfitCount / total) * 100) : 0;
+
+  const fPctEl = document.getElementById('cohort-fit-pct');
+  const fBarEl = document.getElementById('cohort-fit-bar');
+  const nPctEl = document.getElementById('cohort-note-pct');
+  const nBarEl = document.getElementById('cohort-note-bar');
+  const uPctEl = document.getElementById('cohort-unfit-pct');
+  const uBarEl = document.getElementById('cohort-unfit-bar');
+
+  if (fPctEl) fPctEl.textContent = `${fitPct}%`;
+  if (fBarEl) fBarEl.style.width = `${fitPct}%`;
+  if (nPctEl) nPctEl.textContent = `${notePct}%`;
+  if (nBarEl) nBarEl.style.width = `${notePct}%`;
+  if (uPctEl) uPctEl.textContent = `${unfitPct}%`;
+  if (uBarEl) uBarEl.style.width = `${unfitPct}%`;
 }
 
 async function openAddEmployeeModal() {
@@ -2100,7 +2147,7 @@ async function scheduleMcuBookingPortal() {
 }
 
 // --- EMPLOYEE MEDICAL RECORD DETAIL MODAL ---
-function openEmpMedrecModal(empId) {
+async function openEmpMedrecModal(empId) {
   const emp = corporates.find(e => e.id === empId);
   if (!emp) return;
 
@@ -2111,43 +2158,67 @@ function openEmpMedrecModal(empId) {
 
   if (!modal || !titleEl || !contentEl) return;
 
-  titleEl.textContent = `Rekam Medis: ${emp.name}`;
-  subEl.innerHTML = `ID Karyawan: <strong>${emp.id}</strong> &bull; ${emp.test}`;
+  titleEl.textContent = `Hasil MCU: ${emp.full_name || 'Karyawan'}`;
+  subEl.innerHTML = `NIK/ID: <strong>${emp.employee_id || emp.id_number || '—'}</strong> &bull; Dept: ${emp.department || '—'}`;
+  contentEl.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted);">Memuat data hasil klinis...</div>';
+  modal.classList.add('open');
 
-  if (emp.status === 'pending') {
+  if (!emp.booking_admission_id) {
     contentEl.innerHTML = `
       <div style="text-align:center; padding:20px; color:var(--text-muted);">
-        <p style="font-size:24px; margin-bottom:10px;">🧪</p>
-        <p style="font-size:13px; line-height:1.4;">Sampel laboratorium karyawan sedang diproses. Hasil klinis dan status kelayakan kerja akan diterbitkan setelah proses analisa lab selesai.</p>
+        <p style="font-size:24px; margin-bottom:10px;">📅</p>
+        <p style="font-size:13px; line-height:1.4; color:#475569;">Karyawan belum memiliki riwayat pemeriksaan atau penjadwalan MCU.</p>
       </div>
     `;
-  } else {
-    const med = emp.medrec || { cholesterol: 180, sugar: 90, uric: 5.0, notes: 'Data normal.' };
-    const cholClass = med.cholesterol > 200 ? 'abnormal' : 'normal';
-    const sugarClass = med.sugar > 100 ? 'abnormal' : 'normal';
-    const uricClass = med.uric > 7.0 ? 'abnormal' : 'normal';
-
-    contentEl.innerHTML = `
-      <div class="medrec-param-row">
-        <span class="medrec-param-label">Kolesterol Total</span>
-        <span class="medrec-param-value ${cholClass}">${med.cholesterol} mg/dL</span>
-      </div>
-      <div class="medrec-param-row">
-        <span class="medrec-param-label">Glukosa Puasa</span>
-        <span class="medrec-param-value ${sugarClass}">${med.sugar} mg/dL</span>
-      </div>
-      <div class="medrec-param-row">
-        <span class="medrec-param-label">Asam Urat</span>
-        <span class="medrec-param-value ${uricClass}">${med.uric} mg/dL</span>
-      </div>
-      <div style="margin-top:12px; padding:12px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05);">
-        <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block; margin-bottom:4px;">Catatan Dokter / Kelayakan Kerja</span>
-        <p style="font-size:12px; line-height:1.4; color:#f8fafc;">${med.notes}</p>
-      </div>
-    `;
+    return;
   }
 
-  modal.classList.add('open');
+  try {
+    const results = await sbGet('lab_results', `select=product_name,result_value,unit,normal_min,normal_max,interpretation,color_code&admission_id=eq.${emp.booking_admission_id}`).catch(()=>[]);
+    if (!results || !results.length) {
+      contentEl.innerHTML = `
+        <div style="text-align:center; padding:20px; color:var(--text-muted);">
+          <p style="font-size:24px; margin-bottom:10px;">⏳</p>
+          <p style="font-size:13px; line-height:1.4; color:#475569;">Sampel pemeriksaan sedang diproses di laboratorium. Hasil akan otomatis terbit di sini setelah analisa selesai.</p>
+        </div>
+      `;
+      return;
+    }
+
+    // Render parameters dynamically
+    let html = '';
+    results.forEach(r => {
+      const isAbnormal = r.color_code === 'red';
+      const refRange = (r.normal_min != null && r.normal_max != null) ? `(${r.normal_min}-${r.normal_max})` : '';
+      html += `
+        <div class="medrec-param-row" style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-radius:8px; background:#f8fafc; border:1px solid #e2e8f0; font-size:12px; margin-bottom:8px;">
+          <div>
+            <span style="font-weight:700; color:#0f2963; display:block;">${r.product_name}</span>
+            <span style="font-size:9.5px; color:#64748b;">Rujukan: ${refRange} ${r.unit || ''}</span>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-weight:800; color:${isAbnormal ? '#dc2626' : '#059669'}; font-size:13px; display:block;">${r.result_value} ${r.unit || ''}</span>
+            <span style="display:block; font-size:9.5px; color:${isAbnormal ? '#dc2626' : '#64748b'}; font-weight:600; text-transform:uppercase;">${r.interpretation || 'Normal'}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    // Check if there is a doctor conclusion in the admission
+    const adms = await sbGet('admissions', `select=id,doctor_conclusion&id=eq.${emp.booking_admission_id}`).catch(()=>[]);
+    const conclusion = adms?.[0]?.doctor_conclusion || 'Karyawan dalam kondisi sehat secara umum dan Fit to Work.';
+
+    html += `
+      <div style="margin-top:14px; padding:12px; border-radius:8px; background:#f0fdf4; border:1px solid #bbf7d0; text-align:left;">
+        <span style="font-size:9.5px; text-transform:uppercase; color:#166534; font-weight:700; display:block; margin-bottom:4px;">Kesimpulan &amp; Rekomendasi Dokter</span>
+        <p style="font-size:12px; line-height:1.4; color:#14532d; margin:0; font-weight:500;">${conclusion}</p>
+      </div>
+    `;
+
+    contentEl.innerHTML = html;
+  } catch (err) {
+    contentEl.innerHTML = `<div style="text-align:center; padding:20px; color:var(--error);">❌ Gagal memuat hasil: ${err.message}</div>`;
+  }
 }
 
 function closeEmpMedrecModal() {

@@ -237,8 +237,9 @@ th {
 
 .role-btn input:checked + span {
   border-color: #0f2963 !important;
-  background-color: rgba(15, 41, 99, 0.08) !important;
-  color: #0f2963 !important;
+  background-color: #0f2963 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(15, 41, 99, 0.15);
 }
 
 /* Timeline Navigation Bar */
