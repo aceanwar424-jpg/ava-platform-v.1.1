@@ -127,6 +127,12 @@ async function renderAdmission() {
 
 async function loadAdmissions() {
   try {
+    // Sekali per sesi: auto-cancel no-show + lengkapi detail paket booking lama
+    if (!window._noShowSwept) {
+      window._noShowSwept = true;
+      await sweepNoShowBookings();
+      await backfillBookingServices();
+    }
     const date = document.getElementById('adm-date')?.value || new Date().toISOString().split('T')[0];
     const data = await sbGet('admissions',
       `select=*&visit_date=eq.${date}&order=created_at.desc`);
@@ -137,6 +143,62 @@ async function loadAdmissions() {
     document.getElementById('adm-list').innerHTML =
       `<div class="status-box status-err" style="margin:16px">❌ ${e.message}</div>`;
   }
+}
+
+// No-show auto-cancel: booking MCU yang tanggal kunjungannya sudah lewat >1x24 jam
+// dan masih berstatus 'Booking' (belum check-in) → Cancelled otomatis.
+// Catatan: dijalankan saat modul Admisi dibuka. Untuk penjadwalan pasti (walau
+// aplikasi tidak dibuka), pakai pg_cron di supabase_no_show_autocancel.sql.
+async function sweepNoShowBookings() {
+  try {
+    const cutoff = new Date(Date.now() - 24*60*60*1000).toISOString().slice(0,10);
+    const stale = await sbGet('admissions',
+      `select=id&status=eq.Booking&visit_date=lt.${cutoff}`).catch(()=>[]);
+    for (const a of (stale||[])) {
+      await sbPatch('admissions', a.id, { status: 'Cancelled', updated_at: new Date().toISOString() });
+    }
+    if ((stale||[]).length && typeof toast === 'function') toast(`${stale.length} booking no-show dibatalkan otomatis`, 'info', 4000);
+  } catch(e) { console.error('[sweepNoShowBookings]', e); }
+}
+
+// Urai paket → services JSON + total (headless, format sama addPackageLines).
+async function buildServicesFromPkg(pkgId) {
+  if (!pkgId) return null;
+  let pkg = null, items = [];
+  try { pkg = (await sbGet('packages', `select=id,nama_paket,harga_normal,harga_korporat&id=eq.${pkgId}`))?.[0] || null; } catch(e){}
+  try { items = await sbGet('package_items', `select=*,products(id,nama_tes,harga_normal,is_panel)&package_id=eq.${pkgId}`) || []; } catch(e){}
+  if (!pkg) return null;
+  const pkgPrice = parseFloat(pkg.harga_korporat || pkg.harga_normal || 0);
+  if (!items.length) {
+    return { services: JSON.stringify([{ product_id:null, name:`[PAKET] ${pkg.nama_paket}`, priority:'-', unit_price:pkgPrice, discount_pct:0, discount_idr:0 }]), gross: Math.round(pkgPrice), net: Math.round(pkgPrice) };
+  }
+  const sumInd = items.reduce((s,it)=>s+(parseFloat(it.products?.harga_normal||0)*(it.qty||1)),0);
+  const bundlePct = (pkgPrice>0 && sumInd>pkgPrice) ? Math.round((1-pkgPrice/sumInd)*10000)/100 : 0;
+  const lines = items.map(it=>({ product_id: it.products?.id||it.product_id||null, name: it.products?.nama_tes||it.product_name||'', priority:'-', unit_price: parseFloat(it.products?.harga_normal||0), discount_pct: bundlePct, discount_idr: 0 }));
+  return { services: JSON.stringify(lines), gross: Math.round(sumInd), net: bundlePct ? Math.round(pkgPrice) : Math.round(sumInd) };
+}
+
+// Backfill: booking berpaket lama yang `services`-nya kosong → diurai & tagihan diisi.
+async function backfillBookingServices() {
+  try {
+    const rows = await sbGet('admissions',
+      `select=id,package_id,services&package_id=not.is.null&status=neq.Cancelled&limit=500`).catch(()=>[]);
+    let fixed = 0;
+    for (const a of (rows||[])) {
+      const empty = !a.services || a.services === '' || a.services === '[]';
+      if (!empty) continue;
+      const svc = await buildServicesFromPkg(a.package_id);
+      if (!svc) continue;
+      await sbPatch('admissions', a.id, {
+        services: svc.services, gross_amount: svc.gross, total_amount: svc.gross,
+        discount_amount: Math.max(0, svc.gross - svc.net), net_amount: svc.net,
+        updated_at: new Date().toISOString(),
+      });
+      fixed++;
+    }
+    if (fixed && typeof toast === 'function') toast(`${fixed} booking lama dilengkapi detail paket`, 'ok', 4000);
+    return fixed;
+  } catch(e) { console.error('[backfillBookingServices]', e); }
 }
 
 function renderAdmKPI() {
