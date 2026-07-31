@@ -65,6 +65,7 @@ async function renderLeads() {
           ${LEAD_SOURCES.map(s=>`<option>${s}</option>`).join('')}
         </select>
         <button class="btn btn-ghost btn-sm" onclick="exportLeadsCSV()">Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="openImportModal('leads')">Import Excel</button>
         <span id="ld-count" style="font-size:12px;color:var(--text3);white-space:nowrap;margin-left:auto"></span>
       </div>
       <div id="leads-tbody">

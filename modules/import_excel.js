@@ -101,7 +101,7 @@ const IMPORT_TEMPLATES = {
   partners: {
     label: 'Partner / Mitra',
     table: 'partners',
-    icon: '',
+    icon: '🤝',
     sheet: 'Partners',
     upsertKey: null,
     columns: [
@@ -114,6 +114,30 @@ const IMPORT_TEMPLATES = {
       { key: 'status',           header: 'Status Pipeline',      required: false, example: 'Prospect', note:'Prospect|Dihubungi|Meeting|Proposal Dikirim|MOU|Aktif|Tidak Berminat' },
       { key: 'assigned_name',    header: 'Sales PIC',            required: false, example: 'Budi'           },
       { key: 'notes',            header: 'Catatan',              required: false, example: 'Kontak via referral' },
+    ]
+  },
+
+  leads: {
+    label: 'Data Leads Prospek',
+    table: 'leads',
+    icon: '🎯',
+    sheet: 'Leads',
+    upsertKey: null,
+    columns: [
+      { key: 'lead_name',        header: 'Nama Lead / Perusahaan *', required: true,  example: 'Medischa Clinic & Health' },
+      { key: 'company',         header: 'Nama Perusahaan',      required: false, example: 'Medischa Clinic' },
+      { key: 'category',        header: 'Kategori',             required: false, example: 'Klinik / RS', note: 'Perusahaan SME|Klinik / RS|Sekolah / Kampus|Komunitas|Gym & Sport|Apotek|Individu / Personal|Lainnya' },
+      { key: 'contact_name',    header: 'Nama PIC',             required: false, example: 'Budi Santoso' },
+      { key: 'phone',           header: 'No HP PIC',            required: false, example: '0811225105' },
+      { key: 'email',           header: 'Email PIC',            required: false, example: 'budi@medischa.com' },
+      { key: 'source',          header: 'Sumber',               required: false, example: 'Maps Prospecting', note: 'Maps Prospecting|Referral Internal|Referral Eksternal|Cold Call|Event/Pameran|Media Sosial|Walk-in|Lainnya' },
+      { key: 'address',         header: 'Alamat',               required: false, example: 'Jl. Sudirman No. 10' },
+      { key: 'status',          header: 'Status',               required: false, example: 'Baru', note: 'Baru|Dihubungi|Qualified|Presentasi|Proposal|Negosiasi|Won|Lost' },
+      { key: 'estimated_value', header: 'Nilai Est (Rp)',       required: false, example: '1000000', type: 'number' },
+      { key: 'followup_date',   header: 'Tgl Follow Up',        required: false, example: '2026-08-15' },
+      { key: 'followup_note',   header: 'Catatan Follow Up',    required: false, example: 'Sedang Review PKS...' },
+      { key: 'assigned_name',   header: 'Sales PIC',            required: false, example: 'Ace Darojatun Anwar' },
+      { key: 'notes',           header: 'Catatan Tambahan',     required: false, example: 'Butuh proposal MCU corporate' },
     ]
   },
 
@@ -605,6 +629,7 @@ async function doImport(key) {
           });
           payload.updated_at = new Date().toISOString();
           if (!tpl.skipCreatedBy && !payload.created_by) payload.created_by = user;
+          if (tpl.table === 'leads') payload.created_by_name = user;
 
           if (tpl.upsertKey && payload[tpl.upsertKey]) {
             // Check if exists
@@ -641,6 +666,7 @@ async function doImport(key) {
     corporates:    ()=>{ if(typeof loadCorporates==='function') loadCorporates(); },
     families:      ()=>{ if(typeof loadFamilies==='function' && document.getElementById('fam-list')) loadFamilies(); },
     partners:      ()=>{ if(typeof loadPartners==='function') loadPartners(); },
+    leads:         ()=>{ if(typeof loadLeads==='function') loadLeads(); },
   };
   if (reloadMap[key]) reloadMap[key]();
 
