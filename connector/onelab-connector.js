@@ -22,6 +22,19 @@ const net = require('net');
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
+
+// Alamat IPv4 LAN PC ini (untuk diisi di master Alat OneLab, mode server).
+function localIPs() {
+  const out = [];
+  const ifaces = os.networkInterfaces();
+  for (const name in ifaces) {
+    for (const ni of (ifaces[name] || [])) {
+      if (ni.family === 'IPv4' && !ni.internal) out.push(ni.address);
+    }
+  }
+  return out;
+}
 
 // ── Konfigurasi koneksi Supabase ──────────────────────────────────────
 let CFG = {};
@@ -55,7 +68,7 @@ function pushRawStream(deviceName, direction, protocol, raw) {
     protocol: protocol || 'HL7',
     data: String(raw)
   });
-  if (STATE.rawStream.length > 50) STATE.rawStream.shift();
+  if (STATE.rawStream.length > 500) STATE.rawStream.shift();
 }
 
 // ── Kode kontrol protokol ─────────────────────────────────────────────
@@ -313,10 +326,31 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
   @media (max-width: 768px) {
     .split-row {flex-direction:column}
   }
+  .tabs{display:flex;gap:4px;margin-bottom:18px;border-bottom:1px solid var(--border)}
+  .tabx{background:none;color:var(--text-muted);border:none;border-bottom:2px solid transparent;border-radius:0;padding:10px 18px;font-weight:700;font-size:13px}
+  .tabx:hover{color:var(--text-main);opacity:1}
+  .tabx.active{color:var(--teal);border-bottom-color:var(--teal)}
+  .lis-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
+  textarea.lis-in{width:100%;height:190px;background:#060a14;border:1px solid var(--border);border-radius:10px;color:var(--text-main);font-family:'Consolas',monospace;font-size:12px;padding:12px;resize:vertical}
+  select.lis-sel{background:#060a14;color:var(--text-main);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;font-weight:600}
+  .lis-tbl{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+  .lis-tbl th{background:#0e1832;color:var(--text-muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em}
+  .lis-tbl td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
+  .lis-tbl tbody tr:hover{background:#0e1832}
+  .lis-H{color:var(--red);font-weight:700}.lis-L{color:#38bdf8;font-weight:700}
+  .lis-count{font-size:12px;color:var(--text-muted)}
 </style></head><body>
 <div class="container">
   <h1>OneLab Connector</h1>
   <div class="sub" id="sub">memuat…</div>
+
+  <div class="tabs">
+    <button class="tabx active" id="tabx-status" onclick="switchTab('status')">Status Alat</button>
+    <button class="tabx" id="tabx-lis" onclick="switchTab('lis')">LIS — Parsing Manual</button>
+  </div>
+
+  <div id="panel-status">
+  <div id="ip-banner" style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;line-height:1.5">memuat IP…</div>
   <div class="bar">
     <button onclick="reload()">Muat ulang config</button>
     <span style="font-size:11.5px;color:var(--text-muted)">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
@@ -333,6 +367,24 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
       <pre id="raw-stream">…</pre>
     </div>
   </div>
+  </div><!-- /panel-status -->
+
+  <div id="panel-lis" style="display:none">
+    <div class="sub" style="margin-bottom:4px">Mode manual — untuk dipakai saat cloud sedang maintenance/offline. Tempel pesan mentah dari alat (ASTM / HL7), parse jadi tabel, lalu export ke Excel.</div>
+    <div class="lis-toolbar">
+      <select class="lis-sel" id="lis-proto"><option value="auto">Auto-deteksi</option><option value="ASTM">ASTM</option><option value="HL7">HL7</option></select>
+      <button onclick="lisParse()">Parse</button>
+      <button style="background:#334155" onclick="lisClear()">Bersihkan</button>
+      <button style="background:#0e7490" onclick="lisExport()">Export Excel</button>
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted);cursor:pointer;user-select:none"><input type="checkbox" id="lis-auto"> Auto ambil dari alat</label>
+      <span class="lis-count" id="lis-count"></span>
+    </div>
+    <textarea class="lis-in" id="lis-raw" placeholder="Tempel pesan alat di sini...&#10;Contoh ASTM:  R|1|^^^GLU|95|mg/dL|70-110|N&#10;Contoh HL7:   OBX|1|NM|GLU^Glukosa||95|mg/dL|70-110|N"></textarea>
+    <div style="overflow-x:auto"><table class="lis-tbl" id="lis-tbl">
+      <thead><tr><th>ID Sampel</th><th>Kode Item</th><th>Hasil</th><th>Satuan</th><th>Ref Range</th><th>Flag</th></tr></thead>
+      <tbody id="lis-tbody"><tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:20px">Belum ada data. Tempel pesan lalu klik Parse.</td></tr></tbody>
+    </table></div>
+  </div>
 </div>
 <script>
   function esc(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
@@ -341,6 +393,8 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
       const r=await fetch('/api/status'); const s=await r.json();
       const up=Math.round((Date.now()-new Date(s.started).getTime())/1000);
       document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat aktif';
+      var ipEl=document.getElementById('ip-banner');
+      if(ipEl){ var ips=(s.localIps||[]); ipEl.innerHTML='<b style="color:var(--teal)">IP PC Connector:</b> '+(ips.length?ips.map(function(x){return '<code style="color:#38bdf8;font-size:13.5px">'+esc(x)+'</code>';}).join('&nbsp; , &nbsp;'):'(tidak terdeteksi)')+' &nbsp;·&nbsp; <span style="color:var(--text-muted)">Isi IP ini + port yang sama di master Alat OneLab (mode server) agar alat mengirim hasil ke PC ini.</span>'; }
       
       document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
         const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
@@ -396,9 +450,109 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
       const rawEl = document.getElementById('raw-stream');
       rawEl.innerHTML = rawText || '<div style="color:var(--text-muted)">Menunggu aliran data alat lab...</div>';
       rawEl.scrollTop = rawEl.scrollHeight; // Auto scroll to bottom
+      lisAutoFeed(s.rawStream); // feed tab LIS dari kiriman alat (jika Auto aktif)
     }catch(e){ document.getElementById('sub').textContent='connector tidak merespons'; }
   }
   async function reload(){ await fetch('/reload',{method:'POST'}); setTimeout(tick,300); }
+
+  // ── Tab LIS: parsing manual ASTM/HL7 (offline, saat cloud maintenance) ──
+  var lisRows = [];
+  function switchTab(which){
+    document.getElementById('panel-status').style.display = which==='status'?'':'none';
+    document.getElementById('panel-lis').style.display = which==='lis'?'':'none';
+    document.getElementById('tabx-status').classList.toggle('active', which==='status');
+    document.getElementById('tabx-lis').classList.toggle('active', which==='lis');
+  }
+  function isLookLikeBarcode(str) {
+    if (!str) return false;
+    var clean = String(str).trim();
+    if (clean.length < 3) return false;
+    if (/^\d+$/.test(clean) && clean.length <= 3) return false;
+    return true;
+  }
+  function lisComp(x){ return String(x==null?'':x).split('^')[0].trim(); }
+  function lisLastComp(x){ var p=String(x==null?'':x).split('^').filter(function(s){return s.trim();}); return p.length?p[p.length-1].trim():''; }
+  function lisCode(x){ var p=String(x==null?'':x).split('^'); for(var i=0;i<p.length;i++){ if(p[i].trim()) return p[i].trim(); } return ''; }
+  function lisRecords(raw){ return String(raw||'').split(/\\r\\n|\\r|\\n/).map(function(s){return s.replace(/[\\x00-\\x1f]/g,'').trim();}).filter(Boolean); }
+  function lisDetect(recs){ for(var i=0;i<recs.length;i++){ var r=recs[i].replace(/^\\d+/,''); if(/^MSH\\|/.test(r)||/^OBX\\|/.test(r)||/^PID\\|/.test(r)) return 'HL7'; } return 'ASTM'; }
+  function lisParseASTM(recs){
+    var out=[], sample='', patId='';
+    recs.forEach(function(rec){
+      var r=rec.replace(/^\\d+/,'');
+      var f=r.split('|');
+      var t=(f[0]||'').charAt(0).toUpperCase();
+      if(t==='H'){
+        sample=''; patId='';
+      } else if(t==='P'){
+        var b3 = lisComp(f[3]);
+        var b2 = lisComp(f[2]);
+        var b4 = lisComp(f[4]);
+        if (isLookLikeBarcode(b3)) patId = b3;
+        else if (isLookLikeBarcode(b2)) patId = b2;
+        else if (isLookLikeBarcode(b4)) patId = b4;
+        else patId = b3 || b2 || patId;
+      } else if(t==='O'){
+        var b3 = lisComp(f[3]);
+        var b2 = lisComp(f[2]);
+        if (isLookLikeBarcode(b2)) sample = b2;
+        else if (isLookLikeBarcode(b3)) sample = b3;
+        else sample = b3 || b2 || sample;
+      } else if(t==='R'){
+        out.push({id:sample||patId,code:lisCode(f[2]),result:(f[3]||'').trim(),unit:(f[4]||'').trim(),ref:(f[5]||'').trim(),flag:(f[6]||'').trim()});
+      }
+    });
+    return out;
+  }
+  function lisParseHL7(recs){
+    var out=[], sample='', pid='';
+    recs.forEach(function(rec){
+      var f=rec.split('|');
+      var t=(f[0]||'').toUpperCase();
+      if(t==='MSH'){
+        sample=''; pid='';
+      } else if(t==='OBR'){
+        var b2 = lisComp(f[2]);
+        var b3 = lisComp(f[3]);
+        if (isLookLikeBarcode(b2)) sample = b2;
+        else if (isLookLikeBarcode(b3)) sample = b3;
+        else sample = b3 || b2 || sample;
+      } else if(t==='PID'){
+        var b3 = lisComp(f[3]);
+        var b2 = lisComp(f[2]);
+        var b5 = lisComp(f[5]);
+        if (isLookLikeBarcode(b3)) pid = b3;
+        else if (isLookLikeBarcode(b2)) pid = b2;
+        else if (isLookLikeBarcode(b5)) pid = b5;
+        else pid = b3 || b2 || pid;
+      } else if(t==='SPM'){
+        var b2 = lisComp(f[2]);
+        if (isLookLikeBarcode(b2)) sample = b2;
+        else sample = b2 || sample;
+      } else if(t==='OBX'){
+        out.push({id:sample||pid,code:lisCode(f[3]),result:(f[5]||'').trim(),unit:(f[6]||'').trim(),ref:(f[7]||'').trim(),flag:(f[8]||'').trim()});
+      }
+    });
+    return out;
+  }
+  function lisParse(){ var raw=document.getElementById('lis-raw').value; var recs=lisRecords(raw); if(!recs.length){ lisRows=[]; lisRender(); return; } var proto=document.getElementById('lis-proto').value; if(proto==='auto') proto=lisDetect(recs); lisRows = proto==='HL7'?lisParseHL7(recs):lisParseASTM(recs); lisRender(proto); }
+  function lisFlag(fl){ var f=(fl||'').toUpperCase(); if(f.indexOf('H')>=0) return '<span class="lis-H">'+esc(fl)+'</span>'; if(f.indexOf('L')>=0) return '<span class="lis-L">'+esc(fl)+'</span>'; return esc(fl||'—'); }
+  function lisRender(proto){ var tb=document.getElementById('lis-tbody'); var cnt=document.getElementById('lis-count'); if(!lisRows.length){ tb.innerHTML='<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:20px">Tidak ada baris hasil (R/OBX) terdeteksi. Cek protokol atau format pesan.</td></tr>'; cnt.textContent=''; return; } tb.innerHTML=lisRows.map(function(x){ return '<tr><td>'+esc(x.id||'—')+'</td><td style="font-weight:700;color:var(--teal)">'+esc(x.code||'—')+'</td><td>'+esc(x.result||'—')+'</td><td>'+esc(x.unit||'')+'</td><td>'+esc(x.ref||'')+'</td><td>'+lisFlag(x.flag)+'</td></tr>'; }).join(''); cnt.textContent=lisRows.length+' hasil'+(proto?' ('+proto+')':''); }
+  function lisClear(){ document.getElementById('lis-raw').value=''; lisRows=[]; lisRender(); }
+  // Auto ambil kiriman terbaru dari alat (direction IN) lalu parse — sumber data
+  // tetap dari alat, pengolahan tetap manual (bisa dimatikan lewat checkbox).
+  var lisFeedSig = '';
+  function lisAutoFeed(rawStream){
+    var cb=document.getElementById('lis-auto'); if(!cb||!cb.checked) return;
+    var ins=(rawStream||[]).filter(function(r){return r.direction==='IN';});
+    if(!ins.length) return;
+    var sig=ins.length+'|'+new Date(ins[ins.length-1].timestamp).getTime();
+    if(sig===lisFeedSig) return;   // tak ada pesan baru → jangan re-parse berulang
+    lisFeedSig=sig;
+    var ta=document.getElementById('lis-raw');
+    if(ta){ ta.value=ins.map(function(r){return r.data;}).join('\\r\\n'); lisParse(); }  // gabung SEMUA pesan → semua pasien
+  }
+  function lisExport(){ if(!lisRows.length){ alert('Belum ada data untuk diexport. Parse pesan dulu.'); return; } var h=['ID Sampel','Kode Item','Hasil','Satuan','Ref Range','Flag']; var rows=lisRows.map(function(x){return [x.id,x.code,x.result,x.unit,x.ref,x.flag];}); var tbl='<table border="1"><tr>'+h.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+esc(c==null?'':c)+'</td>';}).join('')+'</tr>';}).join('')+'</table>'; var blob=new Blob(['\\ufeff<html><head><meta charset="utf-8"></head><body>'+tbl+'</body></html>'],{type:'application/vnd.ms-excel'}); var a=document.createElement('a'); a.href=URL.createObjectURL(blob); var d=new Date().toISOString().slice(0,10).replace(/-/g,''); a.download='lis_manual_'+d+'.xls'; a.click(); URL.revokeObjectURL(a.href); }
+
   tick(); setInterval(tick,3000);
 </script></body></html>`;
 
@@ -410,7 +564,8 @@ function startStatusServer() {
         started: STATE.started, supabase: SUPABASE_URL,
         devices: [...STATE.devices.entries()].map(([id, d]) => ({ id, ...d })),
         logs: STATE.logs.slice(-120),
-        rawStream: STATE.rawStream
+        rawStream: STATE.rawStream,
+        localIps: localIPs()
       }));
       return;
     }

@@ -35,6 +35,14 @@ function parseWithProfile(text, cfg){
     if(which==='last'){ const nz=parts.filter(x=>x!==''); return (nz.length?nz[nz.length-1]:'').trim(); }
     return (parts[Number(which)]||'').trim();
   };
+  const isLookLikeBarcode = (str) => {
+    if (!str) return false;
+    const clean = String(str).trim();
+    if (clean.length < 3) return false;
+    if (/^\d+$/.test(clean) && clean.length <= 3) return false;
+    return true;
+  };
+
   const entries=[]; let barcode='';
   String(text||'').split(/\r\n|\r|\n/).forEach(line=>{
     const l=line.trim(); if(!l) return;
@@ -47,8 +55,40 @@ function parseWithProfile(text, cfg){
       const flag=cfg.flagField!=null&&cfg.flagField!==''?(f[cfg.flagField]||'').trim():'';
       if(code && value!=='') entries.push({ code, value, unit, flag });
     }
-    if(cfg.barcodeRecord && !barcode && rec===String(cfg.barcodeRecord).toUpperCase()){
-      barcode=comp(f[cfg.barcodeField], cfg.barcodeComp);
+    if(cfg.barcodeRecord && rec===String(cfg.barcodeRecord).toUpperCase()){
+      const candidate = comp(f[cfg.barcodeField], cfg.barcodeComp);
+      if (isLookLikeBarcode(candidate)) {
+        barcode = candidate;
+      }
+    }
+    // Fallbacks if not detected or set to a dummy number like "1"
+    if (!isLookLikeBarcode(barcode)) {
+      if (rec === 'OBR') {
+        const b2 = comp(f[2], cfg.barcodeComp);
+        const b3 = comp(f[3], cfg.barcodeComp);
+        if (isLookLikeBarcode(b2)) barcode = b2;
+        else if (isLookLikeBarcode(b3)) barcode = b3;
+      } else if (rec === 'PID') {
+        const b3 = comp(f[3], cfg.barcodeComp);
+        const b2 = comp(f[2], cfg.barcodeComp);
+        const b5 = comp(f[5], cfg.barcodeComp);
+        if (isLookLikeBarcode(b3)) barcode = b3;
+        else if (isLookLikeBarcode(b2)) barcode = b2;
+        else if (isLookLikeBarcode(b5)) barcode = b5;
+      } else if (rec === 'SPM') {
+        const b2 = comp(f[2], cfg.barcodeComp);
+        if (isLookLikeBarcode(b2)) barcode = b2;
+      } else if (rec === 'O') { // ASTM Order
+        const b2 = comp(f[2], cfg.barcodeComp);
+        const b3 = comp(f[3], cfg.barcodeComp);
+        if (isLookLikeBarcode(b2)) barcode = b2;
+        else if (isLookLikeBarcode(b3)) barcode = b3;
+      } else if (rec === 'P') { // ASTM Patient
+        const b3 = comp(f[3], cfg.barcodeComp);
+        const b4 = comp(f[4], cfg.barcodeComp);
+        if (isLookLikeBarcode(b3)) barcode = b3;
+        else if (isLookLikeBarcode(b4)) barcode = b4;
+      }
     }
   });
   return { entries, barcode };
