@@ -75,37 +75,57 @@ function pushRawStream(deviceName, direction, protocol, raw) {
 const ENQ = 0x05, ACK = 0x06, NAK = 0x15, STX = 0x02, ETX = 0x03, ETB = 0x17, EOT = 0x04, CR = 0x0D, LF = 0x0A;
 const VT = 0x0B, FS = 0x1C; // HL7 MLLP
 
-// Kirim pesan mentah ke Supabase (non-fatal bila gagal — jangan putus koneksi alat)
-async function ingest(analyzer, protocol, raw, direction) {
-  const dir = direction || 'IN';
-  pushRawStream(analyzer.name, dir, protocol, raw);
-  try {
-    const res = await rpc('analyzer_ingest', {
-      p: {
-        analyzer_code: analyzer.code,
-        analyzer_id: analyzer.id,
-        protocol,
-        raw_text: raw,
-        direction: dir
+const INGEST_QUEUE = [];
+let isProcessingQueue = false;
+
+async function processQueue() {
+  if (isProcessingQueue) return;
+  if (INGEST_QUEUE.length === 0) return;
+  isProcessingQueue = true;
+  while (INGEST_QUEUE.length > 0) {
+    const item = INGEST_QUEUE[0];
+    try {
+      const res = await rpc('analyzer_ingest', {
+        p: {
+          analyzer_code: item.analyzer.code,
+          analyzer_id: item.analyzer.id,
+          protocol: item.protocol,
+          raw_text: item.raw,
+          direction: item.direction
+        }
+      });
+      log(`  ⇢ [QUEUE] ingest ${item.analyzer.name} (${item.protocol}, ${item.raw.length}b) id=${res && res.id}`);
+      const d = STATE.devices.get(item.analyzer.id);
+      if (d && item.direction === 'IN') {
+        d.msgCount++;
+        d.lastMsgAt = new Date();
+        d.lastRaw = String(item.raw).slice(0, 4000);
+        d.lastError = null;
+        d.lastErrorAt = null;
       }
-    });
-    log(`  ⇢ ingest ${analyzer.name} (${protocol}, ${raw.length}b) id=${res && res.id}`);
-    const d = STATE.devices.get(analyzer.id);
-    if (d && dir === 'IN') {
-      d.msgCount++;
-      d.lastMsgAt = new Date();
-      d.lastRaw = String(raw).slice(0, 4000);
-      d.lastError = null;
-      d.lastErrorAt = null;
-    }
-  } catch (e) {
-    log(`  ⚠ ingest gagal (${analyzer.name}): ${e.message}`);
-    const d = STATE.devices.get(analyzer.id);
-    if (d) {
-      d.lastError = `ingest gagal: ${e.message}`;
-      d.lastErrorAt = new Date();
+      INGEST_QUEUE.shift(); // remove from queue on success
+    } catch (e) {
+      item.attempts = (item.attempts || 0) + 1;
+      log(`  ⚠ [QUEUE] ingest gagal (${item.analyzer.name}) (ke-${item.attempts}): ${e.message}`);
+      const d = STATE.devices.get(item.analyzer.id);
+      if (d) {
+        d.lastError = `ingest gagal (ke-${item.attempts}): ${e.message}`;
+        d.lastErrorAt = new Date();
+      }
+      // Wait with backoff before retry (max 10s)
+      const delay = Math.min(1000 * Math.pow(2, item.attempts - 1), 10000);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
+  isProcessingQueue = false;
+}
+
+// Kirim pesan mentah ke Supabase (non-fatal bila gagal — jangan putus koneksi alat)
+function ingest(analyzer, protocol, raw, direction) {
+  const dir = direction || 'IN';
+  pushRawStream(analyzer.name, dir, protocol, raw);
+  INGEST_QUEUE.push({ analyzer, protocol, raw, direction: dir, attempts: 0 });
+  processQueue();
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -392,7 +412,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
     try{
       const r=await fetch('/api/status'); const s=await r.json();
       const up=Math.round((Date.now()-new Date(s.started).getTime())/1000);
-      document.getElementById('sub').textContent='Supabase: '+s.supabase+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat aktif';
+      document.getElementById('sub').textContent='Supabase: '+s.supabase+' · Antrean: '+(s.queueSize || 0)+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat aktif';
       var ipEl=document.getElementById('ip-banner');
       if(ipEl){ var ips=(s.localIps||[]); ipEl.innerHTML='<b style="color:var(--teal)">IP PC Connector:</b> '+(ips.length?ips.map(function(x){return '<code style="color:#38bdf8;font-size:13.5px">'+esc(x)+'</code>';}).join('&nbsp; , &nbsp;'):'(tidak terdeteksi)')+' &nbsp;·&nbsp; <span style="color:var(--text-muted)">Isi IP ini + port yang sama di master Alat OneLab (mode server) agar alat mengirim hasil ke PC ini.</span>'; }
       
@@ -562,6 +582,7 @@ function startStatusServer() {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         started: STATE.started, supabase: SUPABASE_URL,
+        queueSize: INGEST_QUEUE.length,
         devices: [...STATE.devices.entries()].map(([id, d]) => ({ id, ...d })),
         logs: STATE.logs.slice(-120),
         rawStream: STATE.rawStream,
