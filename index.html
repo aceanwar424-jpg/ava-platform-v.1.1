@@ -362,26 +362,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch(e) {}
   }
 
-  // ── Desktop / Local Engine: auto-login sebagai admin lokal (tanpa layar login) ──
-  // Hanya aktif saat dibuka dari engine lokal (127.0.0.1/localhost); di Vercel
-  // (domain produksi) blok ini dilewati → alur login normal tetap berlaku.
-  if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
-    window.currentUser = {
-      id: 'local-admin-001',
-      email: 'admin@onelab.local',
-      user_metadata: { full_name: 'Administrator OneLab', role: 'admin' },
-      role: 'admin',
-      profile: { id: 'local-admin-001', full_name: 'Administrator OneLab', role: 'admin' }
-    };
-    localStorage.setItem('ol_token', 'local-engine-token');
-    setupAppUI();
-    applyRoleMenu();
-    if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
-    checkConnection();
-    navigate('dashboard');
-    return;
-  }
-
+  // Tidak ada sesi sah → wajib masuk, termasuk pada engine lokal.
+  // Dulu di sini ada auto-login admin untuk 127.0.0.1/localhost. Itu dihapus:
+  // engine lokal kini punya autentikasi sendiri (kredensial ter-hash di DB,
+  // peran dari user_profiles), sehingga pintasan apa pun sama saja dengan
+  // membuka seluruh basis data klinik tanpa kata sandi.
+  localStorage.removeItem('ol_token');
+  localStorage.removeItem('ol_refresh');
   showLoginScreen();
 });
 

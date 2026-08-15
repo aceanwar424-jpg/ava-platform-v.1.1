@@ -34,14 +34,13 @@ async function initAuth(){
       }
     }
   } catch(e){}
-  // Fallback Mode Offline Desktop Engine (cloud tak terjangkau → masuk sbg admin lokal)
-  window.currentUser = {
-    id: 'local-admin-001',
-    email: 'admin@onelab.local',
-    user_metadata: { full_name: 'Administrator OneLab', role: 'admin' },
-    role: 'admin'
-  };
-  if (typeof showApp === 'function') showApp();
+  // Tidak ada sesi sah → wajib masuk. JANGAN menambahkan jalur pintas
+  // "mode offline" di sini: engine lokal sudah punya autentikasi sendiri
+  // (kredensial di DB), sehingga fallback apa pun sama saja dengan
+  // membuka seluruh basis data tanpa kata sandi.
+  clearStoredToken();
+  window.currentUser = null;
+  showLoginScreen();
 }
 
 function getStoredToken(){ return localStorage.getItem('ol_token')||''; }
