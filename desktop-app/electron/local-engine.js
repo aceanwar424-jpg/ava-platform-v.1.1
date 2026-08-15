@@ -121,9 +121,29 @@ function bacaEnvSederhana(file) {
   return out;
 }
 
+// Diisi saat createEngine berjalan. Pada build terpaket, __dirname berada DI
+// DALAM app.asar sehingga path.join(__dirname,'..','.env') menunjuk ke berkas
+// yang tidak pernah ada — gejalanya: gerbang LLM melapor "0 kunci" padahal
+// .env terisi. dataDir selalu menunjuk folder nyata di luar asar.
+let DIR_DATA_ENGINE = '';
+
+function berkasEnvKandidat() {
+  const daftar = [];
+  if (DIR_DATA_ENGINE) {
+    daftar.push(path.join(path.dirname(DIR_DATA_ENGINE), '.env'));   // desktop-app/.env
+    daftar.push(path.join(DIR_DATA_ENGINE, '.env'));
+  }
+  daftar.push(path.join(__dirname, '..', '.env'));                   // mode pengembangan
+  return daftar;
+}
+
 function muatKunciLLM() {
-  // Urutan: variabel lingkungan proses → desktop-app/.env di samping kode.
-  const env = { ...bacaEnvSederhana(path.join(__dirname, '..', '.env')), ...process.env };
+  // Urutan: berkas .env yang ketemu → variabel lingkungan proses (menang).
+  let dariBerkas = {};
+  for (const f of berkasEnvKandidat()) {
+    if (fs.existsSync(f)) { dariBerkas = bacaEnvSederhana(f); break; }
+  }
+  const env = { ...dariBerkas, ...process.env };
   const gabung = (s) => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
   const kunci = [...new Set([...gabung(env.GEMINI_API_KEYS), ...gabung(env.GEMINI_API_KEY)])];
   return {
@@ -232,8 +252,22 @@ async function tanganiLlmGateway(bodyText, log = () => {}) {
     }
   }
 
+  // Ringkas keadaan TIAP kunci, bukan hanya galat terakhir. Sebelumnya satu
+  // kunci kehabisan kuota dan satu lagi ditolak dilaporkan sebagai "semua
+  // kunci kehabisan kuota" — menutupi kunci yang sebenarnya perlu diganti.
+  const ringkas = kunci.map((_, i) => {
+    const t = LLM.gagal.get(i);
+    if (!t || t.sampai <= Date.now()) return `key-${i + 1}: siap`;
+    const menit = Math.ceil((t.sampai - Date.now()) / 60000);
+    return t.sebab === 'KUNCI_DITOLAK'
+      ? `key-${i + 1}: DITOLAK (tidak sah — perlu diganti)`
+      : `key-${i + 1}: kuota habis (pulih ~${menit} menit lagi)`;
+  }).join('; ');
+
   return { status: 502, payload: {
-    error: `Gerbang LLM gagal: ${galatTerakhir && galatTerakhir.message ? galatTerakhir.message : 'semua kunci kehabisan kuota'}`,
+    error: `Gerbang LLM gagal. ${ringkas}.` +
+           (galatTerakhir && galatTerakhir.message ? ` Galat terakhir: ${galatTerakhir.message}` : ''),
+    keyStatus: ringkas,
     latencyMs: Date.now() - mulai } };
 }
 
@@ -857,6 +891,7 @@ function jsonRes(res, status, payload, extraHeaders = {}) {
 }
 
 async function createEngine({ platformDir, dataDir, port = 54329, log = console.log }) {
+  DIR_DATA_ENGINE = dataDir || '';            // jangkar pencarian .env (lihat muatKunciLLM)
   const { PGlite } = await import('@electric-sql/pglite');   // ESM dari CJS
   const pg = dataDir ? await PGlite.create({ dataDir }) : await new PGlite();
 
@@ -1080,18 +1115,32 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           ]);
 
           let perluIzin = null;
-          if (menulis && TABEL_HAK_AKSES.has(tabel)) perluIzin = 'user.manage';
-          else if (req.method === 'DELETE') perluIzin = 'data.delete';
+          if (menulis && TABEL_HAK_AKSES.has(tabel)) {
+            perluIzin = 'user.manage';
+          } else if (req.method === 'DELETE') {
+            // Hapus tanpa satu pun penyaring mengenai SELURUH isi tabel.
+            // Itu kelas tindakan yang berbeda dari menghapus satu baris, dan
+            // memang dibedakan di matriks (canDelete vs canBulkDelete).
+            //
+            // Aturannya sengaja sederhana dan konservatif: ada penyaing atau
+            // tidak. Menghitung berapa baris yang benar-benar kena menuntut
+            // menjalankan kuerinya lebih dulu; yang ingin dicegah di sini
+            // adalah kasus paling merusak, yaitu tabel terhapus seluruhnya.
+            const adaPenyaring = [...u.searchParams.keys()]
+              .some(k => !['select', 'order', 'limit', 'offset', 'columns'].includes(k));
+            perluIzin = adaPenyaring ? 'data.delete' : 'data.bulk_delete';
+          }
 
           if (perluIzin) {
             const role = await peranTerkini(pg, sesi.sub, sesi.role);
             if (!(await peranPunyaIzin(pg, role, perluIzin))) {
-              return jsonRes(res, 403, {
-                message: perluIzin === 'user.manage'
-                  ? `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`
-                  : `Peran "${role}" tidak berwenang menghapus data`,
-                code: 'PGRST403', required: perluIzin,
-              });
+              const pesan = {
+                'user.manage':      `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`,
+                'data.bulk_delete': `Peran "${role}" tidak berwenang menghapus SELURUH isi tabel ${tabel}. ` +
+                                    `Tambahkan penyaring untuk menghapus baris tertentu.`,
+                'data.delete':      `Peran "${role}" tidak berwenang menghapus data`,
+              }[perluIzin];
+              return jsonRes(res, 403, { message: pesan, code: 'PGRST403', required: perluIzin });
             }
           }
         }
