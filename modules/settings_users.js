@@ -72,6 +72,9 @@ const ROLE_DEFAULT_PAGES = {
   operasional:   ['dashboard','lab-checkin','lab-result','lab-validation','lab-approval','medrecord','admission','radiology','supportive','homecare','hc-schedule','hc-billing','hc-report','inventory','inventory-pr','tasks'],
   hrd_staff:     ['dashboard','hrd','org-structure','work-schedule','attendance','hrd-cuti','hrd-payroll','tasks'],
   finance_staff: ['dashboard','cashier','finance','finance-ar','finance-comm','finance-report','tasks','regulatory'],
+  patient:       ['ava-portals','ava-consult','ava-devices','ava-marketplace','ava-caregiver'],
+  dokter:        ['ava-portals','ava-consult','ava-devices','medrecord'],
+  vendor:        ['ava-portals','ava-calibration','ava-marketplace'],
   viewer:        ['dashboard'],
 };
 
@@ -82,6 +85,24 @@ const ROLES = {
     pages: ROLE_DEFAULT_PAGES.super_admin,
     canDelete:true, canBulkDelete:true, canExport:true, canManageUsers:true,
     canApproveLogbook:true, canAssignTask:true, canSeeTeamBoard:true,
+  },
+  patient: {
+    label:'Pasien / Customer (Registrasi Mandiri)', color:'#10B981',
+    desc:'Portal pasien: konsultasi online, telemetri alkes rumah, toko alkes, caregiver alert',
+    pages: ROLE_DEFAULT_PAGES.patient,
+    canDelete:false, canBulkDelete:false, canExport:false, canManageUsers:false,
+  },
+  dokter: {
+    label:'Dokter Telehealth', color:'#0EA5E9',
+    desc:'Portal dokter: antrian konsultasi, e-resep, review telemetri, klaim fee',
+    pages: ROLE_DEFAULT_PAGES.dokter,
+    canDelete:false, canBulkDelete:false, canExport:true, canManageUsers:false,
+  },
+  vendor: {
+    label:'Vendor Alkes / Lab Kalibrasi', color:'#F59E0B',
+    desc:'Portal vendor: upload alkes, sertifikat kalibrasi, badge AVA Verified',
+    pages: ROLE_DEFAULT_PAGES.vendor,
+    canDelete:false, canBulkDelete:false, canExport:false, canManageUsers:false,
   },
   direktur: {
     label:'Direktur', color:'#0A2342',

@@ -4,9 +4,11 @@
 
 const PAGE_TITLES = {
   dashboard:'Dashboard', partners:'Partner Database', maps:'Maps Prospecting',
-  marketing:'Marketing Kit', voucher:'Voucher Builder', surat:'Surat Keluar',
-  mou:'MOU / Perjanjian', leads:'Leads Management', okr:'OKR & Target Sales',
-  mcu:'Project MCU', finance:'Finance & Billing',
+  marketing:'Marketing Kit', voucher:'Voucher Builder', surat:'Surat Masuk & Keluar',
+  mou:'MOU & Perjanjian', 'test-reviewer':'Peninjau Deskripsi Medis', administration:'Administrasi & Legal', leads:'Leads Management', okr:'OKR & Target Sales',
+  mcu:'Project MCU', avahealth:'AVA Health Ecosystem', 'ava-consult':'Telekonsultasi Dokter',
+  'ava-devices':'Alat Medis & Wearables', 'ava-calibration':'Badge AVA Verified', 'ava-marketplace':'Marketplace Alkes',
+  'ava-caregiver':'Caregiver & Keluarga', 'ava-corporate':'Corporate B2B Wellness', 'ava-portals':'Multi-Portal Switcher', finance:'Finance & Billing',
   inventory:'Inventory & Logistik', hrd:'HRD & SDM', homecare:'Home Care',
   admission:'Admission / Registrasi', anamnesa:'Anamnesa', lab:'Operasional Lab',
   wiki:'Wiki OneLab', agentic:'Agentic AI',
@@ -16,7 +18,7 @@ const PAGE_TITLES = {
   queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payables:'Hutang Usaha', assets:'Aset & Kalibrasi', referral:'Rujukan Lab Luar', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes', inpatient:'Rawat Inap', pharmacy:'Farmasi', 'crm-pipeline':'Pipeline & Pendapatan',
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
-  audit:'Jejak Audit',
+  audit:'Jejak Audit', 'db-studio':'Database Studio (Supabase GUI)',
 };
 
 let currentPage = '';
@@ -35,71 +37,106 @@ function navigate(page, params={}) {
 
   currentPage = page;
 
+  function safeRun(fnName, ...args) {
+    try {
+      if (typeof window[fnName] === 'function') {
+        window[fnName](...args);
+      } else {
+        console.warn(`[Router] Module function ${fnName} not found.`);
+        renderRouterError(page, `Modul '${page}' (${fnName}) belum dimuat.`);
+      }
+    } catch (err) {
+      console.error(`[Router] Error executing ${fnName}:`, err);
+      renderRouterError(page, err.message || String(err));
+    }
+  }
+
   switch(page) {
-    case 'dashboard':   renderDashboard();              break;
-    case 'partners':    renderPartners(params);         break;
-    case 'maps':        renderMaps();                   break;
-    case 'marketing':   renderMarketing();              break;
-    case 'voucher':     renderVoucher();                break;
-    case 'surat':       renderSurat();                  break;
-    case 'mou':         renderMOU();                    break;
-    case 'leads':       renderLeads();                  break;
-    case 'okr':         renderOKR();                    break;
-    case 'mcu':         renderMCU(params);              break;
-    case 'finance':     renderFinance();                break;
-    case 'inventory':   renderInventory(params.tab||'stock'); break;
-    case 'hrd':         renderHRD();                    break;
-    case 'work-schedule': renderWorkSchedule();          break;
-    case 'shift-calendar': renderShiftCalendar();         break;
-    case 'tasks':       renderTaskManagement();          break;
-    case 'wiki':        renderWiki(params.tab||'docs');   break;
-    case 'agentic':     renderAgentic(params.tab||'inbox'); break;
-    case 'audit':       renderAuditTrail();              break;
-    case 'attendance':   renderAttendance();               break;
-    case 'org-structure':renderOrgStructure();             break;
-    case 'regulatory':   renderRegulatoryReports();        break;
-    case 'rl-reports':   renderRLReports();                break;
-    case 'homecare':    renderHomeCare();               break;
-    case 'admission':   renderAdmission();              break;
-    case 'lab':         renderLab(params.tab||'checkin'); break;
-    case 'product':     renderConfigProduct();          break;
-    case 'config':      renderSettings('masterdata');   break;
-    case 'refrange':    renderConfigRefRange();          break;
-    case 'labreport':   renderSettings('pdf');          break;
-    case 'corporate':   renderConfigCorporate();        break;
-    case 'radiology':   renderRIS();                    break;
-    case 'radiology-old':renderRadiology();             break;
-    case 'supportive':  renderSupportive();             break;
-    case 'spirometry':  renderSupportive();             break;
-    case 'medrecord':   renderMedRecord();              break;
-    case 'inpatient':   renderInpatient();              break;
-    case 'pharmacy':    renderPharmacy();               break;
-    case 'crm-pipeline':renderCrmPipeline();            break;
-    case 'queue':       renderQueuePage();                  break;
-    case 'queue-kiosk': renderQueueKiosk();                 break;
-    case 'appointments':renderAppointments();           break;
-    case 'cashier':     renderCashier();                break;
-    case 'accounting':  renderAccounting();             break;
-    case 'payables':    renderPayables();               break;
-    case 'assets':      renderAssets(params.tab||'list'); break;
-    case 'referral':    renderReferral();               break;
-    case 'payroll':     renderPayroll();                break;
-    case 'package':     renderConfigPackage();          break;
-    case 'family':      renderConfigFamily();            break;
-    case 'anamnesa':    renderAnamnesa();               break;
-    case 'import':      renderSettings('data');         break;
-    case 'settings':    renderSettings(params.tab || 'general'); break;
-    case 'users':       renderSettings('users');        break;
+    case 'dashboard':   safeRun('renderDashboard');              break;
+    case 'partners':    safeRun('renderPartners', params);         break;
+    case 'maps':        safeRun('renderMaps');                   break;
+    case 'marketing':   safeRun('renderMarketing');              break;
+    case 'voucher':     safeRun('renderVoucher');                break;
+    case 'surat':       safeRun('renderSurat');                  break;
+    case 'mou':         safeRun('renderMOU');                    break;
+    case 'test-reviewer': safeRun('renderTestReviewer');         break;
+    case 'administration': openCategory('administration'); break;
+    case 'leads':       safeRun('renderLeads');                  break;
+    case 'okr':         safeRun('renderOKR');                    break;
+    case 'mcu':         safeRun('renderMCU', params);              break;
+    case 'avahealth':       safeRun('renderAVAHealth', 'consult');     break;
+    case 'ava-consult':     safeRun('renderAVAHealth', 'consult');     break;
+    case 'ava-devices':     safeRun('renderAVAHealth', 'devices');     break;
+    case 'ava-calibration': safeRun('renderAVAHealth', 'calibration'); break;
+    case 'ava-marketplace': safeRun('renderAVAHealth', 'marketplace'); break;
+    case 'ava-caregiver':   safeRun('renderAVAHealth', 'caregiver');   break;
+    case 'ava-corporate':   safeRun('renderAVAHealth', 'corporate');   break;
+    case 'ava-portals':     safeRun('renderAVAHealth', 'portals');     break;
+    case 'finance':     safeRun('renderFinance');                break;
+    case 'inventory':   safeRun('renderInventory', params.tab||'stock'); break;
+    case 'hrd':         safeRun('renderHRD');                    break;
+    case 'work-schedule': safeRun('renderWorkSchedule');          break;
+    case 'shift-calendar': safeRun('renderShiftCalendar');         break;
+    case 'tasks':       safeRun('renderTaskManagement');          break;
+    case 'wiki':        safeRun('renderWiki', params.tab||'docs');   break;
+    case 'agentic':     safeRun('renderAgentic', params.tab||'inbox'); break;
+    case 'audit':       safeRun('renderAuditTrail');              break;
+    case 'attendance':   safeRun('renderAttendance');               break;
+    case 'org-structure':safeRun('renderOrgStructure');             break;
+    case 'regulatory':   safeRun('renderRegulatoryReports');        break;
+    case 'rl-reports':   safeRun('renderRLReports');                break;
+    case 'homecare':    safeRun('renderHomeCare');               break;
+    case 'admission':   safeRun('renderAdmission');              break;
+    case 'lab':         safeRun('renderLab', params.tab||'checkin'); break;
+    case 'product':     safeRun('renderConfigProduct');          break;
+    case 'config':      safeRun('renderSettings', 'masterdata');   break;
+    case 'refrange':    safeRun('renderConfigRefRange');          break;
+    case 'labreport':   safeRun('renderSettings', 'pdf');          break;
+    case 'corporate':   safeRun('renderConfigCorporate');        break;
+    case 'radiology':   safeRun('renderRIS');                    break;
+    case 'radiology-old':safeRun('renderRadiology');             break;
+    case 'supportive':  safeRun('renderSupportive');             break;
+    case 'spirometry':  safeRun('renderSupportive');             break;
+    case 'medrecord':   safeRun('renderMedRecord');              break;
+    case 'inpatient':   safeRun('renderInpatient');              break;
+    case 'pharmacy':    safeRun('renderPharmacy');               break;
+    case 'crm-pipeline':safeRun('renderCrmPipeline');            break;
+    case 'queue':       safeRun('renderQueuePage');                  break;
+    case 'queue-kiosk': safeRun('renderQueueKiosk');                 break;
+    case 'appointments':safeRun('renderAppointments');           break;
+    case 'cashier':     safeRun('renderCashier');                break;
+    case 'accounting':  safeRun('renderAccounting');             break;
+    case 'payables':    safeRun('renderPayables');               break;
+    case 'assets':      safeRun('renderAssets', params.tab||'list'); break;
+    case 'referral':    safeRun('renderReferral');               break;
+    case 'payroll':     safeRun('renderPayroll');                break;
+    case 'package':     safeRun('renderConfigPackage');          break;
+    case 'family':      safeRun('renderConfigFamily');            break;
+    case 'anamnesa':    safeRun('renderAnamnesa');               break;
+    case 'import':      safeRun('renderSettings', 'data');         break;
+    case 'settings':    safeRun('renderSettings', params.tab || 'general'); break;
+    case 'users':       safeRun('renderSettings', 'users');        break;
+    case 'db-studio':    safeRun('renderDatabaseStudio');           break;
     default:
-      document.getElementById('main-content').innerHTML = `
-        <div class="empty-state" style="min-height:70vh">
-          <div class="ico">🚧</div>
-          <h3>Halaman ini sedang dikembangkan</h3>
-          <button class="btn btn-teal" style="margin-top:14px" onclick="navigate('dashboard')">← Dashboard</button>
-        </div>`;
+      renderRouterError(page, 'Halaman ini belum tersedia.');
   }
 }
 
+function renderRouterError(page, msg) {
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  main.innerHTML = `
+    <div class="empty-state" style="min-height:70vh; padding:40px; text-align:center;">
+      <div class="ico" style="font-size:48px; margin-bottom:12px;">⚠️</div>
+      <h3 style="margin:0 0 8px; color:var(--text, #F8FAFC);">Gagal Memuat Modul '${page}'</h3>
+      <p style="color:var(--text3, #94A3B8); font-size:13.5px; margin:0 0 18px;">${msg}</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button class="btn btn-ghost" onclick="location.reload()">🔄 Muat Ulang Halaman</button>
+        <button class="btn btn-teal" onclick="navigate('dashboard')">← Kembali ke Dashboard</button>
+      </div>
+    </div>`;
+}
+
 function toggleSidebar() {
-  document.getElementById('sidebar')?.classList.toggle('open');
+  document.getElementById('sidebar-rail')?.classList.toggle('open');
 }

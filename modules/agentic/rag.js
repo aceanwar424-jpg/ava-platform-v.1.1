@@ -169,3 +169,31 @@ function agRagRenderSection(containerId){
     </div>`;
   agRagLoadStatus();
 }
+
+function renderAgRagTab(el) {
+  el = el || document.getElementById('ag-tab-content');
+  if (!el) return;
+
+  el.innerHTML = `
+    <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
+      <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:10px; border-radius:12px; color:#38BDF8;">
+            🔍
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:16px; font-weight:700; color:#F8FAFC;">RAG SOP & Vector Search Engine</h3>
+            <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Pencarian dokumen SOP, analisis tumpang tindih (Overlap), & grounding jawaban medis berbasis AI.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="ag-rag-section-container" style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px;">
+      </div>
+    </div>
+  `;
+
+  agRagRenderSection('ag-rag-section-container');
+}
+
+window.renderAgRagTab = renderAgRagTab;

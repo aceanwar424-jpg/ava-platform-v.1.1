@@ -1,2 +1,31 @@
-# graphify generated knowledge graph (rebuild with: python -m graphify extract . --code-only)
+# ── Rahasia — JANGAN PERNAH masuk repo ────────────────────────────
+# Kunci LLM, kredensial DB, token. Pakai .env.example sebagai contoh.
+.env
+.env.*
+!.env.example
+connector/config.json
+!connector/config.example.json
+js/config.local.js
+!js/config.local.example.js
+
+# ── Setelan lokal per-mesin ───────────────────────────────────────
+.claude/settings.local.json
+
+# ── Dependensi & artefak build (bisa dibangun ulang) ──────────────
+node_modules/
+dist/
+dist-electron/
+release/
+
+# ── Data hidup — bukan artefak, jangan pernah dihapus manual ──────
+# Database PGlite lokal berisi data operasional nyata.
+pglite-data/
+.pglite-dev/
+
+# ── Knowledge graph (dibangkitkan ulang: graphify update .) ───────
 graphify-out/
+
+# ── Log & berkas sementara ────────────────────────────────────────
+*.log
+.DS_Store
+Thumbs.db

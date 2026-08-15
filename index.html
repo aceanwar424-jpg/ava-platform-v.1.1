@@ -29,6 +29,10 @@
       <span class="rail-label">Marketing</span>
       <span class="rail-badge" id="badge-partners-rail" style="display:none">0</span>
     </button>
+    <button class="rail-item" data-cat="administration" onclick="openCategory('administration')" data-tooltip="Administrasi & Legal">
+      <span class="rail-icon" data-icon="administration"></span>
+      <span class="rail-label">Administrasi</span>
+    </button>
     <button class="rail-item" data-cat="lab" onclick="openCategory('lab')" data-tooltip="Operasional Lab">
       <span class="rail-icon" data-icon="lab"></span>
       <span class="rail-label">Lab</span>
@@ -40,6 +44,10 @@
     <button class="rail-item" data-cat="homecare" onclick="openCategory('homecare')" data-tooltip="Home Care">
       <span class="rail-icon" data-icon="homecare"></span>
       <span class="rail-label">Home Care</span>
+    </button>
+    <button class="rail-item" data-cat="avahealth" onclick="openCategory('avahealth')" data-tooltip="AVA Health Telehealth">
+      <span class="rail-icon" data-icon="avahealth"></span>
+      <span class="rail-label">AVA Health</span>
     </button>
     <button class="rail-item" data-cat="finance" onclick="openCategory('finance')" data-tooltip="Finance & Billing">
       <span class="rail-icon" data-icon="finance"></span>
@@ -61,7 +69,7 @@
       <span class="rail-icon" data-icon="wiki"></span>
       <span class="rail-label">Wiki</span>
     </button>
-    <button class="rail-item" data-cat="agentic" onclick="openCategory('agentic')" data-tooltip="Agentic AI">
+    <button class="rail-item" data-cat="agentic" onclick="navigate('agentic')" data-tooltip="Agentic AI">
       <span class="rail-icon" data-icon="agentic"></span>
       <span class="rail-label">Agentic</span>
     </button>
@@ -203,6 +211,10 @@
 <script defer src="js/core/router.js?v=20260719s"></script>
 <script defer src="js/core/storage.js?v=20260719s"></script>
 <script defer src="js/core/barcode.js?v=20260725a"></script>
+<!-- Kunci API lokal (tidak masuk repo). Wajib sebelum aiGateway.js.
+     Bila berkas tidak ada, 404-nya tidak fatal — pool AI hanya kosong. -->
+<script defer src="js/config.local.js"></script>
+<script defer src="js/core/aiGateway.js?v=20260803a"></script>
 <script defer src="js/auth.js?v=20260719s"></script>
 
 <script defer src="modules/dashboard/index.js?v=20260719s"></script>
@@ -213,6 +225,8 @@
 <script defer src="modules/voucher.js?v=20260719s"></script>
 <script defer src="modules/surat.js?v=20260719s"></script>
 <script defer src="modules/mou.js?v=20260719s"></script>
+<script defer src="modules/test_reviewer.js?v=20260813a"></script>
+<script defer src="modules/ava_health.js?v=20260813a"></script>
 <script defer src="modules/leads.js?v=20260719s"></script>
 <script defer src="modules/finance.js?v=20260726a"></script>
 <script defer src="modules/accounting.js?v=20260719s"></script>
@@ -234,7 +248,11 @@
 <script defer src="modules/admission.js?v=20260726b"></script>
 <script defer src="modules/anamnesa.js?v=20260719s"></script>
 
-<!-- Laboratory Services (ISO 15189 Compliance) — Auto-Conclusion, Audit, PKI -->
+<!-- Laboratory Services & Open-Source HealthTech 2026 -->
+<script defer src="js/core/fhirConverter.js?v=20260803a"></script>
+<script defer src="js/core/privacyGateway.js?v=20260803a"></script>
+<script defer src="modules/lab/qcEngine.js?v=20260803a"></script>
+<script defer src="modules/radiology/dicomViewer.js?v=20260803a"></script>
 <script defer src="js/core/conclusionEngine.js?v=20260719s"></script>
 <script defer src="js/core/auditLogger.js?v=20260719s"></script>
 <script defer src="js/core/pkiService.js?v=20260719s"></script>
@@ -265,7 +283,7 @@
 <script defer src="modules/clinicflow.js?v=20260719s"></script>
 <script defer src="modules/cashier.js?v=20260719s"></script>
 <script defer src="modules/config_product.js?v=20260719s"></script>
-<script defer src="modules/config_package.js?v=20260725d"></script>
+<script defer src="modules/config_package.js?v=20260726a"></script>
 <script defer src="modules/config_family.js?v=20260719s"></script>
 <!-- Wiki OneLab -->
 <script defer src="modules/wiki/index.js?v=20260721l"></script>
@@ -273,8 +291,11 @@
 <script defer src="modules/wiki/fix.js?v=20260719s"></script>
 <script defer src="modules/wiki/studio.js?v=20260719s"></script>
 
-<!-- Agentic AI (Fase 1 & 2) -->
-<script defer src="modules/agentic/index.js?v=20260719w"></script>
+<!-- Agentic AI Suite (2026 High Performance Edition) -->
+<script defer src="modules/agentic/mcp.js?v=20260803a"></script>
+<script defer src="modules/agentic/orchestrator.js?v=20260803a"></script>
+<script defer src="modules/agentic/clinical_agent.js?v=20260803a"></script>
+<script defer src="modules/agentic/index.js?v=20260803a"></script>
 <script defer src="modules/agentic/inbox.js?v=20260719s"></script>
 <script defer src="modules/agentic/docs.js?v=20260721n"></script>
 <script defer src="modules/agentic/overlap.js?v=20260721b"></script>
@@ -288,6 +309,7 @@
 <script defer src="modules/config_labreport.js?v=20260719s"></script>
 <script defer src="modules/settings.js?v=20260719s"></script>
 <script defer src="modules/settings_users.js?v=20260719s"></script>
+<script defer src="modules/db_studio.js?v=20260814a"></script>
 <script defer src="modules/import_excel.js?v=20260725a"></script>
 
 <script>
@@ -339,6 +361,27 @@ window.addEventListener('DOMContentLoaded', async () => {
       }
     } catch(e) {}
   }
+
+  // ── Desktop / Local Engine: auto-login sebagai admin lokal (tanpa layar login) ──
+  // Hanya aktif saat dibuka dari engine lokal (127.0.0.1/localhost); di Vercel
+  // (domain produksi) blok ini dilewati → alur login normal tetap berlaku.
+  if (location.hostname === '127.0.0.1' || location.hostname === 'localhost') {
+    window.currentUser = {
+      id: 'local-admin-001',
+      email: 'admin@onelab.local',
+      user_metadata: { full_name: 'Administrator OneLab', role: 'admin' },
+      role: 'admin',
+      profile: { id: 'local-admin-001', full_name: 'Administrator OneLab', role: 'admin' }
+    };
+    localStorage.setItem('ol_token', 'local-engine-token');
+    setupAppUI();
+    applyRoleMenu();
+    if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
+    checkConnection();
+    navigate('dashboard');
+    return;
+  }
+
   showLoginScreen();
 });
 
@@ -621,12 +664,21 @@ const FLYOUT_MENUS = {
       {page:'partners', icon:'briefcase', label:'Partner Database', action:"navigate('partners')", badge:'badge-partners'},
       {page:'maps', icon:'map', label:'Maps Prospecting', action:"navigate('maps')"},
       {page:'leads', icon:'target', label:'Leads Management', action:"navigate('leads')"},
-      {page:'crm-pipeline', icon:'funnel', label:'Pipeline & Pendapatan', desc:'Corong penjualan tersambung ke faktur yang benar-benar terbit', action:"navigate('crm-pipeline')"},
-      {page:'marketing', icon:'megaphone', label:'Marketing & Voucher', action:"navigate('marketing')"},
+      {page:'crm-pipeline', icon:'funnel', label:'Pipeline & Pendapatan', desc:'Corong penjualan tersambung ke faktur yang terbit', action:"navigate('crm-pipeline')"},
+      {page:'marketing', icon:'megaphone', label:'Marketing Kit & Campaign', action:"navigate('marketing')"},
       {page:'okr', icon:'trending-up', label:'OKR & Target Sales', action:"navigate('okr')"},
       {page:'mcu', icon:'hospital', label:'Project MCU', action:"navigate('mcu')"},
-      {page:'surat', icon:'file-text', label:'Surat Keluar', action:"navigate('surat')"},
-      {page:'mou', icon:'scroll', label:'MOU / Perjanjian', action:"navigate('mou')"},
+    ]
+  },
+  administration: {
+    label: 'Administrasi & Legal',
+    icon: 'administration',
+    items: [
+      {page:'surat', icon:'file-text', label:'Surat Masuk & Keluar', desc:'Pengarsipan, penomoran, & registrasi surat resmi organisasi', action:"navigate('surat')"},
+      {page:'mou', icon:'scroll', label:'MOU & Perjanjian', desc:'Dokumen perjanjian kerjasama, legalitas, & pengingat tenggat waktu', action:"navigate('mou')"},
+      {page:'voucher', icon:'tag', label:'Voucher & Diskon', desc:'Penerbitan kode promo, voucher diskon, & batas kuota klaim', action:"navigate('voucher')"},
+      {page:'test-reviewer', icon:'file-check', label:'Peninjau Deskripsi Medis', desc:'Tinjau massal (batch) deskripsi & manfaat tes medis versi awam & regulasi Kemenkes', action:"navigate('test-reviewer')"},
+      {page:'agentic-docs', icon:'wrench', label:'Reengineering Dokumen & SOP', desc:'Restrukturisasi dokumen formal & template standar Kemenkes', action:"navigate('agentic',{tab:'docs'})"},
     ]
   },
   lab: {
@@ -670,6 +722,19 @@ const FLYOUT_MENUS = {
       {page:'hc-staff', icon:'users', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"renderHCStaff()"},
       {page:'hc-tariff', icon:'tag', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"renderHCTariff()"},
       {page:'hc-report', icon:'bar-chart', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"renderHCFullReport()"},
+    ]
+  },
+  avahealth: {
+    label: 'AVA Health Trust & Telehealth',
+    icon: 'avahealth',
+    items: [
+      {page:'ava-consult', icon:'stethoscope', label:'Telekonsultasi Dokter', desc:'Konsultasi online Halodoc-style, rujukan tes lab, & e-resep', action:"navigate('ava-consult')"},
+      {page:'ava-devices', icon:'activity', label:'Alat Medis & Wearables', desc:'Pemantauan telemetri IoT smartwatch & alert emergency perawat', action:"navigate('ava-devices')"},
+      {page:'ava-calibration', icon:'shield-check', label:'Badge AVA Verified', desc:'Verifikasi sertifikat kalibrasi alkes & badge kepercayaan lab', action:"navigate('ava-calibration')"},
+      {page:'ava-marketplace', icon:'briefcase', label:'Marketplace Alkes', desc:'Etalase sewa/beli alkes ber-badge & verifikasi vendor', action:"navigate('ava-marketplace')"},
+      {page:'ava-caregiver', icon:'users', label:'Caregiver & Keluarga', desc:'Pendampingan pasien rumah, alert darurat, & rls scope-gated', action:"navigate('ava-caregiver')"},
+      {page:'ava-corporate', icon:'building-2', label:'Corporate B2B Wellness', desc:'Analitik kesehatan karyawan perusahaan bergaransi K-Anonymity', action:"navigate('ava-corporate')"},
+      {page:'ava-portals', icon:'user-square', label:'Multi-Portal Switcher', desc:'Antarmuka khusus peran: Pasien, Dokter Telehealth, & Vendor', action:"navigate('ava-portals')"},
     ]
   },
   finance: {
@@ -735,16 +800,15 @@ const FLYOUT_MENUS = {
     ]
   },
   agentic: {
-    label: 'Agentic AI',
+    label: 'Agentic AI 2026 Suite',
     icon: 'sparkles',
     items: [
-      {page:'agentic-inbox', icon:'inbox', label:'Approval Inbox', action:"navigate('agentic',{tab:'inbox'})"},
-      {page:'agentic-org', icon:'user-square', label:'Organisasi Agent', action:"navigate('agentic',{tab:'org'})"},
-      {page:'agentic-docs', icon:'file-text', label:'Dokumen QMS', action:"navigate('agentic',{tab:'docs'})"},
-      {page:'agentic-compliance', icon:'shield-check', label:'Compliance ISO 15189', action:"navigate('agentic',{tab:'compliance'})"},
-      {page:'agentic-studio', icon:'palette', label:'Content Studio (AI)', action:"navigate('agentic',{tab:'studio'})"},
-      {page:'agentic-monitor', icon:'gauge', label:'Monitor & LLM Usage', action:"navigate('agentic',{tab:'monitor'})"},
-      {page:'audit', icon:'scroll', label:'Jejak Audit → Konfigurasi', action:"navigate('audit')", adminOnly:true},
+      {page:'agentic-orchestrator', icon:'sparkles', label:'🌐 Orchestrator & A2A Topology', action:"navigate('agentic',{tab:'orchestrator'})"},
+      {page:'agentic-mcp', icon:'sliders', label:'🔌 MCP Tools Console', action:"navigate('agentic',{tab:'mcp'})"},
+      {page:'agentic-apimonitor', icon:'activity', label:'⚡ Monitor Kuota & Rate Limit API', desc:'Pelacak jam terisi kembali kuota API (Refill Countdown) & rotasi key terpusat', action:"AIGateway.renderMonitorUI()"},
+      {page:'agentic-clinical', icon:'activity', label:'🩺 Clinical & Lab Ops (LIS-AI)', action:"navigate('agentic',{tab:'clinical'})"},
+      {page:'agentic-inbox', icon:'inbox', label:'📬 Approval Inbox (Mandat R1-R3)', action:"navigate('agentic',{tab:'inbox'})"},
+      {page:'agentic-docs', icon:'file-text', label:'🧪 ISO 15189 Quality Agent', action:"navigate('agentic',{tab:'docs'})"},
     ]
   },
   konfigurasi: {
@@ -753,6 +817,7 @@ const FLYOUT_MENUS = {
     items: [
       {page:'settings', icon:'settings', label:'Pusat Pengaturan', action:"navigate('settings',{tab:'general'})"},
       {page:'users', icon:'user', label:'User Management', action:"navigate('settings',{tab:'users'})", adminOnly:true},
+      {page:'db-studio', icon:'database', label:'Database Studio (Supabase GUI)', desc:'Inspeksi tabel lokal Postgres, editor data baris, & SQL Editor GUI', action:"navigate('db-studio')", adminOnly:true},
       {page:'audit', icon:'scroll', label:'Jejak Audit', action:"navigate('audit')", adminOnly:true},
       {page:'product', icon:'dna', label:'Master Tes / Produk', action:"navigate('product')"},
       {page:'refrange', icon:'bar-chart', label:'Reference Range', action:"navigate('refrange')"},
@@ -904,6 +969,10 @@ const CATEGORY_SUMMARY = { lab: 'labCategorySummary' };
 
 // Halaman indeks kategori — daftar submenu dikelompokkan
 function openCategory(cat) {
+  if (cat === 'agentic') {
+    navigate('agentic');
+    return;
+  }
   const menu = FLYOUT_MENUS[cat];
   if (!menu) return;
   activeFlyoutCat = cat;

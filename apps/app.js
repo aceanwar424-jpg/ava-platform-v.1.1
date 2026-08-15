@@ -219,8 +219,6 @@ function showView(viewId, viewTitle) {
   if (viewId === 'book-examination-view') renderBookExamination();
   else if (viewId === 'examination-approval-view') renderExamApproval();
   else if (viewId === 'examination-history-view') renderExamHistory();
-  else if (viewId === 'corp-results-view') renderCorporateResults();
-  else if (viewId === 'corp-statement-view') renderAccountStatement();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -318,8 +316,6 @@ function renderSidebarMenu() {
       ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Book Examination</span></a>` : ''}
       ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Examination Approval</span></a>` : ''}
       <a class="sidebar-link" onclick="showView('examination-history-view', 'Examination History')">${I.history}<span>Examination History</span></a>
-      <a class="sidebar-link" onclick="showView('corp-results-view', 'Hasil MCU')">${I.result}<span>Hasil MCU</span></a>
-      <a class="sidebar-link" onclick="showView('corp-statement-view', 'Account Statement')">${I.stmt}<span>Account Statement</span></a>
       <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit &amp; Transaction</span></a>
     `;
   } else if (currentRole === 'referral') {

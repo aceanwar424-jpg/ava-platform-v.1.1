@@ -28,14 +28,32 @@ Alat Lab ──TCP(ASTM/HL7)──► OneLab Connector (PC di lab) ──HTTPS�
 
 ## Halaman status lokal (di PC connector)
 Buka **http://localhost:9999** di PC connector untuk memantau tanpa membaca terminal:
+- **IP PC connector** ditampilkan di atas — isikan IP ini + port di master Alat OneLab (mode server),
 - daftar alat + indikator 🟢 tersambung / ⚪ belum,
 - jumlah pesan & waktu pesan terakhir per alat,
 - log langsung (auto-refresh 3 dtk),
 - tombol **Muat ulang config** (menarik alat baru dari OneLab tanpa restart).
 
+### Tab "LIS — Parsing Manual" (mode offline)
+Dipakai saat **cloud sedang maintenance/offline**: alat tetap mengirim ke connector,
+tapi pengolahan dilakukan manual di PC ini.
+- Tempel pesan mentah alat (ASTM / HL7) → **Parse** → tabel **ID · Kode Item · Hasil · Satuan · Ref Range · Flag**.
+- Centang **Auto ambil dari alat** agar kiriman terbaru dari alat langsung masuk & terparse.
+- **Export Excel** (.xls) untuk arsip / entri ulang saat cloud kembali.
+- Kode item diambil dari komponen non-kosong pertama (mendukung `^WBC^`, `GLU^Glukosa`, `^^^GLU`).
+
 Hanya bisa dibuka **di PC connector** (`127.0.0.1`) — log bisa memuat identitas
 pasien, jadi sengaja tidak diekspos ke jaringan. Ganti port lewat `status_port` di `config.json`.
 Manajemen penuh (status semua alat, pesan masuk, terapkan hasil) tetap di **OneLab → LIS → Integrasi Alat**.
+
+## Tab LIS — parsing manual (mode offline)
+Di halaman status ada tab **LIS — Parsing Manual** untuk dipakai saat cloud/OneLab
+sedang **maintenance atau offline**. Tempel pesan mentah alat (ASTM atau HL7),
+klik **Parse** → tabel berisi **ID Sampel · Kode Item · Hasil · Satuan · Ref Range · Flag**,
+lalu **Export Excel** (.xls). Sepenuhnya lokal di browser — tidak butuh koneksi cloud.
+- ASTM: ID dari record `O` (specimen/barcode), tiap record `R` jadi 1 baris.
+- HL7: ID dari `OBR`/`PID`, tiap segmen `OBX` jadi 1 baris.
+- Protokol bisa **Auto-deteksi** atau dipilih manual.
 
 ## Konfigurasi alat (di OneLab, bukan di sini)
 Isi di master Alat OneLab per analyzer:

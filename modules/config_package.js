@@ -716,6 +716,8 @@ async function renderCorporateDetail(id = null) {
           <button class="tab-btn" id="tab-btn-employees" onclick="switchCorpDetailTab('employees')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Employee List</button>
           <button class="tab-btn" id="tab-btn-import" onclick="switchCorpDetailTab('import')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Import Employee</button>
           <button class="tab-btn" id="tab-btn-users" onclick="switchCorpDetailTab('users')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Corporate Users</button>
+          <button class="tab-btn" id="tab-btn-results" onclick="switchCorpDetailTab('results')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Hasil MCU</button>
+          <button class="tab-btn" id="tab-btn-statement" onclick="switchCorpDetailTab('statement')" ${id ? '' : 'disabled'} style="${id ? '' : 'opacity:0.5; cursor:not-allowed;'}">Account Statement</button>
         </div>
 
         <!-- Right Side Panel Workspace -->
@@ -1238,10 +1240,18 @@ async function renderCorporateDetail(id = null) {
             </div>
           </div>
 
+          <div class="tab-content" id="tab-content-results" style="display:none; padding:16px;">
+            <div id="corp-results-body"><div style="text-align:center; padding:24px; color:#64748b;">Memuat…</div></div>
+          </div>
+
+          <div class="tab-content" id="tab-content-statement" style="display:none; padding:16px;">
+            <div id="corp-statement-body"><div style="text-align:center; padding:24px; color:#64748b;">Memuat…</div></div>
+          </div>
+
         </div>
 
       </div>
-      
+
     </div>`;
 
   if (id) {
@@ -1276,8 +1286,62 @@ window.switchCorpDetailTab = function(tabId) {
     if (corpId) {
       loadTabCorpUsers(corpId);
     }
+  } else if (tabId === 'results') {
+    if (window.currentDetailCorpId) renderCorpResultsAdmin(window.currentDetailCorpId, window.currentDetailCorpName||'Corporate');
+  } else if (tabId === 'statement') {
+    if (window.currentDetailCorpId) renderCorpStatementAdmin(window.currentDetailCorpId, window.currentDetailCorpName||'Corporate');
   }
 };
+
+// ══════════════ Hasil MCU & Account Statement per corporate (admin) ══════════════
+let _corpResultsAdmin = [], _corpStmtAdmin = [];
+function _csvDownload(filename, header, rows) {
+  const esc = v => `"${String(v==null?'':v).replace(/"/g,'""')}"`;
+  const csv = '﻿' + [header.map(esc).join(','), ...rows.map(r=>r.map(esc).join(','))].join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+  a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+}
+
+async function renderCorpResultsAdmin(corpId, corpName) {
+  const box = document.getElementById('corp-results-body'); if (!box) return;
+  box.innerHTML = '<div style="text-align:center;padding:24px;color:#64748b">Memuat…</div>';
+  const adms = await sbGet('admissions', `select=id,patient_name,visit_date,package_name&corporate_id=eq.${corpId}&order=visit_date.desc&limit=1000`).catch(()=>[]);
+  const admMap = {}; (adms||[]).forEach(a=>admMap[a.id]=a);
+  const ids = (adms||[]).map(a=>a.id);
+  let results = [];
+  for (let i=0;i<ids.length;i+=100){ const chunk=ids.slice(i,i+100); if(!chunk.length) break;
+    const r=await sbGet('lab_results',`select=admission_id,patient_name,product_name,result_value,unit,normal_min,normal_max,interpretation,color_code&admission_id=in.(${chunk.join(',')})`).catch(()=>[]); results=results.concat(r||[]); }
+  _corpResultsAdmin = (results||[]).map(r=>({ patient:r.patient_name||admMap[r.admission_id]?.patient_name||'—', date:admMap[r.admission_id]?.visit_date||'', package:admMap[r.admission_id]?.package_name||'', test:r.product_name||'', value:r.result_value||'', unit:r.unit||'', ref:(r.normal_min!=null&&r.normal_max!=null)?`${r.normal_min}–${r.normal_max}`:'', interp:r.interpretation||'', color:r.color_code||'' }));
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div style="font-weight:700;color:#0f2963">Hasil MCU — ${_corpResultsAdmin.length} hasil <span style="color:#64748b;font-weight:400;font-size:12px">(${(adms||[]).length} kunjungan)</span></div>
+      <button class="btn btn-teal btn-sm" onclick="exportCorpResultsAdmin('${(corpName||'').replace(/'/g,"\\'")}')">⬇ Tarik Data (CSV)</button>
+    </div>
+    ${_corpResultsAdmin.length ? `<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
+      <thead><tr style="background:#f1f5f9;text-align:left"><th style="padding:8px">Pasien</th><th style="padding:8px">Tanggal</th><th style="padding:8px">Tes</th><th style="padding:8px">Hasil</th><th style="padding:8px">Satuan</th><th style="padding:8px">Rujukan</th><th style="padding:8px">Interpretasi</th></tr></thead>
+      <tbody>${_corpResultsAdmin.map(r=>`<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">${r.patient}</td><td style="padding:8px">${r.date}</td><td style="padding:8px">${r.test}</td><td style="padding:8px;font-weight:700;color:${r.color==='red'?'#dc2626':r.color==='green'?'#059669':'#0f172a'}">${r.value}</td><td style="padding:8px">${r.unit}</td><td style="padding:8px">${r.ref}</td><td style="padding:8px">${r.interp}</td></tr>`).join('')}</tbody></table></div>` : '<div style="text-align:center;padding:26px;color:#64748b">Belum ada hasil MCU untuk perusahaan ini.</div>'}`;
+}
+function exportCorpResultsAdmin(corpName){ if(!_corpResultsAdmin.length){ if(typeof toast==='function') toast('Tidak ada data','warn'); return; }
+  _csvDownload(`hasil_mcu_${(corpName||'corp').replace(/\s+/g,'_')}.csv`, ['Pasien','Tanggal','Paket','Tes','Hasil','Satuan','Rujukan','Interpretasi'], _corpResultsAdmin.map(r=>[r.patient,r.date,r.package,r.test,r.value,r.unit,r.ref,r.interp])); }
+
+async function renderCorpStatementAdmin(corpId, corpName) {
+  const box = document.getElementById('corp-statement-body'); if (!box) return;
+  box.innerHTML = '<div style="text-align:center;padding:24px;color:#64748b">Memuat…</div>';
+  const invs = await sbGet('invoices', `select=*&corporate_id=eq.${corpId}&order=invoice_date.asc&limit=1000`).catch(()=>[]);
+  const fmt = n => (typeof formatCurrency==='function' ? formatCurrency(Number(n||0)) : 'Rp '+Number(n||0).toLocaleString('id-ID'));
+  const isPaid = i => ['Paid','Lunas','Dibayar'].includes(i.status);
+  const totalBill = (invs||[]).reduce((s,i)=>s+Number(i.total_amount||0),0);
+  const totalPaid = (invs||[]).filter(isPaid).reduce((s,i)=>s+Number(i.total_amount||0),0);
+  const outstanding = totalBill - totalPaid;
+  let bal = 0;
+  _corpStmtAdmin = (invs||[]).map(i=>{ const amt=Number(i.total_amount||0); const paid=isPaid(i); bal+=paid?0:amt; return {date:i.invoice_date||'',no:i.invoice_number||('INV-'+i.id),desc:i.service_type||i.notes||'Invoice',debit:amt,credit:paid?amt:0,status:paid?'Dibayar':'Belum Bayar',balance:bal}; });
+  const card=(l,v,c)=>`<div style="flex:1;min-width:150px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px"><div style="font-size:11px;color:#64748b;text-transform:uppercase">${l}</div><div style="font-size:18px;font-weight:800;color:${c};margin-top:4px">${fmt(v)}</div></div>`;
+  box.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">${card('Total Ditagih',totalBill,'#0f2963')}${card('Total Dibayar',totalPaid,'#059669')}${card('Outstanding',outstanding,outstanding>0?'#dc2626':'#059669')}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div style="font-weight:700;color:#0f2963">Account Statement</div><button class="btn btn-teal btn-sm" onclick="exportCorpStatementAdmin('${(corpName||'').replace(/'/g,"\\'")}')">⬇ Tarik Statement (CSV)</button></div>
+    ${_corpStmtAdmin.length?`<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse"><thead><tr style="background:#f1f5f9;text-align:left"><th style="padding:8px">Tanggal</th><th style="padding:8px">No. Invoice</th><th style="padding:8px">Keterangan</th><th style="padding:8px;text-align:right">Tagihan</th><th style="padding:8px;text-align:right">Dibayar</th><th style="padding:8px">Status</th><th style="padding:8px;text-align:right">Saldo</th></tr></thead><tbody>${_corpStmtAdmin.map(r=>`<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">${r.date}</td><td style="padding:8px;font-family:monospace">${r.no}</td><td style="padding:8px">${r.desc}</td><td style="padding:8px;text-align:right">${fmt(r.debit)}</td><td style="padding:8px;text-align:right;color:#059669">${r.credit?fmt(r.credit):'—'}</td><td style="padding:8px">${r.status}</td><td style="padding:8px;text-align:right;font-weight:700">${fmt(r.balance)}</td></tr>`).join('')}</tbody></table></div>`:'<div style="text-align:center;padding:26px;color:#64748b">Belum ada invoice untuk perusahaan ini.</div>'}`;
+}
+function exportCorpStatementAdmin(corpName){ if(!_corpStmtAdmin.length){ if(typeof toast==='function') toast('Tidak ada data','warn'); return; }
+  _csvDownload(`account_statement_${(corpName||'corp').replace(/\s+/g,'_')}.csv`, ['Tanggal','No Invoice','Keterangan','Tagihan','Dibayar','Status','Saldo'], _corpStmtAdmin.map(r=>[r.date,r.no,r.desc,r.debit,r.credit,r.status,r.balance])); }
 
 // Global Employee List loader for erp-style tab inside Corporate Config
 window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statusFilter = '') {

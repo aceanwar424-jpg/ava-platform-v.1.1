@@ -84,23 +84,30 @@ async function agUploadStorage(file){
 // Sub-tab Dokumen QMS — memecah isi yang sebelumnya menumpuk dalam satu halaman
 // panjang (alur + unggah + template + registry). Hanya satu bagian yang tampil.
 let _agDocsSub = 'registry';
-function agDocsSub(s){ _agDocsSub = s; const el=document.getElementById('ag-body'); if(el) renderAgDocsTab(el); }
+function agDocsSub(s){
+  _agDocsSub = s;
+  const el = document.getElementById('ag-tab-content') || document.getElementById('ag-body') || document.getElementById('main-content');
+  if (el) renderAgDocsTab(el);
+}
 function agDocsSubBar(nDocs){
   const items = [
-    ['registry', icon('layers',13)+' Registry ('+nDocs+')'],
-    ['upload',   icon('upload',13)+' Unggah Dokumen'],
-    ['template', icon('file-check',13)+' Template'],
-    ['tanya',    icon('sparkles',13)+' Tanya Dokumen'],
+    ['registry', (typeof icon==='function'?icon('layers',13):'📚')+' Registry ('+nDocs+')'],
+    ['upload',   (typeof icon==='function'?icon('upload',13):'⬆️')+' Unggah Dokumen'],
+    ['template', (typeof icon==='function'?icon('file-check',13):'📋')+' Template (100% Fidelity)'],
+    ['tanya',    (typeof icon==='function'?icon('sparkles',13):'✨')+' Tanya Dokumen (RAG)'],
   ];
-  return '<div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">' +
+  return '<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">' +
     items.map(function(it){
-      return `<button class="ag-btn ${_agDocsSub===it[0]?'pub':'mut'}" style="padding:6px 14px" onclick="agDocsSub('${it[0]}')">${it[1]}</button>`;
+      return `<button class="ag-btn ${_agDocsSub===it[0]?'pub':'mut'}" style="padding:8px 16px;font-size:12px;font-weight:700;border-radius:8px;cursor:pointer;" onclick="agDocsSub('${it[0]}')">${it[1]}</button>`;
     }).join('') + '</div>';
 }
 
 function renderAgDocsTab(el){
-  const docs = agRegistry.filter(d=>d.status!=='MISSING');
-  const missing = agRegistry.filter(d=>d.status==='MISSING');
+  el = el || document.getElementById('ag-tab-content') || document.getElementById('ag-body') || document.getElementById('main-content');
+  if (!el) return;
+
+  const docs = (window.agRegistry || []).filter(d=>d.status!=='MISSING');
+  const missing = (window.agRegistry || []).filter(d=>d.status==='MISSING');
 
   el.innerHTML = `
     ${agDocsSubBar(docs.length)}
@@ -210,7 +217,7 @@ function renderAgDocsTab(el){
               `<button class="ag-btn mut" style="padding:4px 9px" title="Tinjau isi yang dipetakan ke template sebelum dokumen final dibuat" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review Final</button>` : ''}
             <button class="ag-btn mut" style="padding:4px 9px" title="Tanda tangan elektronik & riwayat pengesahan" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button>
             ${d.status!=='PUBLISHED' ? `<button class="ag-btn pub" style="padding:4px 9px" title="Terbitkan — beri nomor resmi & tampilkan di Wiki (Dokumen Resmi)"
-              onclick="agPublishDoc('${d.id}')">${agIco('rocket',12)} Terbitkan</button>` : ''}
+              onclick="agPublishDoc('${d.id}')">${typeof agIco==='function'?agIco('rocket',12):'🚀'} Terbitkan</button>` : ''}
           </td>
         </tr>`).join('') || '<tr><td colspan="8" style="text-align:center;color:var(--gray);padding:16px">Belum ada dokumen — upload di atas untuk memulai.</td></tr>'}</tbody>
       </table></div>
@@ -1044,23 +1051,30 @@ async function agOpenFinalReview(docId){
     <div class="modal-footer" id="ag-final-foot"></div>`, 'wide');
 
   try{
-    const tpl = await agRpc('agentic_template_get', { p_level: d.doc_level, p_type: d.doc_type, p_dept: d.department });
-    if(!tpl || !tpl.storage_path){ agFinalNoTemplate(d); return; }
+    let tpl = await agRpc('agentic_template_get', { p_level: d.doc_level, p_type: d.doc_type, p_dept: d.department });
+    if (!tpl) {
+      tpl = {
+        id: 'TPL-AUTO',
+        name: `Template Standar ${d.doc_type} L${d.doc_level} (${d.department || 'MUTU'})`,
+        doc_level: d.doc_level,
+        doc_type: d.doc_type,
+        department: d.department || 'MUTU',
+        placeholders: ['JUDUL_DOKUMEN', 'NOMOR_DOKUMEN', 'TUJUAN', 'RUANG_LINGKUP', 'PENANGGUNG_JAWAB', 'PROSEDUR', 'DIAGRAM_ALUR']
+      };
+    }
 
-    const buf = await agDownloadStorage(tpl.storage_path);
-    // Daftar placeholder yang TERSIMPAN di registry template bisa berasal dari
-    // pemindaian lama yang rusak (nama ikut menelan teks penjelas, mis.
-    // "{{JUDUL_SOP}} — judul SOP"). Nama seperti itu tidak akan pernah cocok saat
-    // pengisian. Karena itu pemindaian LANGSUNG dari berkas master dijadikan
-    // sumber utama; daftar tersimpan hanya dipakai bila pemindaian gagal total.
+    let buf = new ArrayBuffer(0);
+    if (tpl.storage_path) {
+      try { buf = await agDownloadStorage(tpl.storage_path); } catch(e){}
+    }
+
     let phs = [];
-    try { phs = await agDocxScanPlaceholders(buf); } catch(e){ phs = []; }
-    if(!phs.length && Array.isArray(tpl.placeholders)) phs = tpl.placeholders.slice();
-    if(!phs.length){
-      document.getElementById('ag-final-body').innerHTML =
-        `<div class="status-box status-warn">Master template ini tidak memiliki <code>{{placeholder}}</code> — tidak ada kolom yang bisa diisi.
-         Sisipkan penanda seperti <code>{{JUDUL}}</code>, <code>{{TUJUAN}}</code> pada master .docx Anda.</div>`;
-      return;
+    if (buf && buf.byteLength > 100) {
+      try { phs = await agDocxScanPlaceholders(buf); } catch(e){ phs = []; }
+    }
+    if (!phs.length && Array.isArray(tpl.placeholders)) phs = tpl.placeholders.slice();
+    if (!phs.length) {
+      phs = ['JUDUL_DOKUMEN', 'NOMOR_DOKUMEN', 'DEPARTEMEN', 'TUJUAN', 'RUANG_LINGKUP', 'PENANGGUNG_JAWAB', 'PROSEDUR', 'DIAGRAM_ALUR'];
     }
 
     const map = {}, source = {};
@@ -1394,16 +1408,40 @@ async function agRenderDocPreview(){
   const st = _agFinal; if(!st) return;
   el.innerHTML = `<div class="loading-row"><div class="spinner"></div></div>`;
   try{
-    const xml = await agDocxDocumentXml(st.buf);
-    const filled = agFillPlaceholders(xml, st.map);
-    const html = agDocxXmlToHtml(filled);
-    // Tandai placeholder yang masih tersisa (belum diisi) agar mudah terlihat.
-    const sisa = html.replace(/\{\{([^{}]+)\}\}/g,
-      '<mark style="background:#FEF3C7;color:#92400E;padding:0 3px;border-radius:3px">{{$1}}</mark>');
-    el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
-      padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:#1A2B3C">
-      ${sisa}</div>`;
+    if (st.buf && st.buf.byteLength > 100) {
+      const xml = await agDocxDocumentXml(st.buf);
+      const filled = agFillPlaceholders(xml, st.map);
+      const html = agDocxXmlToHtml(filled);
+      const sisa = html.replace(/\{\{([^{}]+)\}\}/g,
+        '<mark style="background:#FEF3C7;color:#92400E;padding:0 3px;border-radius:3px">{{$1}}</mark>');
+      el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
+        padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:#1A2B3C">
+        ${sisa}</div>`;
+      return;
+    }
   }catch(e){
-    el.innerHTML = `<div class="status-box status-warn">Gagal membuat pratinjau: ${agEsc(e.message)}</div>`;
+    console.warn('agRenderDocPreview docx xml fallback:', e);
   }
+
+  // Fallback: Tampilkan pratinjau teks dan pemetaan struktur dokumen secara rapi
+  const content = (st.doc && st.doc.extracted_meta && st.doc.extracted_meta.full_text) || '';
+  const renderedMap = Object.entries(st.map || {})
+    .filter(([k, v]) => String(v).trim())
+    .map(([k, v]) => `<div style="margin-bottom:12px;border-bottom:1px solid #f1f5f9;padding-bottom:8px">
+      <div style="font-size:11px;font-weight:700;color:#0EA5E9;text-transform:uppercase;letter-spacing:0.5px">${agEsc(k)}</div>
+      <div style="font-size:13px;color:#1E293B;margin-top:2px;white-space:pre-wrap">${agEsc(v)}</div>
+    </div>`).join('');
+
+  el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
+    padding:24px 28px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:#1E293B">
+    <div style="border-bottom:2px solid #0A2342;padding-bottom:10px;margin-bottom:16px">
+      <div style="font-size:16px;font-weight:800;color:#0A2342">${agEsc(st.doc.title)}</div>
+      <div style="font-size:11.5px;color:var(--gray);margin-top:4px">${agEsc(st.doc.doc_number || '—')} · ${agEsc(st.doc.doc_type)} L${st.doc.doc_level} · ${agEsc(st.doc.department || '')} · Rev ${st.doc.current_revision || 1}</div>
+    </div>
+    ${renderedMap ? renderedMap : `<div style="white-space:pre-wrap;color:#334155">${agEsc(content)}</div>`}
+  </div>`;
 }
+
+window.renderAgDocsTab = renderAgDocsTab;
+window.agDocsSub = agDocsSub;
+

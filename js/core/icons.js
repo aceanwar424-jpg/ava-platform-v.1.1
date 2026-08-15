@@ -23,6 +23,7 @@ const ICON_PATHS = {
   flask:       '<path d="M9 3h6"/><path d="M10 3v6.5L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.5V3"/><path d="M7.5 15h9"/>',
   microscope:  '<path d="M6 21h12"/><path d="M9 21v-3"/><path d="M13 5.5 9.5 9 8 7.5 11.5 4a2 2 0 0 1 3 0l1 1a2 2 0 0 1 0 3l-3 3-2-2"/><path d="M7 18a6 6 0 0 0 9-5"/>',
   stethoscope: '<path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M5 3H3.5M13 3h1.5"/><path d="M9 12v3a5 5 0 0 0 5 5 4 4 0 0 0 4-4v-2"/><circle cx="18" cy="12" r="2"/>',
+  avahealth:   '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
   scan:        '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 12h8"/>',
   heart:       '<path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5c0 5-7 9.5-7 9.5Z"/>',
   hospital:    '<path d="M3 21h18"/><path d="M5 21V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v15"/><path d="M12 8v5M9.5 10.5h5"/><path d="M10 21v-4h4v4"/>',
@@ -32,7 +33,8 @@ const ICON_PATHS = {
   dna:         '<path d="M5 3c0 6 14 6 14 12M5 21c0-6 14-6 14-12"/><path d="M7 5h10M7 19h10M9 9h6M9 15h6"/>',
   sliders:     '<path d="M4 20V13M4 9V4M12 20v-8M12 8V4M20 20v-4M20 12V4"/><path d="M2 13h4M10 8h4M18 16h4"/>',
 
-  // — Dokumen —
+  // — Dokumen & Administrasi —
+  administration: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/>',
   'file-text': '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/>',
   'file-check':'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="m9 15 2 2 4-4"/>',
   scroll:      '<path d="M6 3h11a2 2 0 0 1 2 2v13a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V6"/><path d="M4 6a2 2 0 0 1 4 0v2H4Z"/><path d="M9 9h7M9 13h7M9 17h4"/>',

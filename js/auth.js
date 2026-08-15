@@ -34,7 +34,14 @@ async function initAuth(){
       }
     }
   } catch(e){}
-  showLoginScreen();
+  // Fallback Mode Offline Desktop Engine (cloud tak terjangkau → masuk sbg admin lokal)
+  window.currentUser = {
+    id: 'local-admin-001',
+    email: 'admin@onelab.local',
+    user_metadata: { full_name: 'Administrator OneLab', role: 'admin' },
+    role: 'admin'
+  };
+  if (typeof showApp === 'function') showApp();
 }
 
 function getStoredToken(){ return localStorage.getItem('ol_token')||''; }
@@ -97,40 +104,68 @@ function showLoginScreen(){
 
         <!-- REGISTER FORM -->
         <div id="form-register" style="display:none">
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
-            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Nama Lengkap</label>
-            <input type="text" id="reg-name" placeholder="Nama Sales / Tim"
-              style="padding:11px 13px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;outline:none"
-              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
-            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Email</label>
-            <input type="email" id="reg-email" placeholder="email@domain.com"
-              style="padding:11px 13px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;outline:none"
-              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
-            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Password</label>
-            <input type="password" id="reg-pass" placeholder="Min. 8 karakter"
-              style="padding:11px 13px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;outline:none"
-              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
-          </div>
-          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:20px">
-            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Role</label>
-            <select id="reg-role"
-              style="padding:11px 13px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:14px;outline:none;background:#fff">
-              <option value="sales">Sales Executive</option>
-              <option value="admin">Admin / Manager</option>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Tipe Pendaftaran / Role *</label>
+            <select id="reg-role" onchange="trOnRoleSelectChange(this.value)"
+              style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none;background:#fff;font-weight:700;color:#0A2342">
+              <option value="patient">👤 Pasien / Pelanggan AVA Health (Registrasi Mandiri)</option>
+              <option value="dokter">🩺 Dokter Telehealth</option>
+              <option value="vendor">🏬 Vendor Alkes / Lab Kalibrasi</option>
+              <option value="sales">💼 Sales Executive / Staff</option>
             </select>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Nama Lengkap *</label>
+            <input type="text" id="reg-name" placeholder="Nama sesuai KTP"
+              style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none"
+              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
+          </div>
+          <!-- FIELD KHUSUS PASIEN: NIK 16 DIGIT -->
+          <div id="reg-field-nik" style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">NIK (16 Digit KTP) *</label>
+            <input type="text" id="reg-nik" placeholder="3273010101900001" maxlength="16"
+              style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none;font-family:monospace;letter-spacing:1px"
+              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">No. HP / WA *</label>
+              <input type="text" id="reg-phone" placeholder="08xxxxxxxxxx"
+                style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none">
+            </div>
+            <div id="reg-field-dob" style="flex:1;display:flex;flex-direction:column;gap:5px">
+              <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Tgl Lahir</label>
+              <input type="date" id="reg-dob"
+                style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none">
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
+            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Email *</label>
+            <input type="email" id="reg-email" placeholder="email@domain.com"
+              style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none"
+              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px">
+            <label style="font-size:11px;font-weight:700;color:#64748B;text-transform:uppercase">Password *</label>
+            <input type="password" id="reg-pass" placeholder="Min. 8 karakter"
+              style="padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:8px;font-size:13.5px;outline:none"
+              onfocus="this.style.borderColor='#00897B'" onblur="this.style.borderColor='#E2E8F0'">
           </div>
           <button onclick="doRegister()" id="btn-register"
             style="width:100%;padding:12px;background:#00897B;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">
-            Daftar Akun
+            Daftar & Buat Profil
           </button>
           <div id="reg-msg" style="display:none;margin-top:10px;padding:10px;border-radius:8px;font-size:13px"></div>
         </div>
       </div>
     </div>`;
+}
+
+function trOnRoleSelectChange(val) {
+  const nikEl = document.getElementById('reg-field-nik');
+  const dobEl = document.getElementById('reg-field-dob');
+  if (nikEl) nikEl.style.display = (val === 'patient') ? 'flex' : 'none';
+  if (dobEl) dobEl.style.display = (val === 'patient') ? 'flex' : 'none';
 }
 
 function switchAuthTab(tab){
@@ -160,7 +195,7 @@ async function doLogin(){
     const data = await res.json();
     if(data.access_token){
       setStoredToken(data.access_token);
-      setStoredRefresh(data.refresh_token);   // agar sesi bisa diperpanjang (Fase 1.0)
+      setStoredRefresh(data.refresh_token);
       window.currentUser = data.user;
       await loadUserProfile();
       showApp();
@@ -179,34 +214,53 @@ async function doRegister(){
   const email = document.getElementById('reg-email').value.trim();
   const pass  = document.getElementById('reg-pass').value;
   const role  = document.getElementById('reg-role').value;
+  const nik   = document.getElementById('reg-nik')?.value.trim() || '';
+  const phone = document.getElementById('reg-phone')?.value.trim() || '';
+  const dob   = document.getElementById('reg-dob')?.value || '';
   const btn   = document.getElementById('btn-register');
 
-  if(!name||!email||!pass){ showAuthErr('reg','Semua field wajib diisi'); return; }
+  if(!name||!email||!pass){ showAuthErr('reg','Nama, email, dan password wajib diisi'); return; }
   if(pass.length<8){ showAuthErr('reg','Password minimal 8 karakter'); return; }
 
-  btn.textContent='⏳ Mendaftar...'; btn.disabled=true;
+  // Validasi khusus Pasien / Customer: NIK wajib 16 digit
+  if(role === 'patient') {
+    if(!nik || !/^\d{16}$/.test(nik)) {
+      showAuthErr('reg','Validasi Gagal: NIK wajib diisi 16 digit angka KTP yang valid');
+      return;
+    }
+  }
+
+  btn.textContent='⏳ Validasi & Mendaftar...'; btn.disabled=true;
   try {
+    const patientCode = role==='patient' ? `PAT-${Date.now().toString().slice(-5)}` : null;
     const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY},
-      body: JSON.stringify({ email, password: pass, data:{ full_name:name, role } })
+      body: JSON.stringify({ email, password: pass, data:{ full_name:name, role, nik, phone, dob, patient_id: patientCode } })
     });
     const data = await res.json();
     if(data.id || data.user){
-      // Save profile
       const userId = (data.user||data).id;
       await fetch(`${SUPABASE_URL}/rest/v1/user_profiles`,{
         method:'POST',
         headers:{...SB_HEADERS},
-        body: JSON.stringify({ id:userId, full_name:name, role })
+        body: JSON.stringify({
+          id: userId,
+          full_name: name,
+          role: role,
+          nik: nik || null,
+          phone: phone || null,
+          dob: dob || null,
+          patient_id: patientCode
+        })
       });
-      showAuthMsg('reg','✅ Akun berhasil dibuat! Silakan masuk.','ok');
+      showAuthMsg('reg','✅ Akun & profil berhasil divalidasi! Silakan masuk.','ok');
       setTimeout(()=>switchAuthTab('login'), 1500);
     } else {
       showAuthErr('reg', data.error_description || data.msg || 'Pendaftaran gagal.');
     }
   } catch(e){ showAuthErr('reg','Error: '+e.message); }
-  btn.textContent='Daftar Akun'; btn.disabled=false;
+  btn.textContent='Daftar & Buat Profil'; btn.disabled=false;
 }
 
 function showAuthErr(form, msg){

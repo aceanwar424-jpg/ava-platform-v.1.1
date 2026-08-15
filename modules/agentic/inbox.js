@@ -16,6 +16,8 @@ function agInboxTasks(){
 }
 
 function renderAgInboxTab(el){
+  el = el || document.getElementById('ag-tab-content');
+  if(!el) return;
   const items = agInboxTasks();
   if(_agSelTask && !agTasks.find(t=>t.id===_agSelTask)) _agSelTask = null;
   if(!_agSelTask && items.length) _agSelTask = items[0].id;
@@ -388,3 +390,5 @@ async function agReapStuck(){
       'Jalankan supabase_agentic_fase5.sql dulu (fungsi agentic_reap belum ada)' : e.message, 'err');
   }
 }
+
+window.renderAgInboxTab = renderAgInboxTab;

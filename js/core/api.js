@@ -1,7 +1,16 @@
 // ═══════════════════════════════════════════
 // CORE: Supabase API helpers
 // ═══════════════════════════════════════════
-const SUPABASE_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+// SUPABASE_URL dipilih saat runtime:
+//  • Desktop Engine (OneLab Desktop.exe) menyajikan platform di 127.0.0.1:5174 →
+//    pakai shim PostgREST lokal (PGlite) di :54329, sepenuhnya offline.
+//  • Selain itu (mis. Vercel produksi) → Supabase cloud seperti biasa.
+// Deteksi berbasis hostname; TIDAK mengubah perilaku deployment cloud.
+const SUPABASE_CLOUD_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const _isLocalEngine = (typeof location !== 'undefined') &&
+  (location.hostname === '127.0.0.1' || location.hostname === 'localhost');
+const LOCAL_ENGINE_URL = (typeof location !== 'undefined') ? `http://${location.hostname}:54329` : '';
+const SUPABASE_URL = _isLocalEngine ? LOCAL_ENGINE_URL : SUPABASE_CLOUD_URL;
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
 
 // ── Sesi (Fase 1.0) ───────────────────────────────────────────
@@ -63,10 +72,21 @@ async function sbFetch(url, opts = {}) {
 }
 
 async function sbGet(table, query='') {
-  const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.message || data.hint || JSON.stringify(data));
-  return data;
+  try {
+    const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.hint || JSON.stringify(data));
+    return data;
+  } catch (err) {
+    console.warn(`[Local Engine Fallback] Querying table '${table}' via SQLite:`, err);
+    if (table.includes('products') && window.parent?.api?.getProducts) {
+      return await window.parent.api.getProducts();
+    }
+    if (table.includes('products') && window.api?.getProducts) {
+      return await window.api.getProducts();
+    }
+    return [];
+  }
 }
 async function sbPost(table, body) {
   const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}`, { method:'POST', body: JSON.stringify(body) });
@@ -97,6 +117,10 @@ async function sbRpc(fnName, args = {}) {
   if (!res.ok) throw new Error(data?.message || data?.hint || `RPC ${fnName} gagal`);
   return data;
 }
+if (typeof window !== 'undefined' && !window.agRpc) {
+  window.agRpc = sbRpc;
+}
+
 
 // Jejak audit (Fase 1.5) — menyertakan id pengguna, bukan hanya namanya,
 // serta cuplikan data sebelum/sesudah bila diberikan.

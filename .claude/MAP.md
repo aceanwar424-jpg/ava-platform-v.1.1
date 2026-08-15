@@ -22,7 +22,7 @@ Anchor = **nama fungsi**, bukan nomor baris (baris cepat bergeser). Grep nama fu
 | Portal corporate — Home | `apps/app.js` | `renderCorporateHome`, `switchCiTab`, `loadCorporateData` |
 | Portal corporate — Master Employee | `apps/app.js` | `renderCorporateList`, `openAddEmployeeModal`, `submitAddEmployeeForm`, `editEmployeePortal`, `empPosition` |
 | Portal corporate — Book/Approval/History | `apps/app.js` | `renderBookExamination`+`submitExamBooking`, `renderExamApproval`+`saveExamApproval`, `renderExamHistory`, `filterBookExam`, `genBatchCode` |
-| Portal corporate — Hasil MCU & Account Statement | `apps/app.js` | `renderCorporateResults`+`exportCorporateResults` (lab_results via admisi corporate), `renderAccountStatement`+`exportAccountStatement` (invoices+saldo), `downloadCsv` |
+| Hasil MCU & Account Statement (ADMIN, tab di Config Corporate) | `modules/config_package.js` | `renderCorpResultsAdmin`+`exportCorpResultsAdmin` (lab_results via admisi corporate), `renderCorpStatementAdmin`+`exportCorpStatementAdmin` (invoices+saldo), `_csvDownload`. Tab via `switchCorpDetailTab('results'/'statement')`. (Dulu di portal — dipindah ke admin.) |
 | Portal — menu/peran/login | `apps/app.js` | `renderSidebarMenu`, `showView`, `handleLogin` |
 | Config corporate (admin) | `modules/config_package.js` | `openCorpForm` (multi-tab), `openCorpEmployees`, `saveCorpEmpInline`, `_caStyleTag` |
 | Import karyawan (admin, 9-kolom) | `modules/import_excel.js` | `_importCorpEmployees`, `IMPORT_TEMPLATES` |
@@ -37,6 +37,8 @@ Anchor = **nama fungsi**, bukan nomor baris (baris cepat bergeser). Grep nama fu
 | Modal / toast | `js/core/utils.js` | `openModal(html, size)` (size: `'wide'`/`'narrow'`), `closeModalForce`, `toast` |
 
 Modul lain: `modules/hrd.js` (karyawan OneLab internal, ≠ corporate), `cashier.js`, `mcu.js`, `ris.js`/`radiology.js`, `finance.js`/`accounting.js`, `mou.js`, `partners/`, dll — buka sesuai nama.
+
+**Connector alat lab** (Node.js daemon terpisah, bukan frontend): `connector/onelab-connector.js` — TCP listener ASTM/HL7 → Supabase `analyzer_messages`. Punya halaman status lokal `localhost:9999` (`STATUS_HTML`) dengan tab **LIS** parsing manual offline (`lisParse`/`lisExport`, no backtick/`${}` di dalam template literal). Ada 2 salinan identik: repo `connector/` (tracked) + `D:\onelab-platform-main\connector` (live/dijalankan) — edit repo lalu `cp` ke live.
 
 ---
 

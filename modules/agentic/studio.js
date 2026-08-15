@@ -267,3 +267,5 @@ async function agSaveSlot(){
     await agReload();
   }catch(e){ toast(e.message,'err'); }
 }
+
+window.renderAgStudioTab = renderAgStudioTab;

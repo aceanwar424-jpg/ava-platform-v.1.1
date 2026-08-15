@@ -1014,3 +1014,5 @@ window.agRenderLeftPanel = function() {
   }
 };
 
+window.renderAgOrgTab = renderAgOrgTab;
+
