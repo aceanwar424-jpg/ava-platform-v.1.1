@@ -779,6 +779,20 @@ async function peranPunyaIzin(pg, role, izin) {
   return (await izinDariPeran(pg, role)).includes(izin);
 }
 
+// Peran SELALU dibaca ulang dari basis data, tidak dari klaim di dalam token.
+//
+// Token menyatakan SIAPA penggunanya; basis data menyatakan APA yang boleh ia
+// lakukan. Kalau peran dibaca dari token, admin yang menurunkan peran seseorang
+// tidak benar-benar mencabut aksesnya — korban tetap memegang hak lama sampai
+// tokennya kedaluwarsa (12 jam). Untuk pencabutan akses, itu terlalu lama.
+async function peranTerkini(pg, sub, cadangan) {
+  try {
+    const r = await pg.query(`SELECT role FROM public.user_profiles WHERE id = $1`, [sub]);
+    if (r.rows[0] && r.rows[0].role) return r.rows[0].role;
+  } catch (_) { /* tabel belum ada → pakai klaim token */ }
+  return cadangan || 'viewer';
+}
+
 async function siapkanTabelAuth(pg) {
   await pg.exec(`
     CREATE TABLE IF NOT EXISTS public.local_auth_users (
@@ -928,15 +942,21 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           if (p === '/auth/v1/permissions') {
             const payload = bacaToken(SECRET, tokenDariHeader(req));
             if (!payload || payload.typ !== 'access') return jsonRes(res, 401, { message: 'Sesi tidak sah' });
-            const izin = payload.role === 'super_admin'
+
+            // Peran dibaca ulang dari basis data — lihat catatan di peranTerkini().
+            const role = await peranTerkini(pg, payload.sub, payload.role);
+            const izin = role === 'super_admin'
               ? (await pg.query(`SELECT kode FROM public.permissions`).catch(() => ({ rows: [] }))).rows.map(r => r.kode)
-              : await izinDariPeran(pg, payload.role);
+              : await izinDariPeran(pg, role);
             const halaman = await pg.query(
-              `SELECT page FROM public.role_pages WHERE role_kode = $1`, [payload.role]).catch(() => ({ rows: [] }));
+              `SELECT page FROM public.role_pages WHERE role_kode = $1`, [role]).catch(() => ({ rows: [] }));
             return jsonRes(res, 200, {
-              role: payload.role,
+              role,
               permissions: izin,
               pages: halaman.rows.map(r => r.page),
+              // Ditandai bila peran sudah berubah sejak token diterbitkan,
+              // supaya klien bisa menyegarkan tampilannya.
+              roleChanged: role !== payload.role,
             });
           }
 
@@ -1046,12 +1066,33 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // dipercaya: daftar hak akses dulu disimpan di localStorage dan bisa
           // ditulis ulang lewat DevTools. Di sini peran diambil dari token yang
           // ditandatangani, lalu dicocokkan ke matriks di basis data.
-          const perluIzin = req.method === 'DELETE' ? 'data.delete' : null;
-          if (perluIzin && !(await peranPunyaIzin(pg, sesi.role, perluIzin))) {
-            return jsonRes(res, 403, {
-              message: `Peran "${sesi.role}" tidak berwenang menghapus data`,
-              code: 'PGRST403', required: perluIzin,
-            });
+          const menulis = req.method === 'POST' || req.method === 'PATCH' ||
+                          req.method === 'PUT'  || req.method === 'DELETE';
+          const tabel = p.replace(/^\/rest\/v1\//, '').split('?')[0].split('/')[0];
+
+          // Tabel yang menentukan SIAPA BOLEH APA. Menulis ke sini sama dengan
+          // mengubah hak akses, jadi wajib memegang user.manage. Tanpa penjaga
+          // ini, satu PATCH ke user_profiles cukup untuk menaikkan peran diri
+          // sendiri menjadi super_admin.
+          const TABEL_HAK_AKSES = new Set([
+            'user_profiles', 'local_auth_users', 'roles', 'permissions',
+            'role_permissions', 'role_pages', 'tenants',
+          ]);
+
+          let perluIzin = null;
+          if (menulis && TABEL_HAK_AKSES.has(tabel)) perluIzin = 'user.manage';
+          else if (req.method === 'DELETE') perluIzin = 'data.delete';
+
+          if (perluIzin) {
+            const role = await peranTerkini(pg, sesi.sub, sesi.role);
+            if (!(await peranPunyaIzin(pg, role, perluIzin))) {
+              return jsonRes(res, 403, {
+                message: perluIzin === 'user.manage'
+                  ? `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`
+                  : `Peran "${role}" tidak berwenang menghapus data`,
+                code: 'PGRST403', required: perluIzin,
+              });
+            }
           }
         }
 

@@ -349,6 +349,10 @@ window.addEventListener('DOMContentLoaded', async () => {
             console.log('[BOOT DEBUG] Profile query result:', profile);
             if (profile?.[0]) window.currentUser.profile = profile[0];
           } catch(e) { console.log('[BOOT DEBUG] Profile query error:', e); }
+          // Hak akses diambil dari server dulu, baru menu disusun. Tanpa ini
+          // menu jatuh ke matriks bawaan di berkas — bukan bahaya, tapi
+          // perubahan peran oleh admin tidak akan terlihat.
+          if (typeof loadServerAccess === 'function') await loadServerAccess();
           setupAppUI();
           applyRoleMenu();
           if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
@@ -557,6 +561,8 @@ async function refreshMyRole() {
       const oldRole = getUserRole();
       window.currentUser.profile = fresh[0];
       const newRole = getUserRole();
+      // Peran bisa saja baru diubah admin → ambil ulang hak akses dari server.
+      if (typeof loadServerAccess === 'function') await loadServerAccess();
       setupAppUI();
       applyRoleMenu();
       if (oldRole === newRole && newRole !== 'super_admin') {

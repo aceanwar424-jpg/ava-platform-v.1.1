@@ -171,22 +171,55 @@ function saveRolePages(role, pages) {
 }
 
 // ── Apply menu visibility based on role pages ────────────────
+// Ambil izin & halaman milik sesi dari SERVER. Dipanggil sekali saat boot,
+// sebelum applyRoleMenu(). Hasilnya disimpan di window.serverAccess.
+//
+// Sebelumnya daftar halaman dibaca dari localStorage ('ol_user_pages_<id>'),
+// yang bisa ditulis ulang siapa pun lewat DevTools untuk membuka seluruh
+// modul. Sumbernya kini matriks di basis data.
+async function loadServerAccess() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/permissions`, { headers: { ...SB_HEADERS } });
+    if (!res.ok) return null;
+    const d = await res.json();
+    if (!d || !Array.isArray(d.permissions)) return null;
+    window.serverAccess = d;
+    return d;
+  } catch (e) { return null; }
+}
+
+// Pemeriksaan izin untuk dipakai modul: can('data.delete').
+// Ini hanya untuk MENYEMBUNYIKAN kendali di antarmuka — penjaga sesungguhnya
+// ada di server. Jangan pernah menjadikan ini satu-satunya penghalang.
+function can(izin) {
+  const sa = window.serverAccess;
+  if (sa && Array.isArray(sa.permissions)) return sa.permissions.includes(izin);
+  // Cadangan saat endpoint tidak tersedia (deployment lama): matriks bawaan.
+  const rc = ROLES[getUserRole ? getUserRole() : 'viewer'] || ROLES.viewer;
+  const peta = {
+    'data.delete': 'canDelete', 'data.bulk_delete': 'canBulkDelete',
+    'data.export': 'canExport', 'user.manage': 'canManageUsers',
+    'logbook.approve': 'canApproveLogbook', 'task.assign': 'canAssignTask',
+    'team.board.view': 'canSeeTeamBoard',
+  };
+  return !!rc[peta[izin]];
+}
+
 function applyRoleMenu() {
   const role   = getUserRole ? getUserRole() : 'sales';
   const rc     = ROLES[role] || ROLES.sales;
-  const userId = window.currentUser?.id || '';
 
-  // Priority: 1) per-user custom, 2) per-role custom, 3) role default
-  let allowedPages;
-  const userCustom = userId ? localStorage.getItem('ol_user_pages_'+userId) : null;
-  if (userCustom) {
-    try { allowedPages = JSON.parse(userCustom); } catch(e) {}
-  }
-  if (!allowedPages) allowedPages = getRolePages(role);
+  // Urutan sumber: 1) server (tepercaya), 2) matriks bawaan di berkas ini.
+  // localStorage TIDAK lagi dipakai sebagai sumber hak akses.
+  const sa = window.serverAccess;
+  const allowedPages = (sa && Array.isArray(sa.pages) && sa.pages.length)
+    ? sa.pages
+    : getRolePages(role);
 
   window.roleConfig = {
     ...rc,
     pages:        allowedPages,
+    sumber:       (sa && sa.pages && sa.pages.length) ? 'server' : 'bawaan',
     isSpv:        ['super_admin','spv','manager','direktur'].includes(role),
     isManager:    ['super_admin','manager','direktur'].includes(role),
     isSuperAdmin: role === 'super_admin',
