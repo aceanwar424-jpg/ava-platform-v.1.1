@@ -94,8 +94,9 @@ const AIGateway = {
         return pool[idx];
       }
     }
-    // Jika semua key habis, kembalikan key pertama dan berikan peringatan
-    return pool[0];
+    // Semua key habis → kembalikan key pertama (pemanggil menangani status-nya).
+    // Pool boleh kosong (mis. deployment web tanpa config.local.js) → null.
+    return pool[0] || null;
   },
 
   // Cek apakah key yang 429 sudah melewati jam reset untuk diisi kembali secara otomatis
@@ -186,6 +187,12 @@ const AIGateway = {
     }
 
     const currentKeyObj = this.getActiveKey();
+    if (!currentKeyObj) {
+      const pesan = 'Belum ada API key AI. Tambahkan lewat menu "Monitor Kuota & Rate Limit API", ' +
+                    'atau sediakan js/config.local.js pada instalasi lokal.';
+      if (typeof toast === 'function') toast('⚠️ ' + pesan, 'warn');
+      throw new Error('[AI Gateway] ' + pesan);
+    }
     currentKeyObj.requestsToday++;
     this.state.requestHistory.push(Date.now());
     this.state.dailyCount++;
@@ -200,6 +207,8 @@ const AIGateway = {
       if (errStr.includes('429') || errStr.includes('quota') || errStr.includes('RESOURCE_EXHAUSTED')) {
         this.markKeyExhausted(currentKeyObj.id, 3600);
         const nextKeyObj = this.getActiveKey();
+        // Satu-satunya key barusan kena 429 → tidak ada tujuan failover.
+        if (!nextKeyObj || nextKeyObj.id === currentKeyObj.id) throw err;
         console.warn(`[AI Gateway] Auto-Failover: Switching to ${nextKeyObj.provider} (${nextKeyObj.snippet})...`);
         const fallbackResp = await this._callLLM(promptText, systemInstruction, this.config.fallbackModel, nextKeyObj.key);
         this.setCache(cacheKey, fallbackResp);
