@@ -95,10 +95,96 @@ async function loadSchema(pg, repoDir, log = () => {}) {
   return { ok, fail, files: files.length };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MIGRASI SKEMA BERNOMOR
+//
+// Pemuatan skema massal (loadSchema) hanya cocok untuk membangun basis data
+// dari nol: ia menjalankan puluhan berkas dua kali dan menelan kegagalan jadi
+// penghitung. Itu tidak bisa dipakai memutakhirkan basis data klien yang sudah
+// berisi data — dan itulah syarat agar produk ini bisa dijual berulang.
+//
+// Runner di bawah menjalankan berkas db/migrations/NNNN_*.sql sekali saja,
+// berurutan, tiap berkas dalam satu transaksi, dan mencatatnya di
+// public.schema_migrations. Kegagalan dibatalkan (ROLLBACK) lalu dilempar —
+// sengaja berisik, supaya tidak ada lagi kegagalan yang menyamar jadi
+// "belum ada data".
+// ═══════════════════════════════════════════════════════════════════════════
+
+function cariFolderMigrasi(platformDir) {
+  let dir = platformDir || process.cwd();
+  for (let i = 0; i < 8; i++) {
+    const kandidat = path.join(dir, 'db', 'migrations');
+    if (fs.existsSync(kandidat)) return kandidat;
+    const induk = path.dirname(dir);
+    if (induk === dir) break;
+    dir = induk;
+  }
+  return '';
+}
+
+function checksumSql(teks) {
+  return crypto.createHash('sha256').update(teks).digest('hex').slice(0, 16);
+}
+
+async function jalankanMigrasi(pg, platformDir, log = () => {}) {
+  const dir = cariFolderMigrasi(platformDir);
+  if (!dir) { log('[migrasi] folder db/migrations tidak ditemukan — dilewati'); return { terpasang: 0 }; }
+
+  await pg.exec(`
+    CREATE TABLE IF NOT EXISTS public.schema_migrations (
+      version    text PRIMARY KEY,
+      name       text,
+      checksum   text,
+      applied_at timestamptz DEFAULT now()
+    );
+  `);
+
+  const sudah = new Map(
+    (await pg.query(`SELECT version, checksum FROM public.schema_migrations`))
+      .rows.map(r => [r.version, r.checksum]));
+
+  const berkas = fs.readdirSync(dir).filter(f => /^\d{4}_.*\.sql$/.test(f)).sort();
+  let terpasang = 0;
+
+  for (const f of berkas) {
+    const version = f.slice(0, 4);
+    const isi = fs.readFileSync(path.join(dir, f), 'utf8');
+    const sum = checksumSql(isi);
+
+    if (sudah.has(version)) {
+      // Migrasi yang sudah dipasang tidak boleh berubah isinya — kalau berubah,
+      // basis data lama dan baru diam-diam menjadi berbeda.
+      if (sudah.get(version) !== sum) {
+        log(`[migrasi] PERINGATAN: ${f} berubah setelah dipasang. ` +
+            `Buat migrasi baru, jangan menyunting yang lama.`);
+      }
+      continue;
+    }
+
+    try {
+      await pg.exec('BEGIN');
+      await pg.exec(isi);
+      await pg.query(
+        `INSERT INTO public.schema_migrations (version, name, checksum) VALUES ($1,$2,$3)`,
+        [version, f, sum]);
+      await pg.exec('COMMIT');
+      terpasang++;
+      log(`[migrasi] terpasang: ${f}`);
+    } catch (e) {
+      try { await pg.exec('ROLLBACK'); } catch (_) {}
+      log(`[migrasi] GAGAL pada ${f}: ${e && e.message ? e.message : e}`);
+      throw e;
+    }
+  }
+
+  if (!terpasang) log(`[migrasi] skema mutakhir (${berkas.length} migrasi tercatat)`);
+  return { terpasang, total: berkas.length };
+}
+
 // ── SKEMA LOKAL AVA HEALTH ECOSYSTEM ──────────────────────────────────────
-// Dipanggil pada SETIAP boot, bukan hanya saat inisialisasi pertama. Basis data
-// yang dibuat sebelum tabel-tabel ini ada tidak akan pernah mendapatkannya bila
-// pembuatannya hanya ikut jalur loadSchema().
+// DIPERTAHANKAN sebagai jaring pengaman untuk instalasi yang folder
+// db/migrations-nya tidak ikut terdistribusi. Sumber kebenaran DDL kini ada di
+// db/migrations/0002_ava_health.sql.
 async function siapkanTabelAva(pg, log = () => {}) {
   try {
     await pg.exec(`
@@ -578,12 +664,20 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
   // Autentikasi: tabel kredensial, rahasia penanda tangan, dan akun pertama.
   // Dijalankan tiap boot (idempoten) supaya instalasi lama ikut mendapatkannya.
-  const SECRET = authSecret(dataDir);
-  await siapkanTabelAuth(pg);
-  await bootstrapAdmin(pg, dataDir, log);
+  // Migrasi bernomor dijalankan tiap boot; hanya yang belum tercatat yang dipasang.
+  // Ini jalur resmi pemutakhiran skema, termasuk untuk basis data klien yang sudah berisi data.
+  try {
+    await jalankanMigrasi(pg, platformDir, log);
+  } catch (e) {
+    // Sudah dicatat & di-ROLLBACK di dalam runner. Jaring pengaman di bawah tetap
+    // dijalankan agar aplikasi tidak mati total karena satu migrasi bermasalah.
+    log('[local-engine] migrasi gagal — memakai jaring pengaman DDL bawaan');
+  }
 
-  // Tabel AVA Health juga disiapkan tiap boot, agar basis data lama ikut terisi.
-  await siapkanTabelAva(pg, log);
+  const SECRET = authSecret(dataDir);
+  await siapkanTabelAuth(pg);          // jaring pengaman (lihat 0001_auth_lokal.sql)
+  await siapkanTabelAva(pg, log);      // jaring pengaman (lihat 0002_ava_health.sql)
+  await bootstrapAdmin(pg, dataDir, log);
 
   const server = http.createServer((req, res) => {
     (async () => {
@@ -790,4 +884,4 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
   return { pg, server, port };
 }
 
-module.exports = { createEngine, loadSchema, seedProducts, splitStatements, handleRest, handleRpc };
+module.exports = { createEngine, jalankanMigrasi, loadSchema, seedProducts, splitStatements, handleRest, handleRpc };
