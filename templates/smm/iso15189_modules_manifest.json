@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "library_name": "Pustaka Modul Dokumen Mutu ISO 15189:2022 (Generic)",
+  "version": "1.0.0",
+  "ip_ownership": {
+    "tag": "generic",
+    "statement": "Pustaka modul mutu netral - Bebas dari identitas proprietary OneLab"
+  },
+  "modules": [
+    {
+      "module_id": "MOD-ISO-4.1-001",
+      "clause": "4.1",
+      "clause_title": "Impartiality & Confidentiality",
+      "level": "L1",
+      "title": "SK Kebijakan Ketidakberpihakan & Kerahasiaan Informasi Pasien",
+      "filename": "SMM_L1_001_Kebijakan_Ketidakberpihakan_Kerahasiaan.md",
+      "category": "General Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-5.1-001",
+      "clause": "5.1",
+      "clause_title": "Legal Entity & Governance",
+      "level": "L1",
+      "title": "Pedoman Tata Kelola Klinik & Penanggung Jawab Laboratorium",
+      "filename": "SMM_L1_002_Pedoman_Tata_Kelola_Klinik.md",
+      "category": "Structural Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-6.2-001",
+      "clause": "6.2",
+      "clause_title": "Personnel Competency & Credentials",
+      "level": "L2",
+      "title": "SOP Pengelolaan Kualifikasi, STTR/SIP & Evaluasi Kompetensi Analis",
+      "filename": "SMM_L2_001_SOP_Kompetensi_SDM_Analis.md",
+      "category": "Resource Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-6.4-001",
+      "clause": "6.4",
+      "clause_title": "Equipment & Calibration Traceability",
+      "level": "L2",
+      "title": "SOP Pengawasan Mutu K3, Utilitas, Pemeliharaan & Kalibrasi Alat Medis",
+      "filename": "SMM_L2_002_SOP_Pemeliharaan_Kalibrasi_Alat.md",
+      "category": "Resource Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-7.2-001",
+      "clause": "7.2",
+      "clause_title": "Pre-examination Processes",
+      "level": "L2",
+      "title": "SOP Pengambilan Spesimen Darah (Flebotomi), Aksesi & Kriteria Penolakan",
+      "filename": "SMM_L2_003_SOP_Flebotomi_Aksesi_Spesimen.md",
+      "category": "Process Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-7.3-001",
+      "clause": "7.3",
+      "clause_title": "Examination Processes & Verification",
+      "level": "L2",
+      "title": "SOP Pemantapan Mutu Internal (PMI), PME & Grafik Levey-Jennings",
+      "filename": "SMM_L2_004_SOP_PMI_PME_Levey_Jennings.md",
+      "category": "Process Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-7.4-001",
+      "clause": "7.4",
+      "clause_title": "Post-examination & Critical Results",
+      "level": "L2",
+      "title": "SOP Pasca-Analitik, Pelaporan Nilai Kritis & Validasi Klinis Hasil",
+      "filename": "SMM_L2_005_SOP_Pasca_Analitik_Nilai_Kritis.md",
+      "category": "Process Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-8.2-001",
+      "clause": "8.2",
+      "clause_title": "Document Control & Revision",
+      "level": "L3",
+      "title": "WI Pengendalian, Pengarsipan & Penerbitan Dokumen Mutu",
+      "filename": "SMM_L3_001_WI_Pengendalian_Dokumen.md",
+      "category": "Management Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-8.5-001",
+      "clause": "8.5",
+      "clause_title": "Risk Management, IKP & CAPA",
+      "level": "L2",
+      "title": "SOP Manajemen Risiko, Insiden Keselamatan Pasien (IKP) & Tindakan Korektif (CAPA)",
+      "filename": "SMM_L2_006_SOP_Risk_Register_IKP_CAPA.md",
+      "category": "Management Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-08-06"
+    }
+  ]
+}

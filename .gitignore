@@ -1,15 +1,24 @@
+# ══════════════════════════════════════════════════════════════════
+# .gitignore INDUK — berlaku untuk seluruh proyek.
+# Berkas .gitignore di subfolder tetap berlaku dan menambah aturan ini.
+# ══════════════════════════════════════════════════════════════════
+
 # ── Rahasia — JANGAN PERNAH masuk repo ────────────────────────────
-# Kunci LLM, kredensial DB, token. Pakai .env.example sebagai contoh.
 .env
 .env.*
 !.env.example
-connector/config.json
-!connector/config.example.json
-js/config.local.js
-!js/config.local.example.js
+**/connector/config.json
+!**/connector/config.example.json
+**/js/config.local.js
+!**/js/config.local.example.js
+
+# Kredensial akun admin pertama yang ditulis engine saat boot pertama.
+LOGIN_ADMIN_PERTAMA.txt
+.auth-secret
 
 # ── Setelan lokal per-mesin ───────────────────────────────────────
 .claude/settings.local.json
+.claude/launch.json
 
 # ── Dependensi & artefak build (bisa dibangun ulang) ──────────────
 node_modules/
@@ -18,9 +27,14 @@ dist-electron/
 release/
 
 # ── Data hidup — bukan artefak, jangan pernah dihapus manual ──────
-# Database PGlite lokal berisi data operasional nyata.
+# Basis data operasional PGlite. Isinya data klinik yang sesungguhnya.
 pglite-data/
 .pglite-dev/
+
+# ── Cadangan & karantina ──────────────────────────────────────────
+*.tar.gz
+*.zip
+_karantina_*/
 
 # ── Knowledge graph (dibangkitkan ulang: graphify update .) ───────
 graphify-out/

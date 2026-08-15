@@ -1,0 +1,11 @@
+Kode Material,Nama Pemeriksaan,Nama Analit,Operator,Batas Bawah,Batas Atas,Jenis Nilai,Kelompok Usia,Jenis Kelamin,LOINC (OBX-3),UCUM (OBX-6),Sumber Acuan,Status Verifikasi Acuan,Catatan Klinis
+MAT-LAB-001,Darah Lengkap (CBC),Hemoglobin,>=,13.0,17.5,Kuantitatif,Dewasa,Laki-laki,718-7,g/dL,IFU Kit Reagen & CLSI,VERIFIED,Indikator anemia & polisitemia
+MAT-LAB-001,Darah Lengkap (CBC),Hemoglobin,>=,12.0,15.5,Kuantitatif,Dewasa,Perempuan,718-7,g/dL,IFU Kit Reagen & CLSI,VERIFIED,Indikator anemia pada wanita
+MAT-LAB-001,Darah Lengkap (CBC),Leukosit,>=,4.5,11.0,Kuantitatif,Semua,Semua,6690-2,10*3/uL,IFU Kit Reagen,VERIFIED,Indikator infeksi & leukimia
+MAT-LAB-001,Darah Lengkap (CBC),Trombosit,>=,150,450,Kuantitatif,Semua,Semua,777-3,10*3/uL,IFU Kit Reagen,VERIFIED,Evaluasi hemostasis
+MAT-LAB-002,Glukosa Darah Puasa,Glukosa Puasa,<,70,99,Kuantitatif,Dewasa,Semua,1558-6,mg/dL,ADA Guidelines 2024,VERIFIED,Skrining diabetes melitus
+MAT-LAB-003,Kolesterol Total,Kolesterol Total,<,0,200,Kuantitatif,Dewasa,Semua,2093-3,mg/dL,NCEP ATP III,VERIFIED,Profil risiko kardiovaskular
+MAT-LAB-004,SGOT (AST),SGOT (AST),<,0,35,Kuantitatif,Dewasa,Perempuan,1920-8,U/L,IFU Kit Reagen,VERIFIED,Evaluasi fungsi hati & hepatosit
+MAT-LAB-004,SGOT (AST),SGOT (AST),<,0,50,Kuantitatif,Dewasa,Laki-laki,1920-8,U/L,IFU Kit Reagen,VERIFIED,Evaluasi fungsi hati & hepatosit
+MAT-LAB-005,SGPT (ALT),SGPT (ALT),<,0,35,Kuantitatif,Dewasa,Perempuan,1742-6,U/L,IFU Kit Reagen,VERIFIED,Evaluasi kerusakan sel hati spesifik
+MAT-LAB-005,SGPT (ALT),SGPT (ALT),<,0,50,Kuantitatif,Dewasa,Laki-laki,1742-6,U/L,IFU Kit Reagen,VERIFIED,Evaluasi kerusakan sel hati spesifik

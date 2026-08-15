@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "tenant_id": "DEFAULT_TENANT",
+  "lab_info": {
+    "name": "Nama Laboratorium Klinik",
+    "short_name": "LabKlinik",
+    "legal_entity": "PT Akselerator Kesehatan Indonesia",
+    "license_number": "PJK3/KLINIK/2026/001",
+    "address": "Jl. Utama No. 123, Jakarta",
+    "phone": "+62 21 555-0199",
+    "email": "info@labklinik.co.id",
+    "website": "https://labklinik.co.id"
+  },
+  "accreditation": {
+    "iso_version": "ISO 15189:2022",
+    "target_body": "KAN (Komite Akreditasi Nasional)",
+    "accreditation_number": "LP-999-IDN"
+  },
+  "qms_headers": {
+    "doc_code_prefix": "SOP-LAB",
+    "effective_date_format": "YYYY-MM-DD",
+    "approval_roles": [
+      "Penanggung Jawab Laboratorium",
+      "Manajer Mutu",
+      "Kepala Operations"
+    ]
+  },
+  "lis_integration": {
+    "provider_type": "GENERIC_REST",
+    "hl7_version": "v2.5.1",
+    "fhir_version": "R4",
+    "obx3_loinc_required": true,
+    "obx6_ucum_required": true
+  },
+  "ip_ownership": {
+    "tag": "generic",
+    "statement": "Konfigurasi terparameterisasi netral - Tidak mengandung data proprietary OneLab."
+  }
+}

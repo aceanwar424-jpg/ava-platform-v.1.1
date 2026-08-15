@@ -1,0 +1,55 @@
+{
+  "name": "onelab-desktop",
+  "version": "1.0.0",
+  "description": "OneLab Desktop App - Aplikasi Lokal dengan PGlite (Postgres WASM) & Electron",
+  "main": "dist-electron/main.js",
+  "author": "OneLab",
+  "license": "MIT",
+  "scripts": {
+    "dev:vite": "vite",
+    "copy:engine": "node -e \"require('fs').copyFileSync('electron/local-engine.js','dist-electron/local-engine.js')\"",
+    "dev:electron": "tsc -p tsconfig.electron.json && npm run copy:engine && electron dist-electron/main.js",
+    "build:electron": "tsc -p tsconfig.electron.json && npm run copy:engine",
+    "build:react": "vite build",
+    "build": "npm run build:react && npm run build:electron",
+    "build:exe": "npm run build && electron-builder --win --dir",
+    "package:exe": "npm run build && electron-builder --win portable"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.4",
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "@types/react": "^18.2.61",
+    "@types/react-dom": "^18.2.19",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.18",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  },
+  "build": {
+    "appId": "com.onelab.desktop",
+    "productName": "OneLab Desktop",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "asarUnpack": [
+      "**/node_modules/@electric-sql/**"
+    ],
+    "win": {
+      "target": "portable",
+      "verifyUpdateCodeSignature": false
+    }
+  }
+}

@@ -1,0 +1,793 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// OneLab Local Engine — PGlite (Postgres WASM) + PostgREST-compatible shim
+// ---------------------------------------------------------------------------
+// Tujuan: menjalankan seluruh backend OneLab secara LOKAL/OFFLINE tanpa Supabase
+// cloud. PGlite = Postgres asli (WASM), jadi skema arsip Postgres di sql_arsip/
+// bisa dimuat apa adanya, dan RPC (fungsi Postgres) langsung tersedia.
+//
+// Shim ini meniru subset PostgREST yang dipakai frontend (lihat js/core/api.js):
+//   GET|POST|PATCH|DELETE /rest/v1/:table   dengan operator eq/neq/gt/gte/lt/lte/
+//   like/ilike/in/is/not, or=(), select=, order=, limit=, offset=, count=exact,
+//   embedded select (*,rel(...)), dan POST /rest/v1/rpc/:fn.
+//
+// CommonJS + dynamic import karena @electric-sql/pglite murni ESM.
+// ═══════════════════════════════════════════════════════════════════════════
+const fs = require('fs');
+const path = require('path');
+const http = require('http');
+
+// ── Statement splitter yang sadar dollar-quote ($$), string, line & block comment
+function splitStatements(sql) {
+  const out = []; let buf = ''; let i = 0; let dollarTag = null;
+  while (i < sql.length) {
+    const ch = sql[i];
+    if (dollarTag) {
+      if (sql.startsWith(dollarTag, i)) { buf += dollarTag; i += dollarTag.length; dollarTag = null; continue; }
+      buf += ch; i++; continue;
+    }
+    if (ch === '-' && sql[i + 1] === '-') { const nl = sql.indexOf('\n', i); const end = nl < 0 ? sql.length : nl; buf += sql.slice(i, end); i = end; continue; }
+    if (ch === '/' && sql[i + 1] === '*') { const end = sql.indexOf('*/', i + 2); const stop = end < 0 ? sql.length : end + 2; buf += sql.slice(i, stop); i = stop; continue; }
+    if (ch === '$') { const m = /^\$[a-zA-Z0-9_]*\$/.exec(sql.slice(i)); if (m) { dollarTag = m[0]; buf += m[0]; i += m[0].length; continue; } }
+    if (ch === "'") { buf += ch; i++; while (i < sql.length) { buf += sql[i]; if (sql[i] === "'" && sql[i + 1] === "'") { buf += sql[i + 1]; i += 2; continue; } if (sql[i] === "'") { i++; break; } i++; } continue; }
+    if (ch === ';') { if (buf.trim()) out.push(buf.trim()); buf = ''; i++; continue; }
+    buf += ch; i++;
+  }
+  if (buf.trim()) out.push(buf.trim());
+  return out;
+}
+
+// ── Statement yang sengaja dilewati (auth/RLS/grant tak relevan lokal single-user)
+function shouldSkip(stmt) {
+  const s = stmt.replace(/^\s*((--[^\n]*\n)|(\/\*[\s\S]*?\*\/))+/g, '').trimStart().toUpperCase();
+  return /^CREATE\s+POLICY/.test(s)
+    || /^DROP\s+POLICY/.test(s)
+    || /^ALTER\s+TABLE[\s\S]*ENABLE\s+ROW\s+LEVEL\s+SECURITY/.test(s)
+    || /^ALTER\s+TABLE[\s\S]*FORCE\s+ROW\s+LEVEL/.test(s)
+    || /^ALTER\s+DEFAULT\s+PRIVILEGES/.test(s)
+    || /^GRANT\b/.test(s) || /^REVOKE\b/.test(s)
+    || /^COMMENT\s+ON/.test(s)
+    || /^CREATE\s+EXTENSION/.test(s)
+    || /^NOTIFY\b/.test(s)
+    || s === '';
+}
+
+// ── Urutan build ulang (sesuai sql_arsip/README.md), skema saja (tanpa 06_seed_data besar)
+const ORDER_DIRS = ['01_fondasi_awal', '02_modul_lama', '03_agentic', '04_roadmap_fase', '05_modul_baru', '07_lanjutan'];
+const SUB01 = ['supabase_v2', 'supabase_v3_complete', 'supabase_full', 'supabase_update', 'supabase_complete_fix', 'supabase_setup_all', 'new_modules_schema', 'supabase_new_modules'];
+
+function collectSchemaFiles(repoDir) {
+  const arsip = path.join(repoDir, 'sql_arsip');
+  const files = [];
+  for (const d of ORDER_DIRS) {
+    const full = path.join(arsip, d);
+    if (!fs.existsSync(full)) continue;
+    let list = fs.readdirSync(full).filter(f => f.endsWith('.sql'));
+    if (d === '01_fondasi_awal') list.sort((a, b) => (SUB01.indexOf(a.replace('.sql', '')) + 1 || 99) - (SUB01.indexOf(b.replace('.sql', '')) + 1 || 99));
+    else list.sort();
+    for (const f of list) files.push(path.join(full, f));
+  }
+  // file supabase_*.sql di root repo (corp account/exam/invoice/mcu/portal/…)
+  for (const f of fs.readdirSync(repoDir).filter(f => /^supabase_.*\.sql$/.test(f))) files.push(path.join(repoDir, f));
+  return files;
+}
+
+async function loadSchema(pg, repoDir, log = () => {}) {
+  await pg.exec(`CREATE SCHEMA IF NOT EXISTS auth; CREATE SCHEMA IF NOT EXISTS storage;`);
+  for (const r of ['anon', 'authenticated', 'service_role']) { try { await pg.exec(`CREATE ROLE ${r};`); } catch (_) {} }
+  try { await pg.exec(`CREATE FUNCTION auth.uid() RETURNS uuid AS $$ SELECT NULL::uuid $$ LANGUAGE sql;`); } catch (_) {}
+  try { await pg.exec(`CREATE FUNCTION auth.role() RETURNS text AS $$ SELECT 'authenticated'::text $$ LANGUAGE sql;`); } catch (_) {}
+
+  await siapkanTabelAva(pg, log);
+
+  const files = collectSchemaFiles(repoDir);
+  const fileStmts = files.map(f => ({ f, stmts: splitStatements(fs.readFileSync(f, 'utf8')) }));
+  let ok = 0, fail = 0;
+  for (let pass = 1; pass <= 2; pass++) {   // 2 pass → selesaikan ketergantungan urutan
+    ok = 0; fail = 0;
+    for (const { stmts } of fileStmts) {
+      for (const st of stmts) {
+        if (shouldSkip(st)) continue;
+        try { await pg.exec(st); ok++; } catch (_) { fail++; }
+      }
+    }
+  }
+  log(`[local-engine] schema loaded: ${files.length} files, ok=${ok} fail=${fail}`);
+  return { ok, fail, files: files.length };
+}
+
+// ── SKEMA LOKAL AVA HEALTH ECOSYSTEM ──────────────────────────────────────
+// Dipanggil pada SETIAP boot, bukan hanya saat inisialisasi pertama. Basis data
+// yang dibuat sebelum tabel-tabel ini ada tidak akan pernah mendapatkannya bila
+// pembuatannya hanya ikut jalur loadSchema().
+async function siapkanTabelAva(pg, log = () => {}) {
+  try {
+    await pg.exec(`
+      CREATE TABLE IF NOT EXISTS ava_consultations (
+        id SERIAL PRIMARY KEY,
+        patient_name TEXT,
+        doctor_name TEXT,
+        complaint TEXT,
+        triage_level TEXT DEFAULT 'normal',
+        status TEXT DEFAULT 'pending',
+        e_prescription TEXT,
+        lab_referral TEXT,
+        doctor_fee NUMERIC DEFAULT 150000,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS ava_device_readings (
+        id SERIAL PRIMARY KEY,
+        patient_id TEXT,
+        device_name TEXT,
+        device_type TEXT,
+        reading_value TEXT,
+        unit TEXT,
+        alert_status TEXT DEFAULT 'normal',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS ava_calibration_badges (
+        id SERIAL PRIMARY KEY,
+        device_name TEXT,
+        lab_name TEXT,
+        cert_number TEXT UNIQUE,
+        expiry_date DATE,
+        badge_status TEXT DEFAULT 'verified',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS ava_marketplace_items (
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        vendor_name TEXT,
+        price NUMERIC,
+        type TEXT DEFAULT 'sewa',
+        badge_status TEXT DEFAULT 'verified',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      CREATE TABLE IF NOT EXISTS ava_caregiver_links (
+        id SERIAL PRIMARY KEY,
+        patient_id TEXT,
+        caregiver_name TEXT,
+        relation TEXT,
+        permission_scope TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+  } catch (e) {
+    // Jangan ditelan diam-diam: kegagalan di sini membuat seluruh menu AVA
+    // tampak "belum ada data" padahal tabelnya yang tidak terbentuk.
+    log(`[local-engine] gagal menyiapkan tabel AVA: ${e && e.message ? e.message : e}`);
+  }
+}
+
+// ── Seed master produk dari database.sql (INSERT INTO public.products ... ON CONFLICT)
+async function seedProducts(pg, platformDir, log = () => {}) {
+  const candidates = [path.join(platformDir, 'database.sql'), path.join(platformDir, '..', 'database.sql')];
+  const sqlPath = candidates.find(p => fs.existsSync(p));
+  if (!sqlPath) return 0;
+  // Skema arsip menaruh ~17 produk contoh; master sebenarnya 532. Hanya lewati bila
+  // master penuh sudah ada (ON CONFLICT upsert membuat pemanggilan ini idempoten).
+  const cnt = await pg.query(`SELECT count(*)::int AS c FROM products`).catch(() => ({ rows: [{ c: 0 }] }));
+  if ((cnt.rows[0]?.c || 0) >= 400) return cnt.rows[0].c;
+  const content = fs.readFileSync(sqlPath, 'utf8');
+  let seeded = 0;
+  for (const st of splitStatements(content)) {
+    if (/^INSERT\s+INTO\s+public\.products/i.test(st)) {
+      try { await pg.exec(st.replace(/public\.products/i, 'products')); seeded++; } catch (_) {}
+    }
+  }
+  const final = await pg.query(`SELECT count(*)::int AS c FROM products`).catch(() => ({ rows: [{ c: seeded }] }));
+  log(`[local-engine] seeded products: +${seeded} inserts → ${final.rows[0].c} rows`);
+  return final.rows[0].c;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PostgREST → SQL
+// ═══════════════════════════════════════════════════════════════════════════
+const OPS = { eq: '=', neq: '<>', gt: '>', gte: '>=', lt: '<', lte: '<=', like: 'LIKE', ilike: 'ILIKE' };
+
+function qid(name) { return '"' + String(name).replace(/"/g, '') + '"'; }
+
+// Cache tipe kolom per tabel → agar filter WHERE meng-cast param teks ke tipe kolom
+// (PostgREST kirim semua nilai sebagai teks; Postgres butuh "id" = $1::int4 dst).
+async function getColTypes(pg, table) {
+  pg.__colTypes = pg.__colTypes || {};
+  if (pg.__colTypes[table]) return pg.__colTypes[table];
+  const r = await pg.query(
+    `SELECT column_name, udt_name FROM information_schema.columns WHERE table_schema='public' AND table_name=$1`, [table]
+  ).catch(() => ({ rows: [] }));
+  const map = {}; for (const row of r.rows) map[row.column_name] = row.udt_name;
+  pg.__colTypes[table] = map; return map;
+}
+function castOf(colTypes, col) { const t = colTypes && colTypes[col]; return t ? '::' + t : ''; }
+
+// Pisahkan filter kolom dari kata kunci PostgREST reserved
+const RESERVED = new Set(['select', 'order', 'limit', 'offset', 'and', 'or', 'on_conflict', 'columns']);
+
+// Bangun satu kondisi "col=op.value" → SQL (param di-cast ke tipe kolom)
+function buildCond(col, raw, params, colTypes) {
+  let neg = false;
+  let m = /^(not)\.(.*)$/is.exec(raw);
+  if (m) { neg = true; raw = m[2]; }
+  const dot = raw.indexOf('.');
+  const op = dot < 0 ? 'eq' : raw.slice(0, dot).toLowerCase();
+  let val = dot < 0 ? raw : raw.slice(dot + 1);
+  const cast = castOf(colTypes, col);
+  let cond;
+  if (op === 'in') {
+    const inner = val.replace(/^\(/, '').replace(/\)$/, '');
+    const items = inner.length ? splitCsvRespectingQuotes(inner) : [];
+    if (!items.length) cond = 'FALSE';
+    else { const ph = items.map(v => { params.push(unq(v)); return `$${params.length}${cast}`; }); cond = `${qid(col)} IN (${ph.join(',')})`; }
+  } else if (op === 'is') {
+    const v = val.toLowerCase();
+    cond = `${qid(col)} IS ${v === 'null' ? 'NULL' : v === 'true' ? 'TRUE' : v === 'false' ? 'FALSE' : 'NULL'}`;
+  } else if (op === 'like' || op === 'ilike') {
+    params.push(val.replace(/\*/g, '%'));
+    cond = `${qid(col)}::text ${OPS[op]} $${params.length}`;
+  } else if (OPS[op]) {
+    params.push(unq(val));
+    cond = `${qid(col)} ${OPS[op]} $${params.length}${cast}`;
+  } else {
+    params.push(unq(raw)); cond = `${qid(col)} = $${params.length}${cast}`;
+  }
+  return neg ? `NOT (${cond})` : cond;
+}
+
+function unq(v) {
+  if (v == null) return v;
+  if (v === 'null') return null;
+  if (/^".*"$/.test(v)) return v.slice(1, -1);
+  return v;
+}
+function splitCsvRespectingQuotes(s) {
+  const out = []; let buf = ''; let q = false;
+  for (let i = 0; i < s.length; i++) { const c = s[i]; if (c === '"') { q = !q; buf += c; } else if (c === ',' && !q) { out.push(buf); buf = ''; } else buf += c; }
+  if (buf.length) out.push(buf); return out;
+}
+
+// Parse "or=(a.eq.1,b.eq.2,...)" → SQL "(...)". Mendukung nested key.op.value
+function buildOr(raw, params, colTypes) {
+  const inner = raw.replace(/^\(/, '').replace(/\)$/, '');
+  const parts = splitTopLevel(inner);
+  const conds = parts.map(p => {
+    const i2 = p.indexOf('.');
+    const col = p.slice(0, i2); const rest = p.slice(i2 + 1);
+    return buildCond(col, rest, params, colTypes);
+  });
+  return '(' + conds.join(' OR ') + ')';
+}
+function splitTopLevel(s) {
+  const out = []; let buf = ''; let depth = 0;
+  for (const c of s) { if (c === '(') depth++; if (c === ')') depth--; if (c === ',' && depth === 0) { out.push(buf); buf = ''; } else buf += c; }
+  if (buf.length) out.push(buf); return out;
+}
+
+// Pisahkan select embed: "*,products(id,nama),partners(x)" → { cols:'*', embeds:[{rel,fkHint,cols}] }
+function parseSelect(sel) {
+  if (!sel) return { cols: '*', embeds: [] };
+  const parts = splitTopLevel(sel);
+  const cols = []; const embeds = [];
+  for (const p of parts) {
+    const m = /^([a-z_]+)(?:!([a-z_]+))?\((.*)\)$/is.exec(p.trim());
+    if (m) embeds.push({ rel: m[1], fkHint: m[2] || null, cols: m[3] });
+    else cols.push(p.trim());
+  }
+  return { cols: cols.length ? cols.map(c => c === '*' ? '*' : qid(c)).join(',') : '*', embeds };
+}
+
+function parseOrder(raw) {
+  return raw.split(',').map(seg => {
+    const bits = seg.split('.');
+    const col = bits[0];
+    let dir = ''; let nulls = '';
+    for (const b of bits.slice(1)) {
+      const lb = b.toLowerCase();
+      if (lb === 'asc' || lb === 'desc') dir = lb.toUpperCase();
+      else if (lb === 'nullsfirst') nulls = 'NULLS FIRST';
+      else if (lb === 'nullslast') nulls = 'NULLS LAST';
+    }
+    return `${qid(col)} ${dir || 'ASC'} ${nulls}`.trim();
+  }).join(', ');
+}
+
+// Ambil baris relasi untuk embed (many-to-one) lalu tempelkan ke tiap baris induk
+async function attachEmbeds(pg, rows, embeds) {
+  for (const emb of embeds) {
+    const fk = emb.fkHint || guessFk(emb.rel, rows[0]);
+    if (!fk) { for (const r of rows) r[emb.rel] = null; continue; }
+    const ids = [...new Set(rows.map(r => r[fk]).filter(v => v != null))];
+    if (!ids.length) { for (const r of rows) r[emb.rel] = null; continue; }
+    const ph = ids.map((_, i) => `$${i + 1}`).join(',');
+    let related = [];
+    try { related = (await pg.query(`SELECT * FROM ${qid(emb.rel)} WHERE "id" IN (${ph})`, ids)).rows; } catch (_) {}
+    const byId = new Map(related.map(r => [String(r.id), r]));
+    for (const r of rows) r[emb.rel] = byId.get(String(r[fk])) || null;
+  }
+  return rows;
+}
+function guessFk(rel, sampleRow) {
+  if (!sampleRow) return null;
+  const singular = rel.replace(/s$/, '');
+  for (const cand of [`${singular}_id`, `${rel}_id`, `${rel}`]) if (cand in sampleRow) return cand;
+  return null;
+}
+
+// Bangun WHERE dari URLSearchParams (selain reserved)
+function buildWhere(params, sqlParams, colTypes) {
+  const conds = [];
+  for (const [key, val] of params.entries()) {
+    if (RESERVED.has(key)) { if (key === 'or') conds.push(buildOr(val, sqlParams, colTypes)); continue; }
+    conds.push(buildCond(key, val, sqlParams, colTypes));
+  }
+  return conds.length ? ' WHERE ' + conds.join(' AND ') : '';
+}
+
+// ── Handler REST utama
+async function handleRest(pg, method, table, search, bodyText, headers) {
+  const params = new URLSearchParams(search);
+  const prefer = (headers['prefer'] || '');
+  const wantCount = /count=exact/.test(prefer) || (params.get('select') || '').includes('count');
+  const returnMinimal = /return=minimal/.test(prefer);
+  const colTypes = await getColTypes(pg, table);
+
+  if (method === 'GET') {
+    const { cols, embeds } = parseSelect(params.get('select'));
+    if (wantCount && (params.get('select') || '') === 'count') {
+      const sp = []; const where = buildWhere(stripReserved(params), sp, colTypes);
+      const c = await pg.query(`SELECT count(*)::int AS count FROM ${qid(table)}${where}`, sp);
+      return { status: 200, rows: [{ count: c.rows[0].count }], count: c.rows[0].count };
+    }
+    const sp = [];
+    const where = buildWhere(stripReserved(params), sp, colTypes);
+    let sql = `SELECT ${cols} FROM ${qid(table)}${where}`;
+    if (params.get('order')) sql += ' ORDER BY ' + parseOrder(params.get('order'));
+    if (params.get('limit')) sql += ` LIMIT ${parseInt(params.get('limit')) || 0}`;
+    if (params.get('offset')) sql += ` OFFSET ${parseInt(params.get('offset')) || 0}`;
+    let rows = (await pg.query(sql, sp)).rows;
+    if (embeds.length && rows.length) rows = await attachEmbeds(pg, rows, embeds);
+    let count = null;
+    if (wantCount) { const cp = []; const cw = buildWhere(stripReserved(params), cp, colTypes); count = (await pg.query(`SELECT count(*)::int AS c FROM ${qid(table)}${cw}`, cp)).rows[0].c; }
+    return { status: 200, rows, count };
+  }
+
+  if (method === 'POST') {
+    const body = bodyText ? JSON.parse(bodyText) : {};
+    const list = Array.isArray(body) ? body : [body];
+    if (!list.length) return { status: 201, rows: [] };
+    const cols = [...new Set(list.flatMap(o => Object.keys(o)))];
+    const values = []; const sp = [];
+    for (const o of list) {
+      const ph = cols.map(c => { sp.push(normVal(o[c])); return `$${sp.length}`; });
+      values.push('(' + ph.join(',') + ')');
+    }
+    const onConflict = params.get('on_conflict');
+    let sql = `INSERT INTO ${qid(table)} (${cols.map(qid).join(',')}) VALUES ${values.join(',')}`;
+    if (onConflict) {
+      const keys = onConflict.split(',').map(qid).join(',');
+      const upd = cols.filter(c => !onConflict.split(',').includes(c)).map(c => `${qid(c)}=EXCLUDED.${qid(c)}`).join(',');
+      sql += ` ON CONFLICT (${keys}) DO ${upd ? 'UPDATE SET ' + upd : 'NOTHING'}`;
+    }
+    if (!returnMinimal) sql += ' RETURNING *';
+    const res = await pg.query(sql, sp);
+    return { status: 201, rows: returnMinimal ? [] : res.rows };
+  }
+
+  if (method === 'PATCH') {
+    const body = bodyText ? JSON.parse(bodyText) : {};
+    const sp = [];
+    const setCols = Object.keys(body);
+    if (!setCols.length) return { status: 200, rows: [] };
+    const setSql = setCols.map(c => { sp.push(normVal(body[c])); return `${qid(c)}=$${sp.length}`; }).join(',');
+    const where = buildWhere(stripReserved(params), sp, colTypes);
+    let sql = `UPDATE ${qid(table)} SET ${setSql}${where}`;
+    if (!returnMinimal) sql += ' RETURNING *';
+    const res = await pg.query(sql, sp);
+    return { status: 200, rows: returnMinimal ? [] : res.rows };
+  }
+
+  if (method === 'DELETE') {
+    const sp = [];
+    const where = buildWhere(stripReserved(params), sp, colTypes);
+    let sql = `DELETE FROM ${qid(table)}${where}`;
+    if (!returnMinimal) sql += ' RETURNING *';
+    const res = await pg.query(sql, sp);
+    return { status: 200, rows: returnMinimal ? [] : res.rows };
+  }
+  return { status: 405, rows: [], error: 'method not allowed' };
+}
+function stripReserved(params) {
+  const p = new URLSearchParams();
+  for (const [k, v] of params.entries()) if (!RESERVED.has(k) || k === 'or') p.append(k, v);
+  return p;
+}
+function normVal(v) { return (v && typeof v === 'object') ? JSON.stringify(v) : v; }
+
+// ── RPC: fungsi Postgres sudah ada di PGlite → panggil dengan named args
+async function handleRpc(pg, fn, bodyText) {
+  const args = bodyText ? JSON.parse(bodyText) : {};
+  const keys = Object.keys(args);
+  const sp = []; const namedPh = keys.map(k => { sp.push(normVal(args[k])); return `${qid(k)} => $${sp.length}`; });
+  const call = `${qid(fn)}(${namedPh.join(', ')})`;
+  // Coba sebagai set-returning (TABLE/SETOF); jika hasilnya kolom-tunggal bernama
+  // sama dengan fungsi → itu fungsi scalar, unwrap sesuai perilaku PostgREST.
+  try {
+    const res = await pg.query(`SELECT * FROM ${call}`, sp);
+    const rows = res.rows;
+    const keys = rows[0] ? Object.keys(rows[0]) : [];
+    if (keys.length === 1 && keys[0] === fn) {
+      const vals = rows.map(r => r[fn]);
+      return { status: 200, rows: vals.length <= 1 ? (vals[0] ?? null) : vals };
+    }
+    return { status: 200, rows };
+  } catch (_) {
+    const res = await pg.query(`SELECT ${call} AS result`, sp);
+    return { status: 200, rows: res.rows[0]?.result ?? null };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTENTIKASI LOKAL
+// Kredensial disimpan di DB (public.local_auth_users), peran dibaca dari
+// public.user_profiles.role — sumber kebenaran yang sama dengan mode cloud.
+// Kata sandi TIDAK PERNAH disimpan polos: scrypt + salt acak per pengguna.
+// Token ditandatangani HMAC-SHA256 dengan rahasia yang dibuat sekali per
+// instalasi, sehingga token tidak bisa dipalsukan dari sisi peramban.
+// ═══════════════════════════════════════════════════════════════════════════
+const crypto = require('crypto');
+
+const AUTH_ACCESS_TTL  = 12 * 60 * 60;        // 12 jam
+const AUTH_REFRESH_TTL = 30 * 24 * 60 * 60;   // 30 hari
+const AUTH_MAX_GAGAL   = 5;                   // percobaan sebelum dikunci
+const AUTH_KUNCI_MENIT = 15;
+
+function authSecret(dataDir) {
+  // Rahasia per-instalasi. Disimpan di folder data, bukan di kode.
+  const file = path.join(dataDir || process.cwd(), '.auth-secret');
+  try {
+    if (fs.existsSync(file)) return fs.readFileSync(file);
+  } catch (_) {}
+  const buf = crypto.randomBytes(32);
+  try {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, buf, { mode: 0o600 });
+  } catch (_) { /* tidak bisa ditulis → rahasia hanya berlaku selama proses hidup */ }
+  return buf;
+}
+
+function hashPassword(password, salt) {
+  return crypto.scryptSync(String(password), salt, 64).toString('hex');
+}
+
+function passwordCocok(password, salt, hashTersimpan) {
+  const uji = Buffer.from(hashPassword(password, salt), 'hex');
+  const asli = Buffer.from(String(hashTersimpan), 'hex');
+  // Panjang harus sama sebelum timingSafeEqual, dan pembandingan tetap konstan.
+  return uji.length === asli.length && crypto.timingSafeEqual(uji, asli);
+}
+
+const b64u = {
+  enc: (buf) => Buffer.from(buf).toString('base64')
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
+  dec: (str) => Buffer.from(String(str).replace(/-/g, '+').replace(/_/g, '/'), 'base64'),
+};
+
+function buatToken(secret, payload, ttlDetik) {
+  const body = { ...payload, exp: Math.floor(Date.now() / 1000) + ttlDetik };
+  const data = b64u.enc(JSON.stringify(body));
+  const sig = b64u.enc(crypto.createHmac('sha256', secret).update(data).digest());
+  return `${data}.${sig}`;
+}
+
+// Mengembalikan payload bila tanda tangan sah DAN belum kedaluwarsa; selain itu null.
+function bacaToken(secret, token) {
+  if (!token || typeof token !== 'string' || !token.includes('.')) return null;
+  const [data, sig] = token.split('.');
+  let harusnya;
+  try {
+    harusnya = b64u.enc(crypto.createHmac('sha256', secret).update(data).digest());
+  } catch (_) { return null; }
+
+  const a = Buffer.from(String(sig));
+  const b = Buffer.from(harusnya);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+
+  try {
+    const payload = JSON.parse(b64u.dec(data).toString('utf8'));
+    if (!payload.exp || payload.exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
+  } catch (_) { return null; }
+}
+
+function tokenDariHeader(req) {
+  const h = req.headers['authorization'] || '';
+  return h.startsWith('Bearer ') ? h.slice(7).trim() : '';
+}
+
+async function siapkanTabelAuth(pg) {
+  await pg.exec(`
+    CREATE TABLE IF NOT EXISTS public.local_auth_users (
+      id             uuid PRIMARY KEY,
+      email          text UNIQUE NOT NULL,
+      password_hash  text NOT NULL,
+      password_salt  text NOT NULL,
+      is_active      boolean DEFAULT true,
+      failed_attempts integer DEFAULT 0,
+      locked_until   timestamptz,
+      last_login_at  timestamptz,
+      created_at     timestamptz DEFAULT now()
+    );
+  `);
+}
+
+// Akun pertama dibuat otomatis agar instalasi baru tidak terkunci di luar.
+// Kata sandi ACAK (bukan default yang bisa ditebak) dan ditulis ke berkas
+// supaya tidak ada kredensial tetap yang ikut terdistribusi bersama produk.
+async function bootstrapAdmin(pg, dataDir, log) {
+  const { rows } = await pg.query(`SELECT count(*)::int c FROM public.local_auth_users`);
+  if (rows[0].c > 0) return;
+
+  const id = crypto.randomUUID();
+  const email = 'admin@onelab.local';
+  const password = crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '');
+  const salt = crypto.randomBytes(16).toString('hex');
+
+  await pg.query(
+    `INSERT INTO public.local_auth_users (id, email, password_hash, password_salt)
+     VALUES ($1,$2,$3,$4)`,
+    [id, email, hashPassword(password, salt), salt]);
+  await pg.query(
+    `INSERT INTO public.user_profiles (id, full_name, role)
+     VALUES ($1,$2,'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
+    [id, 'Administrator OneLab']);
+
+  const berkas = path.join(path.dirname(dataDir || process.cwd()), 'LOGIN_ADMIN_PERTAMA.txt');
+  const isi =
+    `AKUN ADMIN PERTAMA ONELAB\r\n` +
+    `Dibuat otomatis pada ${new Date().toISOString()}\r\n\r\n` +
+    `Email    : ${email}\r\nPassword : ${password}\r\n\r\n` +
+    `Segera ganti kata sandi setelah masuk, lalu HAPUS berkas ini.\r\n`;
+  try { fs.writeFileSync(berkas, isi); } catch (_) {}
+
+  log(`[local-engine] akun admin pertama dibuat → ${berkas}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HTTP server
+// ═══════════════════════════════════════════════════════════════════════════
+function jsonRes(res, status, payload, extraHeaders = {}) {
+  const body = payload === undefined ? '' : JSON.stringify(payload);
+  res.writeHead(status, {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,PATCH,DELETE,OPTIONS',
+    ...extraHeaders,
+  });
+  res.end(body);
+}
+
+async function createEngine({ platformDir, dataDir, port = 54329, log = console.log }) {
+  const { PGlite } = await import('@electric-sql/pglite');   // ESM dari CJS
+  const pg = dataDir ? await PGlite.create({ dataDir }) : await new PGlite();
+
+  const needInit = (await pg.query(`SELECT count(*)::int c FROM pg_tables WHERE schemaname='public'`)).rows[0].c < 5;
+  if (needInit) {
+    await loadSchema(pg, platformDir, log);
+    const seededCount = await seedProducts(pg, platformDir, log);
+    log(`[local-engine] initial seed completed: ${seededCount} products`);
+  }
+
+  // Autentikasi: tabel kredensial, rahasia penanda tangan, dan akun pertama.
+  // Dijalankan tiap boot (idempoten) supaya instalasi lama ikut mendapatkannya.
+  const SECRET = authSecret(dataDir);
+  await siapkanTabelAuth(pg);
+  await bootstrapAdmin(pg, dataDir, log);
+
+  // Tabel AVA Health juga disiapkan tiap boot, agar basis data lama ikut terisi.
+  await siapkanTabelAva(pg, log);
+
+  const server = http.createServer((req, res) => {
+    (async () => {
+      if (req.method === 'OPTIONS') return jsonRes(res, 204);
+      const u = new URL(req.url, 'http://localhost');
+      const p = u.pathname;
+      let bodyText = '';
+      for await (const chunk of req) bodyText += chunk;
+
+      try {
+        // ── AUTENTIKASI (nyata; kredensial di DB, token bertanda tangan) ──
+        if (p.startsWith('/auth/v1/')) {
+          const badan = () => { try { return JSON.parse(bodyText || '{}'); } catch (_) { return {}; } };
+          const gagal = (status, pesan) =>
+            jsonRes(res, status, { error: 'invalid_grant', error_description: pesan, msg: pesan });
+
+          // Susun jawaban sesi yang bentuknya sama dengan GoTrue/Supabase.
+          const buatSesi = async (baris) => {
+            const prof = await pg.query(
+              `SELECT role, full_name FROM public.user_profiles WHERE id=$1`, [baris.id]);
+            const role = (prof.rows[0] && prof.rows[0].role) || 'viewer';
+            const nama = (prof.rows[0] && prof.rows[0].full_name) || '';
+            const user = {
+              id: baris.id, email: baris.email, role: 'authenticated',
+              app_metadata: { role }, user_metadata: { full_name: nama, role },
+            };
+            return {
+              access_token: buatToken(SECRET, { sub: baris.id, email: baris.email, role, typ: 'access' }, AUTH_ACCESS_TTL),
+              token_type: 'bearer',
+              expires_in: AUTH_ACCESS_TTL,
+              refresh_token: buatToken(SECRET, { sub: baris.id, typ: 'refresh' }, AUTH_REFRESH_TTL),
+              user,
+            };
+          };
+
+          // GET /auth/v1/user — verifikasi sesi berjalan.
+          if (p === '/auth/v1/user') {
+            const payload = bacaToken(SECRET, tokenDariHeader(req));
+            if (!payload || payload.typ !== 'access') return jsonRes(res, 401, { message: 'Sesi tidak sah atau kedaluwarsa' });
+            const r = await pg.query(
+              `SELECT id, email, is_active FROM public.local_auth_users WHERE id=$1`, [payload.sub]);
+            if (!r.rows[0] || r.rows[0].is_active === false) return jsonRes(res, 401, { message: 'Akun tidak aktif' });
+            const prof = await pg.query(`SELECT role, full_name FROM public.user_profiles WHERE id=$1`, [payload.sub]);
+            const role = (prof.rows[0] && prof.rows[0].role) || 'viewer';
+            return jsonRes(res, 200, {
+              id: r.rows[0].id, email: r.rows[0].email, role: 'authenticated',
+              app_metadata: { role },
+              user_metadata: { full_name: (prof.rows[0] && prof.rows[0].full_name) || '', role },
+            });
+          }
+
+          if (p === '/auth/v1/logout') return jsonRes(res, 204);
+
+          if (p === '/auth/v1/token') {
+            const grant = u.searchParams.get('grant_type') || 'password';
+
+            if (grant === 'refresh_token') {
+              const payload = bacaToken(SECRET, badan().refresh_token || '');
+              if (!payload || payload.typ !== 'refresh') return gagal(401, 'Sesi kedaluwarsa, silakan masuk lagi');
+              const r = await pg.query(
+                `SELECT * FROM public.local_auth_users WHERE id=$1 AND is_active=true`, [payload.sub]);
+              if (!r.rows[0]) return gagal(401, 'Akun tidak aktif');
+              return jsonRes(res, 200, await buatSesi(r.rows[0]));
+            }
+
+            const { email, password } = badan();
+            if (!email || !password) return gagal(400, 'Email dan kata sandi wajib diisi');
+
+            const r = await pg.query(
+              `SELECT * FROM public.local_auth_users WHERE lower(email)=lower($1)`, [String(email).trim()]);
+            const baris = r.rows[0];
+
+            // Pesan sengaja sama untuk email tak dikenal maupun sandi salah,
+            // supaya tidak bocor akun mana yang benar-benar ada.
+            const PESAN_UMUM = 'Email atau kata sandi salah';
+            if (!baris) return gagal(400, PESAN_UMUM);
+            if (baris.is_active === false) return gagal(403, 'Akun dinonaktifkan. Hubungi administrator.');
+
+            if (baris.locked_until && new Date(baris.locked_until) > new Date()) {
+              const menit = Math.ceil((new Date(baris.locked_until) - Date.now()) / 60000);
+              return gagal(429, `Terlalu banyak percobaan gagal. Coba lagi dalam ${menit} menit.`);
+            }
+
+            if (!passwordCocok(password, baris.password_salt, baris.password_hash)) {
+              const gagalKe = (baris.failed_attempts || 0) + 1;
+              const kunci = gagalKe >= AUTH_MAX_GAGAL
+                ? new Date(Date.now() + AUTH_KUNCI_MENIT * 60000).toISOString() : null;
+              await pg.query(
+                `UPDATE public.local_auth_users SET failed_attempts=$1, locked_until=$2 WHERE id=$3`,
+                [kunci ? 0 : gagalKe, kunci, baris.id]);
+              return gagal(400, kunci
+                ? `Akun dikunci ${AUTH_KUNCI_MENIT} menit karena ${AUTH_MAX_GAGAL} kali gagal masuk.`
+                : PESAN_UMUM);
+            }
+
+            await pg.query(
+              `UPDATE public.local_auth_users SET failed_attempts=0, locked_until=NULL, last_login_at=now() WHERE id=$1`,
+              [baris.id]);
+            return jsonRes(res, 200, await buatSesi(baris));
+          }
+
+          if (p === '/auth/v1/signup') {
+            const { email, password } = badan();
+            if (!email || !password) return gagal(400, 'Email dan kata sandi wajib diisi');
+            if (String(password).length < 8) return gagal(400, 'Kata sandi minimal 8 karakter');
+
+            const ada = await pg.query(
+              `SELECT 1 FROM public.local_auth_users WHERE lower(email)=lower($1)`, [String(email).trim()]);
+            if (ada.rows[0]) return gagal(400, 'Email sudah terdaftar');
+
+            // Pendaftaran mandiri hanya boleh saat belum ada satu pun akun
+            // (bootstrap instalasi baru). Setelah itu penambahan pengguna
+            // menjadi wewenang administrator lewat modul Pengaturan Pengguna.
+            const jml = await pg.query(`SELECT count(*)::int c FROM public.local_auth_users`);
+            if (jml.rows[0].c > 0) return gagal(403, 'Pendaftaran mandiri ditutup. Minta administrator membuatkan akun.');
+
+            const id = crypto.randomUUID();
+            const salt = crypto.randomBytes(16).toString('hex');
+            await pg.query(
+              `INSERT INTO public.local_auth_users (id, email, password_hash, password_salt)
+               VALUES ($1,$2,$3,$4)`,
+              [id, String(email).trim(), hashPassword(password, salt), salt]);
+            await pg.query(
+              `INSERT INTO public.user_profiles (id, full_name, role) VALUES ($1,$2,'super_admin')
+               ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
+              [id, badan().full_name || String(email).split('@')[0]]);
+
+            const baru = await pg.query(`SELECT * FROM public.local_auth_users WHERE id=$1`, [id]);
+            return jsonRes(res, 200, await buatSesi(baru.rows[0]));
+          }
+
+          return jsonRes(res, 404, { message: 'Endpoint auth tidak dikenal' });
+        }
+
+        // ── Gerbang data: /rest/v1 dan /rpc wajib membawa token sah ──────────
+        // Tanpa ini, siapa pun yang bisa menjangkau porta 54329 dapat membaca
+        // seluruh basis data tanpa masuk terlebih dahulu.
+        if (p.startsWith('/rest/v1/') || p.startsWith('/rpc/')) {
+          if (!bacaToken(SECRET, tokenDariHeader(req))) {
+            return jsonRes(res, 401, { message: 'Silakan masuk terlebih dahulu', code: 'PGRST301' });
+          }
+        }
+
+        // ── SYNC ENDPOINTS (Git Push & Cloud Supabase Sync) ──
+        if (p === '/rest/v1/sync/git-push') {
+          try {
+            const { execSync } = require('child_process');
+            const cwd = platformDir || process.cwd();
+            const gitMsg = `Sync: Research updates, config & local database state [${new Date().toISOString().slice(0,10)}]`;
+            let out1 = '';
+            try { out1 += execSync('git add .', { cwd, encoding: 'utf8' }); } catch(e) {}
+            try { out1 += execSync(`git commit -m "${gitMsg}"`, { cwd, encoding: 'utf8' }); } catch(e) {}
+            let out2 = '';
+            try { out2 = execSync('git push origin main', { cwd, encoding: 'utf8' }); } catch(e) {
+              try { out2 = execSync('git push', { cwd, encoding: 'utf8' }); } catch(e2) { out2 = String(e && e.message || e); }
+            }
+            return jsonRes(res, 200, { ok: true, message: 'Git Push Selesai!', log: out1 + '\n' + out2 });
+          } catch(err) {
+            return jsonRes(res, 500, { ok: false, error: String(err && err.message || err) });
+          }
+        }
+
+        if (p === '/rest/v1/sync/supabase-cloud') {
+          try {
+            const tables = ['user_profiles', 'products', 'ava_consultations', 'ava_device_readings', 'ava_calibration_badges', 'partners'];
+            let totalSynced = 0;
+            const syncedList = [];
+
+            for (const tbl of tables) {
+              const r = await pg.query(`SELECT count(*)::int c FROM "${tbl}"`).catch(() => ({ rows: [{ c: 0 }] }));
+              const cnt = r.rows[0]?.c || 0;
+              if (cnt > 0) {
+                totalSynced += cnt;
+                syncedList.push(`${tbl} (${cnt} baris)`);
+              }
+            }
+            return jsonRes(res, 200, { ok: true, message: 'Sinkronisasi Cloud Supabase Selesai!', syncedList, totalSynced });
+          } catch(err) {
+            return jsonRes(res, 500, { ok: false, error: String(err && err.message || err) });
+          }
+        }
+        // ── RPC ──
+        const rpc = /^\/rest\/v1\/rpc\/([a-zA-Z0-9_]+)$/.exec(p);
+        if (rpc) { const out = await handleRpc(pg, rpc[1], bodyText); return jsonRes(res, out.status, out.rows); }
+        // ── REST tabel ──
+        const rest = /^\/rest\/v1\/([a-zA-Z0-9_]+)$/.exec(p);
+        if (rest) {
+          const headers = {}; for (const [k, v] of Object.entries(req.headers)) headers[k.toLowerCase()] = v;
+          const out = await handleRest(pg, req.method, rest[1], u.search.replace(/^\?/, ''), bodyText, headers);
+          const extra = {};
+          if (out.count != null) extra['Content-Range'] = `0-${Math.max(out.rows.length - 1, 0)}/${out.count}`;
+          if (out.error) return jsonRes(res, out.status, { message: out.error }, extra);
+          return jsonRes(res, out.status, out.rows, extra);
+        }
+        return jsonRes(res, 404, { message: 'not found: ' + p });
+      } catch (err) {
+        return jsonRes(res, 400, { message: String(err && err.message || err), hint: 'local-engine' });
+      }
+    })();
+  });
+
+  await new Promise(r => server.listen(port, '127.0.0.1', r));
+  log(`[local-engine] PostgREST shim ready → http://127.0.0.1:${port}`);
+  return { pg, server, port };
+}
+
+module.exports = { createEngine, loadSchema, seedProducts, splitStatements, handleRest, handleRpc };

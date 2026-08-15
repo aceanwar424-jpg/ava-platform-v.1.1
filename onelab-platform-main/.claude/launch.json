@@ -1,0 +1,13 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "onelab-web",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:\\Users\\acean\\AppData\\Local\\Temp\\claude\\D--onelab-platform-main-onelab-platform-main\\8f877a03-eef3-4dab-baee-f0c120910c6d\\scratchpad\\static-server.js"
+      ],
+      "port": 5178
+    }
+  ]
+}
