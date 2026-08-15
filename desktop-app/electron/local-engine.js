@@ -752,6 +752,33 @@ function tokenDariHeader(req) {
   return h.startsWith('Bearer ') ? h.slice(7).trim() : '';
 }
 
+// Cache kecil: matriks peran jarang berubah, tapi dicek pada tiap permintaan
+// yang menghapus data. Dikosongkan saat peran/izin diubah lewat aplikasi.
+const CACHE_IZIN = new Map();
+
+async function izinDariPeran(pg, role) {
+  if (!role) return [];
+  if (CACHE_IZIN.has(role)) return CACHE_IZIN.get(role);
+  try {
+    const r = await pg.query(
+      `SELECT permission_kode FROM public.role_permissions WHERE role_kode = $1`, [role]);
+    const daftar = r.rows.map(x => x.permission_kode);
+    CACHE_IZIN.set(role, daftar);
+    return daftar;
+  } catch (_) {
+    // Tabel RBAC belum ada (migrasi belum jalan) → jangan mengunci pengguna
+    // keluar dari sistemnya sendiri; kembalikan kosong dan biarkan pemanggil
+    // memutuskan. Lihat pemanggilnya: hanya operasi hapus yang dibatasi.
+    return [];
+  }
+}
+
+async function peranPunyaIzin(pg, role, izin) {
+  // Super admin selalu lolos, termasuk saat matriks belum sempat dimuat.
+  if (role === 'super_admin') return true;
+  return (await izinDariPeran(pg, role)).includes(izin);
+}
+
 async function siapkanTabelAuth(pg) {
   await pg.exec(`
     CREATE TABLE IF NOT EXISTS public.local_auth_users (
@@ -895,6 +922,24 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
           if (p === '/auth/v1/logout') return jsonRes(res, 204);
 
+          // Izin milik sesi berjalan. Sumbernya matriks di basis data, bukan
+          // localStorage — klien memakai ini hanya untuk MENYEMBUNYIKAN menu;
+          // penegakan sesungguhnya tetap di server.
+          if (p === '/auth/v1/permissions') {
+            const payload = bacaToken(SECRET, tokenDariHeader(req));
+            if (!payload || payload.typ !== 'access') return jsonRes(res, 401, { message: 'Sesi tidak sah' });
+            const izin = payload.role === 'super_admin'
+              ? (await pg.query(`SELECT kode FROM public.permissions`).catch(() => ({ rows: [] }))).rows.map(r => r.kode)
+              : await izinDariPeran(pg, payload.role);
+            const halaman = await pg.query(
+              `SELECT page FROM public.role_pages WHERE role_kode = $1`, [payload.role]).catch(() => ({ rows: [] }));
+            return jsonRes(res, 200, {
+              role: payload.role,
+              permissions: izin,
+              pages: halaman.rows.map(r => r.page),
+            });
+          }
+
           if (p === '/auth/v1/token') {
             const grant = u.searchParams.get('grant_type') || 'password';
 
@@ -992,8 +1037,21 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
         // Tanpa ini, siapa pun yang bisa menjangkau porta 54329 dapat membaca
         // seluruh basis data tanpa masuk terlebih dahulu.
         if (p.startsWith('/rest/v1/') || p.startsWith('/rpc/')) {
-          if (!bacaToken(SECRET, tokenDariHeader(req))) {
+          const sesi = bacaToken(SECRET, tokenDariHeader(req));
+          if (!sesi) {
             return jsonRes(res, 401, { message: 'Silakan masuk terlebih dahulu', code: 'PGRST301' });
+          }
+
+          // Penegakan izin di SISI SERVER. Pengecekan di peramban tidak bisa
+          // dipercaya: daftar hak akses dulu disimpan di localStorage dan bisa
+          // ditulis ulang lewat DevTools. Di sini peran diambil dari token yang
+          // ditandatangani, lalu dicocokkan ke matriks di basis data.
+          const perluIzin = req.method === 'DELETE' ? 'data.delete' : null;
+          if (perluIzin && !(await peranPunyaIzin(pg, sesi.role, perluIzin))) {
+            return jsonRes(res, 403, {
+              message: `Peran "${sesi.role}" tidak berwenang menghapus data`,
+              code: 'PGRST403', required: perluIzin,
+            });
           }
         }
 
