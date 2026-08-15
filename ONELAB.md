@@ -114,7 +114,7 @@ Bagian ini tidak boleh dilanggar tanpa persetujuan manusia yang eksplisit.
 - Token ditandatangani **HMAC-SHA256** dengan rahasia per-instalasi di folder data.
 - Peran dibaca dari `user_profiles.role` — sumber kebenaran yang sama untuk mode lokal maupun cloud.
 - `/rest/v1` menolak permintaan tanpa token sah. Akun terkunci 15 menit setelah 5 kali gagal.
-- **Kunci API tidak boleh masuk bundel peramban.** Siapa pun bisa membacanya lewat DevTools. Fitur AI di web menunggu proxy sisi server.
+- **Kunci API tidak boleh masuk bundel peramban.** Siapa pun bisa membacanya lewat DevTools. Semua panggilan LLM wajib lewat gerbang sisi server: Edge Function `llm-gateway` di mode cloud, dan `/functions/v1/llm-gateway` pada engine lokal. Peramban hanya menerima cuplikan kunci untuk tampilan status, tidak pernah nilainya.
 
 ### 5.2 Legal & kepemilikan (IP)
 - Jangan menggabungkan aset milik OneLab (data, dokumen, kode kantor) ke produk generik tanpa kejelasan lisensi. Tandai tiap aset: `OWNED_BY: onelab | personal | generic`.
@@ -226,6 +226,6 @@ Dicatat terbuka agar tidak hilang:
 1. **`desktop-app/` masih di luar git.** Engine, autentikasi, dan launcher tidak ter-versi di mana pun. Ini alasan utama Fase 1 mendahulukan git tunggal di root.
 2. **Dua project Supabase** tercatat di konfigurasi; hanya `rmyqzyfvlmjxtatpctks` yang benar-benar dipakai kode. Yang satu lagi perlu dipastikan lalu dibersihkan.
 3. **Kunci yang pernah tertulis di berkas kerja perlu dirotasi** di dashboard penyedia masing-masing.
-4. **Fitur AI di web produksi tidak berkunci** — menunggu proxy sisi server (Fase 1).
+4. **Kunci Gemini kedua (`AQ.A…ZJDw`) ditolak Google** — bukan kehabisan kuota, melainkan tidak sah/dicabut; tidak akan pulih sendiri. Perlu diterbitkan ulang di Google AI Studio lalu diganti di `desktop-app/.env`. Sementara ini gerbang otomatis melewatinya, jadi fitur AI tetap jalan dengan satu kunci.
 5. **Portal korporat & dokter referral** belum aktif sebagai portal eksternal mandiri; fiturnya sudah ada di dalam aplikasi customer, tetapi akses bertoken bercakupan terbatas belum dibangun.
 6. **`App.tsx:189`** menyimpan error tipe lama (`harga_normal` string vs number) yang tidak memblokir build karena `vite build` tidak melakukan type-check.

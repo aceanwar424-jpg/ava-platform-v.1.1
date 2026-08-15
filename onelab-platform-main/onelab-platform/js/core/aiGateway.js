@@ -12,8 +12,9 @@ const AIGateway = {
     refillWindowMinutes: 60,
     cacheEnabled: true,
     cacheTTLHours: 168,
-    primaryModel: 'gemini-2.5-flash',
-    fallbackModel: 'gemini-2.0-flash'
+    // Alias, bukan versi yang dipatok — lihat catatan di local-engine.js.
+    primaryModel: 'gemini-flash-latest',
+    fallbackModel: 'gemini-flash-lite-latest'
   },
   
   state: {
@@ -27,9 +28,37 @@ const AIGateway = {
     activeKeyIndex: 0
   },
 
-  // Sumber kunci, berurutan:
-  //   1. window.ONELAB_KEYS → js/config.local.js (diblok .gitignore)
-  //   2. localStorage       → kunci yang ditambah lewat UI Monitor Kuota
+  // Status kunci diambil dari GERBANG (server), bukan dari peramban.
+  // Panggilan LLM sendiri sudah lama lewat llm-gateway — kunci tidak pernah
+  // dibutuhkan di sisi peramban, dan memang tidak boleh ada di sana karena
+  // bisa dibaca siapa pun lewat DevTools. Endpoint ini hanya mengembalikan
+  // cuplikan kunci (4 huruf depan/belakang) untuk ditampilkan, bukan nilainya.
+  async loadKeysFromGateway() {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway/status`, {
+        headers: { ...SB_HEADERS },
+      });
+      if (!res.ok) return false;
+      const d = await res.json();
+      if (!d || !Array.isArray(d.keys)) return false;
+
+      this.state.keyPool = d.keys.map((k, i) => ({
+        id: k.alias || `key-${i + 1}`,
+        provider: d.provider || 'Gerbang LLM',
+        key: '',                       // sengaja kosong: peramban tidak memegang kunci
+        snippet: k.snippet || k.alias,
+        status: k.status || 'ACTIVE',
+        requestsToday: 0, tokensToday: 0,
+        exhaustedAt: null,
+        resetAt: k.resetAt || null,
+      }));
+      this.state.sumber = 'gateway';
+      return true;
+    } catch (e) { return false; }
+  },
+
+  // Cadangan bila gerbang tidak tersedia (mis. deployment lama).
+  // Sumber: window.ONELAB_KEYS → js/config.local.js, lalu localStorage.
   loadKeys() {
     const seen = new Set();
     const pool = [];
@@ -76,9 +105,11 @@ const AIGateway = {
     } catch (e) { /* kuota localStorage penuh — tidak fatal */ }
   },
 
-  init() {
-    this.loadKeys();
-    console.log(`[AI Gateway] Initialized — ${this.state.keyPool.length} key dalam pool.`);
+  async init() {
+    const dariGerbang = await this.loadKeysFromGateway();
+    if (!dariGerbang) this.loadKeys();
+    console.log(`[AI Gateway] Initialized — ${this.state.keyPool.length} key ` +
+                `(sumber: ${dariGerbang ? 'gerbang server' : 'konfigurasi lokal'}).`);
     this.checkAutoRecovery();
     // Periodic health check every 30 seconds
     setInterval(() => this.checkAutoRecovery(), 30000);

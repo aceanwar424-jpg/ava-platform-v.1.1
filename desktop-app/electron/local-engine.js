@@ -96,6 +96,170 @@ async function loadSchema(pg, repoDir, log = () => {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// GERBANG LLM LOKAL  (POST /functions/v1/llm-gateway)
+//
+// Di mode cloud, permintaan LLM ditangani Supabase Edge Function dengan nama
+// dan bentuk permintaan yang sama. Engine lokal tidak punya edge function,
+// sehingga tanpa ini seluruh fitur AI mati saat aplikasi dipakai offline.
+//
+// Kunci dibaca DI SISI SERVER (proses Electron) dari desktop-app/.env — tidak
+// pernah dikirim ke peramban. Ini yang membedakannya dari menaruh kunci di
+// berkas JavaScript: apa pun yang sampai ke peramban bisa dibaca siapa saja
+// lewat DevTools.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function bacaEnvSederhana(file) {
+  const out = {};
+  try {
+    for (const baris of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+      const t = baris.trim();
+      if (!t || t.startsWith('#')) continue;
+      const i = t.indexOf('=');
+      if (i > 0) out[t.slice(0, i).trim()] = t.slice(i + 1).trim();
+    }
+  } catch (_) { /* berkas tidak ada → tidak apa-apa */ }
+  return out;
+}
+
+function muatKunciLLM() {
+  // Urutan: variabel lingkungan proses → desktop-app/.env di samping kode.
+  const env = { ...bacaEnvSederhana(path.join(__dirname, '..', '.env')), ...process.env };
+  const gabung = (s) => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+  const kunci = [...new Set([...gabung(env.GEMINI_API_KEYS), ...gabung(env.GEMINI_API_KEY)])];
+  return {
+    kunci,
+    // Sengaja memakai alias "-latest", bukan versi yang dipatok. Nama versi
+    // tertentu bisa ditarik ("no longer available to new users") dan diam-diam
+    // mematikan seluruh fitur AI; alias ikut bergeser ke model terkini.
+    model: env.GEMINI_MODEL || 'gemini-flash-latest',
+    modelRingan: env.GEMINI_MODEL_LIGHT || 'gemini-flash-lite-latest',
+  };
+}
+
+const LLM = { idx: 0, gagal: new Map() };   // rotasi round-robin + tanda kunci kehabisan kuota
+
+async function panggilGemini({ kunci, model, system, prompt, temperature, maxTokens }) {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(kunci)}`;
+  const body = {
+    contents: [{ role: 'user', parts: [{ text: String(prompt || '') }] }],
+    generationConfig: {
+      temperature: temperature != null ? temperature : 0.2,
+      maxOutputTokens: maxTokens || 2500,
+    },
+  };
+  if (system) body.systemInstruction = { parts: [{ text: String(system) }] };
+
+  const res = await fetch(url, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const pesan = (data && data.error && data.error.message) || `HTTP ${res.status}`;
+    const err = new Error(pesan);
+    err.status = res.status;
+    throw err;
+  }
+  const kandidat = (data.candidates || [])[0] || {};
+  const bagian = (kandidat.content || {}).parts || [];
+  // Model generasi baru memakai sebagian anggaran token untuk "thinking";
+  // bagian itu tidak membawa .text. Kalau seluruh anggaran habis di sana,
+  // jawabannya kosong — itu harus dilaporkan, bukan dikembalikan sebagai "".
+  const hasil = bagian.map(p => p.text || '').join('').trim();
+  if (!hasil) {
+    const sebab = kandidat.finishReason || 'tidak diketahui';
+    const err = new Error(sebab === 'MAX_TOKENS'
+      ? 'Jawaban kosong: anggaran token habis sebelum teks dihasilkan. Naikkan maxTokens.'
+      : `Jawaban kosong dari model (finishReason: ${sebab}).`);
+    err.kosong = true;
+    throw err;
+  }
+  return hasil;
+}
+
+async function tanganiLlmGateway(bodyText, log = () => {}) {
+  const mulai = Date.now();
+  let permintaan = {};
+  try { permintaan = JSON.parse(bodyText || '{}'); } catch (_) {}
+
+  const { kunci, model, modelRingan } = muatKunciLLM();
+  if (!kunci.length) {
+    return { status: 503, payload: {
+      error: 'Belum ada kunci LLM di sisi server. Isi GEMINI_API_KEYS pada desktop-app/.env, lalu jalankan ulang aplikasi.' } };
+  }
+
+  const dipakai = permintaan.model || (permintaan.tier === 'light' ? modelRingan : model);
+  const sekarang = Date.now();
+  let galatTerakhir = null;
+
+  // Coba tiap kunci sekali, mulai dari giliran berikutnya. Kunci yang baru saja
+  // kena 429 dilewati sampai jendela pendinginannya lewat.
+  for (let i = 0; i < kunci.length; i++) {
+    const idx = (LLM.idx + i) % kunci.length;
+    const tanda = LLM.gagal.get(idx);
+    if (tanda && tanda.sampai > sekarang) continue;
+
+    try {
+      const text = await panggilGemini({
+        kunci: kunci[idx], model: dipakai,
+        system: permintaan.system, prompt: permintaan.prompt,
+        temperature: permintaan.temperature, maxTokens: permintaan.maxTokens,
+      });
+      LLM.idx = (idx + 1) % kunci.length;    // rotasi supaya beban menyebar
+      LLM.gagal.delete(idx);
+      return { status: 200, payload: {
+        text, provider: 'GEMINI', model: dipakai, cached: false,
+        keyAlias: `key-${idx + 1}`, latencyMs: Date.now() - mulai } };
+    } catch (e) {
+      galatTerakhir = e;
+
+      if (e.status === 429 || /quota|RESOURCE_EXHAUSTED/i.test(e.message || '')) {
+        LLM.gagal.set(idx, { sampai: Date.now() + 60 * 60 * 1000, sebab: 'KUOTA_HABIS' });
+        log(`[llm] kunci ke-${idx + 1} kena kuota, dialihkan ke kunci berikutnya`);
+        continue;
+      }
+
+      // Kunci tidak sah / dicabut: bukan soal kuota, tidak akan pulih sendiri.
+      // Ditandai lama agar tidak dicoba terus, lalu lanjut ke kunci berikutnya —
+      // satu kunci mati tidak boleh mematikan seluruh fitur AI.
+      if (e.status === 400 || e.status === 401 || e.status === 403 ||
+          /invalid authentication|API key not valid|PERMISSION_DENIED/i.test(e.message || '')) {
+        LLM.gagal.set(idx, { sampai: Date.now() + 24 * 60 * 60 * 1000, sebab: 'KUNCI_DITOLAK' });
+        log(`[llm] kunci ke-${idx + 1} DITOLAK (tidak sah/dicabut) — perlu diganti`);
+        continue;
+      }
+
+      break;   // galat lain (mis. jawaban kosong) → mengganti kunci tidak menolong
+    }
+  }
+
+  return { status: 502, payload: {
+    error: `Gerbang LLM gagal: ${galatTerakhir && galatTerakhir.message ? galatTerakhir.message : 'semua kunci kehabisan kuota'}`,
+    latencyMs: Date.now() - mulai } };
+}
+
+// Ringkasan status untuk penanda kuota di antarmuka — TANPA membocorkan kunci.
+function ringkasanKunciLLM() {
+  const { kunci, model } = muatKunciLLM();
+  const sekarang = Date.now();
+  return {
+    provider: 'GEMINI', model, total: kunci.length,
+    keys: kunci.map((k, i) => {
+      const t = LLM.gagal.get(i);
+      const bermasalah = t && t.sampai > sekarang;
+      return {
+        alias: `key-${i + 1}`,
+        snippet: k.slice(0, 4) + '…' + k.slice(-4),
+        // Dibedakan dengan sengaja: kuota habis akan pulih sendiri, kunci
+        // ditolak tidak akan — dan menampilkan keduanya sebagai "kuota habis"
+        // membuat orang menunggu sesuatu yang tidak akan pernah terjadi.
+        status: bermasalah ? (t.sebab === 'KUNCI_DITOLAK' ? 'KUNCI_DITOLAK' : 'EXHAUSTED_429') : 'ACTIVE',
+        resetAt: bermasalah ? t.sampai : null,
+      };
+    }),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // MIGRASI SKEMA BERNOMOR
 //
 // Pemuatan skema massal (loadSchema) hanya cocok untuk membangun basis data
@@ -810,6 +974,18 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           }
 
           return jsonRes(res, 404, { message: 'Endpoint auth tidak dikenal' });
+        }
+
+        // ── Gerbang LLM: setara Edge Function llm-gateway di mode cloud ─────
+        // Tetap menuntut sesi sah — tanpa itu siapa pun yang menjangkau porta
+        // ini bisa memakai kuota LLM berbayar milik pemilik instalasi.
+        if (p.startsWith('/functions/v1/llm-gateway')) {
+          if (!bacaToken(SECRET, tokenDariHeader(req))) {
+            return jsonRes(res, 401, { error: 'Silakan masuk terlebih dahulu' });
+          }
+          if (p.endsWith('/status')) return jsonRes(res, 200, ringkasanKunciLLM());
+          const { status, payload } = await tanganiLlmGateway(bodyText, log);
+          return jsonRes(res, status, payload);
         }
 
         // ── Gerbang data: /rest/v1 dan /rpc wajib membawa token sah ──────────
