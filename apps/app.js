@@ -219,6 +219,10 @@ function showView(viewId, viewTitle) {
   if (viewId === 'book-examination-view') renderBookExamination();
   else if (viewId === 'examination-approval-view') renderExamApproval();
   else if (viewId === 'examination-history-view') renderExamHistory();
+  else if (viewId === 'ava-consult-view') renderAvaConsult();
+  else if (viewId === 'ava-marketplace-view') renderAvaMarketplace();
+  else if (viewId === 'ava-devices-view') renderAvaDevices();
+  else if (viewId === 'ava-caregiver-view') renderAvaCaregiver();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -226,9 +230,10 @@ function showView(viewId, viewTitle) {
 
   // Sync Active Sidebar Link
   document.querySelectorAll('.sidebar-link').forEach(link => {
-    const isTarget = link.getAttribute('onclick').includes(viewId) || 
-                     (viewId === 'patient-view' && link.getAttribute('onclick').includes('patient-view'));
-    link.classList.toggle('active', isTarget);
+    // Sebagian tautan memanggil modal, bukan showView, jadi atribut onclick
+    // tidak dijamin ada — baca dengan aman agar navigasi tak pernah crash.
+    const aksi = link.getAttribute('onclick') || '';
+    link.classList.toggle('active', aksi.includes(viewId));
   });
 
   // Close sidebar drawer on mobile
@@ -293,15 +298,33 @@ function renderSidebarMenu() {
     // Referral specific
     filePlus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>',
     wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M16 8h4v8h-4z"/></svg>',
+
+    // AVA Health
+    consult: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>',
+    market:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+    device:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="6" width="14" height="12" rx="3"/><path d="M8 6V3h8v3M8 18v3h8v-3"/></svg>',
+    care:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
   };
 
   if (currentRole === 'patient') {
+    // Menu pasien digabung: layanan OneLab (lab, home care, paket) dan
+    // layanan AVA Health (telekonsultasi, alkes, wearable, caregiver)
+    // berdiri sejajar dalam satu daftar — bukan dua ekosistem terpisah.
     navContainer.innerHTML = `
+      <div class="sidebar-section">Layanan</div>
+      <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab')">${I.lab}<span>Pesan Lab</span></a>
+      <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Care')">${I.home}<span>Home Care</span></a>
+      <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
+      <a class="sidebar-link" onclick="showView('ava-consult-view', 'Telekonsultasi Dokter')">${I.consult}<span>Telekonsultasi</span></a>
+      <a class="sidebar-link" onclick="showView('ava-marketplace-view', 'Sewa &amp; Beli Alkes')">${I.market}<span>Sewa &amp; Beli Alkes</span></a>
+
+      <div class="sidebar-section">Kesehatan Saya</div>
       <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">${I.dashboard}<span>Dashboard Utama</span></a>
       <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">${I.medrec}<span>Rekam Medis (EHR)</span></a>
-      <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab')">${I.lab}<span>Book Lab Test</span></a>
-      <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Care')">${I.home}<span>Book Home Care</span></a>
-      <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Buy Package</span></a>
+      <a class="sidebar-link" onclick="showView('ava-devices-view', 'Perangkat &amp; Wearables')">${I.device}<span>Perangkat &amp; Wearables</span></a>
+      <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Keluarga')">${I.care}<span>Caregiver &amp; Keluarga</span></a>
+
+      <div class="sidebar-section">Lainnya</div>
       <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">${I.mapPin}<span>Cabang Terdekat</span></a>
       <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">${I.profile}<span>My Profile</span></a>
     `;
@@ -310,7 +333,7 @@ function renderSidebarMenu() {
     const canRequest = isSA || !currentCorpRole || currentCorpRole === 'requestor';
     const canApprove = isSA || !currentCorpRole || currentCorpRole === 'approver';
     navContainer.innerHTML = `
-      <div class="sidebar-section">Company</div>
+      <div class="sidebar-section">Korporat</div>
       <a class="sidebar-link active" onclick="showView('corporate-view', 'Home')">${I.home}<span>Home</span></a>
       <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Employee</span></a>
       ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Book Examination</span></a>` : ''}
@@ -320,11 +343,173 @@ function renderSidebarMenu() {
     `;
   } else if (currentRole === 'referral') {
     navContainer.innerHTML = `
+      <div class="sidebar-section">Kemitraan</div>
       <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">${I.dashboard}<span>Riwayat Rujukan</span></a>
       <a class="sidebar-link" onclick="openReferralForm()">${I.filePlus}<span>Buat Rujukan Baru</span></a>
       <a class="sidebar-link" onclick="openWithdrawFeeModal()">${I.wallet}<span>Tarik Komisi</span></a>
     `;
   }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// AVA HEALTH — layanan wellness di dalam portal customer
+// Dirender saat view dibuka (lihat showView), bukan saat boot, supaya
+// tidak menambah waktu muat halaman untuk pengguna yang tidak membukanya.
+// ════════════════════════════════════════════════════════════════════
+
+const avaRupiah = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+
+// Pengambilan data khusus AVA. Sengaja TIDAK memakai sbGet(): helper itu
+// menangkap semua kesalahan dan mengembalikan array kosong, sehingga tabel
+// yang hilang atau sesi yang kedaluwarsa tampak sama dengan "belum ada data".
+// Di sini kegagalan harus terlihat.
+async function avaAmbil(table, query) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, { headers: { ...SB_HEADERS } });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error((data && (data.message || data.hint)) || `HTTP ${res.status}`);
+  return Array.isArray(data) ? data : [];
+}
+
+// Kartu kosong yang seragam — lebih jelas daripada area kosong tanpa keterangan.
+function avaKosong(pesan) {
+  return `<div class="glass-card" style="padding:28px; text-align:center; background:#ffffff;">
+    <div style="font-size:13px; color:var(--text-muted);">${pesan}</div>
+  </div>`;
+}
+
+function avaGagal(e) {
+  return `<div class="glass-card" style="padding:20px; background:#fff5f5; border-color:#fecaca;">
+    <div style="font-size:13px; color:#b91c1c;">Gagal memuat data: ${e && e.message ? e.message : e}</div>
+  </div>`;
+}
+
+async function renderAvaConsult() {
+  const box = document.getElementById('ava-consult-list');
+  if (!box) return;
+  box.innerHTML = avaKosong('Memuat...');
+  try {
+    const rows = await avaAmbil('ava_consultations', 'select=*&order=created_at.desc&limit=25');
+    if (!rows || !rows.length) return void (box.innerHTML = avaKosong('Belum ada riwayat konsultasi.'));
+
+    const warna = { urgent: '#dc2626', priority: '#d97706', normal: '#0f766e' };
+    box.innerHTML = rows.map(r => `
+      <div class="glass-card" style="padding:14px 18px; background:#ffffff; margin-bottom:10px; display:flex; justify-content:space-between; gap:16px; align-items:flex-start;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:14px; font-weight:700; color:#0f2963;">${r.complaint || 'Tanpa keluhan tertulis'}</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">
+            ${r.doctor_name ? 'dr. ' + r.doctor_name : 'Menunggu dokter'}
+            &bull; ${r.created_at ? new Date(r.created_at).toLocaleDateString('id-ID') : '-'}
+          </div>
+        </div>
+        <div style="text-align:right; white-space:nowrap;">
+          <div style="font-size:11px; font-weight:700; color:${warna[r.triage_level] || warna.normal};">${(r.triage_level || 'normal').toUpperCase()}</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">${r.status || 'pending'}</div>
+        </div>
+      </div>`).join('');
+  } catch (e) { box.innerHTML = avaGagal(e); }
+}
+
+async function submitAvaConsult(ev) {
+  ev.preventDefault();
+  const input = document.getElementById('ac-complaint');
+  const keluhan = (input.value || '').trim();
+  if (!keluhan) return;
+
+  const btn = ev.target.querySelector('button[type=submit]');
+  const labelAsli = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Mengirim...';
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/ava_consultations`, {
+      method: 'POST', headers: SB_HEADERS,
+      body: JSON.stringify({
+        patient_name: (typeof currentUserName !== 'undefined' && currentUserName) || 'Pasien',
+        complaint: keluhan, triage_level: 'normal', status: 'pending',
+      }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    input.value = '';
+    await renderAvaConsult();
+  } catch (e) {
+    alert('Gagal mengirim permintaan konsultasi: ' + (e.message || e));
+  } finally {
+    btn.disabled = false; btn.textContent = labelAsli;
+  }
+}
+
+async function renderAvaMarketplace() {
+  const box = document.getElementById('ava-marketplace-list');
+  if (!box) return;
+  box.innerHTML = avaKosong('Memuat...');
+  try {
+    const rows = await avaAmbil('ava_marketplace_items', 'select=*&order=created_at.desc&limit=40');
+    if (!rows || !rows.length) return void (box.innerHTML = avaKosong('Belum ada alat yang ditawarkan.'));
+
+    box.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px;">
+      ${rows.map(r => {
+        const verified = (r.badge_status || '') === 'verified';
+        return `<div class="glass-card" style="padding:16px; background:#ffffff;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:flex-start;">
+            <div style="font-size:14px; font-weight:700; color:#0f2963;">${r.title || '-'}</div>
+            ${verified ? '<span style="font-size:9.5px; font-weight:800; color:#0f766e; background:#ccfbf1; padding:3px 7px; border-radius:999px; white-space:nowrap;">AVA VERIFIED</span>' : ''}
+          </div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">${r.vendor_name || 'Vendor tidak tercatat'}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px;">
+            <strong style="color:var(--teal); font-size:14px;">${avaRupiah(r.price)}</strong>
+            <span style="font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-muted);">${r.type || 'sewa'}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } catch (e) { box.innerHTML = avaGagal(e); }
+}
+
+async function renderAvaDevices() {
+  const box = document.getElementById('ava-devices-list');
+  if (!box) return;
+  box.innerHTML = avaKosong('Memuat...');
+  try {
+    const rows = await avaAmbil('ava_device_readings', 'select=*&order=created_at.desc&limit=40');
+    if (!rows || !rows.length) return void (box.innerHTML = avaKosong('Belum ada perangkat yang tertaut.'));
+
+    box.innerHTML = rows.map(r => {
+      const siaga = (r.alert_status || 'normal') !== 'normal';
+      return `<div class="glass-card" style="padding:14px 18px; background:#ffffff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:16px; ${siaga ? 'border-color:#fecaca;' : ''}">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:#0f2963;">${r.device_name || 'Perangkat'}</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">
+            ${r.device_type || '-'} &bull; ${r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-'}
+          </div>
+        </div>
+        <div style="text-align:right; white-space:nowrap;">
+          <div style="font-size:17px; font-weight:800; color:${siaga ? '#dc2626' : '#0f2963'};">
+            ${r.reading_value || '-'} <span style="font-size:11px; font-weight:600; color:var(--text-muted);">${r.unit || ''}</span>
+          </div>
+          ${siaga ? `<div style="font-size:10.5px; font-weight:700; color:#dc2626; margin-top:2px;">${String(r.alert_status).toUpperCase()}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) { box.innerHTML = avaGagal(e); }
+}
+
+async function renderAvaCaregiver() {
+  const box = document.getElementById('ava-caregiver-list');
+  if (!box) return;
+  box.innerHTML = avaKosong('Memuat...');
+  try {
+    const rows = await avaAmbil('ava_caregiver_links', 'select=*&order=created_at.desc&limit=30');
+    if (!rows || !rows.length) return void (box.innerHTML = avaKosong('Belum ada caregiver yang diberi izin.'));
+
+    box.innerHTML = rows.map(r => `
+      <div class="glass-card" style="padding:14px 18px; background:#ffffff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:16px;">
+        <div>
+          <div style="font-size:14px; font-weight:700; color:#0f2963;">${r.caregiver_name || '-'}</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">${r.relation || 'Hubungan tidak tercatat'}</div>
+        </div>
+        <span style="font-size:10.5px; font-weight:700; color:#0f766e; background:#ccfbf1; padding:4px 10px; border-radius:999px;">
+          ${r.permission_scope || 'akses terbatas'}
+        </span>
+      </div>`).join('');
+  } catch (e) { box.innerHTML = avaGagal(e); }
 }
 
 // Switch EHR sub tabs (Lab, Radiology, Resume Medis)

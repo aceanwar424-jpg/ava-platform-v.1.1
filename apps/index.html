@@ -1079,6 +1079,55 @@
         </div>
       </div>
 
+      <!-- ════════════ VIEW AVA HEALTH ════════════
+           Empat layanan wellness yang sebelumnya hanya ada di sistem staf.
+           Isi tiap panel dirender app.js dari tabel ava_* saat view dibuka. -->
+
+      <!-- ──────── VIEW: TELEKONSULTASI DOKTER ──────── -->
+      <div id="ava-consult-view" class="view-panel">
+        <div class="section-title" style="margin-bottom:16px; color:#0f2963;">Telekonsultasi Dokter</div>
+        <div class="glass-card" style="padding:20px; background:#ffffff; margin-bottom:20px;">
+          <h4 style="margin:0 0 4px; font-size:15px; color:#0f2963;">Mulai Konsultasi Baru</h4>
+          <p style="font-size:12px; color:var(--text-muted); margin:0 0 16px;">Ceritakan keluhan Anda. Dokter akan menghubungi sesuai antrean.</p>
+          <form onsubmit="submitAvaConsult(event)">
+            <div class="input-group" style="text-align:left;">
+              <label for="ac-complaint">Keluhan</label>
+              <input type="text" id="ac-complaint" placeholder="Contoh: demam 3 hari disertai batuk" required>
+            </div>
+            <button type="submit" class="btn btn-teal" style="margin-top:12px; width:auto; padding:10px 24px;">Kirim Permintaan</button>
+          </form>
+        </div>
+        <div class="section-title" style="margin-bottom:12px; font-size:14px;">Riwayat Konsultasi</div>
+        <div id="ava-consult-list"></div>
+      </div>
+
+      <!-- ──────── VIEW: MARKETPLACE & SEWA ALKES ──────── -->
+      <div id="ava-marketplace-view" class="view-panel">
+        <div class="section-title" style="margin-bottom:6px; color:#0f2963;">Sewa &amp; Beli Alat Kesehatan</div>
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 18px;">
+          Alat bertanda <strong>AVA Verified</strong> sudah lolos verifikasi sertifikat kalibrasi.
+        </p>
+        <div id="ava-marketplace-list"></div>
+      </div>
+
+      <!-- ──────── VIEW: PERANGKAT & WEARABLES ──────── -->
+      <div id="ava-devices-view" class="view-panel">
+        <div class="section-title" style="margin-bottom:6px; color:#0f2963;">Perangkat &amp; Wearables</div>
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 18px;">
+          Pembacaan terakhir dari perangkat yang tertaut ke akun Anda.
+        </p>
+        <div id="ava-devices-list"></div>
+      </div>
+
+      <!-- ──────── VIEW: CAREGIVER & KELUARGA ──────── -->
+      <div id="ava-caregiver-view" class="view-panel">
+        <div class="section-title" style="margin-bottom:6px; color:#0f2963;">Caregiver &amp; Keluarga</div>
+        <p style="font-size:12px; color:var(--text-muted); margin:0 0 18px;">
+          Orang yang Anda beri izin memantau kesehatan Anda, beserta cakupan aksesnya.
+        </p>
+        <div id="ava-caregiver-list"></div>
+      </div>
+
       <!-- ──────── VIEW: MY PROFILE (VIRTU STYLE) ──────── -->
       <div id="profile-view" class="view-panel">
         <div class="section-title" style="margin-bottom: 16px;">Profil Saya &bull; Akun Terverifikasi</div>
