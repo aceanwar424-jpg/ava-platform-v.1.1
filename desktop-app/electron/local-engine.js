@@ -96,6 +96,70 @@ async function loadSchema(pg, repoDir, log = () => {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// OUTBOX SINKRONISASI
+//
+// Setiap perubahan data dicatat SETELAH berhasil tersimpan di basis data
+// lokal. Urutannya penting: pekerjaan klinik tidak boleh gagal hanya karena
+// jaringan bermasalah, jadi penulisan lokal selesai dulu, pengiriman menyusul.
+//
+// Tabel infrastruktur tidak ikut dicatat — mencatat outbox ke dalam outbox
+// akan beranak tanpa henti, dan tabel sesi/izin milik tiap instalasi.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const TABEL_TIDAK_DISINKRON = new Set([
+  'sync_outbox', 'sync_state', 'schema_migrations',
+  'local_auth_users',                       // kredensial: milik instalasi ini saja
+  'roles', 'permissions', 'role_permissions', 'role_pages',
+]);
+
+const PETA_OPERASI = { POST: 'INSERT', PATCH: 'UPDATE', PUT: 'UPDATE', DELETE: 'DELETE' };
+
+async function catatOutbox(pg, { method, tabel, penyaring, bodyText, hasil, log = () => {} }) {
+  const operasi = PETA_OPERASI[method];
+  if (!operasi || TABEL_TIDAK_DISINKRON.has(tabel)) return;
+
+  let muatan = null;
+  try { muatan = bodyText ? JSON.parse(bodyText) : null; } catch (_) { muatan = null; }
+
+  // Simpan identitas baris hasil bila ada, supaya sisi cloud bisa mencocokkan.
+  let kunci = null;
+  try {
+    if (Array.isArray(hasil) && hasil.length && hasil[0] && hasil[0].id != null) {
+      kunci = hasil.map(r => r.id).slice(0, 200);
+    }
+  } catch (_) {}
+
+  try {
+    await pg.query(
+      `INSERT INTO public.sync_outbox (tabel, operasi, penyaring, muatan, hasil_kunci)
+       VALUES ($1,$2,$3,$4,$5)`,
+      [tabel, operasi, penyaring || null,
+       muatan ? JSON.stringify(muatan) : null,
+       kunci ? JSON.stringify(kunci) : null]);
+  } catch (e) {
+    // Outbox gagal TIDAK boleh membatalkan pekerjaan yang sudah tersimpan.
+    // Dicatat agar terlihat, bukan ditelan diam-diam.
+    log(`[sync] gagal mencatat outbox untuk ${tabel}: ${e && e.message ? e.message : e}`);
+  }
+}
+
+async function ringkasanSync(pg) {
+  const kosong = { pending: 0, gagal: 0, terkirim: 0, mode: 'lokal' };
+  try {
+    const r = await pg.query(
+      `SELECT status, count(*)::int c FROM public.sync_outbox GROUP BY status`);
+    const s = { ...kosong };
+    for (const row of r.rows) if (row.status in s) s[row.status] = row.c;
+    const m = await pg.query(`SELECT nilai FROM public.sync_state WHERE kunci='mode'`);
+    s.mode = (m.rows[0] && m.rows[0].nilai) || 'lokal';
+    const t = await pg.query(`SELECT id, tabel, operasi, dibuat_at FROM public.sync_outbox
+                               WHERE status <> 'terkirim' ORDER BY id LIMIT 5`);
+    s.antreanTerdepan = t.rows;
+    return s;
+  } catch (_) { return kosong; }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GERBANG LLM LOKAL  (POST /functions/v1/llm-gateway)
 //
 // Di mode cloud, permintaan LLM ditangani Supabase Edge Function dengan nama
@@ -1115,7 +1179,12 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           ]);
 
           let perluIzin = null;
-          if (menulis && TABEL_HAK_AKSES.has(tabel)) {
+          // Operasi administratif: mendorong kode ke GitHub dan menyinkronkan
+          // ke cloud bukan pekerjaan harian staf. Sebelumnya cukup "sudah
+          // login", sehingga peran serendah viewer pun bisa memicunya.
+          if (p === '/rest/v1/sync/git-push' || p === '/rest/v1/sync/supabase-cloud') {
+            perluIzin = 'user.manage';
+          } else if (menulis && TABEL_HAK_AKSES.has(tabel)) {
             perluIzin = 'user.manage';
           } else if (req.method === 'DELETE') {
             // Hapus tanpa satu pun penyaring mengenai SELURUH isi tabel.
@@ -1146,6 +1215,40 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
         }
 
         // ── SYNC ENDPOINTS (Git Push & Cloud Supabase Sync) ──
+        // Keadaan antrean sinkronisasi — dipakai penanda di antarmuka agar
+        // pengguna tahu masih ada perubahan yang belum terkirim ke cloud.
+        if (p === '/rest/v1/sync/status') {
+          return jsonRes(res, 200, await ringkasanSync(pg));
+        }
+
+        // Cadangan basis data. PGlite menyediakan dump seluruh folder data,
+        // sehingga hasilnya bisa dikembalikan apa adanya tanpa perlu pg_dump.
+        if (p === '/rest/v1/backup/create' && req.method === 'POST') {
+          try {
+            const stempel = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            // Nama basis data asal DIMASUKKAN ke nama berkas. Instalasi
+            // produksi dan basis data pengembangan berbagi folder cadangan
+            // yang sama; tanpa penanda ini keduanya tak bisa dibedakan, dan
+            // memulihkan yang keliru berarti menimpa data klinik dengan data uji.
+            const asal = path.basename(dataDir || 'db').replace(/[^a-zA-Z0-9_-]/g, '');
+            const tujuanDir = path.join(path.dirname(dataDir || process.cwd()), 'backup');
+            fs.mkdirSync(tujuanDir, { recursive: true });
+            const tujuan = path.join(tujuanDir, `onelab-${asal}-${stempel}.tar.gz`);
+
+            const berkas = await pg.dumpDataDir('gzip');
+            const buf = Buffer.from(await berkas.arrayBuffer());
+            fs.writeFileSync(tujuan, buf);
+
+            log(`[backup] tersimpan: ${tujuan} (${(buf.length / 1048576).toFixed(1)} MB)`);
+            return jsonRes(res, 200, {
+              ok: true, berkas: tujuan, ukuranBytes: buf.length,
+            });
+          } catch (e) {
+            log(`[backup] GAGAL: ${e && e.message ? e.message : e}`);
+            return jsonRes(res, 500, { ok: false, error: String(e && e.message || e) });
+          }
+        }
+
         if (p === '/rest/v1/sync/git-push') {
           try {
             const { execSync } = require('child_process');
@@ -1194,6 +1297,15 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           const extra = {};
           if (out.count != null) extra['Content-Range'] = `0-${Math.max(out.rows.length - 1, 0)}/${out.count}`;
           if (out.error) return jsonRes(res, out.status, { message: out.error }, extra);
+
+          // Dicatat SETELAH penulisan lokal berhasil — lihat catatan di catatOutbox().
+          if (!out.error) {
+            await catatOutbox(pg, {
+              method: req.method, tabel: rest[1],
+              penyaring: u.search.replace(/^\?/, ''),
+              bodyText, hasil: out.rows, log,
+            });
+          }
           return jsonRes(res, out.status, out.rows, extra);
         }
         return jsonRes(res, 404, { message: 'not found: ' + p });
