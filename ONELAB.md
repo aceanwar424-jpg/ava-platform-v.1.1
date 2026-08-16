@@ -151,12 +151,12 @@ Bagian ini tidak boleh dilanggar tanpa persetujuan manusia yang eksplisit.
 | Fase | Isi | Status |
 |---|---|---|
 | **0** | Fondasi: satu launcher, cabut path absolut, amankan rahasia, autentikasi nyata | ✅ Selesai |
-| **1** | Satu sumber dua target: restrukturisasi `apps/`+`packages/`, **git tunggal di root**, migrations bernomor, proxy LLM sisi server | ▶ Berikutnya |
-| **2** | Multi-tenant + RLS + RBAC — agar klien ke-2 tidak perlu menyalin kode | |
-| **3** | Sync engine offline-first (outbox, resolusi konflik) + backup/restore | |
-| **4** | Lisensi & aktivasi, installer NSIS, auto-update — **setelah ini produk bisa dijual** | |
-| **5** | Kedalaman domain: SATUSEHAT/RME, connector dua arah, QC/EQA, TAT analytics | |
-| **6** | Kemasan komersial: edisi produk, tenant demo, dokumentasi, materi training | |
+| **1** | Git tunggal di root, migrations bernomor, gerbang LLM sisi server | ✅ Selesai — restrukturisasi `apps/`+`packages/` sengaja dilewati (risiko tinggi, nilai rendah dibanding Fase 2–5) |
+| **2** | Multi-tenant + RBAC — agar klien ke-2 tidak perlu menyalin kode | ✅ Inti selesai — matriks peran-izin di DB, penegakan sisi server. Kolom `tenant_id` per tabel operasional menunggu cloud multi-klinik benar-benar digelar |
+| **3** | Sync engine offline-first + backup/restore | ◐ ±60% — outbox, cadangan, dan pemulihan terverifikasi. Pendorong ke cloud menunggu keputusan project Supabase |
+| **4** | Lisensi & aktivasi, installer NSIS, auto-update — **setelah ini produk bisa dijual** | Belum mulai; sebaiknya menunggu calon pembeli pertama |
+| **5** | Kedalaman domain: SATUSEHAT/RME, connector dua arah, QC/EQA, TAT analytics | ◐ Dimulai — gerbang SATUSEHAT sisi server + pencatatan jejak siap; converter baru Patient & Observation |
+| **6** | Kemasan komersial: edisi produk, tenant demo, dokumentasi, materi training | Belum mulai |
 
 ### 6.2 Jalur fungsional — lima fase OneLab
 
@@ -223,9 +223,19 @@ tetap berlaku di tempatnya masing-masing:
 
 Dicatat terbuka agar tidak hilang:
 
-1. **`desktop-app/` masih di luar git.** Engine, autentikasi, dan launcher tidak ter-versi di mana pun. Ini alasan utama Fase 1 mendahulukan git tunggal di root.
-2. **Dua project Supabase** tercatat di konfigurasi; hanya `rmyqzyfvlmjxtatpctks` yang benar-benar dipakai kode. Yang satu lagi perlu dipastikan lalu dibersihkan.
+1. **Kredensial SATUSEHAT belum diisi.** `SATUSEHAT_CLIENT_ID`, `SATUSEHAT_CLIENT_SECRET`, dan `SATUSEHAT_ORG_ID` di `desktop-app/.env` masih kosong, jadi gerbangnya melapor `siap: false`. Mulai dari `SATUSEHAT_ENV=stg`. Cocokkan juga alamat bawaan dengan portal Anda — alamat resmi pernah berubah.
+2. **Dua project Supabase** tercatat di konfigurasi; hanya `rmyqzyfvlmjxtatpctks` yang benar-benar dipakai kode. Yang satu lagi perlu dipastikan lalu dibersihkan. **Ini yang menghambat pendorong sync ke cloud (Fase 3).**
 3. **Kunci yang pernah tertulis di berkas kerja perlu dirotasi** di dashboard penyedia masing-masing.
 4. **Kunci Gemini kedua (`AQ.A…ZJDw`) ditolak Google** — bukan kehabisan kuota, melainkan tidak sah/dicabut; tidak akan pulih sendiri. Perlu diterbitkan ulang di Google AI Studio lalu diganti di `desktop-app/.env`. Sementara ini gerbang otomatis melewatinya, jadi fitur AI tetap jalan dengan satu kunci.
 5. **Portal korporat & dokter referral** belum aktif sebagai portal eksternal mandiri; fiturnya sudah ada di dalam aplikasi customer, tetapi akses bertoken bercakupan terbatas belum dibangun.
 6. **`App.tsx:189`** menyimpan error tipe lama (`harga_normal` string vs number) yang tidak memblokir build karena `vite build` tidak melakukan type-check.
+7. **Converter FHIR baru Patient & Observation.** Kepatuhan RME penuh menuntut Encounter, Condition, Procedure, Composition, dan DiagnosticReport. Lapisan autentikasi dan pencatatan sudah siap menampung; tiap resource baru hanya menambah converter.
+8. **Lima dari tujuh izin belum punya titik penegakan** (`data.export`, `logbook.approve`, `task.assign`, `team.board.view`) — menjaga fitur yang belum dibangun. Matriksnya siap; penegakan menyusul bersama fiturnya.
+9. **`desktop-app/CARA_KERJA.md` kedaluwarsa** — lihat peringatan di §8.
+10. **`_karantina_20260815/`** menunggu keputusan hapus: scaffold Next.js mati, connector duplikat, tiga `.bat` lama, `.git` kosong sisa `git init`, dan sisa uji Fase 3.
+
+### Pelajaran yang berulang
+
+Tiga bug terpisah punya akar yang sama: **kode yang lolos di `run-local.js` tetapi rusak di build terpaket**, karena `__dirname` berada di dalam `app.asar`. Yang kena: pencarian folder platform, lokasi basis data, dan pembacaan `.env`. **Verifikasi akhir harus selalu dilakukan pada `.exe` hasil build, bukan mode pengembangan.**
+
+Pola kedua yang berulang: **kegagalan yang menyamar jadi keberhasilan** — `sbGet()` mengembalikan array kosong saat query gagal, `syncToSatuSehat()` melaporkan sukses tanpa mengirim apa pun, `catch(e){}` kosong menyembunyikan tabel yang gagal dibuat, dan kunci yang ditolak dilabeli "kuota habis". Setiap kali ditemukan, kegagalan dibuat berisik.
