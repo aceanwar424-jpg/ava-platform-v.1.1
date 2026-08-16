@@ -96,6 +96,155 @@ async function loadSchema(pg, repoDir, log = () => {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SATUSEHAT (Kemenkes RI) — klien sisi server
+//
+// Client secret TIDAK PERNAH sampai ke peramban, sama seperti kunci LLM.
+// Peramban memanggil /functions/v1/satusehat/*; engine yang memegang
+// kredensial, menukar token, dan meneruskan ke API Kemenkes.
+//
+// Alamat default di bawah MENGIKUTI dokumentasi SATUSEHAT Platform, tetapi
+// tetap bisa ditimpa lewat .env — verifikasi terhadap portal Anda sebelum
+// dipakai di produksi, karena alamat resmi pernah berubah.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SATUSEHAT_DEFAULT = {
+  stg:  { auth: 'https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1/accesstoken',
+          fhir: 'https://api-satusehat-stg.dto.kemkes.go.id/fhir-r4/v1' },
+  prod: { auth: 'https://api-satusehat.dto.kemkes.go.id/oauth2/v1/accesstoken',
+          fhir: 'https://api-satusehat.dto.kemkes.go.id/fhir-r4/v1' },
+};
+
+const SS = { token: null, kedaluwarsa: 0 };   // token di-cache sampai mendekati habis
+
+function konfigSatusehat() {
+  let dariBerkas = {};
+  for (const f of berkasEnvKandidat()) {
+    if (fs.existsSync(f)) { dariBerkas = bacaEnvSederhana(f); break; }
+  }
+  const env = { ...dariBerkas, ...process.env };
+  const mode = (env.SATUSEHAT_ENV || 'stg').toLowerCase() === 'prod' ? 'prod' : 'stg';
+  return {
+    mode,
+    clientId:     env.SATUSEHAT_CLIENT_ID || '',
+    clientSecret: env.SATUSEHAT_CLIENT_SECRET || '',
+    orgId:        env.SATUSEHAT_ORG_ID || '',
+    authUrl:      env.SATUSEHAT_AUTH_URL || SATUSEHAT_DEFAULT[mode].auth,
+    fhirUrl:      (env.SATUSEHAT_FHIR_URL || SATUSEHAT_DEFAULT[mode].fhir).replace(/\/+$/, ''),
+  };
+}
+
+async function tokenSatusehat(cfg) {
+  // Pakai ulang token selama masih >60 detik dari kedaluwarsa.
+  if (SS.token && SS.kedaluwarsa - 60_000 > Date.now()) return SS.token;
+  if (!cfg.clientId || !cfg.clientSecret) {
+    const e = new Error('SATUSEHAT_CLIENT_ID / SATUSEHAT_CLIENT_SECRET belum diisi di desktop-app/.env');
+    e.kodeLokal = 'KREDENSIAL_KOSONG';
+    throw e;
+  }
+
+  const body = new URLSearchParams({
+    client_id: cfg.clientId, client_secret: cfg.clientSecret,
+  }).toString();
+
+  const res = await fetch(`${cfg.authUrl}?grant_type=client_credentials`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+  const teks = await res.text();
+  let data = {};
+  try { data = JSON.parse(teks); } catch (_) {}
+
+  if (!res.ok || !data.access_token) {
+    const e = new Error(`Gagal menukar token SATUSEHAT (HTTP ${res.status}): ` +
+                        (data.error_description || data.error || teks.slice(0, 160)));
+    e.status = res.status;
+    throw e;
+  }
+
+  // expires_in dikirim dalam detik, kadang sebagai teks.
+  const detik = parseInt(data.expires_in, 10);
+  SS.token = data.access_token;
+  SS.kedaluwarsa = Date.now() + (Number.isFinite(detik) ? detik : 3000) * 1000;
+  return SS.token;
+}
+
+async function catatSatusehat(pg, baris) {
+  try {
+    await pg.query(
+      `INSERT INTO public.satusehat_log
+         (resource_type, metode, jalur, status_http, berhasil, satusehat_id, galat, muatan_ringkas)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+      [baris.resourceType || null, baris.metode, baris.jalur, baris.status || null,
+       !!baris.berhasil, baris.satusehatId || null, baris.galat || null,
+       baris.ringkas ? String(baris.ringkas).slice(0, 500) : null]);
+  } catch (_) { /* log gagal tidak boleh menggagalkan pengiriman */ }
+}
+
+// Meneruskan permintaan FHIR ke SATUSEHAT. `jalur` contoh: 'Patient' atau
+// 'Patient?identifier=...'. Selalu dicatat, berhasil maupun gagal.
+async function panggilSatusehat(pg, { metode, jalur, muatan, log = () => {} }) {
+  const cfg = konfigSatusehat();
+  const mulai = Date.now();
+  const jalurBersih = String(jalur || '').replace(/^\/+/, '');
+  const resourceType = jalurBersih.split(/[/?]/)[0] || null;
+
+  try {
+    const token = await tokenSatusehat(cfg);
+    const res = await fetch(`${cfg.fhirUrl}/${jalurBersih}`, {
+      method: metode,
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/fhir+json',
+        'Accept': 'application/fhir+json',
+      },
+      body: (metode === 'GET' || metode === 'DELETE') ? undefined
+            : JSON.stringify(muatan || {}),
+    });
+
+    const teks = await res.text();
+    let data = {};
+    try { data = teks ? JSON.parse(teks) : {}; } catch (_) { data = { raw: teks.slice(0, 400) }; }
+
+    const berhasil = res.ok;
+    await catatSatusehat(pg, {
+      resourceType, metode, jalur: jalurBersih, status: res.status, berhasil,
+      satusehatId: data && data.id ? String(data.id) : null,
+      galat: berhasil ? null : JSON.stringify(data).slice(0, 400),
+      ringkas: muatan ? JSON.stringify(muatan).slice(0, 500) : null,
+    });
+
+    if (!berhasil) log(`[satusehat] ${metode} ${jalurBersih} → HTTP ${res.status}`);
+    return { status: res.status, payload: data, latencyMs: Date.now() - mulai };
+
+  } catch (e) {
+    const pesan = e && e.message ? e.message : String(e);
+    await catatSatusehat(pg, {
+      resourceType, metode, jalur: jalurBersih, status: e.status || 0,
+      berhasil: false, galat: pesan,
+      ringkas: muatan ? JSON.stringify(muatan).slice(0, 500) : null,
+    });
+    log(`[satusehat] GAGAL ${metode} ${jalurBersih}: ${pesan}`);
+    return { status: e.kodeLokal === 'KREDENSIAL_KOSONG' ? 503 : 502,
+             payload: { error: pesan }, latencyMs: Date.now() - mulai };
+  }
+}
+
+// Ringkasan kesiapan — tanpa membocorkan client secret.
+function statusSatusehat() {
+  const cfg = konfigSatusehat();
+  return {
+    mode: cfg.mode,
+    fhirUrl: cfg.fhirUrl,
+    orgId: cfg.orgId || null,
+    clientIdTerisi: !!cfg.clientId,
+    clientSecretTerisi: !!cfg.clientSecret,
+    siap: !!(cfg.clientId && cfg.clientSecret && cfg.orgId),
+    tokenAktif: !!(SS.token && SS.kedaluwarsa > Date.now()),
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // OUTBOX SINKRONISASI
 //
 // Setiap perubahan data dicatat SETELAH berhasil tersimpan di basis data
@@ -1047,12 +1196,18 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             const izin = role === 'super_admin'
               ? (await pg.query(`SELECT kode FROM public.permissions`).catch(() => ({ rows: [] }))).rows.map(r => r.kode)
               : await izinDariPeran(pg, role);
-            const halaman = await pg.query(
-              `SELECT page FROM public.role_pages WHERE role_kode = $1`, [role]).catch(() => ({ rows: [] }));
+            // Urutan: halaman khusus pengguna (bila diatur admin) → halaman peran.
+            const khusus = await pg.query(
+              `SELECT page FROM public.user_pages WHERE user_id = $1`, [payload.sub]).catch(() => ({ rows: [] }));
+            const halaman = khusus.rows.length ? khusus
+              : await pg.query(
+                  `SELECT page FROM public.role_pages WHERE role_kode = $1`, [role]).catch(() => ({ rows: [] }));
+
             return jsonRes(res, 200, {
               role,
               permissions: izin,
               pages: halaman.rows.map(r => r.page),
+              pagesSumber: khusus.rows.length ? 'pengguna' : 'peran',
               // Ditandai bila peran sudah berubah sejak token diterbitkan,
               // supaya klien bisa menyegarkan tampilannya.
               roleChanged: role !== payload.role,
@@ -1152,6 +1307,37 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           return jsonRes(res, status, payload);
         }
 
+        // ── SATUSEHAT: kredensial di server, peramban hanya meneruskan ──────
+        if (p.startsWith('/functions/v1/satusehat')) {
+          const sesi = bacaToken(SECRET, tokenDariHeader(req));
+          if (!sesi) return jsonRes(res, 401, { error: 'Silakan masuk terlebih dahulu' });
+
+          if (p.endsWith('/status')) return jsonRes(res, 200, statusSatusehat());
+
+          // Mengirim data pasien ke sistem nasional bukan tindakan harian
+          // biasa: salah kirim sulit ditarik kembali dan terikat kepatuhan.
+          const role = await peranTerkini(pg, sesi.sub, sesi.role);
+          if (!(await peranPunyaIzin(pg, role, 'user.manage'))) {
+            return jsonRes(res, 403, {
+              error: `Peran "${role}" tidak berwenang mengirim data ke SATUSEHAT`,
+              required: 'user.manage',
+            });
+          }
+
+          let badan = {};
+          try { badan = JSON.parse(bodyText || '{}'); } catch (_) {}
+          const jalur = badan.jalur || p.replace('/functions/v1/satusehat', '').replace(/^\/+/, '');
+          if (!jalur) return jsonRes(res, 400, { error: 'Jalur FHIR wajib diisi (mis. "Patient")' });
+
+          // Metode diambil dari badan bila disebut; kalau tidak, ikuti metode
+          // HTTP permintaan, dengan POST sebagai default.
+          const metode = (badan.metode || (req.method === 'GET' ? 'GET' : 'POST')).toUpperCase();
+          const hasil = await panggilSatusehat(pg, {
+            metode, jalur, muatan: badan.resource || badan.muatan, log,
+          });
+          return jsonRes(res, hasil.status, hasil.payload);
+        }
+
         // ── Gerbang data: /rest/v1 dan /rpc wajib membawa token sah ──────────
         // Tanpa ini, siapa pun yang bisa menjangkau porta 54329 dapat membaca
         // seluruh basis data tanpa masuk terlebih dahulu.
@@ -1175,7 +1361,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // sendiri menjadi super_admin.
           const TABEL_HAK_AKSES = new Set([
             'user_profiles', 'local_auth_users', 'roles', 'permissions',
-            'role_permissions', 'role_pages', 'tenants',
+            'role_permissions', 'role_pages', 'user_pages', 'tenants',
           ]);
 
           let perluIzin = null;

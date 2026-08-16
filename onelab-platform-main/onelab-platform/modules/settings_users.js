@@ -326,10 +326,18 @@ async function renderUsers(targetId = 'main-content') {
 
 async function loadUsers() {
   try {
-    const [users, employees] = await Promise.all([
+    const [users, employees, halamanKhusus] = await Promise.all([
       sbGet('user_profiles','select=*&order=created_at.asc'),
       sbGet('employees','select=id,full_name,email,position,division&status=eq.Aktif').catch(()=>[]),
+      sbGet('user_pages','select=user_id,page').catch(()=>[]),
     ]);
+
+    // Jumlah halaman khusus per pengguna, dibaca dari basis data (dulu dari
+    // localStorage, yang hanya berlaku di peramban yang kebetulan dipakai).
+    window._jumlahHalamanKhusus = {};
+    (Array.isArray(halamanKhusus) ? halamanKhusus : []).forEach(r => {
+      window._jumlahHalamanKhusus[r.user_id] = (window._jumlahHalamanKhusus[r.user_id] || 0) + 1;
+    });
     const userList = Array.isArray(users) ? users : [];
     const empList  = Array.isArray(employees) ? employees : [];
 
@@ -415,8 +423,8 @@ function renderUsersTable(users, employees=[]) {
         </td>
         <td style="font-size:11px;color:var(--text3)">
           ${(()=>{ 
-            const custom = localStorage.getItem('ol_user_pages_'+u.id);
-            if (custom) { try { const p=JSON.parse(custom); return `<span style="color:var(--teal);font-weight:700">${p.length} menu (custom)</span>`; } catch(e){} }
+            const jml = (window._jumlahHalamanKhusus || {})[u.id];
+            if (jml) return `<span style="color:var(--teal);font-weight:700">${jml} menu (custom)</span>`;
             const def = ROLE_DEFAULT_PAGES[u.role||'sales']||[];
             return `${def.length} menu (default)`;
           })()}
@@ -575,22 +583,36 @@ async function saveUserRoleAndMenu(userId, userName) {
     await sbPatch('user_profiles', userId, {
       role, updated_at: new Date().toISOString()
     });
-    // Save custom menu to localStorage (keyed by userId for per-user override)
-    const isCustom = JSON.stringify(selectedPages.sort()) !== 
-                     JSON.stringify((ROLE_DEFAULT_PAGES[role]||[]).sort());
-    if (isCustom) {
-      saveRolePages(role+'_'+userId, selectedPages);
-      // Also store per-user
-      localStorage.setItem('ol_user_pages_'+userId, JSON.stringify(selectedPages));
-    } else {
-      localStorage.removeItem('ol_role_pages_'+role+'_'+userId);
+    // Halaman khusus pengguna disimpan di BASIS DATA (tabel user_pages),
+    // bukan localStorage. localStorage bisa ditulis ulang lewat DevTools,
+    // jadi tidak boleh menjadi sumber hak akses — dan sejak menu dibaca dari
+    // server, penyimpanan di localStorage tidak berpengaruh apa pun.
+    const isCustom = JSON.stringify([...selectedPages].sort()) !==
+                     JSON.stringify([...(ROLE_DEFAULT_PAGES[role]||[])].sort());
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/user_pages?user_id=eq.${userId}`,
+                  { method:'DELETE', headers: SB_HEADERS });
+      if (isCustom && selectedPages.length) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/user_pages`, {
+          method:'POST', headers: SB_HEADERS,
+          body: JSON.stringify(selectedPages.map(p => ({ user_id: userId, page: p }))),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      }
+      // Bersihkan sisa penyimpanan lama agar tidak menyesatkan saat ditelusuri.
       localStorage.removeItem('ol_user_pages_'+userId);
+      localStorage.removeItem('ol_role_pages_'+role+'_'+userId);
+    } catch (e) {
+      toast('Gagal menyimpan akses menu: ' + (e.message || e), 'err');
+      return;
     }
     toast(`✅ Role & akses menu ${userName} disimpan`,'ok');
     closeModalForce();
     await loadUsers();
-    // If editing self, reapply menu
+    // Bila menyunting diri sendiri, ambil ulang hak akses dari server dulu —
+    // applyRoleMenu() kini membaca window.serverAccess, bukan localStorage.
     if (userId === window.currentUser?.id) {
+      if (typeof loadServerAccess === 'function') await loadServerAccess();
       applyRoleMenu();
     }
   } catch(e) { toast('❌ '+e.message,'err'); }
