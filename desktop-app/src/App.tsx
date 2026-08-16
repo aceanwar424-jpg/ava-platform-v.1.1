@@ -206,9 +206,18 @@ export default function App() {
       alert('Kode Internal dan Nama Tes wajib diisi!');
       return;
     }
+    // harga_normal disimpan sebagai teks di formulir (input HTML selalu
+    // menghasilkan string) tetapi bertipe angka di Product. Konversi
+    // dilakukan di sini agar tipe cocok, bukan dibiarkan lolos — engine
+    // memang mem-parse ulang, tetapi ketidakcocokan ini menutupi kesalahan
+    // lain karena `vite build` tidak menjalankan type-check.
+    const dataProduk = {
+      ...formData,
+      harga_normal: parseFloat(formData.harga_normal) || 0,
+    };
     try {
       if (window.api) {
-        await window.api.createProduct(formData);
+        await window.api.createProduct(dataProduk);
         setIsModalOpen(false);
         setFormData({
           kode_internal: '',

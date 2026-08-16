@@ -60,6 +60,36 @@ function convertToFhirPatient(patientData) {
  * Mengubah hasil tes lab lokal ke Resource FHIR 'Observation' (LOINC Standard)
  */
 function convertToFhirObservation(resultData) {
+  // Nilai hasil, LOINC, satuan, dan pasien TIDAK boleh dikarang.
+  // Versi sebelumnya memakai nilai cadangan: nilai_hasil || 14.2,
+  // loinc_code || '58410-2', patient_id || 'pat-001'. Artinya hasil lab
+  // fiktif bisa terkirim ke sistem kesehatan nasional atas nama pasien
+  // sungguhan — jauh lebih berbahaya daripada gagal mengirim.
+  const nilai = parseFloat(resultData.nilai_hasil);
+  if (!Number.isFinite(nilai)) {
+    throw new Error(`Nilai hasil "${resultData.nama_tes || 'pemeriksaan'}" kosong atau bukan angka. ` +
+                    'Hasil kualitatif belum didukung pengiriman Observation.');
+  }
+  if (!resultData.loinc_code) {
+    throw new Error(`Kode LOINC belum diisi untuk "${resultData.nama_tes || 'pemeriksaan'}". ` +
+                    'Lengkapi katalog tes sebelum mengirim ke SATUSEHAT.');
+  }
+  if (!resultData.satuan) {
+    throw new Error(`Satuan (UCUM) belum diisi untuk "${resultData.nama_tes || 'pemeriksaan'}".`);
+  }
+  if (!resultData.satusehat_patient_id && !resultData.patient_id) {
+    throw new Error('Pasien belum tertaut. Kirim resource Patient lebih dulu, lalu simpan ID SATUSEHAT-nya.');
+  }
+  const satuan = String(resultData.satuan);
+
+  // Rentang rujukan hanya disertakan bila memang ada — bukan diisi angka contoh.
+  const rMin = parseFloat(resultData.ref_min);
+  const rMax = parseFloat(resultData.ref_max);
+  const rentang = (Number.isFinite(rMin) || Number.isFinite(rMax)) ? {
+    ...(Number.isFinite(rMin) ? { low:  { value: rMin, unit: satuan, system: 'http://unitsofmeasure.org', code: satuan } } : {}),
+    ...(Number.isFinite(rMax) ? { high: { value: rMax, unit: satuan, system: 'http://unitsofmeasure.org', code: satuan } } : {}),
+  } : null;
+
   return {
     resourceType: 'Observation',
     id: resultData.id || `obs-${Date.now()}`,
@@ -79,33 +109,116 @@ function convertToFhirObservation(resultData) {
       coding: [
         {
           system: 'http://loinc.org',
-          code: resultData.loinc_code || '58410-2',
-          display: resultData.nama_tes || 'Hemoglobin [Mass/volume] in Blood'
+          code: resultData.loinc_code,
+          display: resultData.nama_tes
         }
       ],
-      text: resultData.nama_tes || 'Pemeriksaan Lab'
+      text: resultData.nama_tes
     },
     subject: {
-      reference: `Patient/${resultData.patient_id || 'pat-001'}`
+      reference: `Patient/${resultData.satusehat_patient_id || resultData.patient_id}`
     },
+    effectiveDateTime: resultData.tanggal_hasil || resultData.created_at || new Date().toISOString(),
     valueQuantity: {
-      value: parseFloat(resultData.nilai_hasil) || 14.2,
-      unit: resultData.satuan || 'g/dL',
+      value: nilai,
+      unit: satuan,
       system: 'http://unitsofmeasure.org',
-      code: resultData.satuan || 'g/dL'
+      code: satuan
     },
-    referenceRange: [
-      {
-        low: { value: parseFloat(resultData.ref_min) || 13.0, unit: resultData.satuan || 'g/dL' },
-        high: { value: parseFloat(resultData.ref_max) || 17.5, unit: resultData.satuan || 'g/dL' }
-      }
-    ]
+    ...(rentang ? { referenceRange: [rentang] } : {})
   };
 }
 
 /**
  * Simulasi Sinkronisasi Data ke Gateway SATUSEHAT Kemenkes RI
  */
+/**
+ * Kunjungan pasien → Resource FHIR 'Encounter'.
+ * Encounter adalah wadah yang mengikat pemeriksaan ke satu kunjungan;
+ * tanpa ini Observation dan DiagnosticReport menggantung tanpa konteks.
+ */
+function convertToFhirEncounter(visitData, orgId) {
+  const pasien = visitData.satusehat_patient_id || visitData.patient_id;
+  if (!pasien) throw new Error('Pasien belum tertaut untuk kunjungan ini.');
+  if (!orgId) throw new Error('SATUSEHAT_ORG_ID belum diset di sisi server.');
+
+  // Kelas kunjungan mengikuti terminologi HL7 v3 ActCode:
+  // AMB = rawat jalan, IMP = rawat inap, HH = layanan ke rumah.
+  const petaKelas = {
+    'rawat jalan': 'AMB', 'rajal': 'AMB', 'outpatient': 'AMB',
+    'rawat inap': 'IMP', 'ranap': 'IMP', 'inpatient': 'IMP',
+    'home care': 'HH', 'homecare': 'HH', 'home service': 'HH',
+  };
+  const kode = petaKelas[String(visitData.jenis_kunjungan || '').toLowerCase()] || 'AMB';
+  const mulai = visitData.tanggal_kunjungan || visitData.created_at || new Date().toISOString();
+
+  return {
+    resourceType: 'Encounter',
+    id: visitData.id || `enc-${Date.now()}`,
+    status: visitData.status_selesai ? 'finished' : 'in-progress',
+    class: {
+      system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+      code: kode,
+      display: kode === 'IMP' ? 'inpatient encounter'
+             : kode === 'HH'  ? 'home health' : 'ambulatory',
+    },
+    subject: {
+      reference: `Patient/${pasien}`,
+      display: visitData.patient_name || undefined,
+    },
+    period: {
+      start: mulai,
+      ...(visitData.tanggal_selesai ? { end: visitData.tanggal_selesai } : {}),
+    },
+    serviceProvider: { reference: `Organization/${orgId}` },
+  };
+}
+
+/**
+ * Laporan hasil lab → Resource FHIR 'DiagnosticReport'.
+ * Merangkum beberapa Observation menjadi satu laporan yang diterbitkan.
+ *
+ * @param {object}   reportData     data laporan lokal
+ * @param {string[]} observationIds ID Observation yang SUDAH dikirim ke SATUSEHAT
+ */
+function convertToFhirDiagnosticReport(reportData, observationIds = []) {
+  const pasien = reportData.satusehat_patient_id || reportData.patient_id;
+  if (!pasien) throw new Error('Pasien belum tertaut untuk laporan ini.');
+  if (!Array.isArray(observationIds) || !observationIds.length) {
+    // Laporan tanpa hasil yang sudah terdaftar akan ditolak / jadi laporan kosong
+    // di sistem nasional. Lebih baik berhenti di sini dengan sebab yang jelas.
+    throw new Error('Kirim Observation-nya lebih dulu; DiagnosticReport merujuk ID hasil dari SATUSEHAT.');
+  }
+
+  return {
+    resourceType: 'DiagnosticReport',
+    id: reportData.id || `dr-${Date.now()}`,
+    status: 'final',
+    category: [{
+      coding: [{
+        system: 'http://terminology.hl7.org/CodeSystem/v2-0074',
+        code: 'LAB',
+        display: 'Laboratory',
+      }],
+    }],
+    code: {
+      coding: reportData.loinc_code ? [{
+        system: 'http://loinc.org',
+        code: reportData.loinc_code,
+        display: reportData.nama_panel || undefined,
+      }] : undefined,
+      text: reportData.nama_panel || 'Laporan Hasil Laboratorium',
+    },
+    subject: { reference: `Patient/${pasien}` },
+    ...(reportData.satusehat_encounter_id
+        ? { encounter: { reference: `Encounter/${reportData.satusehat_encounter_id}` } } : {}),
+    effectiveDateTime: reportData.tanggal_hasil || reportData.created_at || new Date().toISOString(),
+    issued: reportData.tanggal_terbit || new Date().toISOString(),
+    result: observationIds.map(id => ({ reference: `Observation/${id}` })),
+    ...(reportData.kesimpulan ? { conclusion: String(reportData.kesimpulan) } : {}),
+  };
+}
+
 // Mengirim resource FHIR ke SATUSEHAT lewat gerbang sisi server.
 //
 // Versi sebelumnya TIDAK mengirim apa pun: ia hanya mencetak log lalu
@@ -161,6 +274,8 @@ async function statusSatuSehat() {
 window.fhirConverter = {
   convertToFhirPatient,
   convertToFhirObservation,
+  convertToFhirEncounter,
+  convertToFhirDiagnosticReport,
   syncToSatuSehat,
   statusSatuSehat,
   FHIR_CONFIG

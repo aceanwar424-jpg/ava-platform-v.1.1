@@ -92,7 +92,11 @@ Hasil audit fungsional atas 50 berkas modul / ±31.830 baris. **Angka ini jujur,
 | **SAP · FI/CO** — Akuntansi | 12% | Baru faktur penjualan + kasir |
 
 **Yang benar-benar masih kosong:** rawat inap, farmasi, klaim BPJS/INA-CBG,
-SATUSEHAT/FHIR, buku besar & jurnal, PACS/DICOM, SOAP/CPPT.
+buku besar & jurnal, PACS/DICOM, SOAP/CPPT.
+
+**SATUSEHAT/FHIR** tidak lagi kosong, tetapi belum tuntas: gerbang sisi server,
+pencatatan jejak, dan converter Patient · Observation · Encounter ·
+DiagnosticReport sudah ada; kredensial dan converter lanjutan menyusul.
 
 **Sudah selesai belakangan ini (Agustus 2026):**
 
@@ -101,6 +105,13 @@ SATUSEHAT/FHIR, buku besar & jurnal, PACS/DICOM, SOAP/CPPT.
 - Satu launcher induk `ONELAB.bat` menggantikan tiga berkas `.bat`.
 - **Autentikasi sungguhan.** Sebelumnya login sepenuhnya palsu — ada tiga jalur pintas terpisah yang otomatis masuk sebagai admin. Ketiganya ditutup; lihat §5.
 - Tab **Lab Connector** dan halaman hub **Portal Apps** ditambahkan ke shell desktop.
+- Menu AVA Health digabung ke Portal Customer sebagai satu daftar berkelompok.
+- **Git tunggal di root** — `desktop-app/` akhirnya terversi (343 commit terjaga).
+- **Migrasi skema bernomor** menggantikan pemuatan massal yang menelan kegagalan.
+- **RBAC ditegakkan di server**; dua lubang ditutup: eskalasi hak akses lewat PATCH
+  `user_profiles`, dan pencabutan akses yang baru berlaku 12 jam kemudian.
+- **Outbox offline-first**, cadangan, dan pemulihan yang sudah diuji pulih.
+- **Gerbang SATUSEHAT** menggantikan integrasi lama yang melaporkan sukses palsu.
 
 ---
 
@@ -214,8 +225,7 @@ tetap berlaku di tempatnya masing-masing:
 | `docs/gtm/*.md` | Materi go-to-market |
 | `templates/smm/**` | Pustaka modul SMM ISO 15189 |
 
-> ⚠️ `desktop-app/CARA_KERJA.md` **sudah kedaluwarsa**: masih menyebut `JALANKAN_ONELAB.bat`
-> (kini digantikan `ONELAB.bat`) dan lokasi basis data lama. Pakai §3 dan §7 di berkas ini.
+> `desktop-app/CARA_KERJA.md` berisi rincian mekanisme desktop: arsitektur porta, resolver lokasi berkas, migrasi, serta cadangan dan pemulihan.
 
 ---
 
@@ -228,10 +238,10 @@ Dicatat terbuka agar tidak hilang:
 3. **Kunci yang pernah tertulis di berkas kerja perlu dirotasi** di dashboard penyedia masing-masing.
 4. **Kunci Gemini kedua (`AQ.A…ZJDw`) ditolak Google** — bukan kehabisan kuota, melainkan tidak sah/dicabut; tidak akan pulih sendiri. Perlu diterbitkan ulang di Google AI Studio lalu diganti di `desktop-app/.env`. Sementara ini gerbang otomatis melewatinya, jadi fitur AI tetap jalan dengan satu kunci.
 5. **Portal korporat & dokter referral** belum aktif sebagai portal eksternal mandiri; fiturnya sudah ada di dalam aplikasi customer, tetapi akses bertoken bercakupan terbatas belum dibangun.
-6. **`App.tsx:189`** menyimpan error tipe lama (`harga_normal` string vs number) yang tidak memblokir build karena `vite build` tidak melakukan type-check.
-7. **Converter FHIR baru Patient & Observation.** Kepatuhan RME penuh menuntut Encounter, Condition, Procedure, Composition, dan DiagnosticReport. Lapisan autentikasi dan pencatatan sudah siap menampung; tiap resource baru hanya menambah converter.
+6. ~~`App.tsx` error tipe~~ — **selesai**: `harga_normal` dikonversi ke angka sebelum dikirim; type-check kini nol error di kedua proyek.
+7. **Converter FHIR:** Patient, Observation, Encounter, dan DiagnosticReport sudah ada. Belum ada: Condition, Procedure, Composition — dibutuhkan untuk kepatuhan RME penuh.
 8. **Lima dari tujuh izin belum punya titik penegakan** (`data.export`, `logbook.approve`, `task.assign`, `team.board.view`) — menjaga fitur yang belum dibangun. Matriksnya siap; penegakan menyusul bersama fiturnya.
-9. **`desktop-app/CARA_KERJA.md` kedaluwarsa** — lihat peringatan di §8.
+9. ~~`CARA_KERJA.md` kedaluwarsa~~ — **selesai**: ditulis ulang mengikuti arsitektur sekarang (launcher tanpa menu, resolver path, migrasi, cadangan/pemulihan).
 10. **`_karantina_20260815/`** menunggu keputusan hapus: scaffold Next.js mati, connector duplikat, tiga `.bat` lama, `.git` kosong sisa `git init`, dan sisa uji Fase 3.
 
 ### Pelajaran yang berulang
