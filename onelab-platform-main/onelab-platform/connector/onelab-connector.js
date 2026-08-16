@@ -143,6 +143,16 @@ function attachHandler(socket, analyzer) {
       advanced = false;
       const b0 = buf[0];
 
+      // Saat connector sedang MENGIRIM (host query dijawab), ACK/NAK dari alat
+      // adalah balasan untuk kita — bukan sampah. Tanpa cabang ini byte itu
+      // jatuh ke "byte tak dikenal" di bawah dan pengiriman menggantung.
+      const tx = socket._tx;
+      if (tx && tx.menunggu && (b0 === ACK || b0 === NAK)) {
+        buf = buf.slice(1);
+        tx.menunggu(b0);
+        advanced = true; continue;
+      }
+
       // ── HL7 MLLP: VT ... FS CR ──
       if (b0 === VT || (proto === 'HL7' && b0 !== ENQ && b0 !== STX && b0 !== EOT)) {
         const start = buf.indexOf(VT);
@@ -161,8 +171,15 @@ function attachHandler(socket, analyzer) {
       if (b0 === ENQ) { socket.write(Buffer.from([ACK])); astm = []; buf = buf.slice(1); advanced = true; continue; }
       if (b0 === EOT) {
         buf = buf.slice(1);
-        if (astm.length) { const full = astm.join(''); astm = []; ingest(analyzer, 'ASTM', full, 'IN');
-          if (analyzer.direction === 'twoway') maybeSendOrders(socket, analyzer, full, 'ASTM'); }
+        if (astm.length) {
+          const full = astm.join(''); astm = [];
+          // Hasil bahan kontrol dialihkan ke lab_qc_runs, tidak dicampur
+          // ke jalur hasil pasien.
+          const qc = pisahkanQcAstm(full);
+          if (qc.length) kirimQc(analyzer, qc);
+          else ingest(analyzer, 'ASTM', full, 'IN');
+          if (analyzer.direction === 'twoway') maybeSendOrders(socket, analyzer, full, 'ASTM');
+        }
         advanced = true; continue;
       }
       if (b0 === STX) {
@@ -203,17 +220,72 @@ function hl7Ack(inMsg) {
   return Buffer.concat([Buffer.from([VT]), Buffer.from(ack, 'latin1'), Buffer.from([FS, CR])]);
 }
 
-// ── Dua-arah (scaffold) — kirim order ke alat saat host-query ──────────
-// Deteksi query bersifat SPESIFIK PER ALAT; sesuaikan pola di bawah.
+// ══════════════════════════════════════════════════════════════════════
+// DUA ARAH — host query
+//
+// Alat menanyakan "sampel dengan barcode X mau diperiksa apa?", host
+// menjawab dengan order. Sebelumnya barcode yang ditanyakan TIDAK dibaca,
+// sehingga SELURUH order tertunda dikirim balik untuk setiap query. Pada
+// alat sibuk itu berarti puluhan sampel dijawabkan atas satu pertanyaan,
+// dan alat bisa menjalankan panel milik sampel lain.
+// ══════════════════════════════════════════════════════════════════════
+
+// Barcode yang ditanyakan alat.
+//   ASTM E1394 : Q|1|^^123456^|...   → field ke-3, di antara caret
+//   HL7 QRY^Q02: QRD-8 (who-subject-filter)
+//   HL7 QBP    : QPD-3
+function ambilBarcodeQuery(incoming, protocol) {
+  if (protocol === 'ASTM') {
+    const q = (incoming.split(/\r|\n/).find(b => /^Q\|/.test(b)) || '').split('|');
+    const rentang = q[2] || '';
+    const bagian = rentang.split('^').map(s => s.trim()).filter(Boolean);
+    return bagian.length ? bagian[bagian.length - 1] : '';
+  }
+  for (const seg of incoming.split(/\r|\n/)) {
+    const f = seg.split('|');
+    if (f[0] === 'QRD' && f[8]) return f[8].split('^')[0].trim();
+    if (f[0] === 'QPD' && f[3]) return f[3].split('^')[0].trim();
+  }
+  return '';
+}
+
+function apakahQuery(incoming, protocol) {
+  if (protocol === 'ASTM') return /(^|\r|\n)Q\|/.test(incoming);
+  // ORM^O01 SENGAJA tidak dianggap query: itu pesan ORDER yang dikirim host
+  // KE alat, bukan pertanyaan dari alat. Memperlakukannya sebagai query
+  // membuat connector membalas order atas pesan order.
+  return /\|QRY\^|\|QBP\^/.test(incoming);
+}
+
 async function maybeSendOrders(socket, analyzer, incoming, protocol) {
-  const isQuery = /(^|\r|\n)Q\|/.test(incoming) || /\|ORM\^|\|QRY\^/.test(incoming);
-  if (!isQuery) return;
+  if (!apakahQuery(incoming, protocol)) return;
+
+  const barcode = ambilBarcodeQuery(incoming, protocol);
   let orders = [];
-  try { orders = await rpc('analyzer_pending_orders', { p_analyzer_id: analyzer.id }); } catch (e) { log(`  ⚠ ambil order gagal: ${e.message}`); return; }
-  if (!orders || !orders.length) return;
-  if (protocol === 'ASTM') sendAstmOrders(socket, orders);
+  try {
+    orders = await rpc('analyzer_pending_orders', { p_analyzer_id: analyzer.id });
+  } catch (e) {
+    log(`  ⚠ ambil order gagal: ${e.message}`);
+    return;   // jangan diamkan alat: lanjut ke balasan kosong di bawah
+  }
+  orders = Array.isArray(orders) ? orders : [];
+
+  // Saring ke barcode yang ditanyakan. Bila alat bertanya tanpa menyebut
+  // barcode (query "semua"), barulah seluruh order tertunda dikirim.
+  if (barcode) {
+    orders = orders.filter(o => String(o.barcode || '').trim() === barcode);
+    log(`  ↔ query ${analyzer.name} barcode=${barcode} → ${orders.length} order`);
+  } else {
+    log(`  ↔ query ${analyzer.name} tanpa barcode → ${orders.length} order tertunda`);
+  }
+
+  // Balasan kosong TETAP dikirim. Banyak alat menunggu jawaban dan berhenti
+  // memproses bila host diam — lebih buruk daripada dijawab "tidak ada".
+  if (protocol === 'ASTM') await sendAstmOrders(socket, orders);
   else sendHl7Orders(socket, analyzer, orders);
-  ingest(analyzer, protocol, `[ORDER→ALAT] ${orders.length} sampel`, 'OUT');
+
+  ingest(analyzer, protocol,
+    `[ORDER→ALAT] barcode=${barcode || '(semua)'} jumlah=${orders.length}`, 'OUT');
 }
 function astmFrame(n, text) {
   const body = String(n % 8) + text; // FN + data
@@ -222,17 +294,59 @@ function astmFrame(n, text) {
   const cs = sum.toString(16).toUpperCase().padStart(2, '0');
   return Buffer.from(String.fromCharCode(STX) + withEtx + cs + '\r\n', 'latin1');
 }
-function sendAstmOrders(socket, orders) {
-  socket.write(Buffer.from([ENQ]));
-  let n = 1;
-  socket.write(astmFrame(n++, `H|\\^&|||OneLab`));
-  orders.forEach((o, i) => {
-    socket.write(astmFrame(n++, `P|${i + 1}|||${o.barcode}|${o.patient_name || ''}`));
-    const tests = (o.tests || []).map(t => `^^^${t}`).join('\\');
-    socket.write(astmFrame(n++, `O|1|${o.barcode}||${tests}|R`));
+// Menunggu satu byte balasan (ACK/NAK) dari alat. Byte itu ditangkap oleh
+// penangan 'data' lewat socket._tx — tanpa itu, ACK dari alat akan dibuang
+// sebagai "byte tak dikenal" dan pengiriman menggantung.
+// PENTING: penunggu didaftarkan LEBIH DULU, baru byte-nya ditulis. Bila
+// urutannya dibalik, balasan alat yang datang sangat cepat tiba saat belum
+// ada yang menunggunya — byte itu ikut terbuang dan pengiriman menggantung
+// sampai timeout. Balapan itu jarang terjadi, tapi tidak boleh disisakan.
+function kirimDanTunggu(socket, data, timeoutMs = 15000) {
+  return new Promise((resolve) => {
+    const tx = socket._tx || (socket._tx = {});
+    const selesai = (nilai) => { clearTimeout(t); tx.menunggu = null; resolve(nilai); };
+    const t = setTimeout(() => selesai(null), timeoutMs);   // null = timeout
+    tx.menunggu = selesai;
+    socket.write(data);
   });
-  socket.write(astmFrame(n++, `L|1|N`));
+}
+
+// ASTM E1381: tiap frame harus di-ACK sebelum frame berikutnya dikirim.
+// Versi sebelumnya menulis seluruh frame sekaligus tanpa menunggu apa pun;
+// alat sungguhan akan menolak atau kehilangan sebagian besar isinya.
+async function kirimFrameAstm(socket, frame, label) {
+  for (let coba = 1; coba <= 6; coba++) {      // ASTM: maksimal 6 percobaan
+    const balas = await kirimDanTunggu(socket, frame);
+    if (balas === ACK) return true;
+    if (balas === null) { log(`  ⚠ ASTM ${label}: tidak ada balasan (timeout)`); return false; }
+    log(`  ⚠ ASTM ${label}: NAK, ulang ke-${coba}`);
+  }
+  log(`  ⚠ ASTM ${label}: gagal setelah 6 percobaan`);
+  return false;
+}
+
+async function sendAstmOrders(socket, orders) {
+  const jalur = await kirimDanTunggu(socket, Buffer.from([ENQ]));
+  if (jalur !== ACK) {
+    log(`  ⚠ ASTM: alat tidak memberi ACK atas ENQ — pengiriman order dibatalkan`);
+    return false;
+  }
+
+  let n = 1;
+  const kirim = (teks, label) => kirimFrameAstm(socket, astmFrame(n++, teks), label);
+
+  if (!await kirim(`H|\\^&|||OneLab`, 'header')) { socket.write(Buffer.from([EOT])); return false; }
+
+  for (let i = 0; i < orders.length; i++) {
+    const o = orders[i];
+    if (!await kirim(`P|${i + 1}|||${o.barcode}|${o.patient_name || ''}`, `P#${i + 1}`)) break;
+    const tests = (o.tests || []).map(t => `^^^${t}`).join('\\');
+    if (!await kirim(`O|1|${o.barcode}||${tests}|R`, `O#${i + 1}`)) break;
+  }
+
+  await kirim(`L|1|N`, 'terminator');
   socket.write(Buffer.from([EOT]));
+  return true;
 }
 function sendHl7Orders(socket, analyzer, orders) {
   const ts = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
@@ -243,6 +357,77 @@ function sendHl7Orders(socket, analyzer, orders) {
       ...(o.tests || ['ALL']).map(t => `OBR|1|${o.barcode}||${t}`)].join('\r') + '\r';
     socket.write(Buffer.concat([Buffer.from([VT]), Buffer.from(seg, 'latin1'), Buffer.from([FS, CR])]));
   });
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// AUTO-UPLOAD QC
+//
+// Hasil bahan kontrol yang dikirim alat selama ini masuk ke jalur hasil
+// pasien yang sama, sehingga nilai QC bercampur dengan hasil pasien dan
+// grafik Levey-Jennings harus diisi manual.
+//
+// CATATAN: penandaan QC BERBEDA TIAP ALAT. Dua pola paling umum dipakai di
+// bawah — kode aksi 'Q' pada record O (ASTM), dan pola barcode. Sesuaikan
+// `qc_pattern` di config.json bila alat Anda memakai penanda lain.
+// ══════════════════════════════════════════════════════════════════════
+
+const QC_PATTERN = (() => {
+  try { return new RegExp(CFG.qc_pattern || '^(QC|CTRL|CONTROL)', 'i'); }
+  catch (e) { log(`⚠ qc_pattern tidak sah, memakai bawaan: ${e.message}`); return /^(QC|CTRL|CONTROL)/i; }
+})();
+
+// Memisahkan sesi ASTM menjadi hasil QC bila ditandai sebagai kontrol.
+// Mengembalikan [] bila sesi ini bukan QC — pemanggil lanjut seperti biasa.
+function pisahkanQcAstm(raw) {
+  const baris = raw.split(/\r|\n/).map(s => s.trim()).filter(Boolean);
+
+  const rekO = baris.find(b => /^O\|/.test(b));
+  const rekP = baris.find(b => /^P\|/.test(b));
+  if (!rekO) return [];
+
+  const fO = rekO.split('|');
+  const spesimen = (fO[2] || '').split('^')[0].trim();
+  const kodeAksi = (fO[11] || '').trim().toUpperCase();   // O-12: 'Q' = kontrol
+
+  const iniQc = kodeAksi === 'Q' || QC_PATTERN.test(spesimen);
+  if (!iniQc) return [];
+
+  // Level & lot biasanya menumpang di ID spesimen atau nama "pasien".
+  const namaP = rekP ? (rekP.split('|')[5] || '') : '';
+  const level = (spesimen.match(/(L(?:EVEL)?\s?[123]|NORMAL|ABNORMAL|HIGH|LOW)/i) || [])[1]
+             || (namaP.match(/(L(?:EVEL)?\s?[123]|NORMAL|ABNORMAL|HIGH|LOW)/i) || [])[1] || null;
+  const lot = (spesimen.match(/LOT[:\-]?([A-Z0-9]+)/i) || [])[1] || null;
+
+  const hasil = [];
+  for (const b of baris) {
+    if (!/^R\|/.test(b)) continue;
+    const f = b.split('|');
+    const kodeTes = (f[2] || '').split('^').filter(Boolean).pop() || '';
+    const nilai = parseFloat(f[3]);
+    if (!kodeTes || !Number.isFinite(nilai)) continue;     // jangan kirim nilai karangan
+    hasil.push({ test_name: kodeTes, measured: nilai, qc_level: level, lot_number: lot });
+  }
+  return hasil;
+}
+
+async function kirimQc(analyzer, runs) {
+  if (!runs.length) return;
+  const baris = runs.map(r => ({
+    analyzer_id: analyzer.id, analyzer_name: analyzer.name,
+    test_name: r.test_name, measured: r.measured,
+    qc_level: r.qc_level, lot_number: r.lot_number,
+    run_by: 'connector', notes: 'Otomatis dari alat',
+  }));
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/lab_qc_runs`, {
+      method: 'POST', headers: HDR, body: JSON.stringify(baris),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status} ${(await res.text()).slice(0, 120)}`);
+    log(`  ✓ QC otomatis: ${baris.length} hasil dari ${analyzer.name}`);
+  } catch (e) {
+    // Jangan diamkan: QC yang gagal naik berarti bukti mutu hilang.
+    log(`  ⚠ QC gagal diunggah (${analyzer.name}): ${e.message}`);
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════════
@@ -599,10 +784,20 @@ function startStatusServer() {
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
-(async () => {
-  log('══ OneLab Connector ══');
-  log(`Supabase: ${SUPABASE_URL}`);
-  startStatusServer();
-  await loadAndBind();
-  setInterval(loadAndBind, REFRESH_MS); // pungut alat baru tiap menit (restart utk ubah alat yang sudah bind)
-})();
+// Hanya menyala bila berkas ini DIJALANKAN langsung. Saat di-require untuk
+// pengujian, tidak ada server yang dibuka dan tidak ada koneksi ke alat.
+if (require.main === module) {
+  (async () => {
+    log('══ OneLab Connector ══');
+    log(`Supabase: ${SUPABASE_URL}`);
+    startStatusServer();
+    await loadAndBind();
+    setInterval(loadAndBind, REFRESH_MS); // pungut alat baru tiap menit (restart utk ubah alat yang sudah bind)
+  })();
+}
+
+// Diekspor untuk pengujian protokol (parsing query, penandaan QC, framing).
+module.exports = {
+  ambilBarcodeQuery, apakahQuery, pisahkanQcAstm,
+  astmFrame, sendAstmOrders, attachHandler,
+};

@@ -2,5 +2,6 @@
   "supabase_url": "https://rmyqzyfvlmjxtatpctks.supabase.co",
   "supabase_key": "ISI_ANON_KEY_ATAU_SERVICE_KEY_DI_SINI",
   "refresh_seconds": 60,
-  "status_port": 9999
+  "status_port": 9999,
+  "qc_pattern": "^(QC|CTRL|CONTROL)"
 }

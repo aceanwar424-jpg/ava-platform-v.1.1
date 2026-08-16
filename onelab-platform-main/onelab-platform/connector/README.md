@@ -80,11 +80,51 @@ Opsi mudah — Task Scheduler:
 
 Atau pakai `pm2` (`npm i -g pm2 && pm2 start onelab-connector.js && pm2 save && pm2-startup install`).
 
-## Dua-arah (order → alat)
-Mode `twoway` sudah di-scaffold (ASTM O-record / HL7 ORM). **Format order sangat
-spesifik per alat** — pola query-detection & susunan record di `maybeSendOrders()` /
-`sendAstmOrders()` / `sendHl7Orders()` perlu disesuaikan dengan manual alat Anda.
-Mulai dari `oneway` dulu; aktifkan `twoway` setelah pola order alat dipastikan.
+## Dua-arah (host query → order ke alat)
+
+Mode `twoway`: alat menanyakan "sampel barcode X mau diperiksa apa?", connector
+menjawab dengan order dari OneLab.
+
+**Barcode yang ditanyakan dibaca dan dipakai menyaring order:**
+
+| Protokol | Sumber barcode |
+|---|---|
+| ASTM E1394 | record `Q`, field ke-3 (`Q\|1\|^^123456^\|…`) |
+| HL7 `QRY^Q02` | `QRD-8` |
+| HL7 `QBP^Q11` | `QPD-3` |
+
+Bila alat bertanya tanpa menyebut barcode, seluruh order tertunda dikirim.
+
+Catatan penting:
+
+- **`ORM^O01` tidak dianggap query.** Itu pesan *order* yang dikirim host ke alat,
+  bukan pertanyaan dari alat.
+- **Balasan kosong tetap dikirim** (header + terminator). Banyak alat berhenti
+  memproses bila host diam — lebih buruk daripada dijawab "tidak ada order".
+- **Handshake ASTM dipatuhi**: ENQ menunggu ACK, tiap frame menunggu ACK, NAK
+  diulang sampai 6 kali sesuai E1381. Timeout 15 detik.
+
+Susunan record order tetap **spesifik per alat** — cocokkan `sendAstmOrders()` /
+`sendHl7Orders()` dengan manual alat Anda. Mulai dari `oneway`, aktifkan `twoway`
+setelah pola order alat dipastikan.
+
+## Auto-upload QC
+
+Hasil bahan kontrol dialihkan otomatis ke tabel `lab_qc_runs`, tidak dicampur ke
+jalur hasil pasien. Dua penanda yang dikenali:
+
+1. **Kode aksi `Q`** pada record `O` ASTM (field ke-12) — cara paling baku.
+2. **Pola barcode**, bawaan `^(QC|CTRL|CONTROL)`.
+
+Level QC dan nomor lot diambil dari ID spesimen atau nama "pasien" bila ada
+(mis. `QC-LEVEL 2 LOT:A77`). Hasil tanpa nilai numerik **tidak** dikirim — lebih
+baik kosong daripada angka karangan pada catatan mutu.
+
+Penandaan QC berbeda tiap alat. Sesuaikan lewat `config.json`:
+
+```json
+{ "qc_pattern": "^(QC|CTRL|CONTROL)" }
+```
 
 ## Keamanan
 - Connector menulis ke **staging** (`analyzer_messages`), bukan langsung `lab_results`.
