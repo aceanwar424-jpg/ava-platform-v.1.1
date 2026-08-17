@@ -269,14 +269,14 @@ function apPaintDaftar(el) {
       const lewat = i.payment_status !== 'Dibayar' && telat !== null && telat > 0;
       const pv = apPoValue[i.po_id];
       const bolehBayar = i.match_status === 'Cocok' && i.payment_status !== 'Dibayar' && apBolehBayar();
-      return `<tr style="${lewat ? 'background:#FEF2F2' : ''}">
+      return `<tr style="${lewat ? 'background:var(--danger-soft)' : ''}">
         <td style="font-family:ui-monospace,monospace;font-size:11.5px;color:var(--teal);font-weight:650">
           ${apEsc(i.invoice_number || '—')}</td>
         <td style="font-size:12.5px">${apEsc(i.supplier_name || '—')}</td>
         <td style="font-size:11.5px;color:var(--gray)">${i.invoice_date ? formatDateShort(i.invoice_date) : '—'}</td>
         <td style="font-size:11.5px">
           ${i.due_date ? formatDateShort(i.due_date) : '—'}
-          ${lewat ? `<div style="color:#B91C1C;font-weight:700;font-size:10.5px">
+          ${lewat ? `<div style="color:var(--danger-deep);font-weight:700;font-size:10.5px">
             ⚠️ lewat ${telat} hari</div>` : ''}</td>
         <td style="text-align:right;font-weight:650;font-variant-numeric:tabular-nums">
           ${formatCurrency(i.total_amount)}</td>
@@ -333,7 +333,7 @@ function apPaintUmurHutang(el) {
       ${ember.map(b => {
         const nilai = b.items.reduce((s, i) => s + apNum(i.total_amount), 0);
         const pct = total ? Math.round((nilai / total) * 100) : 0;
-        return `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${b.warna};
+        return `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${b.warna};
           border-radius:10px;padding:13px">
           <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.06em">${b.label}</div>
           <div style="font-size:18px;font-weight:800;color:${b.warna};font-variant-numeric:tabular-nums">
@@ -467,7 +467,7 @@ function apOnPOChange() {
       <div><div style="font-size:10.5px;color:var(--gray);text-transform:uppercase">Nilai Penerimaan</div>
         <b style="color:var(--teal);font-variant-numeric:tabular-nums">${formatCurrency(pv.value)}</b></div>
     </div>
-    ${belumTerima ? `<div style="margin-top:9px;color:#B91C1C;font-weight:600">
+    ${belumTerima ? `<div style="margin-top:9px;color:var(--danger-deep);font-weight:600">
       ⚠️ Barang pada PO ini belum diterima. Faktur boleh dicatat, tetapi pencocokan akan
       berstatus Selisih dan pembayaran tidak akan diizinkan sampai barangnya diterima.</div>` : ''}`;
 }

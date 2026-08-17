@@ -35,7 +35,7 @@ function renderReportTab(){
             <span class="rc-chev" style="color:var(--gray);transition:transform .15s;font-size:12px">▶</span>
             <div style="min-width:0">
               <div style="font-size:14.5px;font-weight:700;color:var(--navy)">${pt.name}
-                ${critCount?`<span style="background:#FEF2F2;color:#DC2626;padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">${critCount} kritis</span>`:''}</div>
+                ${critCount?`<span style="background:var(--danger-soft);color:var(--danger-strong);padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">${critCount} kritis</span>`:''}</div>
               <div style="font-size:11px;color:var(--gray)">${pt.visit||'—'} · ${pt.results.length} pemeriksaan · ${pt.released_at?new Date(pt.released_at).toLocaleString('id-ID'):''}</div>
             </div>
           </div>
@@ -123,7 +123,7 @@ async function showTrend(patientName, productId, productName, itemId=null){
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${patientName} · ${data.length} hasil${nmin!=null&&nmax!=null?` · normal ${nmin}–${nmax}`:''}</div>
-    <div style="overflow-x:auto;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px">
+    <div style="overflow-x:auto;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px">
       <svg width="${w}" height="${h}" style="min-width:100%">
         ${nmin!=null&&nmax!=null&&nmax<=max&&nmin>=min?`
           <rect x="${pad}" y="${(h-pad-((nmax-min)/range)*(h-2*pad)).toFixed(0)}" width="${w-2*pad}"
@@ -282,7 +282,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .brand{display:flex;gap:12px;align-items:center}
       .brand img{max-height:56px;max-width:150px;object-fit:contain}
       .brand h2{color:${hc};margin:0;font-size:19px;font-weight:800}
-      .brand .addr{font-size:11px;color:#546E7A;margin-top:3px;line-height:1.35;max-width:340px}
+      .brand .addr{font-size:11px;color:var(--slate);margin-top:3px;line-height:1.35;max-width:340px}
       .brand .acc{font-size:10px;color:${ac};font-weight:700;margin-top:3px}
       .doc-title{text-align:right}
       .doc-title .t{font-size:16px;font-weight:800;color:${hc}}
@@ -342,7 +342,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       th{border-bottom: 1.5px solid #000; background:none; color:#000; padding:5px 8px;text-align:left;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
       td{padding:4px 8px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '11px'}}
       .cat{background:${ac}18;color:${ac};font-weight:800;padding:4px 8px;font-size:11px;margin-top:10px;border-left:3px solid ${ac}}
-      .flag{font-weight:800}.crit{color:#DC2626}
+      .flag{font-weight:800}.crit{color:var(--danger-strong)}
       .legend{font-size:9px;color:#000;margin-top:6px}
       
       /* tfoot berulang otomatis di dasar tiap halaman cetak (running footer) */
@@ -353,11 +353,11 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .signs{display:flex;justify-content:flex-end;margin-top:10px}
       .signs > div{width: 220px; font-size:11px; text-align: center;}
       .signs .line{border-top:1px solid #000;padding-top:3px;font-weight:bold;}
-      .signs em{color:#546E7A}
+      .signs em{color:var(--slate)}
       .disc{display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:12px;font-size:9.5px;color:#000;line-height:1.4}
       @media print{ .noprint{display:none} }
     </style></head><body>
-    <button class="noprint" onclick="window.print()" style="position:fixed;top:14px;right:14px;padding:8px 18px;background:${hc};color:#fff;border:none;border-radius:6px;cursor:pointer;z-index:9999">🖨 Print</button>
+    <button class="noprint" onclick="window.print()" style="position:fixed;top:14px;right:14px;padding:8px 18px;background:${hc};color:var(--on-accent);border:none;border-radius:6px;cursor:pointer;z-index:9999">🖨 Print</button>
     
     ${cfg.bg_image_url ? `<div class="print-bg-template" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('${cfg.bg_image_url}');background-size:100% 100%;background-repeat:no-repeat;z-index:-9999;pointer-events:none"></div>` : ''}
     
@@ -478,12 +478,12 @@ function _labPrintRow(r, indent, cfg){
   }
   
   return `<tr>
-    <td>${name}${cfg.show_method&&r.method?`<div style="font-size:9px;color:#94A3B8">${r.method}</div>`:''}</td>
+    <td>${name}${cfg.show_method&&r.method?`<div style="font-size:9px;color:var(--text4)">${r.method}</div>`:''}</td>
     <td><strong style="color:${col};font-size:13px">${r.result_value||'—'}</strong>${flag ? ` <span style="color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'};font-weight:800;font-size:11px;margin-left:4px">${flag}</span>` : ''}</td>
-    <td style="color:#546E7A">${r.unit||'—'}</td>
-    <td style="color:#546E7A">${refRange}</td>
-    <td style="color:#546E7A;font-size:11px;font-style:italic">${r.notes||'—'}</td>
-    ${cfg.show_loinc?`<td style="color:#94A3B8;font-family:monospace;font-size:10px">${r.loinc_code||'—'}</td>`:''}
+    <td style="color:var(--slate)">${r.unit||'—'}</td>
+    <td style="color:var(--slate)">${refRange}</td>
+    <td style="color:var(--slate);font-size:11px;font-style:italic">${r.notes||'—'}</td>
+    ${cfg.show_loinc?`<td style="color:var(--text4);font-family:monospace;font-size:10px">${r.loinc_code||'—'}</td>`:''}
   </tr>`;
 }
 // Kelompokkan hasil dalam 1 kategori per tes; panel diberi sub-header + analit terindent

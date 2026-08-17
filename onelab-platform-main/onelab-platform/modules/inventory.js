@@ -36,11 +36,11 @@ function tierPassed(status) { return status==='Approved' || status==='Skip'; }
 
 async function renderInventory(initialTab='stock') {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('inventory')" title="Kembali ke daftar menu Inventory">← Menu Inventory</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('inventory')" title="Kembali ke daftar menu Inventory">← Menu Inventory</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Inventory &amp; Logistik</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Inventory &amp; Logistik</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Stok, Purchase Request/Order, Stock Opname, dan MRP</span>
         </div>
       </div>
@@ -165,16 +165,16 @@ function renderStockAlerts() {
       </div>
     </div>`;
   if (expired.length) html += `
-    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
-      <div style="font-weight:700;color:#B91C1C;font-size:12.5px">${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
+    <div style="background:var(--danger-soft);border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
+      <div style="font-weight:700;color:var(--danger-deep);font-size:12.5px">${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
       <div style="font-size:11px;color:#991B1B;margin-top:2px">
         ${expired.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}${expired.length>5?` +${expired.length-5} lainnya`:''}
       </div>
     </div>`;
   if (nearExp.length) html += `
     <div style="background:var(--gold-light);border:1px solid #FDE68A;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
-      <div style="font-weight:700;color:#B45309;font-size:12.5px">⏳ ${nearExp.length} batch mendekati kedaluwarsa (≤60 hari) — prioritaskan (FEFO)</div>
-      <div style="font-size:11px;color:#92400E;margin-top:2px">
+      <div style="font-weight:700;color:var(--warn-deep);font-size:12.5px">⏳ ${nearExp.length} batch mendekati kedaluwarsa (≤60 hari) — prioritaskan (FEFO)</div>
+      <div style="font-size:11px;color:var(--warn-deeper);margin-top:2px">
         ${nearExp.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)})`).join(' · ')}${nearExp.length>5?` +${nearExp.length-5} lainnya`:''}
       </div>
     </div>`;
@@ -206,7 +206,7 @@ function renderStockTable(data) {
       <td>
         <span style="font-weight:700;color:${low?'#DC2626':'var(--navy)'}">${i.stock_qty||0}</span>
         <span style="font-size:11px;color:var(--gray)"> ${i.unit||''}</span>
-        ${low?'<div style="font-size:10px;color:#DC2626">⚠️ Rendah</div>':''}
+        ${low?'<div style="font-size:10px;color:var(--danger-strong)">⚠️ Rendah</div>':''}
       </td>
       <td style="font-size:11px;color:var(--gray)">${i.min_stock||0} / ${i.max_stock||0}</td>
       <td style="font-size:12px">${i.unit_price?formatCurrency(i.unit_price):'—'}</td>
@@ -723,7 +723,7 @@ function updatePRTotal() {
   if (bEl && _prBudget && _prBudget.budget) {
     const sisa = _prBudget.remaining||0;
     if (total > sisa) {
-      bEl.innerHTML = `<span style="color:#B91C1C;font-weight:600">⚠️ Melampaui sisa pagu
+      bEl.innerHTML = `<span style="color:var(--danger-deep);font-weight:600">⚠️ Melampaui sisa pagu
         ${formatCurrency(sisa)} sebesar ${formatCurrency(total - sisa)}</span> — perlu persetujuan jenjang lebih tinggi`;
     }
   }
@@ -944,7 +944,7 @@ function renderPOTable() {
       <td><span style="background:${col}20;color:${col};padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700">${po.status}</span></td>
       <td><div class="act-row">
         <button class="act-btn" onclick="openPODetail(${po.id})" title="Detail">${icon('file-text', 12)}</button>
-        ${['Dikirim ke Vendor','Dikonfirmasi Vendor','Sebagian Diterima'].includes(po.status)?`<button class="act-btn" onclick="openReceivePO(${po.id})" title="Terima Barang" style="color:#22C55E"></button>`:''}
+        ${['Dikirim ke Vendor','Dikonfirmasi Vendor','Sebagian Diterima'].includes(po.status)?`<button class="act-btn" onclick="openReceivePO(${po.id})" title="Terima Barang" style="color:var(--success-strong)"></button>`:''}
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -1285,7 +1285,7 @@ function renderGILineItems() {
         </select>
       </td>
       <td style="padding:4px;text-align:center;color:${over?'#DC2626':'var(--gray)'}">${item?stock+' '+(item.unit||''):'—'}</td>
-      <td style="padding:4px"><input type="number" min="0" value="${it.qty||0}" style="width:70px;font-size:11px;padding:4px;${over?'border-color:#DC2626':''}" oninput="updateGIItem(${idx},'qty',this.value)">${over?'<div style="font-size:9px;color:#DC2626">> stok</div>':''}</td>
+      <td style="padding:4px"><input type="number" min="0" value="${it.qty||0}" style="width:70px;font-size:11px;padding:4px;${over?'border-color:var(--danger-strong)':''}" oninput="updateGIItem(${idx},'qty',this.value)">${over?'<div style="font-size:9px;color:var(--danger-strong)">> stok</div>':''}</td>
       <td style="padding:4px;font-weight:700">${formatCurrency((item?.unit_price||0)*(it.qty||0))}</td>
       <td style="padding:4px"><button class="act-btn del" onclick="removeGILineItem(${idx})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>`;
@@ -1550,7 +1550,7 @@ function renderMRPDashboard() {
           <td style="text-align:center;font-size:12px">${usage||'—'}</td>
           <td style="text-align:center;font-size:12px">${i.lead_time_days||7} hari</td>
           <td style="text-align:center;font-size:12px">${daysLeft!==null?daysLeft+' hari':'—'}</td>
-          <td>${needOrder?`<span style="color:#DC2626;font-weight:700;font-size:11.5px">⚠️ Reorder ${suggestedQty} ${i.unit||''}</span>`:'<span style="color:#16A34A;font-size:11.5px">✓ Aman</span>'}</td>
+          <td>${needOrder?`<span style="color:var(--danger-strong);font-weight:700;font-size:11.5px">⚠️ Reorder ${suggestedQty} ${i.unit||''}</span>`:'<span style="color:#16A34A;font-size:11.5px">✓ Aman</span>'}</td>
         </tr>`;
       }).join('')}</tbody></table>
     </div>
@@ -1656,7 +1656,7 @@ function renderInvReport() {
         {l:'Jumlah SKU Aktif', v:active.length, c:'#00897B'},
         {l:'Kelas A / B / C', v:`${abc.A} / ${abc.B} / ${abc.C}`, c:'#8B5CF6'},
         {l:'Batch Kadaluarsa', v:bucket.expired, c:'#EF4444'},
-      ].map(k=>`<div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
+      ].map(k=>`<div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
         <div style="font-size:16px;font-weight:800;color:${k.c}">${k.v}</div>
         <div style="font-size:11px;color:var(--gray)">${k.l}</div></div>`).join('')}
     </div>

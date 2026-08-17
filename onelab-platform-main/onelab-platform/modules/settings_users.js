@@ -311,7 +311,7 @@ async function renderUsers(targetId = 'main-content') {
     ${headerHtml}
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px">
       ${Object.entries(ROLES).map(([k,r])=>`
-        <div style="padding:5px 10px;background:#fff;border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:6px">
+        <div style="padding:5px 10px;background:var(--white);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;gap:6px">
           <div style="width:8px;height:8px;border-radius:2px;background:${r.color}"></div>
           <span style="font-size:11px;font-weight:600;color:var(--navy)">${r.label}</span>
           <span style="font-size:10px;color:var(--text3)">— ${r.desc}</span>
@@ -384,7 +384,7 @@ function renderUsersTable(users, employees=[]) {
       return `<tr>
         <td>
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:34px;height:34px;border-radius:50%;background:${rc.color};color:#fff;
+            <div style="width:34px;height:34px;border-radius:50%;background:${rc.color};color:var(--on-accent);
               display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">
               ${(u.full_name||'U').charAt(0).toUpperCase()}
             </div>
@@ -473,13 +473,13 @@ function openEditUserRole(userId, userName, currentRole) {
 
     <!-- Menu access config -->
     <div style="border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;margin-bottom:4px">
-      <div style="background:var(--navy);color:#fff;padding:8px 14px;font-size:12px;font-weight:700;
+      <div style="background:var(--navy);color:var(--on-accent);padding:8px 14px;font-size:12px;font-weight:700;
         display:flex;align-items:center;justify-content:space-between">
         <span>Akses Menu</span>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-xs" style="background:rgba(255,255,255,.15);color:#fff;border:none"
+          <button class="btn btn-xs" style="background:rgba(255,255,255,.15);color:var(--on-accent);border:none"
             onclick="selectAllMenus(true)">Pilih Semua</button>
-          <button class="btn btn-xs" style="background:rgba(255,255,255,.15);color:#fff;border:none"
+          <button class="btn btn-xs" style="background:rgba(255,255,255,.15);color:var(--on-accent);border:none"
             onclick="selectAllMenus(false)">Reset</button>
         </div>
       </div>
@@ -627,7 +627,7 @@ function openInviteUserForm() {
       <div class="modal-title">+ Tambah User Profile</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div style="background:#FFF8E1;border-radius:8px;padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:12px">
+    <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:12px">
       ℹ️ User mendaftar sendiri di halaman login. Setelah login pertama, role diatur di sini.
     </div>
     <div class="form-group">

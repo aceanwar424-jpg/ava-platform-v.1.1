@@ -127,7 +127,7 @@ async function renderMaps() {
               ${MAP_CATEGORIES.filter(c=>c.group===g).map(c=>`
                 <span class="maps-chip chip on" data-q="${c.q}" data-group="${g}"
                   onclick="toggleMChip(this)"
-                  style="background:var(--teal);color:#fff;border-color:var(--teal)">${c.label}</span>`).join('')}
+                  style="background:var(--teal);color:var(--on-accent);border-color:var(--teal)">${c.label}</span>`).join('')}
             </div>
           </div>`).join('')}
       </div>
@@ -536,14 +536,14 @@ function plotMapsResultMarkers() {
       <div style="padding:6px;max-width:240px;font-family:inherit">
         <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">${r.name}</div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
-        <div style="font-size:11px;color:#475569;margin-bottom:6px">${r.address}</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">${r.address}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
           ${r.rating ? `<span style="font-size:11px;font-weight:600">${r.rating} (${r.reviews})</span>` : ''}
           ${isDB ? '<span style="background:#DCFCE7;color:#166534;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">✓ Ada di DB</span>'
-                 : '<span style="background:#FEF3C7;color:#92400E;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">Baru</span>'}
+                 : '<span style="background:var(--warn-soft);color:var(--warn-deeper);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">Baru</span>'}
         </div>
         <div style="display:flex;gap:6px">
-          ${!isDB ? `<button onclick="importOneMaps(${idx})" style="background:#00A896;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">⬆ Import ke Leads</button>` : ''}
+          ${!isDB ? `<button onclick="importOneMaps(${idx})" style="background:#00A896;color:var(--on-accent);border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">⬆ Import ke Leads</button>` : ''}
           <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:var(--bg2);color:var(--text2);text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">Open</a>
         </div>
       </div>`;

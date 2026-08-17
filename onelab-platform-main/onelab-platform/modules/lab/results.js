@@ -34,7 +34,7 @@ function renderResultTab(){
       <button class="btn btn-teal btn-sm" onclick="openResultForm()">+ Input Manual</button>
     </div>
     ${patients.length?`
-    <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
+    <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)">
       <div id="res-worklist" style="border-right:1px solid var(--border);overflow-y:auto;max-height:640px;background:var(--lgray)"></div>
       <div style="display:flex;flex-direction:column;min-width:0">
         <div id="res-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg)"></div>
@@ -78,7 +78,7 @@ async function selectResultPatient(admId){
     <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span style="font-size:15px;font-weight:800;color:var(--navy)">${_resAdm.patient_name||''}</span>
-        ${_resAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_resAdm.patient_blood_type}</span>`:''}
+        ${_resAdm.patient_blood_type?`<span style="color:var(--danger-strong);font-weight:800;margin-left:8px">${_resAdm.patient_blood_type}</span>`:''}
         <div style="font-size:11px;color:var(--gray);font-family:monospace">${_resAdm.mr_number||''} · ${_resAdm.visit_number||''} · ${_resAdm.patient_gender==='F'?'Perempuan':'Laki-laki'}${_resAdm.patient_age?' · '+_resAdm.patient_age+' th':''}</div>
       </div>
       <button class="btn btn-teal btn-sm" onclick="resSaveAll()">Simpan Hasil</button>
@@ -142,7 +142,7 @@ function resInterpret(input){
   if(norm&&!isNaN(num)){ if(num>norm.range_max) flag='H'; else if(num<norm.range_min) flag='L'; }
   const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
   const c=m?labColor(m.color_code):'#94A3B8';
-  flagCell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626"></span>'
+  flagCell.innerHTML= crit?'<span style="font-weight:800;color:var(--danger-strong)"></span>'
     : flag?`<span style="font-weight:800;color:${flag==='H'?'#EF4444':'#0EA5E9'}">${flag}</span>`
     : (m?`<span style="color:${c}">●</span>`:'');
   input.style.borderColor=c;
@@ -176,7 +176,7 @@ async function resPickRow(rid){
       `select=result_value,unit,created_at&patient_name=eq.${encodeURIComponent(r.patient_name||'')}&product_id=eq.${r.product_id}${r.product_item_id?`&product_item_id=eq.${r.product_item_id}`:''}&result_value=not.is.null&status=in.(Approved,Released,Validated)&order=created_at.desc&limit=1`).catch(()=>[]);
     const p=prev?.[0];
     const box=document.getElementById('res-prevbox');
-    if(box) box.innerHTML= p?`Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:#94A3B8">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
+    if(box) box.innerHTML= p?`Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:var(--text4)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
     const prevCell=tr.querySelector('.res-prev'); if(prevCell&&p) prevCell.textContent=p.result_value;
   } catch(e){}
 }
@@ -396,7 +396,7 @@ function renderRRChips(rrs){
           ${rr.value_type==='qualitative'
             ? `: ${rr.expected_values||''}`
             : (rr.range_min!=null&&rr.range_max!=null?`: ${rr.range_min}–${rr.range_max} ${rr.unit||''}`:'')}
-          ${(rr.critical_low!=null||rr.critical_high!=null)?`<span style="color:#DC2626"> · kritis ${rr.critical_low??'‹'}${rr.critical_low!=null&&rr.critical_high!=null?'/':''}${rr.critical_high??'›'}</span>`:''}</div>`;
+          ${(rr.critical_low!=null||rr.critical_high!=null)?`<span style="color:var(--danger-strong)"> · kritis ${rr.critical_low??'‹'}${rr.critical_low!=null&&rr.critical_high!=null?'/':''}${rr.critical_high??'›'}</span>`:''}</div>`;
       }).join('')}
     </div>`;
 }

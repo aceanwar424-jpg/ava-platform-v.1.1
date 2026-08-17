@@ -201,16 +201,16 @@ function lpcTest(){
   const cfg=lpcReadForm();
   const raw=document.getElementById('lpc-raw')?.value||'';
   const box=document.getElementById('lpc-preview'); if(!box) return;
-  if(!raw.trim()){ box.innerHTML='<span style="color:#B45309">Tempel/ pilih pesan dulu.</span>'; return; }
+  if(!raw.trim()){ box.innerHTML='<span style="color:var(--warn-deep)">Tempel/ pilih pesan dulu.</span>'; return; }
   const { entries, barcode } = parseWithProfile(raw, cfg);
   const sample = barcode ? (typeof labSamples!=='undefined'?labSamples:[]).find(s=>String(s.barcode)===String(barcode)||String(s.visit_number)===String(barcode)) : null;
   box.innerHTML=`
     <div style="margin-bottom:6px">Barcode terbaca: <b style="font-family:monospace">${barcode||'(tak ada)'}</b>
-      ${barcode?(sample?`<span class="badge badge-green">✓ ${sample.patient_name||'sampel ditemukan'}</span>`:'<span class="badge" style="background:#FEE2E2;color:#B91C1C">sampel tak ditemukan</span>'):''}</div>
+      ${barcode?(sample?`<span class="badge badge-green">✓ ${sample.patient_name||'sampel ditemukan'}</span>`:'<span class="badge" style="background:#FEE2E2;color:var(--danger-deep)">sampel tak ditemukan</span>'):''}</div>
     <div style="margin-bottom:4px"><b>${entries.length}</b> baris hasil terbaca:</div>
     <div class="table-wrap" style="max-height:220px;overflow:auto"><table><thead><tr><th>Kode</th><th>Nilai</th><th>Unit</th><th>Flag</th></tr></thead><tbody>
     ${entries.length?entries.map(e=>`<tr><td style="font-family:monospace;font-weight:700">${e.code}</td><td style="font-weight:700">${e.value}</td><td style="font-size:11px;color:var(--gray)">${e.unit||''}</td><td style="font-size:11px">${e.flag||''}</td></tr>`).join('')
-      :'<tr><td colspan="4" style="text-align:center;color:#B45309;padding:12px">0 baris — sesuaikan Record/field hasil.</td></tr>'}
+      :'<tr><td colspan="4" style="text-align:center;color:var(--warn-deep);padding:12px">0 baris — sesuaikan Record/field hasil.</td></tr>'}
     </tbody></table></div>`;
 }
 // Tebak posisi field dari pesan nyata (mengatasi format alat non-standar).
@@ -369,12 +369,12 @@ async function lpcHostReload(sampleId){
   _lpcHostSampleId=parseInt(sampleId)||sampleId||'';
   const body=document.getElementById('lpc-hm-body'); if(!body) return;
   const s=(typeof labSamples!=='undefined'?labSamples:[]).find(x=>x.id==_lpcHostSampleId);
-  if(!s){ body.innerHTML='<div style="color:#B45309">Pilih sampel dulu.</div>'; return; }
+  if(!s){ body.innerHTML='<div style="color:var(--warn-deep)">Pilih sampel dulu.</div>'; return; }
   body.innerHTML='Memuat parameter…';
   let drafts=(typeof labResults!=='undefined'?labResults:[]).filter(r=>r.admission_id==s.admission_id && r.product_id==s.product_id && r.status==='Draft');
   if(!drafts.length && s.admission_id){ drafts=await sbGet('lab_results',`select=*&admission_id=eq.${s.admission_id}&product_id=eq.${s.product_id}&status=eq.Draft&order=id.asc`).catch(()=>[]); }
   _lpcHostDrafts=drafts||[];
-  if(!_lpcHostDrafts.length){ body.innerHTML='<div style="color:#B45309">Sampel ini belum punya parameter draft. Pilih sampel lain dgn produk yang sama.</div>'; return; }
+  if(!_lpcHostDrafts.length){ body.innerHTML='<div style="color:var(--warn-deep)">Sampel ini belum punya parameter draft. Pilih sampel lain dgn produk yang sama.</div>'; return; }
   const used=new Set();
   const rows=_lpcHostEntries.map((e,i)=>{
     const sug=lpcSuggest(e.code,_lpcHostDrafts,used); if(sug) used.add(sug.id);

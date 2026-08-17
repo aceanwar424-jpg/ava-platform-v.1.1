@@ -176,7 +176,7 @@ async function lpiRenderPanel(containerId, admId){
           🧠 Kesimpulan Pemeriksaan (Keseluruhan)
           <span style="font-weight:600;color:var(--gray);font-size:10.5px">— dibuat otomatis dari pola hasil, wajib dikonfirmasi dokter</span>
         </div>
-        <button class="btn btn-sm" style="background:#7C3AED;color:#fff"
+        <button class="btn btn-sm" style="background:var(--violet-deep);color:var(--on-accent)"
           onclick="lpiGenerate(${admId})">✨ Buat Otomatis</button>
       </div>
 

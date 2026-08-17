@@ -66,7 +66,7 @@ function renderCheckinTab(){
         }).join('')}
         </tbody></table>
       </div>
-      <div id="ci-detail" style="position:sticky;top:12px;background:#fff;border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:calc(100vh - 130px);overflow-y:auto;box-shadow:var(--shadow-sm,0 1px 3px rgba(0,0,0,.06))"></div>
+      <div id="ci-detail" style="position:sticky;top:12px;background:var(--white);border:1px solid var(--border);border-radius:12px;overflow:hidden;max-height:calc(100vh - 130px);overflow-y:auto;box-shadow:var(--shadow-sm,0 1px 3px rgba(0,0,0,.06))"></div>
     </div>`:`<div class="empty-state"><div class="ico">🧪</div><h3>Belum ada sampel</h3><p>Scan barcode untuk check-in.</p></div>`}`;
   loadPendingLabels();
   if(samples.length && _ciSel!=null) renderCheckinDetail(_ciSel);
@@ -89,8 +89,8 @@ function checkinActions(s){
   const isFinal=rs.some(r=>['Validated','Approved','Released'].includes(r.status));
   // Sampel tanpa hasil & belum final → boleh dihapus (mis. duplikat check-in ganda).
   const del = (!hasVal && !isFinal) ? `<button class="act-btn del" title="Hapus sampel (belum ada hasil)" onclick="deleteCheckinSample(${s.id})">🗑</button>` : '';
-  if(s.status==='Rejected') return `<button class="act-btn" style="color:#0EA5E9;font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>${del}`;
-  if(s.status==='Pending')  return `<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="processSample(${s.id})">Proses</button>
+  if(s.status==='Rejected') return `<button class="act-btn" style="color:var(--info);font-size:11px" onclick="processSample(${s.id})">Terima Ulang</button>${del}`;
+  if(s.status==='Pending')  return `<button class="act-btn" style="color:var(--success-strong);font-size:11px" onclick="processSample(${s.id})">Proses</button>
     <button class="act-btn del" onclick="rejectSample(${s.id})">Tolak</button>${del}`;
   if(rs.some(r=>r.status==='Approved'||r.status==='Released')) return `<span style="font-size:11px;color:var(--gray)">selesai</span>`;
   if(rs.some(r=>r.status==='Validated'))                       return `<button class="btn btn-outline btn-xs" onclick="switchLabTab('approval')">Approval →</button>`;
@@ -221,11 +221,11 @@ async function loadPendingLabels(){
           🏷️ ${labels.length} Label Menunggu Check-In dari Klinik</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           ${labels.map((l,i)=>`
-            <div onclick="openLabelCheckin(${l.id})" style="cursor:pointer;background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;min-width:180px">
+            <div onclick="openLabelCheckin(${l.id})" style="cursor:pointer;background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:8px 12px;min-width:180px">
               <div style="font-family:monospace;font-size:11px;font-weight:700;color:var(--teal)">${l.label_barcode}</div>
               <div style="font-size:12px;font-weight:600">${l.patient_name}</div>
               <div style="font-size:10.5px;color:var(--gray)">
-                <span style="background:var(--teal);color:#fff;padding:1px 6px;border-radius:6px;margin-right:4px">${l.sampel_type}</span>
+                <span style="background:var(--teal);color:var(--on-accent);padding:1px 6px;border-radius:6px;margin-right:4px">${l.sampel_type}</span>
                 ${itemCounts[i]?.length||0} tes</div>
             </div>`).join('')}
         </div>
@@ -270,7 +270,7 @@ async function openLabelCheckin(labelId){
     </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${label.patient_name}</strong> · ${label.visit_number} ·
-      <span style="background:var(--teal);color:#fff;padding:1px 8px;border-radius:8px;font-size:10.5px;margin-left:4px">${label.sampel_type}</span>
+      <span style="background:var(--teal);color:var(--on-accent);padding:1px 8px;border-radius:8px;font-size:10.5px;margin-left:4px">${label.sampel_type}</span>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">
       ${items.length} Tes dalam label ini — semua akan check-in sekaligus</div>
@@ -487,7 +487,7 @@ function rejectSample(id){
       <div class="modal-title">🚫 Tolak Sampel</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div style="background:#FFF8E1;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
+    <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${s.patient_name||'—'}</strong> · ${s.product_name||'—'} · <span style="font-family:monospace">${s.barcode||''}</span></div>
     <div class="form-group"><label>Alasan Penolakan (pra-analitik) *</label>
       <select id="rej-reason">

@@ -119,7 +119,7 @@ function renderHRDKPI() {
     {icon:'',val:formatCurrency(totalGaji),label:'Total Gaji/Bln',color:'#8B5CF6'},
     {icon:'🏆',val:topDiv?`${topDiv[0]} (${topDiv[1]})`:'—',label:'Divisi Terbesar',color:'#00897B'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);
+    <div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);
       border-left:4px solid ${k.color}">
       <div style="font-size:20px">${k.icon}</div>
       <div style="font-size:${k.val.toString().length>8?'12px':'16px'};font-weight:800;color:${k.color}">${k.val}</div>
@@ -181,7 +181,7 @@ function renderEmpTable(data) {
       padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${e.status||'—'}</span></td>
     <td>
       ${hasAccount
-        ? '<span style="color:#22C55E;font-size:11px;font-weight:700">✓ Terhubung</span>'
+        ? '<span style="color:var(--success-strong);font-size:11px;font-weight:700">✓ Terhubung</span>'
         : `<button class="btn btn-xs btn-ghost" onclick="openCreateAccountForm(${e.id},'${(e.full_name||'').replace(/'/g,"\\'")}','${e.email||''}')">+ Buat Akun</button>`}
     </td>
     <td style="font-size:12px;font-weight:600;color:var(--navy)">${e.base_salary?formatCurrency(e.base_salary):'—'}</td>
@@ -506,7 +506,7 @@ function renderLeaveTable(data) {
       <td>
         <div class="act-row">
           ${l.status==='Pending'?`
-            <button class="act-btn" style="color:#22C55E" onclick="approveLeave(${l.id},'Approved')">✅</button>
+            <button class="act-btn" style="color:var(--success-strong)" onclick="approveLeave(${l.id},'Approved')">✅</button>
             <button class="act-btn" style="color:var(--danger)" onclick="approveLeave(${l.id},'Rejected')" style="font-size:10.5px;font-weight:700">Batal</button>`:''}
         </div>
       </td>
@@ -643,7 +643,7 @@ function renderPayrollTab() {
           <td style="font-size:12px;color:var(--gray)">${e.division||'—'}</td>
           <td>${e.base_salary?formatCurrency(e.base_salary):'—'}</td>
           <td style="color:var(--danger)">${bpjs?formatCurrency(bpjs):'—'}</td>
-          <td style="font-weight:700;color:#22C55E">${net?formatCurrency(net):'—'}</td>
+          <td style="font-weight:700;color:var(--success-strong)">${net?formatCurrency(net):'—'}</td>
           <td style="font-size:12px;color:var(--gray)">${e.bank_name||'—'} ${e.bank_account||''}</td>
         </tr>`;
       }).join('')}
@@ -799,7 +799,7 @@ function openCreateAccountForm(empId, empName, empEmail) {
     <div class="form-group">
       <label>Email (wajib sama dengan yang dipakai untuk login nanti) *</label>
       <input type="email" id="ca-email" value="${empEmail||''}" placeholder="nama@onelab.id">
-      ${!empEmail?'<div class="form-hint" style="color:#DC2626">⚠️ Data karyawan ini belum punya email — isi dulu di sini, sebaiknya juga lengkapi di Edit Karyawan.</div>':''}
+      ${!empEmail?'<div class="form-hint" style="color:var(--danger-strong)">⚠️ Data karyawan ini belum punya email — isi dulu di sini, sebaiknya juga lengkapi di Edit Karyawan.</div>':''}
     </div>
     <div class="form-group">
       <label>Role Akses</label>

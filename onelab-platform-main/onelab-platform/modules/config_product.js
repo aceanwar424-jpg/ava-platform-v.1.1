@@ -94,7 +94,7 @@ function renderProdKPI() {
     {label:'Kategori',      val:Object.keys(byKat).length,      color:'#8B5CF6'},
     {label:'Terbanyak',     val:topKat?`${topKat[0]}`:'-',      color:'#0EA5E9'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);
+    <div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);
       border-left:4px solid ${k.color}">
       <div style="font-size:${String(k.val).length>8?'11px':'16px'};font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:10px;color:var(--gray)">${k.label}</div>
@@ -138,8 +138,8 @@ function renderProdTable(data) {
       <td>
         <div style="font-weight:600;color:var(--navy)">${p.nama_tes||'—'}
           ${p._items>1?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL ${p._items}</span>`
-            :p._items===1?`<span style="background:var(--bg2);color:#475569;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
-            :`<span title="Belum ada code item" style="background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">⚠ 0 item</span>`}
+            :p._items===1?`<span style="background:var(--bg2);color:var(--text-dim);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
+            :`<span title="Belum ada code item" style="background:var(--warn-soft);color:var(--warn-deeper);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">⚠ 0 item</span>`}
         </div>
         ${p.sub_kategori?`<div style="font-size:10px;color:var(--gray)">${p.sub_kategori}</div>`:''}
       </td>

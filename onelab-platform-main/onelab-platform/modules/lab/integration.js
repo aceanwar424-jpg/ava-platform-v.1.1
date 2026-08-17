@@ -211,10 +211,10 @@ async function renderAnalyzerHub(){
 
   if(msgs===null){
     host.innerHTML=`
-      <div style="background:#FFF8E1;border:1px solid #FDE68A;border-radius:12px;padding:18px 20px;font-size:13px;color:#92400E;line-height:1.7">
+      <div style="background:var(--warn-soft2);border:1px solid #FDE68A;border-radius:12px;padding:18px 20px;font-size:13px;color:var(--warn-deeper);line-height:1.7">
         Modul <strong>Integrasi Alat</strong> memerlukan tabel <code>analyzer_messages</code>.<br>
         Jalankan <code>supabase_analyzer_bridge.sql</code> di Supabase SQL Editor, lalu muat ulang halaman ini.<br>
-        <span style="font-size:12px;color:#B45309">Setelah itu, jalankan <code>OneLab Connector</code> di PC lab agar hasil alat masuk ke sini.</span>
+        <span style="font-size:12px;color:var(--warn-deep)">Setelah itu, jalankan <code>OneLab Connector</code> di PC lab agar hasil alat masuk ke sini.</span>
       </div>`;
     return;
   }
@@ -338,7 +338,7 @@ function hubInspectMessage(msgId){
     </div>
 
     <div style="font-size:12px;font-weight:700;margin:8px 0 4px">1️⃣ Kiriman mentah (dari alat)</div>
-    <pre style="background:#0b1220;color:var(--border);border-radius:8px;padding:10px;font-size:11.5px;max-height:170px;overflow:auto;white-space:pre-wrap">${_esc(msg.raw_text||'(kosong)')}</pre>
+    <pre style="background:var(--bg);color:var(--border);border-radius:8px;padding:10px;font-size:11.5px;max-height:170px;overflow:auto;white-space:pre-wrap">${_esc(msg.raw_text||'(kosong)')}</pre>
 
     <div style="font-size:12px;font-weight:700;margin:12px 0 4px">2️⃣ Hasil parse — ${entries.length} baris terbaca</div>
     <div class="table-wrap" style="max-height:190px;overflow:auto"><table><thead><tr>
@@ -391,7 +391,7 @@ async function hubInspectMap(msgId){
           <td>${d?'<span class="badge badge-green">✓</span>':'<span class="badge badge-gray">dilewati</span>'}</td></tr>`;
       }).join('')}
     </tbody></table></div>
-    ${r.matched<r.entries.length?`<div style="font-size:11px;color:#B45309;margin-top:6px">Kode "tidak cocok" = host_code parameter belum diisi. Set di <b>Master Produk → item → Host Code</b> agar cocok otomatis.</div>`:''}`;
+    ${r.matched<r.entries.length?`<div style="font-size:11px;color:var(--warn-deep);margin-top:6px">Kode "tidak cocok" = host_code parameter belum diisi. Set di <b>Master Produk → item → Host Code</b> agar cocok otomatis.</div>`:''}`;
   if(applyBtn) applyBtn.style.display = r.matched?'':'none';
 }
 

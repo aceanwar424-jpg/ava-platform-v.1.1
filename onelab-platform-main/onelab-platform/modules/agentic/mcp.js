@@ -101,7 +101,7 @@ function renderAgMcpTab() {
             </div>
             <div>
               <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--bg);">MCP Console — Model Context Protocol 2026</h3>
-              <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Standar terintegrasi untuk menghubungkan Agentic AI ke HL7 FHIR (SATUSEHAT), LangCare Privacy, Bika Westgard QC, OHIF DICOM PACS, & SQLite DB.</p>
+              <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Standar terintegrasi untuk menghubungkan Agentic AI ke HL7 FHIR (SATUSEHAT), LangCare Privacy, Bika Westgard QC, OHIF DICOM PACS, & SQLite DB.</p>
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
@@ -121,7 +121,7 @@ function renderAgMcpTab() {
       <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
         <div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
-            <span style="font-family:monospace; font-size:12px; font-weight:700; color:#38BDF8; background:rgba(56,189,248,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.2);">
+            <span style="font-family:monospace; font-size:12px; font-weight:700; color:var(--sky); background:rgba(56,189,248,0.1); padding:2px 8px; border-radius:6px; border:1px solid rgba(56,189,248,0.2);">
               ${tool.name}
             </span>
             <span style="font-size:10px; color:var(--accent2); font-mono">
@@ -134,8 +134,8 @@ function renderAgMcpTab() {
           </div>
         </div>
         <div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.06); pt:10px; font-size:11px;">
-          <span style="color:#94A3B8;">Kategori: <strong style="color:var(--bg2);">${tool.category}</strong></span>
-          <button onclick="testMcpTool('${tool.id}')" style="background:#0EA5E9; color:white; border:none; padding:4px 10px; border-radius:6px; font-weight:600; cursor:pointer; font-size:11px;">
+          <span style="color:var(--text4);">Kategori: <strong style="color:var(--bg2);">${tool.category}</strong></span>
+          <button onclick="testMcpTool('${tool.id}')" style="background:var(--info); color:var(--on-accent); border:none; padding:4px 10px; border-radius:6px; font-weight:600; cursor:pointer; font-size:11px;">
             Test Run Tool
           </button>
         </div>

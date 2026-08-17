@@ -99,7 +99,7 @@ async function crmPaintBoard(el) {
 
   const note = document.getElementById('crm-note');
   if (note) note.innerHTML = (idle || []).length
-    ? `<span style="color:#B45309;font-weight:600">⚠ ${idle.length} deal menganggur</span>`
+    ? `<span style="color:var(--warn-deep);font-weight:600">⚠ ${idle.length} deal menganggur</span>`
     : '';
 
   if (!crmStages.length) {
@@ -134,7 +134,7 @@ async function crmPaintBoard(el) {
           <div style="font-size:11.5px;color:var(--text3);margin-bottom:8px">
             Perkiraan ${formatCurrency(total)}${s.probability != null ? ` · ${s.probability}%` : ''}</div>
           ${items.slice(0, 12).map(d => `
-            <div style="background:#fff;border:1px solid var(--border);border-radius:7px;padding:8px 10px;
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:7px;padding:8px 10px;
               margin-bottom:6px;${idleIds.has(d.id) ? 'border-left:3px solid #B45309' : ''}">
               <div style="font-size:12.5px;font-weight:600">${d.deal_name || d.title || crmPartnerName(d.partner_id)}</div>
               <div style="font-size:11px;color:var(--gray)">${crmPartnerName(d.partner_id)}</div>
@@ -145,7 +145,7 @@ async function crmPaintBoard(el) {
                   ${crmStages.map(x => `<option value="${x.stage_key}"${x.stage_key === s.stage_key ? ' selected' : ''}>${x.stage_name}</option>`).join('')}
                 </select>
               </div>
-              ${idleIds.has(d.id) ? '<div style="font-size:10px;color:#B45309;margin-top:3px">⚠ menganggur</div>' : ''}
+              ${idleIds.has(d.id) ? '<div style="font-size:10px;color:var(--warn-deep);margin-top:3px">⚠ menganggur</div>' : ''}
             </div>`).join('') || '<div style="font-size:11.5px;color:var(--gray);padding:6px 0">Kosong</div>'}
           ${items.length > 12 ? `<div style="font-size:11px;color:var(--gray)">+${items.length - 12} lainnya</div>` : ''}
         </div>`;
@@ -198,7 +198,7 @@ async function crmPaintFunnel(el) {
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-bottom:18px">
       ${[{ l: 'Nilai perkiraan pipeline', v: f.pipeline_value, c: '#B45309', tag: 'perkiraan' },
          { l: 'Pendapatan nyata terkumpul', v: f.revenue_actual ?? f.total_revenue, c: '#15803D', tag: 'nyata' }]
-        .map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+        .map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
           border-radius:10px;padding:13px">
           <div style="font-size:10.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.06em">${k.l}</div>
           <div style="font-size:18px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${formatCurrency(k.v)}</div>
@@ -242,7 +242,7 @@ async function crmPaintFunnel(el) {
           ${sumber.map(s => `<tr style="border-bottom:1px solid var(--border)">
             <td style="padding:5px">${s.source || '—'}</td>
             <td style="padding:5px;text-align:right;color:var(--gray)">${s.lead_count ?? 0} leads</td>
-            <td style="padding:5px;text-align:right;font-weight:700;color:#15803D">${formatCurrency(s.revenue ?? 0)}</td>
+            <td style="padding:5px;text-align:right;font-weight:700;color:var(--success-deep)">${formatCurrency(s.revenue ?? 0)}</td>
           </tr>`).join('')}</tbody></table>`
           : '<div style="color:var(--gray);font-size:12.5px">Belum ada data sumber</div>'}
       </div>
@@ -272,7 +272,7 @@ async function crmPaintPartners(el) {
       <th style="text-align:right">Faktur</th><th style="text-align:right">Kunjungan Pasien</th><th>Porsi</th>
     </tr></thead><tbody>${ltv.map(p => `<tr style="cursor:pointer" onclick="crmOpenPartnerTrend(${p.partner_id},'${(p.partner_name || '').replace(/'/g, "\\'")}')">
       <td style="font-weight:600">${p.partner_name || '—'}</td>
-      <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:#15803D">${formatCurrency(p.total_revenue)}</td>
+      <td style="text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:var(--success-deep)">${formatCurrency(p.total_revenue)}</td>
       <td style="text-align:right">${p.invoice_count ?? 0}</td>
       <td style="text-align:right">${p.visit_count ?? 0}</td>
       <td><div style="height:6px;background:var(--border);border-radius:3px;min-width:70px">
@@ -333,7 +333,7 @@ async function crmPaintTarget(el) {
         <td style="font-weight:600">${r.assigned_name || '—'}</td>
         <td style="font-size:12.5px">${r.objective || '—'}</td>
         <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(t)}</td>
-        <td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#15803D">${formatCurrency(a)}</td>
+        <td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--success-deep)">${formatCurrency(a)}</td>
         <td style="text-align:right;font-weight:800;color:${warna}">${pct}%</td>
         <td><div style="height:7px;background:var(--border);border-radius:4px;min-width:80px">
           <div style="height:100%;width:${Math.min(pct, 100)}%;background:${warna};border-radius:4px"></div></div></td>

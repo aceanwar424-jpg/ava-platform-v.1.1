@@ -7,11 +7,11 @@ let mrPatients = [], mrActivePatient = null;
 
 async function renderMedRecord() {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('medrecord')" title="Kembali ke daftar menu Rekam Medis">← Menu Rekam Medis</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('medrecord')" title="Kembali ke daftar menu Rekam Medis">← Menu Rekam Medis</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rekam Medis</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Rekam Medis</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Rekam medis gabungan per pasien — anamnesa, lab, radiologi, EKG, semua dalam satu</span>
         </div>
       </div>
@@ -64,7 +64,7 @@ async function searchPatientMR(q) {
           display:flex;align-items:center;gap:12px;transition:all .15s"
         onmouseover="this.style.borderColor='var(--teal)';this.style.background='var(--mint)'"
         onmouseout="this.style.borderColor='var(--border)';this.style.background=''">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--teal);color:#fff;
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--teal);color:var(--on-accent);
           display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0">
           ${p.name.charAt(0).toUpperCase()}
         </div>
@@ -131,7 +131,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
     <!-- Patient Header -->
     <div class="card" style="margin-bottom:16px;border-left:4px solid var(--teal)">
       <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-        <div style="width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;
+        <div style="width:56px;height:56px;border-radius:50%;background:var(--teal);color:var(--on-accent);
           display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;flex-shrink:0">
           ${patientName.charAt(0).toUpperCase()}
         </div>
@@ -163,7 +163,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
         <!-- Visit Header -->
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:36px;height:36px;border-radius:50%;background:var(--navy);color:#fff;
+            <div style="width:36px;height:36px;border-radius:50%;background:var(--navy);color:var(--on-accent);
               display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">
               ${adms.indexOf(a)+1}
             </div>
@@ -323,11 +323,11 @@ function paintMRClinical() {
 
   el.innerHTML = `
     ${alg.length ? `
-    <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;
+    <div style="background:var(--danger-soft);border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;
       border-radius:10px;padding:11px 15px;margin-bottom:14px">
-      <div style="font-weight:800;color:#B91C1C;font-size:12.5px;margin-bottom:5px">⚠️ ALERGI</div>
+      <div style="font-weight:800;color:var(--danger-deep);font-size:12.5px;margin-bottom:5px">⚠️ ALERGI</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${alg.map(a=>`<span style="background:#fff;border:1px solid #FCA5A5;border-radius:6px;
+        ${alg.map(a=>`<span style="background:var(--white);border:1px solid #FCA5A5;border-radius:6px;
           padding:3px 9px;font-size:12px"><b>${a.allergen}</b>${a.reaction?` — ${a.reaction}`:''}
           <span style="color:${sevCol[a.severity]||'#6B7A8B'};font-weight:700">· ${a.severity||''}</span></span>`).join('')}
       </div>
@@ -583,17 +583,17 @@ async function printFullMedRecord(patientName) {
     <style>
       body{font-family:Arial,sans-serif;padding:30px;font-size:12px;color:#1A2B3C}
       .header{border-bottom:3px solid #0A2342;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between}
-      h2{color:#0A2342;margin:0}.card{border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px}
+      h2{color:var(--navy-deep);margin:0}.card{border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px}
       table{width:100%;border-collapse:collapse}td,th{padding:5px 8px}
-      thead tr{background:#0A2342;color:#fff}
+      thead tr{background:var(--navy-deep);color:var(--on-accent)}
       @media print{button{display:none}}
     </style></head><body>
-    <button onclick="window.print()" style="position:fixed;top:12px;right:12px;padding:6px 14px;background:#0A2342;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">🖨 Print</button>
+    <button onclick="window.print()" style="position:fixed;top:12px;right:12px;padding:6px 14px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer;font-size:12px">🖨 Print</button>
     <div class="header">
-      <div><h2>${orgName}</h2><div style="font-size:11px;color:#546E7A">${orgAddr}</div></div>
+      <div><h2>${orgName}</h2><div style="font-size:11px;color:var(--slate)">${orgAddr}</div></div>
       <div style="text-align:right">
-        <strong style="font-size:16px;color:#0A2342">REKAM MEDIS PASIEN</strong>
-        <div style="font-size:11px;color:#546E7A">Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div>
+        <strong style="font-size:16px;color:var(--navy-deep)">REKAM MEDIS PASIEN</strong>
+        <div style="font-size:11px;color:var(--slate)">Dicetak: ${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div>
       </div>
     </div>
     ${content}

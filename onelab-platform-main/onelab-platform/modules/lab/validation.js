@@ -62,12 +62,12 @@ function valPatientsByStatus(targetStatus){
 function valPaneHtml(mode){
   const p=VAL_MODES[mode].prefix;
   return `
-    <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
+    <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)">
       <div id="${p}-worklist" style="border-right:1px solid var(--border);overflow-y:auto;max-height:640px;background:var(--lgray)"></div>
       <div style="display:flex;flex-direction:column;min-width:0">
         <div id="${p}-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg)"></div>
         <div id="${p}-grid" style="overflow:auto;max-height:520px"></div>
-        <div id="${p}-actionbar" style="border-top:1px solid var(--border);background:#fff"></div>
+        <div id="${p}-actionbar" style="border-top:1px solid var(--border);background:var(--white)"></div>
         ${mode==='approve' ? `<div id="${p}-concl"></div>` : ''}
       </div>
       <div id="${p}-notes" style="border-left:1px solid var(--border);background:var(--lgray);padding:14px;overflow-y:auto;max-height:640px"></div>
@@ -88,7 +88,7 @@ function renderValidationTab(){
     <div style="margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span class="badge badge-gold">${toValidate.length} hasil siap divalidasi</span>
-        ${unackCrit?`<span class="badge" style="background:#FEF2F2;color:#DC2626;margin-left:6px">${unackCrit} Kritis Belum Dilapor</span>`:''}
+        ${unackCrit?`<span class="badge" style="background:var(--danger-soft);color:var(--danger-strong);margin-left:6px">${unackCrit} Kritis Belum Dilapor</span>`:''}
       </div>
       ${toValidate.length?`<button class="btn btn-ghost btn-sm" onclick="validateAllResults()">Validasi Semua Pasien (non-kritis)</button>`:''}
     </div>
@@ -135,9 +135,9 @@ function renderValWorklist(patients, mode){
     const crit=p.rows.some(isCriticalResult);
     return `<div onclick="selectValidationPatient(${p.admission_id},'${mode}')"
       style="padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;${sel?'background:var(--mint);border-left:3px solid var(--teal)':'border-left:3px solid transparent'}">
-      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' <span style="font-size:10px;color:#DC2626;background:#FEF2F2;padding:1px 4px;border-radius:4px">KRITIS</span>':''}</div>
+      <div style="font-weight:700;font-size:13px;color:var(--navy)">${p.patient_name||'—'}${crit?' <span style="font-size:10px;color:var(--danger-strong);background:var(--danger-soft);padding:1px 4px;border-radius:4px">KRITIS</span>':''}</div>
       <div style="font-size:10.5px;color:var(--gray);font-family:monospace">${p.mr_number||''} ${p.visit_number||''}</div>
-      <div style="font-size:10px;color:#0EA5E9;font-weight:700;margin-top:2px">${filled} test(s) dgn hasil</div>
+      <div style="font-size:10px;color:var(--info);font-weight:700;margin-top:2px">${filled} test(s) dgn hasil</div>
     </div>`;
   }).join('') || '<div style="padding:16px;text-align:center;color:var(--gray);font-size:12px">Tidak ada pasien</div>';
 }
@@ -193,7 +193,7 @@ async function selectValidationPatient(admId, mode='validate'){
       <div>
         <span style="font-size:15px;font-weight:800;color:var(--navy)">${admInfo.patient_name||''}</span>
         ${[jk,umur].filter(Boolean).length?`<span style="font-size:11px;color:var(--gray);margin-left:8px">${[jk,umur].filter(Boolean).join(' · ')}</span>`:''}
-        ${admInfo.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">Gol. ${admInfo.patient_blood_type}</span>`:''}
+        ${admInfo.patient_blood_type?`<span style="color:var(--danger-strong);font-weight:800;margin-left:8px">Gol. ${admInfo.patient_blood_type}</span>`:''}
       </div>
       <div style="font-size:11px;color:var(--gray);font-family:monospace">${admInfo.mr_number||''} · ${admInfo.visit_number||''}</div>
     </div>
@@ -224,9 +224,9 @@ async function selectValidationPatient(admId, mode='validate'){
         const held=kosong || (crit && !r.critical_ack_at);
         return `<tr data-rid="${r.id}" style="${kosong?'opacity:.55':''}">
           <td style="padding:5px 10px;font-weight:600;cursor:pointer" onclick="selectValResult(${r.id},'${mode}')">${r.item_name||r.product_name||'—'}${r.item_code?` <span style="font-size:9px;color:var(--gray);font-family:monospace">${r.item_code}</span>`:''}
-            ${held?`<span style="font-size:9px;font-weight:700;color:#B45309;background:#FEF3C7;padding:1px 6px;border-radius:10px;margin-left:6px">${kosong?'menunggu hasil':'kritis belum dilapor'} · tertahan</span>`:''}</td>
+            ${held?`<span style="font-size:9px;font-weight:700;color:var(--warn-deep);background:var(--warn-soft);padding:1px 6px;border-radius:10px;margin-left:6px">${kosong?'menunggu hasil':'kritis belum dilapor'} · tertahan</span>`:''}</td>
           <td style="padding:5px 8px;font-weight:800;color:${col};cursor:pointer" onclick="selectValResult(${r.id},'${mode}')">${r.result_value||'—'}</td>
-          <td style="padding:5px 4px;text-align:center">${crit?'<span style="color:#DC2626;font-weight:800;font-size:10px">KRITIS </span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800">${flag}</span>`:''}</td>
+          <td style="padding:5px 4px;text-align:center">${crit?'<span style="color:var(--danger-strong);font-weight:800;font-size:10px">KRITIS </span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800">${flag}</span>`:''}</td>
           <td style="padding:5px 8px;color:var(--gray)">${r.unit||''}</td>
           <td style="padding:5px 8px;color:var(--gray);font-size:11px">${r.normal_min!=null?`${r.normal_min}–${r.normal_max}`:r.interpretation||'—'}</td>
         </tr>`;
@@ -260,7 +260,7 @@ function renderValActionBar(mode, admId, rows){
     bar.innerHTML=`
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;flex-wrap:wrap">
         <div style="font-size:11.5px;color:var(--gray)">
-          ${eligible} hasil siap divalidasi${infoBits.length?` · <span style="color:#B45309">${infoBits.join(' · ')}</span>`:''}
+          ${eligible} hasil siap divalidasi${infoBits.length?` · <span style="color:var(--warn-deep)">${infoBits.join(' · ')}</span>`:''}
         </div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-ghost btn-sm" onclick="printPatientResults(${admId},'validate')">🖨️ Cetak Sementara</button>
@@ -295,8 +295,8 @@ function selectValResult(rid, mode='validate'){
       <div style="font-weight:700;color:#0369A1;margin-bottom:4px">✅ AI Conclusion</div>
       <div style="color:var(--navy);line-height:1.4;margin-bottom:6px">${r.ai_conclusion}</div>
       ${isApprovalTab?`
-        <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:#fff;color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
-        <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:#0EA5E9;color:#fff;border:0;border-radius:4px;font-size:10px;cursor:pointer">Save Edit</button>
+        <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:var(--white);color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
+        <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:var(--info);color:var(--on-accent);border:0;border-radius:4px;font-size:10px;cursor:pointer">Save Edit</button>
       `:''}
     </div>
   `:'';
@@ -308,7 +308,7 @@ function selectValResult(rid, mode='validate'){
       <div><strong>Hasil:</strong> ${r.result_value||'—'} ${r.unit||''}</div>
       <div><strong>Interpretasi:</strong> <span style="color:${labColor(r.color_code)};font-weight:700">${r.interpretation||'—'}</span></div>
       ${r.normal_min!=null?`<div><strong>Rujukan:</strong> ${r.normal_min}–${r.normal_max}</div>`:''}
-      ${isCriticalResult(r)?`<div><strong style="color:#DC2626">NILAI KRITIS</strong></div>`:''}
+      ${isCriticalResult(r)?`<div><strong style="color:var(--danger-strong)">NILAI KRITIS</strong></div>`:''}
     </div>
     ${conclusionSection}
     <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Validator</label>

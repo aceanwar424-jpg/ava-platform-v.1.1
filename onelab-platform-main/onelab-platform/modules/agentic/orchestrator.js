@@ -69,11 +69,11 @@ function renderAgOrchestratorTab() {
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
           <div>
             <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg); display:flex; align-items:center; gap:8px;">
-              <span style="color:#38BDF8;">🔄</span> The 2026 Closed Feedback Loop Engine
+              <span style="color:var(--sky);">🔄</span> The 2026 Closed Feedback Loop Engine
             </h3>
-            <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Siklus otonom: <strong>Observe Environment ➔ Break Down Problem ➔ Create Plan ➔ Take Action ➔ Evaluate ➔ Self-Tune</strong></p>
+            <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Siklus otonom: <strong>Observe Environment ➔ Break Down Problem ➔ Create Plan ➔ Take Action ➔ Evaluate ➔ Self-Tune</strong></p>
           </div>
-          <span style="background:rgba(56,189,248,0.15); color:#38BDF8; border:1px solid rgba(56,189,248,0.3); font-size:11px; padding:4px 12px; border-radius:999px; font-weight:700;">
+          <span style="background:rgba(56,189,248,0.15); color:var(--sky); border:1px solid rgba(56,189,248,0.3); font-size:11px; padding:4px 12px; border-radius:999px; font-weight:700;">
             A2A Protocol v2.4 (Active)
           </span>
         </div>
@@ -82,7 +82,7 @@ function renderAgOrchestratorTab() {
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
             <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">1. OBSERVE & PLAN</p>
-            <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:#38BDF8;">99.8% Accuracy</p>
+            <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:var(--sky);">99.8% Accuracy</p>
           </div>
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
             <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">2. TAKE ACTION (R1/R2)</p>
@@ -109,18 +109,18 @@ function renderAgOrchestratorTab() {
     html += `
       <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between; gap:12px;">
         <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:40px; height:40px; border-radius:12px; background:${ag.avatarBg}; display:flex; align-items:center; justify-content:center; color:white; font-weight:800; font-size:16px;">
+          <div style="width:40px; height:40px; border-radius:12px; background:${ag.avatarBg}; display:flex; align-items:center; justify-content:center; color:var(--on-accent); font-weight:800; font-size:16px;">
             ${ag.title.substring(0,2)}
           </div>
           <div>
             <h4 style="margin:0; font-size:13px; font-weight:700; color:var(--bg);">${ag.title}</h4>
-            <p style="margin:2px 0 0 0; font-size:11px; color:#94A3B8;">${ag.role}</p>
+            <p style="margin:2px 0 0 0; font-size:11px; color:var(--text4);">${ag.role}</p>
           </div>
         </div>
 
         <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; font-size:11px;">
           <span style="color:var(--text3);">Feedback Loop Executions:</span>
-          <span style="font-family:monospace; color:#38BDF8; font-weight:700;">${ag.closedLoopCount} cycles</span>
+          <span style="font-family:monospace; color:var(--sky); font-weight:700;">${ag.closedLoopCount} cycles</span>
         </div>
 
         <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; pt:6px;">

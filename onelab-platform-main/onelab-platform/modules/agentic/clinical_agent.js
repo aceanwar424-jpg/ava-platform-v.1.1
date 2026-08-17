@@ -21,12 +21,12 @@ function renderAgClinicalTab() {
       <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; backdrop-filter:blur(10px);">
         <div style="display:flex; align-items:center; justify-content:space-between;">
           <div style="display:flex; align-items:center; gap:12px;">
-            <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:10px; border-radius:12px; color:#38BDF8;">
+            <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:10px; border-radius:12px; color:var(--sky);">
               🩺
             </div>
             <div>
               <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--bg);">Clinical & Lab Ops Agent (LIS-AI)</h3>
-              <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Otomasi autoverifikasi hasil lab, deteksi Nilai Kritis (Critical Value Alert), & aturan Westgard QC.</p>
+              <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Otomasi autoverifikasi hasil lab, deteksi Nilai Kritis (Critical Value Alert), & aturan Westgard QC.</p>
             </div>
           </div>
           <span style="background:rgba(139,92,246,0.15); color:#A78BFA; border:1px solid rgba(139,92,246,0.3); font-size:11px; padding:4px 10px; border-radius:999px; font-weight:600;">
@@ -43,7 +43,7 @@ function renderAgClinicalTab() {
           <div style="overflow-x:auto;">
             <table style="width:100%; text-align:left; font-size:11px; color:var(--border2); border-collapse:collapse;">
               <thead>
-                <tr style="border-b:1px solid rgba(255,255,255,0.1); color:#94A3B8;">
+                <tr style="border-b:1px solid rgba(255,255,255,0.1); color:var(--text4);">
                   <th style="padding:6px;">Parameter</th>
                   <th style="padding:6px;">Rentang Normal</th>
                   <th style="padding:6px;">Batas Kritis</th>
@@ -74,7 +74,7 @@ function renderAgClinicalTab() {
             <h4 style="margin:0 0 12px 0; font-size:13px; color:var(--bg2); font-weight:700;">Simulasi Evaluasi Agen Klinis</h4>
             <div style="display:flex; flex-direction:column; gap:10px;">
               <div>
-                <label style="font-size:11px; color:#94A3B8; display:block; margin-bottom:4px;">Parameter Lab:</label>
+                <label style="font-size:11px; color:var(--text4); display:block; margin-bottom:4px;">Parameter Lab:</label>
                 <select id="ag-sim-param" style="width:100%; background:var(--text); border:1px solid rgba(255,255,255,0.1); color:var(--bg); padding:6px; border-radius:6px; font-size:12px;">
                   <option value="Hb">Hemoglobin (Hb)</option>
                   <option value="WBC">Leukosit (WBC)</option>
@@ -83,13 +83,13 @@ function renderAgClinicalTab() {
                 </select>
               </div>
               <div>
-                <label style="font-size:11px; color:#94A3B8; display:block; margin-bottom:4px;">Nilai Hasil Tes:</label>
+                <label style="font-size:11px; color:var(--text4); display:block; margin-bottom:4px;">Nilai Hasil Tes:</label>
                 <input type="number" id="ag-sim-val" value="5.5" step="0.1" style="width:100%; background:var(--text); border:1px solid rgba(255,255,255,0.1); color:var(--bg); padding:6px; border-radius:6px; font-size:12px;" />
               </div>
             </div>
           </div>
 
-          <button onclick="runClinicalSim()" style="margin-top:16px; background:#0EA5E9; hover:background:#0284C7; color:white; border:none; padding:8px; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer;">
+          <button onclick="runClinicalSim()" style="margin-top:16px; background:var(--info); hover:background:#0284C7; color:var(--on-accent); border:none; padding:8px; border-radius:8px; font-weight:700; font-size:12px; cursor:pointer;">
             Jalankan Evaluasi Autoverifikasi Agent
           </button>
         </div>

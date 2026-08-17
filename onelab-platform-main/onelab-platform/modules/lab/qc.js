@@ -24,7 +24,7 @@ async function renderQCTab(){
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <div>
         <span class="badge badge-teal">${_labAnalyzers.length} analyzer</span>
-        ${dueSoon.length?`<span class="badge" style="background:#FFF8E1;color:#92400E;margin-left:6px">🔧 ${dueSoon.length} kalibrasi jatuh tempo</span>`:''}
+        ${dueSoon.length?`<span class="badge" style="background:var(--warn-soft2);color:var(--warn-deeper);margin-left:6px">🔧 ${dueSoon.length} kalibrasi jatuh tempo</span>`:''}
       </div>
       <div>
         <button class="btn btn-ghost btn-sm" onclick="openAnalyzerForm()">+ Analyzer</button>
@@ -64,7 +64,7 @@ async function renderQCTab(){
     </div>
 
     ${!qcAvailable?`
-      <div style="background:#FFF8E1;border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;font-size:12.5px;color:#92400E">
+      <div style="background:var(--warn-soft2);border:1px solid #FDE68A;border-radius:10px;padding:14px 16px;font-size:12.5px;color:var(--warn-deeper)">
         Modul <strong>Log QC</strong> memerlukan tabel <code>lab_qc_runs</code>.
         Jalankan <code>supabase_lab_lis.sql</code> di Supabase SQL Editor untuk mengaktifkannya.
       </div>` : `
@@ -319,7 +319,7 @@ function ljChartSVG(runs, w = 720, h = 220) {
 
   const lbl = z => `<text x="4" y="${yOf(z)+3.5}" font-size="9" fill="#6B7A8B">${z>0?'+':''}${z}SD</text>`;
 
-  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;background:#fff;border:1px solid var(--border);border-radius:8px">
+  return `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;background:var(--white);border:1px solid var(--border);border-radius:8px">
     ${band(3,'#FCA5A5')}${band(2,'#FDE68A')}${band(1,'#E3E7EC',true)}
     ${band(0,'#0E7C86')}
     ${band(-1,'#E3E7EC',true)}${band(-2,'#FDE68A')}${band(-3,'#FCA5A5')}

@@ -61,7 +61,7 @@ async function renderAgStudioTab(el){
       <div class="ag-detail" style="margin-bottom:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
           <div>
-            <div style="font-size:12px;font-weight:800;color:#0A2342">Kalender Konten</div>
+            <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">Kalender Konten</div>
             <div style="font-size:11px;color:var(--gray)">Planner AI mengisi slot; produksi H-4 otomatis; hasil menunggu di Approval Inbox</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -83,7 +83,7 @@ async function renderAgStudioTab(el){
             const producible = ['PLANNED','SKIPPED'].includes(c.status);
             return `<div class="ag-detail" style="padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
               <div style="min-width:0">
-                <div style="font-size:12.5px;font-weight:700;color:#0A2342">${svgIcon(m.ic,12)} ${agEsc(c.topic)}</div>
+                <div style="font-size:12.5px;font-weight:700;color:var(--navy-deep)">${svgIcon(m.ic,12)} ${agEsc(c.topic)}</div>
                 <div style="font-size:10.5px;color:var(--gray);margin-top:2px">
                   ${m.l} · ${agEsc(c.channel||'—')} · ${agEsc(c.framework||'')}
                   ${c.health_day_ref?` · 📅 ${agEsc(c.health_day_ref)}`:''}
@@ -102,7 +102,7 @@ async function renderAgStudioTab(el){
           atau tambah <strong>Slot Manual</strong>.</div>`}
 
       <div class="ag-detail" style="margin-top:12px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${svgIcon('box',14)} Aset Konten Terakhir</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${svgIcon('box',14)} Aset Konten Terakhir</div>
         ${agAssets.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
           <thead><tr><th>Waktu</th><th>Jenis</th><th>Isi</th><th></th></tr></thead>
           <tbody>${agAssets.slice(0,20).map(a=>{
@@ -126,7 +126,7 @@ async function renderAgStudioTab(el){
 
     <div>
       <div class="ag-detail" style="margin-bottom:12px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📅 Hari Kesehatan 30 Hari ke Depan</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">📅 Hari Kesehatan 30 Hari ke Depan</div>
         ${upcoming.length ? upcoming.map(h=>`<div style="font-size:11.5px;padding:5px 0;border-bottom:1px dashed #e2e8f0">
             <strong>${new Date(h.date+'T00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</strong>
             · ${agEsc(h.name)} <span style="color:var(--gray)">(${h.scope==='NASIONAL'?'🇮🇩':'🌍'})</span>
@@ -134,8 +134,8 @@ async function renderAgStudioTab(el){
         : '<div style="font-size:11.5px;color:var(--gray)">Tidak ada dalam 30 hari — atau jalankan supabase_agentic_fase34.sql (seed).</div>'}
       </div>
       <div class="ag-detail">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:6px">Alur Konten</div>
-        <div style="font-size:11.5px;color:#475569;line-height:1.7">
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:6px">Alur Konten</div>
+        <div style="font-size:11.5px;color:var(--text-dim);line-height:1.7">
           1. Planner AI / manual mengisi <strong>kalender</strong><br>
           2. <strong>Produksi</strong> → AI membuat copy + gambar<br>
           3. Draft menunggu di <strong>Approval Inbox</strong><br>
@@ -213,7 +213,7 @@ function agOpenSlotForm(){
   const d = new Date(Date.now()+3*864e5).toISOString().slice(0,10);
   openModal(`
     <div style="max-width:460px">
-      <h3 style="margin:0 0 12px;color:#0A2342">Slot Konten Manual</h3>
+      <h3 style="margin:0 0 12px;color:var(--navy-deep)">Slot Konten Manual</h3>
       <div style="display:grid;gap:9px">
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Jenis
           <select id="agsf-type" class="form-input" style="width:100%">

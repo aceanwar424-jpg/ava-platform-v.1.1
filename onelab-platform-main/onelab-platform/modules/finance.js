@@ -24,7 +24,7 @@ async function renderFinance(tabAwal) {
       </div>
       <div class="card" style="text-align:center;padding:14px">
         <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Sudah Dibayar</div>
-        <div style="font-size:20px;font-weight:800;color:#22C55E;margin-top:4px" id="fin-paid">—</div>
+        <div style="font-size:20px;font-weight:800;color:var(--success-strong);margin-top:4px" id="fin-paid">—</div>
       </div>
       <div class="card" style="text-align:center;padding:14px">
         <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Belum Dibayar</div>
@@ -147,7 +147,7 @@ function renderInvoiceTable(data) {
       <td style="font-size:12px;color:${overdue?'#EF4444':'var(--gray)'}">${i.due_date?formatDateShort(i.due_date):'—'}</td>
       <td><span class="badge" style="background:${sc}20;color:${sc}">${i.status||'Draft'}</span></td>
       <td><div class="act-row">
-        <button class="act-btn" onclick="markInvoicePaid(${i.id})" title="Tandai Dibayar" style="color:#22C55E">✓</button>
+        <button class="act-btn" onclick="markInvoicePaid(${i.id})" title="Tandai Dibayar" style="color:var(--success-strong)">✓</button>
         <button class="act-btn edit" onclick="openInvoiceForm(${i.id})">${icon('edit', 12)}</button>
         <button class="act-btn del" onclick="deleteInvoice(${i.id})">${icon('trash', 12)}</button>
       </div></td>
@@ -395,7 +395,7 @@ async function loadPayments() {
     <tbody>${(data||[]).map(i=>`<tr>
       <td style="font-family:monospace;font-size:12px">${i.invoice_number}</td>
       <td>${i.partner_name||'—'}</td>
-      <td style="font-weight:700;color:#22C55E">${formatCurrency(i.total_amount||0)}</td>
+      <td style="font-weight:700;color:var(--success-strong)">${formatCurrency(i.total_amount||0)}</td>
       <td style="font-size:12px;color:var(--gray)">${i.paid_at?new Date(i.paid_at).toLocaleDateString('id-ID'):'—'}</td>
     </tr>`).join('')}</tbody></table>`;
   } catch(e){ el.innerHTML=`<div class="status-box status-err">${e.message}</div>`; }
@@ -413,7 +413,7 @@ async function loadCommissions() {
     <tbody>${Object.entries(byUser).map(([name,total])=>`<tr>
       <td style="font-weight:600">${name}</td>
       <td>${formatCurrency(total)}</td>
-      <td style="color:#22C55E;font-weight:700">${formatCurrency(total*0.03)}</td>
+      <td style="color:var(--success-strong);font-weight:700">${formatCurrency(total*0.03)}</td>
     </tr>`).join('')}</tbody></table>`;
   } catch(e){ el.innerHTML=`<div class="status-box status-err">${e.message}</div>`; }
 }

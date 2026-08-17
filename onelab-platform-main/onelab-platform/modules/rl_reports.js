@@ -147,7 +147,7 @@ function paintRL() {
          { l: 'Pemeriksaan Lab', v: a.lab, c: '#7C3AED' },
          { l: 'Pemeriksaan Radiologi', v: a.rad, c: '#1D4ED8' },
          { l: 'Kunjungan Home Care', v: a.hc, c: '#B45309' }]
-        .map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+        .map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
           border-radius:10px;padding:12px">
           <div style="font-size:21px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
           <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('')}

@@ -156,9 +156,9 @@ function astPaintUnfit() {
   if (!unfit.length) { box.innerHTML = ''; return; }
 
   box.innerHTML = `
-    <div style="background:#FEF2F2;border:1px solid #DC262655;border-left:5px solid #DC2626;
+    <div style="background:var(--danger-soft);border:1px solid #DC262655;border-left:5px solid #DC2626;
       border-radius:10px;padding:13px 16px;margin-bottom:14px">
-      <div style="font-weight:800;color:#B91C1C;font-size:13.5px;margin-bottom:4px">
+      <div style="font-weight:800;color:var(--danger-deep);font-size:13.5px;margin-bottom:4px">
         ${unfit.length} alat lewat jatuh tempo kalibrasi — tidak layak dipakai mengeluarkan hasil
       </div>
       <div style="font-size:12.5px;color:#7F1D1D;margin-bottom:8px">
@@ -167,8 +167,8 @@ function astPaintUnfit() {
         Hentikan pemakaiannya sampai kalibrasi ulang selesai dan dinyatakan Lulus.
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${unfit.map(m => `<span style="background:#fff;border:1px solid #DC262655;border-radius:999px;
-          padding:3px 10px;font-size:11.5px;color:#B91C1C;font-weight:650">
+        ${unfit.map(m => `<span style="background:var(--white);border:1px solid #DC262655;border-radius:999px;
+          padding:3px 10px;font-size:11.5px;color:var(--danger-deep);font-weight:650">
           ${astEsc(m.asset_name || 'Alat tanpa nama')} ·
           terlambat ${Math.abs(astDaysTo(m.due_date) || 0)} hari</span>`).join('')}
       </div>
@@ -269,7 +269,7 @@ function astPaintList(el) {
               <div style="font-weight:650">${astEsc(a.nama) || '—'}</div>
               <div style="font-size:11px;color:var(--gray)">
                 ${astEsc(a.lokasi) || 'Tanpa lokasi'}${a.penanggung_jawab ? ' · ' + astEsc(a.penanggung_jawab) : ''}</div>
-              ${unfit ? `<div style="font-size:11px;color:#B91C1C;font-weight:700;margin-top:2px">
+              ${unfit ? `<div style="font-size:11px;color:var(--danger-deep);font-weight:700;margin-top:2px">
                 kalibrasi terlambat — jangan dipakai mengeluarkan hasil</div>` : ''}
             </td>
             <td style="font-size:12px">${astEsc(a.kategori) || '—'}</td>
@@ -480,7 +480,7 @@ function astPaintDepr(el) {
         ▶️ Jalankan Penyusutan</button>
       <span style="font-size:12.5px;color:var(--text3)">
         ${sudahJalan
-          ? `<b style="color:#15803D">✓ Sudah dijalankan</b> · ${rows.length} aset · ${formatCurrency(totalPer)}`
+          ? `<b style="color:var(--success-deep)">✓ Sudah dijalankan</b> · ${rows.length} aset · ${formatCurrency(totalPer)}`
           : 'Belum dijalankan untuk periode ini'}</span>
     </div>
 
@@ -617,10 +617,10 @@ function astPaintMaint(el) {
         </tr></thead><tbody>${urut.map(m => {
           const st = astDueState(m.due_date);
           const bahaya = st.key === 'late' && m.maint_type === 'Kalibrasi';
-          return `<tr${bahaya ? ' style="background:#FEF2F2"' : ''}>
+          return `<tr${bahaya ? ' style="background:var(--danger-soft)"' : ''}>
             <td>
               <div style="font-weight:650">${astEsc(m.asset_name) || 'Tanpa nama'}</div>
-              ${bahaya ? `<div style="font-size:11px;color:#B91C1C;font-weight:800;margin-top:2px">
+              ${bahaya ? `<div style="font-size:11px;color:var(--danger-deep);font-weight:800;margin-top:2px">
                 TIDAK LAYAK MENGELUARKAN HASIL</div>` : ''}
             </td>
             <td><span class="badge ${m.maint_type === 'Kalibrasi' ? 'badge-teal'

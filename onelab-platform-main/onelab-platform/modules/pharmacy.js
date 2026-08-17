@@ -30,11 +30,11 @@ let rxWarnAllergy = null, rxWarnInteraction = null;
 
 async function renderPharmacy() {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('pharmacy')" title="Kembali ke daftar menu Farmasi">← Menu Farmasi</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('pharmacy')" title="Kembali ke daftar menu Farmasi">← Menu Farmasi</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Farmasi &amp; Apotek</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Farmasi &amp; Apotek</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pharmacy Information System</span>
         </div>
       </div>
@@ -106,7 +106,7 @@ function rxPaintPrescriptions(el) {
   el.innerHTML = `<div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:auto">
     <table style="width:100%;border-collapse:collapse">
       <thead>
-        <tr style="background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
+        <tr style="background:var(--navy-deep);color:var(--on-accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
           <th style="padding:7px 10px;text-align:left">No. Resep</th>
           <th style="padding:7px 10px;text-align:left">Pasien</th>
           <th style="padding:7px 10px;text-align:left">Dokter</th>
@@ -121,7 +121,7 @@ function rxPaintPrescriptions(el) {
         const warn = p.allergy_warning || p.interaction_warning;
         return `<tr style="border-bottom:1px solid #f1f5f9">
           <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${p.rx_number || '—'}</span>
-            ${warn ? '<div style="font-size:10px;color:#DC2626;font-weight:700">PERINGATAN ALERGI</div>' : ''}</td>
+            ${warn ? '<div style="font-size:10px;color:var(--danger-strong);font-weight:700">PERINGATAN ALERGI</div>' : ''}</td>
           <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${p.patient_name || '—'}</div>
             <div style="font-size:11px;color:var(--gray)">${p.mr_number || ''}</div></td>
           <td style="padding:8px 10px;font-size:12.5px;font-weight:600">${p.doctor_name || '—'}</td>
@@ -134,7 +134,7 @@ function rxPaintPrescriptions(el) {
             ${['Aktif', 'Sebagian'].includes(p.status)
               ? `<button class="btn btn-teal btn-xs" onclick="rxOpenDispense(${p.id})">Serahkan</button>` : ''}
             ${p.status === 'Aktif'
-              ? `<button class="btn btn-ghost btn-xs" style="color:#DC2626;border-color:#DC2626" onclick="rxAskCancel(${p.id})">Batalkan</button>` : ''}
+              ? `<button class="btn btn-ghost btn-xs" style="color:var(--danger-strong);border-color:var(--danger-strong)" onclick="rxAskCancel(${p.id})">Batalkan</button>` : ''}
           </div></td>
         </tr>`;
       }).join('')}</tbody>
@@ -199,7 +199,7 @@ function rxSearchPatient(q) {
         `select=mr_number,patient_name,patient_gender,patient_age&patient_name=ilike.${encodeURIComponent('%' + q.trim() + '%')}&mr_number=not.is.null&order=created_at.desc&limit=15`);
       const seen = {}, uniq = [];
       (rows || []).forEach(r => { if (!seen[r.mr_number]) { seen[r.mr_number] = 1; uniq.push(r); } });
-      box.innerHTML = uniq.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+      box.innerHTML = uniq.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
         border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:200px;overflow:auto">
         ${uniq.slice(0, 8).map(r => `<div onclick='rxPickPatient(${JSON.stringify(r).replace(/'/g, "&#39;")})'
           style="padding:8px 11px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12.5px">
@@ -246,7 +246,7 @@ function rxRenderLines() {
         </select>
         ${d ? `<div style="font-size:10.5px;margin-top:2px;color:${keras ? '#B45309' : 'var(--gray)'}">
           ${keras ? '⚠ ' : ''}Golongan ${d.drug_class || '—'}${d.is_formulary ? ' · formularium' : ' · NON-formularium'}
-          ${(d.stock_qty || 0) < (l.qty || 0) ? ' · <b style="color:#B91C1C">stok tidak cukup</b>' : ''}</div>` : ''}
+          ${(d.stock_qty || 0) < (l.qty || 0) ? ' · <b style="color:var(--danger-deep)">stok tidak cukup</b>' : ''}</div>` : ''}
       </td>
       <td style="padding:4px;width:34px"><button class="act-btn del" onclick="rxRemoveLine(${i})" style="font-size:10.5px;font-weight:700"></button></td>
     </tr>
@@ -297,7 +297,7 @@ async function rxCheckSafety() {
         rxWarnAllergy = JSON.stringify(hits);
         if (aBox) aBox.innerHTML = `
           <div style="background:#FBEAEA;border:1.5px solid #B91C1C;border-radius:8px;padding:11px 14px;margin-bottom:12px">
-            <div style="font-weight:800;color:#B91C1C;font-size:13px">⚠️ PERINGATAN ALERGI</div>
+            <div style="font-weight:800;color:var(--danger-deep);font-size:13px">⚠️ PERINGATAN ALERGI</div>
             <div style="font-size:12.5px;color:#7f1d1d;margin-top:4px">
               ${hits.map(h => `<div>• ${h.drug_name || h.drug || ''} — pasien alergi <b>${h.allergen || ''}</b>${h.severity ? ' (' + h.severity + ')' : ''}</div>`).join('')}
             </div>
@@ -318,7 +318,7 @@ async function rxCheckSafety() {
         rxWarnInteraction = JSON.stringify(hits);
         if (iBox) iBox.innerHTML = `
           <div style="background:#FBF1E4;border:1.5px solid #B45309;border-radius:8px;padding:11px 14px;margin-top:10px">
-            <div style="font-weight:800;color:#B45309;font-size:13px">⚠️ INTERAKSI OBAT</div>
+            <div style="font-weight:800;color:var(--warn-deep);font-size:13px">⚠️ INTERAKSI OBAT</div>
             <div style="font-size:12.5px;color:#7a4a12;margin-top:4px">
               ${hits.map(h => `<div>• ${h.drug_a || ''} + ${h.drug_b || ''} — ${h.severity || ''}${h.description ? ': ' + h.description : ''}</div>`).join('')}
             </div>
@@ -554,7 +554,7 @@ function rxPaintDrugs(el) {
           <td style="font-size:12px">${d.strength || ''} ${d.dosage_form || ''}</td>
           <td><span style="font-size:11px;font-weight:700;color:${keras ? '#B91C1C' : 'var(--gray)'}">
             ${keras ? '' : ''}${d.drug_class || '—'}</span>
-            ${d.is_formulary ? '' : '<div style="font-size:10px;color:#B45309">non-formularium</div>'}</td>
+            ${d.is_formulary ? '' : '<div style="font-size:10px;color:var(--warn-deep)">non-formularium</div>'}</td>
           <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(d.unit_price)}</td>
           <td style="text-align:right;font-weight:700;color:${low ? '#B91C1C' : 'var(--text)'}">${d.stock_qty || 0}
             ${low ? '<div style="font-size:10px">di bawah minimum</div>' : ''}</td>
@@ -681,13 +681,13 @@ async function rxPaintStock(el) {
   el.innerHTML = `
     ${kadaluarsa.length ? `<div style="background:#FBEAEA;border:1.5px solid #B91C1C;border-radius:8px;
       padding:11px 14px;margin-bottom:12px">
-      <div style="font-weight:800;color:#B91C1C;font-size:13px">${kadaluarsa.length} batch SUDAH kedaluwarsa — jangan diserahkan</div>
+      <div style="font-weight:800;color:var(--danger-deep);font-size:13px">${kadaluarsa.length} batch SUDAH kedaluwarsa — jangan diserahkan</div>
       <div style="font-size:11.5px;color:#7f1d1d;margin-top:3px">
         ${kadaluarsa.slice(0, 6).map(b => `${nama(b.drug_id)} lot ${b.batch_no || '—'} (${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}</div>
     </div>` : ''}
     ${dekat.length ? `<div style="background:#FBF1E4;border:1px solid #E0A75E;border-radius:8px;
       padding:11px 14px;margin-bottom:12px">
-      <div style="font-weight:800;color:#B45309;font-size:13px">⏳ ${dekat.length} batch mendekati kedaluwarsa (≤90 hari)</div>
+      <div style="font-weight:800;color:var(--warn-deep);font-size:13px">⏳ ${dekat.length} batch mendekati kedaluwarsa (≤90 hari)</div>
       <div style="font-size:11.5px;color:#7a4a12;margin-top:3px">
         ${dekat.slice(0, 6).map(b => `${nama(b.drug_id)} lot ${b.batch_no || '—'} (${formatDateShort(b.expiry_date)})`).join(' · ')}</div>
     </div>` : ''}
@@ -757,7 +757,7 @@ async function rxPaintReport(el) {
          { l: 'Resep', v: rxPrescriptions.length, c: '#0E7C86' },
          { l: 'Di Bawah Minimum', v: low.length, c: '#B45309' },
          { l: 'Non-formularium', v: rxDrugs.filter(d => d.is_formulary === false).length, c: '#7C3AED' }]
-        .map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+        .map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
           border-radius:10px;padding:12px">
           <div style="font-size:20px;font-weight:800;color:${k.c}">${k.v}</div>
           <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('')}

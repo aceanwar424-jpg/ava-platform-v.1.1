@@ -9,7 +9,7 @@ async function renderSettings(activeTab = 'general') {
         gap: 24px;
         min-height: 76vh;
         align-items: stretch;
-        background: #fff;
+        background: var(--white);
         border-radius: var(--r-md);
         border: 1px solid var(--border);
         overflow: hidden;
@@ -54,7 +54,7 @@ async function renderSettings(activeTab = 'general') {
       }
       .settings-sub-tab.active {
         background: var(--navy);
-        color: #fff;
+        color: var(--on-accent);
       }
       .settings-content {
         flex: 1;
@@ -600,18 +600,18 @@ function renderRoleMenuConfig() {
       <table class="role-access-table" style="border-collapse:collapse;min-width:900px;font-size:12.5px;width:100%">
         <thead>
           <tr style="background:var(--navy)">
-            <th style="padding:12px 16px;color:#fff;text-align:left;min-width:200px;
+            <th style="padding:12px 16px;color:var(--on-accent);text-align:left;min-width:200px;
               position:sticky;left:0;background:var(--navy);z-index:2;border-right:2px solid rgba(255,255,255,.1)">
               <div style="font-size:12px;font-weight:700">Menu / Halaman</div>
             </th>
             ${roles.map(r => {
               const rc = ROLES[r] || {};
               const count = getRolePages(r).length;
-              return `<th style="padding:10px 8px;color:#fff;text-align:center;min-width:100px;
+              return `<th style="padding:10px 8px;color:var(--on-accent);text-align:center;min-width:100px;
                 border-right:1px solid rgba(255,255,255,.08)">
                 <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
                   <div style="width:10px;height:10px;border-radius:50%;background:${rc.color||'#94A3B8'}"></div>
-                  <div style="font-size:11px;font-weight:800;color:#fff;line-height:1.2">${rc.label||r}</div>
+                  <div style="font-size:11px;font-weight:800;color:var(--on-accent);line-height:1.2">${rc.label||r}</div>
                   <div style="font-size:9px;color:rgba(255,255,255,.5)">${count} menu</div>
                 </div>
               </th>`;
@@ -689,7 +689,7 @@ function renderRoleMenuConfig() {
         const pages = getRolePages(r);
         return `
           <div style="border-left:4px solid ${rc.color||'#94A3B8'};padding:10px 12px;
-            background:#fff;border-radius:0 var(--r) var(--r) 0;
+            background:var(--white);border-radius:0 var(--r) var(--r) 0;
             border:1px solid var(--border);border-left-width:4px">
             <div style="font-weight:700;font-size:12.5px;color:${rc.color||'var(--text)'}">${rc.label||r}</div>
             <div style="font-size:10.5px;color:var(--text3);margin-top:2px;line-height:1.4">${rc.desc||''}</div>

@@ -101,7 +101,7 @@ function renderOrgChart() {
       ${[1,2,3,4].filter(l=>byLevel[l]?.length).map(l=>`
         <div style="margin-bottom:24px">
           <div style="text-align:center;margin-bottom:12px">
-            <span style="background:${LEVEL_COLORS[l]};color:#fff;padding:4px 14px;
+            <span style="background:${LEVEL_COLORS[l]};color:var(--on-accent);padding:4px 14px;
               border-radius:20px;font-size:11px;font-weight:700">
               ${ORG_LEVELS.find(ol=>ol.value===l)?.label||`Level ${l}`}
             </span>
@@ -112,7 +112,7 @@ function renderOrgChart() {
                 (e.position||'').toLowerCase().includes(pos.title.toLowerCase().slice(0,10))
               );
               return `
-                <div style="background:#fff;border:2px solid ${LEVEL_COLORS[l]};border-radius:var(--r-md);
+                <div style="background:var(--white);border:2px solid ${LEVEL_COLORS[l]};border-radius:var(--r-md);
                   padding:12px 16px;min-width:160px;max-width:200px;text-align:center;cursor:pointer;
                   box-shadow:var(--shadow-xs);transition:all .15s"
                   onmouseover="this.style.boxShadow='var(--shadow-md)'"
@@ -126,7 +126,7 @@ function renderOrgChart() {
                     <div style="display:flex;align-items:center;gap:6px;justify-content:center;
                       background:${LEVEL_COLORS[l]}15;border-radius:6px;padding:4px 8px;margin-bottom:4px">
                       <div style="width:20px;height:20px;border-radius:50%;
-                        background:${LEVEL_COLORS[l]};color:#fff;font-size:9px;
+                        background:${LEVEL_COLORS[l]};color:var(--on-accent);font-size:9px;
                         display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">
                         ${h.full_name.charAt(0)}
                       </div>

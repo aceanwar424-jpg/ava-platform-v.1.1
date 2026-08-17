@@ -77,8 +77,8 @@ async function paintTrialBalance(el) {
   const tc = rows.reduce((s, r) => s + (+r.total_credit || 0), 0);
   const seimbang = Math.abs(td - tc) < 0.01;
   if (sum) sum.innerHTML = seimbang
-    ? `<span style="color:#15803D;font-weight:600">✓ Debit = Kredit</span> · ${rows.length} akun bergerak`
-    : `<span style="color:#B91C1C;font-weight:700">⚠️ Tidak seimbang: selisih ${formatCurrency(td - tc)}</span>`;
+    ? `<span style="color:var(--success-deep);font-weight:600">✓ Debit = Kredit</span> · ${rows.length} akun bergerak`
+    : `<span style="color:var(--danger-deep);font-weight:700">⚠️ Tidak seimbang: selisih ${formatCurrency(td - tc)}</span>`;
 
   el.innerHTML = `<div class="table-wrap"><table><thead><tr>
     <th>Kode</th><th>Nama Akun</th><th>Jenis</th>
@@ -118,7 +118,7 @@ async function paintProfitByUnit(el) {
       ${[{ l: 'Pendapatan', v: tp, c: '#0E7C86' },
          { l: 'Beban', v: tb, c: '#B45309' },
          { l: 'Margin Kotor', v: tp - tb, c: tp - tb >= 0 ? '#15803D' : '#B91C1C' }]
-        .map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+        .map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
           border-radius:10px;padding:13px">
           <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.08em">${k.l}</div>
           <div style="font-size:19px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${formatCurrency(k.v)}</div>

@@ -222,8 +222,8 @@ function injectLisStyle(){
   s.textContent=`
     #lab-shell{ font-size:12.5px; color:#1A2B3C; }
     #lab-shell .lis-header{ display:flex;justify-content:space-between;align-items:center;
-      background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px; }
-    #lab-shell .lis-header h1{ font-size:15px;margin:0;color:#fff;font-weight:800; }
+      background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px; }
+    #lab-shell .lis-header h1{ font-size:15px;margin:0;color:var(--on-accent);font-weight:800; }
     #lab-shell .lis-sub{ font-size:11px;color:#9db4d0; }
     #lab-shell .lis-date{ font-size:11px;color:#cfe0f2; }
     #lab-shell #lab-kpi{ gap:6px !important;margin-bottom:10px !important; }
@@ -233,15 +233,15 @@ function injectLisStyle(){
     #lab-shell .tab-btn{ padding:6px 12px !important;font-size:11.5px !important;border-radius:6px 6px 0 0; }
     #lab-shell .table-wrap{ border:1px solid #d3dae1;border-radius:8px;overflow:auto; }
     #lab-shell .table-wrap table{ width:100%;border-collapse:collapse; }
-    #lab-shell .table-wrap th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;
+    #lab-shell .table-wrap th{ background:var(--navy-deep);color:var(--on-accent);font-size:10.5px;text-transform:uppercase;
       letter-spacing:.03em;padding:5px 8px;text-align:left;position:sticky;top:0;white-space:nowrap; }
     #lab-shell .table-wrap td{ padding:4px 8px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
     #lab-shell .table-wrap tbody tr:nth-child(even){ background:var(--bg); }
     #lab-shell .table-wrap tbody tr:hover{ background:#eaf5f3; }
-    #lab-shell .lis-title{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;
+    #lab-shell .lis-title{ font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;
       letter-spacing:.04em;margin:12px 0 6px;padding-left:7px;border-left:3px solid var(--teal); }
     #lab-shell .lis-badge{ display:inline-block;min-width:18px;padding:1px 7px;border-radius:9px;font-size:11px;font-weight:800;text-align:center; }
-    #lab-shell .lis-badge.warn{ background:#FEF3C7;color:#92400E; }
+    #lab-shell .lis-badge.warn{ background:var(--warn-soft);color:var(--warn-deeper); }
     #lab-shell .lis-badge.info{ background:#DBEAFE;color:#1E40AF; }
     #lab-shell .lis-badge.ok{ background:#DCFCE7;color:#166534; }
     #lab-shell .lis-bar{ height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;min-width:56px; }
@@ -341,7 +341,7 @@ async function labCategorySummary(containerId){
   el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:10px">
     ${cards.map(k=>`
       <button onclick="navigate('lab',{tab:'${k.tab}'})"
-        style="text-align:left;background:#fff;border:1px solid var(--border);border-left:4px solid ${k.color};
+        style="text-align:left;background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.color};
         border-radius:12px;padding:12px 14px;cursor:pointer;transition:box-shadow .15s,transform .15s"
         onmouseover="this.style.boxShadow='var(--shadow-md)';this.style.transform='translateY(-1px)'"
         onmouseout="this.style.boxShadow='';this.style.transform=''">
@@ -388,7 +388,7 @@ function renderLabKPI(){
     {icon:'',val:released,  label:'Released',        color:'#0A2342', tab:'report'},
   ].map(k=>`
     <div onclick="switchLabTab('${k.tab}',document.querySelector('#lab-tabs .tab-btn:nth-child(${LAB_TABS.indexOf(k.tab)+1})'))"
-      style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color};text-align:center;cursor:pointer">
+      style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color};text-align:center;cursor:pointer">
       <div style="font-size:16px">${k.icon}</div>
       <div style="font-size:18px;font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:9px;color:var(--gray)">${k.label}</div>
@@ -401,8 +401,8 @@ function renderCriticalBanner(){
   const crit = labResults.filter(r=>isCriticalResult(r) && !isReleased(r) && !r.critical_ack_at);
   if(!crit.length){ el.innerHTML=''; return; }
   el.innerHTML=`
-    <div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:10px;padding:12px 16px;margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:#B91C1C;font-size:13px;margin-bottom:4px">
+    <div style="background:var(--danger-soft);border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:10px;padding:12px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:var(--danger-deep);font-size:13px;margin-bottom:4px">
         ${crit.length} NILAI KRITIS belum dilaporkan
       </div>
       <div style="font-size:11.5px;color:#991B1B;margin-bottom:8px">
@@ -410,10 +410,10 @@ function renderCriticalBanner(){
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         ${crit.slice(0,8).map(r=>`
-          <div style="background:#fff;border:1px solid #FCA5A5;border-radius:8px;padding:6px 10px;font-size:12px">
+          <div style="background:var(--white);border:1px solid #FCA5A5;border-radius:8px;padding:6px 10px;font-size:12px">
             <strong>${r.patient_name||'—'}</strong> · ${r.product_name||'—'}:
-            <span style="color:#DC2626;font-weight:800">${r.result_value||'—'} ${r.unit||''}</span>
-            <button class="btn btn-xs" style="margin-left:6px;background:#DC2626;color:#fff;border:none"
+            <span style="color:var(--danger-strong);font-weight:800">${r.result_value||'—'} ${r.unit||''}</span>
+            <button class="btn btn-xs" style="margin-left:6px;background:var(--danger-strong);color:var(--on-accent);border:none"
               onclick="ackCritical(${r.id})">Lapor</button>
           </div>`).join('')}
       </div>
@@ -445,10 +445,10 @@ async function ackCritical(id){
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
-    <div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:12px 14px;margin-bottom:14px">
-      <div style="font-size:13px;font-weight:700;color:#B91C1C">${r.patient_name||'—'}</div>
+    <div style="background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:12px 14px;margin-bottom:14px">
+      <div style="font-size:13px;font-weight:700;color:var(--danger-deep)">${r.patient_name||'—'}</div>
       <div style="font-size:12.5px;margin-top:3px">${r.product_name||'—'}:
-        <b style="color:#DC2626;font-size:15px">${r.result_value||'—'} ${r.unit||''}</b></div>
+        <b style="color:var(--danger-strong);font-size:15px">${r.result_value||'—'} ${r.unit||''}</b></div>
       <div style="font-size:11.5px;color:#991B1B;margin-top:2px">Ambang kritis: ${ambang}</div>
     </div>
 

@@ -229,7 +229,7 @@ function agkGambar() {
           <span style="color:var(--text3);white-space:nowrap">${new Date(ev.waktu).toLocaleTimeString('id-ID')}</span>
           <span style="font-family:monospace;color:var(--text3)">${ev.pelaku}</span>
           <span><span style="color:var(--text3)">${ev.dari || '—'}</span>
-                <span style="color:#38BDF8">→</span> <strong>${ev.ke}</strong></span>
+                <span style="color:var(--sky)">→</span> <strong>${ev.ke}</strong></span>
           <span style="color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ev.catatan || ''}</span>
         </div>`).join('')}</div>`
         : `<div style="padding:20px;text-align:center;color:var(--text3);font-size:12.5px">
@@ -287,8 +287,8 @@ function agkPanel(agents, tasks, events) {
       <div style="border-top:1px solid var(--line);padding:7px 0;font-size:11.5px">
         <div style="display:flex;gap:6px;align-items:center">
           <span class="badge" style="font-size:9.5px">${t.status}</span>
-          ${t.induk ? '<span style="font-size:10px;color:#38BDF8" title="tugas turunan dari delegasi">↳ delegasi</span>' : ''}
-          ${t.perlu_review ? '<span style="font-size:10px;color:#F59E0B">perlu review manusia</span>' : ''}
+          ${t.induk ? '<span style="font-size:10px;color:var(--sky)" title="tugas turunan dari delegasi">↳ delegasi</span>' : ''}
+          ${t.perlu_review ? '<span style="font-size:10px;color:var(--gold)">perlu review manusia</span>' : ''}
         </div>
         <div style="margin-top:3px">${t.judul || t.jenis}</div>
         <div style="color:var(--text3);font-size:10.5px;margin-top:2px">

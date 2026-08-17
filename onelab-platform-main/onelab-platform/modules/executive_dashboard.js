@@ -28,7 +28,7 @@ function injectExecToggle() {
   btn.id        = 'exec-toggle-btn';
   btn.className = 'topbar-btn';
   btn.title     = 'Executive Dashboard';
-  btn.style.cssText = 'background:var(--navy);color:#fff;border-color:var(--navy);font-size:12px;padding:4px 10px;width:auto';
+  btn.style.cssText = 'background:var(--navy);color:var(--on-accent);border-color:var(--navy);font-size:12px;padding:4px 10px;width:auto';
   btn.textContent   = 'Exec View';
   btn.onclick       = toggleExecView;
   topbar.insertBefore(btn, topbar.firstChild);
@@ -253,7 +253,7 @@ function renderExecTasks(filter) {
       <thead style="position:sticky;top:0;z-index:1">
         <tr style="background:var(--navy)">
           ${['PIC','TASK','PRIORITAS','DEADLINE','STATUS','LAST UPDATE','AKSI'].map(h=>`
-            <th style="padding:8px 12px;color:#fff;text-align:left;font-size:10.5px;
+            <th style="padding:8px 12px;color:var(--on-accent);text-align:left;font-size:10.5px;
               white-space:nowrap;font-weight:700">${h}</th>`).join('')}
         </tr>
       </thead>
@@ -272,7 +272,7 @@ function renderExecTasks(filter) {
               <td style="padding:8px 12px;font-weight:700;white-space:nowrap">
                 <div style="display:flex;align-items:center;gap:6px">
                   <div style="width:26px;height:26px;border-radius:50%;background:var(--teal);
-                    color:#fff;display:flex;align-items:center;justify-content:center;
+                    color:var(--on-accent);display:flex;align-items:center;justify-content:center;
                     font-size:10px;font-weight:700;flex-shrink:0">
                     ${(t.assigned_to||'?').charAt(0).toUpperCase()}
                   </div>
@@ -302,9 +302,9 @@ function renderExecTasks(filter) {
                 <div class="act-row" style="gap:4px;flex-wrap:nowrap">
                   <button class="btn btn-xs btn-ghost" onclick="openTaskDetail(${t.id})" title="Detail">${icon('file-text', 12)}</button>
                   <button class="btn btn-xs btn-outline" onclick="execAssignExtra(${t.id},'${(t.title||'').replace(/'/g,'').slice(0,30)}')" title="Assign Tambahan"></button>
-                  <button class="btn btn-xs" style="background:var(--teal);color:#fff"
+                  <button class="btn btn-xs" style="background:var(--teal);color:var(--on-accent)"
                     onclick="execPingPIC(${t.id},'${(t.assigned_to||'').replace(/'/g,'')}')" title="Ping WA" style="font-size:10.5px;font-weight:700">WA</button>
-                  ${t.status!=='Done'?`<button class="btn btn-xs" style="background:#22C55E;color:#fff"
+                  ${t.status!=='Done'?`<button class="btn btn-xs" style="background:var(--success-strong);color:var(--on-accent)"
                     onclick="execForceDone(${t.id})" title="Force Done">✅</button>`:''}
                 </div>
               </td>

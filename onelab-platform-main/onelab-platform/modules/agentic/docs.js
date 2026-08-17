@@ -127,7 +127,7 @@ function renderAgDocsTab(el){
       </div>
 
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 11px">
-        <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin-bottom:5px">B · Dokumen masih DRAF / perlu dibuat-dirapikan</div>
+        <div style="font-size:11.5px;font-weight:800;color:var(--navy-deep);margin-bottom:5px">B · Dokumen masih DRAF / perlu dibuat-dirapikan</div>
         <div style="display:flex;align-items:stretch;gap:6px;flex-wrap:wrap;font-size:11px">
           ${[
             ['upload','1. Upload','atau mulai dari dokumen kosong'],
@@ -135,8 +135,8 @@ function renderAgDocsTab(el){
             ['file-text','3. Review Final','petakan isi → template .docx'],
             ['pen-tool','4. TTD','tanda tangan & terbit'],
           ].map((s,i,a)=>`
-            <div style="flex:1;min-width:118px;background:#fff;border:1px solid var(--border);border-radius:7px;padding:7px 9px">
-              <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:#0A2342">${icon(s[0],13)} ${s[1]}</div>
+            <div style="flex:1;min-width:118px;background:var(--white);border:1px solid var(--border);border-radius:7px;padding:7px 9px">
+              <div style="display:flex;align-items:center;gap:6px;font-weight:700;color:var(--navy-deep)">${icon(s[0],13)} ${s[1]}</div>
               <div style="color:var(--gray);margin-top:2px;line-height:1.3">${s[2]}</div>
             </div>${i<a.length-1?'<div style="align-self:center;color:var(--gray)">→</div>':''}`).join('')}
         </div>
@@ -144,7 +144,7 @@ function renderAgDocsTab(el){
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${svgIcon('upload',14)} Ingest Dokumen (DOCX / PDF / TXT / MD)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${svgIcon('upload',14)} Ingest Dokumen (DOCX / PDF / TXT / MD)</div>
       <div class="ag-drop" id="ag-drop" onclick="document.getElementById('ag-file-input').click()">
         <div style="font-size:13px;font-weight:700;color:var(--text2)">Klik atau tarik file ke sini</div>
         <div style="font-size:11px;color:var(--gray);margin-top:4px">
@@ -172,7 +172,7 @@ function renderAgDocsTab(el){
 
     ${_agDocsSub==='template' ? `
     <div class="ag-detail" style="margin-bottom:12px" id="ag-templates-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('layers',14)} Template Dokumen Resmi (fidelity 100%)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${icon('layers',14)} Template Dokumen Resmi (fidelity 100%)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>` : ''}
 
@@ -181,7 +181,7 @@ function renderAgDocsTab(el){
     ${_agDocsSub==='registry' ? `
     ${missing.length ? `
     <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
-      <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Dokumen Wajib yang Belum Ada (${missing.length})</div>
+      <div style="font-size:12px;font-weight:800;color:var(--danger-deep);margin-bottom:6px">Dokumen Wajib yang Belum Ada (${missing.length})</div>
       ${missing.slice(0,10).map(d=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px dashed #fecaca">
         ${agDocChip(d.status)} ${agEsc(d.title)} <span style="color:var(--gray)">· ${agEsc(d.iso_clause||'')}</span></div>`).join('')}
       ${missing.length>10?`<div style="font-size:11px;color:var(--gray);margin-top:4px">+${missing.length-10} lainnya — lihat tab Compliance</div>`:''}
@@ -189,7 +189,7 @@ function renderAgDocsTab(el){
 
     <div class="ag-detail">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;flex-wrap:wrap">
-        <div style="font-size:12px;font-weight:800;color:#0A2342">${svgIcon('book',14)} Registry Dokumen (${docs.length})</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${svgIcon('book',14)} Registry Dokumen (${docs.length})</div>
         <button class="ag-btn mut" style="padding:5px 11px" title="Unduh daftar master SOP terbit (CSV)" onclick="agExportMasterSOP()">${icon('download',13)} Daftar Master SOP</button>
       </div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
@@ -308,7 +308,7 @@ async function agIngestFiles(fileList){
     }
     await agReload();
     // Arahkan langkah berikutnya secara eksplisit — jangan biarkan pengguna menebak.
-    put(`<div style="margin-top:6px;padding:8px 10px;background:#EAF5F3;border-radius:6px;color:#0A2342">
+    put(`<div style="margin-top:6px;padding:8px 10px;background:#EAF5F3;border-radius:6px;color:var(--navy-deep)">
       <b>✅ Selesai — ${created} dokumen masuk registry.</b> Langkah berikutnya di tabel di bawah:
       buka <b>${icon('sparkles',12)} Editor AI</b> untuk lengkapi/tarik isi (terutama PDF),
       lalu <b>${icon('file-text',12)} Review Final</b> untuk merakit .docx sesuai template.</div>`);
@@ -392,7 +392,7 @@ async function renderAgComplianceTab(el){
     <div class="ag-detail" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div>
-          <div style="font-size:12px;font-weight:800;color:#0A2342">Compliance Score — ISO 15189:2022</div>
+          <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">Compliance Score — ISO 15189:2022</div>
           <div style="font-size:11px;color:var(--gray)">Klausul wajib yang terpenuhi dokumen (confidence ≥ 0.7)</div>
         </div>
         <div style="text-align:right">
@@ -410,7 +410,7 @@ async function renderAgComplianceTab(el){
     <div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-bottom:12px">
       ${score.map(s=>`<div class="ag-detail">
         <div style="font-size:9.5px;font-weight:800;color:var(--text3);letter-spacing:.3px">${agEsc(s.framework||'—')}</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:#0A2342">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--navy-deep)">
           <span>${agEsc(s.department)}</span><span>${s.pct}%</span></div>
         <div class="ag-bar" style="margin:6px 0"><div style="width:${s.pct}%"></div></div>
         <div style="font-size:10.5px;color:var(--gray)">✔ ${s.matched} · ⚠ ragu ${s.low_conf} · ✖ kurang ${s.missing} · total ${s.total}</div>
@@ -419,7 +419,7 @@ async function renderAgComplianceTab(el){
 
     <div class="ag-detail">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342">Checklist Klausul (${agChk.length}${_agChkFw!=='ALL'?` dari ${agChecklist.length}`:''})</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">Checklist Klausul (${agChk.length}${_agChkFw!=='ALL'?` dari ${agChecklist.length}`:''})</div>
         <label style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:6px">Framework:
           <select class="form-input" style="padding:3px 6px;font-size:11px" onchange="agChkFwSet(this.value)">
             <option value="ALL" ${_agChkFw==='ALL'?'selected':''}>Semua (${agChecklist.length})</option>
@@ -445,7 +445,7 @@ async function renderAgComplianceTab(el){
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-audit-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('shield-check',14)} Audit Internal & CAPA</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${icon('shield-check',14)} Audit Internal & CAPA</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
   agRenderAuditPanel();
@@ -464,13 +464,13 @@ async function agRenderAuditPanel(){
   } else {
     const s = d.summary||{}; const findings = d.findings||[]; const capa = d.capa||[];
     inner = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">MAYOR ${s.open_mayor||0}</span>
-        <span class="ag-badge" style="background:#FEF3C7;color:#92400E;border:1px solid #FCD34D">MINOR ${s.open_minor||0}</span>
+        <span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">MAYOR ${s.open_mayor||0}</span>
+        <span class="ag-badge" style="background:var(--warn-soft);color:var(--warn-deeper);border:1px solid #FCD34D">MINOR ${s.open_minor||0}</span>
         <span class="ag-badge" style="background:#E0F2FE;color:#075985;border:1px solid #7DD3FC">OBSERVASI ${s.open_obs||0}</span>
         <span class="ag-badge" style="background:var(--bg2);color:var(--text2);border:1px solid #CBD5E1">CAPA terbuka ${s.capa_open||0}</span>
-        ${s.capa_overdue?`<span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">CAPA lewat tempo ${s.capa_overdue}</span>`:''}
+        ${s.capa_overdue?`<span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">CAPA lewat tempo ${s.capa_overdue}</span>`:''}
       </div>
-      <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin:6px 0 4px">Temuan terbuka (${findings.length})</div>
+      <div style="font-size:11.5px;font-weight:800;color:var(--navy-deep);margin:6px 0 4px">Temuan terbuka (${findings.length})</div>
       ${findings.length?`<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
         <thead><tr><th>Severity</th><th>Klausul</th><th>Area</th><th>Temuan</th><th>Status</th></tr></thead>
         <tbody>${findings.map(f=>`<tr>
@@ -480,14 +480,14 @@ async function agRenderAuditPanel(){
           <td>${agEsc(f.finding||'')}</td>
           <td><span style="color:var(--gray)">${agEsc(f.status)}</span></td>
         </tr>`).join('')}</tbody></table></div>`:'<div style="font-size:11.5px;color:var(--gray)">Belum ada temuan terbuka.</div>'}
-      <div style="font-size:11.5px;font-weight:800;color:#0A2342;margin:12px 0 4px">CAPA berjalan (${capa.length})</div>
+      <div style="font-size:11.5px;font-weight:800;color:var(--navy-deep);margin:12px 0 4px">CAPA berjalan (${capa.length})</div>
       ${capa.length?`<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
         <thead><tr><th>Judul</th><th>Akar Masalah</th><th>PIC</th><th>Target</th><th>Status</th><th></th></tr></thead>
         <tbody>${capa.map(c=>`<tr>
           <td>${agEsc(c.title||'')}</td>
           <td>${agEsc((c.root_cause||'').slice(0,80))}</td>
           <td style="white-space:nowrap">${agEsc(c.pic||'—')}</td>
-          <td style="white-space:nowrap;${c.due_date&&c.due_date<new Date().toISOString().slice(0,10)&&c.status!=='CLOSED'?'color:#B91C1C;font-weight:700':''}">${agEsc(c.due_date||'—')}</td>
+          <td style="white-space:nowrap;${c.due_date&&c.due_date<new Date().toISOString().slice(0,10)&&c.status!=='CLOSED'?'color:var(--danger-deep);font-weight:700':''}">${agEsc(c.due_date||'—')}</td>
           <td><span class="ag-badge" style="background:${AG_CAPA_COLOR[c.status]||'#64748B'}22;color:${AG_CAPA_COLOR[c.status]||'#64748B'};border:1px solid ${AG_CAPA_COLOR[c.status]||'#64748B'}">${agEsc(c.status)}</span></td>
           <td style="white-space:nowrap">
             <select class="form-input" style="padding:2px 4px;font-size:10.5px" onchange="agCapaStatus('${c.id}', this.value)">
@@ -496,7 +496,7 @@ async function agRenderAuditPanel(){
         </tr>`).join('')}</tbody></table></div>`:'<div style="font-size:11.5px;color:var(--gray)">Belum ada CAPA berjalan.</div>'}`;
   }
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">${icon('shield-check',14)} Audit Internal & CAPA</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${icon('shield-check',14)} Audit Internal & CAPA</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agRunAudit()">${svgIcon('sparkle',12)} Jalankan Audit Internal</button>
         <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderAuditPanel()">${svgIcon('refresh',11)} Muat ulang</button>
@@ -852,13 +852,13 @@ async function agRenderReviewBody(){
         { v: due.length,    l: 'Jatuh Tempo ≤30 hari', c: '#B45309' },
         { v: belum.length,  l: 'Pengesahan Belum Lengkap', c: '#7C3AED' },
         { v: recent.length, l: 'Pengesahan 90 Hari', c: '#15803D' },
-      ].map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};border-radius:10px;padding:11px 13px">
+      ].map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};border-radius:10px;padding:11px 13px">
         <div style="font-size:20px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
         <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('')}
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('clock',14)} Jatuh Tempo Review (${due.length})</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${icon('clock',14)} Jatuh Tempo Review (${due.length})</div>
       ${due.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
         <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Dept</th><th>Status</th><th>Tgl Review</th><th>Sisa</th><th></th></tr></thead>
         <tbody>${due.map(d => {
@@ -881,7 +881,7 @@ async function agRenderReviewBody(){
     </div>
 
     <div class="ag-detail" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:4px">${icon('pen-tool',14)} Pengesahan Belum Lengkap (${belum.length})</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:4px">${icon('pen-tool',14)} Pengesahan Belum Lengkap (${belum.length})</div>
       <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">
         Acuan kelengkapan: ${AG_REVIEW_REQUIRED_ROLES.join(' · ')}</div>
       ${belum.length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:12px">
@@ -895,7 +895,7 @@ async function agRenderReviewBody(){
             <td>${agEsc(d.department || '')}</td>
             <td>${d.revision || 0}</td>
             <td style="font-size:11px">${roles.length ? roles.map(r => agEsc(r)).join(', ') : '<i style="color:var(--gray)">belum ada</i>'}</td>
-            <td style="font-size:11px;color:#B45309;font-weight:600">${kurang.map(r => agEsc(r)).join(', ')}</td>
+            <td style="font-size:11px;color:var(--warn-deep);font-weight:600">${kurang.map(r => agEsc(r)).join(', ')}</td>
             <td style="white-space:nowrap">
               <button class="ag-btn mut" style="padding:4px 9px" title="Tinjau dokumen final sesuai template" onclick="agOpenFinalReview('${d.id}')">${icon('file-text',12)} Review</button>
               <button class="ag-btn mut" style="padding:4px 9px" onclick="agOpenSignModal('${d.id}')">${icon('pen-tool',12)} TTD</button></td>
@@ -905,7 +905,7 @@ async function agRenderReviewBody(){
     </div>
 
     <div class="ag-detail">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('scroll',14)} Jejak Pengesahan 90 Hari Terakhir (${recent.length})</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${icon('scroll',14)} Jejak Pengesahan 90 Hari Terakhir (${recent.length})</div>
       ${recent.length ? `<div style="max-height:320px;overflow-y:auto">
         ${recent.map(s => `<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;flex-wrap:wrap">
           <div style="min-width:0">
@@ -1224,7 +1224,7 @@ function agRenderFinalReview(){
           const kosong = !v.trim();
           const src = (st.source && st.source[k]) || (kosong?'kosong':'ai');
           const srcBadge = src==='struktur'
-            ? '<span style="font-size:9px;font-weight:700;color:#15803D;background:#DCFCE7;padding:1px 5px;border-radius:8px">dari struktur</span>'
+            ? '<span style="font-size:9px;font-weight:700;color:var(--success-deep);background:#DCFCE7;padding:1px 5px;border-radius:8px">dari struktur</span>'
             : src==='ai' ? '<span style="font-size:9px;font-weight:700;color:#3730A3;background:#EEF2FF;padding:1px 5px;border-radius:8px">AI</span>' : '';
           return `<tr style="border-bottom:1px solid var(--border)">
             <td style="padding:6px 10px;font-family:ui-monospace,monospace;font-size:11px;vertical-align:top;color:${kosong ? '#B45309' : 'var(--navy)'}">
@@ -1326,7 +1326,7 @@ function agDocxXmlToText(xml){
     .replace(/\n{3,}/g, '\n\n').trim();
   if(!teks) return '<div style="color:var(--gray)">Dokumen kosong.</div>';
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;' }[c]));
-  return `<div style="font-size:11px;color:#B45309;margin-bottom:8px">Struktur tabel tidak dapat diuraikan — menampilkan isi sebagai teks.</div>`
+  return `<div style="font-size:11px;color:var(--warn-deep);margin-bottom:8px">Struktur tabel tidak dapat diuraikan — menampilkan isi sebagai teks.</div>`
     + teks.split('\n').map(b => b.trim() ? `<p style="margin:0 0 6px;white-space:pre-wrap">${esc(b)}</p>` : '<div style="height:8px"></div>').join('');
 }
 
@@ -1374,7 +1374,7 @@ function agDocxXmlToHtml(xml){
     if(heading){
       const lv = Math.min(4, parseInt(heading[1], 10) || 1);
       const size = [0, 17, 15, 13.5, 12.5][lv];
-      return `<div style="font-size:${size}px;font-weight:800;color:#0A2342;margin:12px 0 5px;text-align:${ta}">${out}</div>`;
+      return `<div style="font-size:${size}px;font-weight:800;color:var(--navy-deep);margin:12px 0 5px;text-align:${ta}">${out}</div>`;
     }
     return `<p style="margin:0 0 6px;text-align:${ta};white-space:pre-wrap">${out}</p>`;
   }
@@ -1413,8 +1413,8 @@ async function agRenderDocPreview(){
       const filled = agFillPlaceholders(xml, st.map);
       const html = agDocxXmlToHtml(filled);
       const sisa = html.replace(/\{\{([^{}]+)\}\}/g,
-        '<mark style="background:#FEF3C7;color:#92400E;padding:0 3px;border-radius:3px">{{$1}}</mark>');
-      el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
+        '<mark style="background:var(--warn-soft);color:var(--warn-deeper);padding:0 3px;border-radius:3px">{{$1}}</mark>');
+      el.innerHTML = `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;
         padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:#1A2B3C">
         ${sisa}</div>`;
       return;
@@ -1428,14 +1428,14 @@ async function agRenderDocPreview(){
   const renderedMap = Object.entries(st.map || {})
     .filter(([k, v]) => String(v).trim())
     .map(([k, v]) => `<div style="margin-bottom:12px;border-bottom:1px solid #f1f5f9;padding-bottom:8px">
-      <div style="font-size:11px;font-weight:700;color:#0EA5E9;text-transform:uppercase;letter-spacing:0.5px">${agEsc(k)}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--info);text-transform:uppercase;letter-spacing:0.5px">${agEsc(k)}</div>
       <div style="font-size:13px;color:#1E293B;margin-top:2px;white-space:pre-wrap">${agEsc(v)}</div>
     </div>`).join('');
 
-  el.innerHTML = `<div style="background:#fff;border:1px solid var(--border);border-radius:8px;
+  el.innerHTML = `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;
     padding:24px 28px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:#1E293B">
     <div style="border-bottom:2px solid #0A2342;padding-bottom:10px;margin-bottom:16px">
-      <div style="font-size:16px;font-weight:800;color:#0A2342">${agEsc(st.doc.title)}</div>
+      <div style="font-size:16px;font-weight:800;color:var(--navy-deep)">${agEsc(st.doc.title)}</div>
       <div style="font-size:11.5px;color:var(--gray);margin-top:4px">${agEsc(st.doc.doc_number || '—')} · ${agEsc(st.doc.doc_type)} L${st.doc.doc_level} · ${agEsc(st.doc.department || '')} · Rev ${st.doc.current_revision || 1}</div>
     </div>
     ${renderedMap ? renderedMap : `<div style="white-space:pre-wrap;color:var(--text2)">${agEsc(content)}</div>`}

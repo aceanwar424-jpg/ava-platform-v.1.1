@@ -89,7 +89,7 @@ function renderRadioKPI() {
     {icon:'',val:radioAll.filter(r=>r.status==='Validated').length,  label:'Tervalidasi',      color:'#22C55E'},
     {icon:'🔏',val:radioAll.filter(r=>r.status==='Approved').length,   label:'Approved',         color:'#8B5CF6'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
+    <div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:20px">${k.icon}</div>
       <div style="font-size:18px;font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:10px;color:var(--gray)">${k.label}</div>
@@ -151,8 +151,8 @@ function renderRadioList(data) {
               padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">${r.status||'Draft'}</span>
             <div class="act-row" style="margin-top:8px;justify-content:flex-end">
               <button class="act-btn edit" onclick="openRadioForm(${r.id})">Edit</button>
-              ${r.status==='Draft'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
-              ${r.status==='Validated'?`<button class="act-btn" style="color:#8B5CF6;font-size:11px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
+              ${r.status==='Draft'?`<button class="act-btn" style="color:var(--success-strong);font-size:11px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
+              ${r.status==='Validated'?`<button class="act-btn" style="color:var(--violet);font-size:11px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
               <button class="act-btn" onclick="printRadioResult(${r.id})" title="Print">🖨</button>
             </div>
           </div>
@@ -349,17 +349,17 @@ async function printRadioResult(id) {
     <style>
       body{font-family:Arial,sans-serif;padding:30px;font-size:13px;color:#1A2B3C}
       .header{display:flex;justify-content:space-between;border-bottom:3px solid #0A2342;padding-bottom:14px;margin-bottom:20px}
-      h2{color:#0A2342;margin:0}.badge{padding:4px 14px;border-radius:10px;font-size:12px;font-weight:700}
-      .section{margin-bottom:20px}.label{font-size:11px;color:#546E7A;text-transform:uppercase;letter-spacing:.05em}
+      h2{color:var(--navy-deep);margin:0}.badge{padding:4px 14px;border-radius:10px;font-size:12px;font-weight:700}
+      .section{margin-bottom:20px}.label{font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:.05em}
       .img-box{border:1px solid #e2e8f0;border-radius:8px;padding:8px;text-align:center;margin-bottom:16px}
       @media print{button{display:none}}
     </style></head><body>
-    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:#0A2342;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
+    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
     <div class="header">
-      <div><h2>${orgName}</h2><div style="font-size:12px;color:#546E7A">${orgAddr}</div></div>
+      <div><h2>${orgName}</h2><div style="font-size:12px;color:var(--slate)">${orgAddr}</div></div>
       <div style="text-align:right">
-        <div style="font-size:18px;font-weight:800;color:#0A2342">HASIL RADIOLOGI</div>
-        <div style="font-size:12px;color:#546E7A">${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div>
+        <div style="font-size:18px;font-weight:800;color:var(--navy-deep)">HASIL RADIOLOGI</div>
+        <div style="font-size:12px;color:var(--slate)">${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:#F0F4F8;border-radius:8px;padding:14px;margin-bottom:20px">
@@ -379,13 +379,13 @@ async function printRadioResult(id) {
     </div>
     ${rec?`<div class="section">
       <div class="label" style="margin-bottom:4px">Rekomendasi</div>
-      <div style="color:#0A2342;font-weight:600">${rec}</div>
+      <div style="color:var(--navy-deep);font-weight:600">${rec}</div>
     </div>`:''}
     <div style="margin-top:50px;display:flex;justify-content:flex-end">
       <div style="text-align:center">
         <div style="margin-bottom:40px">Diperiksa oleh:</div>
         <div>________________________</div>
-        <div style="font-size:12px;color:#546E7A">${r.approved_by||'Dokter Radiologi'}</div>
+        <div style="font-size:12px;color:var(--slate)">${r.approved_by||'Dokter Radiologi'}</div>
       </div>
     </div>
     </body></html>`);

@@ -50,6 +50,126 @@
   --r-md:  14px;
   --r-lg:  20px;
   --r-xl:  28px;
+
+  /* ══ LAPISAN SEMANTIK ══════════════════════════════════════════
+     Ditambahkan dari warna yang MEMANG SUDAH DIPAKAI di modul — bukan
+     palet baru. Nilainya identik dengan heksa yang digantikan, sehingga
+     penambahan ini nol perubahan visual.
+
+     Alasannya bukan kerapian: selama warna tersebar sebagai heksa keras,
+     tema gelap mustahil tanpa menyunting ribuan tempat. Dengan lapisan ini
+     satu blok override sudah cukup. */
+
+  /* Teks & permukaan tambahan */
+  --text4:        #94A3B8;   /* teks samar / disabled — 158 pemakaian */
+  --text-dim:     #475569;
+  --slate:        #546E7A;
+  --surface:      #FFFFFF;   /* permukaan kartu */
+  --surface2:     #F8FAFC;
+  /* Teks di ATAS warna aksen/lencana. Sengaja dipisah dari --white:
+     --white adalah PERMUKAAN dan ikut menggelap di tema gelap, sedangkan
+     teks di atas lencana merah/hijau harus tetap putih di kedua tema.
+     Satu token untuk dua peran adalah persis kesalahan yang membuat
+     --navy-deep menghilangkan teks di tema gelap. */
+  --on-accent:    #FFFFFF;
+
+  /* Varian brand */
+  --navy-deep:    #0A2342;   /* header gelap — 138 pemakaian */
+  --navy-royal:   #0F2963;
+  --teal-deep:    #0E7C86;
+  --sky:          #38BDF8;
+
+  /* Status — kuat / pekat / lembut.
+     Dipisah karena tiap tingkat punya tugas berbeda: "kuat" untuk lencana,
+     "pekat" untuk teks di atas latar lembut, "lembut" untuk latar itu sendiri. */
+  --success-strong: #22C55E;
+  --success-deep:   #15803D;
+  --success-soft:   #F0FDF4;
+
+  --danger-strong:  #DC2626;
+  --danger-deep:    #B91C1C;
+  --danger-soft:    #FEF2F2;
+  --danger-tint:    #FCA5A5;
+
+  --warn-deep:      #B45309;
+  --warn-deeper:    #92400E;
+  --warn-soft:      #FEF3C7;
+  --warn-soft2:     #FFF8E1;
+
+  --info:           #0EA5E9;
+  --violet:         #8B5CF6;
+  --violet-deep:    #7C3AED;
+
+  /* Gerak — micro-interaction dipusatkan agar seragam dan bisa dimatikan
+     serentak bagi pengguna yang memilih mengurangi animasi. */
+  --dur-cepat:  .14s;
+  --dur:        .22s;
+  --dur-lambat: .38s;
+  --ease:       cubic-bezier(.4, 0, .2, 1);
+  --ease-keluar: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* ══ TEMA GELAP ══════════════════════════════════════════════════
+   OPT-IN: hanya aktif bila <html data-theme="dark">. Mode terang tetap
+   bawaan dan tidak berubah sedikit pun.
+
+   Alasan opt-in, bukan mengikuti sistem operasi: ini sistem klinis yang
+   dipakai bergantian banyak petugas di komputer yang sama. Tampilan yang
+   berubah sendiri mengikuti jam atau setelan OS akan mengejutkan petugas
+   di tengah pekerjaan.
+
+   Yang di-override hanya NEUTRAL dan PERMUKAAN. Warna status (merah, hijau,
+   kuning) sengaja dipertahankan — arti klinisnya tidak boleh bergeser
+   antar-tema, dan petugas mengenalinya dari warna. */
+html[data-theme="dark"] {
+  --text:       #E2E8F0;
+  --text2:      #CBD5E1;
+  --text3:      #94A3B8;
+  --text4:      #64748B;
+  --text-dim:   #94A3B8;
+
+  --bg:         #0B1220;
+  --bg2:        #131C2E;
+  --surface:    #131C2E;
+  --surface2:   #0B1220;
+  --white:      #131C2E;   /* elemen yang mengasumsikan latar putih */
+
+  --border:     #22304A;
+  --border2:    #2E3F5C;
+
+  /* navy-deep & navy-royal DOMINAN dipakai sebagai warna TEKS (79 dan 35
+     pemakaian) dibanding latar (13 dan 2). Menjadikannya gelap di tema
+     gelap membuat teks hilang sama sekali — kesalahan pemetaan pertama
+     saya, tertangkap audit kontras. Di sini keduanya dibuat terbaca;
+     segelintir pemakaian sebagai latar jadi lebih terang, dan itu jauh
+     lebih ringan akibatnya daripada teks yang tak terlihat. */
+  --navy:       #E2E8F0;
+  --navy-deep:  #CBD5E1;
+  --navy-royal: #BFD3EE;
+
+  --teal-light: #0E2A33;
+  --success-soft: #0E2A1C;
+  --danger-soft:  #2A1416;
+  --warn-soft:    #2A2010;
+  --warn-soft2:   #241C0E;
+
+  --shadow-xs:  0 1px 2px rgba(0,0,0,.4);
+  --shadow-sm:  0 2px 8px rgba(0,0,0,.45);
+  --shadow:     0 4px 16px rgba(0,0,0,.5);
+  --shadow-md:  0 8px 32px rgba(0,0,0,.55);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,.6);
+}
+
+html[data-theme="dark"] body { background: var(--bg); color: var(--text); }
+
+/* Hormati pengguna yang meminta pengurangan gerak — bukan sekadar
+   kesantunan, tapi kebutuhan nyata bagi sebagian orang. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }

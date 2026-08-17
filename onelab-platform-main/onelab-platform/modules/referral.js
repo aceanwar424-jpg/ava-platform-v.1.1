@@ -35,17 +35,17 @@ async function renderReferral() {
   if (!refPeriod) refPeriod = new Date().toISOString().slice(0, 7);
 
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('referral')" title="Kembali ke daftar menu Rujukan">← Menu Rujukan</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('referral')" title="Kembali ke daftar menu Rujukan">← Menu Rujukan</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rujukan Lab Luar</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Rujukan Lab Luar</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pemeriksaan lab rekanan · pengiriman · hasil · margin</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="ref-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="refOpenLabForm()">+ Lab Rekanan</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="refOpenLabForm()">+ Lab Rekanan</button>
         <button class="btn btn-teal btn-sm" onclick="refOpenSendForm()">Kirim Pemeriksaan</button>
       </div>
     </div>
@@ -202,7 +202,7 @@ function refPaintKpi() {
   ];
 
   kpi.innerHTML = cards.map(k => `
-    <div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+    <div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
       border-radius:10px;padding:12px">
       <div style="font-size:${k.small ? '15px' : '20px'};font-weight:800;color:${k.c};
         font-variant-numeric:tabular-nums">${k.v}</div>
@@ -247,13 +247,13 @@ function refViewTracking() {
       return `<tr style="${late ? 'background:#FEF6F6' : ''}">
         <td>
           <div style="font-weight:650">${refEsc(t.patient_name || '—')}</div>
-          ${late ? `<div style="font-size:10.5px;color:#B91C1C;font-weight:700">
+          ${late ? `<div style="font-size:10.5px;color:var(--danger-deep);font-weight:700">
             ⚠️ Terlambat ${refLateDays(t)} hari</div>` : ''}
         </td>
         <td style="font-size:12.5px">${refEsc(t.product_name || '—')}</td>
         <td style="font-size:12.5px">${refEsc(t.lab_name || refLabName(t.referral_lab_id) || '—')}</td>
         <td style="font-size:11.5px;color:var(--gray)">${t.sent_at ? formatDateShort(t.sent_at) : '—'}</td>
-        <td style="font-size:11.5px;${late ? 'color:#B91C1C;font-weight:700' : 'color:var(--gray)'}">
+        <td style="font-size:11.5px;${late ? 'color:var(--danger-deep);font-weight:700' : 'color:var(--gray)'}">
           ${t.expected_at ? formatDateShort(t.expected_at) : '—'}</td>
         <td>${refStatusBadge(t)}
           ${t.result_at ? `<div style="font-size:10.5px;color:var(--gray);margin-top:2px">
@@ -266,7 +266,7 @@ function refViewTracking() {
         <td><div class="act-row">
           ${t.status === 'Dikirim' ? `
             <button class="btn btn-teal btn-xs" onclick="refOpenReceiveForm(${t.id})">Terima Hasil</button>
-            <button class="btn btn-ghost btn-xs" style="color:#B91C1C" onclick="refCancelTest(${t.id})">Batalkan</button>` : ''}
+            <button class="btn btn-ghost btn-xs" style="color:var(--danger-deep)" onclick="refCancelTest(${t.id})">Batalkan</button>` : ''}
           ${t.status === 'Diterima' ? `
             <button class="btn btn-ghost btn-xs" onclick="refOpenResultView(${t.id})">Lihat Hasil</button>` : ''}
         </div></td>
@@ -476,12 +476,12 @@ function refSearchPatient(q) {
         `select=id,mr_number,patient_name,visit_number&patient_name=ilike.${encodeURIComponent('%' + q.trim() + '%')}` +
         `&order=id.desc&limit=15`);
       if (!rows || !rows.length) {
-        box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+        box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
           border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12px;color:var(--gray)">
           Tidak ada pasien cocok.</div>`;
         return;
       }
-      box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+      box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
         border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:210px;overflow:auto">
         ${rows.slice(0, 8).map(r => `
           <div onclick='refPickPatient(${JSON.stringify(r).replace(/'/g, "&#39;")})'
@@ -527,9 +527,9 @@ function refPreviewMargin() {
   const price = refNum(document.getElementById('ref-sf-price')?.value);
   const m = price - cost;
   el.innerHTML = m < 0
-    ? `<span style="color:#B91C1C">⚠️ Margin ${formatCurrency(m)} — harga ke pasien lebih rendah
+    ? `<span style="color:var(--danger-deep)">⚠️ Margin ${formatCurrency(m)} — harga ke pasien lebih rendah
        daripada biaya ke lab. Pemeriksaan ini merugi dan perlu ditinjau.</span>`
-    : `<span style="color:#15803D">Margin ${formatCurrency(m)}</span>`;
+    : `<span style="color:var(--success-deep)">Margin ${formatCurrency(m)}</span>`;
 }
 
 async function refSaveSend() {
@@ -617,7 +617,7 @@ function refOpenReceiveForm(id) {
       <div style="color:var(--gray);margin-top:3px">
         Dikirim ${t.sent_at ? formatDateShort(t.sent_at) : '—'} ·
         Perkiraan ${t.expected_at ? formatDateShort(t.expected_at) : '—'}
-        ${late ? `<span style="color:#B91C1C;font-weight:700"> · terlambat ${refLateDays(t)} hari</span>` : ''}
+        ${late ? `<span style="color:var(--danger-deep);font-weight:700"> · terlambat ${refLateDays(t)} hari</span>` : ''}
       </div>
     </div>
 
@@ -681,7 +681,7 @@ function refOpenResultView(id) {
     </div>
     <div class="form-group"><label>Nilai Hasil</label>
       <div style="white-space:pre-wrap;font-size:12.5px;border:1px solid var(--border);
-        border-radius:8px;padding:10px;background:#fff">${refEsc(t.result_value || '—')}</div></div>
+        border-radius:8px;padding:10px;background:var(--white)">${refEsc(t.result_value || '—')}</div></div>
     ${t.notes ? `<div class="form-group"><label>Catatan</label>
       <div style="font-size:12.5px;color:var(--gray)">${refEsc(t.notes)}</div></div>` : ''}
     <div class="modal-footer">
@@ -757,7 +757,7 @@ function refViewMargin() {
         <td style="font-size:12.5px">${refEsc(t.lab_name || refLabName(t.referral_lab_id) || '—')}</td>
         <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(refNum(t.cost))}</td>
         <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(refNum(t.price))}</td>
-        <td style="text-align:right;font-weight:700;color:#B91C1C;font-variant-numeric:tabular-nums">
+        <td style="text-align:right;font-weight:700;color:var(--danger-deep);font-variant-numeric:tabular-nums">
           ${formatCurrency(refMargin(t))}</td>
       </tr>`).join('')}
     </tbody></table></div>` : '';

@@ -541,7 +541,7 @@ async function renderShiftCalendar() {
             ${SHIFT_TEMPLATES.map(t=>`
               <button id="cal-btn-${t.code}" class="btn btn-sm btn-ghost" onclick="setCalShift('${t.code}')">${t.code}</button>`).join('')}
             <button id="cal-btn-OFF" class="btn btn-sm btn-ghost" onclick="setCalShift('OFF')" style="color:var(--danger)">OFF</button>
-            <button id="cal-btn-C" class="btn btn-sm btn-ghost" onclick="setCalShift('C')" style="color:#8B5CF6">CUTI</button>
+            <button id="cal-btn-C" class="btn btn-sm btn-ghost" onclick="setCalShift('C')" style="color:var(--violet)">CUTI</button>
             <button id="cal-btn-S" class="btn btn-sm btn-ghost" onclick="setCalShift('S')" style="color:var(--gold)">SAKIT</button>
             <button id="cal-btn-I" class="btn btn-sm btn-ghost" onclick="setCalShift('I')" style="color:#6B7280">IZIN</button>
           </div>

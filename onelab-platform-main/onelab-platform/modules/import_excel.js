@@ -572,9 +572,9 @@ function showImportPreview(key, tpl, parsed, headerRow, colMap) {
     <table style="min-width:100%">
       <thead>
         <tr>
-          <th style="padding:8px 10px;background:var(--navy);color:#fff;font-size:11px">#</th>
-          ${displayCols.map(c => `<th style="padding:8px 10px;background:var(--navy);color:#fff;font-size:11px;white-space:nowrap">${c.header.replace(' *','')}</th>`).join('')}
-          <th style="padding:8px 10px;background:var(--navy);color:#fff;font-size:11px">Status</th>
+          <th style="padding:8px 10px;background:var(--navy);color:var(--on-accent);font-size:11px">#</th>
+          ${displayCols.map(c => `<th style="padding:8px 10px;background:var(--navy);color:var(--on-accent);font-size:11px;white-space:nowrap">${c.header.replace(' *','')}</th>`).join('')}
+          <th style="padding:8px 10px;background:var(--navy);color:var(--on-accent);font-size:11px">Status</th>
         </tr>
       </thead>
       <tbody>
@@ -821,7 +821,7 @@ function _addImportLog(key, tpl, ok, err, errMsgs) {
       </div>
     </div>
     ${errMsgs.length ? `
-      <div style="margin-top:8px;padding:8px 12px;background:#FEF2F2;border-radius:6px;font-size:11.5px;color:#DC2626">
+      <div style="margin-top:8px;padding:8px 12px;background:var(--danger-soft);border-radius:6px;font-size:11.5px;color:var(--danger-strong)">
         ${errMsgs.slice(0,5).map(m=>`<div>• ${m}</div>`).join('')}
         ${errMsgs.length > 5 ? `<div>... dan ${errMsgs.length-5} error lainnya</div>` : ''}
       </div>` : ''}`;

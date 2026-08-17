@@ -139,7 +139,7 @@ function renderWikiTab(){
 function wikiTabWithBanner(el, kind, legacyRenderer){
   const isFix = kind==='fix';
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,#0A2342,#13856B);border-radius:10px;padding:14px 16px;margin-bottom:12px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+    <div style="background:linear-gradient(135deg,#0A2342,#13856B);border-radius:10px;padding:14px 16px;margin-bottom:12px;color:var(--on-accent);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
       <div>
         <div style="font-weight:800;font-size:13.5px">✨ ${isFix?'Perbaikan SOP':'Produksi konten'} kini ditangani Agentic AI</div>
         <div style="font-size:11.5px;opacity:.85;margin-top:3px">
@@ -147,7 +147,7 @@ function wikiTabWithBanner(el, kind, legacyRenderer){
             ? 'Document Compliance Agent: perbaikan + generate dokumen ISO 15189, lewat approval, dapat nomor resmi & riwayat revisi.'
             : 'Content & Branding Agent: kalender konten + planner mingguan + copy & gambar, semua lewat Approval Inbox.'}</div>
       </div>
-      <button class="btn btn-sm" style="background:#fff;color:#0A2342;font-weight:800;border:none"
+      <button class="btn btn-sm" style="background:var(--white);color:var(--navy-deep);font-weight:800;border:none"
         onclick="navigate('agentic',{tab:'${isFix?'docs':'studio'}'})">Buka Agentic AI →</button>
     </div>
     <details style="margin-bottom:10px">
@@ -207,7 +207,7 @@ function renderWikiKPI(){
     {v:due,                  l:'Perlu Review',   c:'#EF4444'},
     {v:wikiContents.length,  l:'Konten',         c:'#0EA5E9'},
     {v:wikiMedia.length,     l:'Media',          c:'#F59E0B'},
-  ].map(k=>`<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};border-radius:8px;padding:8px 10px">
+  ].map(k=>`<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};border-radius:8px;padding:8px 10px">
       <div style="font-size:18px;font-weight:800;color:${k.c}">${k.v}</div>
       <div style="font-size:10px;color:var(--gray)">${k.l}</div></div>`).join('');
 }
@@ -218,11 +218,11 @@ function injectWikiStyle(){
   s.textContent=`
     .wiki-drop{ border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;background:var(--bg);cursor:pointer;transition:.15s }
     .wiki-drop:hover,.wiki-drop.over{ border-color:var(--teal);background:#eefaf8 }
-    .wiki-out{ background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+    .wiki-out{ background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
       font-size:13px;line-height:1.65;white-space:pre-wrap;max-height:460px;overflow:auto }
-    .wiki-out h1,.wiki-out h2,.wiki-out h3{ margin:.6em 0 .3em;color:#0A2342 }
-    .wiki-card{ background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px }
-    .wiki-sec{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;
+    .wiki-out h1,.wiki-out h2,.wiki-out h3{ margin:.6em 0 .3em;color:var(--navy-deep) }
+    .wiki-card{ background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px }
+    .wiki-sec{ font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;letter-spacing:.05em;
       background:#EAF3FB;border-left:3px solid var(--teal);padding:6px 10px;border-radius:4px;margin:0 0 10px }
     .wiki-badge{ padding:2px 8px;border-radius:8px;font-size:10.5px;font-weight:700;white-space:nowrap }
     .wiki-thumb{ width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border);background:var(--bg2) }`;

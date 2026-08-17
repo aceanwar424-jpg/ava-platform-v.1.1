@@ -146,7 +146,7 @@ function renderLeadsFunnel() {
   el.innerHTML = steps.map(s=>`
     <div class="funnel-step ${leadsFilter.status===s.key||(!leadsFilter.status&&s.key==='all')?'active':''}"
       onclick="${s.key==='all'?'leadsFilter.status=\'\';applyLeadsFilter()':s.key==='overdue'?'leadsFilter.status=\'\';applyLeadsFilter()':'leadsFilter.status=\''+s.key+'\';applyLeadsFilter()'}">
-      <div class="fs-count" style="${leadsFilter.status===s.key||(!leadsFilter.status&&s.key==='all')?'color:#fff':'color:'+s.color}">${s.count}</div>
+      <div class="fs-count" style="${leadsFilter.status===s.key||(!leadsFilter.status&&s.key==='all')?'color:var(--on-accent)':'color:'+s.color}">${s.count}</div>
       <div class="fs-label">${s.label}</div>
     </div>`).join('');
 }
@@ -162,19 +162,19 @@ function renderLeadsReminder() {
   );
   if (!overdue.length) { el.innerHTML = ''; return; }
   el.innerHTML = `
-    <div style="background:#FFF8E1;border:1.5px solid #FCD34D;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+    <div style="background:var(--warn-soft2);border:1.5px solid #FCD34D;border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
       <span style="font-size:22px">⏰</span>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:#92400E">
+        <div style="font-size:13px;font-weight:700;color:var(--warn-deeper)">
           ${overdue.length} lead perlu di-follow up hari ini atau sudah lewat!
         </div>
         <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
           ${overdue.slice(0,5).map(l=>`
             <span onclick="openLeadDetail(${l.id})"
-              style="background:#FEF3C7;border:1px solid #FCD34D;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:#92400E">
+              style="background:var(--warn-soft);border:1px solid #FCD34D;padding:3px 10px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;color:var(--warn-deeper)">
               ${l.lead_name||l.company||'—'} · ${l.followup_date}
             </span>`).join('')}
-          ${overdue.length>5?`<span style="font-size:11px;color:#92400E">+${overdue.length-5} lainnya</span>`:''}
+          ${overdue.length>5?`<span style="font-size:11px;color:var(--warn-deeper)">+${overdue.length-5} lainnya</span>`:''}
         </div>
       </div>
     </div>`;
@@ -264,7 +264,7 @@ function renderLeadsTable(data) {
                 <button class="act-btn edit" onclick="openLeadForm(${l.id})">${icon('edit', 12)}</button>
                 ${!['Won','Lost'].includes(l.status)?`
                   <button class="act-btn" onclick="convertLeadToPartner(${l.id})"
-                    style="color:#22C55E;font-size:11px;padding:4px 7px" title="Convert ke Partner">→Partner</button>`:''}
+                    style="color:var(--success-strong);font-size:11px;padding:4px 7px" title="Convert ke Partner">→Partner</button>`:''}
                 <button class="act-btn del" onclick="deleteLead(${l.id})">${icon('trash', 12)}</button>
               </div>
             </td>
@@ -308,10 +308,10 @@ async function openLeadDetail(id) {
         <div style="font-size:11px;color:var(--text3)">Assigned: ${lead.assigned_name||'—'}</div>
       </div>
       ${lead.followup_date?`
-        <div style="background:#FFF8E1;border-radius:8px;padding:10px 12px">
+        <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 12px">
           <div style="font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Next Follow-up</div>
-          <div style="font-size:13px;font-weight:600;color:#92400E">${formatDateShort(lead.followup_date)}</div>
-          ${lead.followup_note?`<div style="font-size:11px;color:#92400E">${lead.followup_note}</div>`:''}
+          <div style="font-size:13px;font-weight:600;color:var(--warn-deeper)">${formatDateShort(lead.followup_date)}</div>
+          ${lead.followup_note?`<div style="font-size:11px;color:var(--warn-deeper)">${lead.followup_note}</div>`:''}
         </div>`:''}
       ${lead.address?`
         <div style="background:var(--lgray);border-radius:8px;padding:10px 12px">
@@ -722,7 +722,7 @@ async function convertLeadToPartner(id) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
         <button onclick="closeModalForce();navigate('partners')"
-          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
+          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--white);
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="font-size:24px"></div>
@@ -730,7 +730,7 @@ async function convertLeadToPartner(id) {
           <div style="font-size:11px;color:var(--text3)">Kelola output kerjasama</div>
         </button>
         <button onclick="closeModalForce();createMOUFromLead(${partner?.[0]?.id||'null'},'${(lead.lead_name||lead.company||'').replace(/'/g,"\\'")}')"
-          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
+          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--white);
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="font-size:24px"></div>
@@ -738,7 +738,7 @@ async function convertLeadToPartner(id) {
           <div style="font-size:11px;color:var(--text3)">Langsung buat perjanjian</div>
         </button>
         <button onclick="closeModalForce();createMCUFromLead(${partner?.[0]?.id||'null'},'${(lead.lead_name||lead.company||'').replace(/'/g,"\\'")}')"
-          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
+          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--white);
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="font-size:24px"></div>
@@ -746,7 +746,7 @@ async function convertLeadToPartner(id) {
           <div style="font-size:11px;color:var(--text3)">Setup project & RAB</div>
         </button>
         <button onclick="closeModalForce();createCorporateFromLead(${partner?.[0]?.id||'null'},'${(lead.lead_name||lead.company||'').replace(/'/g,"\\'")}')"
-          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:#fff;
+          style="padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--white);
             cursor:pointer;text-align:center;transition:all .2s"
           onmouseover="this.style.borderColor='#8B5CF6'" onmouseout="this.style.borderColor='var(--border)'">
           <div style="font-size:24px">🏢</div>
@@ -861,7 +861,7 @@ async function loadOKRRealKPI() {
           {icon:'🔥', val:activeDeals.length, label:'Deal Aktif', color:'#EF4444'},
           {icon:'📈', val:`${wonLeads.length && (leads||[]).length ? Math.round(wonLeads.length/(leads||[]).length*100) : 0}%`, label:'Conversion Rate', color:'#00897B'},
         ].map(k=>`
-          <div style="background:#fff;border-radius:10px;padding:12px 14px;border:1px solid var(--border);border-left:4px solid ${k.color}">
+          <div style="background:var(--white);border-radius:10px;padding:12px 14px;border:1px solid var(--border);border-left:4px solid ${k.color}">
             <div style="font-size:18px;font-weight:800;color:${k.color}">${k.val}</div>
             <div style="font-size:11px;color:var(--text3);margin-top:2px">${k.label}</div>
           </div>`).join('')}

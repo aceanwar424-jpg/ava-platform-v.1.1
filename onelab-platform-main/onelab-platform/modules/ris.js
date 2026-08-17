@@ -26,11 +26,11 @@ let risOrders = [], risModalities = [], risFilter = '';
 
 async function renderRIS() {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('radiology')" title="Kembali ke daftar menu Radiologi">← Menu Radiologi</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('radiology')" title="Kembali ke daftar menu Radiologi">← Menu Radiologi</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Radiologi (RIS &amp; PACS)</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Radiologi (RIS &amp; PACS)</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Radiology Information System</span>
         </div>
       </div>
@@ -90,7 +90,7 @@ function paintRIS() {
       { l: 'Menunggu Baca', v: risOrders.filter(o => o.status === 'Menunggu Baca').length, c: '#7C3AED' },
       { l: 'Cito', v: risOrders.filter(o => o.priority === 'Cito' && o.status !== 'Selesai').length, c: '#B91C1C' },
       { l: 'Selesai', v: risOrders.filter(o => o.status === 'Selesai').length, c: '#15803D' },
-    ].map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+    ].map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
       border-radius:10px;padding:12px">
       <div style="font-size:20px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
       <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('');
@@ -107,7 +107,7 @@ function paintRIS() {
   el.innerHTML = `<div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:auto">
     <table style="width:100%;border-collapse:collapse">
       <thead>
-        <tr style="background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
+        <tr style="background:var(--navy-deep);color:var(--on-accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;position:sticky;top:0">
           <th style="padding:7px 10px;text-align:left">No. Akses</th>
           <th style="padding:7px 10px;text-align:left">Pasien</th>
           <th style="padding:7px 10px;text-align:left">Pemeriksaan</th>
@@ -120,7 +120,7 @@ function paintRIS() {
         const st = RIS_STATUS[o.status] || RIS_STATUS['Dijadwalkan'];
         return `<tr style="border-bottom:1px solid #f1f5f9">
           <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${o.accession_no || '—'}</span>
-            ${o.priority === 'Cito' ? '<div style="font-size:10px;color:#B91C1C;font-weight:700">CITO</div>' : ''}</td>
+            ${o.priority === 'Cito' ? '<div style="font-size:10px;color:var(--danger-deep);font-weight:700">CITO</div>' : ''}</td>
           <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${o.patient_name || '—'}</div>
             <div style="font-size:11px;color:var(--gray)">${o.mr_number || ''}</div></td>
           <td style="padding:8px 10px"><div style="font-size:12.5px;font-weight:600">${o.procedure_name || '—'}</div>
@@ -194,7 +194,7 @@ function risSearchPatient(q) {
         `select=mr_number,patient_name,patient_gender,patient_dob&patient_name=ilike.${encodeURIComponent('%' + q.trim() + '%')}&mr_number=not.is.null&order=created_at.desc&limit=15`);
       const seen = {}, uniq = [];
       (rows || []).forEach(r => { if (!seen[r.mr_number]) { seen[r.mr_number] = 1; uniq.push(r); } });
-      box.innerHTML = uniq.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+      box.innerHTML = uniq.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
         border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:200px;overflow:auto">
         ${uniq.slice(0, 8).map(r => `<div onclick='risPickPatient(${JSON.stringify(r).replace(/'/g, "&#39;")})'
           style="padding:8px 11px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12.5px">
@@ -351,7 +351,7 @@ async function openRISReport(orderId) {
     </div>
 
     ${locked ? `<div style="background:#E8F5EC;border:1px solid #15803D55;border-radius:8px;padding:9px 13px;
-      margin-bottom:12px;font-size:12.5px;color:#15803D">
+      margin-bottom:12px;font-size:12.5px;color:var(--success-deep)">
       Ditandatangani ${rep.radiologist || ''} pada ${rep.signed_at ? new Date(rep.signed_at).toLocaleString('id-ID') : ''}</div>` : ''}
 
     <div class="form-group"><label>Teknik Pemeriksaan</label>
@@ -425,7 +425,7 @@ async function printRISReport(orderId) {
       .box{border:1px solid #ddd;border-radius:6px;padding:10px 12px;margin-bottom:14px;font-size:11.5px}
       .sec{margin-bottom:12px} .lbl{font-weight:700;font-size:11px;text-transform:uppercase;
         letter-spacing:.06em;color:#555;margin-bottom:3px}
-      .crit{background:#FBEAEA;border:1px solid #B91C1C;color:#B91C1C;padding:8px 12px;
+      .crit{background:#FBEAEA;border:1px solid #B91C1C;color:var(--danger-deep);padding:8px 12px;
         border-radius:6px;font-weight:700;margin-bottom:12px}
       .sign{margin-top:44px;text-align:right}
       .sign div{display:inline-block;width:220px;text-align:center;border-top:1px solid #333;padding-top:4px}</style>

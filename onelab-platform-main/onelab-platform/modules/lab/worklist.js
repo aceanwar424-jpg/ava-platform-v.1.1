@@ -186,13 +186,13 @@ function renderWorklistTab(){
     </div>
 
     ${patients.length ? `
-    <div style="display:grid;grid-template-columns:230px 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
+    <div style="display:grid;grid-template-columns:230px 1fr;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--white)">
       <div id="wl-list" style="border-right:1px solid var(--border);overflow-y:auto;max-height:660px;background:var(--lgray)"></div>
       <div id="wl-work" style="overflow-y:auto;max-height:660px;min-width:0"></div>
     </div>
     <datalist id="wl-note-presets">${LAB_NOTE_PRESETS.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('')}</datalist>
     ` : `
-    <div class="empty-state" style="padding:40px;background:#fff;border-radius:10px;border:1px solid var(--border)">
+    <div class="empty-state" style="padding:40px;background:var(--white);border-radius:10px;border:1px solid var(--border)">
       <h3>Worklist Kosong</h3>
       <p style="color:var(--gray);font-size:12px">Belum ada order pasien atau sampel yang sesuai dengan filter.</p>
     </div>`}
@@ -240,7 +240,7 @@ async function renderWlWork(admId){
     <div style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg);position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span style="font-size:15px;font-weight:800;color:var(--navy)">${_wlAdm.patient_name||p.patient_name||''}</span>
-        ${_wlAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_wlAdm.patient_blood_type}</span>`:''}
+        ${_wlAdm.patient_blood_type?`<span style="color:var(--danger-strong);font-weight:800;margin-left:8px">${_wlAdm.patient_blood_type}</span>`:''}
         <div style="font-size:11px;color:var(--gray);font-family:monospace">${_wlAdm.mr_number||p.mr_number||''} · ${_wlAdm.visit_number||p.visit_number||''}${_wlAdm.patient_age?' · '+_wlAdm.patient_age+' th':''} · ${_wlAdm.patient_gender==='F'?'P':'L'}</div>
       </div>
       <div id="wl-actions"></div>
@@ -258,7 +258,7 @@ function wlTestCard(t){
   const rows=(t.results||[]).slice().sort((a,b)=>(a.id||0)-(b.id||0));
   const editable = t.status==='Pending' || t.status==='Enter Result';
   const stColor = t.status==='Approve'?'#22C55E':t.status==='Validate'?'#0EA5E9':t.status==='Enter Result'?'#8B5CF6':'#F59E0B';
-  return `<details ${editable?'open':''} style="background:#fff;border:1px solid var(--border);border-left:4px solid ${stColor};border-radius:8px;overflow:hidden">
+  return `<details ${editable?'open':''} style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${stColor};border-radius:8px;overflow:hidden">
     <summary style="cursor:pointer;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:12.5px;font-weight:700;color:var(--navy)">${t.product_name||'—'}
         <span style="font-size:10px;color:var(--gray);font-weight:400">· ${rows.length} parameter</span></span>
@@ -313,7 +313,7 @@ function wlInterpret(input){
   let flag=''; if(norm&&!isNaN(num)){ if(num>norm.range_max)flag='H'; else if(num<norm.range_min)flag='L'; }
   const crit=m?((!isNaN(num)&&((m.critical_low!=null&&num<=m.critical_low)||(m.critical_high!=null&&num>=m.critical_high)))||m.condition_type==='critical'):false;
   const c=m?labColor(m.color_code):'#94A3B8';
-  cell.innerHTML= crit?'<span style="font-weight:800;color:#DC2626" title="Nilai kritis">!!</span>'
+  cell.innerHTML= crit?'<span style="font-weight:800;color:var(--danger-strong)" title="Nilai kritis">!!</span>'
     : flag?`<span style="font-weight:800;color:${flag==='H'?'#EF4444':'#0EA5E9'}">${flag}</span>`
     : (m?`<span style="color:${c}">●</span>`:'');
   input.style.borderColor=c;
@@ -328,8 +328,8 @@ function renderWlActions(p){
   const hasValidated   = allRows.some(r=>r.status==='Validated');                    // tervalidasi → siap approve
   let b='';
   if(hasEntry) b+=`<button class="btn btn-teal btn-sm" onclick="wlSaveResults(${p.admission_id})">Simpan Hasil</button>`;
-  if(hasFilledDraft) b+=`<button class="btn btn-sm" style="background:#0369A1;color:#fff;border-color:#0369A1" onclick="wlValidate(${p.admission_id})">Validasi</button>`;
-  if(hasValidated) b+=`<button class="btn btn-sm" style="background:#166534;color:#fff;border-color:#166534" onclick="wlApprove(${p.admission_id})">Approve &amp; Rilis</button>`;
+  if(hasFilledDraft) b+=`<button class="btn btn-sm" style="background:#0369A1;color:var(--on-accent);border-color:#0369A1" onclick="wlValidate(${p.admission_id})">Validasi</button>`;
+  if(hasValidated) b+=`<button class="btn btn-sm" style="background:#166534;color:var(--on-accent);border-color:#166534" onclick="wlApprove(${p.admission_id})">Approve &amp; Rilis</button>`;
   box.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap">${b||'<span style="font-size:11px;color:var(--gray)">Semua hasil sudah dirilis</span>'}</div>`;
 }
 

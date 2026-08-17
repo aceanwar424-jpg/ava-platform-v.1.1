@@ -42,7 +42,7 @@ function renderTestReviewer() {
             <p style="font-size:12px;color:var(--text3);margin:0 0 10px;line-height:1.5">
               Salin dari Excel/Google Sheets lalu tempel di bawah. Satu baris = satu pemeriksaan. Urutan kolom: <code style="background:var(--bg3);padding:2px 6px;border-radius:4px">Nama ⇥ Deskripsi ⇥ Manfaat</code> (dipisah Tab).
             </p>
-            <textarea id="tr-pasteArea" rows="4" style="width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;resize:vertical" placeholder="Hemoglobin A1c&#9;Mengukur rata-rata gula darah 3 bulan&#9;Memantau diabetes&#10;Kolesterol Total&#9;&#9;"></textarea>
+            <textarea id="tr-pasteArea" rows="4" style="width:100%;background:var(--white);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:monospace;font-size:12px;resize:vertical" placeholder="Hemoglobin A1c&#9;Mengukur rata-rata gula darah 3 bulan&#9;Memantau diabetes&#10;Kolesterol Total&#9;&#9;"></textarea>
             <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
               <button class="btn btn-ghost btn-sm" onclick="trLoadPaste(false)">📋 Muat ke tabel</button>
               <button class="btn btn-ghost btn-sm" onclick="trLoadPaste(true)">🔄 Ganti seluruh tabel</button>
@@ -51,7 +51,7 @@ function renderTestReviewer() {
         </details>
 
         <!-- TABLE -->
-        <div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:#fff;margin-bottom:14px">
+        <div style="overflow-x:auto;border:1px solid var(--border);border-radius:10px;background:var(--white);margin-bottom:14px">
           <table style="width:100%;border-collapse:collapse;min-width:700px;font-size:13px" id="tr-table">
             <thead>
               <tr style="background:var(--bg2);border-bottom:1px solid var(--border);color:var(--text);text-align:left;font-family:'IBM Plex Mono',monospace;font-size:11px;text-transform:uppercase">
@@ -374,7 +374,7 @@ function trRenderJobCard(job) {
   const wrap = document.createElement('div');
   wrap.id = `tr-job-${job.id}`;
   wrap.className = 'card tr-job-card';
-  wrap.style.cssText = 'margin-bottom:14px;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:#fff';
+  wrap.style.cssText = 'margin-bottom:14px;padding:0;overflow:hidden;border:1px solid var(--border);border-radius:12px;background:var(--white)';
 
   wrap.innerHTML = `
     <div class="tr-job-head" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'"
@@ -406,7 +406,7 @@ function trUpdateJobCard(job) {
 function trStatusPill(status) {
   const map = {
     pending: '<span style="background:var(--bg3);color:var(--text3);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">Menunggu</span>',
-    processing: '<span style="background:#FEF3C7;color:#92400E;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">Sedang Dianalisis...</span>',
+    processing: '<span style="background:var(--warn-soft);color:var(--warn-deeper);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">Sedang Dianalisis...</span>',
     done: '<span style="background:#DCFCE7;color:#166534;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">✓ Selesai</span>',
     error: '<span style="background:#FEE2E2;color:#991B1B;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">❌ Gagal</span>'
   };
@@ -431,7 +431,7 @@ function trJobBodyHTML(job) {
     ${sum ? `
       <div style="background:var(--gold-light);border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-          <span style="font-size:11px;font-weight:800;color:#92400E;text-transform:uppercase">✦ Ringkasan Awam</span>
+          <span style="font-size:11px;font-weight:800;color:var(--warn-deeper);text-transform:uppercase">✦ Ringkasan Awam</span>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(sum)}')">📋 Salin</button>
         </div>
         <p style="margin:0;font-size:13.5px;color:#78350F;font-style:italic">"${trEsc(sum)}"</p>
@@ -445,7 +445,7 @@ function trJobBodyHTML(job) {
         </div>
         <div style="font-size:13px;color:var(--text);line-height:1.5">${trParas(desc)}</div>
       </div>
-      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:12px">
+      <div style="background:var(--success-soft);border:1px solid #BBF7D0;border-radius:10px;padding:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <strong style="font-size:12px;color:#166534">2. Manfaat Baru</strong>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(man)}')">📋 Salin</button>

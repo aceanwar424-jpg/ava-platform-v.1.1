@@ -58,7 +58,7 @@ function renderMOUSummary() {
   MOU_STATUSES.forEach(s=>counts[s]=0);
   mouAll.forEach(m=>{ if(counts[m.status]!==undefined) counts[m.status]++; });
   el.innerHTML = ['Aktif','Ditandatangani','Review Internal','Expired'].map(s=>`
-    <div style="padding:8px 14px;background:#fff;border-radius:8px;border:1.5px solid ${MOU_STATUS_COLORS[s]}30">
+    <div style="padding:8px 14px;background:var(--white);border-radius:8px;border:1.5px solid ${MOU_STATUS_COLORS[s]}30">
       <div style="font-size:18px;font-weight:800;color:${MOU_STATUS_COLORS[s]}">${counts[s]}</div>
       <div style="font-size:10px;color:var(--gray)">${s}</div>
     </div>`).join('');

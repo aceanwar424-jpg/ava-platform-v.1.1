@@ -156,7 +156,7 @@ function paintTimeline() {
     <div style="margin-bottom:16px">
       <div style="font-family:ui-monospace,monospace;font-size:11px;letter-spacing:.1em;
         text-transform:uppercase;color:var(--gray);margin-bottom:8px;position:sticky;top:0;
-        background:#fff;padding:3px 0;z-index:2">${formatDateShort(d)}</div>
+        background:var(--white);padding:3px 0;z-index:2">${formatDateShort(d)}</div>
       <div style="border-left:2px solid var(--border);padding-left:14px;margin-left:5px">
         ${items.map(e => {
           const t = TL_KIND[e.kind] || { label: e.kind, icon: 'list', c: '#6B7A8B' };

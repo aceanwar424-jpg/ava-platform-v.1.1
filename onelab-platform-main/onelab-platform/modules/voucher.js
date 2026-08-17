@@ -117,7 +117,7 @@ function renderCampaigns(){
         </div>
 
         <!-- Voucher Preview Mini -->
-        <div style="background:${c.bg_color||'#0A2342'};border-radius:10px;padding:14px;margin-bottom:12px;color:#fff;position:relative;overflow:hidden">
+        <div style="background:${c.bg_color||'#0A2342'};border-radius:10px;padding:14px;margin-bottom:12px;color:var(--on-accent);position:relative;overflow:hidden">
           ${c.bg_image_url?`<img src="${c.bg_image_url}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.25">`:'' }
           <div style="position:relative;z-index:1">
             <div style="font-size:10px;opacity:.7;margin-bottom:4px">OneLab Diagnostics</div>
@@ -534,7 +534,7 @@ async function openVoucherDesign(voucherId){
     <!-- Voucher Design -->
     <div id="voucher-design-${v.id}" style="
       background:${c.bg_color||'#0A2342'};
-      border-radius:14px;padding:20px;color:#fff;
+      border-radius:14px;padding:20px;color:var(--on-accent);
       position:relative;overflow:hidden;margin-bottom:16px;
       min-height:180px;
     ">
@@ -551,9 +551,9 @@ async function openVoucherDesign(voucherId){
           </div>
           <div style="font-size:10px;opacity:.5;margin-top:10px">Berlaku s/d ${exp}</div>
         </div>
-        <div style="background:#fff;padding:6px;border-radius:8px;flex-shrink:0">
+        <div style="background:var(--white);padding:6px;border-radius:8px;flex-shrink:0">
           <img src="${qrUrl}" width="90" height="90" alt="QR" style="display:block;border-radius:4px">
-          <div style="font-size:8px;color:#0A2342;text-align:center;margin-top:2px">Scan / Booking</div>
+          <div style="font-size:8px;color:var(--navy-deep);text-align:center;margin-top:2px">Scan / Booking</div>
         </div>
       </div>
     </div>
@@ -641,7 +641,7 @@ function printVoucher(id){
     <style>
       @page{size:10cm 5cm;margin:0}
       *{box-sizing:border-box;margin:0;padding:0}
-      body{width:10cm;height:5cm;background:${c.bg_color||'#0A2342'};color:#fff;font-family:Arial,sans-serif;overflow:hidden;position:relative}
+      body{width:10cm;height:5cm;background:${c.bg_color||'#0A2342'};color:var(--on-accent);font-family:Arial,sans-serif;overflow:hidden;position:relative}
       .bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2}
       .content{position:relative;z-index:1;padding:10px 12px;height:100%;display:flex;justify-content:space-between;align-items:center}
       .left{flex:1}
@@ -653,7 +653,7 @@ function printVoucher(id){
       .code-lbl{font-size:5pt;opacity:.7}
       .code-val{font-family:monospace;font-size:11pt;font-weight:800;letter-spacing:.08em}
       .exp{font-size:5pt;opacity:.5;margin-top:4px}
-      .qr-wrap{background:#fff;padding:4px;border-radius:6px}
+      .qr-wrap{background:var(--white);padding:4px;border-radius:6px}
       @media print{button{display:none}}
     </style></head>
     <body>

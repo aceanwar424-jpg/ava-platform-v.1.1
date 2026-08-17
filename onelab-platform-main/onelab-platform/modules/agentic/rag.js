@@ -94,7 +94,7 @@ async function agRagLoadStatus(){
 }
 function agRagStatusHtml(){
   const s = _agRag.status;
-  if(!s) return `<span style="color:#B45309">Belum aktif — jalankan supabase_agentic_rag.sql &amp; deploy edge function "embed".</span>`;
+  if(!s) return `<span style="color:var(--warn-deep)">Belum aktif — jalankan supabase_agentic_rag.sql &amp; deploy edge function "embed".</span>`;
   return `Terindeks: <b>${s.docs_indexed||0}</b> dari ${s.docs_total||0} dokumen · <b>${s.chunks||0}</b> chunk`;
 }
 
@@ -130,7 +130,7 @@ function agRagPaintAnswer(){
   const ans = document.getElementById('ag-rag-answer'); if(!ans) return;
   const md = (typeof agMd==='function') ? agMd(_agRag.answer||'') : agEsc(_agRag.answer||'');
   ans.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12.5px;line-height:1.55">${md}</div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12.5px;line-height:1.55">${md}</div>
     ${_agRag.sources.length?`<div style="margin-top:8px">
       <div style="font-size:10.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px">Sumber</div>
       ${_agRag.sources.map((r,i)=>`<div style="font-size:11px;border:1px solid var(--border);border-radius:7px;padding:6px 9px;margin-bottom:5px">
@@ -147,7 +147,7 @@ function agRagRenderSection(containerId){
   el.innerHTML = `
     <div class="ag-detail" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342">${icon('layers',14)} Indeks Pencarian</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${icon('layers',14)} Indeks Pencarian</div>
         <div style="display:flex;gap:6px">
           <button class="ag-btn mut" style="padding:5px 11px" onclick="agRagIndexAll('published')">Indeks PUBLISHED</button>
           <button class="ag-btn mut" style="padding:5px 11px" onclick="agRagIndexAll('all')">Indeks Semua</button>
@@ -158,7 +158,7 @@ function agRagRenderSection(containerId){
     </div>
 
     <div class="ag-detail">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">${icon('sparkles',14)} Tanya Dokumen</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">${icon('sparkles',14)} Tanya Dokumen</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <input id="ag-rag-q" placeholder="mis. Bagaimana prosedur penanganan hasil kritis?" style="flex:1;min-width:220px;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:12.5px"
           onkeydown="if(event.key==='Enter')agRagChat()">
@@ -178,12 +178,12 @@ function renderAgRagTab(el) {
     <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:space-between;">
         <div style="display:flex; align-items:center; gap:12px;">
-          <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:10px; border-radius:12px; color:#38BDF8;">
+          <div style="background:rgba(56,189,248,0.15); border:1px solid rgba(56,189,248,0.3); padding:10px; border-radius:12px; color:var(--sky);">
             🔍
           </div>
           <div>
             <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--bg);">RAG SOP & Vector Search Engine</h3>
-            <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Pencarian dokumen SOP, analisis tumpang tindih (Overlap), & grounding jawaban medis berbasis AI.</p>
+            <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Pencarian dokumen SOP, analisis tumpang tindih (Overlap), & grounding jawaban medis berbasis AI.</p>
           </div>
         </div>
       </div>

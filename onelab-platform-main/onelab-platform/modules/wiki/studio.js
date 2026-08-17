@@ -51,7 +51,7 @@ function renderWikiContentTab(el){
             <td style="font-weight:600">${c.title||'—'}</td>
             <td style="font-size:11.5px">${c.content_type||''}</td>
             <td style="font-size:11.5px;color:var(--gray)">${c.channel||'—'}</td>
-            <td><span class="wiki-badge" style="background:var(--bg2);color:#475569">${c.status||'Draft'}</span></td>
+            <td><span class="wiki-badge" style="background:var(--bg2);color:var(--text-dim)">${c.status||'Draft'}</span></td>
             <td style="font-size:11px;color:var(--gray)">${c.created_at?new Date(c.created_at).toLocaleDateString('id-ID'):''}</td>
             <td><div class="act-row">
               <button class="act-btn" title="Lihat" onclick="viewContent(${c.id})">${svgIcon('eye',14)}</button>

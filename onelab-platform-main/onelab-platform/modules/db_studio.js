@@ -32,7 +32,7 @@ function renderDatabaseStudio() {
       <!-- SUPABASE STUDIO HEADER -->
       <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(52,211,153,0.3); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:14px;">
         <div style="display:flex; align-items:center; gap:16px;">
-          <div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; color:white; font-size:24px; font-weight:800; shadow:0 10px 25px rgba(16,185,129,0.3);">
+          <div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; color:var(--on-accent); font-size:24px; font-weight:800; shadow:0 10px 25px rgba(16,185,129,0.3);">
             ⚡
           </div>
           <div>
@@ -42,7 +42,7 @@ function renderDatabaseStudio() {
                 PGlite WASM · Postgres Local Engine
               </span>
             </div>
-            <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Inspektur Tabel GUI, Editor Baris Data, & Penguji SQL Interaktif (Port 54329 / Supabase REST).</p>
+            <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Inspektur Tabel GUI, Editor Baris Data, & Penguji SQL Interaktif (Port 54329 / Supabase REST).</p>
           </div>
         </div>
 
@@ -65,7 +65,7 @@ function renderDatabaseStudio() {
         
         <!-- SIDEBAR TABLE LIST -->
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:8px;">
-          <div style="font-size:11px; font-weight:800; color:#94A3B8; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
+          <div style="font-size:11px; font-weight:800; color:var(--text4); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">
             🗄️ Daftar Tabel Database (${DB_TABLES.length})
           </div>
           ${DB_TABLES.map(t => `
@@ -79,7 +79,7 @@ function renderDatabaseStudio() {
               "
             >
               <span>${t.label}</span>
-              <span style="font-family:monospace; font-size:10px; color:#94A3B8;">${t.name}</span>
+              <span style="font-family:monospace; font-size:10px; color:var(--text4);">${t.name}</span>
             </button>
           `).join('')}
 
@@ -97,17 +97,17 @@ function renderDatabaseStudio() {
               <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg); display:flex; align-items:center; gap:8px;">
                 <span>Tabel:</span> <code style="color:var(--accent2); font-family:monospace; font-size:16px;">${_dbSelectedTable}</code>
               </h3>
-              <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;" id="db-row-count">Memuat baris data...</p>
+              <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);" id="db-row-count">Memuat baris data...</p>
             </div>
             <div style="display:flex; gap:10px;">
-              <input type="text" id="db-search-input" placeholder="Cari dalam tabel..." onkeyup="dbFilterTableRows(this.value)" style="padding:7px 12px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:#fff; font-size:12px; outline:none; width:200px;">
+              <input type="text" id="db-search-input" placeholder="Cari dalam tabel..." onkeyup="dbFilterTableRows(this.value)" style="padding:7px 12px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); font-size:12px; outline:none; width:200px;">
               <button class="btn btn-teal btn-sm" onclick="dbAddRowModal()">+ Tambah Baris</button>
             </div>
           </div>
 
           <!-- DATA TABLE VIEWER -->
           <div id="db-grid-wrapper" style="overflow-x:auto; min-height:400px;">
-            <div style="color:#94A3B8; text-align:center; padding:40px;">⏳ Memuat data tabel...</div>
+            <div style="color:var(--text4); text-align:center; padding:40px;">⏳ Memuat data tabel...</div>
           </div>
         </div>
 
@@ -143,7 +143,7 @@ async function dbFetchTableData(tableName) {
     if (countEl) countEl.textContent = `Menampilkan ${data.length} baris data (Limit 100)`;
 
     if (data.length === 0) {
-      if (grid) grid.innerHTML = `<div style="text-align:center; padding:50px; color:#94A3B8;">📭 Tabel <code>${tableName}</code> masih kosong (0 baris data).</div>`;
+      if (grid) grid.innerHTML = `<div style="text-align:center; padding:50px; color:var(--text4);">📭 Tabel <code>${tableName}</code> masih kosong (0 baris data).</div>`;
       return;
     }
 
@@ -152,7 +152,7 @@ async function dbFetchTableData(tableName) {
     dbRenderGrid(data);
   } catch (err) {
     console.error('[DB Studio] Error fetching table data:', err);
-    if (grid) grid.innerHTML = `<div style="text-align:center; padding:50px; color:#FCA5A5;">❌ Gagal memuat data tabel: ${err.message}</div>`;
+    if (grid) grid.innerHTML = `<div style="text-align:center; padding:50px; color:var(--danger-tint);">❌ Gagal memuat data tabel: ${err.message}</div>`;
   }
 }
 
@@ -160,7 +160,7 @@ function dbRenderGrid(rows) {
   const grid = document.getElementById('db-grid-wrapper');
   if (!grid) return;
 
-  const headerHTML = _dbTableCols.map(c => `<th style="padding:10px 14px; text-align:left; color:#94A3B8; font-family:monospace; font-size:11.5px;">${c}</th>`).join('');
+  const headerHTML = _dbTableCols.map(c => `<th style="padding:10px 14px; text-align:left; color:var(--text4); font-family:monospace; font-size:11.5px;">${c}</th>`).join('');
 
   const bodyHTML = rows.map((r, idx) => {
     const cellsHTML = _dbTableCols.map(c => {
@@ -171,7 +171,7 @@ function dbRenderGrid(rows) {
 
     return `
       <tr style="border-bottom:1px solid rgba(255,255,255,0.05); font-size:12.5px; transition:background 0.2s ease;" onmouseover="this.style.background='rgba(30,41,59,0.5)'" onmouseout="this.style.background='transparent'">
-        <td style="padding:10px; text-align:center; color:#94A3B8; font-family:monospace;">${idx + 1}</td>
+        <td style="padding:10px; text-align:center; color:var(--text4); font-family:monospace;">${idx + 1}</td>
         ${cellsHTML}
       </tr>
     `;
@@ -181,7 +181,7 @@ function dbRenderGrid(rows) {
     <table style="width:100%; border-collapse:collapse; color:var(--bg);">
       <thead>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(30,41,59,0.6);">
-          <th style="padding:10px; width:40px; text-align:center; color:#94A3B8;">#</th>
+          <th style="padding:10px; width:40px; text-align:center; color:var(--text4);">#</th>
           ${headerHTML}
         </tr>
       </thead>
@@ -227,11 +227,11 @@ function dbOpenSQLEditorModal() {
         <h3 style="margin:0; font-size:18px; font-weight:800; color:var(--accent2); display:flex; align-items:center; gap:8px;">
           ⚡ Supabase SQL Query Editor
         </h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:22px; cursor:pointer;">✕</button>
+        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:22px; cursor:pointer;">✕</button>
       </div>
 
       <div style="margin-bottom:14px;">
-        <label style="display:block; margin-bottom:6px; font-size:12px; font-weight:700; color:#94A3B8;">Tuliskan Kueri SQL (Postgres Syntax) *</label>
+        <label style="display:block; margin-bottom:6px; font-size:12px; font-weight:700; color:var(--text4);">Tuliskan Kueri SQL (Postgres Syntax) *</label>
         <textarea id="sql-query-input" rows="5" style="width:100%; padding:12px; background:rgba(30,41,59,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:var(--accent2); font-family:monospace; font-size:13px; outline:none; resize:vertical;">SELECT * FROM user_profiles ORDER BY id DESC LIMIT 10;</textarea>
       </div>
 
@@ -244,7 +244,7 @@ function dbOpenSQLEditorModal() {
       </div>
 
       <div id="sql-result-container" style="max-height:260px; overflow-y:auto; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px; font-size:12px;">
-        <div style="color:#94A3B8; text-align:center; padding:20px;">Klik <strong>Jalankan Kueri SQL</strong> untuk melihat hasil kueri.</div>
+        <div style="color:var(--text4); text-align:center; padding:20px;">Klik <strong>Jalankan Kueri SQL</strong> untuk melihat hasil kueri.</div>
       </div>
     </div>
   `;
@@ -256,7 +256,7 @@ async function dbExecuteSQLQuery() {
   const resContainer = document.getElementById('sql-result-container');
   if (!sql || !resContainer) return;
 
-  resContainer.innerHTML = '<div style="color:#38BDF8; text-align:center;">⏳ Menjalankan kueri SQL pada Postgres engine...</div>';
+  resContainer.innerHTML = '<div style="color:var(--sky); text-align:center;">⏳ Menjalankan kueri SQL pada Postgres engine...</div>';
 
   try {
     const startTime = performance.now();
@@ -278,7 +278,7 @@ async function dbExecuteSQLQuery() {
     }
 
     const cols = Object.keys(data[0]);
-    const headers = cols.map(c => `<th style="padding:6px 10px; color:#94A3B8; font-family:monospace; border-bottom:1px solid rgba(255,255,255,0.1);">${c}</th>`).join('');
+    const headers = cols.map(c => `<th style="padding:6px 10px; color:var(--text4); font-family:monospace; border-bottom:1px solid rgba(255,255,255,0.1);">${c}</th>`).join('');
     const rows = data.map(r => {
       const cHTML = cols.map(c => `<td style="padding:6px 10px; max-width:200px; overflow:hidden; text-overflow:ellipsis;">${dbEsc(r[c])}</td>`).join('');
       return `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">${cHTML}</tr>`;
@@ -292,7 +292,7 @@ async function dbExecuteSQLQuery() {
       </table>
     `;
   } catch (err) {
-    resContainer.innerHTML = `<div style="color:#FCA5A5;">❌ Error Kueri SQL: ${dbEsc(err.message)}</div>`;
+    resContainer.innerHTML = `<div style="color:var(--danger-tint);">❌ Error Kueri SQL: ${dbEsc(err.message)}</div>`;
   }
 }
 

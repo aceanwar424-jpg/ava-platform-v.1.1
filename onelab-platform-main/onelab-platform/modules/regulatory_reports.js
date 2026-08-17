@@ -136,7 +136,7 @@ function renderReportDashboard() {
               <span>PIC: <strong>${rt.pic_default}</strong></span>
               ${pending?`<span style="color:${overdue?'#EF4444':'#F59E0B'};font-weight:700">
                 ${overdue?`⚠️ ${overdue} overdue`:`${pending} pending`}
-              </span>`:`<span style="color:#22C55E;font-weight:700">✅ Clear</span>`}
+              </span>`:`<span style="color:var(--success-strong);font-weight:700">✅ Clear</span>`}
             </div>
           </div>`;
       }).join('')}

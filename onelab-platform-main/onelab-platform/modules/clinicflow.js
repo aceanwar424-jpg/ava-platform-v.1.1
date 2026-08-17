@@ -68,7 +68,7 @@ function paintQueue() {
       {l:'Menunggu', v:menunggu, c:'#B45309'},
       {l:'Dilayani', v:dilayani, c:'#123A5C'},
       {l:'Selesai',  v:selesai,  c:'#15803D'},
-    ].map(k=>`<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+    ].map(k=>`<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
       border-radius:10px;padding:12px">
       <div style="font-size:20px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
       <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('');
@@ -96,7 +96,7 @@ function paintQueue() {
         ${t.status==='Menunggu'?`<button class="btn btn-teal btn-xs" onclick="callTicket(${t.id})">📢 Panggil</button>`:''}
         ${t.status==='Dipanggil'?`<button class="btn btn-teal btn-xs" onclick="setTicket(${t.id},'Dilayani')">Mulai</button>
           <button class="btn btn-ghost btn-xs" onclick="callTicket(${t.id})">Panggil ulang</button>
-          <button class="btn btn-ghost btn-xs" style="color:#B91C1C" onclick="setTicket(${t.id},'Lewat')">Lewati</button>`:''}
+          <button class="btn btn-ghost btn-xs" style="color:var(--danger-deep)" onclick="setTicket(${t.id},'Lewat')">Lewati</button>`:''}
         ${t.status==='Dilayani'?`<button class="btn btn-teal btn-xs" onclick="setTicket(${t.id},'Selesai')">Selesai</button>`:''}
       </div></td>
     </tr>`;
@@ -246,12 +246,12 @@ function paintAppointments() {
             <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
               <span style="background:${stCol[a.status]||'#6B7A8B'}18;color:${stCol[a.status]||'#6B7A8B'};
                 padding:3px 9px;border-radius:5px;font-size:11px;font-weight:700">${a.status}</span>
-              ${wa?`<a href="${wa}" target="_blank" class="btn btn-ghost btn-xs" style="color:#15803D"
+              ${wa?`<a href="${wa}" target="_blank" class="btn btn-ghost btn-xs" style="color:var(--success-deep)"
                 onclick="markReminded(${a.id})">💬 Ingatkan</a>`:''}
               ${a.status==='Terjadwal'?`
                 <button class="btn btn-teal btn-xs" onclick="setAppt(${a.id},'Hadir')">Hadir</button>
                 <button class="btn btn-ghost btn-xs" onclick="setAppt(${a.id},'Tidak Hadir')">Tidak hadir</button>
-                <button class="btn btn-ghost btn-xs" style="color:#B91C1C" onclick="setAppt(${a.id},'Batal')">Batal</button>`:''}
+                <button class="btn btn-ghost btn-xs" style="color:var(--danger-deep)" onclick="setAppt(${a.id},'Batal')">Batal</button>`:''}
             </div>
           </div>
           ${a.reminder_sent_at?`<div style="font-size:10.5px;color:var(--gray);margin-top:4px">

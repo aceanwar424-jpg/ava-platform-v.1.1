@@ -24,18 +24,18 @@ let cashierAll = [], cashierQueue = [];
 
 async function renderCashier(buka) {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('cashier')" title="Kembali ke daftar menu Kasir">← Menu Kasir</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('cashier')" title="Kembali ke daftar menu Kasir">← Menu Kasir</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Kasir &amp; Pembayaran</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Kasir &amp; Pembayaran</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pembayaran, refund, dan tagihan korporat</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="cash-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openShiftPanel()">Shift Kas</button>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCashierReport()">Laporan</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openShiftPanel()">Shift Kas</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCashierReport()">Laporan</button>
         <button class="btn btn-teal btn-sm" onclick="openPaymentForm()">+ Transaksi Baru</button>
       </div>
     </div>
@@ -144,7 +144,7 @@ function renderCashierKPI() {
     {icon:'🏢',val:corpBills.length,         label:'Tagihan Korporat',color:'#F97316'},
     {icon:'',val:payments.length,          label:'Transaksi',       color:'#0A2342'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
+    <div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:18px">${k.icon}</div>
       <div style="font-size:${String(k.val).length>8?'11px':'14px'};font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:10px;color:var(--gray)">${k.label}</div>
@@ -234,7 +234,7 @@ async function openPaymentForm(admissionId=null) {
         <div class="form-group">
           <label>Total Tagihan (Rp)</label>
           <input type="number" id="pay-total" value="${a.net_amount||0}" readonly
-            style="font-size:18px;font-weight:800;color:var(--teal);background:#fff">
+            style="font-size:18px;font-weight:800;color:var(--teal);background:var(--white)">
         </div>
         <div class="form-group">
           <label>Jumlah Bayar (Rp)</label>
@@ -244,7 +244,7 @@ async function openPaymentForm(admissionId=null) {
         <div class="form-group">
           <label>Kembalian (Rp)</label>
           <input type="number" id="pay-change" value="0" readonly
-            style="font-size:16px;font-weight:700;color:#22C55E;background:#fff">
+            style="font-size:16px;font-weight:700;color:var(--success-strong);background:var(--white)">
         </div>
       </div>
     </div>
@@ -419,7 +419,7 @@ async function openRefundForm(txnId) {
       <div class="modal-title">Refund — ${t.patient_name}</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div style="background:#FFF8E1;border-radius:8px;padding:12px;margin-bottom:14px">
+    <div style="background:var(--warn-soft2);border-radius:8px;padding:12px;margin-bottom:14px">
       <div>Transaksi: <strong>${t.transaction_number}</strong></div>
       <div>Total Bayar: <strong>${formatCurrency(t.total_amount||0)}</strong></div>
       <div>Metode: <strong>${t.payment_method||'—'}</strong></div>
@@ -508,9 +508,9 @@ async function printReceipt(txnId) {
       .row{display:flex;justify-content:space-between}
       @media print{button{display:none}body{padding:0}}
     </style></head><body>
-    <button onclick="window.print()" style="display:block;width:100%;padding:8px;background:#0A2342;color:#fff;border:none;cursor:pointer;margin-bottom:14px;border-radius:4px">🖨 Print Struk</button>
+    <button onclick="window.print()" style="display:block;width:100%;padding:8px;background:var(--navy-deep);color:var(--on-accent);border:none;cursor:pointer;margin-bottom:14px;border-radius:4px">🖨 Print Struk</button>
     <div class="center bold" style="font-size:14px">${orgName}</div>
-    <div class="center" style="font-size:10px;color:#546E7A">${orgAddr}</div>
+    <div class="center" style="font-size:10px;color:var(--slate)">${orgAddr}</div>
     <div class="line"></div>
     <div class="center bold">${t.transaction_type==='Refund'?'*** REFUND ***':'BUKTI PEMBAYARAN'}</div>
     <div class="line"></div>

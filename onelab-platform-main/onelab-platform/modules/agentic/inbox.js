@@ -32,7 +32,7 @@ function renderAgInboxTab(el){
         ${items.length ? items.map(t=>`
           <div class="ag-item ${t.id===_agSelTask?'active':''}" onclick="agPickTask('${t.id}')">
             <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
-              <strong style="font-size:12.5px;color:#0A2342;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${agEsc(t.title)}</strong>
+              <strong style="font-size:12.5px;color:var(--navy-deep);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${agEsc(t.title)}</strong>
               ${agChip(t.status)}
             </div>
             <div style="font-size:10.5px;color:var(--gray);margin-top:3px">
@@ -105,17 +105,17 @@ async function agRenderTaskDetail(id){
   if(t.status==='PROCESSING'){
     const mins = Math.floor((Date.now() - new Date(t.updated_at).getTime())/60000);
     stuckWarn = mins >= 3
-      ? `<div style="margin-top:10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C">
+      ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)">
           <strong>⚠ Diproses sudah ${mins} menit — kemungkinan macet.</strong><br>
           Buka tab <strong>Monitor</strong> → <strong>Tes Koneksi AI</strong> untuk cek provider LLM,
           lalu <strong>Bebaskan Task Macet</strong> untuk antri ulang otomatis.</div>`
-      : `<div style="margin-top:10px;font-size:12px;color:#0EA5E9">⏳ Sedang diproses worker (${mins} menit)… panggilan LLM model besar bisa 1–2 menit.</div>`;
+      : `<div style="margin-top:10px;font-size:12px;color:var(--info)">⏳ Sedang diproses worker (${mins} menit)… panggilan LLM model besar bisa 1–2 menit.</div>`;
   }
 
   box.innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap">
       <div>
-        <div style="font-size:15px;font-weight:800;color:#0A2342">${agEsc(t.title)}</div>
+        <div style="font-size:15px;font-weight:800;color:var(--navy-deep)">${agEsc(t.title)}</div>
         <div style="font-size:11px;color:var(--gray);margin-top:3px">
           ${agEsc(t.agent)} · ${agEsc(t.task_type)} · attempt ${t.attempts||0}/${t.max_attempts||3}
           · dibuat ${agAgo(t.created_at)} ${t.needs_medical_review?' · 🩺 wajib review medis':''}
@@ -125,20 +125,20 @@ async function agRenderTaskDetail(id){
     </div>
 
     ${stuckWarn}
-    ${t.error_message ? `<div style="margin-top:10px;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:#B91C1C"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
+    ${t.error_message ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
     ${t.payload && t.payload.rejection_feedback ? `<div style="margin-top:10px;background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 12px;font-size:12px;color:#9A3412"><strong>Feedback penolakan terakhir:</strong> ${agEsc(t.payload.rejection_feedback)}</div>` : ''}
-    ${placeholders ? `<div style="margin-top:10px;background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;font-size:12px;color:#92400E"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
+    ${placeholders ? `<div style="margin-top:10px;background:var(--warn-soft);border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--warn-deeper)"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
     ${qas.length ? qas.map(q=>{
       const qc = q.verdict==='PASS' ? '#22C55E' : '#EF4444';
       const finds = Array.isArray(q.findings)?q.findings:[];
       return `<div style="margin-top:10px;background:${qc}0d;border:1px solid ${qc}55;border-radius:8px;padding:9px 12px;font-size:12px">
         <strong style="color:${qc}">🧪 QA ${agEsc(q.agent_code)}: ${agEsc(q.verdict)} · skor ${q.score}/100</strong>
-        ${finds.length?`<ul style="margin:4px 0 0 16px;color:#475569">${finds.slice(0,6).map(f=>`<li>${agEsc(f)}</li>`).join('')}</ul>`:''}
-        ${q.notes?`<div style="color:#475569;margin-top:3px"><em>Saran: ${agEsc(q.notes)}</em></div>`:''}
+        ${finds.length?`<ul style="margin:4px 0 0 16px;color:var(--text-dim)">${finds.slice(0,6).map(f=>`<li>${agEsc(f)}</li>`).join('')}</ul>`:''}
+        ${q.notes?`<div style="color:var(--text-dim);margin-top:3px"><em>Saran: ${agEsc(q.notes)}</em></div>`:''}
       </div>`;}).join('') : ''}
 
-    ${md ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Preview Draft</div><div class="ag-md">${agMd(md)}</div></div>`
-        : (t.result ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Hasil</div><pre class="ag-md" style="white-space:pre-wrap">${agEsc(JSON.stringify(t.result,null,2)).slice(0,4000)}</pre></div>` : '')}
+    ${md ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Preview Draft</div><div class="ag-md">${typeof agMd === 'function' ? agMd(md) : agEsc(md)}</div></div>`
+        : (t.result ? `<div style="margin-top:12px"><div style="font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Hasil</div><pre class="ag-md" style="white-space:pre-wrap">${agEsc(JSON.stringify(t.result,null,2)).slice(0,4000)}</pre></div>` : '')}
 
     <div class="ag-actions">${actions}</div>
 
@@ -156,7 +156,7 @@ async function agRenderTaskDetail(id){
         <br>• Tombol <strong>.md</strong> / <strong>.docx</strong> di atas untuk arsip file</div>` : ''}
 
     <div style="margin-top:14px">
-      <div style="font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Audit Trail</div>
+      <div style="font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Audit Trail</div>
       ${events.length ? events.map(e=>`<div class="ag-ev">
           <strong>${agEsc(e.from_status||'∅')} → ${agEsc(e.to_status)}</strong>
           · ${agEsc(e.actor_type)} · ${new Date(e.created_at).toLocaleString('id-ID')}
@@ -281,7 +281,7 @@ async function renderAgMonitorTab(el){
     <div class="ag-detail" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-size:12px;font-weight:800;color:#0A2342">🩺 Kesehatan Sistem AI</div>
+          <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">🩺 Kesehatan Sistem AI</div>
           <div style="font-size:11px;color:var(--gray)">Tes semua provider × key × model (bisa ±1 menit — model besar lambat) dan bebaskan task yang macet</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -302,12 +302,12 @@ async function renderAgMonitorTab(el){
          [tokOut.toLocaleString('id-ID'),'Token Keluar (7 hari)','#0A2342'],
          [err7,'Error LLM (7 hari)', err7?'#EF4444':'#22C55E'],
          [failed.length,'Task FAILED terbuka', failed.length?'#EF4444':'#22C55E']]
-        .map(([v,l,c])=>`<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${c};border-radius:8px;padding:8px 10px">
+        .map(([v,l,c])=>`<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${c};border-radius:8px;padding:8px 10px">
           <div style="font-size:17px;font-weight:800;color:${c}">${v}</div>
           <div style="font-size:10px;color:var(--gray)">${l}</div></div>`).join('')}
     </div>`:''}
     ${failed.length?`<div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
-      <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Task Gagal — perlu perhatian</div>
+      <div style="font-size:12px;font-weight:800;color:var(--danger-deep);margin-bottom:6px">Task Gagal — perlu perhatian</div>
       ${failed.slice(0,8).map(f=>`<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed #fecaca;align-items:center">
         <div style="min-width:0"><strong>${agEsc(f.title)}</strong><br><span style="color:var(--text3);font-size:11px">${agEsc(f.error||'')}</span></div>
         <button class="ag-btn warn" style="padding:4px 10px" onclick="agActRetry('${f.id}')">${svgIcon('refresh',12)} Retry</button>
@@ -317,20 +317,20 @@ async function renderAgMonitorTab(el){
   el.innerHTML += `
     <div class="pro-grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px">
       <div class="ag-detail">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">Kedalaman Antrian</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">Kedalaman Antrian</div>
         ${Object.keys(AG_STATUS_META).map(s=>{
           const n=q(s); if(!n) return '';
           return `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
             <span>${agChip(s)}</span><strong>${n}</strong></div>`;}).join('') || '<span style="font-size:12px;color:var(--gray)">Kosong</span>'}
       </div>
       <div class="ag-detail">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">LLM per Provider/Model (100 terakhir)</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">LLM per Provider/Model (100 terakhir)</div>
         ${Object.entries(prov).map(([k,n])=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
           <span>${agEsc(k)}</span><strong>${n}</strong></div>`).join('') || '<span style="font-size:12px;color:var(--gray)">Belum ada panggilan LLM</span>'}
       </div>
     </div>
     <div class="ag-detail" style="margin-top:12px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">Log LLM Terakhir</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">Log LLM Terakhir</div>
       <div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
         <thead><tr><th>Waktu</th><th>Provider</th><th>Model</th><th>Key</th><th>Status</th><th>Latensi</th><th>Token in/out</th></tr></thead>
         <tbody>${agLlmLogs.slice(0,40).map(l=>`<tr>
@@ -372,7 +372,7 @@ async function agRunDiag(){
           <td style="max-width:340px">${agEsc(r.msg||'')}</td>
         </tr>`).join('')}</tbody></table></div>`;
   }catch(e){
-    if(out) out.innerHTML = `<div style="font-size:12px;color:#B91C1C;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px">${agEsc(e.message)}</div>`;
+    if(out) out.innerHTML = `<div style="font-size:12px;color:var(--danger-deep);background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px">${agEsc(e.message)}</div>`;
   }
   if(btn){ btn.disabled = false; btn.innerHTML = `${svgIcon('sparkle',13)} Tes Koneksi AI`; }
 }

@@ -164,7 +164,7 @@ async function renderSurat() {
           <div style="background:var(--lgray);border-radius:8px;padding:14px;margin-bottom:14px">
             <table style="width:100%;font-size:12px;border-collapse:collapse">
               <thead>
-                <tr style="background:var(--navy);color:#fff">
+                <tr style="background:var(--navy);color:var(--on-accent)">
                   <th style="padding:8px 10px;text-align:left;border-radius:4px 0 0 0">Placeholder</th>
                   <th style="padding:8px 10px;text-align:left">Keterangan</th>
                   <th style="padding:8px 10px;text-align:left;border-radius:0 4px 0 0">Contoh</th>
@@ -182,7 +182,7 @@ async function renderSurat() {
               </tbody>
             </table>
           </div>
-          <div style="background:#FFF8E1;border-radius:8px;padding:12px 14px;font-size:12px;color:#5D4037">
+          <div style="background:var(--warn-soft2);border-radius:8px;padding:12px 14px;font-size:12px;color:#5D4037">
             <strong>Contoh penggunaan di Word:</strong><br>
             "Kepada Yth. <strong>[[PIC_TUJUAN]]</strong><br>
             <strong>[[NAMA_TUJUAN]]</strong><br>
@@ -195,12 +195,12 @@ async function renderSurat() {
             Gunakan tanda kurung siku ganda <strong>[[ ]]</strong>, bukan kurung kurawal <strong>{{ }}</strong> —
             format kurung kurawal punya bug yang menyebabkan error "Duplicate tag" pada beberapa kasus.
           </div>
-          <div style="margin-top:14px;padding:12px 14px;background:#FEF2F2;border-radius:8px;font-size:12px;color:#991B1B">
+          <div style="margin-top:14px;padding:12px 14px;background:var(--danger-soft);border-radius:8px;font-size:12px;color:#991B1B">
             <strong>⚠️ Punya template lama dengan format {{NAMA}}?</strong><br><br>
             Buka file Word-nya, gunakan Find &amp; Replace (Ctrl+H): ganti semua <strong>{{</strong> menjadi <strong>[[</strong>,
             lalu ganti semua <strong>}}</strong> menjadi <strong>]]</strong>. Simpan, lalu upload ulang.
           </div>
-          <div style="margin-top:14px;padding:12px 14px;background:#F0FDF4;border-radius:8px;font-size:12px;color:#166534">
+          <div style="margin-top:14px;padding:12px 14px;background:var(--success-soft);border-radius:8px;font-size:12px;color:#166534">
             <strong>📄 Setup Download PDF (sekali saja)</strong><br><br>
             Tombol "Download PDF" (ikon 📄 di Arsip Surat) butuh setup satu kali di Supabase:
             <ol style="margin:6px 0 0 18px;padding:0">
@@ -290,7 +290,7 @@ function renderSuratTable(data) {
                 <button class="act-btn" onclick="downloadSuratPDF(${s.id})" title="Download PDF">📄</button>
                 <button class="act-btn edit" onclick="openSuratForm(${s.id})" title="Edit">${icon('edit', 12)}</button>
                 <button class="act-btn" onclick="updateSuratStatus(${s.id},'Sent')"
-                  title="Tandai Terkirim" style="color:#22C55E">✓</button>
+                  title="Tandai Terkirim" style="color:var(--success-strong)">✓</button>
                 <button class="act-btn del" onclick="deleteSurat(${s.id})">${icon('trash', 12)}</button>
               </div>
             </td>
@@ -1126,7 +1126,7 @@ function printDocxPreview() {
     <title>${window.__docxPreviewFileName||'Surat'}</title>
     <style>
       @page { size: A4; margin: 0 }
-      body { margin: 0; padding: 0; background: white }
+      body { margin: 0; padding: 0; background: var(--white) }
       .docx-preview-content { width: 100% !important }
       @media print { button { display: none !important } }
     </style>
@@ -1283,8 +1283,8 @@ function buildSuratPreviewHTML(s) {
       *{box-sizing:border-box}
       body{font-family:'Times New Roman',serif;font-size:12pt;color:#000;line-height:1.6;margin:0;padding:20px}
       .header{border-bottom:3px double #0A2342;padding-bottom:10px;margin-bottom:20px;display:flex;gap:14px;align-items:center}
-      .logo{width:52px;height:52px;background:#0A2342;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;font-family:Arial;flex-shrink:0}
-      .org-name{font-size:14pt;font-weight:bold;color:#0A2342}
+      .logo{width:52px;height:52px;background:var(--navy-deep);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--on-accent);font-weight:800;font-size:16px;font-family:Arial;flex-shrink:0}
+      .org-name{font-size:14pt;font-weight:bold;color:var(--navy-deep)}
       .org-sub{font-size:9pt;color:#555;margin-top:2px}
       .info{margin-bottom:20px}
       .info table td{padding:2px 0;vertical-align:top}
@@ -1295,8 +1295,8 @@ function buildSuratPreviewHTML(s) {
       @media print{.no-print{display:none}}
     </style></head><body>
     <button class="no-print" onclick="window.print()"
-      style="position:fixed;top:16px;right:16px;padding:10px 20px;background:#0A2342;
-      color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;z-index:999">
+      style="position:fixed;top:16px;right:16px;padding:10px 20px;background:var(--navy-deep);
+      color:var(--on-accent);border:none;border-radius:8px;cursor:pointer;font-size:13px;z-index:999">
       🖨 Print / Save PDF
     </button>
     <div class="header">

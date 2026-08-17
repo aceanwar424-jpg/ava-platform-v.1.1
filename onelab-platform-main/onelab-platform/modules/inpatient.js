@@ -103,11 +103,11 @@ async function renderInpatient(tab) {
     { k: 'master', l: 'Ruang & Tarif' },
   ];
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('inpatient')" title="Kembali ke daftar menu Rawat Inap">← Menu Rawat Inap</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('inpatient')" title="Kembali ke daftar menu Rawat Inap">← Menu Rawat Inap</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Rawat Inap (Inpatient Management)</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Rawat Inap (Inpatient Management)</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Papan tempat tidur, admisi, visite, billing harian, dan resume pulang</span>
         </div>
       </div>
@@ -181,7 +181,7 @@ function inpPaintKpi() {
     { l: 'Tempat Tidur Kosong', v: kosong, c: '#15803D' },
     { l: 'BOR Hari Ini', v: bor + '%', c: '#123A5C' },
     { l: 'Perlu Dibersihkan', v: aktif.filter(b => b.status === 'Dibersihkan').length, c: '#B45309' },
-  ].map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+  ].map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
     border-radius:10px;padding:12px">
     <div style="font-size:20px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">${k.v}</div>
     <div style="font-size:10.5px;color:var(--gray)">${k.l}</div></div>`).join('');
@@ -229,7 +229,7 @@ function inpBoardWardHtml(w) {
   const beds = inpBeds.filter(b => b.ward_id === w.id && b.is_active !== false);
   const terisi = beds.filter(b => b.status === 'Terisi').length;
   return `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
         <div style="font-weight:750;font-size:14px">${inpEsc(w.name)}</div>
         <div style="font-size:11px;color:var(--gray)">${inpEsc(w.floor || '')} ·
@@ -435,7 +435,7 @@ function inpSearchPatient(q) {
         `&or=(patient_name.ilike.${term},mr_number.ilike.${term})` +
         `&mr_number=not.is.null&order=created_at.desc&limit=20`);
       const list = (rows || []).slice(0, 10);
-      box.innerHTML = list.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+      box.innerHTML = list.length ? `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
         border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:230px;overflow:auto">
         ${list.map(r => `<div onclick="inpPickPatient(${r.id},'${inpEsc(r.mr_number).replace(/'/g, '')}','${inpEsc(r.patient_name).replace(/'/g, '')}')"
           style="padding:8px 11px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12.5px">
@@ -626,7 +626,7 @@ async function inpPaintNotes() {
   } catch (e) { inpNotes = []; }
 
   el.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px">
       <div style="font-weight:700;font-size:12.5px;margin-bottom:9px">Catatan Baru</div>
       <div class="form-row">
         <div class="form-group"><label>Jenis</label>
@@ -652,7 +652,7 @@ async function inpPaintNotes() {
     <div style="font-weight:700;font-size:12.5px;margin-bottom:8px">
       Riwayat Catatan (${inpNotes.length})</div>
     ${inpNotes.length ? inpNotes.map(n => `
-      <div style="border-left:3px solid var(--teal);background:#fff;border:1px solid var(--border);
+      <div style="border-left:3px solid var(--teal);background:var(--white);border:1px solid var(--border);
         border-radius:8px;padding:10px 12px;margin-bottom:8px">
         <div style="display:flex;gap:8px;align-items:center;font-size:11px;color:var(--gray);margin-bottom:5px">
           <b style="color:var(--text)">${inpEsc(n.author_name || '—')}</b>
@@ -710,7 +710,7 @@ async function inpPaintVitals() {
     <input type="number" step="any" id="${id}" placeholder="${ph || ''}"></div>`;
 
   el.innerHTML = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:14px">
       <div style="font-weight:700;font-size:12.5px;margin-bottom:9px">Pencatatan Tanda Vital</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:9px">
         ${f('inp-vs-sys', 'Sistolik', '120')}
@@ -971,7 +971,7 @@ async function inpPaintResume() {
   if (s.status !== 'Dirawat') {
     el.innerHTML = `
       <div style="background:#E8F5EC;border:1px solid #15803D55;border-radius:8px;padding:10px 13px;
-        margin-bottom:12px;font-size:12.5px;color:#15803D">
+        margin-bottom:12px;font-size:12.5px;color:var(--success-deep)">
         ✅ ${inpEsc(s.status)} pada ${inpDateTime(s.discharged_at)} ·
         ${inpLos(s)} hari rawat · tagihan ${inpMoney(s.total_charges)}</div>
       ${d ? `
@@ -1152,7 +1152,7 @@ function inpPaintMaster() {
   el.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px">
 
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px">
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px">
         <div style="display:flex;align-items:center;margin-bottom:10px">
           <div style="font-weight:750;font-size:13px">Bangsal / Ruang</div>
           <button class="btn btn-teal btn-xs" style="margin-left:auto" onclick="inpOpenWardForm()">+ Bangsal</button>
@@ -1172,7 +1172,7 @@ function inpPaintMaster() {
           : '<div style="font-size:12px;color:var(--gray)">Belum ada bangsal.</div>'}
       </div>
 
-      <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px">
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px">
         <div style="display:flex;align-items:center;margin-bottom:10px">
           <div style="font-weight:750;font-size:13px">Kelas &amp; Tarif Kamar</div>
           <button class="btn btn-teal btn-xs" style="margin-left:auto" onclick="inpOpenClassForm()">+ Kelas</button>
@@ -1191,7 +1191,7 @@ function inpPaintMaster() {
       </div>
     </div>
 
-    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px">
       <div style="display:flex;align-items:center;margin-bottom:10px">
         <div style="font-weight:750;font-size:13px">Tempat Tidur (${inpBeds.length})</div>
         <button class="btn btn-teal btn-xs" style="margin-left:auto" onclick="inpOpenBedForm()">+ Tempat Tidur</button>

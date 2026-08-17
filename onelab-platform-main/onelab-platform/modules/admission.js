@@ -51,32 +51,32 @@ function injectProShell(){
   s.textContent=`
     .pro-shell{ font-size:12.5px;color:#1A2B3C; }
     .pro-shell .pro-header{ display:flex;justify-content:space-between;align-items:center;
-      background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:9px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px; }
-    .pro-shell .pro-header h1{ font-size:16px;margin:0;color:#fff;font-weight:800;display:flex;align-items:center;gap:8px; }
+      background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:9px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px; }
+    .pro-shell .pro-header h1{ font-size:16px;margin:0;color:var(--on-accent);font-weight:800;display:flex;align-items:center;gap:8px; }
     .pro-shell .pro-sub{ font-size:11px;color:#9db4d0; }
     .pro-shell .pro-kpi{ display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px; }
     .pro-shell .pro-kpi > div{ padding:8px 10px !important;border-radius:8px !important; }
     .pro-shell .pro-toolbar{ display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px; }
-    .pro-shell .pro-chip{ font-size:11.5px;padding:5px 11px;border-radius:7px;border:1px solid #d3dae1;background:#fff;cursor:pointer;font-weight:600;color:#1A2B3C; }
-    .pro-shell .pro-chip.active{ background:var(--teal);color:#fff;border-color:var(--teal); }
-    .pro-shell .pro-grid{ width:100%;border-collapse:collapse;background:#fff;border:1px solid #d3dae1;border-radius:8px;overflow:hidden; }
-    .pro-shell .pro-grid th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
+    .pro-shell .pro-chip{ font-size:11.5px;padding:5px 11px;border-radius:7px;border:1px solid #d3dae1;background:var(--white);cursor:pointer;font-weight:600;color:#1A2B3C; }
+    .pro-shell .pro-chip.active{ background:var(--teal);color:var(--on-accent);border-color:var(--teal); }
+    .pro-shell .pro-grid{ width:100%;border-collapse:collapse;background:var(--white);border:1px solid #d3dae1;border-radius:8px;overflow:hidden; }
+    .pro-shell .pro-grid th{ background:var(--navy-deep);color:var(--on-accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
     .pro-shell .pro-grid td{ padding:5px 9px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
     .pro-shell .pro-grid tbody tr:nth-child(even){ background:var(--bg); }
     .pro-shell .pro-grid tbody tr:hover{ background:#eaf5f3; }
     .pro-shell .pro-grid tbody tr.sel{ background:#e0f2f1 !important; }
     /* Examination tab-rail (Virtu-style) */
-    .exam-wrap{ display:grid;grid-template-columns:210px 1fr;gap:0;border:1px solid #d3dae1;border-radius:10px;overflow:hidden;background:#fff;margin-top:12px; }
+    .exam-wrap{ display:grid;grid-template-columns:210px 1fr;gap:0;border:1px solid #d3dae1;border-radius:10px;overflow:hidden;background:var(--white);margin-top:12px; }
     .exam-rail{ background:var(--bg2);border-right:1px solid #d3dae1;padding:8px; }
     .exam-tab{ display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:8px;
       cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);text-align:left;margin-bottom:2px; }
     .exam-tab:hover{ background:var(--border); }
-    .exam-tab.active{ background:#0A2342;color:#fff; }
+    .exam-tab.active{ background:var(--navy-deep);color:var(--on-accent); }
     .exam-tab svg{ flex-shrink:0; }
     .exam-body{ padding:14px 16px;min-height:320px; }
     .exam-topbar{ display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
       background:var(--bg);border-bottom:1px solid #d3dae1;padding:10px 14px; }
-    .exam-sec{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;
+    .exam-sec{ font-size:11px;font-weight:800;color:var(--navy-deep);text-transform:uppercase;letter-spacing:.05em;
       background:#EAF3FB;border-left:3px solid var(--teal);padding:6px 10px;border-radius:4px;margin:2px 0 10px; }`;
   document.head.appendChild(s);
 }
@@ -85,17 +85,17 @@ async function renderAdmission() {
   injectProShell();
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('admission')" title="Kembali ke daftar menu Admission">← Menu Admission</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('admission')" title="Kembali ke daftar menu Admission">← Menu Admission</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Admission / Registrasi Pasien</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Admission / Registrasi Pasien</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Walk-in · Booking · Rujukan · Project MCU</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="adm-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderAdmissionReport()">Laporan</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderAdmissionReport()">Laporan</button>
         <button class="btn btn-teal btn-sm" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
       </div>
     </div>
@@ -214,7 +214,7 @@ function renderAdmKPI() {
     {icon:'', val:formatCurrency(revenue), label:'Revenue Hari Ini', color:'#8B5CF6'},
     {icon:'', val:admAll.filter(a=>a.visit_type==='Project MCU').length, label:'MCU Project', color:'#F59E0B'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
+    <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:18px">${k.icon}</div>
       <div style="font-size:16px;font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:10px;color:var(--gray)">${k.label}</div>
@@ -268,7 +268,7 @@ function renderAdmList(data) {
         ${['Registered','Anamnesa'].includes(a.status)?`<button class="btn btn-teal btn-xs" title="Buka Anamnesa" onclick="navigate('anamnesa')" style="padding:2px 6px">${svgIcon('stethoscope',13,'#fff')} Anamnesa</button>`:''}
         ${a.package_id?`<button class="act-btn" title="Cetak Ulang Barcode" onclick="reprintSampleLabels(${a.id})" style="padding:2px">${svgIcon('print',13,'var(--teal)')}</button>`:''}
         <button class="act-btn edit" onclick="openAdmissionForm(${a.id})" style="padding:2px">${svgIcon('edit',13,'var(--navy)')}</button>
-        ${a.payment_status!=='Paid'?`<button class="act-btn" style="color:#22C55E;font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>`:''}
+        ${a.payment_status!=='Paid'?`<button class="act-btn" style="color:var(--success-strong);font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>`:''}
       </div></td>
     </tr>`;
   }).join('')}
@@ -442,11 +442,11 @@ function renderServiceLines() {
                        onfocus="showServiceDropdown(${i})" 
                        onblur="hideServiceDropdown(${i})"
                        oninput="filterServiceDropdown(${i}, this.value)"
-                       style="font-size:11px;padding:4px;width:100%;border:1px solid var(--border);border-radius:4px;background:#fff"
+                       style="font-size:11px;padding:4px;width:100%;border:1px solid var(--border);border-radius:4px;background:var(--white)"
                        autocomplete="off">
                 <div class="custom-select-list" 
                      id="service-list-${i}" 
-                     style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:#fff;border:1px solid var(--border);border-radius:4px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
+                     style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--white);border:1px solid var(--border);border-radius:4px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
                   <div class="custom-select-option" 
                        onclick="selectServiceProduct(${i}, '', 0, '')"
                        style="padding:6px 10px;cursor:pointer;font-size:11px;color:var(--text-muted);border-bottom:1px solid #f1f5f9;text-align:left">
@@ -575,7 +575,7 @@ function renderBillSummary(b) {
   const schemeLabel = admFormState.scheme==='family' ? `Diskon Family (${admFormState.schemeName||'-'})`
     : admFormState.scheme==='corporate' ? `Diskon Corporate (${admFormState.schemeName||'-'})` : null;
   const html = `
-    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
       ${billRow('Subtotal Layanan', b.gross)}
       ${b.lineDisc>0 ? billRow('Diskon per-baris', b.lineDisc, {neg:true, color:'#EF4444'}) : ''}
       ${schemeLabel && b.schemeDisc>0 ? billRow(schemeLabel, b.schemeDisc, {neg:true, color:'#EF4444'}) : ''}
@@ -786,8 +786,8 @@ async function openAdmissionForm(id=null) {
     <div id="af-tab-content-patient">
       <div style="background:var(--lgray);border-radius:8px;padding:10px 14px;margin-bottom:14px">
         <div class="form-row">
-          <div class="form-group"><label>No. Kunjungan</label><input type="text" id="af-visit" value="${visitNum}" readonly style="background:#fff;font-family:monospace"></div>
-          <div class="form-group"><label>MR Number</label><input type="text" id="af-mr" value="${mrNum}" readonly style="background:#fff;font-family:monospace"></div>
+          <div class="form-group"><label>No. Kunjungan</label><input type="text" id="af-visit" value="${visitNum}" readonly style="background:var(--white);font-family:monospace"></div>
+          <div class="form-group"><label>MR Number</label><input type="text" id="af-mr" value="${mrNum}" readonly style="background:var(--white);font-family:monospace"></div>
           <div class="form-group">
             <label>Tipe Kunjungan</label>
             <select id="af-type" onchange="toggleProjectField(this.value)">
@@ -1063,7 +1063,7 @@ function openPatientSearch() {
   ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10001;display:flex;align-items:flex-start;justify-content:center;padding:56px 16px';
   ov.onclick = (e)=>{ if(e.target===ov) closePatientSearch(); };
   ov.innerHTML = `
-    <div style="background:#fff;border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.28);width:100%;max-width:640px;max-height:82vh;display:flex;flex-direction:column;padding:20px">
+    <div style="background:var(--white);border-radius:14px;box-shadow:0 12px 44px rgba(0,0,0,.28);width:100%;max-width:640px;max-height:82vh;display:flex;flex-direction:column;padding:20px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
         <div style="font-size:16px;font-weight:800;color:var(--navy)">Cari Pasien Terdaftar</div>
         <button onclick="closePatientSearch()" style="border:none;background:none;font-size:18px;cursor:pointer;color:var(--gray)" style="font-size:10.5px;font-weight:700"></button>

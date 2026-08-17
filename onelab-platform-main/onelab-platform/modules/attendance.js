@@ -101,7 +101,7 @@ function renderClockPanel() {
       <!-- Today status -->
       ${isComplete ? `
         <div style="background:#DCFCE7;border-radius:var(--r-md);padding:16px;margin-bottom:16px">
-          <div style="font-size:15px;font-weight:800;color:#15803D;margin-bottom:8px">✅ Hadir Hari Ini</div>
+          <div style="font-size:15px;font-weight:800;color:var(--success-deep);margin-bottom:8px">✅ Hadir Hari Ini</div>
           <div style="display:flex;gap:20px;justify-content:center;font-size:13px">
             <div><div style="color:var(--text3);font-size:11px">CLOCK IN</div><strong>${rec.clock_in_at?.slice(11,16)||'—'}</strong></div>
             <div><div style="color:var(--text3);font-size:11px">CLOCK OUT</div><strong>${rec.clock_out_at?.slice(11,16)||'—'}</strong></div>
@@ -132,7 +132,7 @@ function renderClockPanel() {
           📍 Clock In Sekarang
         </button>` : ''}
       ${canClockOut ? `
-        <button class="btn btn-lg" style="width:100%;font-size:15px;background:#7C3AED;color:#fff" onclick="startClock('out')">
+        <button class="btn btn-lg" style="width:100%;font-size:15px;background:var(--violet-deep);color:var(--on-accent)" onclick="startClock('out')">
           🏠 Clock Out Sekarang
         </button>` : ''}
       ${isComplete ? `
@@ -267,7 +267,7 @@ function showGPSError(msg) {
   gpsEl.innerHTML = `
     <div style="text-align:center;padding:20px">
       <div style="font-size:40px;margin-bottom:12px"></div>
-      <div style="font-weight:700;color:#DC2626;margin-bottom:8px">Clock In Ditolak</div>
+      <div style="font-weight:700;color:var(--danger-strong);margin-bottom:8px">Clock In Ditolak</div>
       <div style="font-size:13px;color:var(--text2);margin-bottom:16px">${msg}</div>
       <button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button>
     </div>`;
@@ -302,7 +302,7 @@ async function showCameraStep(type, location, distM, noLocConfig) {
     const camEl = document.getElementById('clock-step-camera');
     if (camEl) camEl.innerHTML = `
       <div style="text-align:center;padding:20px">
-        <div style="font-size:13px;color:#DC2626;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--danger-strong);margin-bottom:12px">
           ❌ Kamera tidak tersedia: ${e.message}
         </div>
         <button class="btn btn-teal" onclick="submitClockNoPhoto('${type}')">
@@ -533,7 +533,7 @@ async function renderTeamAttendance() {
         const hasClockedOut = !!rec?.clock_out_at;
         const sc = STATUS_COLOR[rec?.clock_in_status]||'#94A3B8';
         return `
-          <div style="background:#fff;border:1.5px solid ${hasClockedIn?sc:'var(--border)'};
+          <div style="background:var(--white);border:1.5px solid ${hasClockedIn?sc:'var(--border)'};
             border-radius:var(--r-md);padding:14px;transition:all .15s">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
               <div style="width:38px;height:38px;border-radius:50%;

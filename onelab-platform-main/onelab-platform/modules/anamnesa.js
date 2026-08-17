@@ -12,18 +12,18 @@ async function renderAnamnesa() {
   if(typeof injectProShell==='function') injectProShell();
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('anamnesa')" title="Kembali ke daftar menu Anamnesa">← Menu Anamnesa</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('anamnesa')" title="Kembali ke daftar menu Anamnesa">← Menu Anamnesa</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Anamnesa &amp; Skrining Awal</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Anamnesa &amp; Skrining Awal</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Pemeriksaan awal wajib · TTV &amp; antropometri · cetak barcode · rujuk ke Lab</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="anam-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
         <input type="date" class="table-filter" id="anam-date" onchange="loadAnamnesaQueue()"
-          value="${new Date().toISOString().split('T')[0]}" style="max-width:170px;background:#fff;color:var(--navy)">
+          value="${new Date().toISOString().split('T')[0]}" style="max-width:170px;background:var(--white);color:var(--navy)">
       </div>
     </div>
     <div id="anam-kpi" class="pro-kpi"></div>
@@ -66,7 +66,7 @@ function renderAnamKPI() {
     {icon:'', val:inLab,   label:'Di Lab',            color:'#0EA5E9'},
     {icon:'', val:anamAll.length, label:'Total Antrian', color:'#0A2342'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
+    <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
       <div style="font-size:16px">${k.icon}</div>
       <div style="font-size:18px;font-weight:800;color:${k.color}">${k.val}</div>
       <div style="font-size:10px;color:var(--gray)">${k.label}</div>
@@ -357,7 +357,7 @@ function renderExam(){
             <strong style="color:var(--navy)">${a.mr_number||'—'}</strong> · ${a.visit_number||''}
             <div style="color:var(--gray)">${a.patient_name||''} · ${a.patient_gender==='F'?'Perempuan':a.patient_gender==='M'?'Laki-laki':''}${a.patient_age?' · '+a.patient_age+' th':''}</div>
           </div>
-          <div style="text-align:center">${bc}<div style="font-family:monospace;font-size:9px;color:#475569">${a.visit_number||''}</div></div>
+          <div style="text-align:center">${bc}<div style="font-family:monospace;font-size:9px;color:var(--text-dim)">${a.visit_number||''}</div></div>
           <button class="btn btn-ghost btn-sm" onclick="closeExam()">Tutup</button>
         </div>
         <div class="exam-body" id="exam-body"></div>

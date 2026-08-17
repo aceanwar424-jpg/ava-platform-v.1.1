@@ -98,7 +98,7 @@ function renderAddTemplateBtn() {
     <div class="mkt-add-dropdown" style="position:relative;display:inline-block">
       <button class="btn btn-teal" onclick="toggleMktAddMenu()">+ Tambah Template ▾</button>
       <div id="mkt-add-menu" style="display:none;position:absolute;top:calc(100% + 6px);right:0;
-        background:#fff;border:1px solid var(--border);border-radius:var(--r-md);
+        background:var(--white);border:1px solid var(--border);border-radius:var(--r-md);
         box-shadow:var(--shadow-md);min-width:220px;z-index:300;overflow:hidden">
         ${MKT_TYPES.map(t => `
           <button onclick="closeMktAddMenu();openMktForm(null,'${t.key}')"

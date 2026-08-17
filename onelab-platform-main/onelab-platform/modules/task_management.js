@@ -203,7 +203,7 @@ function renderMyTasks() {
         <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.04em">
           🔴 Primary Tasks <span style="color:var(--text3);font-weight:400">(${primary.length} task · ${priUsed.toFixed(1)}j)</span>
         </div>
-        ${priUsed > priMax?`<span style="font-size:11px;color:#DC2626;font-weight:700">⚠️ Melebihi batas ${priMax.toFixed(1)}j</span>`:''}
+        ${priUsed > priMax?`<span style="font-size:11px;color:var(--danger-strong);font-weight:700">⚠️ Melebihi batas ${priMax.toFixed(1)}j</span>`:''}
       </div>
       ${renderTaskCards(primary.filter(t=>!taskState.filterStatus||t.status===taskState.filterStatus), 'PRIMARY')}
     </div>
@@ -221,11 +221,11 @@ function renderMyTasks() {
     <div style="margin-top:20px;background:linear-gradient(135deg,#0891B2,#0E7490);border-radius:var(--r);padding:14px 18px;
       display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer"
       onclick="renderTaskManagement('logbook')">
-      <div style="color:#fff">
+      <div style="color:var(--on-accent)">
         <div style="font-weight:700;font-size:13px">Isi Daily Logbook</div>
         <div style="font-size:11.5px;opacity:.8">Rekap aktivitas hari ini sebelum EOD</div>
       </div>
-      <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.3)">
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.2);color:var(--on-accent);border:1px solid rgba(255,255,255,.3)">
         Buka Logbook →
       </button>
     </div>`:''}`;
@@ -242,7 +242,7 @@ function renderTaskCards(tasks, type) {
   const STATUS_ICON  = {Todo:'⬜',InProgress:'🔵',Done:'✅',Blocked:'🚫',CarryOver:''};
 
   return tasks.map(t=>`
-    <div style="background:#fff;border:1.5px solid ${t.status==='Done'?'#BBF7D0':t.status==='Blocked'?'#FECACA':'var(--border)'};
+    <div style="background:var(--white);border:1.5px solid ${t.status==='Done'?'#BBF7D0':t.status==='Blocked'?'#FECACA':'var(--border)'};
       border-radius:var(--r);padding:12px 14px;margin-bottom:8px;
       ${t.status==='Done'?'opacity:.7':''}
       transition:all .15s;cursor:pointer"
@@ -270,13 +270,13 @@ function renderTaskCards(tasks, type) {
               ${t.status}
             </span>
           </div>
-          ${t.carry_over_note?`<div style="font-size:10.5px;color:#92400E;margin-top:4px;background:var(--gold-light);padding:3px 8px;border-radius:4px">📌 ${t.carry_over_note}</div>`:''}
+          ${t.carry_over_note?`<div style="font-size:10.5px;color:var(--warn-deeper);margin-top:4px;background:var(--gold-light);padding:3px 8px;border-radius:4px">📌 ${t.carry_over_note}</div>`:''}
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div onclick="event.stopPropagation()" style="display:flex;gap:4px">
             <button class="act-btn edit" onclick="openTaskForm(${t.id})" title="Edit">${icon('edit', 12)}</button>
             ${t.status!=='Done'?`<button class="act-btn" onclick="event.stopPropagation();markTaskDone(${t.id})" 
-              style="color:#22C55E" title="Selesai">✅</button>`:''}
+              style="color:var(--success-strong)" title="Selesai">✅</button>`:''}
           </div>
         </div>
       </div>
@@ -323,7 +323,7 @@ function showOverdueTasksModal() {
           <div style="flex:1;min-width:0">
             <div style="font-weight:600;font-size:13px">${t.title}</div>
             <div style="font-size:11px;color:var(--text3)">
-              ${t.category||'Admin'} · Due: <strong style="color:#DC2626">${t.due_date}</strong> · ${t.status}
+              ${t.category||'Admin'} · Due: <strong style="color:var(--danger-strong)">${t.due_date}</strong> · ${t.status}
             </div>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="rescheduleOverdueTask(${t.id})">→ Hari Ini</button>
@@ -394,7 +394,7 @@ function renderTeamBoard() {
 
     <!-- Capacity legend -->
     <div style="display:flex;gap:12px;margin-bottom:14px;font-size:11.5px;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#22C55E;border-radius:3px"></div>Normal (&lt;80%)</div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--success-strong);border-radius:3px"></div>Normal (&lt;80%)</div>
       <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--gold);border-radius:3px"></div>Hampir Penuh (80–100%)</div>
       <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--danger);border-radius:3px"></div>Overload (&gt;100%)</div>
       <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--bg2);border-radius:3px;border:1px solid var(--border)"></div>Tidak ada task</div>
@@ -405,16 +405,16 @@ function renderTeamBoard() {
       <table style="width:100%;border-collapse:collapse;min-width:700px">
         <thead>
           <tr>
-            <th style="padding:8px 12px;background:var(--navy);color:#fff;font-size:12px;text-align:left;min-width:150px">Karyawan</th>
+            <th style="padding:8px 12px;background:var(--navy);color:var(--on-accent);font-size:12px;text-align:left;min-width:150px">Karyawan</th>
             ${weekDates.map(d=>{
               const dd = new Date(d+'T00:00:00');
               const isToday = d===new Date().toISOString().split('T')[0];
-              return `<th style="padding:8px 10px;background:${isToday?'var(--teal)':'var(--navy)'};color:#fff;font-size:11px;text-align:center;min-width:100px">
+              return `<th style="padding:8px 10px;background:${isToday?'var(--teal)':'var(--navy)'};color:var(--on-accent);font-size:11px;text-align:center;min-width:100px">
                 ${dd.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'short'})}
                 ${isToday?'<br><span style="font-size:9px;opacity:.8">Hari ini</span>':''}
               </th>`;
             }).join('')}
-            <th style="padding:8px 10px;background:var(--navy);color:#fff;font-size:11px;text-align:center">Total</th>
+            <th style="padding:8px 10px;background:var(--navy);color:var(--on-accent);font-size:11px;text-align:center">Total</th>
           </tr>
         </thead>
         <tbody>
@@ -423,7 +423,7 @@ function renderTeamBoard() {
             const weekTotal = empTasks.reduce((s,t)=>s+(parseFloat(t.alokasi_jam)||0),0);
             return `
               <tr style="border-bottom:1px solid var(--border)">
-                <td style="padding:10px 12px;font-weight:600;font-size:13px;background:#fff">
+                <td style="padding:10px 12px;font-weight:600;font-size:13px;background:var(--white)">
                   <div>${emp}</div>
                   <div style="font-size:10px;color:var(--text3)">${empTasks.filter(t=>t.status==='Done').length}/${empTasks.length} done minggu ini</div>
                 </td>
@@ -442,7 +442,7 @@ function renderTeamBoard() {
                     `:`<div style="color:var(--text3);font-size:11px">—</div>`}
                   </td>`;
                 }).join('')}
-                <td style="padding:10px;text-align:center;background:#fff;font-weight:700;color:var(--teal)">${weekTotal.toFixed(1)}j</td>
+                <td style="padding:10px;text-align:center;background:var(--white);font-weight:700;color:var(--teal)">${weekTotal.toFixed(1)}j</td>
               </tr>`;
           }).join('') : `
             <tr><td colspan="${weekDates.length+2}" style="text-align:center;padding:40px;color:var(--text3)">
@@ -528,7 +528,7 @@ async function renderLogbook() {
         {icon:'⏱', val:totPlan.toFixed(1)+'j', label:'Jam Plan',color:'#0891B2'},
         {icon:'', val:totActual.toFixed(1)+'j',label:'Jam Aktual',color:'#7C3AED'},
       ].map(k=>`
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);
           padding:10px 12px;border-top:3px solid ${k.color};text-align:center">
           <div style="font-size:20px">${k.icon}</div>
           <div style="font-size:16px;font-weight:800;color:${k.color}">${k.val}</div>
@@ -830,7 +830,7 @@ async function renderWeeklySummary() {
             <div class="card" style="margin-bottom:14px">
               <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
                 <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--accent));
-                  display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;flex-shrink:0">
+                  display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--on-accent);font-size:14px;flex-shrink:0">
                   ${emp.charAt(0).toUpperCase()}
                 </div>
                 <div style="flex:1">

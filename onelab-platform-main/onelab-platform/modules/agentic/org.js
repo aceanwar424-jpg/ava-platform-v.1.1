@@ -73,19 +73,19 @@ async function renderAgOrgTab(el){
     const members = agOrgAgents.filter(a=>a.reports_to===m.head);
     return `<div class="ag-detail" style="border-top:3px solid ${m.color};padding:10px 12px;min-width:250px;flex:1">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div style="font-size:12.5px;font-weight:800;color:#0A2342">${m.icon} ${agEsc(m.label)}</div>
+        <div style="font-size:12.5px;font-weight:800;color:var(--navy-deep)">${m.icon} ${agEsc(m.label)}</div>
         <button class="ag-btn mut" style="padding:3px 8px;font-size:10.5px" onclick="agOrgKick('${m.tick}')">${svgIcon('sparkle',10)} Patroli</button>
       </div>
       <div class="ag-detail" style="border:1px solid ${m.color};padding:7px 10px;margin-top:8px;text-align:center;position:relative;${dh.active?'':'opacity:.45'}">
         <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${dh.code}')">${svgIcon('edit',10)}</button>
-        <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[dh.code]||'🤖'} ${agEsc(dh.name)}</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${AG_ORG_ICON[dh.code]||'🤖'} ${agEsc(dh.name)}</div>
         <div style="font-size:9.5px;color:var(--gray)">${agEsc(dh.role_title)}</div>
       </div>
       <div style="width:2px;height:8px;background:var(--border2);margin:0 auto"></div>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${members.map(a=>`<div class="ag-detail" style="padding:6px 9px;position:relative;${a.active?'':'opacity:.45'}">
           <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',10)}</button>
-          <div style="font-size:11.5px;font-weight:700;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
+          <div style="font-size:11.5px;font-weight:700;color:var(--navy-deep)">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
           <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)} · ${agEsc(a.model_tier)}${a.active?'':' · NONAKTIF'}</div>
         </div>`).join('') || '<div style="font-size:10.5px;color:var(--gray);text-align:center">belum ada anggota</div>'}
       </div>
@@ -96,7 +96,7 @@ async function renderAgOrgTab(el){
     <div class="ag-detail" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div>
-          <div style="font-size:12px;font-weight:800;color:#0A2342">Struktur Organisasi Agent</div>
+          <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">Struktur Organisasi Agent</div>
           <div style="font-size:11px;color:var(--gray)">Anda (CEO) → HEAD → staf. HEAD berdetak tiap 15 menit via cron (atau manual di sini).</div>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -116,13 +116,13 @@ async function renderAgOrgTab(el){
       </div>
 
       <div style="display:flex;flex-direction:column;align-items:center;margin-top:14px">
-        <div style="background:#0A2342;color:#fff;border-radius:10px;padding:8px 22px;font-weight:800;font-size:12.5px">👑 ANDA (CEO)</div>
+        <div style="background:var(--navy-deep);color:var(--on-accent);border-radius:10px;padding:8px 22px;font-weight:800;font-size:12.5px">👑 ANDA (CEO)</div>
         <div style="width:2px;height:14px;background:var(--border2)"></div>
         ${head?`<div class="ag-detail" style="border:2px solid #0A2342;padding:10px 18px;text-align:center;min-width:230px;position:relative">
           <button class="act-btn" title="Edit job desc" style="position:absolute;top:6px;right:6px" onclick="agOrgEditAgent('HEAD')">${svgIcon('edit',12)}</button>
-          <div style="font-size:14px;font-weight:800;color:#0A2342">${AG_ORG_ICON.HEAD} ${agEsc(head.name)}</div>
+          <div style="font-size:14px;font-weight:800;color:var(--navy-deep)">${AG_ORG_ICON.HEAD} ${agEsc(head.name)}</div>
           <div style="font-size:10.5px;color:var(--gray)">${agEsc(head.role_title)}</div>
-          <span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
+          <span class="ag-badge" style="background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
         </div>`:''}
         <div style="width:2px;height:14px;background:var(--border2)"></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%">
@@ -132,10 +132,10 @@ async function renderAgOrgTab(el){
         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
           ${crossFn.map(a=>`<div class="ag-detail" style="padding:8px 13px;text-align:center;min-width:140px;position:relative;${a.active?'':'opacity:.45'}">
             <button class="act-btn" title="Edit job desc" style="position:absolute;top:5px;right:5px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',11)}</button>
-            <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
+            <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
             <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)}</div>
             <span class="ag-badge" style="margin-top:4px;display:inline-block;${a.active
-              ?'background:#DCFCE7;color:#15803D;border:1px solid #86EFAC':'background:var(--bg2);color:var(--text3);border:1px solid #CBD5E1'}">
+              ?'background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC':'background:var(--bg2);color:var(--text3);border:1px solid #CBD5E1'}">
               ${a.active?'AKTIF':'NONAKTIF'} · ${agEsc(a.model_tier)}</span>
           </div>`).join('')}
         </div>`:''}
@@ -148,7 +148,7 @@ async function renderAgOrgTab(el){
       </div>
 
       <div class="ag-detail">
-        <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⚖️ Matriks Mandat (decision rights)</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">⚖️ Matriks Mandat (decision rights)</div>
         ${Object.entries(AG_RISK_META).map(([k,mm])=>`
           <div style="font-size:10.5px;font-weight:800;color:${mm.c};margin:8px 0 4px">${mm.l}</div>
           ${agOrgRights.filter(r=>r.risk_class===k && !['HEAD_TICK','QA_REVIEW','IT_CHECK','SMOKE_TEST'].includes(r.task_type)).map(r=>`
@@ -164,32 +164,32 @@ async function renderAgOrgTab(el){
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-cron-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⏰ Penjadwal Otomatis (cron)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">⏰ Penjadwal Otomatis (cron)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-templates-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">📐 Template Dokumen Resmi (fidelity 100%)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-creds-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-complaints-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-aiconfig-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">⚙️ Konfigurasi AI (model · API · video)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">⚙️ Konfigurasi AI (model · API · video)</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>
 
     <div class="ag-detail" style="margin-top:12px" id="ag-prompthist-box">
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">🔧 Perbaikan Prompt oleh Kepala IT</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">🔧 Perbaikan Prompt oleh Kepala IT</div>
       <div class="loading-row"><div class="spinner"></div></div>
     </div>`;
   agRenderLeftPanel();
@@ -230,7 +230,7 @@ async function agRenderComplaints(){
       </table></div>`;
   }
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">💬 Keluhan Pelanggan (CX · ISO §7.7)</div>
       <div style="display:flex;gap:6px">
         <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agComplaintEdit()">${svgIcon('plus',11)} Tambah Keluhan</button>
         <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agOrgKick('CX_TICK')">💬 Patroli CX</button>
@@ -246,7 +246,7 @@ async function agComplaintEdit(id){
   const kat = ['Hasil','Layanan','Waktu Tunggu','Billing','Fasilitas','Lainnya'];
   openModal(`
     <div style="max-width:520px">
-      <h3 style="margin:0 0 10px;color:#0A2342">💬 ${r?'Edit':'Tambah'} Keluhan</h3>
+      <h3 style="margin:0 0 10px;color:var(--navy-deep)">💬 ${r?'Edit':'Tambah'} Keluhan</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Pelanggan
@@ -317,7 +317,7 @@ async function agRenderCreds(){
       </table></div>`;
   }
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">🪪 Kredensial Nakes (STR / SIP / Sertifikat)</div>
       <div style="display:flex;gap:6px">
         <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agCredEdit()">${svgIcon('plus',11)} Tambah</button>
         <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agOrgKick('HR_TICK')">🪪 Patroli Kredensial</button>
@@ -333,7 +333,7 @@ async function agCredEdit(id){
   const jenis = ['STR','SIP','SIPB','SIPA','Sertifikat Kompetensi','Lainnya'];
   openModal(`
     <div style="max-width:520px">
-      <h3 style="margin:0 0 10px;color:#0A2342">🪪 ${r?'Edit':'Tambah'} Kredensial Nakes</h3>
+      <h3 style="margin:0 0 10px;color:var(--navy-deep)">🪪 ${r?'Edit':'Tambah'} Kredensial Nakes</h3>
       <div style="display:grid;gap:9px">
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nama nakes
           <input id="agcr-name" class="form-input" style="width:100%" value="${agEsc(r?r.staff_name:'')}"></label>
@@ -395,11 +395,11 @@ async function agRenderAiConfig(){
     const cats = [...new Set(rows.map(r=>r.category))];
     inner = `<div style="font-size:11px;color:var(--gray);margin-bottom:8px">Kosongkan nilai untuk memakai Secret/env lama. Perubahan berlaku di panggilan AI berikutnya (tanpa re-deploy).</div>` +
       cats.map(cat=>`<div style="margin-bottom:10px">
-        <div style="font-size:11px;font-weight:800;color:#0A2342;margin:6px 0 4px">${AG_CFG_CAT[cat]||cat}</div>
+        <div style="font-size:11px;font-weight:800;color:var(--navy-deep);margin:6px 0 4px">${AG_CFG_CAT[cat]||cat}</div>
         ${rows.filter(r=>r.category===cat).map(r=>`
           <div style="display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed #e2e8f0">
             <div>
-              <div style="font-size:11.5px;font-weight:700;color:var(--text2)">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:#B91C1C">🔒</span>':''}</div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--text2)">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:var(--danger-deep)">🔒</span>':''}</div>
               <div style="font-size:10px;color:var(--gray)">${agEsc(r.notes||'')}</div>
             </div>
             <input id="agc-${agEsc(r.key)}" class="form-input" style="width:100%;font-size:11.5px"
@@ -410,7 +410,7 @@ async function agRenderAiConfig(){
       </div>`).join('');
   }
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">⚙️ Konfigurasi AI (model · API · video)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">⚙️ Konfigurasi AI (model · API · video)</div>
       <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderAiConfig()">${svgIcon('refresh',11)} Muat ulang</button>
     </div>${inner}`;
 }
@@ -441,16 +441,16 @@ async function agRenderTemplates(){
           <td>${agEsc(r.doc_type)}</td>
           <td>${(r.department||'')==='SEMUA'?'<span style="color:var(--gray)">Semua</span>':agEsc(r.department)}</td>
           <td>${agEsc(r.name)}</td>
-          <td>${r.storage_path?`<span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5">belum ada</span>'}</td>
+          <td>${r.storage_path?`<span class="ag-badge" style="background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">belum ada</span>'}</td>
           <td>${r.sample_path?'✅':'—'}</td>
           <td style="white-space:nowrap">
             ${r.storage_path?`<button class="act-btn" title="Tes rakit .docx dari master" onclick="agTemplateTestBuild('${r.id}')">${svgIcon('download',11)||'⬇'}</button>`:''}
             <button class="act-btn" title="Edit / unggah" onclick="agTemplateEdit('${r.id}')">${svgIcon('edit',11)}</button>
-            <button class="act-btn" title="Hapus template" style="color:#B91C1C" onclick="agTemplateDelete('${r.id}','${(r.name||'').replace(/'/g,'')}')">${typeof icon==='function'?icon('trash',11):'🗑'}</button></td>
+            <button class="act-btn" title="Hapus template" style="color:var(--danger-deep)" onclick="agTemplateDelete('${r.id}','${(r.name||'').replace(/'/g,'')}')">${typeof icon==='function'?icon('trash',11):'🗑'}</button></td>
         </tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:var(--gray);padding:14px">Belum ada template — tambah lalu unggah master .docx contoh Anda.</td></tr>'}</tbody>
       </table></div>`;
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">📐 Template Dokumen Resmi (fidelity 100%)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">📐 Template Dokumen Resmi (fidelity 100%)</div>
       <div style="display:flex;gap:6px">
         <button class="ag-btn pub" style="padding:4px 10px;font-size:11px" onclick="agTemplateEdit()">${svgIcon('plus',11)} Tambah Template</button>
         <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderTemplates()">${svgIcon('refresh',11)} Muat ulang</button>
@@ -468,7 +468,7 @@ async function agTemplateEdit(id){
   const mg = fs.margins_cm || {};
   openModal(`
     <div style="max-width:560px">
-      <h3 style="margin:0 0 10px;color:#0A2342">📐 ${r?'Edit':'Tambah'} Template Dokumen</h3>
+      <h3 style="margin:0 0 10px;color:var(--navy-deep)">📐 ${r?'Edit':'Tambah'} Template Dokumen</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Level
@@ -505,10 +505,10 @@ async function agTemplateEdit(id){
         </div>
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Master .docx (mengunci header/footer/format)
           <input type="file" id="agt-file" class="form-input" style="width:100%" accept=".docx">
-          ${r&&r.storage_path?`<span style="font-size:10.5px;color:#15803D">master terpasang — unggah baru hanya bila ingin mengganti</span>`:''}</label>
+          ${r&&r.storage_path?`<span style="font-size:10.5px;color:var(--success-deep)">master terpasang — unggah baru hanya bila ingin mengganti</span>`:''}</label>
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Contoh dokumen jadi (referensi — .docx/.pdf)
           <input type="file" id="agt-sample" class="form-input" style="width:100%" accept=".docx,.pdf">
-          <span style="font-size:10.5px;color:var(--gray)">Unggah contoh dokumen asli Anda di sini. Dipakai sebagai acuan format & isi saat menyusun master.${r&&r.sample_path?' <span style="color:#15803D">contoh terpasang</span>':''}</span></label>
+          <span style="font-size:10.5px;color:var(--gray)">Unggah contoh dokumen asli Anda di sini. Dipakai sebagai acuan format & isi saat menyusun master.${r&&r.sample_path?' <span style="color:var(--success-deep)">contoh terpasang</span>':''}</span></label>
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Daftar placeholder di master (satu per baris, tanpa kurung)
           <span style="font-weight:400;color:var(--gray)">— di file .docx tulis <code>{{NAMA}}</code>.</span>
           <div style="font-weight:400;font-size:10.5px;color:var(--gray);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin:3px 0">
@@ -622,11 +622,11 @@ async function agRenderPromptHist(){
           <span><strong>${agEsc(h.code)}</strong> <span style="color:var(--gray)">v${h.version} · oleh ${agEsc(h.changed_by)}</span></span>
           <span style="color:var(--gray)">${agAgo(h.created_at)}</span>
         </div>
-        <div style="font-size:11.5px;color:#475569;margin-top:2px">${agEsc(h.reason||'')}</div>
+        <div style="font-size:11.5px;color:var(--text-dim);margin-top:2px">${agEsc(h.reason||'')}</div>
         <button class="ag-btn warn" style="padding:3px 10px;margin-top:5px;font-size:11px" onclick="agPromptRollback('${agEsc(h.code)}')">${svgIcon('refresh',11)} Rollback ke versi ini</button>
       </div>`).join('');
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">🔧 Perbaikan Prompt oleh Kepala IT</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">🔧 Perbaikan Prompt oleh Kepala IT</div>
       <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderPromptHist()">${svgIcon('refresh',11)} Muat ulang</button>
     </div>${inner}`;
 }
@@ -647,7 +647,7 @@ async function agRenderCronBox(){
   const inner = !cs
     ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase6b.sql</strong> untuk mengaktifkan panel ini.</div>`
     : !cs.enabled
-    ? `<div style="font-size:12px;color:#92400E;background:#FEF3C7;border:1px solid #F59E0B;border-radius:8px;padding:9px 12px">
+    ? `<div style="font-size:12px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid #F59E0B;border-radius:8px;padding:9px 12px">
         Extension <strong>pg_cron</strong> belum aktif — Database → Extensions → aktifkan <code>pg_cron</code> &amp; <code>pg_net</code>,
         lalu jalankan blok §CRON (lihat AGENTIC_FASE6.md). Tanpa cron, gunakan tombol manual di atas.</div>`
     : `${(cs.jobs||[]).length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
@@ -655,18 +655,18 @@ async function agRenderCronBox(){
         <tbody>${cs.jobs.map(j=>`<tr>
           <td style="font-weight:700">${agEsc(j.jobname)}</td>
           <td style="font-family:monospace">${agEsc(j.schedule)}</td>
-          <td><span class="ag-badge" style="${j.active?'background:#DCFCE7;color:#15803D;border:1px solid #86EFAC':'background:#FEE2E2;color:#B91C1C;border:1px solid #FCA5A5'}">${j.active?'AKTIF':'DIJEDA'}</span></td>
+          <td><span class="ag-badge" style="${j.active?'background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC':'background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5'}">${j.active?'AKTIF':'DIJEDA'}</span></td>
           <td><button class="ag-btn ${j.active?'warn':'ok'}" style="padding:3px 10px;font-size:11px"
             onclick="agCronToggle('${agEsc(j.jobname)}', ${!j.active})">${j.active?'⏸ Jeda':'▶ Aktifkan'}</button></td>
         </tr>`).join('')}</tbody></table></div>`
       : `<div style="font-size:12px;color:var(--gray)">pg_cron aktif tapi belum ada job agentic — jalankan blok §CRON siap-pakai (lihat AGENTIC_FASE6.md).</div>`}
-      ${(cs.runs||[]).length ? `<div style="font-size:11px;font-weight:800;color:#0A2342;margin:10px 0 4px">Eksekusi terakhir</div>
+      ${(cs.runs||[]).length ? `<div style="font-size:11px;font-weight:800;color:var(--navy-deep);margin:10px 0 4px">Eksekusi terakhir</div>
         ${cs.runs.slice(0,8).map(r=>`<div style="font-size:11px;padding:3px 0;border-bottom:1px dashed #e2e8f0;display:flex;justify-content:space-between;gap:8px">
-          <span>${r.status==='succeeded'?'✅':'❌'} <strong>${agEsc(r.jobname)}</strong> ${r.msg&&r.status!=='succeeded'?`<span style="color:#B91C1C">· ${agEsc(r.msg)}</span>`:''}</span>
+          <span>${r.status==='succeeded'?'✅':'❌'} <strong>${agEsc(r.jobname)}</strong> ${r.msg&&r.status!=='succeeded'?`<span style="color:var(--danger-deep)">· ${agEsc(r.msg)}</span>`:''}</span>
           <span style="color:var(--gray);white-space:nowrap">${new Date(r.start_time).toLocaleString('id-ID')}</span>
         </div>`).join('')}` : ''}`;
   box.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-size:12px;font-weight:800;color:#0A2342">⏰ Penjadwal Otomatis (cron)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">⏰ Penjadwal Otomatis (cron)</div>
       <button class="ag-btn mut" style="padding:4px 10px;font-size:11px" onclick="agRenderCronBox()">${svgIcon('refresh',11)} Muat ulang</button>
     </div>${inner}`;
 }
@@ -683,7 +683,7 @@ function agOrgEditAgent(code){
   const a = agOrgAgents.find(x=>x.code===code); if(!a) return;
   openModal(`
     <div style="max-width:560px">
-      <h3 style="margin:0 0 10px;color:#0A2342">${AG_ORG_ICON[code]||'🤖'} Edit Organ — ${agEsc(a.code)}</h3>
+      <h3 style="margin:0 0 10px;color:var(--navy-deep)">${AG_ORG_ICON[code]||'🤖'} Edit Organ — ${agEsc(a.code)}</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
           <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nama
@@ -732,7 +732,7 @@ function agOrgEditRight(taskType){
   const qaOpts = agOrgAgents.filter(a=>a.code.startsWith('QA')).map(a=>a.code);
   openModal(`
     <div style="max-width:480px">
-      <h3 style="margin:0 0 10px;color:#0A2342">⚖️ Mandat — ${agEsc(r.task_type)}</h3>
+      <h3 style="margin:0 0 10px;color:var(--navy-deep)">⚖️ Mandat — ${agEsc(r.task_type)}</h3>
       <div style="display:grid;gap:9px">
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Aksi otomatis HEAD
           <select id="agre-action" class="form-input" style="width:100%">
@@ -753,7 +753,7 @@ function agOrgEditRight(taskType){
         </div>
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Catatan
           <input id="agre-note" class="form-input" style="width:100%" value="${agEsc(r.note||'')}"></label>
-        <div style="font-size:10.5px;color:#92400E;background:#FEF3C7;border:1px solid #F59E0B;border-radius:6px;padding:6px 9px">
+        <div style="font-size:10.5px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid #F59E0B;border-radius:6px;padding:6px 9px">
           Konten ber-review-medis tetap dipaksa R3 oleh sistem, apa pun setelan ini.</div>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -863,9 +863,9 @@ window.getAgentStatus = function(agent) {
   );
   if (activeTask) {
     const actionText = activeTask.status === 'PROCESSING' ? 'Memproses' : 'Antri';
-    return `<span style="color:#0ea5e9;font-weight:700">⚡ ${actionText} ("${activeTask.title}")</span>`;
+    return `<span style="color:var(--info);font-weight:700">⚡ ${actionText} ("${activeTask.title}")</span>`;
   }
-  return '<span style="color:#22c55e;font-weight:700">🟢 Menganggur (IDLE)</span>';
+  return '<span style="color:var(--success-strong);font-weight:700">🟢 Menganggur (IDLE)</span>';
 };
 
 window.agSendChatMsg = async function() {
@@ -957,7 +957,7 @@ window.agRenderLeftPanel = function() {
       </div>
       
       <div class="ag-detail" style="padding:10px;margin-bottom:8px;background:var(--bg);border-left:4px solid var(--primary);border-radius:6px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342">${activeAgent ? activeAgent.name : ''}</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${activeAgent ? activeAgent.name : ''}</div>
         <div style="font-size:10px;color:var(--gray);margin-bottom:4px">${activeAgent ? activeAgent.role_title : ''}</div>
         <div style="font-size:11px;display:flex;align-items:center;gap:4px">
           <span>Status Kerja:</span>
@@ -994,7 +994,7 @@ window.agRenderLeftPanel = function() {
     if (chatContainer) chatContainer.scrollTop = chatContainer.scrollHeight;
   } else {
     let inboxHtml = `
-      <div style="font-size:12px;font-weight:800;color:#0A2342;margin-bottom:8px">📨 Pesan untuk Anda (eskalasi · standup · alert)</div>
+      <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">📨 Pesan untuk Anda (eskalasi · standup · alert)</div>
       <div style="max-height:50vh;overflow-y:auto">
       ${agOrgMsgs.length ? agOrgMsgs.map(m=>{
         const kc = m.kind==='ESCALATION'?'#EF4444':m.kind==='ALERT'?'#F59E0B':m.kind==='STANDUP'?'#0EA5E9':'#64748B';

@@ -53,7 +53,7 @@ function renderLabReportConfig(targetId = 'main-content'){
         </div>
         <div class="form-group"><label>Logo Laboratorium</label>
           <div style="display:flex;gap:8px;align-items:center">
-            <img id="lr-logo-prev" src="${g('logo_url')}" style="max-height:44px;max-width:120px;${g('logo_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:#fff;object-fit:contain">
+            <img id="lr-logo-prev" src="${g('logo_url')}" style="max-height:44px;max-width:120px;${g('logo_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:var(--white);object-fit:contain">
             <input type="file" id="lr-logo-file" accept="image/*" onchange="lrLogoUpload(this)" style="font-size:12px">
             ${g('logo_url')?`<button class="btn btn-ghost btn-xs" onclick="lrLogoClear()" style="color:var(--danger)">Hapus</button>`:''}
           </div>
@@ -123,7 +123,7 @@ function renderLabReportConfig(targetId = 'main-content'){
         
         <div class="form-group" style="margin-bottom:12px"><label>Latar Belakang / Kertas Kop (Gambar / PDF Template)</label>
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
-            <img id="lr-bg-prev" src="${g('bg_image_url')}" style="max-height:60px;max-width:120px;${g('bg_image_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:#fff;object-fit:contain">
+            <img id="lr-bg-prev" src="${g('bg_image_url')}" style="max-height:60px;max-width:120px;${g('bg_image_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:var(--white);object-fit:contain">
             <input type="file" id="lr-bg-file" accept="image/*" onchange="lrBgUpload(this)" style="font-size:12px">
             ${g('bg_image_url')?`<button class="btn btn-ghost btn-xs" onclick="lrBgClear()" style="color:var(--danger)">Hapus Latar</button>`:''}
           </div>

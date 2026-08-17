@@ -82,8 +82,8 @@ function paintPayroll() {
 
   const final = payRun.status === 'Final';
   if (st) st.innerHTML = final
-    ? `<span style="color:#15803D;font-weight:600">Final</span> · dikunci ${payRun.finalized_at ? new Date(payRun.finalized_at).toLocaleString('id-ID') : ''}`
-    : `<span style="color:#B45309;font-weight:600">Draft</span> · masih bisa dihitung ulang`;
+    ? `<span style="color:var(--success-deep);font-weight:600">Final</span> · dikunci ${payRun.finalized_at ? new Date(payRun.finalized_at).toLocaleString('id-ID') : ''}`
+    : `<span style="color:var(--warn-deep);font-weight:600">Draft</span> · masih bisa dihitung ulang`;
 
   el.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-bottom:16px">
@@ -91,7 +91,7 @@ function paintPayroll() {
          { l: 'Total Bruto', v: payRun.total_gross || 0, c: '#0E7C86', money: true },
          { l: 'Total PPh 21', v: payRun.total_tax || 0, c: '#B45309', money: true },
          { l: 'Total Diterima', v: payRun.total_net || 0, c: '#15803D', money: true }]
-        .map(k => `<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k.c};
+        .map(k => `<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k.c};
           border-radius:10px;padding:13px">
           <div style="font-size:10.5px;color:var(--gray);text-transform:uppercase;letter-spacing:.08em">${k.l}</div>
           <div style="font-size:17px;font-weight:800;color:${k.c};font-variant-numeric:tabular-nums">
@@ -119,9 +119,9 @@ function paintPayroll() {
       <td style="text-align:right;font-variant-numeric:tabular-nums">${formatCurrency(i.allowances)}</td>
       <td style="text-align:right;font-variant-numeric:tabular-nums;color:${i.commission ? 'var(--teal)' : 'var(--gray)'}">${i.commission ? formatCurrency(i.commission) : '—'}</td>
       <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums">${formatCurrency(i.gross)}</td>
-      <td style="text-align:right;font-variant-numeric:tabular-nums;color:#B45309">${formatCurrency(i.bpjs_employee)}</td>
-      <td style="text-align:right;font-variant-numeric:tabular-nums;color:#B45309">${formatCurrency(i.pph21)}</td>
-      <td style="text-align:right;font-weight:800;font-variant-numeric:tabular-nums;color:#15803D">${formatCurrency(i.net)}</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--warn-deep)">${formatCurrency(i.bpjs_employee)}</td>
+      <td style="text-align:right;font-variant-numeric:tabular-nums;color:var(--warn-deep)">${formatCurrency(i.pph21)}</td>
+      <td style="text-align:right;font-weight:800;font-variant-numeric:tabular-nums;color:var(--success-deep)">${formatCurrency(i.net)}</td>
       <td><button class="btn btn-ghost btn-xs" onclick="printPayslip(${i.id})">Slip</button></td>
     </tr>`).join('') || '<tr><td colspan="9" style="padding:20px;text-align:center;color:var(--gray)">Tidak ada karyawan aktif</td></tr>'}
     </tbody></table></div>`;
@@ -260,7 +260,7 @@ function printPayslip(itemId) {
   const i = payItems.find(x => x.id === itemId); if (!i) return;
   const org = localStorage.getItem('ol_org_name') || 'OneLab Diagnostics';
   const w = window.open('', '_blank');
-  const row = (l, v, neg) => `<tr><td>${l}</td><td class="r" style="${neg ? 'color:#B91C1C' : ''}">${neg ? '(' : ''}${formatCurrency(v)}${neg ? ')' : ''}</td></tr>`;
+  const row = (l, v, neg) => `<tr><td>${l}</td><td class="r" style="${neg ? 'color:var(--danger-deep)' : ''}">${neg ? '(' : ''}${formatCurrency(v)}${neg ? ')' : ''}</td></tr>`;
   w.document.write(`<html><head><meta charset="utf-8"><title>Slip Gaji — ${i.employee_name}</title>
     <style>body{font-family:Arial,sans-serif;font-size:12px;padding:26px;max-width:640px;margin:auto}
       h2{margin:0 0 2px} .sub{color:#666;margin-bottom:18px;font-size:11px}

@@ -169,3 +169,53 @@ function getRoleLabel(role) {
 function isAdmin() {
   return getUserRole() === 'super_admin';
 }
+
+// ── Tema terang/gelap ────────────────────────────────────────────
+// Pilihan disimpan per peramban, TIDAK mengikuti setelan sistem operasi.
+// Alasannya: satu komputer klinik dipakai bergantian banyak petugas, dan
+// tampilan yang berubah sendiri mengikuti jam atau setelan OS akan
+// mengejutkan orang di tengah pekerjaan. Bawaannya tetap terang.
+function olTerapkanTema(nama) {
+  const gelap = nama === 'dark';
+  document.documentElement.setAttribute('data-theme', gelap ? 'dark' : 'light');
+  const b = document.getElementById('btn-tema');
+  if (b) {
+    b.textContent = gelap ? '☀️' : '🌙';
+    b.title = gelap ? 'Ganti ke tema terang' : 'Ganti ke tema gelap';
+  }
+}
+
+function olToggleTema() {
+  const kini = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  const baru = kini === 'dark' ? 'light' : 'dark';
+  try { localStorage.setItem('ol_tema', baru); } catch (e) {}
+  olTerapkanTema(baru);
+
+  // Peringatan sekali per peramban. Tema gelap BELUM tuntas: sekitar 296
+  // warna di modul masih heksa keras, sehingga sebagian teks gelap masih
+  // berada di atas latar yang kini ikut menggelap. Audit kontras menemukan
+  // teks tak terbaca di beberapa layar (mis. Admission).
+  //
+  // Dibiarkan bisa dicoba, tapi TIDAK boleh dipakai diam-diam untuk kerja
+  // klinis sehari-hari sebelum sisanya dituntaskan — teks yang tak terbaca
+  // pada layar pasien bukan sekadar soal estetika.
+  if (baru === 'dark') {
+    let sudah = false;
+    try { sudah = localStorage.getItem('ol_tema_notis') === '1'; } catch (e) {}
+    if (!sudah) {
+      try { localStorage.setItem('ol_tema_notis', '1'); } catch (e) {}
+      if (typeof toast === 'function') {
+        toast('Tema gelap masih EKSPERIMENTAL — sebagian teks belum terbaca di layar tertentu. ' +
+              'Jangan dipakai untuk kerja klinis dulu.', 'warn', 9000);
+      }
+    }
+  }
+}
+
+// Diterapkan sedini mungkin agar tidak ada kedipan terang saat memuat.
+(function () {
+  let t = 'light';
+  try { t = localStorage.getItem('ol_tema') || 'light'; } catch (e) {}
+  olTerapkanTema(t);
+  document.addEventListener('DOMContentLoaded', () => olTerapkanTema(t));
+})();

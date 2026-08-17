@@ -132,9 +132,9 @@ async function openPacsViewer(orderId, accession) {
   pacsResetView();
 
   openModal(`
-    <div class="modal-header" style="background:#0D1520;color:#fff;border-bottom-color:#243243">
-      <div class="modal-title" style="color:#fff">🖼️ ${accession} — ${imgs.length} citra</div>
-      <button class="modal-close" style="color:#fff" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+    <div class="modal-header" style="background:#0D1520;color:var(--on-accent);border-bottom-color:#243243">
+      <div class="modal-title" style="color:var(--on-accent)">🖼️ ${accession} — ${imgs.length} citra</div>
+      <button class="modal-close" style="color:var(--on-accent)" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:#0D1520;margin:-16px -16px 0;padding:10px 16px;
       display:flex;gap:6px;flex-wrap:wrap;align-items:center;border-bottom:1px solid #243243">

@@ -50,7 +50,7 @@ async function agAiEditorOpen(docId){
 // manusia langsung terlihat saat review (bukan tersembunyi di tengah teks).
 function agAiHighlightGaps(html){
   return String(html).replace(/\[ISI:([^\]]*)\]/g,
-    '<mark style="background:#FEF3C7;color:#92400E;border:1px solid #F59E0B;border-radius:4px;padding:0 5px;font-weight:700;font-style:normal">✎ ISI:$1</mark>');
+    '<mark style="background:var(--warn-soft);color:var(--warn-deeper);border:1px solid #F59E0B;border-radius:4px;padding:0 5px;font-weight:700;font-style:normal">✎ ISI:$1</mark>');
 }
 function agAiCountGaps(text){ return (String(text||'').match(/\[ISI:[^\]]*\]/g)||[]).length; }
 
@@ -62,11 +62,11 @@ function agAiEditorRender(){
   const gaps = agAiCountGaps(st.content);
 
   host.innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0b1526,#0f2038);color:#fff;border-radius:10px;padding:9px 14px;margin-bottom:12px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0b1526,#0f2038);color:var(--on-accent);border-radius:10px;padding:9px 14px;margin-bottom:12px">
       <div style="display:flex;align-items:center;gap:12px;min-width:0">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,.2)" onclick="agAiEditorBack()">← Dokumen QMS</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,.2)" onclick="agAiEditorBack()">← Dokumen QMS</button>
         <div style="min-width:0">
-          <h1 style="margin:0;font-size:14px;color:#fff;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw">${agEsc(st.doc.title)}</h1>
+          <h1 style="margin:0;font-size:14px;color:var(--on-accent);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw">${agEsc(st.doc.title)}</h1>
           <span style="font-size:11px;color:#9db4d0">${agEsc(st.doc.doc_type)} L${st.doc.doc_level} · ${agEsc(st.doc.department||'')} · Editor Dokumen AI</span>
         </div>
       </div>
@@ -84,14 +84,14 @@ function agAiEditorRender(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px">
             ${st.mode==='preview'?'Pratinjau Dokumen':'Sunting Teks (Markdown)'} · ${(st.content||'').length.toLocaleString('id-ID')} karakter
-            ${gaps?`<span style="color:#92400E;background:#FEF3C7;border-radius:8px;padding:1px 7px;margin-left:6px;text-transform:none;letter-spacing:0">✎ ${gaps} bagian perlu diisi</span>`:''}</div>
+            ${gaps?`<span style="color:var(--warn-deeper);background:var(--warn-soft);border-radius:8px;padding:1px 7px;margin-left:6px;text-transform:none;letter-spacing:0">✎ ${gaps} bagian perlu diisi</span>`:''}</div>
           <div style="display:flex;gap:6px">
             ${st.prev!=null?`<button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorUndo()">↶ Batalkan</button>`:''}
             <button class="ag-btn mut" style="padding:3px 9px;font-size:10.5px" onclick="agAiEditorToggle()">${st.mode==='preview'?'✏️ Sunting teks':'👁 Pratinjau'}</button>
           </div>
         </div>
 
-        <div style="border:1px solid var(--border);border-radius:10px;background:#fff;min-height:52vh;max-height:64vh;overflow:auto">
+        <div style="border:1px solid var(--border);border-radius:10px;background:var(--white);min-height:52vh;max-height:64vh;overflow:auto">
           ${st.mode==='preview'
             ? `<div style="padding:22px 26px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6;color:#1a2b3c" class="ag-ed-doc">
                  ${kosong ? `<div style="color:var(--gray);font-style:italic;text-align:center;padding:40px">Dokumen masih kosong. ${isPdf?'Tekan "Tarik teks dari PDF" di kanan, atau ':''}minta AI menyusun, atau "Sunting teks".</div>` : agAiHighlightGaps(agMd(st.content))}
@@ -110,10 +110,10 @@ function agAiEditorRender(){
       </div>
 
       <!-- KANAN: chat -->
-      <div style="border:1px solid var(--border);border-radius:10px;background:#fff;display:flex;flex-direction:column;height:calc(64vh + 92px)">
-        <div style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:800;color:#0A2342">
+      <div style="border:1px solid var(--border);border-radius:10px;background:var(--white);display:flex;flex-direction:column;height:calc(64vh + 92px)">
+        <div style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;font-weight:800;color:var(--navy-deep)">
           ${icon('sparkles',13)} Perbaikan dengan AI
-          ${st.noChatTable?`<div style="font-size:10px;font-weight:400;color:#B45309">Riwayat belum aktif — jalankan supabase_agentic_doc_sign.sql</div>`:''}
+          ${st.noChatTable?`<div style="font-size:10px;font-weight:400;color:var(--warn-deep)">Riwayat belum aktif — jalankan supabase_agentic_doc_sign.sql</div>`:''}
         </div>
         <div id="ag-ed-chat" style="flex:1;overflow-y:auto;padding:10px 12px"></div>
         <div style="border-top:1px solid var(--border);padding:9px 10px">
@@ -138,7 +138,7 @@ function agAiEditorPaintChat(){
     const me = m.role==='user';
     return `<div style="display:flex;justify-content:${me?'flex-end':'flex-start'};margin-bottom:7px">
       <div style="max-width:88%;font-size:11.5px;line-height:1.4;padding:7px 10px;border-radius:10px;
-        ${me?'background:#0f766e;color:#fff':'background:var(--bg2);color:#1a2b3c'}">
+        ${me?'background:#0f766e;color:var(--on-accent)':'background:var(--bg2);color:#1a2b3c'}">
         ${agEsc(m.content||'')}
         <div style="font-size:9px;opacity:.6;margin-top:3px">${m.created_at?new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>
       </div></div>`;

@@ -37,6 +37,14 @@ const PROP = '(color|background|background-color|border-color|border-top-color|'
              'border-bottom-color|border-left-color|border-right-color|outline-color)';
 const RE = new RegExp(`(${PROP}\\s*:\\s*)(#[0-9A-Fa-f]{6})\\b`, 'gi');
 
+// Putih ditangani terpisah, dan DIBEDAKAN menurut perannya:
+//   background:#fff → --white     (permukaan; ikut menggelap di tema gelap)
+//   color:#fff      → --on-accent (teks di atas lencana; tetap putih)
+// Menyamakan keduanya membuat teks putih di atas lencana merah berubah gelap
+// saat tema gelap — tidak terbaca. 136 latar + 148 teks.
+const RE_BG_PUTIH   = /((?:background|background-color)\s*:\s*)(#fff(?:fff)?|white)\b/gi;
+const RE_TEKS_PUTIH = /((?<!background-)(?<!background)color\s*:\s*)(#fff(?:fff)?|white)\b/gi;
+
 const berkas = [];
 (function walk(d) {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {
@@ -54,11 +62,14 @@ for (const f of berkas) {
   const baru = asli.split('\n').map(baris => {
     // Sabuk pengaman kedua: lewati baris yang menyentuh canvas.
     if (/fillStyle|strokeStyle|getContext\(/.test(baris)) return baris;
-    return baris.replace(RE, (utuh, awal, _prop, hex) => {
+    let b = baris.replace(RE, (utuh, awal, _prop, hex) => {
       const t = token[hex.toLowerCase()];
       if (!t) { dilewati++; return utuh; }
       n++; return `${awal}var(--${t})`;
     });
+    b = b.replace(RE_BG_PUTIH,   (_u, awal) => { n++; return `${awal}var(--white)`; });
+    b = b.replace(RE_TEKS_PUTIH, (_u, awal) => { n++; return `${awal}var(--on-accent)`; });
+    return b;
   }).join('\n');
 
   if (n) {

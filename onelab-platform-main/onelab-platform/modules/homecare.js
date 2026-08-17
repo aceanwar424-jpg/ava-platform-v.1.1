@@ -46,20 +46,20 @@ function hcCommissionPct(staffId, serviceType) {
 
 async function renderHomeCare() {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('homecare')" title="Kembali ke daftar menu Home Care">← Menu Home Care</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('homecare')" title="Kembali ke daftar menu Home Care">← Menu Home Care</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Home Care</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Home Care</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Manajemen order layanan kunjungan rumah · jadwal · nakes · billing</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="hc-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCLiveMap()">Peta Live</button>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCStaff()">Master Nakes</button>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCTariff()">Master Tarif</button>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderHCReport()">Laporan</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderHCLiveMap()">Peta Live</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderHCStaff()">Master Nakes</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderHCTariff()">Master Tarif</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderHCReport()">Laporan</button>
         <button class="btn btn-teal btn-sm" onclick="openHCForm()">+ Order Baru</button>
       </div>
     </div>
@@ -125,7 +125,7 @@ function renderHCKPI() {
     {icon:'✅',val:done,            label:'Selesai',       color:'#22C55E'},
     {icon:'',val:formatCurrency(revenue),label:'Revenue', color:'#00897B'},
   ].map(k=>`
-    <div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);
+    <div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);
       border-left:4px solid ${k.color};text-align:center">
       <div style="font-size:20px">${k.icon}</div>
       <div style="font-size:16px;font-weight:800;color:${k.color}">${k.val}</div>
@@ -604,7 +604,7 @@ async function openHCForm(id=null) {
         <input type="text" id="hf-cancel-reason" value="${o.cancel_reason||''}" placeholder="Alasan order dibatalkan">
       </div>
       <div class="form-group" id="hf-conflict-wrap" style="grid-column:1/-1;display:none">
-        <div id="hf-conflict" style="background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:12px;color:#B91C1C"></div>
+        <div id="hf-conflict" style="background:var(--danger-soft);border:1px solid #FECACA;border-radius:8px;padding:8px 10px;font-size:12px;color:var(--danger-deep)"></div>
       </div>
       <div class="form-group">
         <label>Referral Partner</label>
@@ -641,7 +641,7 @@ function hcSearchPatient(q) {
       const seen = {}, uniq = [];
       (rows||[]).forEach(r => { if (!seen[r.mr_number]) { seen[r.mr_number] = 1; uniq.push(r); } });
       if (!uniq.length) { box.innerHTML = ''; return; }
-      box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:#fff;
+      box.innerHTML = `<div style="position:absolute;z-index:50;left:0;right:0;background:var(--white);
         border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);max-height:210px;overflow:auto">
         ${uniq.slice(0,8).map(r=>`
           <div onclick='hcPickPatient(${JSON.stringify(r).replace(/'/g,"&#39;")})'
@@ -892,7 +892,7 @@ async function loadHCSchedule() {
           {l:'Nakes Bertugas',v:Object.keys(byNakes).filter(n=>n!=='Belum Ditugaskan').length, c:'#22C55E'},
           {l:'Belum Assign', v:byNakes['Belum Ditugaskan']?.length||0,               c:'#EF4444'},
           {l:'Selesai',      v:orders.filter(o=>o.status==='Selesai').length,         c:'#8B5CF6'},
-        ].map(k=>`<div style="background:#fff;border-radius:10px;padding:10px;border:1px solid var(--border);border-left:4px solid ${k.c};text-align:center">
+        ].map(k=>`<div style="background:var(--white);border-radius:10px;padding:10px;border:1px solid var(--border);border-left:4px solid ${k.c};text-align:center">
           <div style="font-size:18px;font-weight:800;color:${k.c}">${k.v}</div>
           <div style="font-size:10px;color:var(--gray)">${k.l}</div>
         </div>`).join('')}
@@ -904,7 +904,7 @@ async function loadHCSchedule() {
           <div class="card">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)">
               <div style="width:36px;height:36px;border-radius:50%;background:${nakesColors[idx%nakesColors.length]};
-                color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">
+                color:var(--on-accent);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">
                 ${nakes.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -1023,7 +1023,7 @@ async function loadHCBilling() {
         <td style="font-weight:700;color:var(--navy)">${n.name}</td>
         <td style="text-align:center;font-weight:600">${n.orders.length}</td>
         <td style="font-weight:700">${formatCurrency(n.total)}</td>
-        <td style="font-weight:800;color:#22C55E">${formatCurrency(n.fee)}</td>
+        <td style="font-weight:800;color:var(--success-strong)">${formatCurrency(n.fee)}</td>
         <td>
           <button class="btn btn-ghost btn-xs" onclick="showNakesDetail('${n.name.replace(/'/g,"\\'")}',${JSON.stringify(n.orders.map(o=>o.id)).replace(/"/g,'&quot;')})">
             Detail
@@ -1034,7 +1034,7 @@ async function loadHCBilling() {
         <td>TOTAL</td>
         <td style="text-align:center">${orders.length}</td>
         <td>${formatCurrency(Object.values(byNakes).reduce((s,n)=>s+n.total,0))}</td>
-        <td style="color:#22C55E">${formatCurrency(Object.values(byNakes).reduce((s,n)=>s+n.fee,0))}</td>
+        <td style="color:var(--success-strong)">${formatCurrency(Object.values(byNakes).reduce((s,n)=>s+n.fee,0))}</td>
         <td></td>
       </tr>
       </tbody></table></div>`;
@@ -1099,7 +1099,7 @@ async function loadHCReport() {
           {l:'Margin Kotor', v:formatCurrency(margin),c:'#00897B'},
           {l:'Rata Kepuasan', v:avgRating?avgRating.toFixed(1)+'/5':'—',c:'#F59E0B'},
           {l:'Belum Lunas',  v:formatCurrency(unbilledVal),c:'#DC2626'},
-        ].map(k=>`<div style="background:#fff;border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
+        ].map(k=>`<div style="background:var(--white);border-radius:10px;padding:12px;border:1px solid var(--border);border-left:4px solid ${k.c}">
           <div style="font-size:${String(k.v).length>8?'12px':'16px'};font-weight:800;color:${k.c}">${k.v}</div>
           <div style="font-size:10px;color:var(--gray)">${k.l}</div>
         </div>`).join('')}
@@ -1155,7 +1155,7 @@ function showNakesDetail(name, ids) {
         <td style="padding:5px">${o.patient_name||'—'}</td>
         <td style="padding:5px">${o.service_type||'—'}</td>
         <td style="padding:5px;text-align:right">${formatCurrency(o.total_amount||0)}</td>
-        <td style="padding:5px;text-align:right;font-weight:700;color:#22C55E">${formatCurrency(fee)}</td>
+        <td style="padding:5px;text-align:right;font-weight:700;color:var(--success-strong)">${formatCurrency(fee)}</td>
       </tr>`;
     }).join('')||'<tr><td colspan="5" style="padding:8px;color:var(--gray)">Tidak ada data</td></tr>'}</tbody></table>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`, 'wide');
@@ -1477,7 +1477,7 @@ async function renderHCLiveMap(){
     </div>
     <div id="hc-live-status" style="font-size:12px;color:var(--gray);margin-bottom:8px">Memuat peta…</div>
     <div id="hc-live-map" style="height:70vh;min-height:420px;border-radius:12px;border:1px solid var(--border)"></div>`;
-  try{ await hcEnsureGmaps(); }catch(e){ document.getElementById('hc-live-map').innerHTML=`<div style="padding:20px;color:#B91C1C">❌ ${e.message}</div>`; return; }
+  try{ await hcEnsureGmaps(); }catch(e){ document.getElementById('hc-live-map').innerHTML=`<div style="padding:20px;color:var(--danger-deep)">❌ ${e.message}</div>`; return; }
   _hcLive.map=new google.maps.Map(document.getElementById('hc-live-map'),{center:{lat:-6.2088,lng:106.8456},zoom:12,mapTypeControl:false,streetViewControl:false});
   _hcLive.directions=new google.maps.DirectionsRenderer({map:_hcLive.map,suppressMarkers:true,polylineOptions:{strokeColor:'#0EA5E9',strokeWeight:5}});
   if(_hcLive.timer) clearInterval(_hcLive.timer);
@@ -1517,7 +1517,7 @@ function hcLiveOrderInfo(o, marker){
     <div style="font-weight:800">${st.icon||''} ${o.patient_name||'—'}</div>
     <div style="color:var(--text3)">${o.service_type||''} · ${o.status}</div>
     <div style="margin:3px 0">${o.scheduled_date||''} ${o.scheduled_time||''}</div>
-    <div>Nakes: <b>${o.staff_name||'—'}</b>${o.staff_lat?' · <span style="color:#16a34a">📡 live</span>':' · <span style="color:#94a3b8">offline</span>'}</div>
+    <div>Nakes: <b>${o.staff_name||'—'}</b>${o.staff_lat?' · <span style="color:#16a34a">📡 live</span>':' · <span style="color:var(--text4)">offline</span>'}</div>
     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
       ${(o.staff_lat&&o.lat)?`<button class="btn btn-teal btn-sm" onclick="hcRouteToPatient(${o.id})">🧭 Rute + ETA</button>`:''}
       <button class="btn btn-ghost btn-sm" onclick="hcCopyTrackLink(${o.id})">Link Pasien</button>

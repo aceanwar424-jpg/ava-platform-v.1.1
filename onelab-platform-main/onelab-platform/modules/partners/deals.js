@@ -71,7 +71,7 @@ function renderDealsList(partnerId, deals) {
           <div style="font-size:18px;font-weight:800;color:#2E7D32">${active.length}</div>
           <div style="font-size:11px;color:var(--gray)">Aktif</div>
         </div>
-        <div style="background:#FFF8E1;border-radius:8px;padding:10px;text-align:center">
+        <div style="background:var(--warn-soft2);border-radius:8px;padding:10px;text-align:center">
           <div style="font-size:14px;font-weight:800;color:#F57F17">${formatCurrency(totalVal)}</div>
           <div style="font-size:11px;color:var(--gray)">Nilai Aktif</div>
         </div>
@@ -112,7 +112,7 @@ function renderDealsList(partnerId, deals) {
         </div>
 
         <!-- Body -->
-        <div style="padding:12px 14px;background:#fff">
+        <div style="padding:12px 14px;background:var(--white)">
           <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:8px">
             ${d.value?`<div style="font-size:12px"><span style="color:var(--gray)">Nilai:</span> <strong style="color:var(--navy)">${formatCurrency(d.value)}</strong></div>`:''}
             ${d.participant_count?`<div style="font-size:12px"><span style="color:var(--gray)">Peserta:</span> <strong>${d.participant_count} orang</strong></div>`:''}
@@ -121,7 +121,7 @@ function renderDealsList(partnerId, deals) {
           </div>
           ${d.description?`<div style="font-size:12px;color:var(--gray);margin-bottom:8px">${d.description}</div>`:''}
           ${d.next_action?`
-            <div style="background:#FFF8E1;border-radius:6px;padding:8px 10px;font-size:12px;color:#5D4037;margin-bottom:8px">
+            <div style="background:var(--warn-soft2);border-radius:6px;padding:8px 10px;font-size:12px;color:#5D4037;margin-bottom:8px">
               <strong>Next Action:</strong> ${d.next_action}
               ${d.next_action_date?` — <strong>${formatDateShort(d.next_action_date)}</strong>`:''}
             </div>`:''}
@@ -161,7 +161,7 @@ async function openDealForm(partnerId, dealId=null, partnerNameHint='') {
   overlay.id = 'deal-overlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:600;display:flex;align-items:center;justify-content:center;padding:14px;overflow-y:auto';
   overlay.innerHTML = `
-    <div style="background:#fff;border-radius:14px;max-width:540px;width:100%;padding:22px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="background:var(--white);border-radius:14px;max-width:540px;width:100%;padding:22px;max-height:92vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <div style="font-size:16px;font-weight:800;color:var(--navy)">${dealId?'Edit Output Kerjasama':'Tambah Output Kerjasama'}</div>
         <button onclick="document.getElementById('deal-overlay').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--gray)" style="font-size:10.5px;font-weight:700"></button>

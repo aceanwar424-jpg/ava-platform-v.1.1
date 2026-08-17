@@ -229,7 +229,7 @@ async function loadDashboardData() {
           <div style="margin-bottom:10px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
               <div style="display:flex;align-items:center;gap:6px">
-                <div style="width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;
+                <div style="width:22px;height:22px;border-radius:50%;background:var(--navy);color:var(--on-accent);
                   display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700">
                   ${i+1}
                 </div>
@@ -278,15 +278,15 @@ async function loadDashboardData() {
           onclick="navigate('leads')">
           <span style="font-size:24px">⏰</span>
           <div style="flex:1">
-            <div style="font-size:13px;font-weight:700;color:#92400E">
+            <div style="font-size:13px;font-weight:700;color:var(--warn-deeper)">
               ${overdueLeads.length} lead membutuhkan follow-up hari ini!
             </div>
-            <div style="font-size:11px;color:#B45309;margin-top:2px">
+            <div style="font-size:11px;color:var(--warn-deep);margin-top:2px">
               ${overdueLeads.slice(0,3).map(l=>l.lead_name||l.company).join(', ')}
               ${overdueLeads.length>3?` +${overdueLeads.length-3} lainnya`:''}
             </div>
           </div>
-          <span style="font-size:18px;color:#92400E">→</span>
+          <span style="font-size:18px;color:var(--warn-deeper)">→</span>
         </div>`;
     }
 

@@ -91,7 +91,7 @@ async function renderSupportive() {
     <div class="pro-kpi" id="supp-type-cards">
       ${Object.entries(SUPPORTIVE_TYPES).map(([type,cfg])=>`
         <div onclick="filterSuppType('${type}',this)" class="supp-type-card"
-          style="background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;border:1px solid var(--border);border-left:4px solid ${cfg.color};transition:all .15s">
+          style="background:var(--white);border-radius:8px;padding:8px 10px;cursor:pointer;border:1px solid var(--border);border-left:4px solid ${cfg.color};transition:all .15s">
           <div style="font-size:11px;font-weight:700;color:var(--navy)">${type}</div>
           <div style="font-size:18px;font-weight:800;color:${cfg.color}" id="supp-count-${type.replace(/\s/g,'_')}">—</div>
         </div>`).join('')}
@@ -203,8 +203,8 @@ function renderSuppList(data) {
         <td>
           <div class="act-row">
             <button class="act-btn edit" onclick="openSupportiveForm(${r.id})">${icon('edit', 12)}</button>
-            ${r.status==='Draft'?`<button class="act-btn" style="color:#22C55E;font-size:10px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
-            ${r.status==='Validated'?`<button class="act-btn" style="color:#8B5CF6;font-size:10px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
+            ${r.status==='Draft'?`<button class="act-btn" style="color:var(--success-strong);font-size:10px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
+            ${r.status==='Validated'?`<button class="act-btn" style="color:var(--violet);font-size:10px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
             <button class="act-btn" onclick="printSuppResult(${r.id})">🖨</button>
           </div>
         </td>
@@ -414,7 +414,7 @@ function printSuppResult(id) {
   const c={green:'#22C55E',yellow:'#F59E0B',orange:'#F97316',red:'#EF4444'}[r.color_code]||'#94A3B8';
 
   const rows = cfg.fields.filter(f=>f.type!=='file'&&data[f.id]).map(f=>`
-    <tr><td style="color:#546E7A;font-size:12px;padding:6px 10px">${f.label}</td>
+    <tr><td style="color:var(--slate);font-size:12px;padding:6px 10px">${f.label}</td>
     <td style="font-weight:600;padding:6px 10px">${data[f.id]||'—'}</td></tr>`).join('');
 
   const w=window.open('','_blank','width=800,height:600');
@@ -422,29 +422,29 @@ function printSuppResult(id) {
     <title>${r.product_name} — ${r.patient_name}</title>
     <style>body{font-family:Arial,sans-serif;padding:30px;font-size:13px}
     .header{border-bottom:3px solid ${cfg.color};padding-bottom:14px;margin-bottom:20px;display:flex;justify-content:space-between}
-    h2{color:#0A2342;margin:0}table{width:100%;border-collapse:collapse}
+    h2{color:var(--navy-deep);margin:0}table{width:100%;border-collapse:collapse}
     tr:nth-child(even){background:var(--bg)}
     .badge{padding:4px 14px;border-radius:10px;font-size:13px;font-weight:700}
     @media print{button{display:none}}</style></head><body>
-    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:#0A2342;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
+    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
     <div class="header">
       <div><h2>${orgName}</h2></div>
-      <div style="text-align:right"><strong style="font-size:16px;color:#0A2342">${cfg.icon} ${r.product_name}</strong>
-      <div style="font-size:12px;color:#546E7A">${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+      <div style="text-align:right"><strong style="font-size:16px;color:var(--navy-deep)">${cfg.icon} ${r.product_name}</strong>
+      <div style="font-size:12px;color:var(--slate)">${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}</div></div>
     </div>
     <div style="background:#F0F4F8;border-radius:8px;padding:12px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div><span style="font-size:11px;color:#546E7A">PASIEN</span><br><strong>${r.patient_name}</strong></div>
-      <div><span style="font-size:11px;color:#546E7A">NO. KUNJUNGAN</span><br><strong>${r.visit_number||'—'}</strong></div>
+      <div><span style="font-size:11px;color:var(--slate)">PASIEN</span><br><strong>${r.patient_name}</strong></div>
+      <div><span style="font-size:11px;color:var(--slate)">NO. KUNJUNGAN</span><br><strong>${r.visit_number||'—'}</strong></div>
     </div>
     <table>${rows}</table>
     <div style="margin-top:16px;padding:12px;background:${c}15;border-radius:8px;border-left:4px solid ${c}">
-      <span style="font-size:11px;color:#546E7A">INTERPRETASI:</span><br>
+      <span style="font-size:11px;color:var(--slate)">INTERPRETASI:</span><br>
       <span class="badge" style="background:${c}20;color:${c}">${r.interpretation||'—'}</span>
     </div>
     ${data.rec?`<div style="margin-top:12px"><strong>Rekomendasi:</strong> ${data.rec}</div>`:''}
     <div style="margin-top:50px;text-align:right">
       <div>________________________</div>
-      <div style="font-size:12px;color:#546E7A">${r.approved_by||'Dokter Pemeriksa'}</div>
+      <div style="font-size:12px;color:var(--slate)">${r.approved_by||'Dokter Pemeriksa'}</div>
     </div>
     </body></html>`);
   w.document.close();

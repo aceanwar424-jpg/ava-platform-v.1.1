@@ -589,17 +589,17 @@ let rabParams   = {};   // { peserta, days, margin, selectedTests, items }
 // ══════════════════════════════════════════════════════════════
 async function renderMCU() {
   document.getElementById('main-content').innerHTML = `
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
+    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="openCategory('mcu')" title="Kembali ke daftar menu MCU">← Menu MCU</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('mcu')" title="Kembali ke daftar menu MCU">← Menu MCU</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:#fff;font-weight:800">Project MCU Korporat</h1>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Project MCU Korporat</h1>
           <span class="lis-sub" style="font-size:11px;color:#9db4d0">Manajemen project MCU B2B · 6 Fase · 31 Tahapan · Gate System</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="mcu-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:#fff;border-color:rgba(255,255,255,0.2)" onclick="renderMCU()">Refresh</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderMCU()">Refresh</button>
         <button class="btn btn-teal btn-sm" onclick="openMCUForm()">+ Buat Project MCU</button>
       </div>
     </div>
@@ -661,7 +661,7 @@ function renderMCUKPI() {
     {val:formatCurrency(totalRAB), label:'Total RAB',   color:'#06B6D4'},
   ];
   el.innerHTML = kpis.map(k=>`
-    <div class="kpi-card" style="border-top:3px solid ${k.color};padding:12px;background:#fff;border-radius:8px;box-shadow:var(--shadow-xs)">
+    <div class="kpi-card" style="border-top:3px solid ${k.color};padding:12px;background:var(--white);border-radius:8px;box-shadow:var(--shadow-xs)">
       <div>
         <div class="kpi-val" style="font-size:${typeof k.val==='string'&&k.val.length>10?'12.5px':'18px'};font-weight:800;color:var(--navy);margin-bottom:3px">${k.val}</div>
         <div class="kpi-label" style="font-size:11px;color:var(--gray);text-transform:uppercase;font-weight:700">${k.label}</div>
@@ -1122,13 +1122,13 @@ function rabRenderTests() {
     <table style="width:100%;border-collapse:collapse;font-size:12px">
       <thead>
         <tr style="background:var(--navy)">
-          <th style="padding:6px 10px;color:#fff;text-align:left;font-size:11px">Nama Tes</th>
-          <th style="padding:6px 10px;color:#fff;text-align:left;font-size:11px">Kategori</th>
-          <th style="padding:6px 10px;color:#fff;text-align:right;font-size:11px">HPP/unit</th>
-          <th style="padding:6px 10px;color:#fff;text-align:center;font-size:11px">Qty</th>
-          <th style="padding:6px 10px;color:#fff;text-align:center;font-size:11px">Per Peserta?</th>
-          <th style="padding:6px 10px;color:#fff;text-align:right;font-size:11px">Total HPP</th>
-          <th style="padding:6px;color:#fff;text-align:center;font-size:11px">Hapus</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:left;font-size:11px">Nama Tes</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:left;font-size:11px">Kategori</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:right;font-size:11px">HPP/unit</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:center;font-size:11px">Qty</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:center;font-size:11px">Per Peserta?</th>
+          <th style="padding:6px 10px;color:var(--on-accent);text-align:right;font-size:11px">Total HPP</th>
+          <th style="padding:6px;color:var(--on-accent);text-align:center;font-size:11px">Hapus</th>
         </tr>
       </thead>
       <tbody>
@@ -1163,7 +1163,7 @@ async function rabRenderOpsTable(opMap={}, peserta=100, days=1) {
   const isAct = rabParams.mode === 'actual';
   let html = '';
   RAB_TEMPLATE.forEach(section=>{
-    html += `<div style="background:var(--navy);color:#fff;padding:5px 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">${section.cat} — ${section.sub}</div>`;
+    html += `<div style="background:var(--navy);color:var(--on-accent);padding:5px 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">${section.cat} — ${section.sub}</div>`;
     html += `<table style="width:100%;border-collapse:collapse;font-size:11.5px">
       <thead><tr style="background:var(--bg)">
         <th style="padding:5px 10px;text-align:left;font-size:10px;color:var(--text3)">Item</th>
@@ -1304,7 +1304,7 @@ function rabRecalc() {
         {label:'Nilai MG (${mg} peserta)',val:formatCurrency(mgValue),  color:'#F59E0B',sub:'Minimum guarantee',  icon:''},
         {label:isActual?'HPP Aktual':'HPP Plan',val:formatCurrency(isActual?hppActual:hppTotal),color:isActual&&hppActual>hargaJual?'#EF4444':'#6B7280',sub:isActual?'Realisasi biaya':'Estimasi biaya',icon:isActual?'':''},
       ].map(k=>`
-        <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;border-top:3px solid ${k.color}">
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;border-top:3px solid ${k.color}">
           <div style="font-size:10px;color:var(--text3);margin-bottom:2px">${k.icon} ${k.label}</div>
           <div style="font-size:13px;font-weight:800;color:${k.color}">${k.val}</div>
           <div style="font-size:10px;color:var(--text3)">${k.sub}</div>
@@ -1315,7 +1315,7 @@ function rabRecalc() {
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
 
       <!-- Breakdown Scheme -->
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:12px">
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px">
         <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">
           Breakdown per Fase Biaya
         </div>
@@ -1346,7 +1346,7 @@ function rabRecalc() {
       </div>
 
       <!-- Breakdown Source (Sumber Dana) -->
-      <div style="background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:12px">
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:12px">
         <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em">
           💳 Breakdown Sumber Dana
         </div>
@@ -1374,7 +1374,7 @@ function rabRecalc() {
     </div>
 
     <!-- Row 3: Fee Margin -->
-    <div style="background:linear-gradient(135deg,#0891B2,#0E7490);border-radius:var(--r);padding:12px 16px;color:#fff">
+    <div style="background:linear-gradient(135deg,#0891B2,#0E7490);border-radius:var(--r);padding:12px 16px;color:var(--on-accent)">
       <div style="font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;opacity:.8">
         Analisis Margin & Fee
       </div>
@@ -1597,7 +1597,7 @@ async function printRAB(projectId) {
     <div class="section">Step 3 — Biaya Operasional (per Sumber Dana)</div>
     ${Object.entries(opsBySource).map(([source, rows])=>{
       const subTotal = rows.reduce((s,o)=>s+o.total,0);
-      return `<table><thead><tr><th colspan="7" style="background:var(--teal);color:#fff">${source}</th></tr>
+      return `<table><thead><tr><th colspan="7" style="background:var(--teal);color:var(--on-accent)">${source}</th></tr>
         <tr><th>Item</th><th class="c">UoM</th><th>Skema</th><th class="r">Harga</th><th class="c">Qty Plan</th><th class="c">Qty Aktual</th><th class="r">Total Plan</th></tr></thead>
         <tbody>
           ${rows.map(o=>`<tr><td>${o.name}</td><td class="c">${o.uom}</td><td>${o.scheme}</td><td class="r">${formatCurrency(o.harga)}</td><td class="c">${o.qtyPlan}</td><td class="c">${o.qtyActual}</td><td class="r">${formatCurrency(o.total)}</td></tr>`).join('')}
@@ -1702,7 +1702,7 @@ async function openMCUDetail(id) {
                   ${isDone||isActive?`onmouseover="this.style.borderColor='${phase.color}'" onmouseout="this.style.borderColor='${isActive?(hasIssue?'#FECACA':phase.color):isDone?'#BBF7D0':'var(--border)'}'"`:''}>
                   <div style="width:26px;height:26px;border-radius:50%;
                     background:${isDone?'#22C55E':isActive?(hasIssue?'#EF4444':phase.color):'var(--border2)'};
-                    color:#fff;display:flex;align-items:center;justify-content:center;
+                    color:var(--on-accent);display:flex;align-items:center;justify-content:center;
                     font-size:11px;font-weight:800;flex-shrink:0">
                     ${isDone?'✓':stage.no}
                   </div>
@@ -1715,7 +1715,7 @@ async function openMCUDetail(id) {
                       PIC: ${stage.pic} · ${stage.form}
                       ${stepData.done_by?` · ${stepData.done_by}`:''} ${stepData.done_date?`· ${formatDateShort(stepData.done_date)}`:''}
                     </div>
-                    ${isActive&&hasIssue?`<div style="font-size:10.5px;color:#DC2626;margin-top:3px">${gateUnmet[0]}</div>`:''}
+                    ${isActive&&hasIssue?`<div style="font-size:10.5px;color:var(--danger-strong);margin-top:3px">${gateUnmet[0]}</div>`:''}
                   </div>
                   <div style="font-size:10px;white-space:nowrap;text-align:right">
                     ${isDone?'<span class="badge badge-green" style="font-size:10px">✅ Done</span>':isActive?`<span class="badge ${hasIssue?'badge-red':'badge-teal'}" style="font-size:10px">${hasIssue?'Blocked':'🔵 Aktif'}</span>`:'<span style="color:var(--text3);font-size:11px">⚪</span>'}
@@ -1735,7 +1735,7 @@ async function openMCUDetail(id) {
         <button class="btn btn-teal" onclick="advanceMCUStep(${id})">
           ▶ Lanjut ke ${`S${String(Math.min(curNo+1,31)).padStart(2,'0')}`}
         </button>`
-        :`<button class="btn btn-teal" style="background:#22C55E" disabled>✅ Project Selesai!</button>`}
+        :`<button class="btn btn-teal" style="background:var(--success-strong)" disabled>✅ Project Selesai!</button>`}
     </div>`,'wide');
   } catch(e) {
     console.error('[openMCUDetail] Failed:', e);
@@ -1797,9 +1797,9 @@ async function openStepForm(projectId, stageId) {
     </div>
 
     ${gateUnmet.length?`
-    <div style="background:#FEF2F2;border-left:4px solid #EF4444;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
-      <div style="font-weight:700;color:#DC2626;margin-bottom:6px">Gate Condition Belum Terpenuhi</div>
-      ${gateUnmet.map(g=>`<div style="font-size:12.5px;color:#DC2626;margin-bottom:4px">• ${g}</div>`).join('')}
+    <div style="background:var(--danger-soft);border-left:4px solid #EF4444;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
+      <div style="font-weight:700;color:var(--danger-strong);margin-bottom:6px">Gate Condition Belum Terpenuhi</div>
+      ${gateUnmet.map(g=>`<div style="font-size:12.5px;color:var(--danger-strong);margin-bottom:4px">• ${g}</div>`).join('')}
       <div style="font-size:11.5px;color:#9CA3AF;margin-top:8px">Anda masih bisa melihat & mengisi form ini, namun tidak bisa menandai sebagai Done.</div>
     </div>`:''}
 

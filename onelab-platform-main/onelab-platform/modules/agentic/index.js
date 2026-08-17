@@ -4507,7 +4507,7 @@ function initAgenticModule() {
       <!-- 2026 HEADER BAR -->
       <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:16px;">
-          <div style="width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, #0EA5E9, #8B5CF6); display:flex; align-items:center; justify-content:center; color:white; font-size:22px; font-weight:800; box-shadow:0 10px 25px rgba(14,165,233,0.3);">
+          <div style="width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, #0EA5E9, #8B5CF6); display:flex; align-items:center; justify-content:center; color:var(--on-accent); font-size:22px; font-weight:800; box-shadow:0 10px 25px rgba(14,165,233,0.3);">
             🤖
           </div>
           <div>
@@ -4517,7 +4517,7 @@ function initAgenticModule() {
                 2026 HIGH PERFORMANCE EDITION
               </span>
             </div>
-            <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Organisasi Agent · QMS ISO 15189 · MCP Protocol · A2A Inter-Agent · Content Studio · RAG SOP</p>
+            <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Organisasi Agent · QMS ISO 15189 · MCP Protocol · A2A Inter-Agent · Content Studio · RAG SOP</p>
           </div>
         </div>
 
@@ -4601,8 +4601,8 @@ function renderActiveAgTabContent() {
       <div style="padding:30px; text-align:center;">
         <div style="font-size:32px; margin-bottom:10px;">⚠️</div>
         <h4 style="color:#F87171; margin:0 0 8px 0;">Terjadi Kendala Memuat Tab ${_agTabActive}</h4>
-        <p style="color:#94A3B8; font-size:12px; margin-bottom:16px;">${agEsc(err.message)}</p>
-        <button onclick="switchAgTab('docs')" style="background:#0EA5E9; color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;">
+        <p style="color:var(--text4); font-size:12px; margin-bottom:16px;">${agEsc(err.message)}</p>
+        <button onclick="switchAgTab('docs')" style="background:var(--info); color:var(--on-accent); border:none; padding:8px 16px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer;">
           Buka Tab Dokumen QMS
         </button>
       </div>

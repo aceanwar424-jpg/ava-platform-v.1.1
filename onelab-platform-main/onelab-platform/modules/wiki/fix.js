@@ -34,7 +34,7 @@ function renderWikiFixTab(el){
           <div id="fx-tplinfo" style="font-size:12px;color:var(--teal);font-weight:700;margin-top:4px"></div>
         </div>
         <input type="file" id="fx-tplfile" style="display:none" accept=".pdf,.txt,.md" onchange="fixPick('tpl',this.files[0])">
-        ${templates.length?'':`<div style="font-size:11px;color:#92400E;background:#FFF8E1;border-radius:6px;padding:8px;margin-top:8px">
+        ${templates.length?'':`<div style="font-size:11px;color:var(--warn-deeper);background:var(--warn-soft2);border-radius:6px;padding:8px;margin-top:8px">
           Belum ada dokumen bertanda <strong>Template Acuan</strong>. Tandai di tab Dokumen SOP, atau upload manual di atas.</div>`}
       </div>
 

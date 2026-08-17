@@ -159,7 +159,7 @@ function renderPipelineBar() {
     .filter(([s]) => counts[s] > 0)
     .map(([s, c]) => `
       <div style="flex:${counts[s]};background:${c};display:flex;align-items:center;
-        justify-content:center;font-size:11px;font-weight:700;color:#fff;
+        justify-content:center;font-size:11px;font-weight:700;color:var(--on-accent);
         cursor:pointer;min-width:4px;transition:flex .4s"
         onclick="document.getElementById('ps-status').value='${s}';psFilter()"
         title="${s}: ${counts[s]}">
@@ -277,10 +277,10 @@ function renderKanban() {
     const col=STATUS_COLORS[s]||'#94A3B8';
     return `
       <div style="min-width:200px;flex:1;max-width:240px">
-        <div style="padding:8px 12px;border-radius:8px 8px 0 0;background:${col};color:#fff;font-size:12px;font-weight:700;display:flex;justify-content:space-between">
+        <div style="padding:8px 12px;border-radius:8px 8px 0 0;background:${col};color:var(--on-accent);font-size:12px;font-weight:700;display:flex;justify-content:space-between">
           <span>${s}</span><span>${cards.length}</span>
         </div>
-        <div style="background:#fff;border-radius:0 0 8px 8px;padding:6px;min-height:100px;box-shadow:var(--shadow)">
+        <div style="background:var(--white);border-radius:0 0 8px 8px;padding:6px;min-height:100px;box-shadow:var(--shadow)">
           ${cards.map(p=>`
             <div style="background:${col}12;border-radius:6px;padding:8px 10px;margin-bottom:5px;cursor:pointer;border-left:3px solid ${col}"
               onclick="openPartnerForm(${p.id})">
@@ -425,9 +425,9 @@ async function renderPMap() {
         ${p.address ? `<div style="font-size:11px;color:var(--gray);margin-bottom:6px">${p.address}</div>` : ''}
         ${p.pic_name ? `<div style="font-size:11px;color:var(--navy);margin-bottom:6px">👤 ${p.pic_name} ${p.phone ? '· ' + p.phone : ''}</div>` : ''}
         <div style="display:flex;gap:6px;margin-top:8px">
-          ${waUrl ? `<a href="${waUrl}" target="_blank" style="background:#25D366;color:#fff;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">💬 WA</a>` : ''}
-          <button onclick="openPartnerForm(${p.id})" style="background:var(--teal);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Edit</button>
-          <button onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" style="background:var(--navy);color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Kerjasama</button>
+          ${waUrl ? `<a href="${waUrl}" target="_blank" style="background:#25D366;color:var(--on-accent);text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">💬 WA</a>` : ''}
+          <button onclick="openPartnerForm(${p.id})" style="background:var(--teal);color:var(--on-accent);border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Edit</button>
+          <button onclick="showDealsOverlay(${p.id},'${(p.partner_name||'').replace(/'/g,"\\'")}')" style="background:var(--navy);color:var(--on-accent);border:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600;cursor:pointer">Kerjasama</button>
         </div>
       </div>`;
 
@@ -734,13 +734,13 @@ function showDealsOverlay(partnerId, partnerName) {
     display:flex;align-items:center;justify-content:center;padding:14px`;
 
   overlay.innerHTML = `
-    <div style="background:#fff;border-radius:14px;max-width:620px;width:100%;
+    <div style="background:var(--white);border-radius:14px;max-width:620px;width:100%;
       max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2)">
 
       <!-- Header -->
       <div style="padding:18px 20px;border-bottom:1px solid var(--border);
         display:flex;align-items:center;justify-content:space-between;
-        position:sticky;top:0;background:#fff;z-index:10;border-radius:14px 14px 0 0">
+        position:sticky;top:0;background:var(--white);z-index:10;border-radius:14px 14px 0 0">
         <div>
           <div style="font-size:16px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:6px">${icon('briefcase', 16)} Output Kerjasama</div>
           <div style="font-size:12px;color:var(--gray);margin-top:2px">${partnerName}</div>

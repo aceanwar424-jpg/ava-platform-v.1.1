@@ -199,7 +199,7 @@ function agOverlapPaint(rows){
   body.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:10px">
       ${[['Perlu ditinjau',aktif.length,'#B45309'],['Kemiripan ≥70%',aktif.filter(r=>r.score>=0.7).length,'#B91C1C'],['Sudah ditinjau',ditinjau.length,'#15803D']]
-        .map(k=>`<div style="background:#fff;border:1px solid var(--border);border-left:4px solid ${k[2]};border-radius:9px;padding:9px 11px">
+        .map(k=>`<div style="background:var(--white);border:1px solid var(--border);border-left:4px solid ${k[2]};border-radius:9px;padding:9px 11px">
           <div style="font-size:18px;font-weight:800;color:${k[2]}">${k[1]}</div>
           <div style="font-size:10px;color:var(--gray)">${k[0]}</div></div>`).join('')}
     </div>
@@ -225,7 +225,7 @@ function agOverlapRenderSection(containerId){
   el.innerHTML = `
     <div class="ag-detail">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:#0A2342">${typeof icon==='function'?icon('layers',14):''} Tumpang Tindih Dokumen</div>
+        <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${typeof icon==='function'?icon('layers',14):''} Tumpang Tindih Dokumen</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <label style="font-size:11px;color:var(--gray);display:flex;align-items:center;gap:4px">Ambang
             <input id="ag-ov-th" type="number" min="0.3" max="0.95" step="0.05" value="0.5" style="width:64px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;font-size:11.5px"></label>
