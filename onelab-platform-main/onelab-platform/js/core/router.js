@@ -19,6 +19,10 @@ const PAGE_TITLES = {
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
   audit:'Jejak Audit', 'db-studio':'Database Studio (Supabase GUI)',
+  satusehat:'SATUSEHAT — Kemenkes RI',
+  'hc-schedule':'Home Care — Jadwal', 'hc-staff':'Home Care — Petugas',
+  'hc-tariff':'Home Care — Tarif', 'hc-billing':'Home Care — Penagihan',
+  'hc-report':'Home Care — Laporan',
 };
 
 let currentPage = '';
@@ -72,7 +76,7 @@ function navigate(page, params={}) {
     case 'ava-caregiver':   safeRun('renderAVAHealth', 'caregiver');   break;
     case 'ava-corporate':   safeRun('renderAVAHealth', 'corporate');   break;
     case 'ava-portals':     safeRun('renderAVAHealth', 'portals');     break;
-    case 'finance':     safeRun('renderFinance');                break;
+    case 'finance':     safeRun('renderFinance', params.tab);      break;
     case 'inventory':   safeRun('renderInventory', params.tab||'stock'); break;
     case 'hrd':         safeRun('renderHRD');                    break;
     case 'work-schedule': safeRun('renderWorkSchedule');          break;
@@ -81,6 +85,17 @@ function navigate(page, params={}) {
     case 'wiki':        safeRun('renderWiki', params.tab||'docs');   break;
     case 'agentic':     safeRun('renderAgentic', params.tab||'inbox'); break;
     case 'audit':       safeRun('renderAuditTrail');              break;
+    case 'satusehat':   safeRun('renderSatuSehat');               break;
+
+    // Home Care: sub-halaman ini dulu memanggil renderHC*() LANGSUNG dari
+    // atribut onclick menu, melewati router — sehingga judul topbar tidak
+    // ikut berubah, sorotan menu tidak sinkron, dan galat modul tidak
+    // tertangkap safeRun. Kini lewat jalur yang sama seperti halaman lain.
+    case 'hc-schedule': safeRun('renderHCSchedule');              break;
+    case 'hc-staff':    safeRun('renderHCStaff');                 break;
+    case 'hc-tariff':   safeRun('renderHCTariff');                break;
+    case 'hc-billing':  safeRun('renderHCBilling');               break;
+    case 'hc-report':   safeRun('renderHCFullReport');            break;
     case 'attendance':   safeRun('renderAttendance');               break;
     case 'org-structure':safeRun('renderOrgStructure');             break;
     case 'regulatory':   safeRun('renderRegulatoryReports');        break;
@@ -104,7 +119,7 @@ function navigate(page, params={}) {
     case 'queue':       safeRun('renderQueuePage');                  break;
     case 'queue-kiosk': safeRun('renderQueueKiosk');                 break;
     case 'appointments':safeRun('renderAppointments');           break;
-    case 'cashier':     safeRun('renderCashier');                break;
+    case 'cashier':     safeRun('renderCashier', params.buka);     break;
     case 'accounting':  safeRun('renderAccounting');             break;
     case 'payables':    safeRun('renderPayables');               break;
     case 'assets':      safeRun('renderAssets', params.tab||'list'); break;

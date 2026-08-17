@@ -22,7 +22,7 @@ const PAYMENT_METHODS = [
 const TXN_TYPES = ['Payment','Refund','Cancellation','Corporate Bill'];
 let cashierAll = [], cashierQueue = [];
 
-async function renderCashier() {
+async function renderCashier(buka) {
   document.getElementById('main-content').innerHTML = `
     <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:#fff;border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
@@ -76,6 +76,12 @@ async function renderCashier() {
     </div>`;
 
   await Promise.all([loadCashierQueue(), loadCashierTxn()]);
+
+  // Menu "Shift Kas" dulu memakai setTimeout(openShiftPanel, 600) — balapan:
+  // bila pemuatan data lebih lama dari 600 ms, panel terbuka di atas layar
+  // yang belum siap, atau fungsinya belum ada dan gagal diam-diam. Kini
+  // dibuka SESUDAH data selesai dimuat.
+  if (buka === 'shift' && typeof openShiftPanel === 'function') openShiftPanel();
 }
 
 async function loadCashierQueue() {

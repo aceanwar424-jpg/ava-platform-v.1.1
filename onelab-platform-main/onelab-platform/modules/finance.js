@@ -5,7 +5,7 @@
 const FIN_TABS = ['invoice','payment','report','commission'];
 let finInvoices=[], finPayments=[];
 
-async function renderFinance() {
+async function renderFinance(tabAwal) {
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>Finance & Billing</h1>
@@ -84,6 +84,12 @@ async function renderFinance() {
     </div>`;
 
   await loadInvoices();
+
+  // Menu "Tagihan AR", "Komisi Sales", dan "Laporan Keuangan" dulu sama-sama
+  // memanggil navigate('finance') tanpa argumen, sehingga ketiganya mendarat
+  // di layar yang persis sama — menu yang menjanjikan tiga tujuan berbeda
+  // tetapi memberi satu. Kini tab awalnya ikut ditentukan.
+  if (tabAwal && tabAwal !== 'invoice') switchFinTab(tabAwal);
 }
 
 async function loadInvoices() {
@@ -149,9 +155,13 @@ function renderInvoiceTable(data) {
   }).join('')}</tbody></table>`;
 }
 
+// btn OPSIONAL: saat dipanggil dari router (mis. menu "Laporan Keuangan"
+// membuka langsung tab laporan) tidak ada elemen tombol yang diklik.
+// Sebelumnya btn.classList langsung disentuh dan akan melempar TypeError.
 function switchFinTab(tab, btn) {
+  const tombol = btn || document.querySelector(`#fin-tabs .tab-btn[onclick*="'${tab}'"]`);
   document.querySelectorAll('#fin-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if (tombol) tombol.classList.add('active');
   ['invoice','payment','report','commission'].forEach(t=>{
     const el=document.getElementById(`fin-${t}`);
     if(el) el.style.display=t===tab?'block':'none';

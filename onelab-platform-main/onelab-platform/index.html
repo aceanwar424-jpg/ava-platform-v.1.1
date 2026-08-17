@@ -233,6 +233,7 @@
 <script defer src="modules/payables.js?v=20260719s"></script>
 <script defer src="modules/assets.js?v=20260719s"></script>
 <script defer src="modules/audit.js?v=20260719s"></script>
+<script defer src="modules/satusehat.js?v=20260815a"></script>
 <script defer src="modules/inventory.js?v=20260719s"></script>
 <script defer src="modules/hrd.js?v=20260719s"></script>
 <script defer src="modules/payroll.js?v=20260719s"></script>
@@ -702,7 +703,7 @@ const FLYOUT_MENUS = {
       {page:'radiology', icon:'scan', label:'Radiology', group:'Pemeriksaan', desc:'Hasil pencitraan dan pelaporannya', action:"navigate('radiology')"},
       {page:'supportive', icon:'heart', label:'Supportive', group:'Pemeriksaan', desc:'EKG, spirometri, audiometri', action:"navigate('supportive')"},
       {page:'package', icon:'layers', label:'Package Service', group:'Konfigurasi Layanan', desc:'Paket pemeriksaan dan panelnya', action:"navigate('package')"},
-      {page:'satusehat', icon:'landmark', label:'Satu Sehat', group:'Kepatuhan', desc:'Integrasi FHIR Kemenkes (Fase 5)', action:"", soon:true},
+      {page:'satusehat', icon:'landmark', label:'Satu Sehat', group:'Kepatuhan', desc:'Integrasi FHIR Kemenkes — status, uji koneksi, riwayat kirim', action:"navigate('satusehat')"},
     ]
   },
   homecare: {
@@ -710,11 +711,11 @@ const FLYOUT_MENUS = {
     icon: 'home-heart',
     items: [
       {page:'homecare', icon:'home-heart', label:'Order Kunjungan', group:'Operasional', desc:'Buat & pantau order layanan ke rumah pasien', action:"navigate('homecare')"},
-      {page:'hc-schedule', icon:'calendar', label:'Jadwal & Penugasan', group:'Operasional', desc:'Kalender harian dan pembagian tugas nakes', action:"renderHCSchedule()"},
-      {page:'hc-billing', icon:'banknote', label:'Penagihan & Komisi', group:'Keuangan', desc:'Rekap fee nakes dan status penagihan', action:"renderHCBilling()"},
-      {page:'hc-staff', icon:'users', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"renderHCStaff()"},
-      {page:'hc-tariff', icon:'tag', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"renderHCTariff()"},
-      {page:'hc-report', icon:'bar-chart', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"renderHCFullReport()"},
+      {page:'hc-schedule', icon:'calendar', label:'Jadwal & Penugasan', group:'Operasional', desc:'Kalender harian dan pembagian tugas nakes', action:"navigate('hc-schedule')"},
+      {page:'hc-billing', icon:'banknote', label:'Penagihan & Komisi', group:'Keuangan', desc:'Rekap fee nakes dan status penagihan', action:"navigate('hc-billing')"},
+      {page:'hc-staff', icon:'users', label:'Tenaga Kesehatan', group:'Data Induk', desc:'Master nakes: kompetensi, wilayah, komisi', action:"navigate('hc-staff')"},
+      {page:'hc-tariff', icon:'tag', label:'Tarif Layanan', group:'Data Induk', desc:'Tarif dasar dan komisi per jenis layanan', action:"navigate('hc-tariff')"},
+      {page:'hc-report', icon:'bar-chart', label:'Laporan & Kepuasan', group:'Analitik', desc:'Kinerja nakes, margin, dan rating pasien', action:"navigate('hc-report')"},
     ]
   },
   avahealth: {
@@ -735,11 +736,11 @@ const FLYOUT_MENUS = {
     icon: 'wallet',
     items: [
       {page:'cashier', icon:'credit-card', label:'Cashier', action:"navigate('cashier')"},
-      {page:'cashier-shift', icon:'clock', label:'Shift Kas', group:'Kasir', desc:'Buka dan tutup shift dengan berita acara selisih', action:"navigate('cashier');setTimeout(openShiftPanel,600)"},
+      {page:'cashier-shift', icon:'clock', label:'Shift Kas', group:'Kasir', desc:'Buka dan tutup shift dengan berita acara selisih', action:"navigate('cashier',{buka:'shift'})"},
       {page:'finance', icon:'wallet', label:'Invoice & Tagihan', action:"navigate('finance')"},
-      {page:'finance-ar', icon:'receipt', label:'Tagihan AR', action:"navigate('finance')"},
-      {page:'finance-comm', icon:'trophy', label:'Komisi Sales', action:"navigate('finance')"},
-      {page:'finance-report', icon:'bar-chart', label:'Laporan Keuangan', action:"navigate('finance')"},
+      {page:'finance-ar', icon:'receipt', label:'Tagihan AR', action:"navigate('finance',{tab:'invoice'})"},
+      {page:'finance-comm', icon:'trophy', label:'Komisi Sales', action:"navigate('finance',{tab:'commission'})"},
+      {page:'finance-report', icon:'bar-chart', label:'Laporan Keuangan', action:"navigate('finance',{tab:'report'})"},
       {page:'accounting', icon:'book-open', label:'Akuntansi', group:'Pembukuan', desc:'Buku besar, neraca saldo, dan laba rugi per unit layanan', action:"navigate('accounting')"},
       {page:'payables', icon:'receipt', label:'Hutang Usaha', group:'Pembukuan', desc:'Faktur supplier, pencocokan tiga arah, dan pengendalian pembayaran', action:"navigate('payables')"},
       {page:'assets', icon:'wrench', label:'Aset & Kalibrasi', group:'Pembukuan', desc:'Aset tetap, penyusutan, dan jadwal kalibrasi alat', action:"navigate('assets')"},
