@@ -747,6 +747,7 @@ const FLYOUT_MENUS = {
     items: [
       {page:'settings', icon:'settings', label:'Pusat Pengaturan', action:"navigate('settings',{tab:'general'})"},
       {page:'users', icon:'user', label:'User Management', action:"navigate('settings',{tab:'users'})", adminOnly:true},
+      {page:'portal-akses', icon:'key', label:'Akses Portal', desc:'Tautan bertoken untuk klien korporat — buat, pantau, cabut', action:"navigate('portal-akses')", adminOnly:true},
       {page:'db-studio', icon:'database', label:'Database Studio (Supabase GUI)', desc:'Inspeksi tabel lokal Postgres, editor data baris, & SQL Editor GUI', action:"navigate('db-studio')", adminOnly:true},
       {page:'audit', icon:'scroll', label:'Jejak Audit', action:"navigate('audit')", adminOnly:true},
       {page:'product', icon:'dna', label:'Master Tes / Produk', action:"navigate('product')"},

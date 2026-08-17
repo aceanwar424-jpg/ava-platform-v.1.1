@@ -122,6 +122,12 @@
           <p>Kontrak MCU, daftar karyawan, rekam medis karyawan, billing perusahaan, dan klaim cashback kemitraan.</p>
           <span class="lencana aktif">Ada di Portal Customer</span>
         </a>
+        <span class="kartu nonaktif" title="Dibuka lewat tautan bertoken yang dikirim ke PIC perusahaan">
+          <span class="ikon">🔐</span>
+          <h3>Portal Klien Korporat</h3>
+          <p>Halaman khusus PIC perusahaan: kontrak, kuota MCU, status pemeriksaan karyawan, dan tagihan.</p>
+          <span class="lencana token">Perlu tautan bertoken</span>
+        </span>
         <a class="kartu" href="apps/index.html#rujukan">
           <span class="ikon">🔄</span>
           <h3>Dokter &amp; Lab Referral</h3>
@@ -132,11 +138,11 @@
     </section>
 
     <footer>
-      Fitur korporat dan rujukan sudah berjalan di dalam <strong>Portal Customer &amp; Korporat</strong>.
-      Yang belum ada adalah pemisahannya menjadi portal mandiri dengan akses bertoken bercakupan
-      terbatas — satu token hanya boleh melihat data korporat atau lab perujuknya sendiri.
-      Tabel pendukungnya sudah tersedia: <code>corporates</code>, <code>corporate_contracts</code>,
-      <code>corp_exam_requests</code>, <code>referral_labs</code>.
+      <strong>Portal Klien Korporat</strong> kini berdiri sendiri dengan akses bertoken: satu token
+      hanya membuka data satu perusahaan, hanya-baca, bisa dicabut, dan punya masa berlaku.
+      Cakupannya ditentukan di sisi server dari token — tidak ada identitas perusahaan yang
+      diterima dari peramban. Tautannya dibuat dari menu <code>Akses Portal</code> di aplikasi utama.
+      <br><br>Portal dokter perujuk menyusul memakai mekanisme yang sama.
     </footer>
   </div>
 </body>

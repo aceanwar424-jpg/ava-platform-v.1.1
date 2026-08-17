@@ -249,3 +249,11 @@ Dicatat terbuka agar tidak hilang:
 Tiga bug terpisah punya akar yang sama: **kode yang lolos di `run-local.js` tetapi rusak di build terpaket**, karena `__dirname` berada di dalam `app.asar`. Yang kena: pencarian folder platform, lokasi basis data, dan pembacaan `.env`. **Verifikasi akhir harus selalu dilakukan pada `.exe` hasil build, bukan mode pengembangan.**
 
 Pola kedua yang berulang: **kegagalan yang menyamar jadi keberhasilan** — `sbGet()` mengembalikan array kosong saat query gagal, `syncToSatuSehat()` melaporkan sukses tanpa mengirim apa pun, `catch(e){}` kosong menyembunyikan tabel yang gagal dibuat, dan kunci yang ditolak dilabeli "kuota habis". Setiap kali ditemukan, kegagalan dibuat berisik.
+
+Pola ketiga: **penyaringan cakupan lewat teks bebas, bukan kunci relasi.** Portal korporat sempat menyaring tagihan dengan `partner_name = corporate_name`. Saat diuji, token satu klien menampilkan tagihan milik *mitra rujukan* yang kebetulan bernama sama — data keuangan pihak ketiga terbuka lewat tautan yang justru dirancang membatasi. Nama tidak unik dan bisa berubah; cakupan wajib memakai kunci yang dijamin unik. Diperbaiki di `0017_portal_tagihan_kunci_relasi.sql`.
+
+Pola keempat: **skrip inline di HTML tidak pernah ikut diperiksa.** `node --check` hanya membaca berkas `.js`. Satu entri menu yang tersisip di tengah entri lain membuat sebuah string tak tertutup, dan seluruh 734 baris skrip inline `index.html` gagal diurai sekaligus — struktur menu mati tanpa satu pun tanda selain sebaris galat di konsol peramban. Kini dijaga `scripts/periksa-html-inline.js`; **jalankan setelah menyunting berkas HTML mana pun.**
+
+```bash
+node scripts/periksa-html-inline.js
+```

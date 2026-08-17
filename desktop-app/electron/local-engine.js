@@ -371,6 +371,18 @@ function muatKunciLLM() {
 
 const LLM = { idx: 0, gagal: new Map() };   // rotasi round-robin + tanda kunci kehabisan kuota
 
+// Penghitung percobaan portal per-IP (jendela 1 menit). Sederhana dan cukup:
+// yang menjaga sesungguhnya adalah token acak 24 byte; ini hanya membuat
+// penebakan massal tidak sepadan.
+const PORTAL_COBA = new Map();
+
+// Satu-satunya pesan penolakan portal. Token salah, kedaluwarsa, dicabut,
+// dan format cacat semuanya menjawab kalimat ini — supaya tidak ada yang
+// bisa disimpulkan dari perbedaan jawaban. Nilainya harus tetap sama dengan
+// yang ada di db/migrations/0017_portal_tagihan_kunci_relasi.sql.
+const PORTAL_PESAN_TOLAK =
+  'Tautan tidak berlaku atau sudah berakhir. Hubungi OneLab untuk tautan baru.';
+
 async function panggilGemini({ kunci, model, system, prompt, temperature, maxTokens }) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(kunci)}`;
   const body = {
@@ -816,6 +828,30 @@ function buildWhere(params, sqlParams, colTypes) {
     conds.push(buildCond(key, val, sqlParams, colTypes));
   }
   return conds.length ? ' WHERE ' + conds.join(' AND ') : '';
+}
+
+// Kolom yang TIDAK BOLEH keluar lewat REST, berapa pun hak akses pemintanya.
+//
+// portal_akses.token adalah kredensial itu sendiri — memegangnya sama dengan
+// bisa membuka data perusahaan yang bersangkutan. Sebelum ini layar admin
+// mengambil kolom itu untuk menampilkan potongannya, sehingga token utuh
+// benar-benar terkirim ke peramban: cukup buka DevTools untuk memanen seluruh
+// tautan klien sekaligus, tanpa jejak di portal_akses_log. Janji "token hanya
+// ditampilkan sekali" tidak ada artinya selama kolomnya masih bisa dibaca.
+//
+// Satu-satunya jalan token terlihat kini adalah nilai kembalian
+// portal_akses_buat(), tepat saat dibuat.
+const KOLOM_RAHASIA = { portal_akses: ['token'] };
+
+function sensorKolom(tabel, rows) {
+  const buang = KOLOM_RAHASIA[tabel];
+  if (!buang || !Array.isArray(rows) || !rows.length) return rows;
+  return rows.map(r => {
+    if (!r || typeof r !== 'object') return r;
+    const salinan = { ...r };
+    for (const k of buang) delete salinan[k];
+    return salinan;
+  });
 }
 
 // ── Handler REST utama
@@ -1307,6 +1343,49 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           return jsonRes(res, status, payload);
         }
 
+        // ── PORTAL PIHAK LUAR (klien korporat / lab perujuk) ────────────────
+        //
+        // SENGAJA di luar gerbang sesi: pemakainya PIC perusahaan klien, bukan
+        // staf klinik. Tokennya sendiri yang menjadi kredensial.
+        //
+        // Yang menjaga: cakupan ditentukan sepenuhnya di dalam fungsi basis
+        // data dari token — tidak ada corporate_id yang diterima dari klien.
+        // Kalau ada, pemegang token bisa menukarnya dengan milik perusahaan
+        // lain. Hanya-baca, dan setiap pemakaian dicatat.
+        if (p.startsWith('/functions/v1/portal')) {
+          if (req.method !== 'POST') return jsonRes(res, 405, { error: 'Metode tidak didukung' });
+          let badan = {};
+          try { badan = JSON.parse(bodyText || '{}'); } catch (_) {}
+          const token = String(badan.token || '').trim();
+
+          // Pembatasan kasar terhadap penebakan token. Bukan pengganti token
+          // acak 24 byte, tapi membuat percobaan massal tidak sepadan.
+          const kunciIP = req.socket.remoteAddress || 'x';
+          const kini = Date.now();
+          const jejak = PORTAL_COBA.get(kunciIP) || { n: 0, sejak: kini };
+          if (kini - jejak.sejak > 60_000) { jejak.n = 0; jejak.sejak = kini; }
+          jejak.n++; PORTAL_COBA.set(kunciIP, jejak);
+          if (jejak.n > 30) {
+            return jsonRes(res, 429, { error: 'Terlalu banyak permintaan. Coba lagi beberapa saat lagi.' });
+          }
+
+          // Pesan HARUS sama persis dengan yang dikembalikan portal_korporat()
+          // untuk token yang tidak ditemukan. Kalau berbeda, penebak bisa
+          // memisahkan "formatnya salah" dari "formatnya benar tapi tidak
+          // ada" — dan itu memberitahunya bahwa tebakannya sudah di jalur
+          // yang benar.
+          if (!/^[a-f0-9]{20,80}$/.test(token)) {
+            return jsonRes(res, 200, { error: PORTAL_PESAN_TOLAK });
+          }
+          try {
+            const r = await pg.query(`SELECT public.portal_korporat($1) AS d`, [token]);
+            return jsonRes(res, 200, (r.rows[0] && r.rows[0].d) || { error: 'Tidak ada data' });
+          } catch (e) {
+            log(`[portal] galat: ${e && e.message ? e.message : e}`);
+            return jsonRes(res, 500, { error: 'Terjadi kesalahan pada server' });
+          }
+        }
+
         // ── SATUSEHAT: kredensial di server, peramban hanya meneruskan ──────
         if (p.startsWith('/functions/v1/satusehat')) {
           const sesi = bacaToken(SECRET, tokenDariHeader(req));
@@ -1359,9 +1438,14 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // mengubah hak akses, jadi wajib memegang user.manage. Tanpa penjaga
           // ini, satu PATCH ke user_profiles cukup untuk menaikkan peran diri
           // sendiri menjadi super_admin.
+          //
+          // portal_akses ikut di sini karena membuat satu barisnya berarti
+          // memberi pihak DI LUAR klinik akses ke data satu perusahaan, tanpa
+          // perlu akun. Itu keputusan hak akses, bukan pekerjaan harian.
           const TABEL_HAK_AKSES = new Set([
             'user_profiles', 'local_auth_users', 'roles', 'permissions',
             'role_permissions', 'role_pages', 'user_pages', 'tenants',
+            'portal_akses',
           ]);
 
           let perluIzin = null;
@@ -1369,6 +1453,13 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // ke cloud bukan pekerjaan harian staf. Sebelumnya cukup "sudah
           // login", sehingga peran serendah viewer pun bisa memicunya.
           if (p === '/rest/v1/sync/git-push' || p === '/rest/v1/sync/supabase-cloud') {
+            perluIzin = 'user.manage';
+          } else if (p === '/rest/v1/rpc/portal_akses_buat') {
+            // Fungsinya SECURITY DEFINER dan diberikan ke peran "authenticated",
+            // jadi tanpa penjaga ini setiap pengguna yang sudah masuk — termasuk
+            // viewer — bisa mencetak tautan ke data korporat mana pun. Penjaga
+            // tabel di atas tidak menangkapnya karena jalurnya /rpc/, bukan
+            // /rest/v1/portal_akses.
             perluIzin = 'user.manage';
           } else if (menulis && TABEL_HAK_AKSES.has(tabel)) {
             perluIzin = 'user.manage';
@@ -1390,7 +1481,9 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             const role = await peranTerkini(pg, sesi.sub, sesi.role);
             if (!(await peranPunyaIzin(pg, role, perluIzin))) {
               const pesan = {
-                'user.manage':      `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`,
+                'user.manage':      p === '/rest/v1/rpc/portal_akses_buat'
+                                      ? `Peran "${role}" tidak berwenang membuat tautan portal klien`
+                                      : `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`,
                 'data.bulk_delete': `Peran "${role}" tidak berwenang menghapus SELURUH isi tabel ${tabel}. ` +
                                     `Tambahkan penyaring untuk menghapus baris tertentu.`,
                 'data.delete':      `Peran "${role}" tidak berwenang menghapus data`,
@@ -1480,6 +1573,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
         if (rest) {
           const headers = {}; for (const [k, v] of Object.entries(req.headers)) headers[k.toLowerCase()] = v;
           const out = await handleRest(pg, req.method, rest[1], u.search.replace(/^\?/, ''), bodyText, headers);
+          if (out.rows) out.rows = sensorKolom(rest[1], out.rows);
           const extra = {};
           if (out.count != null) extra['Content-Range'] = `0-${Math.max(out.rows.length - 1, 0)}/${out.count}`;
           if (out.error) return jsonRes(res, out.status, { message: out.error }, extra);
