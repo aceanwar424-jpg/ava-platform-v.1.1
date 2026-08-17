@@ -52,6 +52,18 @@ function renderAgOrchestratorTab() {
 
   let html = `
     <div style="padding:20px; display:flex; flex-direction:column; gap:20px;">
+      <!-- Peringatan wajib: angka di layar ini TIDAK dibaca dari basis data.
+           Daftar agen dan closedLoopCount diketik langsung di berkas ini.
+           Tanpa peringatan, panel monitoring yang isinya karangan adalah
+           kebohongan paling berbahaya — orang mengambil keputusan darinya. -->
+      <div style="background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.4);
+                  border-radius:12px;padding:12px 15px;font-size:12.5px;line-height:1.6;color:#FCD34D">
+        <strong>Skema statis — bukan data langsung.</strong>
+        Angka dan daftar agen di layar ini contoh tetap yang tertulis di kode,
+        bukan bacaan dari basis data. Untuk pemantauan sesungguhnya
+        (53 agen terdaftar, status, delegasi, dan jejak keputusan),
+        buka tab <strong>🕸 Kanvas Orkestrator</strong>.
+      </div>
       {/* 2026 CLOSED FEEDBACK LOOP BANNER */}
       <div style="background:linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9)); border:1px solid rgba(56,189,248,0.3); border-radius:16px; p:20px; backdrop-filter:blur(12px);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">

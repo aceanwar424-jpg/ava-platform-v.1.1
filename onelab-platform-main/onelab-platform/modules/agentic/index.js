@@ -4223,7 +4223,8 @@ if (typeof window.agAgo !== 'function') {
 
 // ── Tab Registry & Config ─────────────────────────────────────────
 const AG_TABS_2026 = [
-  { id: 'orchestrator', label: '🌐 Orchestrator & A2A', badge: 'Protocol v2.4' },
+  { id: 'canvas',       label: '🕸 Kanvas Orkestrator', badge: 'Data langsung' },
+  { id: 'orchestrator', label: '🌐 Orchestrator & A2A', badge: 'Skema statis' },
   { id: 'org',          label: '👥 Organisasi Agent',  badge: 'Struktur AI' },
   { id: 'docs',         label: '📄 Dokumen QMS',        badge: 'ISO 15189' },
   { id: 'inbox',        label: '📬 Approval Inbox',     badge: 'Mandat R1-R3' },
@@ -4569,7 +4570,13 @@ function renderActiveAgTabContent() {
   if (!container) return;
 
   try {
-    if (_agTabActive === 'orchestrator' && typeof renderAgOrchestratorTab === 'function') {
+    // Kanvas membaca data sungguhan (agentic.agents/tasks/messages/events).
+    // Tab orchestrator lama menampilkan daftar agen dan angka yang diketik
+    // di kode — dipertahankan hanya sebagai cadangan bila kanvas belum bisa
+    // dimuat, supaya tidak ada layar yang kosong tanpa penjelasan.
+    if (_agTabActive === 'canvas' && typeof renderAgCanvasTab === 'function') {
+      renderAgCanvasTab(container);
+    } else if (_agTabActive === 'orchestrator' && typeof renderAgOrchestratorTab === 'function') {
       renderAgOrchestratorTab(container);
     } else if (_agTabActive === 'org' && typeof renderAgOrgTab === 'function') {
       renderAgOrgTab(container);

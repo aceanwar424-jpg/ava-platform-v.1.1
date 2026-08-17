@@ -4,9 +4,35 @@
 const fs = require('fs'), path = require('path');
 process.chdir('D:/onelab-platform-main/onelab-platform-main/onelab-platform');
 
-// Urutan <script> di index.html menentukan urutan muat yang sudah terbukti jalan.
-const html = fs.readFileSync('index.html', 'utf8');
-const urutan = [...html.matchAll(/<script[^>]*src="(modules\/[^"?]+)\.js[^"]*"/g)].map(m => m[1] + '.js');
+// Urutan muat.
+//
+// Dulu diambil dari tag <script> di index.html. Sejak modul dimuat saat
+// dibutuhkan, tag itu tidak ada lagi — menjalankan generator versi lama kini
+// menghasilkan manifest KOSONG dan akan mematikan seluruh halaman.
+//
+// Sumber urutan sekarang: manifest yang berlaku (urutan yang sudah terbukti
+// jalan), lalu berkas baru di disk ditambahkan di belakang.
+function urutanModul() {
+  const daftar = [];
+  const jalur = 'js/core/modul-manifest.js';
+  if (fs.existsSync(jalur)) {
+    const m = fs.readFileSync(jalur, 'utf8').match(/window\.MODUL_SEMUA\s*=\s*(\[[\s\S]*?\]);/);
+    if (m) { try { daftar.push(...JSON.parse(m[1])); } catch (_) {} }
+  }
+  const diDisk = [];
+  (function walk(d) {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.js')) diDisk.push(p.split(path.sep).join('/'));
+    }
+  })('modules');
+
+  const ada = new Set(daftar);
+  for (const f of diDisk.sort()) if (!ada.has(f)) daftar.push(f);   // berkas baru
+  return daftar.filter(f => fs.existsSync(f));                      // buang yang sudah terhapus
+}
+const urutan = urutanModul();
 
 const router = fs.readFileSync('js/core/router.js', 'utf8');
 const pageFn = {};

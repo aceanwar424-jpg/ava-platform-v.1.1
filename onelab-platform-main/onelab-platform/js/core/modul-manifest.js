@@ -96,7 +96,8 @@ window.MODUL_HALAMAN = {
   "modules/agentic/docxfill.js",
   "modules/agentic/studio.js",
   "modules/agentic/render.js",
-  "modules/agentic/org.js"
+  "modules/agentic/org.js",
+  "modules/agentic/canvas.js"
  ],
  "audit": [
   "modules/audit.js"
@@ -320,5 +321,6 @@ window.MODUL_SEMUA = [
  "modules/config_labreport.js",
  "modules/settings.js",
  "modules/db_studio.js",
- "modules/import_excel.js"
+ "modules/import_excel.js",
+ "modules/agentic/canvas.js"
 ];
