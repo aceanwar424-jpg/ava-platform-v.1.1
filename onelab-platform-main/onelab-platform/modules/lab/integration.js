@@ -230,7 +230,7 @@ async function renderAnalyzerHub(){
       <div>
         <span class="badge badge-teal">${integs} alat integrasi</span>
         <span class="badge ${online?'badge-green':'badge-gray'}" style="margin-left:6px">${online} online</span>
-        <span class="badge" style="background:#EFF6FF;color:#1D4ED8;margin-left:6px">${received.length} pesan belum diproses</span>
+        <span class="badge" style="background:#EFF6FF;color:var(--ink-26);margin-left:6px">${received.length} pesan belum diproses</span>
       </div>
       <div style="display:flex;gap:6px">
         <button class="btn btn-ghost btn-sm" onclick="renderAnalyzerHub()">↻ Segarkan</button>

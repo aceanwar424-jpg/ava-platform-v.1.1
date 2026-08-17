@@ -100,7 +100,7 @@ function renderClockPanel() {
 
       <!-- Today status -->
       ${isComplete ? `
-        <div style="background:#DCFCE7;border-radius:var(--r-md);padding:16px;margin-bottom:16px">
+        <div style="background:var(--tint-01);border-radius:var(--r-md);padding:16px;margin-bottom:16px">
           <div style="font-size:15px;font-weight:800;color:var(--success-deep);margin-bottom:8px">✅ Hadir Hari Ini</div>
           <div style="display:flex;gap:20px;justify-content:center;font-size:13px">
             <div><div style="color:var(--text3);font-size:11px">CLOCK IN</div><strong>${rec.clock_in_at?.slice(11,16)||'—'}</strong></div>
@@ -109,13 +109,13 @@ function renderClockPanel() {
           </div>
           ${rec.clock_in_foto_url?`
           <div style="margin-top:10px">
-            <img src="${rec.clock_in_foto_url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid #22C55E">
+            <img src="${rec.clock_in_foto_url}" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--success-strong)">
             <span style="font-size:11px;color:var(--text3);margin-left:8px">Foto clock in</span>
           </div>`:''}
         </div>` :
       rec?.clock_in_at ? `
         <div style="background:#FFF7ED;border-radius:var(--r-md);padding:14px;margin-bottom:16px">
-          <div style="font-weight:700;color:#C2410C">🔵 Sedang Bekerja</div>
+          <div style="font-weight:700;color:var(--ink-13)">🔵 Sedang Bekerja</div>
           <div style="font-size:13px;margin-top:6px">Clock in: <strong>${rec.clock_in_at?.slice(11,16)}</strong>
             <span class="badge ${rec.clock_in_status==='OnTime'?'badge-green':'badge-red'}" style="margin-left:8px;font-size:10px">
               ${rec.clock_in_status==='OnTime'?'Tepat Waktu':'Terlambat'}

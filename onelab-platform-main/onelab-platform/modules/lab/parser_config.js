@@ -206,7 +206,7 @@ function lpcTest(){
   const sample = barcode ? (typeof labSamples!=='undefined'?labSamples:[]).find(s=>String(s.barcode)===String(barcode)||String(s.visit_number)===String(barcode)) : null;
   box.innerHTML=`
     <div style="margin-bottom:6px">Barcode terbaca: <b style="font-family:monospace">${barcode||'(tak ada)'}</b>
-      ${barcode?(sample?`<span class="badge badge-green">✓ ${sample.patient_name||'sampel ditemukan'}</span>`:'<span class="badge" style="background:#FEE2E2;color:var(--danger-deep)">sampel tak ditemukan</span>'):''}</div>
+      ${barcode?(sample?`<span class="badge badge-green">✓ ${sample.patient_name||'sampel ditemukan'}</span>`:'<span class="badge" style="background:var(--tint-02);color:var(--danger-deep)">sampel tak ditemukan</span>'):''}</div>
     <div style="margin-bottom:4px"><b>${entries.length}</b> baris hasil terbaca:</div>
     <div class="table-wrap" style="max-height:220px;overflow:auto"><table><thead><tr><th>Kode</th><th>Nilai</th><th>Unit</th><th>Flag</th></tr></thead><tbody>
     ${entries.length?entries.map(e=>`<tr><td style="font-family:monospace;font-weight:700">${e.code}</td><td style="font-weight:700">${e.value}</td><td style="font-size:11px;color:var(--gray)">${e.unit||''}</td><td style="font-size:11px">${e.flag||''}</td></tr>`).join('')

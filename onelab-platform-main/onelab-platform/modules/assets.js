@@ -156,12 +156,12 @@ function astPaintUnfit() {
   if (!unfit.length) { box.innerHTML = ''; return; }
 
   box.innerHTML = `
-    <div style="background:var(--danger-soft);border:1px solid #DC262655;border-left:5px solid #DC2626;
+    <div style="background:var(--danger-soft);border:1px solid #DC262655;border-left:5px solid var(--danger-strong);
       border-radius:10px;padding:13px 16px;margin-bottom:14px">
       <div style="font-weight:800;color:var(--danger-deep);font-size:13.5px;margin-bottom:4px">
         ${unfit.length} alat lewat jatuh tempo kalibrasi — tidak layak dipakai mengeluarkan hasil
       </div>
-      <div style="font-size:12.5px;color:#7F1D1D;margin-bottom:8px">
+      <div style="font-size:12.5px;color:var(--ink-08);margin-bottom:8px">
         Hasil yang dikeluarkan alat di bawah ini tidak dapat dipertanggungjawabkan
         dan berpotensi menjadi temuan pada audit ISO 15189 / BAPETEN.
         Hentikan pemakaiannya sampai kalibrasi ulang selesai dan dinyatakan Lulus.
@@ -489,7 +489,7 @@ function astPaintDepr(el) {
       yang dapat menjalankannya. Anda tetap bisa melihat hasilnya.</div>` : ''}
 
     <div style="background:#F0F9FF;border:1px solid #0EA5E955;border-radius:8px;padding:11px 14px;
-      margin-bottom:14px;font-size:12.5px;color:#075985">
+      margin-bottom:14px;font-size:12.5px;color:var(--ink-17)">
       Metode garis lurus: <b>(nilai perolehan − nilai residu) ÷ masa manfaat</b>.
       Penyusutan berhenti sendiri ketika nilai buku menyentuh nilai residu.
       Menjalankan periode yang sama dua kali <b>tidak</b> menggandakan angkanya —

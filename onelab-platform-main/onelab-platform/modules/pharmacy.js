@@ -119,7 +119,7 @@ function rxPaintPrescriptions(el) {
       <tbody>${rxPrescriptions.map(p => {
         const st = RX_STATUS[p.status] || RX_STATUS['Draft'];
         const warn = p.allergy_warning || p.interaction_warning;
-        return `<tr style="border-bottom:1px solid #f1f5f9">
+        return `<tr style="border-bottom:1px solid var(--bg2)">
           <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${p.rx_number || '—'}</span>
             ${warn ? '<div style="font-size:10px;color:var(--danger-strong);font-weight:700">PERINGATAN ALERGI</div>' : ''}</td>
           <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${p.patient_name || '—'}</div>
@@ -296,12 +296,12 @@ async function rxCheckSafety() {
       if (hits && hits.length) {
         rxWarnAllergy = JSON.stringify(hits);
         if (aBox) aBox.innerHTML = `
-          <div style="background:#FBEAEA;border:1.5px solid #B91C1C;border-radius:8px;padding:11px 14px;margin-bottom:12px">
+          <div style="background:#FBEAEA;border:1.5px solid var(--danger-deep);border-radius:8px;padding:11px 14px;margin-bottom:12px">
             <div style="font-weight:800;color:var(--danger-deep);font-size:13px">⚠️ PERINGATAN ALERGI</div>
-            <div style="font-size:12.5px;color:#7f1d1d;margin-top:4px">
+            <div style="font-size:12.5px;color:var(--ink-08);margin-top:4px">
               ${hits.map(h => `<div>• ${h.drug_name || h.drug || ''} — pasien alergi <b>${h.allergen || ''}</b>${h.severity ? ' (' + h.severity + ')' : ''}</div>`).join('')}
             </div>
-            <div style="font-size:11.5px;color:#7f1d1d;margin-top:6px">
+            <div style="font-size:11.5px;color:var(--ink-08);margin-top:6px">
               Bila tetap diresepkan, alasannya wajib diisi dan tersimpan pada resep.</div>
             <input type="text" id="rx-allergy-reason" placeholder="Alasan tetap meresepkan (wajib)"
               style="width:100%;margin-top:7px;font-size:12px;padding:6px">
@@ -317,9 +317,9 @@ async function rxCheckSafety() {
       if (hits && hits.length) {
         rxWarnInteraction = JSON.stringify(hits);
         if (iBox) iBox.innerHTML = `
-          <div style="background:#FBF1E4;border:1.5px solid #B45309;border-radius:8px;padding:11px 14px;margin-top:10px">
+          <div style="background:#FBF1E4;border:1.5px solid var(--warn-deep);border-radius:8px;padding:11px 14px;margin-top:10px">
             <div style="font-weight:800;color:var(--warn-deep);font-size:13px">⚠️ INTERAKSI OBAT</div>
-            <div style="font-size:12.5px;color:#7a4a12;margin-top:4px">
+            <div style="font-size:12.5px;color:var(--ink-03);margin-top:4px">
               ${hits.map(h => `<div>• ${h.drug_a || ''} + ${h.drug_b || ''} — ${h.severity || ''}${h.description ? ': ' + h.description : ''}</div>`).join('')}
             </div>
             <input type="text" id="rx-interaction-reason" placeholder="Alasan tetap meresepkan (wajib)"
@@ -393,10 +393,10 @@ async function rxOpenDetail(id) {
       Dokter: ${p.doctor_name || '—'}${p.diagnosis ? ' · Diagnosis: ' + p.diagnosis : ''}
     </div>
     ${p.allergy_override ? `<div style="background:#FBEAEA;border:1px solid #B91C1C55;border-radius:8px;
-      padding:9px 12px;margin-bottom:10px;font-size:12px;color:#7f1d1d">
+      padding:9px 12px;margin-bottom:10px;font-size:12px;color:var(--ink-08)">
       <b>Diteruskan meski ada peringatan alergi.</b> Alasan: ${p.allergy_override}</div>` : ''}
     ${p.interaction_override ? `<div style="background:#FBF1E4;border:1px solid #B4530955;border-radius:8px;
-      padding:9px 12px;margin-bottom:10px;font-size:12px;color:#7a4a12">
+      padding:9px 12px;margin-bottom:10px;font-size:12px;color:var(--ink-03)">
       <b>Diteruskan meski ada interaksi obat.</b> Alasan: ${p.interaction_override}</div>` : ''}
     <table style="width:100%;font-size:12.5px"><thead><tr style="background:var(--bg2)">
       <th style="padding:6px;text-align:left">Obat</th><th style="padding:6px">Jumlah</th>
@@ -439,8 +439,8 @@ async function rxOpenDispense(id) {
       </tr>`;
     }).join('')}</tbody></table>
 
-    ${adaKeras ? `<div style="background:#FBEAEA;border:1px solid #B91C1C;border-radius:8px;padding:10px 13px;
-      margin-top:12px;font-size:12.5px;color:#7f1d1d">
+    ${adaKeras ? `<div style="background:#FBEAEA;border:1px solid var(--danger-deep);border-radius:8px;padding:10px 13px;
+      margin-top:12px;font-size:12.5px;color:var(--ink-08)">
       <b>Mengandung golongan Narkotika/Psikotropika.</b>
       Identitas penerima wajib dicatat dan masuk register khusus.</div>` : ''}
 
@@ -679,16 +679,16 @@ async function rxPaintStock(el) {
   const nama = id => rxDrugs.find(d => d.id === id)?.generic_name || `(obat ${id})`;
 
   el.innerHTML = `
-    ${kadaluarsa.length ? `<div style="background:#FBEAEA;border:1.5px solid #B91C1C;border-radius:8px;
+    ${kadaluarsa.length ? `<div style="background:#FBEAEA;border:1.5px solid var(--danger-deep);border-radius:8px;
       padding:11px 14px;margin-bottom:12px">
       <div style="font-weight:800;color:var(--danger-deep);font-size:13px">${kadaluarsa.length} batch SUDAH kedaluwarsa — jangan diserahkan</div>
-      <div style="font-size:11.5px;color:#7f1d1d;margin-top:3px">
+      <div style="font-size:11.5px;color:var(--ink-08);margin-top:3px">
         ${kadaluarsa.slice(0, 6).map(b => `${nama(b.drug_id)} lot ${b.batch_no || '—'} (${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}</div>
     </div>` : ''}
     ${dekat.length ? `<div style="background:#FBF1E4;border:1px solid #E0A75E;border-radius:8px;
       padding:11px 14px;margin-bottom:12px">
       <div style="font-weight:800;color:var(--warn-deep);font-size:13px">⏳ ${dekat.length} batch mendekati kedaluwarsa (≤90 hari)</div>
-      <div style="font-size:11.5px;color:#7a4a12;margin-top:3px">
+      <div style="font-size:11.5px;color:var(--ink-03);margin-top:3px">
         ${dekat.slice(0, 6).map(b => `${nama(b.drug_id)} lot ${b.batch_no || '—'} (${formatDateShort(b.expiry_date)})`).join(' · ')}</div>
     </div>` : ''}
     ${low.length ? `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;

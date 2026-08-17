@@ -8,20 +8,51 @@ function toast(msg, type='info', dur=2800) {
   const el = document.createElement('div');
   el.className = `toast toast-${type}`;
   el.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
-  document.getElementById('toast-container').appendChild(el);
+  // Wadah dibuat bila belum ada. Sebelumnya appendChild dipanggil langsung
+  // pada hasil getElementById, sehingga toast APA PUN yang muncul sebelum
+  // shell aplikasi terpasang — mis. galat saat boot atau di layar login —
+  // melempar TypeError dan justru menutupi pesan yang ingin disampaikan.
+  let wadah = document.getElementById('toast-container');
+  if (!wadah) {
+    wadah = document.createElement('div');
+    wadah.id = 'toast-container';
+    document.body.appendChild(wadah);
+  }
+  wadah.appendChild(el);
   setTimeout(() => el.remove(), dur);
 }
 
 // Modal
+//
+// Wadah dibuat bila belum ada. showLoginScreen() mengganti isi body,
+// sehingga #modal-overlay dan #modal-box lenyap — dan setiap openModal()
+// sesudah itu melempar TypeError. Akibatnya paling terasa justru pada
+// dialog galat: pesan yang seharusnya menjelaskan masalah malah ikut hilang.
+function _wadahModal() {
+  let ov = document.getElementById('modal-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'modal-overlay';
+    ov.className = 'modal-overlay';
+    ov.onclick = (e) => { if (e.target === ov) closeModalForce(); };
+    ov.innerHTML = '<div class="modal-box" id="modal-box"></div>';
+    document.body.appendChild(ov);
+  }
+  return { ov, box: document.getElementById('modal-box') };
+}
+
 function openModal(html, size='') {
-  const box = document.getElementById('modal-box');
+  const { ov, box } = _wadahModal();
+  if (!box) return;
   box.innerHTML = html;
   box.className = 'modal-box' + (size ? ' '+size : '');
-  document.getElementById('modal-overlay').classList.add('open');
+  ov.classList.add('open');
 }
 function closeModalForce() {
-  document.getElementById('modal-overlay').classList.remove('open');
-  document.getElementById('modal-box').innerHTML = '';
+  const ov = document.getElementById('modal-overlay');
+  const box = document.getElementById('modal-box');
+  if (ov) ov.classList.remove('open');
+  if (box) box.innerHTML = '';
 }
 function closeModal(e) {
   if (!e || e.target === document.getElementById('modal-overlay')) closeModalForce();
@@ -191,22 +222,21 @@ function olToggleTema() {
   try { localStorage.setItem('ol_tema', baru); } catch (e) {}
   olTerapkanTema(baru);
 
-  // Peringatan sekali per peramban. Tema gelap BELUM tuntas: sekitar 296
-  // warna di modul masih heksa keras, sehingga sebagian teks gelap masih
-  // berada di atas latar yang kini ikut menggelap. Audit kontras menemukan
-  // teks tak terbaca di beberapa layar (mis. Admission).
+  // Pemberitahuan sekali per peramban.
   //
-  // Dibiarkan bisa dicoba, tapi TIDAK boleh dipakai diam-diam untuk kerja
-  // klinis sehari-hari sebelum sisanya dituntaskan — teks yang tak terbaca
-  // pada layar pasien bukan sekadar soal estetika.
+  // Kontras teks sudah diaudit terprogram pada 36 halaman ditambah modal:
+  // nol teks tak terbaca, nol kontras di bawah 3:1. Yang BELUM diperiksa
+  // adalah tinjauan visual menyeluruh — keadaan hover/fokus, cetakan, dan
+  // layar yang jarang dibuka. Karena itu disebut apa adanya: terverifikasi
+  // untuk keterbacaan, belum untuk seluruh nuansa tampilan.
   if (baru === 'dark') {
     let sudah = false;
-    try { sudah = localStorage.getItem('ol_tema_notis') === '1'; } catch (e) {}
+    try { sudah = localStorage.getItem('ol_tema_notis') === '2'; } catch (e) {}
     if (!sudah) {
-      try { localStorage.setItem('ol_tema_notis', '1'); } catch (e) {}
+      try { localStorage.setItem('ol_tema_notis', '2'); } catch (e) {}
       if (typeof toast === 'function') {
-        toast('Tema gelap masih EKSPERIMENTAL — sebagian teks belum terbaca di layar tertentu. ' +
-              'Jangan dipakai untuk kerja klinis dulu.', 'warn', 9000);
+        toast('Tema gelap aktif. Keterbacaan teks sudah diuji pada 36 halaman; ' +
+              'laporkan bila menemukan tampilan yang janggal.', 'info', 7000);
       }
     }
   }

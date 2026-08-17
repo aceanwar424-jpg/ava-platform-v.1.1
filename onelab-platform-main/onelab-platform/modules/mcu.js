@@ -1562,7 +1562,7 @@ async function printRAB(projectId) {
   w.document.write(`
     <html><head><title>RAB — ${p.project_name}</title>
     <style>
-      body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:#1E293B}
+      body{font-family:Arial,sans-serif;font-size:11px;padding:20px;color:var(--ink-07)}
       h2{margin-bottom:2px} .sub{color:#666;margin-bottom:16px;font-size:12px}
       table{width:100%;border-collapse:collapse;margin-bottom:14px}
       th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
@@ -1797,7 +1797,7 @@ async function openStepForm(projectId, stageId) {
     </div>
 
     ${gateUnmet.length?`
-    <div style="background:var(--danger-soft);border-left:4px solid #EF4444;border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
+    <div style="background:var(--danger-soft);border-left:4px solid var(--danger);border-radius:var(--r);padding:12px 16px;margin-bottom:14px">
       <div style="font-weight:700;color:var(--danger-strong);margin-bottom:6px">Gate Condition Belum Terpenuhi</div>
       ${gateUnmet.map(g=>`<div style="font-size:12.5px;color:var(--danger-strong);margin-bottom:4px">• ${g}</div>`).join('')}
       <div style="font-size:11.5px;color:#9CA3AF;margin-top:8px">Anda masih bisa melihat & mengisi form ini, namun tidak bisa menandai sebagai Done.</div>

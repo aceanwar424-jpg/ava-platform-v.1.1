@@ -58,7 +58,7 @@ function renderReportTab(){
             const flag=r.result_numeric!=null&&r.normal_max!=null&&r.result_numeric>r.normal_max?'H'
                       :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
             const crit=isCriticalResult(r);
-            return `<tr style="border-bottom:1px solid #f1f5f9">
+            return `<tr style="border-bottom:1px solid var(--bg2)">
               <td style="padding:6px 10px;font-weight:600">${r.item_name||r.product_name||'—'}${r.item_name?`<div style="font-size:9px;color:var(--gray);font-weight:400">${r.product_name}</div>`:''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${col}">${r.result_value||'—'}${crit?' ':''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
@@ -136,7 +136,7 @@ async function showTrend(patientName, productId, productName, itemId=null){
     <table style="width:100%;font-size:12px;border-collapse:collapse;margin-top:12px">
       <thead><tr style="background:var(--lgray)"><th style="padding:5px 8px;text-align:left">Tanggal</th><th style="padding:5px 8px;text-align:left">Hasil</th></tr></thead>
       <tbody>${data.slice().reverse().map(d=>{const c=labColor(d.color_code);
-        return `<tr style="border-bottom:1px solid #f1f5f9"><td style="padding:5px 8px">${new Date(d.created_at).toLocaleString('id-ID')}</td>
+        return `<tr style="border-bottom:1px solid var(--bg2)"><td style="padding:5px 8px">${new Date(d.created_at).toLocaleString('id-ID')}</td>
         <td style="padding:5px 8px;font-weight:700;color:${c}">${d.result_value} ${d.unit||''}</td></tr>`;}).join('')}</tbody>
     </table>
     <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`);
@@ -263,7 +263,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       body{
         font-family:Arial,Helvetica,sans-serif;
         font-size:11.5px;
-        color:#1A2B3C;
+        color:var(--ink-04);
         margin:0;
         padding: ${isTemplate ? `${pTop} ${pRight} ${pBottom} ${pLeft}` : '10mm 10mm 15mm 10mm'};
         position: relative;
@@ -299,14 +299,14 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         letter-spacing: 0.05em;
         margin-bottom: 8px;
         text-transform: uppercase;
-        color: #1a2a3a;
+        color: var(--ink-27);
       }
       .pinfo{
         display: grid;
         grid-template-columns: 1.15fr 0.85fr;
         gap: 12px;
-        border-top: 1.5px solid #000;
-        border-bottom: 1.5px solid #000;
+        border-top: 1.5px solid var(--ink-01);
+        border-bottom: 1.5px solid var(--ink-01);
         padding: 6px 0;
         font-size: 11px;
         line-height: 1.5;
@@ -339,7 +339,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       table{width:100%;border-collapse:collapse;margin-bottom:4px}
       tr{page-break-inside:avoid}
       thead{display:table-header-group}
-      th{border-bottom: 1.5px solid #000; background:none; color:#000; padding:5px 8px;text-align:left;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
+      th{border-bottom: 1.5px solid var(--ink-01); background:none; color:#000; padding:5px 8px;text-align:left;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.02em}
       td{padding:4px 8px;border-bottom:1px solid #edf1f5;font-size:${cfg.table_font_size || '11px'}}
       .cat{background:${ac}18;color:${ac};font-weight:800;padding:4px 8px;font-size:11px;margin-top:10px;border-left:3px solid ${ac}}
       .flag{font-weight:800}.crit{color:var(--danger-strong)}
@@ -352,7 +352,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       .sign-cell{border:none;padding-top:10px}
       .signs{display:flex;justify-content:flex-end;margin-top:10px}
       .signs > div{width: 220px; font-size:11px; text-align: center;}
-      .signs .line{border-top:1px solid #000;padding-top:3px;font-weight:bold;}
+      .signs .line{border-top:1px solid var(--ink-01);padding-top:3px;font-weight:bold;}
       .signs em{color:var(--slate)}
       .disc{display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:12px;font-size:9.5px;color:#000;line-height:1.4}
       @media print{ .noprint{display:none} }
@@ -411,7 +411,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         <tbody>
           ${Object.entries(byCat).map(([cat,rows])=>`
             <tr class="cat-row">
-              <td colspan="${cfg.show_loinc?6:5}" style="background:var(--bg2);font-weight:800;font-size:11.5px;padding:6px 10px;border-bottom:1px solid #cbd5e1;color:${hc}">${cat.toUpperCase()}</td>
+              <td colspan="${cfg.show_loinc?6:5}" style="background:var(--bg2);font-weight:800;font-size:11.5px;padding:6px 10px;border-bottom:1px solid var(--border2);color:${hc}">${cat.toUpperCase()}</td>
             </tr>
             ${_labPrintCatRows(rows, cfg)}
           `).join('')}
@@ -422,7 +422,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
                 <div style="margin: 4px 0;">
                   <img src="${qrUrl}" style="width:70px;height:70px;object-fit:contain" alt="QR Signature">
                 </div>
-                <div class="line" style="width: 100%; border-top:1px solid #000; padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
+                <div class="line" style="width: 100%; border-top:1px solid var(--ink-01); padding-top:3px; font-weight:bold; margin-top:0;">${cfg.sign3_name || first.approved_by || '—'}</div>
               </div>
             </div>
           </td></tr>
@@ -432,7 +432,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
             <td colspan="${cfg.show_loinc?6:5}">
               <div class="run-footer">
                 ${cfg.footer_note ? `<div style="font-size:10px;color:#000;margin-top:8px;line-height:1.4">${cfg.footer_note}</div>` : ''}
-                <div class="disc" style="display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:8px;font-size:10px;color:#000;border-top:1px dashed #000;padding-top:6px">
+                <div class="disc" style="display:${cfg.hide_default_footer ? 'none' : 'block'};margin-top:8px;font-size:10px;color:#000;border-top:1px dashed var(--ink-01);padding-top:6px">
                   <div style="display:flex;justify-content:space-between">
                     <span><strong>Validator:</strong> ${validator}</span>
                     <span><strong>Approval:</strong> ${approver}</span>
@@ -495,7 +495,7 @@ function _labPrintCatRows(rows, cfg){
   return Object.entries(byProd).map(([prod,prows])=>{
     const isPanel = prows.length>1 || prows.some(r=>r.item_name);
     if(isPanel){
-      return `<tr><td colspan="${span}" style="background:#EEF2FF;font-weight:700;color:#3730A3;padding:5px 10px">${prod}</td></tr>`
+      return `<tr><td colspan="${span}" style="background:#EEF2FF;font-weight:700;color:var(--ink-05);padding:5px 10px">${prod}</td></tr>`
         + prows.map(r=>_labPrintRow(r,true,cfg)).join('');
     }
     return prows.map(r=>_labPrintRow(r,false,cfg)).join('');

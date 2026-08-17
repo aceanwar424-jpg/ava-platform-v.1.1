@@ -29,7 +29,7 @@ async function renderRLReports() {
     </div>
 
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:11px 14px;
-      margin-bottom:14px;font-size:12.5px;color:#7a4a12">
+      margin-bottom:14px;font-size:12.5px;color:var(--ink-03)">
       Angka di bawah adalah <b>rekapitulasi dari data operasional Anda</b>, siap disalin ke
       format resmi yang berlaku. Format RL berubah mengikuti peraturan — periksa definisi tiap
       indikator sebelum dikirimkan.

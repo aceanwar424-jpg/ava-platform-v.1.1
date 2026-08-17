@@ -163,7 +163,7 @@ function paintTimeline() {
           const jam = new Date(e.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
           return `<div style="position:relative;padding:8px 0 10px">
             <span style="position:absolute;left:-21px;top:11px;width:11px;height:11px;border-radius:50%;
-              background:${t.c};border:2px solid #fff;box-shadow:0 0 0 1px ${t.c}55"></span>
+              background:${t.c};border:2px solid var(--white);box-shadow:0 0 0 1px ${t.c}55"></span>
             <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
               <span style="color:${t.c};line-height:0">${typeof icon === 'function' ? icon(t.icon, 14) : ''}</span>
               <span style="font-size:10.5px;font-weight:700;color:${t.c};text-transform:uppercase;

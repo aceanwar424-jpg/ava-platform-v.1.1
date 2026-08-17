@@ -32,7 +32,7 @@ function renderWikiDocsTab(el){
       return `<tr>
         <td style="font-family:monospace;font-size:11px">${d.doc_code||'—'}<div style="color:var(--gray)">v${d.version||'1.0'}</div></td>
         <td><div style="font-weight:700;color:var(--navy)">${d.title||'—'}
-            ${d.is_template?`<span class="wiki-badge" style="background:#EDE9FE;color:#6D28D9;margin-left:4px">TEMPLATE ACUAN</span>`:''}
+            ${d.is_template?`<span class="wiki-badge" style="background:var(--tint-03);color:var(--ink-15);margin-left:4px">TEMPLATE ACUAN</span>`:''}
             ${overdue?`<span class="wiki-badge" style="background:var(--danger-soft);color:var(--danger-strong);margin-left:4px">Perlu Review</span>`:''}</div>
           ${d.summary?`<div style="font-size:10.5px;color:var(--gray);max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.summary}</div>`:''}</td>
         <td style="font-size:11.5px">${d.doc_type||'—'}</td>

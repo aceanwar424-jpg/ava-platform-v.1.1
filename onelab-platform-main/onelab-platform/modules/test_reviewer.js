@@ -407,8 +407,8 @@ function trStatusPill(status) {
   const map = {
     pending: '<span style="background:var(--bg3);color:var(--text3);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">Menunggu</span>',
     processing: '<span style="background:var(--warn-soft);color:var(--warn-deeper);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">Sedang Dianalisis...</span>',
-    done: '<span style="background:#DCFCE7;color:#166534;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">✓ Selesai</span>',
-    error: '<span style="background:#FEE2E2;color:#991B1B;padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">❌ Gagal</span>'
+    done: '<span style="background:var(--tint-01);color:var(--ink-06);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">✓ Selesai</span>',
+    error: '<span style="background:var(--tint-02);color:var(--ink-10);padding:3px 9px;border-radius:12px;font-size:11px;font-weight:700">❌ Gagal</span>'
   };
   return map[status] || '';
 }
@@ -434,7 +434,7 @@ function trJobBodyHTML(job) {
           <span style="font-size:11px;font-weight:800;color:var(--warn-deeper);text-transform:uppercase">✦ Ringkasan Awam</span>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(sum)}')">📋 Salin</button>
         </div>
-        <p style="margin:0;font-size:13.5px;color:#78350F;font-style:italic">"${trEsc(sum)}"</p>
+        <p style="margin:0;font-size:13.5px;color:var(--ink-29);font-style:italic">"${trEsc(sum)}"</p>
       </div>` : ''}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
@@ -447,10 +447,10 @@ function trJobBodyHTML(job) {
       </div>
       <div style="background:var(--success-soft);border:1px solid #BBF7D0;border-radius:10px;padding:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-          <strong style="font-size:12px;color:#166534">2. Manfaat Baru</strong>
+          <strong style="font-size:12px;color:var(--ink-06)">2. Manfaat Baru</strong>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(man)}')">📋 Salin</button>
         </div>
-        <div style="font-size:13px;color:#14532D;line-height:1.5">${trParas(man)}</div>
+        <div style="font-size:13px;color:var(--ink-30);line-height:1.5">${trParas(man)}</div>
       </div>
     </div>
 
@@ -474,7 +474,7 @@ function trJobBodyHTML(job) {
       </div>` : ''}
 
     ${comp ? `<div style="font-size:12px;color:var(--text3);background:var(--bg2);padding:8px 10px;border-radius:6px;margin-bottom:8px"><b>Regulasi & Kepatuhan:</b> ${trEsc(comp)}</div>` : ''}
-    ${warn ? `<div style="font-size:12px;color:#991B1B;background:#FEE2E2;padding:8px 10px;border-radius:6px"><b>⚠️ Perhatian:</b> ${trEsc(warn)}</div>` : ''}
+    ${warn ? `<div style="font-size:12px;color:var(--ink-10);background:var(--tint-02);padding:8px 10px;border-radius:6px"><b>⚠️ Perhatian:</b> ${trEsc(warn)}</div>` : ''}
   `;
 }
 

@@ -363,7 +363,7 @@ function audRowHtml(r) {
   return `
     <div style="position:relative;padding:9px 0 10px;border-bottom:1px solid var(--border)">
       <span style="position:absolute;left:-21px;top:13px;width:11px;height:11px;border-radius:50%;
-        background:${m.c};border:2px solid #fff;box-shadow:0 0 0 1px ${m.c}55"></span>
+        background:${m.c};border:2px solid var(--white);box-shadow:0 0 0 1px ${m.c}55"></span>
 
       <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
         <span style="color:${m.c};line-height:0">${audIco(m.ic, 14)}</span>

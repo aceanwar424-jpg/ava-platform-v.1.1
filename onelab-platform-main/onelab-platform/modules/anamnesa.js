@@ -170,7 +170,7 @@ async function openAnamnesaForm(admissionId) {
       <textarea id="an-note" rows="3" placeholder="Catatan anamnesa, keluhan singkat, kondisi pasien...">${an.notes||an.chief_complaint||''}</textarea></div>
     <div class="form-group"><label>Petugas</label><input type="text" id="an-nurse" value="${an.nurse_name||(getUserName?getUserName():'')}"></div>
 
-    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:#1E40AF">
+    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:var(--ink-11)">
       ${hasLab
         ? 'Kunjungan ini <strong>ada tes lab</strong>. Setelah anamnesa disimpan, barcode akan digenerate & dicetak, lalu pasien dilempar ke <strong>Lab</strong>.'
         : 'ℹ️ Kunjungan ini <strong>tanpa tes lab</strong>. Setelah anamnesa disimpan, status menjadi <strong>Selesai</strong>.'}
@@ -378,7 +378,7 @@ function renderExamTab(){
 }
 
 function examPatientHTML(a){
-  const row=(l,v)=>`<div style="display:flex;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px">
+  const row=(l,v)=>`<div style="display:flex;padding:5px 0;border-bottom:1px solid var(--bg2);font-size:12.5px">
     <div style="width:140px;color:var(--gray);flex-shrink:0">${l}</div><div style="font-weight:600">${v||'—'}</div></div>`;
   return `<div class="exam-sec">Data Pasien</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px">

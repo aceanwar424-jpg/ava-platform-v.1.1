@@ -135,7 +135,7 @@ async function crmPaintBoard(el) {
             Perkiraan ${formatCurrency(total)}${s.probability != null ? ` · ${s.probability}%` : ''}</div>
           ${items.slice(0, 12).map(d => `
             <div style="background:var(--white);border:1px solid var(--border);border-radius:7px;padding:8px 10px;
-              margin-bottom:6px;${idleIds.has(d.id) ? 'border-left:3px solid #B45309' : ''}">
+              margin-bottom:6px;${idleIds.has(d.id) ? 'border-left:3px solid var(--warn-deep)' : ''}">
               <div style="font-size:12.5px;font-weight:600">${d.deal_name || d.title || crmPartnerName(d.partner_id)}</div>
               <div style="font-size:11px;color:var(--gray)">${crmPartnerName(d.partner_id)}</div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">

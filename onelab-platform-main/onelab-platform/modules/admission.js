@@ -49,7 +49,7 @@ function injectProShell(){
   if(document.getElementById('pro-shell-style')) return;
   const s=document.createElement('style'); s.id='pro-shell-style';
   s.textContent=`
-    .pro-shell{ font-size:12.5px;color:#1A2B3C; }
+    .pro-shell{ font-size:12.5px;color:var(--ink-04); }
     .pro-shell .pro-header{ display:flex;justify-content:space-between;align-items:center;
       background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:9px 16px;margin-bottom:12px;flex-wrap:wrap;gap:8px; }
     .pro-shell .pro-header h1{ font-size:16px;margin:0;color:var(--on-accent);font-weight:800;display:flex;align-items:center;gap:8px; }
@@ -57,7 +57,7 @@ function injectProShell(){
     .pro-shell .pro-kpi{ display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:12px; }
     .pro-shell .pro-kpi > div{ padding:8px 10px !important;border-radius:8px !important; }
     .pro-shell .pro-toolbar{ display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px; }
-    .pro-shell .pro-chip{ font-size:11.5px;padding:5px 11px;border-radius:7px;border:1px solid #d3dae1;background:var(--white);cursor:pointer;font-weight:600;color:#1A2B3C; }
+    .pro-shell .pro-chip{ font-size:11.5px;padding:5px 11px;border-radius:7px;border:1px solid #d3dae1;background:var(--white);cursor:pointer;font-weight:600;color:var(--ink-04); }
     .pro-shell .pro-chip.active{ background:var(--teal);color:var(--on-accent);border-color:var(--teal); }
     .pro-shell .pro-grid{ width:100%;border-collapse:collapse;background:var(--white);border:1px solid #d3dae1;border-radius:8px;overflow:hidden; }
     .pro-shell .pro-grid th{ background:var(--navy-deep);color:var(--on-accent);font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
@@ -449,7 +449,7 @@ function renderServiceLines() {
                      style="display:none;position:absolute;top:100%;left:0;right:0;max-height:200px;overflow-y:auto;background:var(--white);border:1px solid var(--border);border-radius:4px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,0.15)">
                   <div class="custom-select-option" 
                        onclick="selectServiceProduct(${i}, '', 0, '')"
-                       style="padding:6px 10px;cursor:pointer;font-size:11px;color:var(--text-muted);border-bottom:1px solid #f1f5f9;text-align:left">
+                       style="padding:6px 10px;cursor:pointer;font-size:11px;color:var(--text-muted);border-bottom:1px solid var(--bg2);text-align:left">
                     -- Pilih Tes/Layanan --
                   </div>
                   ${admMasterProducts.map(pr => {
@@ -461,7 +461,7 @@ function renderServiceLines() {
                          data-name="${pr.nama_tes}"
                          data-label="${label.toLowerCase()}"
                          onclick="selectServiceProduct(${i}, ${pr.id}, ${pr.harga_normal || 0}, '${pr.nama_tes.replace(/'/g, "\\'")}')"
-                         style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #f1f5f9;text-align:left;${row.product_id == pr.id ? 'background:var(--border);font-weight:700' : ''}"
+                         style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid var(--bg2);text-align:left;${row.product_id == pr.id ? 'background:var(--border);font-weight:700' : ''}"
                          onmouseover="this.style.background='#f1f5f9'"
                          onmouseout="if(${row.product_id != pr.id}) this.style.background='none'; else this.style.background='#e2e8f0'">
                       ${label}

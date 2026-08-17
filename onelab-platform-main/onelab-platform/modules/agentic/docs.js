@@ -117,8 +117,8 @@ function renderAgDocsTab(el){
       <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Alur Dokumen — pilih sesuai keadaan dokumen Anda</div>
 
       <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:9px 11px;margin-bottom:8px">
-        <div style="font-size:11.5px;font-weight:800;color:#065F46;margin-bottom:3px">A · Dokumen SUDAH FINAL (sudah ditinjau &amp; sesuai template)</div>
-        <div style="font-size:11px;color:#065F46;line-height:1.45">
+        <div style="font-size:11.5px;font-weight:800;color:var(--ink-12);margin-bottom:3px">A · Dokumen SUDAH FINAL (sudah ditinjau &amp; sesuai template)</div>
+        <div style="font-size:11px;color:var(--ink-12);line-height:1.45">
           Upload → <b>selesai</b>. Ingest hanya <b>mendaftarkan</b> dokumen (untuk registry, gap analysis,
           deteksi tumpang tindih, tanda tangan). Berkas asli Anda <b>disimpan utuh</b> — ambil lagi lewat tombol
           <b>${icon('download',11)} Asli</b>. <u>Jangan pakai Review Final</u> — itu merakit ulang dari teks dan
@@ -180,7 +180,7 @@ function renderAgDocsTab(el){
 
     ${_agDocsSub==='registry' ? `
     ${missing.length ? `
-    <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
+    <div class="ag-detail" style="margin-bottom:12px;border-left:4px solid var(--danger)">
       <div style="font-size:12px;font-weight:800;color:var(--danger-deep);margin-bottom:6px">Dokumen Wajib yang Belum Ada (${missing.length})</div>
       ${missing.slice(0,10).map(d=>`<div style="font-size:12px;padding:4px 0;border-bottom:1px dashed #fecaca">
         ${agDocChip(d.status)} ${agEsc(d.title)} <span style="color:var(--gray)">· ${agEsc(d.iso_clause||'')}</span></div>`).join('')}
@@ -464,11 +464,11 @@ async function agRenderAuditPanel(){
   } else {
     const s = d.summary||{}; const findings = d.findings||[]; const capa = d.capa||[];
     inner = `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-        <span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">MAYOR ${s.open_mayor||0}</span>
+        <span class="ag-badge" style="background:var(--tint-02);color:var(--danger-deep);border:1px solid var(--danger-tint)">MAYOR ${s.open_mayor||0}</span>
         <span class="ag-badge" style="background:var(--warn-soft);color:var(--warn-deeper);border:1px solid #FCD34D">MINOR ${s.open_minor||0}</span>
-        <span class="ag-badge" style="background:#E0F2FE;color:#075985;border:1px solid #7DD3FC">OBSERVASI ${s.open_obs||0}</span>
-        <span class="ag-badge" style="background:var(--bg2);color:var(--text2);border:1px solid #CBD5E1">CAPA terbuka ${s.capa_open||0}</span>
-        ${s.capa_overdue?`<span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">CAPA lewat tempo ${s.capa_overdue}</span>`:''}
+        <span class="ag-badge" style="background:#E0F2FE;color:var(--ink-17);border:1px solid #7DD3FC">OBSERVASI ${s.open_obs||0}</span>
+        <span class="ag-badge" style="background:var(--bg2);color:var(--text2);border:1px solid var(--border2)">CAPA terbuka ${s.capa_open||0}</span>
+        ${s.capa_overdue?`<span class="ag-badge" style="background:var(--tint-02);color:var(--danger-deep);border:1px solid var(--danger-tint)">CAPA lewat tempo ${s.capa_overdue}</span>`:''}
       </div>
       <div style="font-size:11.5px;font-weight:800;color:var(--navy-deep);margin:6px 0 4px">Temuan terbuka (${findings.length})</div>
       ${findings.length?`<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
@@ -1174,7 +1174,7 @@ function agRenderFinalReview(){
       Template: <b>${agEsc(st.tpl.name || '—')}</b> · ${terisi}/${st.phs.length} kolom terisi${st.dariStruktur ? ` (${st.dariStruktur} isi verbatim dari struktur dokumen)` : ''}
       ${st.contentLen != null ? ` · isi sumber ${st.contentLen.toLocaleString('id-ID')} karakter` : ''}
     </div>
-    <div class="status-box" style="margin-bottom:10px;font-size:11px;background:#ECFDF5;border-color:#A7F3D0;color:#065F46">
+    <div class="status-box" style="margin-bottom:10px;font-size:11px;background:#ECFDF5;border-color:#A7F3D0;color:var(--ink-12)">
       Layar ini <b>merakit ulang</b> dokumen dari teks + template. Kalau dokumen Anda <b>sudah final</b>
       (sudah ditinjau &amp; sesuai template), tidak perlu dirakit ulang — tutup layar ini dan pakai tombol
       <b>Asli</b> di registry untuk mengambil berkas Anda yang utuh.
@@ -1182,7 +1182,7 @@ function agRenderFinalReview(){
     ${st.gagal ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(st.gagal)}</div>` : ''}
     ${catatan ? `<div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px">⚠️ ${agEsc(catatan)}</div>` : ''}
     ${st.adaIsi === false ? `
-      <div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px;border-left:4px solid #B91C1C">
+      <div class="status-box status-warn" style="margin-bottom:10px;font-size:11.5px;border-left:4px solid var(--danger-deep)">
         <b>Template ini tidak punya kolom untuk ISI dokumen.</b>
         Semua ${st.phs.length} kolomnya berupa metadata (judul, nomor, tanggal, penyetuju).
         Akibatnya bagian <b>Tujuan / Ruang Lingkup / Prosedur</b> pada hasil akhir tetap memakai
@@ -1224,8 +1224,8 @@ function agRenderFinalReview(){
           const kosong = !v.trim();
           const src = (st.source && st.source[k]) || (kosong?'kosong':'ai');
           const srcBadge = src==='struktur'
-            ? '<span style="font-size:9px;font-weight:700;color:var(--success-deep);background:#DCFCE7;padding:1px 5px;border-radius:8px">dari struktur</span>'
-            : src==='ai' ? '<span style="font-size:9px;font-weight:700;color:#3730A3;background:#EEF2FF;padding:1px 5px;border-radius:8px">AI</span>' : '';
+            ? '<span style="font-size:9px;font-weight:700;color:var(--success-deep);background:var(--tint-01);padding:1px 5px;border-radius:8px">dari struktur</span>'
+            : src==='ai' ? '<span style="font-size:9px;font-weight:700;color:var(--ink-05);background:#EEF2FF;padding:1px 5px;border-radius:8px">AI</span>' : '';
           return `<tr style="border-bottom:1px solid var(--border)">
             <td style="padding:6px 10px;font-family:ui-monospace,monospace;font-size:11px;vertical-align:top;color:${kosong ? '#B45309' : 'var(--navy)'}">
               {{${agEsc(k)}}}<div style="margin-top:2px">${kosong ? '<span style="font-size:10px;font-style:italic">kosong</span>' : srcBadge}</div></td>
@@ -1385,7 +1385,7 @@ function agDocxXmlToHtml(xml){
       ${rows.map(tr => `<tr>${[...tr.children].filter(n => n.localName === 'tc').map(tc => {
         const inner = [...tc.children].map(n =>
           n.localName === 'p' ? paraHtml(n) : n.localName === 'tbl' ? tableHtml(n) : '').join('');
-        return `<td style="border:1px solid #cbd5e1;padding:5px 8px;vertical-align:top">${inner}</td>`;
+        return `<td style="border:1px solid var(--border2);padding:5px 8px;vertical-align:top">${inner}</td>`;
       }).join('')}</tr>`).join('')}
     </table>`;
   }
@@ -1415,7 +1415,7 @@ async function agRenderDocPreview(){
       const sisa = html.replace(/\{\{([^{}]+)\}\}/g,
         '<mark style="background:var(--warn-soft);color:var(--warn-deeper);padding:0 3px;border-radius:3px">{{$1}}</mark>');
       el.innerHTML = `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;
-        padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:#1A2B3C">
+        padding:26px 30px;font-family:Georgia,'Times New Roman',serif;font-size:12.5px;line-height:1.55;color:var(--ink-04)">
         ${sisa}</div>`;
       return;
     }
@@ -1427,14 +1427,14 @@ async function agRenderDocPreview(){
   const content = (st.doc && st.doc.extracted_meta && st.doc.extracted_meta.full_text) || '';
   const renderedMap = Object.entries(st.map || {})
     .filter(([k, v]) => String(v).trim())
-    .map(([k, v]) => `<div style="margin-bottom:12px;border-bottom:1px solid #f1f5f9;padding-bottom:8px">
+    .map(([k, v]) => `<div style="margin-bottom:12px;border-bottom:1px solid var(--bg2);padding-bottom:8px">
       <div style="font-size:11px;font-weight:700;color:var(--info);text-transform:uppercase;letter-spacing:0.5px">${agEsc(k)}</div>
-      <div style="font-size:13px;color:#1E293B;margin-top:2px;white-space:pre-wrap">${agEsc(v)}</div>
+      <div style="font-size:13px;color:var(--ink-07);margin-top:2px;white-space:pre-wrap">${agEsc(v)}</div>
     </div>`).join('');
 
   el.innerHTML = `<div style="background:var(--white);border:1px solid var(--border);border-radius:8px;
-    padding:24px 28px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:#1E293B">
-    <div style="border-bottom:2px solid #0A2342;padding-bottom:10px;margin-bottom:16px">
+    padding:24px 28px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.6;color:var(--ink-07)">
+    <div style="border-bottom:2px solid var(--navy-deep);padding-bottom:10px;margin-bottom:16px">
       <div style="font-size:16px;font-weight:800;color:var(--navy-deep)">${agEsc(st.doc.title)}</div>
       <div style="font-size:11.5px;color:var(--gray);margin-top:4px">${agEsc(st.doc.doc_number || '—')} · ${agEsc(st.doc.doc_type)} L${st.doc.doc_level} · ${agEsc(st.doc.department || '')} · Rev ${st.doc.current_revision || 1}</div>
     </div>

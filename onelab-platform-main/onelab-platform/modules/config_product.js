@@ -137,7 +137,7 @@ function renderProdTable(data) {
       <td style="font-family:monospace;font-size:11px;color:var(--gray)">${p.loinc_code||'—'}</td>
       <td>
         <div style="font-weight:600;color:var(--navy)">${p.nama_tes||'—'}
-          ${p._items>1?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL ${p._items}</span>`
+          ${p._items>1?`<span style="background:var(--tint-03);color:var(--ink-15);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL ${p._items}</span>`
             :p._items===1?`<span style="background:var(--bg2);color:var(--text-dim);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
             :`<span title="Belum ada code item" style="background:var(--warn-soft);color:var(--warn-deeper);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">⚠ 0 item</span>`}
         </div>
@@ -654,7 +654,7 @@ function renderRRTable(data) {
       return `<tr>
         <td>
           <div style="font-size:12px;font-weight:600;color:var(--navy)">${prodName}
-            ${r.item_code?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 5px;border-radius:5px;font-size:9px;font-weight:700;font-family:monospace">${r.item_code}</span>`:''}</div>
+            ${r.item_code?`<span style="background:var(--tint-03);color:var(--ink-15);padding:1px 5px;border-radius:5px;font-size:9px;font-weight:700;font-family:monospace">${r.item_code}</span>`:''}</div>
           ${prodCode?`<div style="font-size:10px;color:var(--gray);font-family:monospace">${prodCode}</div>`:''}
         </td>
         <td style="font-size:12px;text-align:center">${r.gender||'All'}</td>
@@ -668,7 +668,7 @@ function renderRRTable(data) {
         </td>
         <td style="font-size:12px;font-weight:600;white-space:nowrap">
           ${r.value_type==='qualitative'
-            ? `<span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:8px;font-size:11px">💬 ${r.expected_values||'—'}</span>`
+            ? `<span style="background:#EFF6FF;color:var(--ink-11);padding:2px 8px;border-radius:8px;font-size:11px">💬 ${r.expected_values||'—'}</span>`
             : (r.range_min!==null&&r.range_max!==null?`${r.range_min} – ${r.range_max}`:'—')}
         </td>
         <td style="font-size:11px;color:var(--gray)">${r.unit||'—'}</td>

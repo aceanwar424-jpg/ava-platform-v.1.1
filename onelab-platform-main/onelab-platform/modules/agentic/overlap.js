@@ -176,7 +176,7 @@ function agOverlapPaint(rows){
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
         <div style="font-size:11px;font-weight:800;color:var(--navy)">
           Kemiripan ${(r.score*100).toFixed(0)}%
-          <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;${r.method==='semantic'?'background:#EDE9FE;color:#5B21B6':'background:#E0F2FE;color:#075985'}">${r.method==='semantic'?'makna':'kata'}</span>
+          <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;${r.method==='semantic'?'background:var(--tint-03);color:var(--ink-20)':'background:#E0F2FE;color:var(--ink-17)'}">${r.method==='semantic'?'makna':'kata'}</span>
           ${agOvTypeChip(r.overlap_type)}
           ${r.status!=='DETECTED'?`<span style="font-size:10px;color:var(--gray);font-weight:600">· ${agEsc(r.status)}${r.reviewed_by?' oleh '+agEsc(r.reviewed_by):''}</span>`:''}
         </div>
@@ -191,7 +191,7 @@ function agOverlapPaint(rows){
         <div><b>${agEsc(r.b_number||'—')}</b> ${agEsc(r.b_title||'')}<div style="font-size:10px;color:var(--gray)">${agEsc(r.b_dept||'')}</div></div>
       </div>
       ${(r.shared_terms&&r.shared_terms.length)?`<div style="font-size:10.5px;color:var(--text2);margin-top:5px">
-        <span style="color:var(--gray)">Istilah beririsan:</span> ${r.shared_terms.map(t=>`<span style="background:#EEF2FF;color:#3730A3;padding:1px 6px;border-radius:8px;margin-right:3px">${agEsc(t)}</span>`).join('')}
+        <span style="color:var(--gray)">Istilah beririsan:</span> ${r.shared_terms.map(t=>`<span style="background:#EEF2FF;color:var(--ink-05);padding:1px 6px;border-radius:8px;margin-right:3px">${agEsc(t)}</span>`).join('')}
         ${(r.shared_clauses&&r.shared_clauses.length)?` · <span style="color:var(--gray)">klausul:</span> ${r.shared_clauses.map(c=>agEsc(c)).join(', ')}`:''}</div>`:''}
       ${r.recommendation?`<div style="font-size:11px;color:var(--text2);margin-top:4px"><b>Anjuran:</b> ${agEsc(r.recommendation)}</div>`:''}
     </div>`;

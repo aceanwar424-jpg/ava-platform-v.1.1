@@ -169,7 +169,7 @@ async function wikiPrependOfficialDocs(el){
   if(!rows.length) return;
   const box = document.createElement('div');
   box.innerHTML = `
-    <div class="wiki-card" style="margin-bottom:12px;border-left:4px solid #22C55E">
+    <div class="wiki-card" style="margin-bottom:12px;border-left:4px solid var(--success-strong)">
       <div class="wiki-sec" style="margin-bottom:8px">📌 Dokumen Resmi — diterbitkan via Agentic AI (${rows.length})</div>
       <div style="overflow-x:auto"><table class="pro-grid" style="width:100%;font-size:11.5px">
         <thead><tr><th>No. Dokumen</th><th>Judul</th><th>Jenis</th><th>Dept</th><th>Rev</th><th>Berlaku</th><th>Review</th><th></th></tr></thead>
@@ -216,7 +216,7 @@ function injectWikiStyle(){
   if(document.getElementById('wiki-style')) return;
   const s=document.createElement('style'); s.id='wiki-style';
   s.textContent=`
-    .wiki-drop{ border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;background:var(--bg);cursor:pointer;transition:.15s }
+    .wiki-drop{ border:2px dashed var(--border2);border-radius:10px;padding:20px;text-align:center;background:var(--bg);cursor:pointer;transition:.15s }
     .wiki-drop:hover,.wiki-drop.over{ border-color:var(--teal);background:#eefaf8 }
     .wiki-out{ background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
       font-size:13px;line-height:1.65;white-space:pre-wrap;max-height:460px;overflow:auto }

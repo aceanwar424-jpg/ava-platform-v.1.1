@@ -105,7 +105,7 @@ function renderPkgList() {
             </div>
 
             ${p.persiapan?`
-              <div style="background:var(--warn-soft2);border-radius:6px;padding:6px 8px;margin-top:8px;font-size:11px;color:#5D4037">
+              <div style="background:var(--warn-soft2);border-radius:6px;padding:6px 8px;margin-top:8px;font-size:11px;color:var(--ink-14)">
                 ⚠️ ${p.persiapan}
               </div>`:''}
 
@@ -336,7 +336,7 @@ async function renderConfigCorporate() {
         background: var(--white);
         border-radius: 12px;
         padding: 14px 18px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01), 0 2px 4px -1px rgba(0,0,0,0.01);
         display: flex;
         align-items: center;
@@ -361,7 +361,7 @@ async function renderConfigCorporate() {
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--border);
         border-radius: 10px;
         overflow: hidden;
         background: var(--white);
@@ -375,11 +375,11 @@ async function renderConfigCorporate() {
         letter-spacing: 0.05em;
         padding: 10px 14px;
         text-align: left;
-        border-bottom: 2px solid #cbd5e1;
+        border-bottom: 2px solid var(--border2);
       }
       .premium-table td {
         padding: 12px 14px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--bg2);
         vertical-align: middle;
         font-size: 12.5px;
       }
@@ -401,9 +401,9 @@ async function renderConfigCorporate() {
         <p style="font-size: 12.5px; color: var(--text3); margin-top: 4px; margin-bottom: 0;">Manajemen klien korporat — kontrak, billing, limit kredit</p>
       </div>
       <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">🏢 Health Facility</button>
-        <button class="btn btn-ghost btn-sm" onclick="navigate('import')" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">📥 Import</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid #cbd5e1; background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">📤 Export</button>
+        <button class="btn btn-ghost btn-sm" onclick="renderConfigHealthFacility()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid var(--border2); background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">🏢 Health Facility</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('import')" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid var(--border2); background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">📥 Import</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportCorporatesCSV()" style="padding: 8px 14px; font-size:12.5px; font-weight:600; border-radius:8px; border:1px solid var(--border2); background:var(--white); color:var(--text-dim); display:flex; align-items:center; gap:6px;">📤 Export</button>
         <button class="btn btn-teal btn-sm" onclick="renderCorporateDetail()" style="padding: 8px 16px; font-size:12.5px; font-weight:700; border-radius:8px; background:linear-gradient(135deg, #0f2963, #14b8a6); border:none; color:var(--on-accent); display:flex; align-items:center; gap:6px; cursor:pointer;">➕ Tambah Corporate</button>
       </div>
     </div>
@@ -413,17 +413,17 @@ async function renderConfigCorporate() {
       <div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div>
     </div>
 
-    <div style="background:var(--white); border:1px solid #e2e8f0; border-radius:12px; padding:16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
+    <div style="background:var(--white); border:1px solid var(--border); border-radius:12px; padding:16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01);">
       <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
         <div style="position:relative; flex:1; min-width:240px;">
           <span style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text4); font-size:14px;">🔍</span>
-          <input type="text" class="table-search" id="corp-q" placeholder="Cari nama perusahaan..." oninput="filterCorp()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid #cbd5e1; border-radius:8px; outline:none; font-size:12.5px; color:var(--text); box-sizing:border-box;">
+          <input type="text" class="table-search" id="corp-q" placeholder="Cari nama perusahaan..." oninput="filterCorp()" style="width:100%; padding:9px 12px 9px 34px; border:1px solid var(--border2); border-radius:8px; outline:none; font-size:12.5px; color:var(--text); box-sizing:border-box;">
         </div>
-        <select class="table-filter" id="corp-status" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid #cbd5e1; border-radius:8px; outline:none; background:var(--white); font-size:12.5px; color:var(--text);">
+        <select class="table-filter" id="corp-status" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid var(--border2); border-radius:8px; outline:none; background:var(--white); font-size:12.5px; color:var(--text);">
           <option value="">Semua Status</option>
           <option>Aktif</option><option>Non-Aktif</option><option>Suspend</option>
         </select>
-        <select class="table-filter" id="corp-billing" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid #cbd5e1; border-radius:8px; outline:none; background:var(--white); font-size:12.5px; color:var(--text);">
+        <select class="table-filter" id="corp-billing" onchange="filterCorp()" style="width: 160px; padding:9px; border:1px solid var(--border2); border-radius:8px; outline:none; background:var(--white); font-size:12.5px; color:var(--text);">
           <option value="">Semua Billing</option>
           <option>Invoice</option><option>Prepaid</option><option>Credit</option>
         </select>
@@ -492,9 +492,9 @@ function renderCorpTable(data) {
   const el=document.getElementById('corp-tbody');
   if (!el) return;
   if (!data.length) {
-    el.innerHTML=`<div class="empty-state" style="text-align:center; padding:40px; background:var(--bg); border-radius:12px; border:2px dashed #cbd5e1;">
+    el.innerHTML=`<div class="empty-state" style="text-align:center; padding:40px; background:var(--bg); border-radius:12px; border:2px dashed var(--border2);">
       <div style="font-size:40px; margin-bottom:12px;">🏢</div>
-      <h3 style="margin:0 0 6px 0; color:#1e293b;">${corpAll.length ? 'Tidak ada hasil pencarian' : 'Belum ada data corporate'}</h3>
+      <h3 style="margin:0 0 6px 0; color:var(--ink-07);">${corpAll.length ? 'Tidak ada hasil pencarian' : 'Belum ada data corporate'}</h3>
       <p style="color:var(--text3); font-size:12.5px; margin:0 0 16px 0;">Silakan tambah data corporate baru di atas.</p>
       <button class="btn btn-teal" onclick="renderCorporateDetail()" style="padding:8px 16px; border-radius:6px; background:#14b8a6; border:none; color:var(--on-accent); font-weight:600; cursor:pointer;">➕ Tambah Corporate</button>
     </div>`; return;
@@ -535,12 +535,12 @@ function renderCorpTable(data) {
                 🏢 ${c.corporate_name || '—'}
               </div>
               <div style="display: flex; gap: 6px; margin-top: 4px; align-items: center; flex-wrap: wrap;">
-                ${c.kode_corp ? `<span style="font-family: monospace; font-size: 10px; background: var(--bg2); color: var(--text-dim); padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0; font-weight: 600;">${c.kode_corp}</span>` : ''}
-                ${c.industry ? `<span style="font-size: 10px; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 600;">${c.industry}</span>` : ''}
+                ${c.kode_corp ? `<span style="font-family: monospace; font-size: 10px; background: var(--bg2); color: var(--text-dim); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border); font-weight: 600;">${c.kode_corp}</span>` : ''}
+                ${c.industry ? `<span style="font-size: 10px; background: #e0f2fe; color: var(--ink-09); padding: 2px 6px; border-radius: 4px; font-weight: 600;">${c.industry}</span>` : ''}
               </div>
             </td>
             <td>
-              <div style="font-weight: 600; color: #1e293b;">${c.pic_name || '—'}</div>
+              <div style="font-weight: 600; color: var(--ink-07);">${c.pic_name || '—'}</div>
               ${c.pic_phone ? `<div style="font-size: 11.5px; color: #0d9488; font-weight:500; margin-top: 2px;">📞 ${c.pic_phone}</div>` : ''}
             </td>
             <td>
@@ -562,7 +562,7 @@ function renderCorpTable(data) {
             </td>
             <td>
               <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-                <button onclick="renderCorporateDetail(${c.id})" title="Detail &amp; Edit" style="width:28px; height:28px; border-radius:6px; border:1px solid #bfdbfe; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
+                <button onclick="renderCorporateDetail(${c.id})" title="Detail &amp; Edit" style="width:28px; height:28px; border-radius:6px; border:1px solid #bfdbfe; background:#eff6ff; color:var(--ink-23); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='#dbeafe';" onmouseout="this.style.background='#eff6ff';">
                   ${icon('edit', 12)}
                 </button>
                 <button onclick="deleteCorp(${c.id})" title="Hapus" style="width:28px; height:28px; border-radius:6px; border:1px solid #fecaca; background:var(--danger-soft); color:var(--danger-strong); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.15s ease;" onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
@@ -583,13 +583,13 @@ function _caStyleTag() {
   return `<style>
     .corp-acct {
       font-family: 'Outfit', sans-serif;
-      color: #1e293b;
+      color: var(--ink-07);
       font-size: 13px;
     }
     .corp-acct .tab-btn {
       text-align: left;
       padding: 10px 14px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border2);
       border-radius: 6px;
       background: var(--white);
       color: var(--navy-royal);
@@ -614,11 +614,11 @@ function _caStyleTag() {
       border-collapse: collapse;
       margin-bottom: 16px;
       font-size: 12.5px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border2);
     }
     .corp-acct .erp-form-table td {
       padding: 8px 12px;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border2);
       vertical-align: middle;
       background: var(--white);
     }
@@ -635,7 +635,7 @@ function _caStyleTag() {
     .corp-acct .erp-form-table input[type="date"],
     .corp-acct .erp-form-table select,
     .corp-acct .erp-form-table textarea {
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border2);
       border-radius: 4px;
       padding: 6px 10px;
       font-size: 12.5px;
@@ -651,7 +651,7 @@ function _caStyleTag() {
     }
     .corp-acct .erp-section-title {
       background-color: #d9ebf7;
-      border: 1px solid #cbd5e1;
+      border: 1px solid var(--border2);
       border-bottom: none;
       padding: 8px 12px;
       font-size: 13px;
@@ -695,7 +695,7 @@ async function renderCorporateDetail(id = null) {
     <div class="pro-shell corp-acct" style="max-width: 1200px; margin: 0 auto; padding: 10px;">
       
       <!-- Top Navigation Tabs Bar matching Virtu Digilab -->
-      <div style="display:flex; gap:20px; border-bottom:2px solid #cbd5e1; padding-bottom:6px; margin-bottom:12px;">
+      <div style="display:flex; gap:20px; border-bottom:2px solid var(--border2); padding-bottom:6px; margin-bottom:12px;">
         <span style="font-weight:700; color:var(--navy-royal); text-transform:uppercase; font-size:13px; cursor:pointer;" onclick="navigate('corporate')">Configuration</span>
         <span style="font-weight:700; color:var(--teal); text-transform:uppercase; font-size:13px; cursor:pointer;" onclick="navigate('corporate')">Corporate List</span>
       </div>
@@ -721,7 +721,7 @@ async function renderCorporateDetail(id = null) {
         </div>
 
         <!-- Right Side Panel Workspace -->
-        <div class="glass-card" style="padding:0; border: 1px solid #cbd5e1; border-radius:6px; background:var(--white); overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+        <div class="glass-card" style="padding:0; border: 1px solid var(--border2); border-radius:6px; background:var(--white); overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
           
           <!-- ==================== TAB: BUSINESS PARTNER ==================== -->
           <div class="tab-content" id="tab-content-partner" style="display:block;">
@@ -811,8 +811,8 @@ async function renderCorporateDetail(id = null) {
               </table>
               
               <!-- Tab Action Footer -->
-              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
-                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid #cbd5e1; padding:6px 16px;"><span style="color:var(--danger-strong);">&times;</span> Cancel</button>
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid var(--border2); padding-top:14px;">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid var(--border2); padding:6px 16px;"><span style="color:var(--danger-strong);">&times;</span> Cancel</button>
                 <button class="btn btn-teal btn-sm" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')" style="display:flex; align-items:center; gap:6px; padding:6px 16px;">💾 Save</button>
               </div>
             </div>
@@ -856,20 +856,20 @@ async function renderCorporateDetail(id = null) {
               <table class="erp-form-table">
                 <thead>
                   <tr style="background: var(--bg2); font-weight: 700; text-align: center;">
-                    <td style="padding:6px; border:1px solid #cbd5e1; width: 80px;">Primary</td>
-                    <td style="padding:6px; border:1px solid #cbd5e1;">Name</td>
-                    <td style="padding:6px; border:1px solid #cbd5e1;">Branch</td>
-                    <td style="padding:6px; border:1px solid #cbd5e1;">Account Number</td>
-                    <td style="padding:6px; border:1px solid #cbd5e1;">Account Name</td>
+                    <td style="padding:6px; border:1px solid var(--border2); width: 80px;">Primary</td>
+                    <td style="padding:6px; border:1px solid var(--border2);">Name</td>
+                    <td style="padding:6px; border:1px solid var(--border2);">Branch</td>
+                    <td style="padding:6px; border:1px solid var(--border2);">Account Number</td>
+                    <td style="padding:6px; border:1px solid var(--border2);">Account Name</td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td style="padding:4px; border:1px solid #cbd5e1; text-align:center;"><input type="checkbox" checked disabled style="width:auto; margin:0;"></td>
-                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA" style="border:none; padding:4px; width:100%;"></td>
-                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Cabang" style="border:none; padding:4px; width:100%;"></td>
-                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}" placeholder="No Rekening" style="border:none; padding:4px; width:100%;"></td>
-                    <td style="padding:4px; border:1px solid #cbd5e1;"><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}" placeholder="Atas Nama" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid var(--border2); text-align:center;"><input type="checkbox" checked disabled style="width:auto; margin:0;"></td>
+                    <td style="padding:4px; border:1px solid var(--border2);"><input type="text" id="cf-bank" value="${esc(c.bank_name)}" placeholder="BCA" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid var(--border2);"><input type="text" id="cf-bankbranch" value="${esc(c.bank_branch)}" placeholder="Cabang" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid var(--border2);"><input type="text" id="cf-bankacc" value="${esc(c.bank_account_number)}" placeholder="No Rekening" style="border:none; padding:4px; width:100%;"></td>
+                    <td style="padding:4px; border:1px solid var(--border2);"><input type="text" id="cf-bankname" value="${esc(c.bank_account_name)}" placeholder="Atas Nama" style="border:none; padding:4px; width:100%;"></td>
                   </tr>
                 </tbody>
               </table>
@@ -906,13 +906,13 @@ async function renderCorporateDetail(id = null) {
 
               <!-- Contracts and Packages List -->
               ${id ? `
-                <div style="margin-top: 24px; border: 1px solid #cbd5e1; border-radius: 6px; padding: 16px;">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; border-bottom:1px solid #cbd5e1; padding-bottom:8px;">
+                <div style="margin-top: 24px; border: 1px solid var(--border2); border-radius: 6px; padding: 16px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; border-bottom:1px solid var(--border2); padding-bottom:8px;">
                     <h5 style="margin:0; font-size:14px; font-weight:700; color:var(--navy-royal);">Daftar Kontrak &amp; Paket</h5>
                     <button class="btn btn-teal btn-xs" onclick="openInlineContractForm(${id}, '${esc(c.corporate_name)}')">+ Kontrak Baru</button>
                   </div>
                   
-                  <div id="inline-contract-form-container" style="display:none; background: var(--bg); padding: 14px; border-radius: 8px; border: 1px dashed #cbd5e1; margin-bottom: 14px;"></div>
+                  <div id="inline-contract-form-container" style="display:none; background: var(--bg); padding: 14px; border-radius: 8px; border: 1px dashed var(--border2); margin-bottom: 14px;"></div>
                   
                   <div id="corporate-detail-contracts-list">
                     <div class="loading-row"><div class="spinner"></div></div>
@@ -921,8 +921,8 @@ async function renderCorporateDetail(id = null) {
               ` : ''}
 
               <!-- Tab Action Footer -->
-              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
-                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid #cbd5e1; padding:6px 16px;"><span style="color:var(--danger-strong);">&times;</span> Cancel</button>
+              <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px; border-top:1px solid var(--border2); padding-top:14px;">
+                <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="display:flex; align-items:center; gap:6px; border:1px solid var(--border2); padding:6px 16px;"><span style="color:var(--danger-strong);">&times;</span> Cancel</button>
                 <button class="btn btn-teal btn-sm" onclick="saveCorpDetail(${id || 'null'}, '${esc(kode)}')" style="display:flex; align-items:center; gap:6px; padding:6px 16px;">💾 Save</button>
               </div>
             </div>
@@ -936,8 +936,8 @@ async function renderCorporateDetail(id = null) {
             </div>
             
             <div style="display:flex; gap:8px; margin: 12px 0;">
-              <input class="table-search" id="erp-cemp-q" placeholder="Cari nama, NIK..." oninput="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', this.value, document.getElementById('erp-cemp-status').value)" style="flex:1; padding:8px 12px; border:1px solid #cbd5e1; border-radius:6px; outline:none;">
-              <select class="table-filter" id="erp-cemp-status" onchange="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', document.getElementById('erp-cemp-q').value, this.value)" style="width: 140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+              <input class="table-search" id="erp-cemp-q" placeholder="Cari nama, NIK..." oninput="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', this.value, document.getElementById('erp-cemp-status').value)" style="flex:1; padding:8px 12px; border:1px solid var(--border2); border-radius:6px; outline:none;">
+              <select class="table-filter" id="erp-cemp-status" onchange="loadTabCorpEmployees(${id}, '${esc(c.corporate_name)}', document.getElementById('erp-cemp-q').value, this.value)" style="width: 140px; padding:8px; border:1px solid var(--border2); border-radius:6px;">
                 <option value="">Semua Status</option>
                 <option value="Aktif">Aktif</option>
                 <option value="Non-Aktif">Non-Aktif</option>
@@ -946,9 +946,9 @@ async function renderCorporateDetail(id = null) {
             </div>
 
             <div style="overflow-x:auto;">
-              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid #cbd5e1;">
+              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid var(--border2);">
                 <thead>
-                  <tr style="background:var(--bg2); border-bottom:2px solid #cbd5e1;">
+                  <tr style="background:var(--bg2); border-bottom:2px solid var(--border2);">
                     <th style="padding:10px; text-align:center; width: 140px;">Action</th>
                     <th style="padding:10px; text-align:left;">Name</th>
                     <th style="padding:10px; text-align:left;">Employee Number (NIK)</th>
@@ -962,8 +962,8 @@ async function renderCorporateDetail(id = null) {
               </table>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
-              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid var(--border2); padding-top:12px;">
+              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid var(--border2); padding:6px 16px;">Tutup</button>
             </div>
           </div>
 
@@ -975,14 +975,14 @@ async function renderCorporateDetail(id = null) {
             
             <div style="padding:12px 0;">
               <!-- Identity Documents Grid -->
-              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
-                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--navy-royal);">
+              <div style="border: 1px solid var(--border2); border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
+                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid var(--border2); display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:var(--navy-royal);">
                   <span>Identity Documents</span>
                   <button class="btn btn-teal btn-xs" style="padding:4px 10px; font-size:11px; margin:0;" onclick="addIdentityDocRow()">➕ Add</button>
                 </div>
                 <table style="width:100%; border-collapse:collapse; font-size:12px;">
                   <thead>
-                    <tr style="background:var(--bg); border-bottom:1px solid #cbd5e1;">
+                    <tr style="background:var(--bg); border-bottom:1px solid var(--border2);">
                       <th style="padding:8px; width:60px; text-align:center;">Primary</th>
                       <th style="padding:8px; width:80px; text-align:center;">Action</th>
                       <th style="padding:8px; text-align:left;">ID</th>
@@ -995,49 +995,49 @@ async function renderCorporateDetail(id = null) {
                       <td style="padding:8px; text-align:center;"><input type="checkbox" id="cef-doc-primary" checked></td>
                       <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:var(--danger); border:1px solid #fecaca; background:var(--white); padding:2px 6px; margin:0;">Delete</button></td>
                       <td style="padding:8px;">
-                        <select id="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+                        <select id="cef-doc-type" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;">
                           <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
                         </select>
                       </td>
-                      <td style="padding:8px;"><input type="text" id="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
-                      <td style="padding:8px;"><input type="text" id="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+                      <td style="padding:8px;"><input type="text" id="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
+                      <td style="padding:8px;"><input type="text" id="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
                     </tr>
                   </tbody>
                 </table>
               </div>
 
               <!-- Personal Data Section -->
-              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
-                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; font-size:12.5px; color:var(--navy-royal);">Personal Data</div>
+              <div style="border: 1px solid var(--border2); border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
+                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid var(--border2); font-size:12.5px; color:var(--navy-royal);">Personal Data</div>
                 <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                   
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Employee Number *</label>
-                    <input type="text" id="cef-id" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-id" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Date Of Birth / Age *</label>
-                    <input type="date" id="cef-dob" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="date" id="cef-dob" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Department *</label>
-                    <input type="text" id="cef-dept" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-dept" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Place Of Birth *</label>
-                    <input type="text" id="cef-pob" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-pob" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Level *</label>
-                    <select id="cef-level" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-level" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option>STAFF</option><option>SUPERVISOR</option><option>MANAGER</option><option>DIRECTOR</option>
                     </select>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Blood Type *</label>
-                    <select id="cef-blood" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-blood" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option value="">—</option><option>A</option><option>B</option><option>AB</option><option>O</option>
                     </select>
                   </div>
@@ -1045,53 +1045,53 @@ async function renderCorporateDetail(id = null) {
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Name *</label>
                     <div style="display:flex; gap:8px;">
-                      <input type="text" id="cef-firstname" placeholder="First Name" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
-                      <input type="text" id="cef-lastname" placeholder="Last Name" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                      <input type="text" id="cef-firstname" placeholder="First Name" style="flex:1; border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
+                      <input type="text" id="cef-lastname" placeholder="Last Name" style="flex:1; border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                     </div>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Marital Status *</label>
-                    <select id="cef-marital" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-marital" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option value="">—</option><option>Single</option><option>Married</option><option>Divorced</option>
                     </select>
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Job Position *</label>
-                    <input type="text" id="cef-job" placeholder="Supervisor, Manager..." style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-job" placeholder="Supervisor, Manager..." style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Religion</label>
-                    <select id="cef-religion" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-religion" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option value="">—</option><option>Islam</option><option>Kristen Protestan</option><option>Katolik</option><option>Hindu</option><option>Buddha</option><option>Khonghucu</option>
                     </select>
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Email *</label>
-                    <input type="email" id="cef-email" placeholder="email@perusahaan.com" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="email" id="cef-email" placeholder="email@perusahaan.com" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Ethnic *</label>
-                    <input type="text" id="cef-ethnic" value="JAWA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-ethnic" value="JAWA" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Gender *</label>
-                    <select id="cef-gender" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-gender" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option value="M">Male</option><option value="F">Female</option>
                     </select>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Country of Birth *</label>
-                    <input type="text" id="cef-country" value="INDONESIA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-country" value="INDONESIA" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Mobile Phone *</label>
                     <div style="display:flex; gap:4px;">
-                      <select id="cef-phonecode" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);"><option>+62</option><option>+1</option><option>+65</option></select>
-                      <input type="text" id="cef-phone" placeholder="8xxxxxxxx" style="flex:1; border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                      <select id="cef-phonecode" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);"><option>+62</option><option>+1</option><option>+65</option></select>
+                      <input type="text" id="cef-phone" placeholder="8xxxxxxxx" style="flex:1; border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                     </div>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
@@ -1104,53 +1104,53 @@ async function renderCorporateDetail(id = null) {
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Status *</label>
-                    <select id="cef-status" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
+                    <select id="cef-status" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; background:var(--white); color:var(--text);">
                       <option value="Non-Aktif">Non-Aktif (Terdaftar)</option>
                       <option value="Aktif">Aktif</option>
                     </select>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Special Notes</label>
-                    <input type="text" id="cef-notes" placeholder="Alergi, kondisi khusus..." style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-notes" placeholder="Alergi, kondisi khusus..." style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                 </div>
               </div>
 
               <!-- Primary Address Section -->
-              <div style="border: 1px solid #cbd5e1; border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
-                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid #cbd5e1; font-size:12.5px; color:var(--navy-royal);">Primary Address</div>
+              <div style="border: 1px solid var(--border2); border-radius: 4px; margin-bottom: 16px; background:var(--white); overflow:hidden;">
+                <div style="background:var(--bg2); padding:8px 12px; font-weight:700; border-bottom:1px solid var(--border2); font-size:12.5px; color:var(--navy-royal);">Primary Address</div>
                 <div style="padding:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
                   
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:start; grid-row: span 2;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal); margin-top:6px;">Address *</label>
-                    <textarea id="cef-address" placeholder="Alamat Lengkap" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px; height:80px; resize:none;"></textarea>
+                    <textarea id="cef-address" placeholder="Alamat Lengkap" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px; height:80px; resize:none;"></textarea>
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">City *</label>
-                    <input type="text" id="cef-city" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-city" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Province *</label>
-                    <input type="text" id="cef-province" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-province" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Sub District *</label>
-                    <input type="text" id="cef-subdistrict" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-subdistrict" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Country *</label>
-                    <input type="text" id="cef-address-country" value="INDONESIA" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-address-country" value="INDONESIA" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">District *</label>
-                    <input type="text" id="cef-district" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-district" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
                   <div class="form-group-inline" style="display:grid; grid-template-columns: 140px 1fr; gap:10px; align-items:center;">
                     <label style="font-weight:600; font-size:11.5px; color:var(--navy-royal);">Postal Code *</label>
-                    <input type="text" id="cef-postal" style="border:1px solid #cbd5e1; border-radius:4px; padding:6px; font-size:12px;">
+                    <input type="text" id="cef-postal" style="border:1px solid var(--border2); border-radius:4px; padding:6px; font-size:12px;">
                   </div>
 
                 </div>
@@ -1159,8 +1159,8 @@ async function renderCorporateDetail(id = null) {
             </div>
 
             <!-- Form Action Footer -->
-            <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid #cbd5e1; padding-top:14px; margin-top:12px;">
-              <button class="btn btn-ghost btn-sm" onclick="closeCorpEmpFormInline()" style="border:1px solid #cbd5e1; padding:6px 16px;">Cancel</button>
+            <div style="display:flex; justify-content:flex-end; gap:8px; border-top:1px solid var(--border2); padding-top:14px; margin-top:12px;">
+              <button class="btn btn-ghost btn-sm" onclick="closeCorpEmpFormInline()" style="border:1px solid var(--border2); padding:6px 16px;">Cancel</button>
               <button class="btn btn-teal btn-sm" id="cef-submit-btn" onclick="saveCorpEmpInline()" style="padding:6px 20px; margin:0;">💾 Save</button>
             </div>
           </div>
@@ -1169,7 +1169,7 @@ async function renderCorporateDetail(id = null) {
           <div class="tab-content" id="tab-content-import" style="display:none; padding:16px;">
             <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Import Data Employee</div>
             
-            <div style="background:var(--warn-soft2); border-radius:8px; padding:12px; margin: 14px 0; font-size:12px; color:#b7791f; border: 1px solid #fef3c7;">
+            <div style="background:var(--warn-soft2); border-radius:8px; padding:12px; margin: 14px 0; font-size:12px; color:#b7791f; border: 1px solid var(--warn-soft);">
               ⚠️ Format CSV yang didukung: <strong>nama,nik,departemen,gender(M/F),tanggal_lahir,phone,email</strong>
             </div>
 
@@ -1186,13 +1186,13 @@ async function renderCorporateDetail(id = null) {
               </tr>
             </table>
 
-            <div id="erp-csv-preview" style="max-height:220px; overflow-y:auto; margin-top:14px; border:1px solid #cbd5e1; border-radius:6px; display:none;"></div>
+            <div id="erp-csv-preview" style="max-height:220px; overflow-y:auto; margin-top:14px; border:1px solid var(--border2); border-radius:6px; display:none;"></div>
 
-            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid #cbd5e1; padding-top:14px;">
-              <button class="btn btn-ghost btn-sm" onclick="clearImportInline()" style="border:1px solid #cbd5e1;">Clear</button>
-              <button class="btn btn-sm" onclick="downloadTemplateKaryawan()" style="border:1px solid #cbd5e1;">📋 Download Template</button>
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:20px; border-top:1px solid var(--border2); padding-top:14px;">
+              <button class="btn btn-ghost btn-sm" onclick="clearImportInline()" style="border:1px solid var(--border2);">Clear</button>
+              <button class="btn btn-sm" onclick="downloadTemplateKaryawan()" style="border:1px solid var(--border2);">📋 Download Template</button>
               <button class="btn btn-teal btn-sm" id="erp-csv-import-btn" onclick="processCSVImportInline(${id})" disabled>💾 Load File</button>
-              <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="border:1px solid #cbd5e1;">Cancel</button>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('corporate')" style="border:1px solid var(--border2);">Cancel</button>
             </div>
           </div>
 
@@ -1200,15 +1200,15 @@ async function renderCorporateDetail(id = null) {
           <div class="tab-content" id="tab-content-users" style="display:none; padding:16px;">
             <div class="erp-section-title" style="margin-top:0; border-top:none; border-left:none; border-right:none;">Corporate Users Settings</div>
             
-            <div style="background:var(--bg); border:1px solid #e2e8f0; border-radius:6px; padding:14px; margin-bottom:16px;">
+            <div style="background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:14px; margin-bottom:16px;">
               <span style="font-weight:700; color:var(--navy-royal); font-size:12.5px; display:block; margin-bottom:6px;">Link Existing User Account / Employee</span>
               <div style="display:flex; flex-direction:column; gap:8px;">
-                <input type="text" id="erp-corp-user-search-q" placeholder="🔍 Ketik nama/email untuk mencari..." oninput="filterCorpUserSelect(this.value)" style="padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px; outline:none; width:100%;">
+                <input type="text" id="erp-corp-user-search-q" placeholder="🔍 Ketik nama/email untuk mencari..." oninput="filterCorpUserSelect(this.value)" style="padding:8px; border:1px solid var(--border2); border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px; outline:none; width:100%;">
                 <div style="display:flex; gap:8px;">
-                  <select id="erp-corp-user-select" style="flex:1; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px;">
+                  <select id="erp-corp-user-select" style="flex:1; padding:8px; border:1px solid var(--border2); border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px;">
                     <!-- Dinamis load via JS -->
                   </select>
-                  <select id="erp-corp-role-select" style="width:140px; padding:8px; border:1px solid #cbd5e1; border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px;">
+                  <select id="erp-corp-role-select" style="width:140px; padding:8px; border:1px solid var(--border2); border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px;">
                     <option value="requestor">Requestor</option>
                     <option value="approver" selected>Approver</option>
                     <option value="">None / View Only</option>
@@ -1219,9 +1219,9 @@ async function renderCorporateDetail(id = null) {
             </div>
 
             <div style="overflow-x:auto;">
-              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid #cbd5e1;">
+              <table style="width:100%; font-size:12px; border-collapse:collapse; border:1px solid var(--border2);">
                 <thead>
-                  <tr style="background:var(--bg2); border-bottom:2px solid #cbd5e1;">
+                  <tr style="background:var(--bg2); border-bottom:2px solid var(--border2);">
                     <th style="padding:10px; text-align:left;">Name</th>
                     <th style="padding:10px; text-align:left;">Email</th>
                     <th style="padding:10px; text-align:left;">Phone</th>
@@ -1235,8 +1235,8 @@ async function renderCorporateDetail(id = null) {
               </table>
             </div>
 
-            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid #cbd5e1; padding-top:12px;">
-              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid #cbd5e1; padding:6px 16px;">Tutup</button>
+            <div style="display:flex; justify-content:flex-end; align-items:center; margin-top:16px; border-top:1px solid var(--border2); padding-top:12px;">
+              <button class="btn btn-sm btn-ghost" onclick="navigate('corporate')" style="border:1px solid var(--border2); padding:6px 16px;">Tutup</button>
             </div>
           </div>
 
@@ -1319,7 +1319,7 @@ async function renderCorpResultsAdmin(corpId, corpName) {
     </div>
     ${_corpResultsAdmin.length ? `<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">
       <thead><tr style="background:var(--bg2);text-align:left"><th style="padding:8px">Pasien</th><th style="padding:8px">Tanggal</th><th style="padding:8px">Tes</th><th style="padding:8px">Hasil</th><th style="padding:8px">Satuan</th><th style="padding:8px">Rujukan</th><th style="padding:8px">Interpretasi</th></tr></thead>
-      <tbody>${_corpResultsAdmin.map(r=>`<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">${r.patient}</td><td style="padding:8px">${r.date}</td><td style="padding:8px">${r.test}</td><td style="padding:8px;font-weight:700;color:${r.color==='red'?'#dc2626':r.color==='green'?'#059669':'#0f172a'}">${r.value}</td><td style="padding:8px">${r.unit}</td><td style="padding:8px">${r.ref}</td><td style="padding:8px">${r.interp}</td></tr>`).join('')}</tbody></table></div>` : '<div style="text-align:center;padding:26px;color:var(--text3)">Belum ada hasil MCU untuk perusahaan ini.</div>'}`;
+      <tbody>${_corpResultsAdmin.map(r=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">${r.patient}</td><td style="padding:8px">${r.date}</td><td style="padding:8px">${r.test}</td><td style="padding:8px;font-weight:700;color:${r.color==='red'?'#dc2626':r.color==='green'?'#059669':'#0f172a'}">${r.value}</td><td style="padding:8px">${r.unit}</td><td style="padding:8px">${r.ref}</td><td style="padding:8px">${r.interp}</td></tr>`).join('')}</tbody></table></div>` : '<div style="text-align:center;padding:26px;color:var(--text3)">Belum ada hasil MCU untuk perusahaan ini.</div>'}`;
 }
 function exportCorpResultsAdmin(corpName){ if(!_corpResultsAdmin.length){ if(typeof toast==='function') toast('Tidak ada data','warn'); return; }
   _csvDownload(`hasil_mcu_${(corpName||'corp').replace(/\s+/g,'_')}.csv`, ['Pasien','Tanggal','Paket','Tes','Hasil','Satuan','Rujukan','Interpretasi'], _corpResultsAdmin.map(r=>[r.patient,r.date,r.package,r.test,r.value,r.unit,r.ref,r.interp])); }
@@ -1335,10 +1335,10 @@ async function renderCorpStatementAdmin(corpId, corpName) {
   const outstanding = totalBill - totalPaid;
   let bal = 0;
   _corpStmtAdmin = (invs||[]).map(i=>{ const amt=Number(i.total_amount||0); const paid=isPaid(i); bal+=paid?0:amt; return {date:i.invoice_date||'',no:i.invoice_number||('INV-'+i.id),desc:i.service_type||i.notes||'Invoice',debit:amt,credit:paid?amt:0,status:paid?'Dibayar':'Belum Bayar',balance:bal}; });
-  const card=(l,v,c)=>`<div style="flex:1;min-width:150px;background:var(--white);border:1px solid #e2e8f0;border-radius:10px;padding:14px"><div style="font-size:11px;color:var(--text3);text-transform:uppercase">${l}</div><div style="font-size:18px;font-weight:800;color:${c};margin-top:4px">${fmt(v)}</div></div>`;
+  const card=(l,v,c)=>`<div style="flex:1;min-width:150px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="font-size:11px;color:var(--text3);text-transform:uppercase">${l}</div><div style="font-size:18px;font-weight:800;color:${c};margin-top:4px">${fmt(v)}</div></div>`;
   box.innerHTML = `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">${card('Total Ditagih',totalBill,'#0f2963')}${card('Total Dibayar',totalPaid,'#059669')}${card('Outstanding',outstanding,outstanding>0?'#dc2626':'#059669')}</div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div style="font-weight:700;color:var(--navy-royal)">Account Statement</div><button class="btn btn-teal btn-sm" onclick="exportCorpStatementAdmin('${(corpName||'').replace(/'/g,"\\'")}')">⬇ Tarik Statement (CSV)</button></div>
-    ${_corpStmtAdmin.length?`<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse"><thead><tr style="background:var(--bg2);text-align:left"><th style="padding:8px">Tanggal</th><th style="padding:8px">No. Invoice</th><th style="padding:8px">Keterangan</th><th style="padding:8px;text-align:right">Tagihan</th><th style="padding:8px;text-align:right">Dibayar</th><th style="padding:8px">Status</th><th style="padding:8px;text-align:right">Saldo</th></tr></thead><tbody>${_corpStmtAdmin.map(r=>`<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:8px">${r.date}</td><td style="padding:8px;font-family:monospace">${r.no}</td><td style="padding:8px">${r.desc}</td><td style="padding:8px;text-align:right">${fmt(r.debit)}</td><td style="padding:8px;text-align:right;color:#059669">${r.credit?fmt(r.credit):'—'}</td><td style="padding:8px">${r.status}</td><td style="padding:8px;text-align:right;font-weight:700">${fmt(r.balance)}</td></tr>`).join('')}</tbody></table></div>`:'<div style="text-align:center;padding:26px;color:var(--text3)">Belum ada invoice untuk perusahaan ini.</div>'}`;
+    ${_corpStmtAdmin.length?`<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse"><thead><tr style="background:var(--bg2);text-align:left"><th style="padding:8px">Tanggal</th><th style="padding:8px">No. Invoice</th><th style="padding:8px">Keterangan</th><th style="padding:8px;text-align:right">Tagihan</th><th style="padding:8px;text-align:right">Dibayar</th><th style="padding:8px">Status</th><th style="padding:8px;text-align:right">Saldo</th></tr></thead><tbody>${_corpStmtAdmin.map(r=>`<tr style="border-bottom:1px solid var(--border)"><td style="padding:8px">${r.date}</td><td style="padding:8px;font-family:monospace">${r.no}</td><td style="padding:8px">${r.desc}</td><td style="padding:8px;text-align:right">${fmt(r.debit)}</td><td style="padding:8px;text-align:right;color:#059669">${r.credit?fmt(r.credit):'—'}</td><td style="padding:8px">${r.status}</td><td style="padding:8px;text-align:right;font-weight:700">${fmt(r.balance)}</td></tr>`).join('')}</tbody></table></div>`:'<div style="text-align:center;padding:26px;color:var(--text3)">Belum ada invoice untuk perusahaan ini.</div>'}`;
 }
 function exportCorpStatementAdmin(corpName){ if(!_corpStmtAdmin.length){ if(typeof toast==='function') toast('Tidak ada data','warn'); return; }
   _csvDownload(`account_statement_${(corpName||'corp').replace(/\s+/g,'_')}.csv`, ['Tanggal','No Invoice','Keterangan','Tagihan','Dibayar','Status','Saldo'], _corpStmtAdmin.map(r=>[r.date,r.no,r.desc,r.debit,r.credit,r.status,r.balance])); }
@@ -1380,8 +1380,8 @@ window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statu
       countBadgeContainer.innerHTML = `
         <span class="badge badge-green">${activeCount} Aktif</span>
         <span class="badge badge-gray">${inactiveCount} Non-Aktif</span>
-        <span class="badge" style="background:#EEF2FF;color:#3730A3; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${assignedCount} Berpaket</span>
-        <span class="badge" style="background:#E0F2FE;color:#0369A1; font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${bookedCount} Booking</span>
+        <span class="badge" style="background:#EEF2FF;color:var(--ink-05); font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${assignedCount} Berpaket</span>
+        <span class="badge" style="background:#E0F2FE;color:var(--ink-09); font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px;">${bookedCount} Booking</span>
       `;
     }
 
@@ -1401,11 +1401,11 @@ window.loadTabCorpEmployees = async function(corpId, corpName, query = '', statu
       const department = e.department || '—';
       const employee_id = e.employee_id || '—';
       return `
-        <tr style="border-bottom:1px solid #cbd5e1;">
+        <tr style="border-bottom:1px solid var(--border2);">
           <td style="padding:8px; text-align:center;">
             <div style="display:flex; gap:6px; justify-content:center;">
-              <button class="act-btn edit" onclick="openCorpEmpForm(${corpId},'${partnerEsc}',${e.id})" style="padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; cursor:pointer; background:var(--white);">Edit</button>
-              <button class="act-btn del" onclick="deleteCorpEmp(${e.id},${corpId},'${partnerEsc}')" style="padding:4px 8px; border-radius:4px; border:1px solid #ef4444; color:var(--danger); cursor:pointer; background:var(--white);">Delete</button>
+              <button class="act-btn edit" onclick="openCorpEmpForm(${corpId},'${partnerEsc}',${e.id})" style="padding:4px 8px; border-radius:4px; border:1px solid var(--border2); cursor:pointer; background:var(--white);">Edit</button>
+              <button class="act-btn del" onclick="deleteCorpEmp(${e.id},${corpId},'${partnerEsc}')" style="padding:4px 8px; border-radius:4px; border:1px solid var(--danger); color:var(--danger); cursor:pointer; background:var(--white);">Delete</button>
             </div>
           </td>
           <td style="padding:8px; font-weight:600;">${nm}</td>
@@ -1476,12 +1476,12 @@ window.loadTabCorpUsers = async function(corpId) {
 
     tbody.innerHTML = linkedUsers.map(u => {
       return `
-        <tr style="border-bottom:1px solid #cbd5e1;">
+        <tr style="border-bottom:1px solid var(--border2);">
           <td style="padding:10px 8px; font-weight:600; color:var(--navy-royal);">${u.full_name || '—'}</td>
           <td style="padding:10px 8px; color:var(--text-dim);">${u.email || '—'}</td>
           <td style="padding:10px 8px; color:var(--text-dim);">${u.phone || '—'}</td>
           <td style="padding:10px 8px;">
-            <select onchange="updateUserCorpRole('${u.id}', this.value, ${corpId})" style="padding:6px; border:1px solid #cbd5e1; border-radius:4px; background:var(--white); color:var(--text); font-size:12px;">
+            <select onchange="updateUserCorpRole('${u.id}', this.value, ${corpId})" style="padding:6px; border:1px solid var(--border2); border-radius:4px; background:var(--white); color:var(--text); font-size:12px;">
               <option value="requestor" ${u.corp_role === 'requestor' ? 'selected' : ''}>Requestor</option>
               <option value="approver" ${u.corp_role === 'approver' ? 'selected' : ''}>Approver</option>
               <option value="" ${!u.corp_role ? 'selected' : ''}>None / View Only</option>
@@ -1702,19 +1702,19 @@ window.previewCSVImportInline = function(input, corpId) {
     if (el) {
       el.style.display = 'block';
       el.innerHTML = `
-        <div style="font-size:12px;color:var(--gray);padding:8px;border-bottom:1px solid #cbd5e1;background:var(--bg);">${inlineCsvRows.length} data ditemukan</div>
+        <div style="font-size:12px;color:var(--gray);padding:8px;border-bottom:1px solid var(--border2);background:var(--bg);">${inlineCsvRows.length} data ditemukan</div>
         <table style="width:100%;font-size:11px;border-collapse:collapse">
-          <thead><tr style="background:var(--bg2);border-bottom:1px solid #cbd5e1;">
-            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">Nama</th>
-            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">NIK</th>
-            <th style="padding:6px;text-align:left;border-right:1px solid #cbd5e1;">Dept</th>
+          <thead><tr style="background:var(--bg2);border-bottom:1px solid var(--border2);">
+            <th style="padding:6px;text-align:left;border-right:1px solid var(--border2);">Nama</th>
+            <th style="padding:6px;text-align:left;border-right:1px solid var(--border2);">NIK</th>
+            <th style="padding:6px;text-align:left;border-right:1px solid var(--border2);">Dept</th>
             <th style="padding:6px;text-align:left;">Gender</th>
           </tr></thead>
           <tbody>
-            ${inlineCsvRows.slice(0,5).map(r=>`<tr style="border-bottom:1px solid #cbd5e1">
-              <td style="padding:6px;border-right:1px solid #cbd5e1;font-weight:600;">${r.first_name} ${r.last_name||''}</td>
-              <td style="padding:6px;font-family:monospace;border-right:1px solid #cbd5e1;">${r.nik||'—'}</td>
-              <td style="padding:6px;border-right:1px solid #cbd5e1;">${r.dept||'—'}</td>
+            ${inlineCsvRows.slice(0,5).map(r=>`<tr style="border-bottom:1px solid var(--border2)">
+              <td style="padding:6px;border-right:1px solid var(--border2);font-weight:600;">${r.first_name} ${r.last_name||''}</td>
+              <td style="padding:6px;font-family:monospace;border-right:1px solid var(--border2);">${r.nik||'—'}</td>
+              <td style="padding:6px;border-right:1px solid var(--border2);">${r.dept||'—'}</td>
               <td style="padding:6px;">${r.gender||'—'}</td>
             </tr>`).join('')}
             ${inlineCsvRows.length>5?`<tr><td colspan="4" style="padding:6px;text-align:center;color:var(--gray);background:var(--bg);">...dan ${inlineCsvRows.length-5} lainnya</td></tr>`:''}
@@ -2012,7 +2012,7 @@ async function openInlineContractForm(corpId, corpName) {
           <div style="max-height: 180px; overflow-y: auto; background: var(--white); border: 1px solid var(--border); border-radius: 8px; padding: 8px; box-sizing: border-box;">
             <table style="width: 100%; border-collapse: collapse; font-size: 11.5px;">
               <thead>
-                <tr style="border-bottom: 1px solid #cbd5e1; text-align: left;">
+                <tr style="border-bottom: 1px solid var(--border2); text-align: left;">
                   <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 45%;">Nama Paket</th>
                   <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 30%;">Skema Diskon</th>
                   <th style="padding: 6px 4px; font-weight: 700; color: var(--navy); width: 25%;">Nilai Diskon</th>
@@ -2020,7 +2020,7 @@ async function openInlineContractForm(corpId, corpName) {
               </thead>
               <tbody>
                 ${(pkgs || []).map(p => `
-                  <tr style="border-bottom: 1px solid #f1f5f9;">
+                  <tr style="border-bottom: 1px solid var(--bg2);">
                     <td style="padding: 6px 4px;">
                       <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: #000; margin: 0;">
                         <input type="checkbox" class="ctf-pkg-cb" value="${p.id}" onchange="toggleCtfPkgRow(${p.id}, this.checked)" style="width: auto; margin:0;">
@@ -2028,14 +2028,14 @@ async function openInlineContractForm(corpId, corpName) {
                       </label>
                     </td>
                     <td style="padding: 6px 4px;">
-                      <select id="ctf-pkg-disctype-${p.id}" disabled onchange="updateCtfPkgValPlaceholder(${p.id}, this.value)" style="padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; width: 100%; background: var(--bg); color:var(--text); box-sizing: border-box;">
+                      <select id="ctf-pkg-disctype-${p.id}" disabled onchange="updateCtfPkgValPlaceholder(${p.id}, this.value)" style="padding: 4px; border: 1px solid var(--border2); border-radius: 4px; font-size: 11.5px; width: 100%; background: var(--bg); color:var(--text); box-sizing: border-box;">
                         <option value="none">Tanpa Diskon</option>
                         <option value="percent">Persentase (%)</option>
                         <option value="nominal">Fix Rate (Rp)</option>
                       </select>
                     </td>
                     <td style="padding: 6px 4px;">
-                      <input type="number" id="ctf-pkg-discval-${p.id}" disabled placeholder="0" style="padding: 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 11.5px; width: 100%; text-align: right; background: var(--bg); color:var(--text); box-sizing: border-box;">
+                      <input type="number" id="ctf-pkg-discval-${p.id}" disabled placeholder="0" style="padding: 4px; border: 1px solid var(--border2); border-radius: 4px; font-size: 11.5px; width: 100%; text-align: right; background: var(--bg); color:var(--text); box-sizing: border-box;">
                     </td>
                   </tr>
                 `).join('') || '<tr><td colspan="3" style="color:var(--gray); font-size:11px; text-align:center; padding: 12px 0;">Tidak ada paket aktif. Buat paket dulu.</td></tr>'}
@@ -2250,8 +2250,8 @@ async function openCorpEmployees(corpId, corpName) {
       <div style="display:flex;gap:6px;align-items:center">
         <span class="badge badge-green">${active} Aktif</span>
         <span class="badge badge-gray">${inactive} Non-Aktif</span>
-        <span class="badge" style="background:#EEF2FF;color:#3730A3">${assigned} Berpaket</span>
-        <span class="badge" style="background:#E0F2FE;color:#0369A1">${booked} Booking</span>
+        <span class="badge" style="background:#EEF2FF;color:var(--ink-05)">${assigned} Berpaket</span>
+        <span class="badge" style="background:#E0F2FE;color:var(--ink-09)">${booked} Booking</span>
         <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
       </div>
     </div>
@@ -2329,12 +2329,12 @@ window.addIdentityDocRow = function() {
     <td style="padding:8px; text-align:center;"><input type="checkbox" class="cef-doc-primary" onclick="onlyOnePrimaryDoc(this)"></td>
     <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:var(--danger); border:1px solid #fecaca; background:var(--white); padding:2px 6px; margin:0;" onclick="this.closest('tr').remove()">Delete</button></td>
     <td style="padding:8px;">
-      <select class="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+      <select class="cef-doc-type" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;">
         <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
       </select>
     </td>
-    <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
-    <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+    <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
+    <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
   `;
   tbody.appendChild(tr);
 };
@@ -2398,16 +2398,16 @@ window.openCorpEmpForm = async function(corpId, corpName, id=null) {
   const tbody = document.getElementById('cef-docs-tbody');
   if (tbody) {
     tbody.innerHTML = `
-      <tr style="border-bottom:1px solid #cbd5e1;">
+      <tr style="border-bottom:1px solid var(--border2);">
         <td style="padding:8px; text-align:center;"><input type="checkbox" class="cef-doc-primary" checked onclick="onlyOnePrimaryDoc(this)"></td>
         <td style="padding:8px; text-align:center;"><button class="btn btn-unfit btn-xs" style="color:var(--danger); border:1px solid #fecaca; background:var(--white); padding:2px 6px; margin:0;" onclick="this.closest('tr').remove()">Delete</button></td>
         <td style="padding:8px;">
-          <select class="cef-doc-type" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;">
+          <select class="cef-doc-type" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;">
             <option>KTP</option><option>Paspor</option><option>BPJS</option><option>SIM</option>
           </select>
         </td>
-        <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
-        <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid #cbd5e1; border-radius:4px; padding:4px;"></td>
+        <td style="padding:8px;"><input type="text" class="cef-doc-num" placeholder="Identity Number" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
+        <td style="padding:8px;"><input type="text" class="cef-doc-issuer" value="INDONESIA" style="width:100%; border:1px solid var(--border2); border-radius:4px; padding:4px;"></td>
       </tr>
     `;
   }
@@ -2592,7 +2592,7 @@ async function scheduleMcuBooking(corpId, corpName) {
         </tr></thead>
         <tbody>${eligible.map(e=>`<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:5px 8px;font-weight:600">${e.full_name||'—'}</td>
-          <td style="padding:5px 8px;color:#3730A3">${e.package_name||'—'}</td>
+          <td style="padding:5px 8px;color:var(--ink-05)">${e.package_name||'—'}</td>
         </tr>`).join('')}</tbody>
       </table>
     </div>
@@ -3103,9 +3103,9 @@ async function openCustomPackageModal(corpId, corpName) {
       <div class="form-group">
         <label style="font-weight:700; margin-bottom: 6px; display:flex; justify-content:space-between; align-items:center;">
           <span>Pilih Pemeriksaan / Tes Laboratorium</span>
-          <input type="text" id="cp-prod-search" placeholder="Cari tes..." oninput="filterCustomPkgProds(this.value)" style="width:160px; padding:4px 8px; font-size:11.5px; border:1px solid #cbd5e1; border-radius:4px;">
+          <input type="text" id="cp-prod-search" placeholder="Cari tes..." oninput="filterCustomPkgProds(this.value)" style="width:160px; padding:4px 8px; font-size:11.5px; border:1px solid var(--border2); border-radius:4px;">
         </label>
-        <div id="cp-prods-list" style="max-height: 180px; overflow-y: auto; background: var(--bg); border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; box-sizing:border-box;">
+        <div id="cp-prods-list" style="max-height: 180px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border2); border-radius: 8px; padding: 8px; box-sizing:border-box;">
           <div class="loading-row"><div class="spinner"></div></div>
         </div>
       </div>
@@ -3143,7 +3143,7 @@ function renderCustomPkgProds(prods) {
 
   el.innerHTML = Object.entries(grouped).map(([cat, items]) => `
     <div class="cp-prod-cat-group" style="margin-bottom:10px;">
-      <div style="font-size:10.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px; border-bottom:1px solid #e2e8f0; padding-bottom:2px;">${cat}</div>
+      <div style="font-size:10.5px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.03em; margin-bottom:4px; border-bottom:1px solid var(--border); padding-bottom:2px;">${cat}</div>
       <div style="display:grid; grid-template-columns: 1fr; gap:6px; padding-left:4px;">
         ${items.map(p => `
           <label class="cp-prod-item" data-name="${p.nama_tes.toLowerCase()}" data-code="${(p.kode_internal||'').toLowerCase()}" style="display:flex; align-items:center; gap:8px; font-weight:normal; font-size:12px; cursor:pointer; color:var(--text2); margin:0;">

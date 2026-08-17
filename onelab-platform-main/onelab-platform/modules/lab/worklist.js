@@ -264,7 +264,7 @@ function wlTestCard(t){
         <span style="font-size:10px;color:var(--gray);font-weight:400">· ${rows.length} parameter</span></span>
       ${wlStatusBadge(t.status)}
     </summary>
-    <div style="border-top:1px solid #f1f5f9;overflow-x:auto">
+    <div style="border-top:1px solid var(--bg2);overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:12px">
         <thead><tr style="background:var(--lgray);color:var(--gray);font-size:10px;text-transform:uppercase">
           <th style="padding:5px 10px;text-align:left">Parameter</th>
@@ -328,8 +328,8 @@ function renderWlActions(p){
   const hasValidated   = allRows.some(r=>r.status==='Validated');                    // tervalidasi → siap approve
   let b='';
   if(hasEntry) b+=`<button class="btn btn-teal btn-sm" onclick="wlSaveResults(${p.admission_id})">Simpan Hasil</button>`;
-  if(hasFilledDraft) b+=`<button class="btn btn-sm" style="background:#0369A1;color:var(--on-accent);border-color:#0369A1" onclick="wlValidate(${p.admission_id})">Validasi</button>`;
-  if(hasValidated) b+=`<button class="btn btn-sm" style="background:#166534;color:var(--on-accent);border-color:#166534" onclick="wlApprove(${p.admission_id})">Approve &amp; Rilis</button>`;
+  if(hasFilledDraft) b+=`<button class="btn btn-sm" style="background:var(--ink-09);color:var(--on-accent);border-color:var(--ink-09)" onclick="wlValidate(${p.admission_id})">Validasi</button>`;
+  if(hasValidated) b+=`<button class="btn btn-sm" style="background:var(--ink-06);color:var(--on-accent);border-color:var(--ink-06)" onclick="wlApprove(${p.admission_id})">Approve &amp; Rilis</button>`;
   box.innerHTML=`<div style="display:flex;gap:6px;flex-wrap:wrap">${b||'<span style="font-size:11px;color:var(--gray)">Semua hasil sudah dirilis</span>'}</div>`;
 }
 
@@ -411,7 +411,7 @@ async function openBatchEntry(nameEnc){
           return `<tr data-sample="${s.id}" data-prod="${s.product_id}">
             <td style="font-size:12px"><div style="font-weight:600">${s.patient_name||'—'}</div>
               <div style="font-size:10px;color:var(--gray)">${s.visit_number||''}</div></td>
-            <td style="font-size:12px">${s.product_name||'—'} <span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700">PANEL</span></td>
+            <td style="font-size:12px">${s.product_name||'—'} <span style="background:var(--tint-03);color:var(--ink-15);padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700">PANEL</span></td>
             <td colspan="2"><button class="btn btn-teal btn-xs" onclick="closeModalForce();openResultEntry(${s.admission_id},${s.product_id})">Input per parameter →</button></td>
             <td class="be-interp" style="font-size:11px;color:var(--gray)">panel</td>
           </tr>`;

@@ -291,11 +291,11 @@ function selectValResult(rid, mode='validate'){
   // Kotak sunting kesimpulan per-test hanya di tab Approval (dokter).
   const isApprovalTab = (mode==='approve');
   const conclusionSection=r.ai_conclusion?`
-    <div style="background:#F0F9FF;border-left:3px solid #0EA5E9;border-radius:6px;padding:10px;margin-bottom:8px;font-size:11px">
-      <div style="font-weight:700;color:#0369A1;margin-bottom:4px">✅ AI Conclusion</div>
+    <div style="background:#F0F9FF;border-left:3px solid var(--info);border-radius:6px;padding:10px;margin-bottom:8px;font-size:11px">
+      <div style="font-weight:700;color:var(--ink-09);margin-bottom:4px">✅ AI Conclusion</div>
       <div style="color:var(--navy);line-height:1.4;margin-bottom:6px">${r.ai_conclusion}</div>
       ${isApprovalTab?`
-        <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid #0EA5E9;border-radius:4px;background:var(--white);color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
+        <textarea id="${VAL_MODES[mode].prefix}-conclusion-edit" rows="3" style="width:100%;font-size:10px;padding:4px;border:1px solid var(--info);border-radius:4px;background:var(--white);color:var(--navy)" placeholder="Edit conclusion if needed...">${r.ai_conclusion}</textarea>
         <button onclick="saveConclusionEdit(${rid},'${mode}')" style="margin-top:4px;padding:4px 8px;background:var(--info);color:var(--on-accent);border:0;border-radius:4px;font-size:10px;cursor:pointer">Save Edit</button>
       `:''}
     </div>

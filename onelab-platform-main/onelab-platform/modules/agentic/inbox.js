@@ -105,7 +105,7 @@ async function agRenderTaskDetail(id){
   if(t.status==='PROCESSING'){
     const mins = Math.floor((Date.now() - new Date(t.updated_at).getTime())/60000);
     stuckWarn = mins >= 3
-      ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)">
+      ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid var(--danger-tint);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)">
           <strong>⚠ Diproses sudah ${mins} menit — kemungkinan macet.</strong><br>
           Buka tab <strong>Monitor</strong> → <strong>Tes Koneksi AI</strong> untuk cek provider LLM,
           lalu <strong>Bebaskan Task Macet</strong> untuk antri ulang otomatis.</div>`
@@ -125,9 +125,9 @@ async function agRenderTaskDetail(id){
     </div>
 
     ${stuckWarn}
-    ${t.error_message ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
-    ${t.payload && t.payload.rejection_feedback ? `<div style="margin-top:10px;background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 12px;font-size:12px;color:#9A3412"><strong>Feedback penolakan terakhir:</strong> ${agEsc(t.payload.rejection_feedback)}</div>` : ''}
-    ${placeholders ? `<div style="margin-top:10px;background:var(--warn-soft);border:1px solid #F59E0B;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--warn-deeper)"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
+    ${t.error_message ? `<div style="margin-top:10px;background:var(--danger-soft);border:1px solid var(--danger-tint);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--danger-deep)"><strong>Error:</strong> ${agEsc(t.error_message)}</div>` : ''}
+    ${t.payload && t.payload.rejection_feedback ? `<div style="margin-top:10px;background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink-18)"><strong>Feedback penolakan terakhir:</strong> ${agEsc(t.payload.rejection_feedback)}</div>` : ''}
+    ${placeholders ? `<div style="margin-top:10px;background:var(--warn-soft);border:1px solid var(--gold);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--warn-deeper)"><strong>⚠ ${placeholders} nilai butuh konfirmasi operator</strong> — periksa tanda KONFIRMASI di draft sebelum approve (kebijakan §9.3: AI dilarang mengarang angka klinis/nama/harga).</div>` : ''}
     ${qas.length ? qas.map(q=>{
       const qc = q.verdict==='PASS' ? '#22C55E' : '#EF4444';
       const finds = Array.isArray(q.findings)?q.findings:[];
@@ -142,11 +142,11 @@ async function agRenderTaskDetail(id){
 
     <div class="ag-actions">${actions}</div>
 
-    ${t.status==='APPROVED' ? `<div style="margin-top:10px;background:#ECFDF5;border:1px solid #86EFAC;border-radius:8px;padding:9px 12px;font-size:12px;color:#065F46">
+    ${t.status==='APPROVED' ? `<div style="margin-top:10px;background:#ECFDF5;border:1px solid #86EFAC;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink-12)">
         <strong>Langkah terakhir:</strong> klik <strong>Publish</strong> di atas.
         ${t.agent==='DOCUMENT' ? 'Dokumen akan dapat nomor resmi & tampil di <strong>Dokumen QMS</strong> + <strong>Wiki → Dokumen Resmi</strong>.'
           : 'Aset (caption + gambar) akan siap diunduh di <strong>Content Studio → Aset Konten</strong> dan slot kalender jadi READY.'}</div>` : ''}
-    ${t.status==='PUBLISHED' ? `<div style="margin-top:10px;background:#EFF6FF;border:1px solid #93C5FD;border-radius:8px;padding:9px 12px;font-size:12px;color:#1E40AF">
+    ${t.status==='PUBLISHED' ? `<div style="margin-top:10px;background:#EFF6FF;border:1px solid #93C5FD;border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink-11)">
         <strong>📍 Konten ini sudah terbit. Hasilnya ada di:</strong><br>
         ${t.agent==='DOCUMENT'
           ? `• Tab <a href="javascript:switchAgenticTab('docs')" style="font-weight:700">Dokumen QMS</a> (registry + nomor resmi & jadwal review)<br>
@@ -290,7 +290,7 @@ async function renderAgMonitorTab(el){
         </div>
       </div>
       ${processing.length?`<div style="margin-top:10px">
-        ${processing.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+        ${processing.map(p=>`<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed var(--border)">
           <span>⏳ ${agEsc(p.title)} <span style="color:var(--gray)">(${agEsc(p.task_type)})</span></span>
           <strong style="color:${p.mins>=3?'#EF4444':'#0EA5E9'}">${p.mins} menit${p.mins>=3?' — macet?':''}</strong>
         </div>`).join('')}</div>`:''}
@@ -306,7 +306,7 @@ async function renderAgMonitorTab(el){
           <div style="font-size:17px;font-weight:800;color:${c}">${v}</div>
           <div style="font-size:10px;color:var(--gray)">${l}</div></div>`).join('')}
     </div>`:''}
-    ${failed.length?`<div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
+    ${failed.length?`<div class="ag-detail" style="margin-bottom:12px;border-left:4px solid var(--danger)">
       <div style="font-size:12px;font-weight:800;color:var(--danger-deep);margin-bottom:6px">Task Gagal — perlu perhatian</div>
       ${failed.slice(0,8).map(f=>`<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed #fecaca;align-items:center">
         <div style="min-width:0"><strong>${agEsc(f.title)}</strong><br><span style="color:var(--text3);font-size:11px">${agEsc(f.error||'')}</span></div>
@@ -320,12 +320,12 @@ async function renderAgMonitorTab(el){
         <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">Kedalaman Antrian</div>
         ${Object.keys(AG_STATUS_META).map(s=>{
           const n=q(s); if(!n) return '';
-          return `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+          return `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)">
             <span>${agChip(s)}</span><strong>${n}</strong></div>`;}).join('') || '<span style="font-size:12px;color:var(--gray)">Kosong</span>'}
       </div>
       <div class="ag-detail">
         <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">LLM per Provider/Model (100 terakhir)</div>
-        ${Object.entries(prov).map(([k,n])=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+        ${Object.entries(prov).map(([k,n])=>`<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--border)">
           <span>${agEsc(k)}</span><strong>${n}</strong></div>`).join('') || '<span style="font-size:12px;color:var(--gray)">Belum ada panggilan LLM</span>'}
       </div>
     </div>
@@ -372,7 +372,7 @@ async function agRunDiag(){
           <td style="max-width:340px">${agEsc(r.msg||'')}</td>
         </tr>`).join('')}</tbody></table></div>`;
   }catch(e){
-    if(out) out.innerHTML = `<div style="font-size:12px;color:var(--danger-deep);background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:9px 12px">${agEsc(e.message)}</div>`;
+    if(out) out.innerHTML = `<div style="font-size:12px;color:var(--danger-deep);background:var(--danger-soft);border:1px solid var(--danger-tint);border-radius:8px;padding:9px 12px">${agEsc(e.message)}</div>`;
   }
   if(btn){ btn.disabled = false; btn.innerHTML = `${svgIcon('sparkle',13)} Tes Koneksi AI`; }
 }

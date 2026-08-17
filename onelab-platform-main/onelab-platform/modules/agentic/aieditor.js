@@ -50,7 +50,7 @@ async function agAiEditorOpen(docId){
 // manusia langsung terlihat saat review (bukan tersembunyi di tengah teks).
 function agAiHighlightGaps(html){
   return String(html).replace(/\[ISI:([^\]]*)\]/g,
-    '<mark style="background:var(--warn-soft);color:var(--warn-deeper);border:1px solid #F59E0B;border-radius:4px;padding:0 5px;font-weight:700;font-style:normal">✎ ISI:$1</mark>');
+    '<mark style="background:var(--warn-soft);color:var(--warn-deeper);border:1px solid var(--gold);border-radius:4px;padding:0 5px;font-weight:700;font-style:normal">✎ ISI:$1</mark>');
 }
 function agAiCountGaps(text){ return (String(text||'').match(/\[ISI:[^\]]*\]/g)||[]).length; }
 
@@ -93,7 +93,7 @@ function agAiEditorRender(){
 
         <div style="border:1px solid var(--border);border-radius:10px;background:var(--white);min-height:52vh;max-height:64vh;overflow:auto">
           ${st.mode==='preview'
-            ? `<div style="padding:22px 26px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6;color:#1a2b3c" class="ag-ed-doc">
+            ? `<div style="padding:22px 26px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.6;color:var(--ink-04)" class="ag-ed-doc">
                  ${kosong ? `<div style="color:var(--gray);font-style:italic;text-align:center;padding:40px">Dokumen masih kosong. ${isPdf?'Tekan "Tarik teks dari PDF" di kanan, atau ':''}minta AI menyusun, atau "Sunting teks".</div>` : agAiHighlightGaps(agMd(st.content))}
                </div>`
             : `<textarea id="ag-ed-textarea" oninput="_agAiEd.content=this.value" style="width:100%;min-height:52vh;border:0;outline:0;padding:16px 18px;font-family:ui-monospace,monospace;font-size:11.5px;line-height:1.55;resize:vertical">${agEsc(st.content||'')}</textarea>`}
@@ -138,7 +138,7 @@ function agAiEditorPaintChat(){
     const me = m.role==='user';
     return `<div style="display:flex;justify-content:${me?'flex-end':'flex-start'};margin-bottom:7px">
       <div style="max-width:88%;font-size:11.5px;line-height:1.4;padding:7px 10px;border-radius:10px;
-        ${me?'background:#0f766e;color:var(--on-accent)':'background:var(--bg2);color:#1a2b3c'}">
+        ${me?'background:#0f766e;color:var(--on-accent)':'background:var(--bg2);color:var(--ink-04)'}">
         ${agEsc(m.content||'')}
         <div style="font-size:9px;opacity:.6;margin-top:3px">${m.created_at?new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>
       </div></div>`;

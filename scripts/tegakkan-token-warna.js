@@ -26,16 +26,35 @@ const fs = require('fs'), path = require('path');
 const AKAR = path.resolve(__dirname, '..', 'onelab-platform-main', 'onelab-platform');
 const HANYA_UJI = process.argv.includes('--uji');
 
+// Heksa 3-digit dinormalkan ke 6-digit agar #fff dan #ffffff dianggap sama.
+function normalHex(h) {
+  h = h.toLowerCase().replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  return '#' + h;
+}
+
+// Token dibaca HANYA dari blok :root (tema terang). Blok tema gelap memakai
+// nama token yang sama dengan nilai berbeda — ikut terbaca akan membuat
+// pemetaan heksa→token salah arah.
 const css = fs.readFileSync(path.join(AKAR, 'css', 'style.css'), 'utf8');
+const akarCss = css.slice(css.indexOf(':root'), css.indexOf('html[data-theme'));
 const token = {};
-for (const m of css.matchAll(/--([a-z0-9-]+)\s*:\s*(#[0-9A-Fa-f]{3,8})\s*;/g)) {
-  const hex = m[2].toLowerCase();
+for (const m of akarCss.matchAll(/--([a-z0-9-]+)\s*:\s*(#[0-9A-Fa-f]{3,8})\s*;/g)) {
+  const hex = normalHex(m[2]);
   if (!token[hex]) token[hex] = m[1];
 }
 
 const PROP = '(color|background|background-color|border-color|border-top-color|' +
              'border-bottom-color|border-left-color|border-right-color|outline-color)';
 const RE = new RegExp(`(${PROP}\\s*:\\s*)(#[0-9A-Fa-f]{6})\\b`, 'gi');
+
+// Bentuk RINGKAS: `border:1px solid #CBD5E1`, `box-shadow:0 2px 4px #ccc`.
+// Pola di atas menuntut heksa persis setelah titik dua, sehingga seluruh
+// bentuk ringkas terlewat — 118 pemakaian border saja, semuanya berjarak 0
+// dari token yang sudah ada. Di sini heksa boleh didahului lebar/gaya.
+const RE_RINGKAS = new RegExp(
+  '((?:border|border-top|border-bottom|border-left|border-right|outline|box-shadow)' +
+  '\\s*:\\s*[^;"\'`{}]*?)(#[0-9A-Fa-f]{3,6})\\b', 'gi');
 
 // Putih ditangani terpisah, dan DIBEDAKAN menurut perannya:
 //   background:#fff → --white     (permukaan; ikut menggelap di tema gelap)
@@ -63,12 +82,17 @@ for (const f of berkas) {
     // Sabuk pengaman kedua: lewati baris yang menyentuh canvas.
     if (/fillStyle|strokeStyle|getContext\(/.test(baris)) return baris;
     let b = baris.replace(RE, (utuh, awal, _prop, hex) => {
-      const t = token[hex.toLowerCase()];
+      const t = token[normalHex(hex)];
       if (!t) { dilewati++; return utuh; }
       n++; return `${awal}var(--${t})`;
     });
     b = b.replace(RE_BG_PUTIH,   (_u, awal) => { n++; return `${awal}var(--white)`; });
     b = b.replace(RE_TEKS_PUTIH, (_u, awal) => { n++; return `${awal}var(--on-accent)`; });
+    b = b.replace(RE_RINGKAS, (utuh, awal, hex) => {
+      const t = token[normalHex(hex)];
+      if (!t) { dilewati++; return utuh; }
+      n++; return `${awal}var(--${t})`;
+    });
     return b;
   }).join('\n');
 

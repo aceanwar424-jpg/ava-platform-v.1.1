@@ -936,7 +936,7 @@ function renderOKRList() {
         const pct = o.target > 0 ? Math.min(100, Math.round((o.actual||0)/o.target*100)) : 0;
         const color = pct >= 100 ? '#22C55E' : pct >= 70 ? '#F59E0B' : '#EF4444';
         return `
-          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #F1F5F9">
+          <div style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--bg2)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
               <div>
                 <span style="font-size:13px;font-weight:600;color:var(--text)">${o.metric_type||o.metric||'—'}</span>

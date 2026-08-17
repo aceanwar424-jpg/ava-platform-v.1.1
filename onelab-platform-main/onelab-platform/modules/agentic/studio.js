@@ -127,7 +127,7 @@ async function renderAgStudioTab(el){
     <div>
       <div class="ag-detail" style="margin-bottom:12px">
         <div style="font-size:12px;font-weight:800;color:var(--navy-deep);margin-bottom:8px">📅 Hari Kesehatan 30 Hari ke Depan</div>
-        ${upcoming.length ? upcoming.map(h=>`<div style="font-size:11.5px;padding:5px 0;border-bottom:1px dashed #e2e8f0">
+        ${upcoming.length ? upcoming.map(h=>`<div style="font-size:11.5px;padding:5px 0;border-bottom:1px dashed var(--border)">
             <strong>${new Date(h.date+'T00:00').toLocaleDateString('id-ID',{day:'numeric',month:'short'})}</strong>
             · ${agEsc(h.name)} <span style="color:var(--gray)">(${h.scope==='NASIONAL'?'🇮🇩':'🌍'})</span>
           </div>`).join('')

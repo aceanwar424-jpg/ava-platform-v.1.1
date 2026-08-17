@@ -182,25 +182,25 @@ async function renderSurat() {
               </tbody>
             </table>
           </div>
-          <div style="background:var(--warn-soft2);border-radius:8px;padding:12px 14px;font-size:12px;color:#5D4037">
+          <div style="background:var(--warn-soft2);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--ink-14)">
             <strong>Contoh penggunaan di Word:</strong><br>
             "Kepada Yth. <strong>[[PIC_TUJUAN]]</strong><br>
             <strong>[[NAMA_TUJUAN]]</strong><br>
             <strong>[[ALAMAT_TUJUAN]]</strong>"<br><br>
             Setelah generate, teks ini akan otomatis terisi dengan data yang Anda input.
           </div>
-          <div style="margin-top:14px;padding:12px 14px;background:#E3F2FD;border-radius:8px;font-size:12px;color:#0D47A1">
+          <div style="margin-top:14px;padding:12px 14px;background:#E3F2FD;border-radius:8px;font-size:12px;color:var(--ink-28)">
             <strong>💡 Tips:</strong> Simpan template dalam format <strong>.docx</strong> (bukan .doc).
             Setelah upload, template bisa digunakan berkali-kali — tinggal ganti tujuan dan tanggal.
             Gunakan tanda kurung siku ganda <strong>[[ ]]</strong>, bukan kurung kurawal <strong>{{ }}</strong> —
             format kurung kurawal punya bug yang menyebabkan error "Duplicate tag" pada beberapa kasus.
           </div>
-          <div style="margin-top:14px;padding:12px 14px;background:var(--danger-soft);border-radius:8px;font-size:12px;color:#991B1B">
+          <div style="margin-top:14px;padding:12px 14px;background:var(--danger-soft);border-radius:8px;font-size:12px;color:var(--ink-10)">
             <strong>⚠️ Punya template lama dengan format {{NAMA}}?</strong><br><br>
             Buka file Word-nya, gunakan Find &amp; Replace (Ctrl+H): ganti semua <strong>{{</strong> menjadi <strong>[[</strong>,
             lalu ganti semua <strong>}}</strong> menjadi <strong>]]</strong>. Simpan, lalu upload ulang.
           </div>
-          <div style="margin-top:14px;padding:12px 14px;background:var(--success-soft);border-radius:8px;font-size:12px;color:#166534">
+          <div style="margin-top:14px;padding:12px 14px;background:var(--success-soft);border-radius:8px;font-size:12px;color:var(--ink-06)">
             <strong>📄 Setup Download PDF (sekali saja)</strong><br><br>
             Tombol "Download PDF" (ikon 📄 di Arsip Surat) butuh setup satu kali di Supabase:
             <ol style="margin:6px 0 0 18px;padding:0">
@@ -650,7 +650,7 @@ async function openSuratForm(id=null) {
           ${tmplOpts}
         </select>
       </div>
-      <div id="sf-template-info" style="display:none;padding:10px;background:var(--mint);border-radius:8px;font-size:12px;color:#085041;margin-bottom:10px"></div>
+      <div id="sf-template-info" style="display:none;padding:10px;background:var(--mint);border-radius:8px;font-size:12px;color:var(--ink-24);margin-bottom:10px"></div>
 
       <div style="font-size:12px;color:var(--gray);margin-bottom:8px">— atau upload template baru —</div>
       ${renderUploadArea('sf-file','sf-file-preview',
@@ -1282,7 +1282,7 @@ function buildSuratPreviewHTML(s) {
       @page{size:A4;margin:2.5cm 2.5cm 2.5cm 3cm}
       *{box-sizing:border-box}
       body{font-family:'Times New Roman',serif;font-size:12pt;color:#000;line-height:1.6;margin:0;padding:20px}
-      .header{border-bottom:3px double #0A2342;padding-bottom:10px;margin-bottom:20px;display:flex;gap:14px;align-items:center}
+      .header{border-bottom:3px double var(--navy-deep);padding-bottom:10px;margin-bottom:20px;display:flex;gap:14px;align-items:center}
       .logo{width:52px;height:52px;background:var(--navy-deep);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--on-accent);font-weight:800;font-size:16px;font-family:Arial;flex-shrink:0}
       .org-name{font-size:14pt;font-weight:bold;color:var(--navy-deep)}
       .org-sub{font-size:9pt;color:#555;margin-top:2px}
@@ -1291,7 +1291,7 @@ function buildSuratPreviewHTML(s) {
       .info td:first-child{width:150px;color:#333}
       .salut{margin:20px 0 8px}
       .sig{margin-top:50px}
-      .sig-line{border-top:1px solid #000;display:inline-block;min-width:180px;padding-top:4px;margin-top:60px}
+      .sig-line{border-top:1px solid var(--ink-01);display:inline-block;min-width:180px;padding-top:4px;margin-top:60px}
       @media print{.no-print{display:none}}
     </style></head><body>
     <button class="no-print" onclick="window.print()"

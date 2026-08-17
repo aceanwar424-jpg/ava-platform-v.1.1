@@ -42,7 +42,7 @@ async function loadPayrollSettings() {
   const belum = paySettings.filter(s => !s.confirmed).length;
   el.innerHTML = belum ? `
     <div style="background:#FBF1E4;border:1px solid #E0A75E;border-radius:8px;padding:11px 14px;
-      margin-bottom:14px;font-size:12.5px;color:#7a4a12;display:flex;justify-content:space-between;
+      margin-bottom:14px;font-size:12.5px;color:var(--ink-03);display:flex;justify-content:space-between;
       align-items:center;gap:10px;flex-wrap:wrap">
       <span><b>${belum} parameter belum dikonfirmasi.</b>
         Tarif BPJS dan PPh 21 terpasang sebagai titik awal dan wajib diperiksa konsultan pajak
@@ -155,7 +155,7 @@ async function openPayrollSettings() {
     <div class="modal-header"><div class="modal-title">Parameter Penggajian</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:10px 13px;
-      margin-bottom:12px;font-size:12.5px;color:#7a4a12">
+      margin-bottom:12px;font-size:12.5px;color:var(--ink-03)">
       Nilai di bawah adalah <b>titik awal</b>, bukan angka resmi. Peraturan pajak dan iuran BPJS
       berubah, jadi mintalah konsultan pajak Anda memeriksanya lalu centang <b>Dikonfirmasi</b>.
       Gaji tidak dapat difinalkan selama parameter pajak belum dicentang.

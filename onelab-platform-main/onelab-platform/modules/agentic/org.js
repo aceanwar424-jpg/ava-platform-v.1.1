@@ -118,11 +118,11 @@ async function renderAgOrgTab(el){
       <div style="display:flex;flex-direction:column;align-items:center;margin-top:14px">
         <div style="background:var(--navy-deep);color:var(--on-accent);border-radius:10px;padding:8px 22px;font-weight:800;font-size:12.5px">👑 ANDA (CEO)</div>
         <div style="width:2px;height:14px;background:var(--border2)"></div>
-        ${head?`<div class="ag-detail" style="border:2px solid #0A2342;padding:10px 18px;text-align:center;min-width:230px;position:relative">
+        ${head?`<div class="ag-detail" style="border:2px solid var(--navy-deep);padding:10px 18px;text-align:center;min-width:230px;position:relative">
           <button class="act-btn" title="Edit job desc" style="position:absolute;top:6px;right:6px" onclick="agOrgEditAgent('HEAD')">${svgIcon('edit',12)}</button>
           <div style="font-size:14px;font-weight:800;color:var(--navy-deep)">${AG_ORG_ICON.HEAD} ${agEsc(head.name)}</div>
           <div style="font-size:10.5px;color:var(--gray)">${agEsc(head.role_title)}</div>
-          <span class="ag-badge" style="background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
+          <span class="ag-badge" style="background:var(--tint-01);color:var(--success-deep);border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
         </div>`:''}
         <div style="width:2px;height:14px;background:var(--border2)"></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%">
@@ -135,7 +135,7 @@ async function renderAgOrgTab(el){
             <div style="font-size:12px;font-weight:800;color:var(--navy-deep)">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
             <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)}</div>
             <span class="ag-badge" style="margin-top:4px;display:inline-block;${a.active
-              ?'background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC':'background:var(--bg2);color:var(--text3);border:1px solid #CBD5E1'}">
+              ?'background:var(--tint-01);color:var(--success-deep);border:1px solid #86EFAC':'background:var(--bg2);color:var(--text3);border:1px solid var(--border2)'}">
               ${a.active?'AKTIF':'NONAKTIF'} · ${agEsc(a.model_tier)}</span>
           </div>`).join('')}
         </div>`:''}
@@ -152,7 +152,7 @@ async function renderAgOrgTab(el){
         ${Object.entries(AG_RISK_META).map(([k,mm])=>`
           <div style="font-size:10.5px;font-weight:800;color:${mm.c};margin:8px 0 4px">${mm.l}</div>
           ${agOrgRights.filter(r=>r.risk_class===k && !['HEAD_TICK','QA_REVIEW','IT_CHECK','SMOKE_TEST'].includes(r.task_type)).map(r=>`
-            <div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:4px 0;border-bottom:1px dashed #e2e8f0;cursor:pointer"
+            <div style="display:flex;justify-content:space-between;gap:8px;font-size:11.5px;padding:4px 0;border-bottom:1px dashed var(--border);cursor:pointer"
                  title="Klik untuk mengubah mandat" onclick="agOrgEditRight('${r.task_type}')">
               <span><strong>${agEsc(r.task_type)}</strong> <span style="color:var(--gray)">· ${agEsc(r.note||'')}</span></span>
               <span style="white-space:nowrap;color:var(--gray)">${r.qa_agent?`QA: ${agEsc(r.qa_agent)} ≥${r.min_score}`:'tanpa QA'} ${svgIcon('edit',10)}</span>
@@ -397,7 +397,7 @@ async function agRenderAiConfig(){
       cats.map(cat=>`<div style="margin-bottom:10px">
         <div style="font-size:11px;font-weight:800;color:var(--navy-deep);margin:6px 0 4px">${AG_CFG_CAT[cat]||cat}</div>
         ${rows.filter(r=>r.category===cat).map(r=>`
-          <div style="display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed #e2e8f0">
+          <div style="display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed var(--border)">
             <div>
               <div style="font-size:11.5px;font-weight:700;color:var(--text2)">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:var(--danger-deep)">🔒</span>':''}</div>
               <div style="font-size:10px;color:var(--gray)">${agEsc(r.notes||'')}</div>
@@ -441,7 +441,7 @@ async function agRenderTemplates(){
           <td>${agEsc(r.doc_type)}</td>
           <td>${(r.department||'')==='SEMUA'?'<span style="color:var(--gray)">Semua</span>':agEsc(r.department)}</td>
           <td>${agEsc(r.name)}</td>
-          <td>${r.storage_path?`<span class="ag-badge" style="background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5">belum ada</span>'}</td>
+          <td>${r.storage_path?`<span class="ag-badge" style="background:var(--tint-01);color:var(--success-deep);border:1px solid #86EFAC">terpasang</span>`:'<span class="ag-badge" style="background:var(--tint-02);color:var(--danger-deep);border:1px solid var(--danger-tint)">belum ada</span>'}</td>
           <td>${r.sample_path?'✅':'—'}</td>
           <td style="white-space:nowrap">
             ${r.storage_path?`<button class="act-btn" title="Tes rakit .docx dari master" onclick="agTemplateTestBuild('${r.id}')">${svgIcon('download',11)||'⬇'}</button>`:''}
@@ -617,7 +617,7 @@ async function agRenderPromptHist(){
     ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase6c.sql</strong> untuk mengaktifkan self-heal prompt oleh Kepala IT.</div>`
     : !hist.length
     ? `<div style="font-size:12px;color:var(--gray)">Belum ada perbaikan. Kepala IT akan memperbaiki prompt otomatis saat mendeteksi kegagalan berulang (gambar diblokir / QA gagal), lalu tercatat di sini dengan tombol rollback.</div>`
-    : hist.map(h=>`<div style="border:1px solid var(--border);border-left:4px solid #8B5CF6;border-radius:8px;padding:8px 12px;margin-bottom:7px">
+    : hist.map(h=>`<div style="border:1px solid var(--border);border-left:4px solid var(--violet);border-radius:8px;padding:8px 12px;margin-bottom:7px">
         <div style="display:flex;justify-content:space-between;gap:8px;font-size:12px">
           <span><strong>${agEsc(h.code)}</strong> <span style="color:var(--gray)">v${h.version} · oleh ${agEsc(h.changed_by)}</span></span>
           <span style="color:var(--gray)">${agAgo(h.created_at)}</span>
@@ -647,7 +647,7 @@ async function agRenderCronBox(){
   const inner = !cs
     ? `<div style="font-size:12px;color:var(--gray)">Jalankan <strong>supabase_agentic_fase6b.sql</strong> untuk mengaktifkan panel ini.</div>`
     : !cs.enabled
-    ? `<div style="font-size:12px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid #F59E0B;border-radius:8px;padding:9px 12px">
+    ? `<div style="font-size:12px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid var(--gold);border-radius:8px;padding:9px 12px">
         Extension <strong>pg_cron</strong> belum aktif — Database → Extensions → aktifkan <code>pg_cron</code> &amp; <code>pg_net</code>,
         lalu jalankan blok §CRON (lihat AGENTIC_FASE6.md). Tanpa cron, gunakan tombol manual di atas.</div>`
     : `${(cs.jobs||[]).length ? `<div style="overflow-x:auto"><table class="pro-table" style="width:100%;font-size:11.5px">
@@ -655,13 +655,13 @@ async function agRenderCronBox(){
         <tbody>${cs.jobs.map(j=>`<tr>
           <td style="font-weight:700">${agEsc(j.jobname)}</td>
           <td style="font-family:monospace">${agEsc(j.schedule)}</td>
-          <td><span class="ag-badge" style="${j.active?'background:#DCFCE7;color:var(--success-deep);border:1px solid #86EFAC':'background:#FEE2E2;color:var(--danger-deep);border:1px solid #FCA5A5'}">${j.active?'AKTIF':'DIJEDA'}</span></td>
+          <td><span class="ag-badge" style="${j.active?'background:var(--tint-01);color:var(--success-deep);border:1px solid #86EFAC':'background:var(--tint-02);color:var(--danger-deep);border:1px solid var(--danger-tint)'}">${j.active?'AKTIF':'DIJEDA'}</span></td>
           <td><button class="ag-btn ${j.active?'warn':'ok'}" style="padding:3px 10px;font-size:11px"
             onclick="agCronToggle('${agEsc(j.jobname)}', ${!j.active})">${j.active?'⏸ Jeda':'▶ Aktifkan'}</button></td>
         </tr>`).join('')}</tbody></table></div>`
       : `<div style="font-size:12px;color:var(--gray)">pg_cron aktif tapi belum ada job agentic — jalankan blok §CRON siap-pakai (lihat AGENTIC_FASE6.md).</div>`}
       ${(cs.runs||[]).length ? `<div style="font-size:11px;font-weight:800;color:var(--navy-deep);margin:10px 0 4px">Eksekusi terakhir</div>
-        ${cs.runs.slice(0,8).map(r=>`<div style="font-size:11px;padding:3px 0;border-bottom:1px dashed #e2e8f0;display:flex;justify-content:space-between;gap:8px">
+        ${cs.runs.slice(0,8).map(r=>`<div style="font-size:11px;padding:3px 0;border-bottom:1px dashed var(--border);display:flex;justify-content:space-between;gap:8px">
           <span>${r.status==='succeeded'?'✅':'❌'} <strong>${agEsc(r.jobname)}</strong> ${r.msg&&r.status!=='succeeded'?`<span style="color:var(--danger-deep)">· ${agEsc(r.msg)}</span>`:''}</span>
           <span style="color:var(--gray);white-space:nowrap">${new Date(r.start_time).toLocaleString('id-ID')}</span>
         </div>`).join('')}` : ''}`;
@@ -753,7 +753,7 @@ function agOrgEditRight(taskType){
         </div>
         <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Catatan
           <input id="agre-note" class="form-input" style="width:100%" value="${agEsc(r.note||'')}"></label>
-        <div style="font-size:10.5px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid #F59E0B;border-radius:6px;padding:6px 9px">
+        <div style="font-size:10.5px;color:var(--warn-deeper);background:var(--warn-soft);border:1px solid var(--gold);border-radius:6px;padding:6px 9px">
           Konten ber-review-medis tetap dipaksa R3 oleh sistem, apa pun setelan ini.</div>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">

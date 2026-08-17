@@ -551,17 +551,17 @@ async function openCashierReport() {
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-      <div style="background:#E8F5E9;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:18px;font-weight:800;color:#2E7D32">${formatCurrency(totalIn)}</div>
-        <div style="font-size:11px;color:#2E7D32">Total Pemasukan</div>
+      <div style="background:var(--tint-04);border-radius:8px;padding:12px;text-align:center">
+        <div style="font-size:18px;font-weight:800;color:var(--ink-19)">${formatCurrency(totalIn)}</div>
+        <div style="font-size:11px;color:var(--ink-19)">Total Pemasukan</div>
       </div>
       <div style="background:#FFEBEE;border-radius:8px;padding:12px;text-align:center">
-        <div style="font-size:18px;font-weight:800;color:#C62828">${formatCurrency(totalOut)}</div>
-        <div style="font-size:11px;color:#C62828">Total Refund</div>
+        <div style="font-size:18px;font-weight:800;color:var(--ink-21)">${formatCurrency(totalOut)}</div>
+        <div style="font-size:11px;color:var(--ink-21)">Total Refund</div>
       </div>
       <div style="background:#E3F2FD;border-radius:8px;padding:12px;text-align:center;grid-column:1/-1">
-        <div style="font-size:20px;font-weight:800;color:#1565C0">${formatCurrency(totalIn-totalOut)}</div>
-        <div style="font-size:12px;color:#1565C0">NET REVENUE</div>
+        <div style="font-size:20px;font-weight:800;color:var(--ink-22)">${formatCurrency(totalIn-totalOut)}</div>
+        <div style="font-size:12px;color:var(--ink-22)">NET REVENUE</div>
       </div>
     </div>
     <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">Per Metode Pembayaran</div>
@@ -604,7 +604,7 @@ function paintShiftBanner() {
     return;
   }
   const since = activeShift.opened_at ? new Date(activeShift.opened_at).toLocaleString('id-ID') : '—';
-  el.innerHTML = `<div style="background:#E6F2F3;border:1px solid #0E7C86;border-radius:8px;
+  el.innerHTML = `<div style="background:#E6F2F3;border:1px solid var(--teal-deep);border-radius:8px;
     padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
     <span style="font-size:12.5px"><b>Shift terbuka</b> — ${activeShift.cashier_name||''} sejak ${since}
       · saldo awal ${formatCurrency(activeShift.opening_balance||0)}</span>

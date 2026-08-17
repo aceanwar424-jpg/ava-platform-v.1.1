@@ -18,7 +18,7 @@ async function renderAccounting() {
     </div>
 
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:11px 14px;
-      margin-bottom:14px;font-size:12.5px;color:#7a4a12">
+      margin-bottom:14px;font-size:12.5px;color:var(--ink-03)">
       <b>Sebelum diandalkan:</b> bagan akun terpasang dengan template standar klinik.
       Minta akuntan Anda memeriksa nomor dan nama akunnya, lalu jalankan paralel dengan
       pembukuan manual selama satu periode penuh.

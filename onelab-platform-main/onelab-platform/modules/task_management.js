@@ -155,10 +155,10 @@ function renderMyTasks() {
     ${overdue.length?`
     <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--r);padding:10px 14px;margin-bottom:14px;cursor:pointer"
       onclick="showOverdueTasksModal()">
-      <div style="font-weight:700;color:#C2410C;font-size:12.5px">
+      <div style="font-weight:700;color:var(--ink-13);font-size:12.5px">
         ⚠️ ${overdue.length} task overdue dari hari sebelumnya — klik untuk lihat &amp; kerjakan
       </div>
-      <div style="font-size:11px;color:#9A3412;margin-top:2px">
+      <div style="font-size:11px;color:var(--ink-18);margin-top:2px">
         ${overdue.slice(0,3).map(t=>t.title).join(', ')}${overdue.length>3?` +${overdue.length-3} lainnya`:''}
       </div>
     </div>`:''}
@@ -556,7 +556,7 @@ async function renderLogbook() {
       <!-- Carry-over tasks -->
       ${pendTasks.length?`
       <div style="background:#FFF7ED;border-radius:var(--r);padding:12px;margin-bottom:14px">
-        <div style="font-weight:700;font-size:12px;color:#C2410C;margin-bottom:8px">
+        <div style="font-weight:700;font-size:12px;color:var(--ink-13);margin-bottom:8px">
           Task Pending — akan di-carry-over ke besok (${pendTasks.length} task)
         </div>
         ${pendTasks.map(t=>`

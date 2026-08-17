@@ -67,8 +67,8 @@ function renderDealsList(partnerId, deals) {
           <div style="font-size:18px;font-weight:800;color:var(--navy)">${deals.length}</div>
           <div style="font-size:11px;color:var(--gray)">Total Output</div>
         </div>
-        <div style="background:#E8F5E9;border-radius:8px;padding:10px;text-align:center">
-          <div style="font-size:18px;font-weight:800;color:#2E7D32">${active.length}</div>
+        <div style="background:var(--tint-04);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;font-weight:800;color:var(--ink-19)">${active.length}</div>
           <div style="font-size:11px;color:var(--gray)">Aktif</div>
         </div>
         <div style="background:var(--warn-soft2);border-radius:8px;padding:10px;text-align:center">
@@ -121,7 +121,7 @@ function renderDealsList(partnerId, deals) {
           </div>
           ${d.description?`<div style="font-size:12px;color:var(--gray);margin-bottom:8px">${d.description}</div>`:''}
           ${d.next_action?`
-            <div style="background:var(--warn-soft2);border-radius:6px;padding:8px 10px;font-size:12px;color:#5D4037;margin-bottom:8px">
+            <div style="background:var(--warn-soft2);border-radius:6px;padding:8px 10px;font-size:12px;color:var(--ink-14);margin-bottom:8px">
               <strong>Next Action:</strong> ${d.next_action}
               ${d.next_action_date?` — <strong>${formatDateShort(d.next_action_date)}</strong>`:''}
             </div>`:''}

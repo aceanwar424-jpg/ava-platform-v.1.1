@@ -150,7 +150,7 @@ function renderCheckinDetail(sid){
     {label:'Selesai',     at:pick(r=>r.approved_at||r.released_at,1), by:aRow.approved_by||aRow.released_by,     c:'#22C55E'},
   ];
   const testRows = list.length ? list.map(r=>`
-    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+    <div style="display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--bg2)">
       <div style="min-width:0">
         <div style="font-size:12px;font-weight:600;color:var(--navy)">${r.item_name||r.product_name||'—'}</div>
         ${(r.interpretation||r.condition_name)?`<div style="font-size:10.5px;color:var(--gray)">${r.interpretation||r.condition_name}</div>`:''}

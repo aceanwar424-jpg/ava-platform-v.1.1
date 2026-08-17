@@ -158,7 +158,7 @@ async function lpiRenderPanel(containerId, admId){
 
   if (_lpiTableOk === false) {
     el.innerHTML = `
-      <div style="margin:10px 14px;padding:10px 12px;background:#FEF9E7;border:1px solid #F5D77E;border-radius:8px;font-size:11.5px;color:#7A5B00">
+      <div style="margin:10px 14px;padding:10px 12px;background:#FEF9E7;border:1px solid #F5D77E;border-radius:8px;font-size:11.5px;color:var(--ink-25)">
         Fitur kesimpulan panel belum aktif. Jalankan <code>supabase_lab_panel_conclusion.sql</code> di Supabase SQL Editor.
       </div>`;
     return;
@@ -172,7 +172,7 @@ async function lpiRenderPanel(containerId, admId){
     <div style="margin:10px 14px 16px;border:1px solid var(--border);border-radius:10px;overflow:hidden">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;
         padding:9px 12px;background:#F3F0FB;border-bottom:1px solid var(--border);flex-wrap:wrap">
-        <div style="font-size:12.5px;font-weight:800;color:#5B21B6">
+        <div style="font-size:12.5px;font-weight:800;color:var(--ink-20)">
           🧠 Kesimpulan Pemeriksaan (Keseluruhan)
           <span style="font-weight:600;color:var(--gray);font-size:10.5px">— dibuat otomatis dari pola hasil, wajib dikonfirmasi dokter</span>
         </div>

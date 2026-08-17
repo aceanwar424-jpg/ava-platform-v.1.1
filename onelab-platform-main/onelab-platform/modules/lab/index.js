@@ -220,7 +220,7 @@ function injectLisStyle(){
   if(document.getElementById('lis-style')) return;
   const s=document.createElement('style'); s.id='lis-style';
   s.textContent=`
-    #lab-shell{ font-size:12.5px; color:#1A2B3C; }
+    #lab-shell{ font-size:12.5px; color:var(--ink-04); }
     #lab-shell .lis-header{ display:flex;justify-content:space-between;align-items:center;
       background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px; }
     #lab-shell .lis-header h1{ font-size:15px;margin:0;color:var(--on-accent);font-weight:800; }
@@ -242,8 +242,8 @@ function injectLisStyle(){
       letter-spacing:.04em;margin:12px 0 6px;padding-left:7px;border-left:3px solid var(--teal); }
     #lab-shell .lis-badge{ display:inline-block;min-width:18px;padding:1px 7px;border-radius:9px;font-size:11px;font-weight:800;text-align:center; }
     #lab-shell .lis-badge.warn{ background:var(--warn-soft);color:var(--warn-deeper); }
-    #lab-shell .lis-badge.info{ background:#DBEAFE;color:#1E40AF; }
-    #lab-shell .lis-badge.ok{ background:#DCFCE7;color:#166534; }
+    #lab-shell .lis-badge.info{ background:#DBEAFE;color:var(--ink-11); }
+    #lab-shell .lis-badge.ok{ background:var(--tint-01);color:var(--ink-06); }
     #lab-shell .lis-bar{ height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;min-width:56px; }
     #lab-shell .lis-bar > span{ display:block;height:100%;background:var(--teal); }
     #lab-shell .btn-xs{ padding:3px 8px !important;font-size:11px !important; }`;
@@ -401,16 +401,16 @@ function renderCriticalBanner(){
   const crit = labResults.filter(r=>isCriticalResult(r) && !isReleased(r) && !r.critical_ack_at);
   if(!crit.length){ el.innerHTML=''; return; }
   el.innerHTML=`
-    <div style="background:var(--danger-soft);border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;border-radius:10px;padding:12px 16px;margin-bottom:14px">
+    <div style="background:var(--danger-soft);border:1.5px solid var(--danger-tint);border-left:5px solid var(--danger-strong);border-radius:10px;padding:12px 16px;margin-bottom:14px">
       <div style="display:flex;align-items:center;gap:8px;font-weight:800;color:var(--danger-deep);font-size:13px;margin-bottom:4px">
         ${crit.length} NILAI KRITIS belum dilaporkan
       </div>
-      <div style="font-size:11.5px;color:#991B1B;margin-bottom:8px">
+      <div style="font-size:11.5px;color:var(--ink-10);margin-bottom:8px">
         Wajib dilaporkan ke dokter penanggung jawab beserta bukti read-back (ISO 15189).
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         ${crit.slice(0,8).map(r=>`
-          <div style="background:var(--white);border:1px solid #FCA5A5;border-radius:8px;padding:6px 10px;font-size:12px">
+          <div style="background:var(--white);border:1px solid var(--danger-tint);border-radius:8px;padding:6px 10px;font-size:12px">
             <strong>${r.patient_name||'—'}</strong> · ${r.product_name||'—'}:
             <span style="color:var(--danger-strong);font-weight:800">${r.result_value||'—'} ${r.unit||''}</span>
             <button class="btn btn-xs" style="margin-left:6px;background:var(--danger-strong);color:var(--on-accent);border:none"
@@ -445,11 +445,11 @@ async function ackCritical(id){
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
-    <div style="background:var(--danger-soft);border:1px solid #FCA5A5;border-radius:8px;padding:12px 14px;margin-bottom:14px">
+    <div style="background:var(--danger-soft);border:1px solid var(--danger-tint);border-radius:8px;padding:12px 14px;margin-bottom:14px">
       <div style="font-size:13px;font-weight:700;color:var(--danger-deep)">${r.patient_name||'—'}</div>
       <div style="font-size:12.5px;margin-top:3px">${r.product_name||'—'}:
         <b style="color:var(--danger-strong);font-size:15px">${r.result_value||'—'} ${r.unit||''}</b></div>
-      <div style="font-size:11.5px;color:#991B1B;margin-top:2px">Ambang kritis: ${ambang}</div>
+      <div style="font-size:11.5px;color:var(--ink-10);margin-top:2px">Ambang kritis: ${ambang}</div>
     </div>
 
     ${prev.length?`

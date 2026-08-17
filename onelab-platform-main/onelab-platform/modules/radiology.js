@@ -347,11 +347,11 @@ async function printRadioResult(id) {
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>Hasil Radiologi — ${r.patient_name}</title>
     <style>
-      body{font-family:Arial,sans-serif;padding:30px;font-size:13px;color:#1A2B3C}
-      .header{display:flex;justify-content:space-between;border-bottom:3px solid #0A2342;padding-bottom:14px;margin-bottom:20px}
+      body{font-family:Arial,sans-serif;padding:30px;font-size:13px;color:var(--ink-04)}
+      .header{display:flex;justify-content:space-between;border-bottom:3px solid var(--navy-deep);padding-bottom:14px;margin-bottom:20px}
       h2{color:var(--navy-deep);margin:0}.badge{padding:4px 14px;border-radius:10px;font-size:12px;font-weight:700}
       .section{margin-bottom:20px}.label{font-size:11px;color:var(--slate);text-transform:uppercase;letter-spacing:.05em}
-      .img-box{border:1px solid #e2e8f0;border-radius:8px;padding:8px;text-align:center;margin-bottom:16px}
+      .img-box{border:1px solid var(--border);border-radius:8px;padding:8px;text-align:center;margin-bottom:16px}
       @media print{button{display:none}}
     </style></head><body>
     <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer">🖨 Print</button>

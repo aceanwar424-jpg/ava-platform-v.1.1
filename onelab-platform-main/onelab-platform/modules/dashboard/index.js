@@ -256,7 +256,7 @@ async function loadDashboardData() {
         actEl.innerHTML = `<div class="empty-state" style="padding:20px"><p>Belum ada aktivitas</p></div>`;
       } else {
         actEl.innerHTML = (activity||[]).map(a=>`
-          <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #F1F5F9">
+          <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--bg2)">
             <div style="width:26px;height:26px;border-radius:50%;background:var(--lgray);
               display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0">
               ${actIcons[a.action]||'📌'}

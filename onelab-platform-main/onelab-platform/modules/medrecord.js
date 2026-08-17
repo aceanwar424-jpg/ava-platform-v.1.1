@@ -211,7 +211,7 @@ function renderPatientMR(adms, anamnesas, results, patientName) {
                 <tbody>
                 ${labR.map(r=>{
                   const c=cMap[r.color_code]||'#94A3B8';
-                  return `<tr style="border-bottom:1px solid #F1F5F9">
+                  return `<tr style="border-bottom:1px solid var(--bg2)">
                     <td style="padding:5px 10px;font-weight:600">${r.product_name||'—'}</td>
                     <td style="padding:5px 10px;text-align:center;font-weight:800;color:${c}">${r.result_value||'—'}</td>
                     <td style="padding:5px 10px;text-align:center;color:var(--gray)">${r.unit||'—'}</td>
@@ -323,11 +323,11 @@ function paintMRClinical() {
 
   el.innerHTML = `
     ${alg.length ? `
-    <div style="background:var(--danger-soft);border:1.5px solid #FCA5A5;border-left:5px solid #DC2626;
+    <div style="background:var(--danger-soft);border:1.5px solid var(--danger-tint);border-left:5px solid var(--danger-strong);
       border-radius:10px;padding:11px 15px;margin-bottom:14px">
       <div style="font-weight:800;color:var(--danger-deep);font-size:12.5px;margin-bottom:5px">⚠️ ALERGI</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px">
-        ${alg.map(a=>`<span style="background:var(--white);border:1px solid #FCA5A5;border-radius:6px;
+        ${alg.map(a=>`<span style="background:var(--white);border:1px solid var(--danger-tint);border-radius:6px;
           padding:3px 9px;font-size:12px"><b>${a.allergen}</b>${a.reaction?` — ${a.reaction}`:''}
           <span style="color:${sevCol[a.severity]||'#6B7A8B'};font-weight:700">· ${a.severity||''}</span></span>`).join('')}
       </div>
@@ -581,9 +581,9 @@ async function printFullMedRecord(patientName) {
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
     <title>Rekam Medis — ${patientName}</title>
     <style>
-      body{font-family:Arial,sans-serif;padding:30px;font-size:12px;color:#1A2B3C}
-      .header{border-bottom:3px solid #0A2342;padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between}
-      h2{color:var(--navy-deep);margin:0}.card{border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:12px}
+      body{font-family:Arial,sans-serif;padding:30px;font-size:12px;color:var(--ink-04)}
+      .header{border-bottom:3px solid var(--navy-deep);padding-bottom:12px;margin-bottom:20px;display:flex;justify-content:space-between}
+      h2{color:var(--navy-deep);margin:0}.card{border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:12px}
       table{width:100%;border-collapse:collapse}td,th{padding:5px 8px}
       thead tr{background:var(--navy-deep);color:var(--on-accent)}
       @media print{button{display:none}}

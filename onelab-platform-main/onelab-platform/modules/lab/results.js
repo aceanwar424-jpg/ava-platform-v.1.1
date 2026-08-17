@@ -99,7 +99,7 @@ async function selectResultPatient(admId){
       </tr></thead><tbody>
       ${Object.entries(groups).map(([pid,g])=>{
         const isPanel=g.rows.length>1 || g.rows.some(r=>r.product_item_id);
-        let html=isPanel?`<tr><td colspan="6" style="background:#EEF2FF;color:#3730A3;font-weight:700;padding:5px 10px">${g.name}</td></tr>`:'';
+        let html=isPanel?`<tr><td colspan="6" style="background:#EEF2FF;color:var(--ink-05);font-weight:700;padding:5px 10px">${g.name}</td></tr>`:'';
         html+=g.rows.map(r=>resRowHtml(r,pid,isPanel)).join('');
         return html;
       }).join('')}
@@ -119,12 +119,12 @@ function resRowHtml(r, pid, indent){
   const norm=rr.find(x=>x.value_type!=='qualitative'&&x.condition_type==='normal'&&x.range_min!=null&&x.range_max!=null);
   const refTxt=norm?`${norm.range_min}–${norm.range_max}`:(rr.filter(x=>x.value_type==='qualitative').map(x=>x.condition_name).join('/')||'—');
   return `<tr data-rid="${r.id}" data-item="${r.product_item_id||''}" data-prod="${pid}" onclick="resPickRow(${r.id})">
-    <td style="padding:5px 10px;border-bottom:1px solid #f1f5f9">${name}</td>
-    <td style="padding:4px 8px;border-bottom:1px solid #f1f5f9"><input type="text" class="res-val" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="resInterpret(this)" onclick="event.stopPropagation()" style="width:96px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px"></td>
-    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray)" class="res-prev">—</td>
-    <td style="padding:5px 4px;border-bottom:1px solid #f1f5f9;text-align:center" class="res-flag"></td>
-    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray)">${r.unit||''}</td>
-    <td style="padding:5px 8px;border-bottom:1px solid #f1f5f9;color:var(--gray);font-size:11px">${refTxt}</td>
+    <td style="padding:5px 10px;border-bottom:1px solid var(--bg2)">${name}</td>
+    <td style="padding:4px 8px;border-bottom:1px solid var(--bg2)"><input type="text" class="res-val" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="resInterpret(this)" onclick="event.stopPropagation()" style="width:96px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px"></td>
+    <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray)" class="res-prev">—</td>
+    <td style="padding:5px 4px;border-bottom:1px solid var(--bg2);text-align:center" class="res-flag"></td>
+    <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray)">${r.unit||''}</td>
+    <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray);font-size:11px">${refTxt}</td>
   </tr>`;
 }
 
@@ -448,7 +448,7 @@ async function showDeltaCheck(patientName, productId, excludeId=null){
     const p=(prev||[]).find(x=>true);
     if(!p){ box.innerHTML=''; return; }
     box.innerHTML=`
-      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:#1E40AF">
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink-11)">
         Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong>
         <span style="color:var(--text3)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
         <span id="rf-delta-arrow"></span>

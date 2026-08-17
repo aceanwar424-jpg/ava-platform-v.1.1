@@ -107,6 +107,45 @@
   --dur-lambat: .38s;
   --ease:       cubic-bezier(.4, 0, .2, 1);
   --ease-keluar: cubic-bezier(.16, 1, .3, 1);
+
+  /* ══ TINTA — dibangkitkan scripts/bangun-token-tinta.js ══════════
+     Warna teks gelap dan latar bernuansa yang sebelumnya heksa keras.
+     Nilai di sini IDENTIK dengan aslinya, jadi mode terang tidak berubah;
+     pasangan gelapnya ada di blok tema gelap. */
+  --ink-01: #000000;          /* teks · 20 pemakaian */
+  --ink-02: #666666;          /* teks · 11 pemakaian */
+  --ink-03: #7A4A12;          /* teks · 9 pemakaian */
+  --ink-04: #1A2B3C;          /* teks · 9 pemakaian */
+  --ink-05: #3730A3;          /* teks · 7 pemakaian */
+  --ink-06: #166534;          /* teks · 7 pemakaian */
+  --ink-07: #1E293B;          /* teks · 6 pemakaian */
+  --ink-08: #7F1D1D;          /* teks · 6 pemakaian */
+  --ink-09: #0369A1;          /* teks · 6 pemakaian */
+  --ink-10: #991B1B;          /* teks · 6 pemakaian */
+  --ink-11: #1E40AF;          /* teks · 5 pemakaian */
+  --ink-12: #065F46;          /* teks · 4 pemakaian */
+  --ink-13: #C2410C;          /* teks · 4 pemakaian */
+  --ink-14: #5D4037;          /* teks · 4 pemakaian */
+  --ink-15: #6D28D9;          /* teks · 4 pemakaian */
+  --ink-16: #555555;          /* teks · 4 pemakaian */
+  --ink-17: #075985;          /* teks · 3 pemakaian */
+  --ink-18: #9A3412;          /* teks · 3 pemakaian */
+  --ink-19: #2E7D32;          /* teks · 3 pemakaian */
+  --ink-20: #5B21B6;          /* teks · 2 pemakaian */
+  --ink-21: #C62828;          /* teks · 2 pemakaian */
+  --ink-22: #1565C0;          /* teks · 2 pemakaian */
+  --ink-23: #2563EB;          /* teks · 2 pemakaian */
+  --ink-24: #085041;          /* teks · 2 pemakaian */
+  --ink-25: #7A5B00;          /* teks · 1 pemakaian */
+  --ink-26: #1D4ED8;          /* teks · 1 pemakaian */
+  --ink-27: #1A2A3A;          /* teks · 1 pemakaian */
+  --ink-28: #0D47A1;          /* teks · 1 pemakaian */
+  --ink-29: #78350F;          /* teks · 1 pemakaian */
+  --ink-30: #14532D;          /* teks · 1 pemakaian */
+  --tint-01: #DCFCE7;         /* latar · 9 pemakaian */
+  --tint-02: #FEE2E2;         /* latar · 7 pemakaian */
+  --tint-03: #EDE9FE;         /* latar · 5 pemakaian */
+  --tint-04: #E8F5E9;         /* latar · 2 pemakaian */
 }
 
 /* ══ TEMA GELAP ══════════════════════════════════════════════════
@@ -158,6 +197,44 @@ html[data-theme="dark"] {
   --shadow:     0 4px 16px rgba(0,0,0,.5);
   --shadow-md:  0 8px 32px rgba(0,0,0,.55);
   --shadow-lg:  0 16px 48px rgba(0,0,0,.6);
+
+  /* Pasangan tema gelap untuk token tinta. Rona dipertahankan, kecerahan
+     dibalik agar terbaca — inilah yang membuat tema gelap tidak lagi
+     menyembunyikan teks. */
+  --ink-01: #D1D1D1;
+  --ink-02: #CCCCCC;
+  --ink-03: #EAD3B8;
+  --ink-04: #BFD1E3;
+  --ink-05: #B1AEE7;
+  --ink-06: #B8EACB;
+  --ink-07: #C2CDE0;
+  --ink-08: #EAB8B8;
+  --ink-09: #B8D8EA;
+  --ink-10: #EAB8B8;
+  --ink-11: #B0BDE8;
+  --ink-12: #B8EADC;
+  --ink-13: #E8C0AF;
+  --ink-14: #DDCBC5;
+  --ink-15: #B79BE2;
+  --ink-16: #D1D1D1;
+  --ink-17: #B8D9EA;
+  --ink-18: #EAC4B8;
+  --ink-19: #BCE6BE;
+  --ink-20: #C3ACE7;
+  --ink-21: #E4A3A3;
+  --ink-22: #ACC8E7;
+  --ink-23: #96ADE0;
+  --ink-24: #B8EAE0;
+  --ink-25: #EADEB8;
+  --ink-26: #A0B2E3;
+  --ink-27: #C0D1E3;
+  --ink-28: #B8CCEA;
+  --ink-29: #EACAB8;
+  --ink-30: #B8EACC;
+  --tint-01: #14341F;
+  --tint-02: #341414;
+  --tint-03: #1A1434;
+  --tint-04: #163218;
 }
 
 html[data-theme="dark"] body { background: var(--bg); color: var(--text); }

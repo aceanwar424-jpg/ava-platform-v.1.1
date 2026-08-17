@@ -107,7 +107,7 @@ async function renderPayables() {
     </div>
 
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:11px 14px;
-      margin-bottom:14px;font-size:12.5px;color:#7a4a12">
+      margin-bottom:14px;font-size:12.5px;color:var(--ink-03)">
       <b>Aturan pembayaran:</b> faktur hanya dapat dibayar bila hasil pencocokan tiga arah
       berstatus <b>Cocok</b> — yaitu nilai faktur sepadan dengan nilai barang yang benar-benar
       diterima. Aturan ini dijaga langsung oleh basis data dan tidak dapat dilewati dari layar mana pun.

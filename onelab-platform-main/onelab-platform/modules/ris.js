@@ -118,7 +118,7 @@ function paintRIS() {
       </thead>
       <tbody>${list.map(o => {
         const st = RIS_STATUS[o.status] || RIS_STATUS['Dijadwalkan'];
-        return `<tr style="border-bottom:1px solid #f1f5f9">
+        return `<tr style="border-bottom:1px solid var(--bg2)">
           <td style="padding:8px 10px"><span style="font-family:ui-monospace,monospace;font-size:11.5px;font-weight:700;color:var(--teal)">${o.accession_no || '—'}</span>
             ${o.priority === 'Cito' ? '<div style="font-size:10px;color:var(--danger-deep);font-weight:700">CITO</div>' : ''}</td>
           <td style="padding:8px 10px"><div style="font-weight:700;color:var(--navy)">${o.patient_name || '—'}</div>
@@ -425,7 +425,7 @@ async function printRISReport(orderId) {
       .box{border:1px solid #ddd;border-radius:6px;padding:10px 12px;margin-bottom:14px;font-size:11.5px}
       .sec{margin-bottom:12px} .lbl{font-weight:700;font-size:11px;text-transform:uppercase;
         letter-spacing:.06em;color:#555;margin-bottom:3px}
-      .crit{background:#FBEAEA;border:1px solid #B91C1C;color:var(--danger-deep);padding:8px 12px;
+      .crit{background:#FBEAEA;border:1px solid var(--danger-deep);color:var(--danger-deep);padding:8px 12px;
         border-radius:6px;font-weight:700;margin-bottom:12px}
       .sign{margin-top:44px;text-align:right}
       .sign div{display:inline-block;width:220px;text-align:center;border-top:1px solid #333;padding-top:4px}</style>

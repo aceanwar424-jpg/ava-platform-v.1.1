@@ -159,15 +159,15 @@ function renderStockAlerts() {
   let html = '';
   if (low.length) html += `
     <div style="background:#FFF7ED;border:1px solid #FED7AA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
-      <div style="font-weight:700;color:#C2410C;font-size:12.5px">⚠️ ${low.length} barang di bawah stok minimum</div>
-      <div style="font-size:11px;color:#9A3412;margin-top:2px">
+      <div style="font-weight:700;color:var(--ink-13);font-size:12.5px">⚠️ ${low.length} barang di bawah stok minimum</div>
+      <div style="font-size:11px;color:var(--ink-18);margin-top:2px">
         ${low.slice(0,5).map(i=>`${i.item_name} (${i.stock_qty} ${i.unit})`).join(', ')}${low.length>5?` +${low.length-5} lainnya`:''}
       </div>
     </div>`;
   if (expired.length) html += `
     <div style="background:var(--danger-soft);border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
       <div style="font-weight:700;color:var(--danger-deep);font-size:12.5px">${expired.length} batch SUDAH kedaluwarsa — jangan dipakai</div>
-      <div style="font-size:11px;color:#991B1B;margin-top:2px">
+      <div style="font-size:11px;color:var(--ink-10);margin-top:2px">
         ${expired.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)}, sisa ${b.qty_remaining})`).join(' · ')}${expired.length>5?` +${expired.length-5} lainnya`:''}
       </div>
     </div>`;

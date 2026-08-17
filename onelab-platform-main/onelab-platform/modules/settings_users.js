@@ -627,7 +627,7 @@ function openInviteUserForm() {
       <div class="modal-title">+ Tambah User Profile</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 12px;font-size:12px;color:#5D4037;margin-bottom:12px">
+    <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ink-14);margin-bottom:12px">
       ℹ️ User mendaftar sendiri di halaman login. Setelah login pertama, role diatur di sini.
     </div>
     <div class="form-group">

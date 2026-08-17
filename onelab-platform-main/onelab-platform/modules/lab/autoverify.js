@@ -112,7 +112,7 @@ async function openAutoverifyRules() {
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
 
     <div style="background:#FBF1E4;border:1px solid #E0A75E55;border-radius:8px;padding:10px 13px;
-      margin-bottom:12px;font-size:12.5px;color:#7a4a12">
+      margin-bottom:12px;font-size:12.5px;color:var(--ink-03)">
       Mulailah dari sedikit pemeriksaan yang paling stabil. Hasil yang lolos otomatis tetap
       tercatat di jejak audit dan sebaiknya ditinjau berkala.
     </div>

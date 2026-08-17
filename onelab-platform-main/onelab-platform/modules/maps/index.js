@@ -90,7 +90,7 @@ async function renderMaps() {
             onblur="this.style.borderColor='var(--border)'">
           <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none">📍</span>
         </div>
-        <div id="place-confirmed" style="display:none;margin-top:8px;padding:8px 12px;background:var(--mint);border-radius:6px;font-size:12px;color:#085041;display:flex;align-items:center;gap:6px"></div>
+        <div id="place-confirmed" style="display:none;margin-top:8px;padding:8px 12px;background:var(--mint);border-radius:6px;font-size:12px;color:var(--ink-24);display:flex;align-items:center;gap:6px"></div>
       </div>
 
       <div class="form-row" style="margin-bottom:14px">
@@ -539,7 +539,7 @@ function plotMapsResultMarkers() {
         <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">${r.address}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
           ${r.rating ? `<span style="font-size:11px;font-weight:600">${r.rating} (${r.reviews})</span>` : ''}
-          ${isDB ? '<span style="background:#DCFCE7;color:#166534;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">✓ Ada di DB</span>'
+          ${isDB ? '<span style="background:var(--tint-01);color:var(--ink-06);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">✓ Ada di DB</span>'
                  : '<span style="background:var(--warn-soft);color:var(--warn-deeper);font-size:10px;padding:2px 6px;border-radius:4px;font-weight:600">Baru</span>'}
         </div>
         <div style="display:flex;gap:6px">
