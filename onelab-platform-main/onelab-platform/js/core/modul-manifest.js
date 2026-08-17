@@ -105,6 +105,24 @@ window.MODUL_HALAMAN = {
  "satusehat": [
   "modules/satusehat.js"
  ],
+ "ar-aging": [
+  "modules/finance_aging.js"
+ ],
+ "lab-tat": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js"
+ ],
  "hc-schedule": [
   "modules/homecare.js"
  ],
@@ -150,7 +168,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/qc.js",
   "modules/lab/autoverify.js",
   "modules/lab/integration.js",
-  "modules/lab/parser_config.js"
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js"
  ],
  "product": [
   "modules/config_product.js"
@@ -322,5 +341,7 @@ window.MODUL_SEMUA = [
  "modules/settings.js",
  "modules/db_studio.js",
  "modules/import_excel.js",
- "modules/agentic/canvas.js"
+ "modules/agentic/canvas.js",
+ "modules/finance_aging.js",
+ "modules/lab/tat.js"
 ];

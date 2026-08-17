@@ -616,6 +616,7 @@ const FLYOUT_MENUS = {
       {page:'lab-approval', icon:'shield-check', label:'Approval',          action:"navigate('lab',{tab:'approval'})"},
       {page:'lab-report', icon:'folder', label:'Rekam Medis Lab',   action:"navigate('lab',{tab:'report'})"},
       {page:'lab-qc', icon:'sliders', label:'QC & Analyzer',     action:"navigate('lab',{tab:'qc'})"},
+      {page:'lab-tat', icon:'activity', label:'Turnaround Time', desc:'Lama tiap tahap dan di mana pekerjaan menumpuk', action:"navigate('lab-tat')"},
       {page:'referral', icon:'truck', label:'Rujukan Lab Luar', desc:'Kirim, lacak, terima hasil, dan hitung margin lab rekanan', action:"navigate('referral')"},
       {page:'medrecord', icon:'folders', label:'Rekam Medis Umum',  action:"navigate('medrecord')"},
     ]
@@ -672,6 +673,7 @@ const FLYOUT_MENUS = {
       {page:'finance-ar', icon:'receipt', label:'Tagihan AR', action:"navigate('finance',{tab:'invoice'})"},
       {page:'finance-comm', icon:'trophy', label:'Komisi Sales', action:"navigate('finance',{tab:'commission'})"},
       {page:'finance-report', icon:'bar-chart', label:'Laporan Keuangan', action:"navigate('finance',{tab:'report'})"},
+      {page:'ar-aging', icon:'receipt', label:'Umur Piutang', desc:'Tagihan lewat jatuh tempo per kelompok umur dan penunggak terbesar', action:"navigate('ar-aging')"},
       {page:'accounting', icon:'book-open', label:'Akuntansi', group:'Pembukuan', desc:'Buku besar, neraca saldo, dan laba rugi per unit layanan', action:"navigate('accounting')"},
       {page:'payables', icon:'receipt', label:'Hutang Usaha', group:'Pembukuan', desc:'Faktur supplier, pencocokan tiga arah, dan pengendalian pembayaran', action:"navigate('payables')"},
       {page:'assets', icon:'wrench', label:'Aset & Kalibrasi', group:'Pembukuan', desc:'Aset tetap, penyusutan, dan jadwal kalibrasi alat', action:"navigate('assets')"},
