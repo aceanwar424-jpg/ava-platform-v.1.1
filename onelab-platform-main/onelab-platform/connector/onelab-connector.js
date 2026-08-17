@@ -249,6 +249,9 @@ function ambilBarcodeQuery(incoming, protocol) {
   return '';
 }
 
+// Selalu lebih pendek daripada timeout host-query alat (umumnya 10–30 detik).
+const ORDER_TIMEOUT_MS = parseInt(CFG.order_timeout_ms, 10) || 5000;
+
 function apakahQuery(incoming, protocol) {
   if (protocol === 'ASTM') return /(^|\r|\n)Q\|/.test(incoming);
   // ORM^O01 SENGAJA tidak dianggap query: itu pesan ORDER yang dikirim host
@@ -263,10 +266,19 @@ async function maybeSendOrders(socket, analyzer, incoming, protocol) {
   const barcode = ambilBarcodeQuery(incoming, protocol);
   let orders = [];
   try {
-    orders = await rpc('analyzer_pending_orders', { p_analyzer_id: analyzer.id });
+    // Batas waktu WAJIB. Alat sedang menunggu jawaban di ujung sana; bila
+    // pengambilan order menggantung (internet klinik putus, Supabase lambat),
+    // alat ikut menggantung sampai timeout internalnya sendiri dan sampel
+    // berhenti diproses. Lebih baik dijawab "tidak ada order" dalam hitungan
+    // detik — alat akan bertanya lagi.
+    orders = await Promise.race([
+      rpc('analyzer_pending_orders', { p_analyzer_id: analyzer.id }),
+      new Promise((_, tolak) =>
+        setTimeout(() => tolak(new Error('batas waktu 5 dtk terlampaui')), ORDER_TIMEOUT_MS)),
+    ]);
   } catch (e) {
-    log(`  ⚠ ambil order gagal: ${e.message}`);
-    return;   // jangan diamkan alat: lanjut ke balasan kosong di bawah
+    log(`  ⚠ ambil order gagal (${e.message}) — dijawab kosong agar alat tidak menggantung`);
+    orders = [];
   }
   orders = Array.isArray(orders) ? orders : [];
 
@@ -410,20 +422,132 @@ function pisahkanQcAstm(raw) {
   return hasil;
 }
 
+// ── Penilaian Westgard ────────────────────────────────────────────────
+// Mencatat angka QC saja belum menjadi bukti mutu; yang dinilai auditor
+// adalah apakah rentetannya melanggar aturan. Aturan yang memerlukan
+// riwayat (2-2s, R-4s, 4-1s, 10x) memakai run sebelumnya pada alat, tes,
+// dan level yang sama.
+//
+// `riwayatZ` = z-score run sebelumnya, urut dari yang TERBARU.
+function nilaiWestgard(z, riwayatZ = []) {
+  const abs = Math.abs(z);
+  const semua = [z, ...riwayatZ];                       // termasuk run ini
+  const sama = (a, b) => (a >= 0) === (b >= 0);         // sisi yang sama terhadap mean
+
+  // 1-3s — kesalahan acak besar. Paling tegas, dicek lebih dulu.
+  if (abs > 3) return { verdict: 'REJECT', rule: '1-3s',
+    catatan: 'Menyimpang >3 SD. Tolak batch, telusuri alat/reagen sebelum melanjutkan.' };
+
+  // R-4s — selisih dua run berturut pada sisi berlawanan melebihi 4 SD.
+  if (riwayatZ.length >= 1 && Math.abs(z - riwayatZ[0]) > 4 && !sama(z, riwayatZ[0]))
+    return { verdict: 'REJECT', rule: 'R-4s',
+      catatan: 'Rentang dua run >4 SD berlawanan arah. Indikasi kesalahan acak.' };
+
+  // 2-2s — dua run berturut >2 SD pada sisi yang sama.
+  if (abs > 2 && riwayatZ.length >= 1 && Math.abs(riwayatZ[0]) > 2 && sama(z, riwayatZ[0]))
+    return { verdict: 'REJECT', rule: '2-2s',
+      catatan: 'Dua run berturut >2 SD searah. Indikasi kesalahan sistematik.' };
+
+  // 4-1s — empat run berturut >1 SD pada sisi yang sama.
+  if (semua.length >= 4 && semua.slice(0, 4).every(v => Math.abs(v) > 1 && sama(v, z)))
+    return { verdict: 'REJECT', rule: '4-1s',
+      catatan: 'Empat run berturut >1 SD searah. Pergeseran sistematik.' };
+
+  // 10x — sepuluh run berturut pada sisi yang sama, sekecil apa pun simpangannya.
+  if (semua.length >= 10 && semua.slice(0, 10).every(v => sama(v, z)))
+    return { verdict: 'REJECT', rule: '10x',
+      catatan: 'Sepuluh run berturut di sisi yang sama. Bias terhadap mean.' };
+
+  // 1-2s — bukan penolakan, melainkan tanda waspada.
+  if (abs > 2) return { verdict: 'WARNING', rule: '1-2s',
+    catatan: 'Satu run >2 SD. Amati run berikutnya sebelum menyimpulkan.' };
+
+  return { verdict: 'PASS', rule: null, catatan: null };
+}
+
+async function ambilLot(analyzer, r) {
+  const q = new URLSearchParams({
+    select: 'target,sd,unit,lot_number',
+    analyzer_id: `eq.${analyzer.id}`,
+    test_name: `eq.${r.test_name}`,
+    is_active: 'eq.true',
+    limit: '1',
+  });
+  if (r.qc_level) q.set('qc_level', `eq.${r.qc_level}`);
+  if (r.lot_number) q.set('lot_number', `eq.${r.lot_number}`);
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/lab_qc_lots?${q}`, { headers: HDR });
+  if (!res.ok) return null;
+  const d = await res.json().catch(() => []);
+  return Array.isArray(d) && d[0] ? d[0] : null;
+}
+
+async function ambilRiwayatZ(analyzer, r, n = 10) {
+  const q = new URLSearchParams({
+    select: 'z_score',
+    analyzer_id: `eq.${analyzer.id}`,
+    test_name: `eq.${r.test_name}`,
+    order: 'run_at.desc',
+    limit: String(n),
+  });
+  if (r.qc_level) q.set('qc_level', `eq.${r.qc_level}`);
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/lab_qc_runs?${q}`, { headers: HDR });
+  if (!res.ok) return [];
+  const d = await res.json().catch(() => []);
+  return (Array.isArray(d) ? d : [])
+    .map(x => parseFloat(x.z_score)).filter(Number.isFinite);
+}
+
 async function kirimQc(analyzer, runs) {
   if (!runs.length) return;
-  const baris = runs.map(r => ({
-    analyzer_id: analyzer.id, analyzer_name: analyzer.name,
-    test_name: r.test_name, measured: r.measured,
-    qc_level: r.qc_level, lot_number: r.lot_number,
-    run_by: 'connector', notes: 'Otomatis dari alat',
-  }));
+
+  const baris = [];
+  for (const r of runs) {
+    const dasar = {
+      analyzer_id: analyzer.id, analyzer_name: analyzer.name,
+      test_name: r.test_name, measured: r.measured,
+      qc_level: r.qc_level, lot_number: r.lot_number,
+      run_by: 'connector',
+    };
+
+    let lot = null;
+    try { lot = await ambilLot(analyzer, r); } catch (e) { /* dinilai tanpa lot di bawah */ }
+
+    if (!lot) {
+      // Tanpa target & SD, z-score tidak bisa dihitung. Angkanya tetap
+      // disimpan agar tidak hilang, tetapi TIDAK dinilai — memberi verdict
+      // tanpa dasar sama saja mengarang bukti mutu.
+      baris.push({ ...dasar, notes: 'Otomatis dari alat — lot QC belum terdaftar, belum dinilai' });
+      log(`  ⚠ QC ${r.test_name} (${r.qc_level || 'tanpa level'}): lot belum terdaftar di lab_qc_lots`);
+      continue;
+    }
+
+    const z = (r.measured - Number(lot.target)) / Number(lot.sd);
+    let riwayat = [];
+    try { riwayat = await ambilRiwayatZ(analyzer, r); } catch (e) { /* aturan rentetan dilewati */ }
+    const nilai = nilaiWestgard(z, riwayat);
+
+    baris.push({
+      ...dasar,
+      target: Number(lot.target), sd: Number(lot.sd),
+      z_score: Number(z.toFixed(3)),
+      verdict: nilai.verdict,
+      notes: nilai.rule ? `${nilai.rule} — ${nilai.catatan}` : 'Otomatis dari alat — dalam batas',
+    });
+
+    if (nilai.verdict === 'REJECT')
+      log(`  ⛔ QC ${r.test_name} ${nilai.rule}: z=${z.toFixed(2)} — batch perlu ditahan`);
+    else if (nilai.verdict === 'WARNING')
+      log(`  ⚡ QC ${r.test_name} 1-2s: z=${z.toFixed(2)}`);
+  }
+
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/lab_qc_runs`, {
       method: 'POST', headers: HDR, body: JSON.stringify(baris),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status} ${(await res.text()).slice(0, 120)}`);
-    log(`  ✓ QC otomatis: ${baris.length} hasil dari ${analyzer.name}`);
+    const ditolak = baris.filter(b => b.verdict === 'REJECT').length;
+    log(`  ✓ QC otomatis: ${baris.length} hasil dari ${analyzer.name}` +
+        (ditolak ? ` — ${ditolak} REJECT` : ''));
   } catch (e) {
     // Jangan diamkan: QC yang gagal naik berarti bukti mutu hilang.
     log(`  ⚠ QC gagal diunggah (${analyzer.name}): ${e.message}`);
@@ -798,6 +922,6 @@ if (require.main === module) {
 
 // Diekspor untuk pengujian protokol (parsing query, penandaan QC, framing).
 module.exports = {
-  ambilBarcodeQuery, apakahQuery, pisahkanQcAstm,
+  ambilBarcodeQuery, apakahQuery, pisahkanQcAstm, nilaiWestgard,
   astmFrame, sendAstmOrders, attachHandler,
 };

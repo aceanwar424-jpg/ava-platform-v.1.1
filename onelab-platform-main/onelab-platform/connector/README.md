@@ -123,8 +123,44 @@ baik kosong daripada angka karangan pada catatan mutu.
 Penandaan QC berbeda tiap alat. Sesuaikan lewat `config.json`:
 
 ```json
-{ "qc_pattern": "^(QC|CTRL|CONTROL)" }
+{ "qc_pattern": "^(QC|CTRL|CONTROL)", "order_timeout_ms": 5000 }
 ```
+
+### Penilaian Westgard otomatis
+
+Bila lot bahan kontrol sudah terdaftar di **`lab_qc_lots`** (alat + tes + level →
+target & SD), connector langsung menghitung z-score dan menilai aturan Westgard,
+lalu mengisi kolom `target`, `sd`, `z_score`, dan `verdict` di `lab_qc_runs`.
+
+| Aturan | Arti | Hasil |
+|---|---|---|
+| `1-2s` | satu run >2 SD | WARNING |
+| `1-3s` | satu run >3 SD | REJECT |
+| `2-2s` | dua run berturut >2 SD searah | REJECT |
+| `R-4s` | rentang dua run >4 SD berlawanan | REJECT |
+| `4-1s` | empat run berturut >1 SD searah | REJECT |
+| `10x` | sepuluh run berturut di sisi sama | REJECT |
+
+Aturan yang butuh rentetan membaca 10 run terakhir untuk alat, tes, dan level
+yang sama. **Bila lot belum terdaftar, nilainya tetap disimpan tetapi tidak
+dinilai** — memberi verdict tanpa target dan SD sama saja mengarang bukti mutu.
+
+## Simulator alat — uji tanpa hardware
+
+Verifikasi connector tidak perlu menunggu berhadapan dengan alat sungguhan di
+lab yang sedang berjalan. `simulator-alat.js` berperan sebagai alat:
+
+```bash
+node simulator-alat.js hasil --port 5001 --barcode 778899
+node simulator-alat.js query --port 5001 --barcode 778899
+node simulator-alat.js qc    --port 5001 --level "LEVEL 2" --lot A77
+```
+
+Pilihan lain: `--host`, `--protokol HL7`, `--tes`, `--nilai`.
+Connector harus dalam mode `server` (listen) pada porta yang dituju.
+
+Keluarannya menampilkan tiap frame dua arah (`→` keluar, `←` masuk), sehingga
+handshake ASTM dan jawaban order bisa diperiksa langsung.
 
 ## Keamanan
 - Connector menulis ke **staging** (`analyzer_messages`), bukan langsung `lab_results`.
