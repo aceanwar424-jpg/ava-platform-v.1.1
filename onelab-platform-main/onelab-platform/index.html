@@ -218,100 +218,27 @@
 <script defer src="js/auth.js?v=20260719s"></script>
 
 <script defer src="modules/dashboard/index.js?v=20260719s"></script>
-<script defer src="modules/partners/index.js?v=20260721n"></script>
-<script defer src="modules/partners/deals.js?v=20260719s"></script>
-<script defer src="modules/maps/index.js?v=20260719s"></script>
-<script defer src="modules/marketing.js?v=20260719s"></script>
-<script defer src="modules/voucher.js?v=20260719s"></script>
-<script defer src="modules/surat.js?v=20260719s"></script>
+<!-- Modul bisnis TIDAK lagi dimuat semuanya di awal (dulu 82 berkas / 3,1 MB).
+     Manifest di bawah memetakan halaman → berkas; router memuatnya saat dibuka.
+     Empat modul tetap eager karena dipakai sebelum navigasi pertama. -->
+<script defer src="js/core/modul-manifest.js?v=20260815a"></script>
+<script defer src="js/core/lazy.js?v=20260815a"></script>
 <script defer src="modules/mou.js?v=20260719s"></script>
-<script defer src="modules/test_reviewer.js?v=20260813a"></script>
-<script defer src="modules/ava_health.js?v=20260813a"></script>
-<script defer src="modules/leads.js?v=20260719s"></script>
-<script defer src="modules/finance.js?v=20260726a"></script>
-<script defer src="modules/accounting.js?v=20260719s"></script>
-<script defer src="modules/payables.js?v=20260719s"></script>
-<script defer src="modules/assets.js?v=20260719s"></script>
-<script defer src="modules/audit.js?v=20260719s"></script>
-<script defer src="modules/satusehat.js?v=20260815a"></script>
-<script defer src="modules/inventory.js?v=20260719s"></script>
-<script defer src="modules/hrd.js?v=20260719s"></script>
-<script defer src="modules/payroll.js?v=20260719s"></script>
-<script defer src="modules/work_schedule.js?v=20260719s"></script>
-<script defer src="modules/task_management.js?v=20260719s"></script>
-<script defer src="modules/org_structure.js?v=20260719s"></script>
-<script defer src="modules/attendance.js?v=20260719s"></script>
-<script defer src="modules/regulatory_reports.js?v=20260719s"></script>
-<script defer src="modules/rl_reports.js?v=20260719s"></script>
 <script defer src="modules/executive_dashboard.js?v=20260719s"></script>
-<script defer src="modules/homecare.js?v=20260723a"></script>
-<script defer src="modules/mcu.js?v=20260719s"></script>
-<script defer src="modules/admission.js?v=20260726b"></script>
-<script defer src="modules/anamnesa.js?v=20260719s"></script>
 
 <!-- Laboratory Services & Open-Source HealthTech 2026 -->
 <script defer src="js/core/fhirConverter.js?v=20260803a"></script>
 <script defer src="js/core/privacyGateway.js?v=20260803a"></script>
-<script defer src="modules/lab/qcEngine.js?v=20260803a"></script>
-<script defer src="modules/radiology/dicomViewer.js?v=20260803a"></script>
 <script defer src="js/core/conclusionEngine.js?v=20260719s"></script>
 <script defer src="js/core/auditLogger.js?v=20260719s"></script>
 <script defer src="js/core/pkiService.js?v=20260719s"></script>
 <script defer src="js/core/ntpService.js?v=20260719s"></script>
 
 <!-- Laboratory Information System (LIS) — modular -->
-<script defer src="modules/lab/index.js?v=20260723b"></script>
-<script defer src="modules/lab/checkin.js?v=20260723g"></script>
-<script defer src="modules/lab/worklist.js?v=20260723a"></script>
-<script defer src="modules/lab/results.js?v=20260719s"></script>
-<script defer src="modules/lab/validation.js?v=20260719v"></script>
-<script defer src="modules/lab/impression.js?v=20260719s"></script>
-<script defer src="modules/lab/report.js?v=20260719u"></script>
-<script defer src="modules/lab/qc.js?v=20260723a"></script>
-<script defer src="modules/lab/autoverify.js?v=20260719s"></script>
-<script defer src="modules/referral.js?v=20260719s"></script>
-<script defer src="modules/lab/integration.js?v=20260723f"></script>
-<script defer src="modules/lab/parser_config.js?v=20260723e"></script>
-<script defer src="modules/radiology.js?v=20260719s"></script>
-<script defer src="modules/pacs.js?v=20260719s"></script>
-<script defer src="modules/ris.js?v=20260719s"></script>
-<script defer src="modules/supportive.js?v=20260719s"></script>
-<script defer src="modules/medrecord.js?v=20260719s"></script>
-<script defer src="modules/inpatient.js?v=20260719s"></script>
-<script defer src="modules/pharmacy.js?v=20260719s"></script>
-<script defer src="modules/crm_pipeline.js?v=20260719s"></script>
-<script defer src="modules/timeline.js?v=20260719s"></script>
-<script defer src="modules/clinicflow.js?v=20260719s"></script>
-<script defer src="modules/cashier.js?v=20260719s"></script>
-<script defer src="modules/config_product.js?v=20260719s"></script>
-<script defer src="modules/config_package.js?v=20260726a"></script>
-<script defer src="modules/config_family.js?v=20260719s"></script>
 <!-- Wiki OneLab -->
-<script defer src="modules/wiki/index.js?v=20260721l"></script>
-<script defer src="modules/wiki/sop.js?v=20260719s"></script>
-<script defer src="modules/wiki/fix.js?v=20260719s"></script>
-<script defer src="modules/wiki/studio.js?v=20260719s"></script>
 
 <!-- Agentic AI Suite (2026 High Performance Edition) -->
-<script defer src="modules/agentic/mcp.js?v=20260803a"></script>
-<script defer src="modules/agentic/orchestrator.js?v=20260803a"></script>
-<script defer src="modules/agentic/clinical_agent.js?v=20260803a"></script>
-<script defer src="modules/agentic/index.js?v=20260803a"></script>
-<script defer src="modules/agentic/inbox.js?v=20260719s"></script>
-<script defer src="modules/agentic/docs.js?v=20260721n"></script>
-<script defer src="modules/agentic/overlap.js?v=20260721b"></script>
-<script defer src="modules/agentic/aieditor.js?v=20260721j"></script>
-<script defer src="modules/agentic/rag.js?v=20260721a"></script>
-<script defer src="modules/agentic/docxfill.js?v=20260719z"></script>
-<script defer src="modules/agentic/studio.js?v=20260719s"></script>
-<script defer src="modules/agentic/render.js?v=20260719s"></script>
-<script defer src="modules/agentic/org.js?v=20260721j"></script>
-<script defer src="modules/config_home.js?v=20260719s"></script>
-<script defer src="modules/config_labreport.js?v=20260719s"></script>
-<script defer src="modules/settings.js?v=20260719s"></script>
 <script defer src="modules/settings_users.js?v=20260719s"></script>
-<script defer src="modules/db_studio.js?v=20260814a"></script>
-<script defer src="modules/import_excel.js?v=20260725a"></script>
 
 <script>
 // ── Sidebar rail — always 64px, flyout handles submenu ──
@@ -359,6 +286,9 @@ window.addEventListener('DOMContentLoaded', async () => {
           if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
           checkConnection();
           navigate('dashboard');
+          // Sesudah aplikasi diam, siapkan modul yang paling sering dibuka
+          // supaya perpindahan pertama terasa seketika — tanpa membebani boot.
+          if (typeof prefetchModulUmum === 'function') prefetchModulUmum();
           // Check renewals after load
           setTimeout(()=>{ if(typeof checkMOURenewals==='function') checkMOURenewals(); }, 2000);
           return;

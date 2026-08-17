@@ -27,7 +27,9 @@ const PAGE_TITLES = {
 
 let currentPage = '';
 
-function navigate(page, params={}) {
+// async: modul halaman dimuat saat dibutuhkan (lihat js/core/lazy.js).
+// Pemanggil lama tidak perlu diubah — mereka mengabaikan nilai kembalian.
+async function navigate(page, params={}) {
   // Sync rail + flyout active states (new sidebar structure)
   if (typeof syncFlyoutToPage === 'function') syncFlyoutToPage(page);
 
@@ -41,8 +43,23 @@ function navigate(page, params={}) {
 
   currentPage = page;
 
-  function safeRun(fnName, ...args) {
+  // Muat modul halaman ini lebih dulu. Untuk halaman yang modulnya sudah
+  // termuat (atau eager), ini selesai seketika.
+  if (typeof pastikanModulHalaman === 'function') {
+    try { await pastikanModulHalaman(page); }
+    catch (e) { console.warn('[Router] pemuatan modul gagal:', e); }
+  }
+
+  // Halaman lain mungkin sudah dibuka sementara modul ini dimuat; jangan
+  // menimpa layar yang sedang aktif dengan hasil navigasi yang sudah basi.
+  if (currentPage !== page) return;
+
+  async function safeRun(fnName, ...args) {
     try {
+      if (typeof window[fnName] !== 'function' && typeof muatSemuaModul === 'function') {
+        await muatSemuaModul();                     // jaring pengaman lintas-modul
+        if (currentPage !== page) return;
+      }
       if (typeof window[fnName] === 'function') {
         window[fnName](...args);
       } else {
