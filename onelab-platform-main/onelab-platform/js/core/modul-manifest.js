@@ -111,6 +111,12 @@ window.MODUL_HALAMAN = {
  "penawaran": [
   "modules/quotation.js"
  ],
+ "ops-kendali": [
+  "modules/ops_kendali.js"
+ ],
+ "sales-corong": [
+  "modules/sales_corong.js"
+ ],
  "lab-tat": [
   "modules/lab/qcEngine.js",
   "modules/lab/index.js",
@@ -347,5 +353,7 @@ window.MODUL_SEMUA = [
  "modules/agentic/canvas.js",
  "modules/finance_aging.js",
  "modules/lab/tat.js",
- "modules/quotation.js"
+ "modules/quotation.js",
+ "modules/ops_kendali.js",
+ "modules/sales_corong.js"
 ];
