@@ -540,9 +540,9 @@ async function renderShiftCalendar() {
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
             ${SHIFT_TEMPLATES.map(t=>`
               <button id="cal-btn-${t.code}" class="btn btn-sm btn-ghost" onclick="setCalShift('${t.code}')">${t.code}</button>`).join('')}
-            <button id="cal-btn-OFF" class="btn btn-sm btn-ghost" onclick="setCalShift('OFF')" style="color:#EF4444">OFF</button>
+            <button id="cal-btn-OFF" class="btn btn-sm btn-ghost" onclick="setCalShift('OFF')" style="color:var(--danger)">OFF</button>
             <button id="cal-btn-C" class="btn btn-sm btn-ghost" onclick="setCalShift('C')" style="color:#8B5CF6">CUTI</button>
-            <button id="cal-btn-S" class="btn btn-sm btn-ghost" onclick="setCalShift('S')" style="color:#F59E0B">SAKIT</button>
+            <button id="cal-btn-S" class="btn btn-sm btn-ghost" onclick="setCalShift('S')" style="color:var(--gold)">SAKIT</button>
             <button id="cal-btn-I" class="btn btn-sm btn-ghost" onclick="setCalShift('I')" style="color:#6B7280">IZIN</button>
           </div>
           <div id="cal-active-info" style="font-size:12px;color:var(--text3);margin-bottom:12px">

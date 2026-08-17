@@ -609,7 +609,7 @@ async function renderMCU() {
     </div>
 
     <div class="table-wrap" style="border:1px solid #d3dae1;border-radius:8px;overflow:hidden">
-      <div class="table-toolbar" style="padding:10px;background:#f8fafc;border-bottom:1px solid #d3dae1;display:flex;gap:8px">
+      <div class="table-toolbar" style="padding:10px;background:var(--bg);border-bottom:1px solid #d3dae1;display:flex;gap:8px">
         <input class="table-search" id="mcu-q" placeholder="Cari project, partner..."
           oninput="mcuFilter.search=this.value.toLowerCase();filterMCU()" style="flex:1">
         <select class="table-filter" id="mcu-status" onchange="mcuFilter.status=this.value;filterMCU()">
@@ -1203,7 +1203,7 @@ async function rabRenderOpsTable(opMap={}, peserta=100, days=1) {
             oninput="rabRecalc()">
         </td>`:''}
         <td style="padding:5px 8px;text-align:right;font-weight:600" id="rab-row-total-${safeKey}">${formatCurrency(price*qtyPlan)}</td>
-        ${isAct?`<td style="padding:5px 8px;text-align:right;font-weight:600;color:#06B6D4" id="rab-row-act-${safeKey}">${formatCurrency(price*qtyAct)}</td>`:''}
+        ${isAct?`<td style="padding:5px 8px;text-align:right;font-weight:600;color:var(--teal2)" id="rab-row-act-${safeKey}">${formatCurrency(price*qtyAct)}</td>`:''}
       </tr>`;
     });
     html += '</tbody></table>';
@@ -1566,12 +1566,12 @@ async function printRAB(projectId) {
       h2{margin-bottom:2px} .sub{color:#666;margin-bottom:16px;font-size:12px}
       table{width:100%;border-collapse:collapse;margin-bottom:14px}
       th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
-      th{background:#f1f5f9} .r{text-align:right} .c{text-align:center}
-      .section{font-weight:700;font-size:12.5px;color:#0891B2;text-transform:uppercase;margin:16px 0 6px}
+      th{background:var(--bg2)} .r{text-align:right} .c{text-align:center}
+      .section{font-weight:700;font-size:12.5px;color:var(--teal);text-transform:uppercase;margin:16px 0 6px}
       .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
       .sumcard{border:1px solid #ddd;border-radius:6px;padding:10px}
       .sumcard .lbl{font-size:10px;color:#777} .sumcard .val{font-size:14px;font-weight:700}
-      .total-row{font-weight:700;background:#f8fafc}
+      .total-row{font-weight:700;background:var(--bg)}
       .sign{margin-top:40px;display:flex;justify-content:space-between}
       .sign div{width:200px;text-align:center;border-top:1px solid #333;padding-top:4px}
     </style></head><body>
@@ -1597,7 +1597,7 @@ async function printRAB(projectId) {
     <div class="section">Step 3 — Biaya Operasional (per Sumber Dana)</div>
     ${Object.entries(opsBySource).map(([source, rows])=>{
       const subTotal = rows.reduce((s,o)=>s+o.total,0);
-      return `<table><thead><tr><th colspan="7" style="background:#0891B2;color:#fff">${source}</th></tr>
+      return `<table><thead><tr><th colspan="7" style="background:var(--teal);color:#fff">${source}</th></tr>
         <tr><th>Item</th><th class="c">UoM</th><th>Skema</th><th class="r">Harga</th><th class="c">Qty Plan</th><th class="c">Qty Aktual</th><th class="r">Total Plan</th></tr></thead>
         <tbody>
           ${rows.map(o=>`<tr><td>${o.name}</td><td class="c">${o.uom}</td><td>${o.scheme}</td><td class="r">${formatCurrency(o.harga)}</td><td class="c">${o.qtyPlan}</td><td class="c">${o.qtyActual}</td><td class="r">${formatCurrency(o.total)}</td></tr>`).join('')}

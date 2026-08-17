@@ -182,7 +182,7 @@ function renderAgRagTab(el) {
             🔍
           </div>
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:700; color:#F8FAFC;">RAG SOP & Vector Search Engine</h3>
+            <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--bg);">RAG SOP & Vector Search Engine</h3>
             <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Pencarian dokumen SOP, analisis tumpang tindih (Overlap), & grounding jawaban medis berbasis AI.</p>
           </div>
         </div>

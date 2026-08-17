@@ -406,7 +406,7 @@ async function audShowDetail(id) {
     const fmt = v => v === undefined ? '<i style="color:var(--gray)">—</i>'
                    : v === null      ? '<i style="color:var(--gray)">kosong</i>'
                    : audEsc(typeof v === 'object' ? JSON.stringify(v) : v);
-    return `<tr style="${berubah ? 'background:#FFFBEB' : ''}">
+    return `<tr style="${berubah ? 'background:var(--gold-light)' : ''}">
       <td style="font-family:ui-monospace,monospace;font-size:11px">${audEsc(k)}</td>
       <td style="font-size:12px">${fmt(vb)}</td>
       <td style="font-size:12px;${berubah ? 'font-weight:600' : ''}">${fmt(va)}</td>

@@ -216,7 +216,7 @@ function injectWikiStyle(){
   if(document.getElementById('wiki-style')) return;
   const s=document.createElement('style'); s.id='wiki-style';
   s.textContent=`
-    .wiki-drop{ border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;background:#f8fafc;cursor:pointer;transition:.15s }
+    .wiki-drop{ border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;background:var(--bg);cursor:pointer;transition:.15s }
     .wiki-drop:hover,.wiki-drop.over{ border-color:var(--teal);background:#eefaf8 }
     .wiki-out{ background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px 16px;
       font-size:13px;line-height:1.65;white-space:pre-wrap;max-height:460px;overflow:auto }
@@ -225,7 +225,7 @@ function injectWikiStyle(){
     .wiki-sec{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;
       background:#EAF3FB;border-left:3px solid var(--teal);padding:6px 10px;border-radius:4px;margin:0 0 10px }
     .wiki-badge{ padding:2px 8px;border-radius:8px;font-size:10.5px;font-weight:700;white-space:nowrap }
-    .wiki-thumb{ width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border);background:#f1f5f9 }`;
+    .wiki-thumb{ width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border);background:var(--bg2) }`;
   document.head.appendChild(s);
 }
 

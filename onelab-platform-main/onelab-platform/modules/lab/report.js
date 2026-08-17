@@ -411,7 +411,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         <tbody>
           ${Object.entries(byCat).map(([cat,rows])=>`
             <tr class="cat-row">
-              <td colspan="${cfg.show_loinc?6:5}" style="background:#f1f5f9;font-weight:800;font-size:11.5px;padding:6px 10px;border-bottom:1px solid #cbd5e1;color:${hc}">${cat.toUpperCase()}</td>
+              <td colspan="${cfg.show_loinc?6:5}" style="background:var(--bg2);font-weight:800;font-size:11.5px;padding:6px 10px;border-bottom:1px solid #cbd5e1;color:${hc}">${cat.toUpperCase()}</td>
             </tr>
             ${_labPrintCatRows(rows, cfg)}
           `).join('')}
@@ -462,7 +462,7 @@ function _labPrintRow(r, indent, cfg){
   if (cfg.show_test_code) {
     const p = labProduct(r.product_id);
     const code = p ? (p.kode_internal || p.host_code || '') : '';
-    if (code) codeStr = ` <span style="font-size:10px;color:#64748b;font-family:monospace">[${code}]</span>`;
+    if (code) codeStr = ` <span style="font-size:10px;color:var(--text3);font-family:monospace">[${code}]</span>`;
   }
   
   const name=indent?`<span style="padding-left:16px">${r.item_name||'—'}${codeStr}</span>`:`<strong>${r.product_name||'—'}${codeStr}</strong>`;

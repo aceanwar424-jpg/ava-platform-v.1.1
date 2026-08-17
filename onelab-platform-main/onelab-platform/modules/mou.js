@@ -96,7 +96,7 @@ function renderMOUTable(data) {
         <td style="font-size:12px;font-weight:600">${m.value?formatCurrency(m.value):'—'}</td>
         <td style="font-size:11px;color:var(--gray)">
           ${formatDateShort(m.start_date)} → ${formatDateShort(m.end_date)}
-          ${expiring&&m.status==='Aktif'?'<br><span style="color:#F59E0B;font-size:10px">⚠️ Segera expired</span>':''}
+          ${expiring&&m.status==='Aktif'?'<br><span style="color:var(--gold);font-size:10px">⚠️ Segera expired</span>':''}
         </td>
         <td><span style="background:${col}20;color:${col};padding:3px 9px;border-radius:10px;font-size:11px;font-weight:700">${m.status}</span></td>
         <td style="font-size:11px;color:var(--gray)">${m.created_by_name||'—'}</td>

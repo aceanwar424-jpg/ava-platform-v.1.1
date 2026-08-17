@@ -28,11 +28,11 @@ async function renderFinance(tabAwal) {
       </div>
       <div class="card" style="text-align:center;padding:14px">
         <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Belum Dibayar</div>
-        <div style="font-size:20px;font-weight:800;color:#F59E0B;margin-top:4px" id="fin-unpaid">—</div>
+        <div style="font-size:20px;font-weight:800;color:var(--gold);margin-top:4px" id="fin-unpaid">—</div>
       </div>
       <div class="card" style="text-align:center;padding:14px">
         <div style="font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em">Overdue</div>
-        <div style="font-size:20px;font-weight:800;color:#EF4444;margin-top:4px" id="fin-overdue">—</div>
+        <div style="font-size:20px;font-weight:800;color:var(--danger);margin-top:4px" id="fin-overdue">—</div>
       </div>
     </div>
 

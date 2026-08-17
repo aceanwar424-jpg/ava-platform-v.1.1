@@ -24,7 +24,7 @@ function renderAVAHealth(tab = 'consult') {
   if (tab && AVA_TABS.some(t => t.id === tab)) _avaTabActive = tab;
 
   main.innerHTML = `
-    <div style="min-height:85vh; background:#020617; color:#F8FAFC; padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
+    <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
       <!-- AVA HEALTH HEADER -->
       <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:14px;">
         <div style="display:flex; align-items:center; gap:16px;">
@@ -33,7 +33,7 @@ function renderAVAHealth(tab = 'consult') {
           </div>
           <div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <h2 style="margin:0; font-size:19px; font-weight:800; color:#F8FAFC;">AVA Health Ecosystem</h2>
+              <h2 style="margin:0; font-size:19px; font-weight:800; color:var(--bg);">AVA Health Ecosystem</h2>
               <span style="background:linear-gradient(90deg, #34D399, #38BDF8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:11px; font-weight:800; border:1px solid rgba(52,211,153,0.4); padding:2px 8px; border-radius:6px;">
                 KBLI 86910 · TRUST & TELEHEALTH LAYER
               </span>
@@ -44,7 +44,7 @@ function renderAVAHealth(tab = 'consult') {
 
         <!-- Telemetry Metrics Badge -->
         <div style="display:flex; align-items:center; gap:10px;">
-          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:#34D399; font-weight:700;">
+          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:var(--accent2); font-weight:700;">
             ● 24 Dokter Standby
           </div>
           <div style="background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:#38BDF8; font-weight:700;">
@@ -112,7 +112,7 @@ function renderAVAConsult(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">🩺 Konsol Telekonsultasi Dokter (Halodoc-Style)</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🩺 Konsol Telekonsultasi Dokter (Halodoc-Style)</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">State Machine Konsultasi: Confirm → Complete → E-Resep → Rujukan Lab → Komisi Dokter.</p>
         </div>
         <button class="btn btn-teal btn-sm" onclick="avaStartConsultModal()">+ Sesi Konsultasi Baru</button>
@@ -122,12 +122,12 @@ function renderAVAConsult(container) {
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <strong style="font-size:13px; color:#34D399;">🟢 Sesi Aktif Berjalan (3 Sesi)</strong>
-            <span style="font-size:11px; background:rgba(52,211,153,0.15); color:#34D399; padding:2px 8px; border-radius:6px;">Live Chat & Video</span>
+            <strong style="font-size:13px; color:var(--accent2);">🟢 Sesi Aktif Berjalan (3 Sesi)</strong>
+            <span style="font-size:11px; background:rgba(52,211,153,0.15); color:var(--accent2); padding:2px 8px; border-radius:6px;">Live Chat & Video</span>
           </div>
           <div style="display:flex; flex-direction:column; gap:10px;">
             <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;">
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:#F8FAFC;">
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--bg);">
                 <span>Pasien: Bpk. Bambang S. (48 th)</span>
                 <span style="color:#38BDF8;">dr. Rizky Pratama, Sp.PD</span>
               </div>
@@ -148,7 +148,7 @@ function renderAVAConsult(container) {
           </div>
           <div style="display:flex; flex-direction:column; gap:10px;">
             <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;">
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:#F8FAFC;">
+              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--bg);">
                 <span>Ibu Siti Aminah (56 th)</span>
                 <span style="color:#FBBF24;">Triase: PERHATIAN</span>
               </div>
@@ -168,7 +168,7 @@ function renderAVADevices(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">📟 Telemetri Alat Medis Rumah & Wearable IoT</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">📟 Telemetri Alat Medis Rumah & Wearable IoT</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Normalisasi data smartwatch (Detak Jantung, SpO2, Tensi, Tidur) & pemicu Alert Emergency Perawat.</p>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="toast('Hubungkan Alat IoT Baru','info')">+ Hubungkan Alat IoT</button>
@@ -178,8 +178,8 @@ function renderAVADevices(container) {
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13px; font-weight:800; color:#F8FAFC;">⌚ Smartwatch Pasien #102</span>
-            <span style="font-size:10px; background:rgba(16,185,129,0.2); color:#34D399; padding:2px 6px; border-radius:4px;">Normal</span>
+            <span style="font-size:13px; font-weight:800; color:var(--bg);">⌚ Smartwatch Pasien #102</span>
+            <span style="font-size:10px; background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 6px; border-radius:4px;">Normal</span>
           </div>
           <div style="margin:14px 0; font-size:24px; font-weight:800; color:#38BDF8;">
             78 <span style="font-size:12px; color:#94A3B8; font-weight:400;">BPM (Detak Jantung)</span>
@@ -192,7 +192,7 @@ function renderAVADevices(container) {
 
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(239,68,68,0.4); border-radius:14px; padding:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13px; font-weight:800; color:#F8FAFC;">🩺 Tensimeter Bluetooth Rumah</span>
+            <span style="font-size:13px; font-weight:800; color:var(--bg);">🩺 Tensimeter Bluetooth Rumah</span>
             <span style="font-size:10px; background:rgba(239,68,68,0.2); color:#FCA5A5; padding:2px 6px; border-radius:4px;">🚨 SEGERA (Alert Perawat)</span>
           </div>
           <div style="margin:14px 0; font-size:24px; font-weight:800; color:#FCA5A5;">
@@ -200,7 +200,7 @@ function renderAVADevices(container) {
           </div>
           <div style="font-size:11.5px; color:#94A3B8; display:flex; justify-content:space-between; align-items:center;">
             <span>Bpk. Hendra S.</span>
-            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:#EF4444; border-color:#EF4444;" onclick="toast('Kirim Perawat Home Care ke Rumah Pasien','warn')">🚑 Kirim Nakes</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--danger); border-color:var(--danger);" onclick="toast('Kirim Perawat Home Care ke Rumah Pasien','warn')">🚑 Kirim Nakes</button>
           </div>
         </div>
       </div>
@@ -214,7 +214,7 @@ function renderAVACalibration(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(245,158,11,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">🛠️ Sertifikasi & Badge Kalibrasi AVA Verified</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🛠️ Sertifikasi & Badge Kalibrasi AVA Verified</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Verifikasi sertifikat kalibrasi lab terakreditasi KAN/Kemenkes & penerbitan badge kepercayaan alkes.</p>
         </div>
         <button class="btn btn-teal btn-sm" onclick="toast('Input Sertifikat Kalibrasi Baru','info')">+ Input Sertifikat Kalibrasi</button>
@@ -222,7 +222,7 @@ function renderAVACalibration(container) {
 
       <!-- Verified Devices List -->
       <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-        <table style="width:100%; border-collapse:collapse; font-size:12.5px; color:#F8FAFC;">
+        <table style="width:100%; border-collapse:collapse; font-size:12.5px; color:var(--bg);">
           <thead>
             <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:#94A3B8; text-align:left;">
               <th style="padding:10px;">Nama Alat Medis</th>
@@ -237,8 +237,8 @@ function renderAVACalibration(container) {
               <td style="padding:10px; font-weight:700;">Centrifuge Lab Pro-5000</td>
               <td style="padding:10px;">Balai Kalibrasi Kemenkes RI</td>
               <td style="padding:10px; font-family:monospace;">KAL-2026-9901</td>
-              <td style="padding:10px; color:#34D399;">s/d 14 Des 2026</td>
-              <td style="padding:10px;"><span style="background:rgba(16,185,129,0.2); color:#34D399; padding:2px 8px; border-radius:6px; font-weight:700;">🛡️ AVA VERIFIED</span></td>
+              <td style="padding:10px; color:var(--accent2);">s/d 14 Des 2026</td>
+              <td style="padding:10px;"><span style="background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 8px; border-radius:6px; font-weight:700;">🛡️ AVA VERIFIED</span></td>
             </tr>
             <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
               <td style="padding:10px; font-weight:700;">Syringe Pump Clinic-X</td>
@@ -260,7 +260,7 @@ function renderAVAMarketplace(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">🏬 Marketplace Alat Kesehatan & Vendor Portal</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🏬 Marketplace Alat Kesehatan & Vendor Portal</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Etalase penyewaan/pembelian alkes ber-badge "AVA Verified" & verifikasi supplier resmi.</p>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="toast('Tambah Produk Alkes Baru','info')">+ Tambah Produk Alkes</button>
@@ -268,8 +268,8 @@ function renderAVAMarketplace(container) {
 
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <span style="font-size:10px; background:rgba(16,185,129,0.2); color:#34D399; padding:2px 6px; border-radius:4px; font-weight:700;">🛡️ AVA VERIFIED</span>
-          <h4 style="margin:8px 0 4px 0; color:#F8FAFC;">Konsentrasi Oksigen Medis 5L</h4>
+          <span style="font-size:10px; background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 6px; border-radius:4px; font-weight:700;">🛡️ AVA VERIFIED</span>
+          <h4 style="margin:8px 0 4px 0; color:var(--bg);">Konsentrasi Oksigen Medis 5L</h4>
           <p style="margin:0; font-size:12px; color:#94A3B8;">Vendor: PT Medika Alkes Indonesia</p>
           <div style="margin:12px 0 8px 0; font-size:16px; font-weight:800; color:#38BDF8;">Rp 350.000 <span style="font-size:11px; color:#94A3B8; font-weight:400;">/ bulan (Sewa)</span></div>
           <button class="btn btn-teal btn-sm" style="width:100%; font-size:11px;" onclick="toast('Order Sewa Alkes Berhasil','ok')">🛒 Pesan Sekarang</button>
@@ -285,7 +285,7 @@ function renderAVACaregiver(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(168,85,247,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">👥 Caregiver & Emergency Family Network</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">👥 Caregiver & Emergency Family Network</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Akses pendampingan keluarga berbasis RLS scope-gated & pengiriman alert darurat otomatis.</p>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="toast('Tautkan Akun Pendamping/Keluarga','info')">+ Tautkan Pendamping</button>
@@ -296,7 +296,7 @@ function renderAVACaregiver(container) {
         <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
           <div style="background:rgba(30,41,59,0.6); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
             <span>Anak: <strong>Dewi Lestari</strong> (Izin: Baca Tensi & SpO2)</span>
-            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:#EF4444;" onclick="toast('Akses Pendamping Dicabut','warn')">Cabut Akses</button>
+            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--danger);" onclick="toast('Akses Pendamping Dicabut','warn')">Cabut Akses</button>
           </div>
         </div>
       </div>
@@ -310,7 +310,7 @@ function renderAVACorporate(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">🏢 Corporate B2B Wellness (K-Anonymity Engine)</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🏢 Corporate B2B Wellness (K-Anonymity Engine)</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Analitik agregat kesehatan karyawan perusahaan tanpa membuka identitas individu (Garansi Privasi ISO 27001).</p>
         </div>
       </div>
@@ -318,11 +318,11 @@ function renderAVACorporate(container) {
       <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
           <div style="font-size:12px; color:#94A3B8;">Karyawan Berpartisipasi</div>
-          <div style="font-size:24px; font-weight:800; color:#38BDF8; margin:6px 0;">340 <span style="font-size:12px; font-weight:400; color:#34D399;">(85% Total)</span></div>
+          <div style="font-size:24px; font-weight:800; color:#38BDF8; margin:6px 0;">340 <span style="font-size:12px; font-weight:400; color:var(--accent2);">(85% Total)</span></div>
         </div>
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
           <div style="font-size:12px; color:#94A3B8;">Skor Wellness Perusahaan</div>
-          <div style="font-size:24px; font-weight:800; color:#34D399; margin:6px 0;">82.4 <span style="font-size:12px; font-weight:400; color:#34D399;">/ 100</span></div>
+          <div style="font-size:24px; font-weight:800; color:var(--accent2); margin:6px 0;">82.4 <span style="font-size:12px; font-weight:400; color:var(--accent2);">/ 100</span></div>
         </div>
       </div>
     </div>
@@ -335,7 +335,7 @@ function renderAVAPortals(container) {
     <div style="display:flex; flex-direction:column; gap:20px;">
       <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC;">🌐 Switcher Portal Khusus Peran User</h3>
+          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🌐 Switcher Portal Khusus Peran User</h3>
           <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Pilih tampilan portal khusus sesuai peran pengguna (Pasien, Dokter Telehealth, atau Vendor Alkes).</p>
         </div>
         <div style="display:flex; gap:8px;">
@@ -360,7 +360,7 @@ function switchAVAPortalView(portalRole) {
 
   if (portalRole === 'customer') {
     viewEl.innerHTML = `
-      <div style="color:#34D399; font-weight:800; font-size:15px; margin-bottom:12px;">📱 Portal Pasien & Pelanggan AVA Health</div>
+      <div style="color:var(--accent2); font-weight:800; font-size:15px; margin-bottom:12px;">📱 Portal Pasien & Pelanggan AVA Health</div>
       <p style="font-size:12.5px; color:#94A3B8;">Antarmuka ramah pengguna untuk booking konsultasi dokter, cek grafik vital harian, sewa alkes, & kelola pendamping keluarga.</p>
       <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
         <button class="btn btn-teal btn-sm" onclick="avaStartConsultModal()">🩺 Booking Konsultasi Dokter</button>
@@ -401,9 +401,9 @@ function avaStartConsultModal() {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
   
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(52,211,153,0.4); border-radius:16px; padding:24px; width:100%; max-width:520px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(52,211,153,0.4); border-radius:16px; padding:24px; width:100%; max-width:520px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:#34D399;">🩺 Buat Sesi Telekonsultasi Baru</h3>
+        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--accent2);">🩺 Buat Sesi Telekonsultasi Baru</h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:20px; cursor:pointer;">✕</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
@@ -467,7 +467,7 @@ function avaAddEPrescriptionModal(sessionId = 'SESI-101') {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
 
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
         <h3 style="margin:0; font-size:17px; font-weight:800; color:#38BDF8;">💊 Penerbitan E-Resep Digital</h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:20px; cursor:pointer;">✕</button>
@@ -501,7 +501,7 @@ function avaAddLabReferralModal(sessionId = 'SESI-101') {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
 
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
         <h3 style="margin:0; font-size:17px; font-weight:800; color:#FBBF24;">🧪 Surat Rujukan Pemeriksaan Lab</h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:20px; cursor:pointer;">✕</button>
@@ -540,7 +540,7 @@ function avaAddDeviceModal() {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
 
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
         <h3 style="margin:0; font-size:17px; font-weight:800; color:#38BDF8;">📟 Registrasi Alat Medis / Wearable IoT</h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:20px; cursor:pointer;">✕</button>
@@ -579,7 +579,7 @@ function avaAddCalibrationModal() {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
 
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
         <h3 style="margin:0; font-size:17px; font-weight:800; color:#FBBF24;">🛡️ Registrasi Sertifikat Kalibrasi AVA Verified</h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:20px; cursor:pointer;">✕</button>

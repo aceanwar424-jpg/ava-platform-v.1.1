@@ -230,7 +230,7 @@ function printRL() {
       h2{margin:0 0 2px} .sub{color:#666;font-size:11px;margin-bottom:16px}
       table{width:100%;border-collapse:collapse;margin-bottom:12px}
       th,td{border:1px solid #ddd;padding:5px 7px;text-align:left}
-      th{background:#f1f5f9}
+      th{background:var(--bg2)}
       .card{border:1px solid #ddd;border-radius:6px;padding:11px;margin-bottom:12px;page-break-inside:avoid}
       .card-title{font-weight:700;margin-bottom:7px}</style></head><body>
     <h2>Laporan Rekapitulasi — ${org}</h2>

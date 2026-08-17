@@ -214,7 +214,7 @@ function renderHCList(orders) {
           ${o.status==='Selesai'?`<button class="btn btn-ghost btn-sm" onclick="openHCRating(${o.id})">${o.rating?''.repeat(o.rating):'Rating'}</button>`:''}
           ${o.patient_phone?`<button class="btn btn-outline btn-sm" onclick="window.open('https://wa.me/${(o.patient_phone||'').replace(/\D/g,'').replace(/^0/,'62')}','_blank')">💬 WA Pasien</button>`:''}
           <button class="btn btn-ghost btn-sm" onclick="openHCForm(${o.id})">Edit</button>
-          ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:#EF4444" onclick="cancelHCOrder(${o.id})">Batal</button>`:''}
+          ${o.status!=='Selesai'&&o.status!=='Dibatalkan'?`<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="cancelHCOrder(${o.id})">Batal</button>`:''}
         </div>
       </div>`;
     }).join('')}
@@ -299,7 +299,7 @@ async function completeHCVisit(id) {
       <span>Bahan / BHP Dipakai (potong stok otomatis)</span>
       <button class="btn btn-xs btn-ghost" onclick="addHCBhpRow()" ${hcInvItems.length?'':'disabled'}>+ Item</button>
     </div>
-    ${hcInvItems.length?'<div id="hc-bhp-table"></div>':'<div class="form-hint" style="color:#F59E0B">Data inventory tidak tersedia — lewati BHP.</div>'}
+    ${hcInvItems.length?'<div id="hc-bhp-table"></div>':'<div class="form-hint" style="color:var(--gold)">Data inventory tidak tersedia — lewati BHP.</div>'}
 
     <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin:8px 0">Persetujuan & Bukti</div>
     <div class="form-group"><label>URL Foto Bukti Kunjungan (opsional)</label>
@@ -586,7 +586,7 @@ async function openHCForm(id=null) {
       <div class="form-group">
         <label>Nakes / Tim yang Bertugas</label>
         <select id="hf-staff" onchange="hcOnStaffChange()">${staffOpts}</select>
-        ${activeStaff.length?'':'<div class="form-hint" style="color:#F59E0B">Belum ada master Nakes. Tambah via tombol "Master Nakes".</div>'}
+        ${activeStaff.length?'':'<div class="form-hint" style="color:var(--gold)">Belum ada master Nakes. Tambah via tombol "Master Nakes".</div>'}
       </div>
       <div class="form-group">
         <label>Status</label>
@@ -1515,7 +1515,7 @@ function hcLiveOrderInfo(o, marker){
   const st=(HC_STATUS[o.status]||{});
   const html=`<div style="font-size:12.5px;min-width:210px">
     <div style="font-weight:800">${st.icon||''} ${o.patient_name||'—'}</div>
-    <div style="color:#64748b">${o.service_type||''} · ${o.status}</div>
+    <div style="color:var(--text3)">${o.service_type||''} · ${o.status}</div>
     <div style="margin:3px 0">${o.scheduled_date||''} ${o.scheduled_time||''}</div>
     <div>Nakes: <b>${o.staff_name||'—'}</b>${o.staff_lat?' · <span style="color:#16a34a">📡 live</span>':' · <span style="color:#94a3b8">offline</span>'}</div>
     <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">

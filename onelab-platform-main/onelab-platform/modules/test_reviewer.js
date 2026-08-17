@@ -429,7 +429,7 @@ function trJobBodyHTML(job) {
 
   return `
     ${sum ? `
-      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:14px">
+      <div style="background:var(--gold-light);border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
           <span style="font-size:11px;font-weight:800;color:#92400E;text-transform:uppercase">✦ Ringkasan Awam</span>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(sum)}')">📋 Salin</button>
@@ -438,7 +438,7 @@ function trJobBodyHTML(job) {
       </div>` : ''}
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-      <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:10px;padding:12px">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <strong style="font-size:12px;color:var(--teal)">1. Deskripsi Baru (Awam & Akurat)</strong>
           <button class="btn btn-ghost btn-sm" onclick="trCopyText('${trEsc(desc)}')">📋 Salin</button>

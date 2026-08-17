@@ -183,7 +183,7 @@ async function parseAnalyzerIntake(){
       <td style="font-family:monospace;font-size:12px;font-weight:700">${m.entry.code}</td>
       <td style="font-weight:700">${m.entry.value}</td>
       <td style="font-size:11px;color:var(--gray)">${m.entry.unit||''}</td>
-      <td style="font-size:12px">${m.draft?(m.draft.item_name||m.draft.product_name):'<span style="color:#EF4444">tidak cocok</span>'}</td>
+      <td style="font-size:12px">${m.draft?(m.draft.item_name||m.draft.product_name):'<span style="color:var(--danger)">tidak cocok</span>'}</td>
       <td>${m.draft?'<span class="badge badge-green">✓ cocok</span>':'<span class="badge badge-gray">dilewati</span>'}</td>
     </tr>`).join('')}
     </tbody></table></div>`;
@@ -275,7 +275,7 @@ async function renderAnalyzerHub(){
         return `<tr>
           <td style="font-size:11px;color:var(--gray)">${m.received_at?new Date(m.received_at).toLocaleString('id-ID',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td>
           <td style="font-size:12px">${a.nama_alat||m.analyzer_code||'—'}</td>
-          <td style="font-size:11px">${m.sample_barcode?`${m.sample_barcode}${barSample?`<div style="font-size:10px;color:#16a34a">${barSample.patient_name||''}</div>`:`<div style="font-size:10px;color:#EF4444">tak dikenal</div>`}`:'<span style="color:var(--gray)">—</span>'}</td>
+          <td style="font-size:11px">${m.sample_barcode?`${m.sample_barcode}${barSample?`<div style="font-size:10px;color:#16a34a">${barSample.patient_name||''}</div>`:`<div style="font-size:10px;color:var(--danger)">tak dikenal</div>`}`:'<span style="color:var(--gray)">—</span>'}</td>
           <td style="font-family:monospace;font-size:11px;color:var(--gray)" title="${(m.raw_text||'').replace(/"/g,'')}">${raw}${(m.raw_text||'').length>48?'…':''}</td>
           <td><span style="background:${stColor}20;color:${stColor};padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${m.status}</span>${m.parse_note?`<div style="font-size:10px;color:var(--gray)">${m.parse_note}</div>`:''}</td>
           <td style="white-space:nowrap">
@@ -338,7 +338,7 @@ function hubInspectMessage(msgId){
     </div>
 
     <div style="font-size:12px;font-weight:700;margin:8px 0 4px">1️⃣ Kiriman mentah (dari alat)</div>
-    <pre style="background:#0b1220;color:#e2e8f0;border-radius:8px;padding:10px;font-size:11.5px;max-height:170px;overflow:auto;white-space:pre-wrap">${_esc(msg.raw_text||'(kosong)')}</pre>
+    <pre style="background:#0b1220;color:var(--border);border-radius:8px;padding:10px;font-size:11.5px;max-height:170px;overflow:auto;white-space:pre-wrap">${_esc(msg.raw_text||'(kosong)')}</pre>
 
     <div style="font-size:12px;font-weight:700;margin:12px 0 4px">2️⃣ Hasil parse — ${entries.length} baris terbaca</div>
     <div class="table-wrap" style="max-height:190px;overflow:auto"><table><thead><tr>
@@ -386,7 +386,7 @@ async function hubInspectMap(msgId){
         return `<tr>
           <td style="font-family:monospace;font-weight:700">${_esc(m.entry.code)}</td>
           <td style="font-weight:700">${_esc(m.entry.value)}</td>
-          <td style="font-size:12px">${d?_esc(d.item_name||d.product_name):'<span style="color:#EF4444">tidak cocok</span>'}</td>
+          <td style="font-size:12px">${d?_esc(d.item_name||d.product_name):'<span style="color:var(--danger)">tidak cocok</span>'}</td>
           <td style="font-size:11px;color:var(--gray)">${_esc(via)}</td>
           <td>${d?'<span class="badge badge-green">✓</span>':'<span class="badge badge-gray">dilewati</span>'}</td></tr>`;
       }).join('')}

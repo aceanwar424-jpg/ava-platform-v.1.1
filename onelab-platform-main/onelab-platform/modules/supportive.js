@@ -423,7 +423,7 @@ function printSuppResult(id) {
     <style>body{font-family:Arial,sans-serif;padding:30px;font-size:13px}
     .header{border-bottom:3px solid ${cfg.color};padding-bottom:14px;margin-bottom:20px;display:flex;justify-content:space-between}
     h2{color:#0A2342;margin:0}table{width:100%;border-collapse:collapse}
-    tr:nth-child(even){background:#F8FAFC}
+    tr:nth-child(even){background:var(--bg)}
     .badge{padding:4px 14px;border-radius:10px;font-size:13px;font-weight:700}
     @media print{button{display:none}}</style></head><body>
     <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:#0A2342;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print</button>

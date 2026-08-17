@@ -56,7 +56,7 @@ function renderAgOrchestratorTab() {
       <div style="background:linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.9)); border:1px solid rgba(56,189,248,0.3); border-radius:16px; p:20px; backdrop-filter:blur(12px);">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
           <div>
-            <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC; display:flex; align-items:center; gap:8px;">
+            <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg); display:flex; align-items:center; gap:8px;">
               <span style="color:#38BDF8;">🔄</span> The 2026 Closed Feedback Loop Engine
             </h3>
             <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Siklus otonom: <strong>Observe Environment ➔ Break Down Problem ➔ Create Plan ➔ Take Action ➔ Evaluate ➔ Self-Tune</strong></p>
@@ -69,19 +69,19 @@ function renderAgOrchestratorTab() {
         {/* 4 Steps Telemetry Bar */}
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
-            <p style="margin:0; font-size:10px; color:#64748B; uppercase font-weight:700;">1. OBSERVE & PLAN</p>
+            <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">1. OBSERVE & PLAN</p>
             <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:#38BDF8;">99.8% Accuracy</p>
           </div>
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
-            <p style="margin:0; font-size:10px; color:#64748B; uppercase font-weight:700;">2. TAKE ACTION (R1/R2)</p>
-            <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:#34D399;">3,690 Tasks Executed</p>
+            <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">2. TAKE ACTION (R1/R2)</p>
+            <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:var(--accent2);">3,690 Tasks Executed</p>
           </div>
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
-            <p style="margin:0; font-size:10px; color:#64748B; uppercase font-weight:700;">3. EVALUATE RESULTS</p>
+            <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">3. EVALUATE RESULTS</p>
             <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:#FBBF24;">0 Critical Anomaly</p>
           </div>
           <div style="background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:10px;">
-            <p style="margin:0; font-size:10px; color:#64748B; uppercase font-weight:700;">4. SELF-TUNING ANALYTICS</p>
+            <p style="margin:0; font-size:10px; color:var(--text3); uppercase font-weight:700;">4. SELF-TUNING ANALYTICS</p>
             <p style="margin:4px 0 0 0; font-size:13px; font-weight:700; color:#A78BFA;">Auto-Optimized</p>
           </div>
         </div>
@@ -89,7 +89,7 @@ function renderAgOrchestratorTab() {
 
       {/* A2A AGENT TOPOLOGY CARDS */}
       <div>
-        <h4 style="margin:0 0 12px 0; font-size:14px; color:#F1F5F9; font-weight:700;">Jaringan Agen Digital (A2A Inter-Agent Protocol)</h4>
+        <h4 style="margin:0 0 12px 0; font-size:14px; color:var(--bg2); font-weight:700;">Jaringan Agen Digital (A2A Inter-Agent Protocol)</h4>
         <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
   `;
 
@@ -101,19 +101,19 @@ function renderAgOrchestratorTab() {
             ${ag.title.substring(0,2)}
           </div>
           <div>
-            <h4 style="margin:0; font-size:13px; font-weight:700; color:#F8FAFC;">${ag.title}</h4>
+            <h4 style="margin:0; font-size:13px; font-weight:700; color:var(--bg);">${ag.title}</h4>
             <p style="margin:2px 0 0 0; font-size:11px; color:#94A3B8;">${ag.role}</p>
           </div>
         </div>
 
         <div style="background:rgba(15,23,42,0.6); padding:10px; border-radius:8px; display:flex; align-items:center; justify-content:space-between; font-size:11px;">
-          <span style="color:#64748B;">Feedback Loop Executions:</span>
+          <span style="color:var(--text3);">Feedback Loop Executions:</span>
           <span style="font-family:monospace; color:#38BDF8; font-weight:700;">${ag.closedLoopCount} cycles</span>
         </div>
 
         <div style="display:flex; align-items:center; justify-content:space-between; font-size:11px; pt:6px;">
-          <span style="color:#34D399; font-weight:600;">● ${ag.status}</span>
-          <button onclick="triggerAgentTask('${ag.id}')" style="background:rgba(255,255,255,0.08); hover:background:rgba(255,255,255,0.15); color:#F1F5F9; border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+          <span style="color:var(--accent2); font-weight:600;">● ${ag.status}</span>
+          <button onclick="triggerAgentTask('${ag.id}')" style="background:rgba(255,255,255,0.08); hover:background:rgba(255,255,255,0.15); color:var(--bg2); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
             Pemicu Tugas
           </button>
         </div>

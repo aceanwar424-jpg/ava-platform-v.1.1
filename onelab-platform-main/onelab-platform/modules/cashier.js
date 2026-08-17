@@ -110,7 +110,7 @@ function renderQueue() {
         <div style="font-weight:700;color:var(--navy)">${a.patient_name||'—'}</div>
         <div style="font-size:11px;color:var(--gray)">${a.visit_number||'—'}</div>
         <div style="font-size:14px;font-weight:800;color:var(--teal);margin-top:4px">${formatCurrency(a.net_amount||0)}</div>
-        <div style="font-size:10px;color:#F59E0B;margin-top:2px">● Menunggu Bayar</div>
+        <div style="font-size:10px;color:var(--gold);margin-top:2px">● Menunggu Bayar</div>
       </div>`).join('')}
   </div>`;
 }

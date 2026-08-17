@@ -55,7 +55,7 @@ function renderLabReportConfig(targetId = 'main-content'){
           <div style="display:flex;gap:8px;align-items:center">
             <img id="lr-logo-prev" src="${g('logo_url')}" style="max-height:44px;max-width:120px;${g('logo_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:#fff;object-fit:contain">
             <input type="file" id="lr-logo-file" accept="image/*" onchange="lrLogoUpload(this)" style="font-size:12px">
-            ${g('logo_url')?`<button class="btn btn-ghost btn-xs" onclick="lrLogoClear()" style="color:#EF4444">Hapus</button>`:''}
+            ${g('logo_url')?`<button class="btn btn-ghost btn-xs" onclick="lrLogoClear()" style="color:var(--danger)">Hapus</button>`:''}
           </div>
           <input type="hidden" id="lr-logo" value="${g('logo_url')}">
           <div style="font-size:10.5px;color:var(--gray);margin-top:4px">PNG/JPG, disimpan sebagai data URI di browser.</div>
@@ -66,7 +66,7 @@ function renderLabReportConfig(targetId = 'main-content'){
       <div class="card">
         <div style="font-size:11px;font-weight:800;color:var(--gray);text-transform:uppercase;margin-bottom:10px">Tanda Tangan &amp; Opsi Tampilan</div>
         
-        <div style="background:#f8fafc;padding:10px;border-radius:8px;margin-bottom:14px;border:1px solid var(--border)">
+        <div style="background:var(--bg);padding:10px;border-radius:8px;margin-bottom:14px;border:1px solid var(--border)">
           <div style="font-weight:700;font-size:11.5px;margin-bottom:8px">Konfigurasi Tanda Tangan (Kolom):</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             <div>
@@ -125,7 +125,7 @@ function renderLabReportConfig(targetId = 'main-content'){
           <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
             <img id="lr-bg-prev" src="${g('bg_image_url')}" style="max-height:60px;max-width:120px;${g('bg_image_url')?'':'display:none'};border:1px solid var(--border);border-radius:6px;background:#fff;object-fit:contain">
             <input type="file" id="lr-bg-file" accept="image/*" onchange="lrBgUpload(this)" style="font-size:12px">
-            ${g('bg_image_url')?`<button class="btn btn-ghost btn-xs" onclick="lrBgClear()" style="color:#EF4444">Hapus Latar</button>`:''}
+            ${g('bg_image_url')?`<button class="btn btn-ghost btn-xs" onclick="lrBgClear()" style="color:var(--danger)">Hapus Latar</button>`:''}
           </div>
           <input type="hidden" id="lr-bg-url" value="${g('bg_image_url')}">
           <div style="font-size:10.5px;color:var(--gray);line-height:1.3">Gunakan kertas kop kosong atau file layout. Format PNG/JPG, maks 800KB.</div>

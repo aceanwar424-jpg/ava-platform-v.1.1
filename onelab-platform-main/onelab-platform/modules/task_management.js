@@ -270,7 +270,7 @@ function renderTaskCards(tasks, type) {
               ${t.status}
             </span>
           </div>
-          ${t.carry_over_note?`<div style="font-size:10.5px;color:#92400E;margin-top:4px;background:#FFFBEB;padding:3px 8px;border-radius:4px">📌 ${t.carry_over_note}</div>`:''}
+          ${t.carry_over_note?`<div style="font-size:10.5px;color:#92400E;margin-top:4px;background:var(--gold-light);padding:3px 8px;border-radius:4px">📌 ${t.carry_over_note}</div>`:''}
         </div>
         <div style="text-align:right;flex-shrink:0">
           <div onclick="event.stopPropagation()" style="display:flex;gap:4px">
@@ -395,8 +395,8 @@ function renderTeamBoard() {
     <!-- Capacity legend -->
     <div style="display:flex;gap:12px;margin-bottom:14px;font-size:11.5px;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#22C55E;border-radius:3px"></div>Normal (&lt;80%)</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#F59E0B;border-radius:3px"></div>Hampir Penuh (80–100%)</div>
-      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:#EF4444;border-radius:3px"></div>Overload (&gt;100%)</div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--gold);border-radius:3px"></div>Hampir Penuh (80–100%)</div>
+      <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--danger);border-radius:3px"></div>Overload (&gt;100%)</div>
       <div style="display:flex;align-items:center;gap:5px"><div style="width:12px;height:12px;background:var(--bg2);border-radius:3px;border:1px solid var(--border)"></div>Tidak ada task</div>
     </div>
 

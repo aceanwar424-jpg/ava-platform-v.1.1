@@ -236,7 +236,7 @@ function injectLisStyle(){
     #lab-shell .table-wrap th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;
       letter-spacing:.03em;padding:5px 8px;text-align:left;position:sticky;top:0;white-space:nowrap; }
     #lab-shell .table-wrap td{ padding:4px 8px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
-    #lab-shell .table-wrap tbody tr:nth-child(even){ background:#f8fafc; }
+    #lab-shell .table-wrap tbody tr:nth-child(even){ background:var(--bg); }
     #lab-shell .table-wrap tbody tr:hover{ background:#eaf5f3; }
     #lab-shell .lis-title{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;
       letter-spacing:.04em;margin:12px 0 6px;padding-left:7px;border-left:3px solid var(--teal); }
@@ -283,7 +283,7 @@ async function renderLab(tab='checkin'){
         <span id="lab-date-badge" class="lis-date"></span>
       </div>
 
-      <div class="lab-sub-nav" style="display:flex;gap:4px;background:#f8fafc;padding:4px;border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap">
+      <div class="lab-sub-nav" style="display:flex;gap:4px;background:var(--bg);padding:4px;border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap">
         ${Object.entries(LAB_TAB_META).map(([key, m]) => `
           <button class="nav-tab-btn" onclick="switchLabTab('${key}')"
             style="padding:6px 14px;border:none;background:${tab === key ? 'var(--teal)' : 'transparent'};

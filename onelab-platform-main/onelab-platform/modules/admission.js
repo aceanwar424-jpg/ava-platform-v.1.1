@@ -62,20 +62,20 @@ function injectProShell(){
     .pro-shell .pro-grid{ width:100%;border-collapse:collapse;background:#fff;border:1px solid #d3dae1;border-radius:8px;overflow:hidden; }
     .pro-shell .pro-grid th{ background:#0A2342;color:#fff;font-size:10.5px;text-transform:uppercase;letter-spacing:.03em;padding:6px 9px;text-align:left;white-space:nowrap; }
     .pro-shell .pro-grid td{ padding:5px 9px;border-bottom:1px solid #eef1f4;font-size:12px;vertical-align:middle; }
-    .pro-shell .pro-grid tbody tr:nth-child(even){ background:#f8fafc; }
+    .pro-shell .pro-grid tbody tr:nth-child(even){ background:var(--bg); }
     .pro-shell .pro-grid tbody tr:hover{ background:#eaf5f3; }
     .pro-shell .pro-grid tbody tr.sel{ background:#e0f2f1 !important; }
     /* Examination tab-rail (Virtu-style) */
     .exam-wrap{ display:grid;grid-template-columns:210px 1fr;gap:0;border:1px solid #d3dae1;border-radius:10px;overflow:hidden;background:#fff;margin-top:12px; }
-    .exam-rail{ background:#f1f5f9;border-right:1px solid #d3dae1;padding:8px; }
+    .exam-rail{ background:var(--bg2);border-right:1px solid #d3dae1;padding:8px; }
     .exam-tab{ display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border:none;background:none;border-radius:8px;
-      cursor:pointer;font-size:12.5px;font-weight:600;color:#334155;text-align:left;margin-bottom:2px; }
-    .exam-tab:hover{ background:#e2e8f0; }
+      cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);text-align:left;margin-bottom:2px; }
+    .exam-tab:hover{ background:var(--border); }
     .exam-tab.active{ background:#0A2342;color:#fff; }
     .exam-tab svg{ flex-shrink:0; }
     .exam-body{ padding:14px 16px;min-height:320px; }
     .exam-topbar{ display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
-      background:#f8fafc;border-bottom:1px solid #d3dae1;padding:10px 14px; }
+      background:var(--bg);border-bottom:1px solid #d3dae1;padding:10px 14px; }
     .exam-sec{ font-size:11px;font-weight:800;color:#0A2342;text-transform:uppercase;letter-spacing:.05em;
       background:#EAF3FB;border-left:3px solid var(--teal);padding:6px 10px;border-radius:4px;margin:2px 0 10px; }`;
   document.head.appendChild(s);
@@ -394,7 +394,7 @@ function renderPatientIdTable() {
             </td>
             <td style="padding:3px"><input type="text" value="${row.id_number||''}" oninput="updatePatientIdField(${i},'id_number',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px"><input type="text" value="${row.issuer_country||'Indonesia'}" oninput="updatePatientIdField(${i},'issuer_country',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removePatientId(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removePatientId(${i})" style="color:var(--danger)" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`).join('')}
       </tbody>
     </table>`;
@@ -461,7 +461,7 @@ function renderServiceLines() {
                          data-name="${pr.nama_tes}"
                          data-label="${label.toLowerCase()}"
                          onclick="selectServiceProduct(${i}, ${pr.id}, ${pr.harga_normal || 0}, '${pr.nama_tes.replace(/'/g, "\\'")}')"
-                         style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #f1f5f9;text-align:left;${row.product_id == pr.id ? 'background:#e2e8f0;font-weight:700' : ''}"
+                         style="padding:6px 10px;cursor:pointer;font-size:11px;border-bottom:1px solid #f1f5f9;text-align:left;${row.product_id == pr.id ? 'background:var(--border);font-weight:700' : ''}"
                          onmouseover="this.style.background='#f1f5f9'"
                          onmouseout="if(${row.product_id != pr.id}) this.style.background='none'; else this.style.background='#e2e8f0'">
                       ${label}
@@ -479,7 +479,7 @@ function renderServiceLines() {
             <td style="padding:3px"><input type="number" value="${row.discount_pct||0}" oninput="updateServiceLine(${i},'discount_pct',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px"><input type="number" value="${row.discount_idr||0}" oninput="updateServiceLine(${i},'discount_idr',this.value)" style="font-size:11px;padding:3px;width:100%"></td>
             <td style="padding:3px;font-weight:700">${formatCurrency(subtotal)}</td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeServiceLine(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeServiceLine(${i})" style="color:var(--danger)" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -580,7 +580,7 @@ function renderBillSummary(b) {
       ${b.lineDisc>0 ? billRow('Diskon per-baris', b.lineDisc, {neg:true, color:'#EF4444'}) : ''}
       ${schemeLabel && b.schemeDisc>0 ? billRow(schemeLabel, b.schemeDisc, {neg:true, color:'#EF4444'}) : ''}
       ${admFormState.voucher && b.voucherDisc>0 ? billRow(`Voucher ${admFormState.voucher.code}`, b.voucherDisc, {neg:true, color:'#EF4444'}) : ''}
-      ${admFormState.voucher && b.voucherDisc===0 ? `<div style="font-size:11px;color:#F59E0B;padding:2px 0">⚠️ Voucher belum memenuhi min. pembelian</div>` : ''}
+      ${admFormState.voucher && b.voucherDisc===0 ? `<div style="font-size:11px;color:var(--gold);padding:2px 0">⚠️ Voucher belum memenuhi min. pembelian</div>` : ''}
       ${billRow('GRAND TOTAL', b.net, {big:true, border:true, color:'var(--teal)'})}
       ${b.totalDisc>0 ? `<div style="font-size:11px;color:#16A34A;text-align:right;margin-top:4px">Total hemat ${formatCurrency(Math.round(b.totalDisc))}</div>` : ''}
     </div>`;
@@ -658,19 +658,19 @@ function onCorporateChange(sel) {
 async function applyVoucher() {
   const code = (document.getElementById('af-voucher-code')?.value||'').trim().toUpperCase();
   const msg = document.getElementById('af-voucher-msg');
-  if(!code){ if(msg) msg.innerHTML='<span style="color:#EF4444">Masukkan kode voucher</span>'; return; }
+  if(!code){ if(msg) msg.innerHTML='<span style="color:var(--danger)">Masukkan kode voucher</span>'; return; }
   if(msg) msg.innerHTML='<span style="color:var(--gray)">⏳ Memeriksa...</span>';
   try {
     const rows = await sbGet('vouchers', `select=*&code=eq.${encodeURIComponent(code)}&limit=1`);
     const v = rows?.[0];
-    if(!v){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Kode voucher tidak ditemukan</span>'; return; }
-    if(v.status && !['Active','Aktif'].includes(v.status)){ if(msg) msg.innerHTML=`<span style="color:#EF4444">❌ Voucher sudah ${v.status}</span>`; return; }
-    if(v.expires_at && new Date(v.expires_at) < new Date()){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Voucher kedaluwarsa</span>'; return; }
+    if(!v){ if(msg) msg.innerHTML='<span style="color:var(--danger)">❌ Kode voucher tidak ditemukan</span>'; return; }
+    if(v.status && !['Active','Aktif'].includes(v.status)){ if(msg) msg.innerHTML=`<span style="color:var(--danger)">❌ Voucher sudah ${v.status}</span>`; return; }
+    if(v.expires_at && new Date(v.expires_at) < new Date()){ if(msg) msg.innerHTML='<span style="color:var(--danger)">❌ Voucher kedaluwarsa</span>'; return; }
 
     // Ambil detail campaign untuk nilai diskon
     let camp={};
     if(v.campaign_id){ const c=await sbGet('voucher_campaigns',`select=*&id=eq.${v.campaign_id}&limit=1`).catch(()=>[]); camp=c?.[0]||{}; }
-    if(camp.valid_until && new Date(camp.valid_until) < new Date()){ if(msg) msg.innerHTML='<span style="color:#EF4444">❌ Campaign voucher sudah berakhir</span>'; return; }
+    if(camp.valid_until && new Date(camp.valid_until) < new Date()){ if(msg) msg.innerHTML='<span style="color:var(--danger)">❌ Campaign voucher sudah berakhir</span>'; return; }
 
     admFormState.voucher = {
       id: v.id, code: v.code, campaign: camp.campaign_name||v.campaign_name||'',
@@ -683,8 +683,8 @@ async function applyVoucher() {
     const b=computeAdmBill();
     if(msg) msg.innerHTML = b.voucherDisc>0
       ? `<span style="color:#16A34A">✅ ${admFormState.voucher.campaign||'Voucher'} — hemat ${formatCurrency(b.voucherDisc)}</span>`
-      : `<span style="color:#F59E0B">⚠️ Voucher valid tapi min. pembelian ${formatCurrency(admFormState.voucher.minPurchase)} belum tercapai</span>`;
-  } catch(e){ if(msg) msg.innerHTML=`<span style="color:#EF4444">❌ ${e.message}</span>`; }
+      : `<span style="color:var(--gold)">⚠️ Voucher valid tapi min. pembelian ${formatCurrency(admFormState.voucher.minPurchase)} belum tercapai</span>`;
+  } catch(e){ if(msg) msg.innerHTML=`<span style="color:var(--danger)">❌ ${e.message}</span>`; }
 }
 
 function removeVoucher() {
@@ -702,7 +702,7 @@ function refreshVoucherUI() {
   wrap.innerHTML = `
     <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
       value="${v?.code||''}" ${v?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
-    ${v ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">Lepas</button>`
+    ${v ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:var(--danger)">Lepas</button>`
         : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}`;
 }
 
@@ -928,7 +928,7 @@ async function openAdmissionForm(id=null) {
         <input type="text" id="af-voucher-code" placeholder="Masukkan kode voucher..." style="flex:1;text-transform:uppercase"
           value="${admFormState.voucher?.code||''}" ${admFormState.voucher?'readonly style="background:var(--lgray);flex:1;text-transform:uppercase"':''}>
         ${admFormState.voucher
-          ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:#EF4444">Lepas</button>`
+          ? `<button type="button" class="btn btn-ghost btn-sm" onclick="removeVoucher()" style="color:var(--danger)">Lepas</button>`
           : `<button type="button" class="btn btn-teal btn-sm" onclick="applyVoucher()">Terapkan</button>`}
       </div>
       <div id="af-voucher-msg" style="font-size:11.5px;margin-bottom:14px">${admFormState.voucher?`<span style="color:#16A34A">✅ Voucher ${admFormState.voucher.code} aktif</span>`:''}</div>

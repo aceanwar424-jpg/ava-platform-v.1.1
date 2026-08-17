@@ -160,7 +160,7 @@ async function agRenderTaskDetail(id){
       ${events.length ? events.map(e=>`<div class="ag-ev">
           <strong>${agEsc(e.from_status||'∅')} → ${agEsc(e.to_status)}</strong>
           · ${agEsc(e.actor_type)} · ${new Date(e.created_at).toLocaleString('id-ID')}
-          ${e.note?`<br><span style="color:#64748B">${agEsc(e.note)}</span>`:''}
+          ${e.note?`<br><span style="color:var(--text3)">${agEsc(e.note)}</span>`:''}
         </div>`).join('') : '<div class="ag-ev">Belum ada event.</div>'}
     </div>`;
 }
@@ -309,7 +309,7 @@ async function renderAgMonitorTab(el){
     ${failed.length?`<div class="ag-detail" style="margin-bottom:12px;border-left:4px solid #EF4444">
       <div style="font-size:12px;font-weight:800;color:#B91C1C;margin-bottom:6px">Task Gagal — perlu perhatian</div>
       ${failed.slice(0,8).map(f=>`<div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px dashed #fecaca;align-items:center">
-        <div style="min-width:0"><strong>${agEsc(f.title)}</strong><br><span style="color:#64748B;font-size:11px">${agEsc(f.error||'')}</span></div>
+        <div style="min-width:0"><strong>${agEsc(f.title)}</strong><br><span style="color:var(--text3);font-size:11px">${agEsc(f.error||'')}</span></div>
         <button class="ag-btn warn" style="padding:4px 10px" onclick="agActRetry('${f.id}')">${svgIcon('refresh',12)} Retry</button>
       </div>`).join('')}
     </div>`:''}`;

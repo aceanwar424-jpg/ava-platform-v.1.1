@@ -65,7 +65,7 @@ function valPaneHtml(mode){
     <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
       <div id="${p}-worklist" style="border-right:1px solid var(--border);overflow-y:auto;max-height:640px;background:var(--lgray)"></div>
       <div style="display:flex;flex-direction:column;min-width:0">
-        <div id="${p}-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC"></div>
+        <div id="${p}-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg)"></div>
         <div id="${p}-grid" style="overflow:auto;max-height:520px"></div>
         <div id="${p}-actionbar" style="border-top:1px solid var(--border);background:#fff"></div>
         ${mode==='approve' ? `<div id="${p}-concl"></div>` : ''}

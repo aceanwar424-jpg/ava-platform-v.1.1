@@ -172,7 +172,7 @@ function renderStockAlerts() {
       </div>
     </div>`;
   if (nearExp.length) html += `
-    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
+    <div style="background:var(--gold-light);border:1px solid #FDE68A;border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
       <div style="font-weight:700;color:#B45309;font-size:12.5px">⏳ ${nearExp.length} batch mendekati kedaluwarsa (≤60 hari) — prioritaskan (FEFO)</div>
       <div style="font-size:11px;color:#92400E;margin-top:2px">
         ${nearExp.slice(0,5).map(b=>`${b.item_code||''} lot ${b.batch_no||'—'} (exp ${formatDateShort(b.expiry_date)})`).join(' · ')}${nearExp.length>5?` +${nearExp.length-5} lainnya`:''}
@@ -457,7 +457,7 @@ function printStockLedgerPDF() {
       body{font-family:Arial,sans-serif;font-size:11px;padding:20px}
       h2{margin-bottom:4px} .sub{color:#666;margin-bottom:16px}
       table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
-      th{background:#f1f5f9}
+      th{background:var(--bg2)}
     </style></head><body>
     <h2>Stock Ledger — OneLab Diagnostics</h2>
     <div class="sub">Dicetak: ${new Date().toLocaleString('id-ID')} ${itemId?'· Filter: '+(invItems.find(i=>i.id==itemId)?.item_name||''):''}</div>
@@ -516,7 +516,7 @@ function renderPRTable() {
       <td><div class="act-row">
         <button class="act-btn" onclick="openPRDetail(${p.id})" title="Detail & Chat">${icon('file-text', 12)}</button>
         ${p.status==='Draft'?`<button class="act-btn edit" onclick="openPRForm(${p.id})">${icon('edit', 12)}</button>`:''}
-        ${p.status==='Approved'?`<button class="act-btn" onclick="convertPRtoPO(${p.id})" title="Buat PO" style="color:#06B6D4">📄</button>`:''}
+        ${p.status==='Approved'?`<button class="act-btn" onclick="convertPRtoPO(${p.id})" title="Buat PO" style="color:var(--teal2)">📄</button>`:''}
       </div></td>
     </tr>`;
   }).join('')}</tbody></table>`;
@@ -1491,7 +1491,7 @@ async function printOpnamePDF(opnameId) {
       body{font-family:Arial,sans-serif;font-size:11px;padding:20px}
       h2{margin-bottom:2px} .sub{color:#666;margin-bottom:16px}
       table{width:100%;border-collapse:collapse} th,td{border:1px solid #ccc;padding:5px 8px;text-align:left}
-      th{background:#f1f5f9} .r{text-align:right} .c{text-align:center}
+      th{background:var(--bg2)} .r{text-align:right} .c{text-align:center}
       .sign{margin-top:40px;display:flex;justify-content:space-between}
       .sign div{width:200px;text-align:center;border-top:1px solid #333;padding-top:4px}
     </style></head><body>

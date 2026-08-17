@@ -237,7 +237,7 @@ async function renderWlWork(admId){
   _wlAdm=admD?.[0]||{};
 
   work.innerHTML=`
-    <div style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC;position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+    <div style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg);position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
       <div>
         <span style="font-size:15px;font-weight:800;color:var(--navy)">${_wlAdm.patient_name||p.patient_name||''}</span>
         ${_wlAdm.patient_blood_type?`<span style="color:#DC2626;font-weight:800;margin-left:8px">${_wlAdm.patient_blood_type}</span>`:''}

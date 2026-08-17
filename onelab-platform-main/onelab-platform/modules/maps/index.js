@@ -534,8 +534,8 @@ function plotMapsResultMarkers() {
 
     const infoContent = `
       <div style="padding:6px;max-width:240px;font-family:inherit">
-        <div style="font-weight:700;font-size:13px;color:#0F172A;margin-bottom:4px">${r.name}</div>
-        <div style="font-size:11px;color:#64748B;margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
+        <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">${r.name}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
         <div style="font-size:11px;color:#475569;margin-bottom:6px">${r.address}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
           ${r.rating ? `<span style="font-size:11px;font-weight:600">${r.rating} (${r.reviews})</span>` : ''}
@@ -544,7 +544,7 @@ function plotMapsResultMarkers() {
         </div>
         <div style="display:flex;gap:6px">
           ${!isDB ? `<button onclick="importOneMaps(${idx})" style="background:#00A896;color:#fff;border:none;border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;font-weight:600">⬆ Import ke Leads</button>` : ''}
-          <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:#F1F5F9;color:#334155;text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">Open</a>
+          <a href="https://www.google.com/maps/place/?q=place_id:${r.place_id}" target="_blank" style="background:var(--bg2);color:var(--text2);text-decoration:none;border-radius:4px;padding:4px 8px;font-size:11px;font-weight:600">Open</a>
         </div>
       </div>`;
 

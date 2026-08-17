@@ -138,7 +138,7 @@ function renderProdTable(data) {
       <td>
         <div style="font-weight:600;color:var(--navy)">${p.nama_tes||'—'}
           ${p._items>1?`<span style="background:#EDE9FE;color:#6D28D9;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">🧬 PANEL ${p._items}</span>`
-            :p._items===1?`<span style="background:#F1F5F9;color:#475569;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
+            :p._items===1?`<span style="background:var(--bg2);color:#475569;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">1 item</span>`
             :`<span title="Belum ada code item" style="background:#FEF3C7;color:#92400E;padding:1px 6px;border-radius:6px;font-size:9px;font-weight:700;margin-left:4px">⚠ 0 item</span>`}
         </div>
         ${p.sub_kategori?`<div style="font-size:10px;color:var(--gray)">${p.sub_kategori}</div>`:''}
@@ -230,7 +230,7 @@ function renderProductItemTable() {
               <option value="">-- Pilih --</option>${SPECIMEN_TYPES.map(s=>`<option ${row.specimen_type===s?'selected':''}>${s}</option>`).join('')}</select></td>
             <td style="padding:3px"><input type="text" value="${piVal(row.host_code)}" oninput="updateProdItem(${i},'host_code',this.value)" placeholder="731" style="font-size:11px;padding:3px;width:84px;font-family:monospace"></td>
             <td style="padding:3px;text-align:center"><input type="checkbox" ${row.is_active!==false?'checked':''} onchange="updateProdItem(${i},'is_active',this.checked)"></td>
-            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeProdItem(${i})" style="color:#EF4444" style="font-size:10.5px;font-weight:700"></button></td>
+            <td style="padding:3px;text-align:center"><button class="btn btn-ghost btn-xs" onclick="removeProdItem(${i})" style="color:var(--danger)" style="font-size:10.5px;font-weight:700"></button></td>
           </tr>`).join('')}
       </tbody>
     </table></div>
@@ -672,7 +672,7 @@ function renderRRTable(data) {
             : (r.range_min!==null&&r.range_max!==null?`${r.range_min} – ${r.range_max}`:'—')}
         </td>
         <td style="font-size:11px;color:var(--gray)">${r.unit||'—'}</td>
-        <td style="font-size:11px;color:#EF4444;white-space:nowrap">
+        <td style="font-size:11px;color:var(--danger);white-space:nowrap">
           ${r.critical_low!==null?`↓${r.critical_low}`:''}
           ${r.critical_high!==null?` ↑${r.critical_high}`:''}
           ${!r.critical_low&&!r.critical_high?'—':''}

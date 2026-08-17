@@ -25,7 +25,7 @@ function renderAgClinicalTab() {
               🩺
             </div>
             <div>
-              <h3 style="margin:0; font-size:16px; font-weight:700; color:#F8FAFC;">Clinical & Lab Ops Agent (LIS-AI)</h3>
+              <h3 style="margin:0; font-size:16px; font-weight:700; color:var(--bg);">Clinical & Lab Ops Agent (LIS-AI)</h3>
               <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;">Otomasi autoverifikasi hasil lab, deteksi Nilai Kritis (Critical Value Alert), & aturan Westgard QC.</p>
             </div>
           </div>
@@ -39,9 +39,9 @@ function renderAgClinicalTab() {
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
         {/* Rules Table */}
         <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px;">
-          <h4 style="margin:0 0 12px 0; font-size:13px; color:#F1F5F9; font-weight:700;">Aturan Autoverifikasi & Nilai Kritis</h4>
+          <h4 style="margin:0 0 12px 0; font-size:13px; color:var(--bg2); font-weight:700;">Aturan Autoverifikasi & Nilai Kritis</h4>
           <div style="overflow-x:auto;">
-            <table style="width:100%; text-align:left; font-size:11px; color:#CBD5E1; border-collapse:collapse;">
+            <table style="width:100%; text-align:left; font-size:11px; color:var(--border2); border-collapse:collapse;">
               <thead>
                 <tr style="border-b:1px solid rgba(255,255,255,0.1); color:#94A3B8;">
                   <th style="padding:6px;">Parameter</th>
@@ -55,8 +55,8 @@ function renderAgClinicalTab() {
   CLINICAL_RULES.forEach(r => {
     html += `
       <tr style="border-b:1px solid rgba(255,255,255,0.04);">
-        <td style="padding:6px; font-weight:600; color:#F8FAFC;">${r.parameter}</td>
-        <td style="padding:6px; color:#34D399;">${r.refMin} - ${r.refMax} ${r.unit}</td>
+        <td style="padding:6px; font-weight:600; color:var(--bg);">${r.parameter}</td>
+        <td style="padding:6px; color:var(--accent2);">${r.refMin} - ${r.refMax} ${r.unit}</td>
         <td style="padding:6px; color:#F87171;">< ${r.criticalMin} atau > ${r.criticalMax}</td>
       </tr>
     `;
@@ -71,11 +71,11 @@ function renderAgClinicalTab() {
         {/* Test Run Simulator */}
         <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:16px; display:flex; flex-direction:column; justify-content:space-between;">
           <div>
-            <h4 style="margin:0 0 12px 0; font-size:13px; color:#F1F5F9; font-weight:700;">Simulasi Evaluasi Agen Klinis</h4>
+            <h4 style="margin:0 0 12px 0; font-size:13px; color:var(--bg2); font-weight:700;">Simulasi Evaluasi Agen Klinis</h4>
             <div style="display:flex; flex-direction:column; gap:10px;">
               <div>
                 <label style="font-size:11px; color:#94A3B8; display:block; margin-bottom:4px;">Parameter Lab:</label>
-                <select id="ag-sim-param" style="width:100%; background:#0F172A; border:1px solid rgba(255,255,255,0.1); color:#F8FAFC; padding:6px; border-radius:6px; font-size:12px;">
+                <select id="ag-sim-param" style="width:100%; background:var(--text); border:1px solid rgba(255,255,255,0.1); color:var(--bg); padding:6px; border-radius:6px; font-size:12px;">
                   <option value="Hb">Hemoglobin (Hb)</option>
                   <option value="WBC">Leukosit (WBC)</option>
                   <option value="PLT">Trombosit (PLT)</option>
@@ -84,7 +84,7 @@ function renderAgClinicalTab() {
               </div>
               <div>
                 <label style="font-size:11px; color:#94A3B8; display:block; margin-bottom:4px;">Nilai Hasil Tes:</label>
-                <input type="number" id="ag-sim-val" value="5.5" step="0.1" style="width:100%; background:#0F172A; border:1px solid rgba(255,255,255,0.1); color:#F8FAFC; padding:6px; border-radius:6px; font-size:12px;" />
+                <input type="number" id="ag-sim-val" value="5.5" step="0.1" style="width:100%; background:var(--text); border:1px solid rgba(255,255,255,0.1); color:var(--bg); padding:6px; border-radius:6px; font-size:12px;" />
               </div>
             </div>
           </div>

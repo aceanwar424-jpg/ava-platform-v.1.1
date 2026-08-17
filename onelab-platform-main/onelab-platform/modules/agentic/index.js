@@ -4502,7 +4502,7 @@ function initAgenticModule() {
   if (!main) return;
 
   main.innerHTML = `
-    <div style="min-height:85vh; background:#020617; color:#F8FAFC; padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
+    <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
       <!-- 2026 HEADER BAR -->
       <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:16px;">
@@ -4511,7 +4511,7 @@ function initAgenticModule() {
           </div>
           <div>
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-              <h2 style="margin:0; font-size:18px; font-weight:800; color:#F8FAFC; letter-spacing:0.3px;">Agentic AI Enterprise Suite</h2>
+              <h2 style="margin:0; font-size:18px; font-weight:800; color:var(--bg); letter-spacing:0.3px;">Agentic AI Enterprise Suite</h2>
               <span style="background:linear-gradient(90deg, #38BDF8, #A78BFA); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:11px; font-weight:800; border:1px solid rgba(168,85,247,0.4); padding:2px 8px; border-radius:6px;">
                 2026 HIGH PERFORMANCE EDITION
               </span>
@@ -4523,8 +4523,8 @@ function initAgenticModule() {
         <!-- Status Telemetry Badge -->
         <div style="display:flex; align-items:center; gap:12px;">
           <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; display:flex; align-items:center; gap:8px;">
-            <span style="width:8px; height:8px; border-radius:50%; background:#10B981; animation:pulse 2s infinite;"></span>
-            <span style="font-size:11px; font-weight:700; color:#34D399;">8 Agents & Services Active</span>
+            <span style="width:8px; height:8px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite;"></span>
+            <span style="font-size:11px; font-weight:700; color:var(--accent2);">8 Agents & Services Active</span>
           </div>
         </div>
       </div>
@@ -4586,7 +4586,7 @@ function renderActiveAgTabContent() {
     } else if (_agTabActive === 'rag' && typeof renderAgRagTab === 'function') {
       renderAgRagTab(container);
     } else {
-      container.innerHTML = `<div style="padding:40px; text-align:center; color:#64748B;">Memuat modul ${_agTabActive}...</div>`;
+      container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text3);">Memuat modul ${_agTabActive}...</div>`;
     }
   } catch(err) {
     console.error(`[Agentic] Error rendering tab ${_agTabActive}:`, err);

@@ -81,7 +81,7 @@ async function renderAgOrgTab(el){
         <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[dh.code]||'🤖'} ${agEsc(dh.name)}</div>
         <div style="font-size:9.5px;color:var(--gray)">${agEsc(dh.role_title)}</div>
       </div>
-      <div style="width:2px;height:8px;background:#cbd5e1;margin:0 auto"></div>
+      <div style="width:2px;height:8px;background:var(--border2);margin:0 auto"></div>
       <div style="display:flex;flex-direction:column;gap:6px">
         ${members.map(a=>`<div class="ag-detail" style="padding:6px 9px;position:relative;${a.active?'':'opacity:.45'}">
           <button class="act-btn" title="Edit job desc" style="position:absolute;top:4px;right:4px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',10)}</button>
@@ -117,25 +117,25 @@ async function renderAgOrgTab(el){
 
       <div style="display:flex;flex-direction:column;align-items:center;margin-top:14px">
         <div style="background:#0A2342;color:#fff;border-radius:10px;padding:8px 22px;font-weight:800;font-size:12.5px">👑 ANDA (CEO)</div>
-        <div style="width:2px;height:14px;background:#cbd5e1"></div>
+        <div style="width:2px;height:14px;background:var(--border2)"></div>
         ${head?`<div class="ag-detail" style="border:2px solid #0A2342;padding:10px 18px;text-align:center;min-width:230px;position:relative">
           <button class="act-btn" title="Edit job desc" style="position:absolute;top:6px;right:6px" onclick="agOrgEditAgent('HEAD')">${svgIcon('edit',12)}</button>
           <div style="font-size:14px;font-weight:800;color:#0A2342">${AG_ORG_ICON.HEAD} ${agEsc(head.name)}</div>
           <div style="font-size:10.5px;color:var(--gray)">${agEsc(head.role_title)}</div>
           <span class="ag-badge" style="background:#DCFCE7;color:#15803D;border:1px solid #86EFAC;margin-top:4px;display:inline-block">AKTIF · ${agEsc(head.model_tier)}</span>
         </div>`:''}
-        <div style="width:2px;height:14px;background:#cbd5e1"></div>
+        <div style="width:2px;height:14px;background:var(--border2)"></div>
         <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:stretch;width:100%">
           ${Object.values(AG_DEPT_META).map(deptCard).join('')}
         </div>
-        ${crossFn.length?`<div style="width:2px;height:10px;background:#cbd5e1"></div>
+        ${crossFn.length?`<div style="width:2px;height:10px;background:var(--border2)"></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
           ${crossFn.map(a=>`<div class="ag-detail" style="padding:8px 13px;text-align:center;min-width:140px;position:relative;${a.active?'':'opacity:.45'}">
             <button class="act-btn" title="Edit job desc" style="position:absolute;top:5px;right:5px" onclick="agOrgEditAgent('${a.code}')">${svgIcon('edit',11)}</button>
             <div style="font-size:12px;font-weight:800;color:#0A2342">${AG_ORG_ICON[a.code]||'🤖'} ${agEsc(a.name)}</div>
             <div style="font-size:9.5px;color:var(--gray)">${agEsc(a.role_title)}</div>
             <span class="ag-badge" style="margin-top:4px;display:inline-block;${a.active
-              ?'background:#DCFCE7;color:#15803D;border:1px solid #86EFAC':'background:#F1F5F9;color:#64748B;border:1px solid #CBD5E1'}">
+              ?'background:#DCFCE7;color:#15803D;border:1px solid #86EFAC':'background:var(--bg2);color:var(--text3);border:1px solid #CBD5E1'}">
               ${a.active?'AKTIF':'NONAKTIF'} · ${agEsc(a.model_tier)}</span>
           </div>`).join('')}
         </div>`:''}
@@ -249,22 +249,22 @@ async function agComplaintEdit(id){
       <h3 style="margin:0 0 10px;color:#0A2342">💬 ${r?'Edit':'Tambah'} Keluhan</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Pelanggan
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Pelanggan
             <input id="agcx-name" class="form-input" style="width:100%" value="${agEsc(r?r.customer_name||'':'')}"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Kanal
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Kanal
             <select id="agcx-chan" class="form-input" style="width:100%">${kanal.map(k=>`<option ${r&&r.channel===k?'selected':''}>${k}</option>`).join('')}</select></label>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Kategori
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Kategori
             <select id="agcx-cat" class="form-input" style="width:100%">${kat.map(k=>`<option ${r&&r.category===k?'selected':''}>${k}</option>`).join('')}</select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Tingkat
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Tingkat
             <select id="agcx-sev" class="form-input" style="width:100%">${['Rendah','Sedang','Tinggi'].map(k=>`<option ${r&&r.severity===k?'selected':(!r&&k==='Sedang'?'selected':'')}>${k}</option>`).join('')}</select></label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Uraian keluhan
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Uraian keluhan
           <textarea id="agcx-desc" class="form-input" style="width:100%;font-size:12px" rows="3">${agEsc(r?r.description||'':'')}</textarea></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Ditangani oleh
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Ditangani oleh
           <input id="agcx-assign" class="form-input" style="width:100%" value="${agEsc(r?r.assigned_name||'':'')}"></label>
-        ${r?`<label style="font-size:11.5px;font-weight:700;color:#334155">Resolusi
+        ${r?`<label style="font-size:11.5px;font-weight:700;color:var(--text2)">Resolusi
           <textarea id="agcx-res" class="form-input" style="width:100%;font-size:12px" rows="2">${agEsc(r.resolution||'')}</textarea></label>`:''}
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -335,27 +335,27 @@ async function agCredEdit(id){
     <div style="max-width:520px">
       <h3 style="margin:0 0 10px;color:#0A2342">🪪 ${r?'Edit':'Tambah'} Kredensial Nakes</h3>
       <div style="display:grid;gap:9px">
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Nama nakes
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nama nakes
           <input id="agcr-name" class="form-input" style="width:100%" value="${agEsc(r?r.staff_name:'')}"></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Profesi
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Profesi
             <select id="agcr-prof" class="form-input" style="width:100%">
               ${prof.map(p=>`<option ${r&&r.profession===p?'selected':''}>${p}</option>`).join('')}</select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Jenis
             <select id="agcr-type" class="form-input" style="width:100%">
               ${jenis.map(p=>`<option ${r&&r.credential_type===p?'selected':''}>${p}</option>`).join('')}</select></label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Nomor
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nomor
           <input id="agcr-num" class="form-input" style="width:100%" value="${agEsc(r?r.number||'':'')}"></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Tanggal terbit
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Tanggal terbit
             <input id="agcr-issued" type="date" class="form-input" style="width:100%" value="${agEsc(r?r.issued_date||'':'')}"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Kedaluwarsa
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Kedaluwarsa
             <input id="agcr-expiry" type="date" class="form-input" style="width:100%" value="${agEsc(r?r.expiry_date||'':'')}"></label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Penerbit (KKI/KTKI/Organisasi profesi)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Penerbit (KKI/KTKI/Organisasi profesi)
           <input id="agcr-issuer" class="form-input" style="width:100%" value="${agEsc(r?r.issuer||'':'')}"></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155;display:flex;align-items:center;gap:6px">
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2);display:flex;align-items:center;gap:6px">
           <input type="checkbox" id="agcr-active" ${!r||r.is_active?'checked':''}> Aktif</label>
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
@@ -399,7 +399,7 @@ async function agRenderAiConfig(){
         ${rows.filter(r=>r.category===cat).map(r=>`
           <div style="display:grid;grid-template-columns:1fr 1.4fr auto;gap:8px;align-items:center;padding:4px 0;border-bottom:1px dashed #e2e8f0">
             <div>
-              <div style="font-size:11.5px;font-weight:700;color:#334155">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:#B91C1C">🔒</span>':''}</div>
+              <div style="font-size:11.5px;font-weight:700;color:var(--text2)">${agEsc(r.label)} ${r.is_secret?'<span title="rahasia — tak ditampilkan" style="color:#B91C1C">🔒</span>':''}</div>
               <div style="font-size:10px;color:var(--gray)">${agEsc(r.notes||'')}</div>
             </div>
             <input id="agc-${agEsc(r.key)}" class="form-input" style="width:100%;font-size:11.5px"
@@ -471,11 +471,11 @@ async function agTemplateEdit(id){
       <h3 style="margin:0 0 10px;color:#0A2342">📐 ${r?'Edit':'Tambah'} Template Dokumen</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Level
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Level
             <select id="agt-level" class="form-input" style="width:100%">
               ${[1,2,3,4].map(l=>`<option value="${l}" ${r&&r.doc_level==l?'selected':''}>${AG_DOC_LEVELS[l]}</option>`).join('')}
             </select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Jenis
             <input id="agt-type" class="form-input" style="width:100%" placeholder="SOP / IK / FORM …" value="${agEsc(r?r.doc_type:'SOP')}"></label>
         </div>
         <!-- Template berlaku untuk SEMUA departemen — tidak perlu diset per dept.
@@ -483,35 +483,35 @@ async function agTemplateEdit(id){
              wildcard yang cocok untuk dokumen departemen apa pun. -->
         <input type="hidden" id="agt-dept" value="SEMUA">
         <div style="font-size:11px;color:var(--gray)">Template ini berlaku untuk <b>semua departemen</b> pada level &amp; jenis di atas.</div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Nama template
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nama template
           <input id="agt-name" class="form-input" style="width:100%" value="${agEsc(r?r.name:'')}" placeholder="mis. SOP Pra-Analitik OneLab"></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Font
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Font
             <input id="agt-font" class="form-input" style="width:100%" value="${agEsc(fs.font||'')}" placeholder="Arial / Times New Roman"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Ukuran (pt)
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Ukuran (pt)
             <input id="agt-size" class="form-input" style="width:100%" value="${agEsc(fs.size_pt||'')}" placeholder="11"></label>
         </div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr) 1fr;gap:8px">
-          <label style="font-size:11px;font-weight:700;color:#334155">Margin atas
+          <label style="font-size:11px;font-weight:700;color:var(--text2)">Margin atas
             <input id="agt-mt" class="form-input" style="width:100%" value="${agEsc(mg.t||'')}" placeholder="cm"></label>
-          <label style="font-size:11px;font-weight:700;color:#334155">bawah
+          <label style="font-size:11px;font-weight:700;color:var(--text2)">bawah
             <input id="agt-mb" class="form-input" style="width:100%" value="${agEsc(mg.b||'')}"></label>
-          <label style="font-size:11px;font-weight:700;color:#334155">kiri
+          <label style="font-size:11px;font-weight:700;color:var(--text2)">kiri
             <input id="agt-ml" class="form-input" style="width:100%" value="${agEsc(mg.l||'')}"></label>
-          <label style="font-size:11px;font-weight:700;color:#334155">kanan
+          <label style="font-size:11px;font-weight:700;color:var(--text2)">kanan
             <input id="agt-mr" class="form-input" style="width:100%" value="${agEsc(mg.r||'')}"></label>
-          <label style="font-size:11px;font-weight:700;color:#334155">Spasi baris
+          <label style="font-size:11px;font-weight:700;color:var(--text2)">Spasi baris
             <input id="agt-ls" class="form-input" style="width:100%" value="${agEsc(fs.line_spacing||'')}" placeholder="1.0/1.5"></label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Master .docx (mengunci header/footer/format)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Master .docx (mengunci header/footer/format)
           <input type="file" id="agt-file" class="form-input" style="width:100%" accept=".docx">
           ${r&&r.storage_path?`<span style="font-size:10.5px;color:#15803D">master terpasang — unggah baru hanya bila ingin mengganti</span>`:''}</label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Contoh dokumen jadi (referensi — .docx/.pdf)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Contoh dokumen jadi (referensi — .docx/.pdf)
           <input type="file" id="agt-sample" class="form-input" style="width:100%" accept=".docx,.pdf">
           <span style="font-size:10.5px;color:var(--gray)">Unggah contoh dokumen asli Anda di sini. Dipakai sebagai acuan format & isi saat menyusun master.${r&&r.sample_path?' <span style="color:#15803D">contoh terpasang</span>':''}</span></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Daftar placeholder di master (satu per baris, tanpa kurung)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Daftar placeholder di master (satu per baris, tanpa kurung)
           <span style="font-weight:400;color:var(--gray)">— di file .docx tulis <code>{{NAMA}}</code>.</span>
-          <div style="font-weight:400;font-size:10.5px;color:var(--gray);background:#F8FAFC;border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin:3px 0">
+          <div style="font-weight:400;font-size:10.5px;color:var(--gray);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 8px;margin:3px 0">
             <b>Penanda ISI (diisi otomatis verbatim dari struktur dokumen):</b>
             <code>{{TUJUAN}}</code> <code>{{RUANG_LINGKUP}}</code> <code>{{PENANGGUNG_JAWAB}}</code>
             <code>{{REFERENSI}}</code> <code>{{IKHTISAR_UMUM}}</code> <code>{{GLOSARIUM}}</code>
@@ -523,7 +523,7 @@ async function agTemplateEdit(id){
             NAMA_PENYETUJU, JABATAN_PENYETUJU.
           </div>
           <textarea id="agt-ph" class="form-input" style="width:100%;font-size:12px" rows="3" placeholder="JUDUL&#10;NO_DOKUMEN&#10;TANGGAL_TERBIT">${agEsc(r&&Array.isArray(r.placeholders)?r.placeholders.join('\n'):'')}</textarea></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Catatan (header/footer, penomoran, dll)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Catatan (header/footer, penomoran, dll)
           <textarea id="agt-notes" class="form-input" style="width:100%;font-size:12px" rows="3">${agEsc(r?r.notes||'':'')}</textarea></label>
       </div>
       <div id="agt-log" style="font-size:11.5px;margin-top:6px"></div>
@@ -686,21 +686,21 @@ function agOrgEditAgent(code){
       <h3 style="margin:0 0 10px;color:#0A2342">${AG_ORG_ICON[code]||'🤖'} Edit Organ — ${agEsc(a.code)}</h3>
       <div style="display:grid;gap:9px">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Nama
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Nama
             <input id="agoe-name" class="form-input" style="width:100%" value="${agEsc(a.name)}"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Jabatan
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Jabatan
             <input id="agoe-role" class="form-input" style="width:100%" value="${agEsc(a.role_title)}"></label>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Model
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Model
             <select id="agoe-tier" class="form-input" style="width:100%">
               <option value="main" ${a.model_tier==='main'?'selected':''}>main (Nemotron — berat)</option>
               <option value="light" ${a.model_tier==='light'?'selected':''}>light (cepat & murah)</option>
             </select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155;display:flex;align-items:end;gap:6px;padding-bottom:8px">
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2);display:flex;align-items:end;gap:6px;padding-bottom:8px">
             <input type="checkbox" id="agoe-active" ${a.active?'checked':''}> Aktif</label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Job Description / Charter
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Job Description / Charter
           <span style="font-weight:400;color:var(--gray)">(= system prompt agent — ini "perintah kerja"-nya)</span>
           <textarea id="agoe-charter" class="form-input" style="width:100%;font-size:12px" rows="9">${agEsc(a.charter)}</textarea></label>
       </div>
@@ -734,7 +734,7 @@ function agOrgEditRight(taskType){
     <div style="max-width:480px">
       <h3 style="margin:0 0 10px;color:#0A2342">⚖️ Mandat — ${agEsc(r.task_type)}</h3>
       <div style="display:grid;gap:9px">
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Aksi otomatis HEAD
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Aksi otomatis HEAD
           <select id="agre-action" class="form-input" style="width:100%">
             ${[['AUTO_PUBLISH','R1 — publish sendiri (butuh QA PASS)'],
                ['AUTO_PUBLISH_NOQA','R1 — publish tanpa QA (log/internal)'],
@@ -743,15 +743,15 @@ function agOrgEditRight(taskType){
               .map(([v,l])=>`<option value="${v}" ${r.auto_action===v?'selected':''}>${l}</option>`).join('')}
           </select></label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">QA penilai
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">QA penilai
             <select id="agre-qa" class="form-input" style="width:100%">
               <option value="">(tanpa QA)</option>
               ${qaOpts.map(q=>`<option ${r.qa_agent===q?'selected':''}>${q}</option>`).join('')}
             </select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Skor minimal lulus
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Skor minimal lulus
             <input id="agre-min" type="number" min="0" max="100" class="form-input" style="width:100%" value="${r.min_score}"></label>
         </div>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Catatan
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Catatan
           <input id="agre-note" class="form-input" style="width:100%" value="${agEsc(r.note||'')}"></label>
         <div style="font-size:10.5px;color:#92400E;background:#FEF3C7;border:1px solid #F59E0B;border-radius:6px;padding:6px 9px">
           Konten ber-review-medis tetap dipaksa R3 oleh sistem, apa pun setelan ini.</div>
@@ -856,7 +856,7 @@ window.agSelectChatAgent = function(code) {
 };
 
 window.getAgentStatus = function(agent) {
-  if (!agent.active) return '<span style="color:#ef4444">🔴 Nonaktif</span>';
+  if (!agent.active) return '<span style="color:var(--danger)">🔴 Nonaktif</span>';
   const activeTask = agTasks.find(t => 
     (t.status === 'PROCESSING' || t.status === 'QUEUED') && 
     (t.payload?.agent_code === agent.code || t.task_type.startsWith(agent.code.split('_')[0]))
@@ -956,7 +956,7 @@ window.agRenderLeftPanel = function() {
         </select>
       </div>
       
-      <div class="ag-detail" style="padding:10px;margin-bottom:8px;background:#f8fafc;border-left:4px solid var(--primary);border-radius:6px">
+      <div class="ag-detail" style="padding:10px;margin-bottom:8px;background:var(--bg);border-left:4px solid var(--primary);border-radius:6px">
         <div style="font-size:12px;font-weight:800;color:#0A2342">${activeAgent ? activeAgent.name : ''}</div>
         <div style="font-size:10px;color:var(--gray);margin-bottom:4px">${activeAgent ? activeAgent.role_title : ''}</div>
         <div style="font-size:11px;display:flex;align-items:center;gap:4px">
@@ -965,7 +965,7 @@ window.agRenderLeftPanel = function() {
         </div>
       </div>
 
-      <div id="ag-chat-history-container" style="height:32vh;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:#ffffff;margin-bottom:8px;display:flex;flex-direction:column;gap:8px">
+      <div id="ag-chat-history-container" style="height:32vh;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:10px;background:var(--white);margin-bottom:8px;display:flex;flex-direction:column;gap:8px">
         ${chatMsgs.length ? chatMsgs.map(m => {
           const isMe = m.from_agent === 'ACE';
           const bubbleBg = isMe ? '#0f2963' : '#f1f5f9';
@@ -998,7 +998,7 @@ window.agRenderLeftPanel = function() {
       <div style="max-height:50vh;overflow-y:auto">
       ${agOrgMsgs.length ? agOrgMsgs.map(m=>{
         const kc = m.kind==='ESCALATION'?'#EF4444':m.kind==='ALERT'?'#F59E0B':m.kind==='STANDUP'?'#0EA5E9':'#64748B';
-        return `<div style="border:1px solid var(--border);border-left:4px solid ${kc};border-radius:8px;padding:9px 12px;margin-bottom:8px;background:#ffffff">
+        return `<div style="border:1px solid var(--border);border-left:4px solid ${kc};border-radius:8px;padding:9px 12px;margin-bottom:8px;background:var(--white)">
           <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--gray)">
             <span><strong style="color:${kc}">${agEsc(m.kind)}</strong> · dari ${AG_ORG_ICON[m.from_agent]||''} ${agEsc(m.from_agent)}</span>
             <span>${agAgo(m.created_at)}</span>

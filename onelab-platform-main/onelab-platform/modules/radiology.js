@@ -371,7 +371,7 @@ async function printRadioResult(id) {
     ${fileUrl&&!fileUrl.startsWith('data:')?`<div class="img-box"><img src="${fileUrl}" style="max-width:100%;max-height:400px"></div>`:''}
     <div class="section">
       <div class="label" style="margin-bottom:6px">Deskripsi / Kesan Radiologi</div>
-      <div style="background:#F8FAFC;border-radius:8px;padding:14px;line-height:1.8">${r.result_value||'—'}</div>
+      <div style="background:var(--bg);border-radius:8px;padding:14px;line-height:1.8">${r.result_value||'—'}</div>
     </div>
     <div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">
       <div class="label">Kesimpulan:</div>

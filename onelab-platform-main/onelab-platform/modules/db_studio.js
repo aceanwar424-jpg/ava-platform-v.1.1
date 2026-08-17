@@ -28,7 +28,7 @@ function renderDatabaseStudio() {
   if (!main) return;
 
   main.innerHTML = `
-    <div style="min-height:85vh; background:#020617; color:#F8FAFC; padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
+    <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
       <!-- SUPABASE STUDIO HEADER -->
       <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(52,211,153,0.3); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:14px;">
         <div style="display:flex; align-items:center; gap:16px;">
@@ -37,8 +37,8 @@ function renderDatabaseStudio() {
           </div>
           <div>
             <div style="display:flex; align-items:center; gap:10px;">
-              <h2 style="margin:0; font-size:20px; font-weight:800; color:#F8FAFC;">Local Supabase Database Studio</h2>
-              <span style="background:rgba(16,185,129,0.2); color:#34D399; border:1px solid rgba(52,211,153,0.4); font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px;">
+              <h2 style="margin:0; font-size:20px; font-weight:800; color:var(--bg);">Local Supabase Database Studio</h2>
+              <span style="background:rgba(16,185,129,0.2); color:var(--accent2); border:1px solid rgba(52,211,153,0.4); font-size:11px; font-weight:800; padding:2px 8px; border-radius:6px;">
                 PGlite WASM · Postgres Local Engine
               </span>
             </div>
@@ -47,7 +47,7 @@ function renderDatabaseStudio() {
         </div>
 
         <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:#34D399; font-weight:700;">
+          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:var(--accent2); font-weight:700;">
             🟢 Server Status: 127.0.0.1:54329 (Active)
           </div>
           <button class="btn btn-teal btn-sm" onclick="dbTriggerGitPush()" style="background:linear-gradient(135deg, #2563EB, #1D4ED8); border:none; font-weight:800;">
@@ -94,8 +94,8 @@ function renderDatabaseStudio() {
         <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:14px;">
             <div>
-              <h3 style="margin:0; font-size:16px; font-weight:800; color:#F8FAFC; display:flex; align-items:center; gap:8px;">
-                <span>Tabel:</span> <code style="color:#34D399; font-family:monospace; font-size:16px;">${_dbSelectedTable}</code>
+              <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg); display:flex; align-items:center; gap:8px;">
+                <span>Tabel:</span> <code style="color:var(--accent2); font-family:monospace; font-size:16px;">${_dbSelectedTable}</code>
               </h3>
               <p style="margin:4px 0 0 0; font-size:12px; color:#94A3B8;" id="db-row-count">Memuat baris data...</p>
             </div>
@@ -178,7 +178,7 @@ function dbRenderGrid(rows) {
   }).join('');
 
   grid.innerHTML = `
-    <table style="width:100%; border-collapse:collapse; color:#F8FAFC;">
+    <table style="width:100%; border-collapse:collapse; color:var(--bg);">
       <thead>
         <tr style="border-bottom:1px solid rgba(255,255,255,0.1); background:rgba(30,41,59,0.6);">
           <th style="padding:10px; width:40px; text-align:center; color:#94A3B8;">#</th>
@@ -222,9 +222,9 @@ function dbOpenSQLEditorModal() {
   modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;font-family:\'Plus Jakarta Sans\',sans-serif;';
 
   modal.innerHTML = `
-    <div style="background:#0F172A; border:1px solid rgba(52,211,153,0.4); border-radius:16px; padding:24px; width:100%; max-width:760px; color:#F8FAFC; box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
+    <div style="background:var(--text); border:1px solid rgba(52,211,153,0.4); border-radius:16px; padding:24px; width:100%; max-width:760px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:18px; font-weight:800; color:#34D399; display:flex; align-items:center; gap:8px;">
+        <h3 style="margin:0; font-size:18px; font-weight:800; color:var(--accent2); display:flex; align-items:center; gap:8px;">
           ⚡ Supabase SQL Query Editor
         </h3>
         <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:#94A3B8; font-size:22px; cursor:pointer;">✕</button>
@@ -232,7 +232,7 @@ function dbOpenSQLEditorModal() {
 
       <div style="margin-bottom:14px;">
         <label style="display:block; margin-bottom:6px; font-size:12px; font-weight:700; color:#94A3B8;">Tuliskan Kueri SQL (Postgres Syntax) *</label>
-        <textarea id="sql-query-input" rows="5" style="width:100%; padding:12px; background:rgba(30,41,59,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#34D399; font-family:monospace; font-size:13px; outline:none; resize:vertical;">SELECT * FROM user_profiles ORDER BY id DESC LIMIT 10;</textarea>
+        <textarea id="sql-query-input" rows="5" style="width:100%; padding:12px; background:rgba(30,41,59,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:var(--accent2); font-family:monospace; font-size:13px; outline:none; resize:vertical;">SELECT * FROM user_profiles ORDER BY id DESC LIMIT 10;</textarea>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
@@ -273,7 +273,7 @@ async function dbExecuteSQLQuery() {
     const elapsed = (performance.now() - startTime).toFixed(1);
 
     if (!Array.isArray(data) || data.length === 0) {
-      resContainer.innerHTML = `<div style="color:#34D399;">✅ Kueri sukses dieksekusi (${elapsed} ms). 0 baris dikembalikan.</div>`;
+      resContainer.innerHTML = `<div style="color:var(--accent2);">✅ Kueri sukses dieksekusi (${elapsed} ms). 0 baris dikembalikan.</div>`;
       return;
     }
 
@@ -285,7 +285,7 @@ async function dbExecuteSQLQuery() {
     }).join('');
 
     resContainer.innerHTML = `
-      <div style="font-size:11px; color:#34D399; margin-bottom:8px; font-weight:700;">🟢 Kueri sukses dieksekusi (${elapsed} ms) — ${data.length} baris hasil</div>
+      <div style="font-size:11px; color:var(--accent2); margin-bottom:8px; font-weight:700;">🟢 Kueri sukses dieksekusi (${elapsed} ms) — ${data.length} baris hasil</div>
       <table style="width:100%; border-collapse:collapse; text-align:left;">
         <thead><tr>${headers}</tr></thead>
         <tbody>${rows}</tbody>

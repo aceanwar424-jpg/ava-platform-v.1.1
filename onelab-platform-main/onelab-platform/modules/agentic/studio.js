@@ -215,27 +215,27 @@ function agOpenSlotForm(){
     <div style="max-width:460px">
       <h3 style="margin:0 0 12px;color:#0A2342">Slot Konten Manual</h3>
       <div style="display:grid;gap:9px">
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Jenis
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Jenis
           <select id="agsf-type" class="form-input" style="width:100%">
             ${Object.entries(AG_CT_META).map(([k,m])=>`<option value="${k}">${m.l}</option>`).join('')}
           </select></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Topik
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Topik
           <input id="agsf-topic" class="form-input" style="width:100%" placeholder="cth: Kenali gejala diabetes sejak dini"></label>
-        <label style="font-size:11.5px;font-weight:700;color:#334155">Angle / Brief (opsional)
+        <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Angle / Brief (opsional)
           <textarea id="agsf-angle" class="form-input" style="width:100%" rows="2"></textarea></label>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Tanggal
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Tanggal
             <input id="agsf-date" type="date" class="form-input" style="width:100%" value="${d}"></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Channel
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Channel
             <select id="agsf-channel" class="form-input" style="width:100%">
               <option>IG</option><option>LINKEDIN</option><option>WEB</option><option>WHATSAPP</option><option>OFFLINE</option>
             </select></label>
-          <label style="font-size:11.5px;font-weight:700;color:#334155">Framework
+          <label style="font-size:11.5px;font-weight:700;color:var(--text2)">Framework
             <select id="agsf-fw" class="form-input" style="width:100%">
               <option>PAS</option><option>AIDA</option><option>EDU</option>
             </select></label>
         </div>
-        <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:#334155">
+        <label style="display:flex;gap:6px;align-items:center;font-size:12px;color:var(--text2)">
           <input type="checkbox" id="agsf-produce" checked> Langsung produksi sekarang (AI membuat draft)
         </label>
       </div>

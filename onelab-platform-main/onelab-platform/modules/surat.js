@@ -460,7 +460,7 @@ function renderDeptList() {
       </div>
       <div style="display:flex;gap:4px">
         <button class="btn btn-ghost btn-xs" onclick="openDeptForm(${d.id})">${icon('edit', 12)}</button>
-        <button class="btn btn-ghost btn-xs" onclick="deleteDept(${d.id})" style="color:#EF4444">${icon('trash', 12)}</button>
+        <button class="btn btn-ghost btn-xs" onclick="deleteDept(${d.id})" style="color:var(--danger)">${icon('trash', 12)}</button>
       </div>
     </div>`).join('');
 }

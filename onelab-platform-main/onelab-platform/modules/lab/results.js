@@ -37,7 +37,7 @@ function renderResultTab(){
     <div style="display:grid;grid-template-columns:240px 1fr 260px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:#fff">
       <div id="res-worklist" style="border-right:1px solid var(--border);overflow-y:auto;max-height:640px;background:var(--lgray)"></div>
       <div style="display:flex;flex-direction:column;min-width:0">
-        <div id="res-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:#F8FAFC"></div>
+        <div id="res-pbar" style="border-bottom:1px solid var(--border);padding:10px 14px;background:var(--bg)"></div>
         <div id="res-grid" style="overflow:auto;max-height:600px"></div>
       </div>
       <div id="res-notes" style="border-left:1px solid var(--border);background:var(--lgray);padding:14px;overflow-y:auto;max-height:640px"></div>
@@ -450,7 +450,7 @@ async function showDeltaCheck(patientName, productId, excludeId=null){
     box.innerHTML=`
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:#1E40AF">
         Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong>
-        <span style="color:#64748B">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
+        <span style="color:var(--text3)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
         <span id="rf-delta-arrow"></span>
       </div>`;
     box._prevNum=p.result_numeric;

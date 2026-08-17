@@ -225,7 +225,7 @@ async function loadPendingLabels(){
               <div style="font-family:monospace;font-size:11px;font-weight:700;color:var(--teal)">${l.label_barcode}</div>
               <div style="font-size:12px;font-weight:600">${l.patient_name}</div>
               <div style="font-size:10.5px;color:var(--gray)">
-                <span style="background:#0891B2;color:#fff;padding:1px 6px;border-radius:6px;margin-right:4px">${l.sampel_type}</span>
+                <span style="background:var(--teal);color:#fff;padding:1px 6px;border-radius:6px;margin-right:4px">${l.sampel_type}</span>
                 ${itemCounts[i]?.length||0} tes</div>
             </div>`).join('')}
         </div>
@@ -270,7 +270,7 @@ async function openLabelCheckin(labelId){
     </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${label.patient_name}</strong> · ${label.visit_number} ·
-      <span style="background:#0891B2;color:#fff;padding:1px 8px;border-radius:8px;font-size:10.5px;margin-left:4px">${label.sampel_type}</span>
+      <span style="background:var(--teal);color:#fff;padding:1px 8px;border-radius:8px;font-size:10.5px;margin-left:4px">${label.sampel_type}</span>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:8px">
       ${items.length} Tes dalam label ini — semua akan check-in sekaligus</div>

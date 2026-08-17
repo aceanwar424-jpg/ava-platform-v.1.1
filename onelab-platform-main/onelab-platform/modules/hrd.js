@@ -507,7 +507,7 @@ function renderLeaveTable(data) {
         <div class="act-row">
           ${l.status==='Pending'?`
             <button class="act-btn" style="color:#22C55E" onclick="approveLeave(${l.id},'Approved')">✅</button>
-            <button class="act-btn" style="color:#EF4444" onclick="approveLeave(${l.id},'Rejected')" style="font-size:10.5px;font-weight:700">Batal</button>`:''}
+            <button class="act-btn" style="color:var(--danger)" onclick="approveLeave(${l.id},'Rejected')" style="font-size:10.5px;font-weight:700">Batal</button>`:''}
         </div>
       </td>
     </tr>`;
@@ -642,7 +642,7 @@ function renderPayrollTab() {
           <td style="font-weight:600">${e.full_name}</td>
           <td style="font-size:12px;color:var(--gray)">${e.division||'—'}</td>
           <td>${e.base_salary?formatCurrency(e.base_salary):'—'}</td>
-          <td style="color:#EF4444">${bpjs?formatCurrency(bpjs):'—'}</td>
+          <td style="color:var(--danger)">${bpjs?formatCurrency(bpjs):'—'}</td>
           <td style="font-weight:700;color:#22C55E">${net?formatCurrency(net):'—'}</td>
           <td style="font-size:12px;color:var(--gray)">${e.bank_name||'—'} ${e.bank_account||''}</td>
         </tr>`;

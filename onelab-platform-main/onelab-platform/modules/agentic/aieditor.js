@@ -138,7 +138,7 @@ function agAiEditorPaintChat(){
     const me = m.role==='user';
     return `<div style="display:flex;justify-content:${me?'flex-end':'flex-start'};margin-bottom:7px">
       <div style="max-width:88%;font-size:11.5px;line-height:1.4;padding:7px 10px;border-radius:10px;
-        ${me?'background:#0f766e;color:#fff':'background:#F1F5F9;color:#1a2b3c'}">
+        ${me?'background:#0f766e;color:#fff':'background:var(--bg2);color:#1a2b3c'}">
         ${agEsc(m.content||'')}
         <div style="font-size:9px;opacity:.6;margin-top:3px">${m.created_at?new Date(m.created_at).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}):''}</div>
       </div></div>`;
