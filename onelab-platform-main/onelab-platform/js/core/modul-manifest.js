@@ -108,6 +108,9 @@ window.MODUL_HALAMAN = {
  "ar-aging": [
   "modules/finance_aging.js"
  ],
+ "penawaran": [
+  "modules/quotation.js"
+ ],
  "lab-tat": [
   "modules/lab/qcEngine.js",
   "modules/lab/index.js",
@@ -343,5 +346,6 @@ window.MODUL_SEMUA = [
  "modules/import_excel.js",
  "modules/agentic/canvas.js",
  "modules/finance_aging.js",
- "modules/lab/tat.js"
+ "modules/lab/tat.js",
+ "modules/quotation.js"
 ];
