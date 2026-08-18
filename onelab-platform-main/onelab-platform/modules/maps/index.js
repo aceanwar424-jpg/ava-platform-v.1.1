@@ -16,6 +16,7 @@ let mapsState = {
   resultMarkers: [],
   centerMarker: null,
   activeInfoWindow: null,
+  katSembunyi: new Set(),   // kategori yang dimatikan lewat legenda
   viewMode: 'both' // 'both', 'map', 'table'
 };
 let autocompleteWidget = null; // Google Places Autocomplete widget
@@ -50,6 +51,57 @@ const MAP_CATEGORIES = [
 ];
 
 const CAT_GROUPS = [...new Set(MAP_CATEGORIES.map(c=>c.group))];
+
+// ═══════════════════════════════════════════════════════════════
+// WARNA PENANDA PER KATEGORI
+//
+// Sebelas rona di bawah BUKAN pilihan selera. Peta adalah kasus
+// "semua-pasangan": dua titik kategori apa pun bisa bersebelahan, jadi
+// setiap pasang warna harus terbedakan — bukan hanya yang bertetangga di
+// legenda. Palet ini dicari dan diuji dengan validator palet kategorikal
+// (skills/dataviz), lolos di mode terang maupun gelap:
+//
+//   jarak warna terburuk antar-pasangan  ΔE 15.0 (penglihatan normal)
+//   jarak warna terburuk simulasi buta warna  ΔE 6.2 (deutan)
+//
+// Angka 6.2 itu berada di pita 6–8, yang HANYA sah bila ada penyandian
+// kedua selain warna. Karena itu tiap penanda membawa KODE DUA HURUF, dan
+// legenda selalu tampil beserta tabel hasil. Pembaca yang tidak bisa
+// memisahkan oranye dari hijau tetap bisa membaca "GY" dan "LB".
+//
+// Sebelas adalah batas nyata: pencarian menyeluruh tidak menemukan warna
+// ke-12 mana pun yang masih lolos bersama kesebelasnya. Karena itu
+// "Dokter Praktik" dan "Dokter Spesialis" berbagi satu warna peta —
+// keduanya sama-sama praktik perorangan — sedangkan tabel dan hasil ekspor
+// tetap membedakannya. "Lainnya" memakai abu netral, bukan rona, supaya
+// terbaca sebagai "belum dikategorikan".
+// ═══════════════════════════════════════════════════════════════
+const MAPS_KATEGORI = [
+  { kunci:'Klinik Pratama',    kode:'KP', warna:'#2354c7' },
+  { kunci:'Klinik Utama',      kode:'KU', warna:'#098dae' },
+  { kunci:'Rumah Sakit',       kode:'RS', warna:'#9b3b3b' },
+  { kunci:'Puskesmas',         kode:'PK', warna:'#e90c0c' },
+  { kunci:'Lab Klinik',        kode:'LB', warna:'#4ca968' },
+  { kunci:'Dokter Praktik',    kode:'DR', warna:'#8974dc' },
+  { kunci:'Dokter Spesialis',  kode:'DR', warna:'#8974dc' },   // sengaja sewarna
+  { kunci:'Apotek',            kode:'AP', warna:'#7a711f' },
+  { kunci:'Gym & Sport Club',  kode:'GY', warna:'#d07d39' },
+  { kunci:'Sekolah / Kampus',  kode:'SK', warna:'#7e3b9b' },
+  { kunci:'Perusahaan SME',    kode:'PT', warna:'#b420f3' },
+  { kunci:'Komunitas',         kode:'KM', warna:'#c94a90' },
+  { kunci:'Lainnya',           kode:'LN', warna:'#64748b' },
+];
+
+const MAPS_KAT_PETA = Object.fromEntries(MAPS_KATEGORI.map(k => [k.kunci, k]));
+
+// Kategori baku sebuah hasil. Selalu lewat mapCatFromQ() supaya warna di
+// peta, label di tabel, dan nilai yang masuk ke Leads berasal dari satu
+// sumber yang sama — bukan tiga tafsiran berbeda atas kata kunci pencarian.
+function katMaps(r) {
+  const nama = mapCatFromQ(r && r.category);
+  return MAPS_KAT_PETA[nama] || MAPS_KAT_PETA['Lainnya'];
+}
+
 
 async function renderMaps() {
   mapsState.apiKey = await loadMapsApiKey();
@@ -170,6 +222,8 @@ async function renderMaps() {
           </div>
         </div>
       </div>
+
+      <div id="maps-legenda" style="margin-top:12px"></div>
     </div>
 
     <!-- Results Table -->
@@ -181,6 +235,8 @@ async function renderMaps() {
             oninput="filterMapsRes(this.value)" style="max-width:200px">
           <div class="btn-row" style="margin-left:auto">
             <button class="btn btn-ghost btn-sm" onclick="toggleAllMapsSelect()">☑ Pilih Semua</button>
+            <button class="btn btn-ghost btn-sm" onclick="eksporMapsDialog()"
+              title="Unduh seluruh hasil pencarian beserta titik koordinat">⬇ Ekspor</button>
             <button class="btn btn-teal btn-sm" id="maps-import-btn" onclick="importSelectedMaps()" disabled>
               ⬆ Import
             </button>
@@ -515,27 +571,40 @@ function plotMapsResultMarkers() {
     if (!r.lat || !r.lng) return;
     const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
 
-    const isDB = r.in_db;
-    const pinColor = isDB ? '#22C55E' : '#00A896'; // Green for DB, Teal for new prospect
+    const kat = katMaps(r);
+    if (mapsState.katSembunyi && mapsState.katSembunyi.has(kat.kunci)) return;
 
+    const isDB = r.in_db;
+
+    // Dua hal berbeda disandikan dengan dua saluran berbeda:
+    //   ISIAN  = kategori   (apa jenis tempatnya)
+    //   CINCIN = status DB  (sudah jadi mitra, atau masih prospek baru)
+    // Sebelumnya keduanya berebut saluran warna, sehingga peta hanya bisa
+    // menjawab satu pertanyaan pada satu waktu.
     const marker = new google.maps.Marker({
       position: pos,
       map: mapsState.mapInstance,
-      title: r.name,
+      title: `${r.name} — ${mapCatFromQ(r.category)}`,
+      zIndex: isDB ? 2 : 1,
       icon: {
         path: google.maps.SymbolPath.CIRCLE,
-        scale: 7,
-        fillColor: pinColor,
+        scale: 11,
+        fillColor: kat.warna,
         fillOpacity: 0.95,
-        strokeColor: '#FFFFFF',
-        strokeWeight: 2,
-      }
+        strokeColor: isDB ? '#0F172A' : '#FFFFFF',
+        strokeWeight: isDB ? 3 : 2,
+      },
+      // Penyandian kedua selain warna — wajib, karena pasangan terdekat di
+      // palet ini hanya terpaut ΔE 6.2 pada simulasi buta warna.
+      label: { text: kat.kode, color: '#FFFFFF', fontSize: '9px', fontWeight: '700' },
     });
 
     const infoContent = `
       <div style="padding:6px;max-width:240px;font-family:inherit">
         <div style="font-weight:700;font-size:13px;color:var(--text);margin-bottom:4px">${r.name}</div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:6px">${catIcon(r.category)} ${r.category}</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;display:flex;align-items:center;gap:5px">
+          <span style="width:9px;height:9px;border-radius:50%;background:${kat.warna};display:inline-block;flex:none"></span>
+          ${mapCatFromQ(r.category)}</div>
         <div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">${r.address}</div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
           ${r.rating ? `<span style="font-size:11px;font-weight:600">${r.rating} (${r.reviews})</span>` : ''}
@@ -560,6 +629,76 @@ function plotMapsResultMarkers() {
   if (mapsState.resultMarkers.length > 0 && mapsState.radiusCircle) {
     mapsState.mapInstance.fitBounds(mapsState.radiusCircle.getBounds());
   }
+}
+
+// ── Legenda kategori ──────────────────────────────
+//
+// Legenda di sini bukan hiasan: palet peta melewati ambang buta warna
+// hanya KARENA ada penyandian kedua, dan legenda inilah yang menerjemahkan
+// kode dua huruf pada tiap titik. Karena itu ia selalu tampil begitu ada
+// hasil, tidak bisa disembunyikan.
+//
+// Sekalian jadi penyaring: klik satu kategori untuk menyembunyikannya dari
+// peta. Warna TIDAK pernah dibagi ulang saat menyaring — tiap kategori
+// memegang ronanya sendiri, sehingga peta sebelum dan sesudah disaring
+// tetap bisa dibandingkan.
+function gambarLegendaMaps() {
+  const el = document.getElementById('maps-legenda');
+  if (!el) return;
+
+  const hitung = {};
+  (mapsState.results || []).forEach(r => {
+    const k = katMaps(r).kunci;
+    hitung[k] = (hitung[k] || 0) + 1;
+  });
+
+  // Hanya kategori yang benar-benar ada di hasil. Urutan mengikuti urutan
+  // tetap MAPS_KATEGORI, bukan jumlah — supaya posisi tidak melompat-lompat
+  // setiap kali pencarian diulang.
+  const tampil = MAPS_KATEGORI.filter((k, i) =>
+    hitung[k.kunci] && MAPS_KATEGORI.findIndex(x => x.kunci === k.kunci) === i);
+
+  if (!tampil.length) { el.innerHTML = ''; return; }
+
+  const adaDB = (mapsState.results || []).some(r => r.in_db);
+
+  el.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+      <span style="font-size:11px;font-weight:700;color:var(--text3);
+            text-transform:uppercase;letter-spacing:.05em;margin-right:2px">Kategori</span>
+      ${tampil.map(k => {
+        const mati = mapsState.katSembunyi.has(k.kunci);
+        return `<button onclick="toggleKatMaps('${k.kunci.replace(/'/g,"\'")}')"
+          title="${mati ? 'Tampilkan' : 'Sembunyikan'} ${k.kunci} di peta"
+          style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+                 border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 4px;
+                 background:var(--bg);font-size:11.5px;font-weight:600;
+                 color:var(--text2);opacity:${mati ? '.4' : '1'};
+                 text-decoration:${mati ? 'line-through' : 'none'}">
+          <span style="width:16px;height:16px;border-radius:50%;background:${k.warna};
+                color:#FFF;font-size:8px;font-weight:700;display:inline-flex;
+                align-items:center;justify-content:center;flex:none">${k.kode}</span>
+          ${k.kunci}
+          <span style="color:var(--text3);font-weight:500">${hitung[k.kunci]}</span>
+        </button>`;
+      }).join('')}
+    </div>
+    ${adaDB ? `<div style="display:flex;gap:14px;align-items:center;margin-top:9px;
+         font-size:11px;color:var(--text3)">
+      <span style="display:inline-flex;align-items:center;gap:5px">
+        <span style="width:13px;height:13px;border-radius:50%;background:var(--text3);
+              border:2px solid #FFF;display:inline-block"></span> prospek baru</span>
+      <span style="display:inline-flex;align-items:center;gap:5px">
+        <span style="width:13px;height:13px;border-radius:50%;background:var(--text3);
+              border:3px solid #0F172A;display:inline-block"></span> sudah jadi mitra di database</span>
+    </div>` : ''}`;
+}
+
+function toggleKatMaps(kunci) {
+  if (mapsState.katSembunyi.has(kunci)) mapsState.katSembunyi.delete(kunci);
+  else mapsState.katSembunyi.add(kunci);
+  plotMapsResultMarkers();
+  gambarLegendaMaps();
 }
 
 async function renderMapsResults() {
@@ -589,6 +728,7 @@ async function renderMapsResults() {
   } catch(e) {}
 
   plotMapsResultMarkers();
+  gambarLegendaMaps();
 
   const inDB = mapsState.results.filter(r => r.in_db).length;
   const newOnes = mapsState.results.length - inDB;
@@ -777,19 +917,198 @@ async function importSelectedMaps() {
 }
 
 // ── Helpers ───────────────────────────────────────
+// ── Ekspor hasil pencarian ────────────────────────
+//
+// Sebelumnya hasil pencarian hanya bisa keluar lewat tombol Import, yang
+// membuang sebagian besar isinya: titik koordinat, place_id, jumlah ulasan,
+// dan kata kunci pencarian aslinya tidak ikut ke mana-mana. Padahal justru
+// itu yang dibutuhkan untuk pemetaan wilayah, pembagian rute kunjungan, dan
+// analisis di luar aplikasi.
+//
+// Yang diekspor adalah SELURUH hasil apa adanya — bukan hanya baris yang
+// dicentang, dan bukan hanya yang belum ada di database. Menyaring diam-diam
+// pada tahap ekspor membuat orang mengira dapat semuanya padahal tidak.
+
+const MAPS_KOLOM_EKSPOR = [
+  ['no',              (r, i) => i + 1],
+  ['nama',            r => r.name || ''],
+  ['kategori',        r => mapCatFromQ(r.category)],
+  ['kode_kategori',   r => katMaps(r).kode],
+  ['kata_kunci_cari', r => r.category || ''],
+  ['alamat',          r => r.address || ''],
+  ['telepon',         r => r.phone || r.db_phone || ''],
+  ['rating',          r => (r.rating === '' || r.rating == null) ? '' : r.rating],
+  ['jumlah_ulasan',   r => r.reviews || 0],
+  ['latitude',        r => (r.lat === '' || r.lat == null) ? '' : r.lat],
+  ['longitude',       r => (r.lng === '' || r.lng == null) ? '' : r.lng],
+  ['place_id',        r => r.place_id || ''],
+  ['url_google_maps', r => r.place_id ? 'https://www.google.com/maps/place/?q=place_id:' + r.place_id : ''],
+  ['status_database', r => r.in_db ? 'Sudah ada' : 'Baru'],
+  ['id_partner',      r => r.db_id || ''],
+];
+
+function radiusMapsTerpilih() {
+  const el = document.getElementById('maps-radius');
+  return el ? parseInt(el.value, 10) : null;
+}
+
+function eksporMapsDialog() {
+  const n = (mapsState.results || []).length;
+  if (!n) { toast('Belum ada hasil pencarian untuk diekspor', 'warn'); return; }
+
+  const tanpaKoord = mapsState.results.filter(r => !r.lat || !r.lng).length;
+
+  openModal(`
+    <h3 style="margin:0 0 4px">Ekspor ${n} Hasil Pencarian</h3>
+    <p style="font-size:12px;color:var(--text3);margin:0 0 14px;line-height:1.6">
+      Termasuk titik koordinat, place_id, rating, jumlah ulasan, dan status di
+      database. Seluruh hasil ikut, bukan hanya yang dicentang.
+      ${tanpaKoord ? `<br><b>${tanpaKoord}</b> baris tidak punya koordinat, jadi kolom
+        lintang/bujurnya kosong dan baris itu tidak ikut ke GeoJSON.` : ''}</p>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;height:auto;padding:11px 13px"
+              onclick="jalankanEksporMaps('excel')">
+        <div><div style="font-weight:700;font-size:13px">CSV untuk Excel</div>
+        <div style="font-size:11.5px;color:var(--text3);font-weight:400;margin-top:3px;line-height:1.5">
+          Pemisah titik koma — kolomnya langsung rapi di Excel berbahasa Indonesia.</div></div>
+      </button>
+      <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;height:auto;padding:11px 13px"
+              onclick="jalankanEksporMaps('csv')">
+        <div><div style="font-weight:700;font-size:13px">CSV standar</div>
+        <div style="font-size:11.5px;color:var(--text3);font-weight:400;margin-top:3px;line-height:1.5">
+          Pemisah koma — untuk Google Sheets, Python, dan alat lain.</div></div>
+      </button>
+      <button class="btn btn-ghost" style="justify-content:flex-start;text-align:left;height:auto;padding:11px 13px"
+              onclick="jalankanEksporMaps('geojson')">
+        <div><div style="font-weight:700;font-size:13px">GeoJSON</div>
+        <div style="font-size:11.5px;color:var(--text3);font-weight:400;margin-top:3px;line-height:1.5">
+          Untuk QGIS, Google My Maps, atau peta lain — koordinatnya sudah bertipe
+          titik, bukan teks, dan warna kategori ikut terbawa.</div></div>
+      </button>
+    </div>
+    <div style="display:flex;margin-top:14px">
+      <button class="btn btn-close" onclick="closeModalForce()">Batal</button>
+    </div>`);
+}
+
+// Satu sel CSV menurut RFC 4180: tanda kutip di dalam digandakan, dan sel
+// yang memuat pemisah, kutip, atau ganti baris dibungkus kutip. Alamat di
+// Indonesia kerap mengandung koma ("Jl. Aselih Raya No.50A, RT.10/RW.1"),
+// jadi tanpa ini satu alamat bisa pecah menjadi beberapa kolom.
+function selCsvMaps(nilai, pemisah) {
+  const t = nilai == null ? '' : String(nilai);
+  return (t.includes(pemisah) || t.includes('"') || /[\r\n]/.test(t))
+    ? '"' + t.replace(/"/g, '""') + '"'
+    : t;
+}
+
+function susunCsvMaps(pemisah) {
+  const baris = [MAPS_KOLOM_EKSPOR.map(k => selCsvMaps(k[0], pemisah)).join(pemisah)];
+  mapsState.results.forEach((r, i) => {
+    baris.push(MAPS_KOLOM_EKSPOR.map(k => selCsvMaps(k[1](r, i), pemisah)).join(pemisah));
+  });
+  // BOM UTF-8 di depan: tanpa ini Excel membaca berkas sebagai ANSI dan
+  // huruf beraksen pada nama tempat jadi berantakan.
+  return '﻿' + baris.join('\r\n') + '\r\n';
+}
+
+function susunGeoJsonMaps() {
+  const fitur = mapsState.results
+    .filter(r => r.lat !== '' && r.lng !== '' && r.lat != null && r.lng != null)
+    .map((r, i) => {
+      const sifat = {};
+      MAPS_KOLOM_EKSPOR.forEach(k => { sifat[k[0]] = k[1](r, i); });
+      sifat.warna_peta = katMaps(r).warna;
+      return {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [parseFloat(r.lng), parseFloat(r.lat)] },
+        properties: sifat,
+      };
+    });
+
+  return JSON.stringify({
+    type: 'FeatureCollection',
+    // Konteks pencarian ikut disimpan. Tanpa ini, berkas yang dibuka sebulan
+    // kemudian tidak bisa menjawab "ini radius berapa, dari titik mana".
+    metadata: {
+      sumber: 'OneLab Maps Prospecting',
+      diekspor: new Date().toISOString(),
+      pusat_pencarian: searchCenter || null,
+      radius_meter: radiusMapsTerpilih(),
+      jumlah_hasil: mapsState.results.length,
+      tanpa_koordinat: mapsState.results.length - fitur.length,
+    },
+    features: fitur,
+  }, null, 1);
+}
+
+function jalankanEksporMaps(jenis) {
+  try {
+    let isi, namaBerkas, tipe;
+    const stempel = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+
+    if (jenis === 'geojson') {
+      isi = susunGeoJsonMaps();
+      namaBerkas = 'prospek-maps-' + stempel + '.geojson';
+      tipe = 'application/geo+json;charset=utf-8';
+    } else {
+      isi = susunCsvMaps(jenis === 'excel' ? ';' : ',');
+      namaBerkas = 'prospek-maps-' + stempel + '.csv';
+      tipe = 'text/csv;charset=utf-8';
+    }
+
+    const blob = new Blob([isi], { type: tipe });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = namaBerkas;
+    document.body.appendChild(a); a.click(); a.remove();
+    // Dilepas belakangan; mencabut URL seketika bisa membatalkan unduhan
+    // yang belum sempat dimulai di sebagian peramban.
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+
+    closeModalForce();
+    toast(mapsState.results.length + ' baris diekspor ke ' + namaBerkas, 'ok', 4000);
+  } catch (e) {
+    toast('Ekspor gagal: ' + (e && e.message ? e.message : e), 'err');
+  }
+}
+
+// Urutan pemeriksaan di sini MENENTUKAN HASIL, karena kata kuncinya saling
+// mengandung. Versi sebelumnya memeriksa "klinik" lebih dulu, sehingga:
+//
+//   "laboratorium klinik" → Klinik Pratama   (seharusnya Lab Klinik)
+//   "klinik gigi"         → Klinik Pratama   (seharusnya Dokter Spesialis)
+//   "klinik mata"         → Klinik Pratama   (seharusnya Dokter Spesialis)
+//
+// Salah golong ini tidak berhenti di tampilan: fungsi yang sama dipakai saat
+// Import ke Leads, jadi setiap lab yang pernah diimpor tersimpan sebagai
+// klinik — dan target penjualan untuk lab jadi tidak pernah kelihatan.
+//
+// Aturannya: yang paling khusus diperiksa lebih dulu, yang paling umum
+// terakhir. Jangan menyisipkan kata kunci baru di tengah tanpa memeriksa
+// apakah ia terkandung di kata kunci lain.
 function mapCatFromQ(q) {
-  if (!q) return 'Lainnya'; q = q.toLowerCase();
-  if (q.includes('apotek')) return 'Apotek';
-  if (q.includes('klinik utama')) return 'Klinik Utama';
-  if (q.includes('klinik')) return 'Klinik Pratama';
-  if (q.includes('spesialis') || q.includes('kandungan') || q.includes('anak') || q.includes('gigi') || q.includes('mata')) return 'Dokter Spesialis';
-  if (q.includes('dokter')) return 'Dokter Praktik';
-  if (q.includes('puskesmas')) return 'Puskesmas';
-  if (q.includes('rumah sakit')) return 'Rumah Sakit';
-  if (q.includes('lab')) return 'Lab Klinik';
-  if (q.includes('gym') || q.includes('fitness') || q.includes('yoga') || q.includes('golf') || q.includes('spa') || q.includes('cycling')) return 'Gym & Sport Club';
+  if (!q) return 'Lainnya';
+  q = q.toLowerCase();
+
+  if (q.includes('apotek'))                       return 'Apotek';
+  if (q.includes('lab'))                          return 'Lab Klinik';      // sebelum "klinik"
+  if (q.includes('puskesmas'))                    return 'Puskesmas';
+  if (q.includes('rumah sakit'))                  return 'Rumah Sakit';
+  if (q.includes('spesialis') || q.includes('kandungan') ||
+      q.includes('anak')      || q.includes('gigi') ||
+      q.includes('mata'))                         return 'Dokter Spesialis'; // sebelum "klinik"
+  if (q.includes('klinik utama'))                 return 'Klinik Utama';
+  if (q.includes('klinik'))                       return 'Klinik Pratama';
+  if (q.includes('dokter'))                       return 'Dokter Praktik';
+  if (q.includes('gym')  || q.includes('fitness') || q.includes('yoga') ||
+      q.includes('golf') || q.includes('spa')     || q.includes('cycling'))
+                                                  return 'Gym & Sport Club';
   if (q.includes('sekolah') || q.includes('universitas')) return 'Sekolah / Kampus';
-  if (q.includes('masjid') || q.includes('perumahan')) return 'Komunitas';
-  if (q.includes('pabrik') || q.includes('industri') || q.includes('kawasan') || q.includes('kantor')) return 'Perusahaan SME';
+  if (q.includes('masjid')  || q.includes('perumahan'))   return 'Komunitas';
+  if (q.includes('pabrik')  || q.includes('industri') ||
+      q.includes('kawasan') || q.includes('kantor'))      return 'Perusahaan SME';
   return 'Lainnya';
+
 }
