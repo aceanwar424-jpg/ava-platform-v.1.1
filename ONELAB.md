@@ -130,6 +130,8 @@ Bagian ini tidak boleh dilanggar tanpa persetujuan manusia yang eksplisit.
 - `/rest/v1` menolak permintaan tanpa token sah. Akun terkunci 15 menit setelah 5 kali gagal.
 - **Kunci API tidak boleh masuk bundel peramban.** Siapa pun bisa membacanya lewat DevTools. Semua panggilan LLM wajib lewat gerbang sisi server: Edge Function `llm-gateway` di mode cloud, dan `/functions/v1/llm-gateway` pada engine lokal. Peramban hanya menerima cuplikan kunci untuk tampilan status, tidak pernah nilainya.
 
+- **Root Directory proyek Vercel harus tetap di akar repo.** Di situlah `vercel.json` dibaca. Folder platform ditunjuk lewat `outputDirectory`. Memindahkan folder platform tanpa memperbarui berkas itu pada commit yang sama membuat seluruh situs 404 — sudah pernah terjadi, lihat `docs/DEPLOY-WEB-VERCEL.md`.
+
 ### 5.2 Legal & kepemilikan (IP)
 - Jangan menggabungkan aset milik OneLab (data, dokumen, kode kantor) ke produk generik tanpa kejelasan lisensi. Tandai tiap aset: `OWNED_BY: onelab | personal | generic`.
 - Jangan menyalin harga, PKS/MoU, atau daftar klien OneLab ke repo produk.

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "onelab-platform-main/onelab-platform",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "kiosk.avahealth.sbs" }],
+      "destination": "/kiosk/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "kiosk.avahelath.sbs" }],
+      "destination": "/kiosk/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "apps.avahealth.sbs" }],
+      "destination": "/apps/index.html",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "apps.avahelath.sbs" }],
+      "destination": "/apps/index.html",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "missing": [
+        { "type": "host", "value": "kiosk.avahealth.sbs" },
+        { "type": "host", "value": "kiosk.avahelath.sbs" },
+        { "type": "host", "value": "apps.avahealth.sbs" },
+        { "type": "host", "value": "apps.avahelath.sbs" }
+      ],
+      "destination": "/index.html"
+    }
+  ]
+}
