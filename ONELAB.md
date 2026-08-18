@@ -168,7 +168,7 @@ Bagian ini tidak boleh dilanggar tanpa persetujuan manusia yang eksplisit.
 | **1** | Git tunggal di root, migrations bernomor, gerbang LLM sisi server | ✅ Selesai — restrukturisasi `apps/`+`packages/` sengaja dilewati (risiko tinggi, nilai rendah dibanding Fase 2–5) |
 | **2** | Multi-tenant + RBAC — agar klien ke-2 tidak perlu menyalin kode | ✅ Inti selesai — matriks peran-izin di DB, penegakan sisi server. Kolom `tenant_id` per tabel operasional menunggu cloud multi-klinik benar-benar digelar |
 | **3** | Sync engine offline-first + backup/restore | ◐ ±60% — outbox, cadangan, dan pemulihan terverifikasi. Pendorong ke cloud menunggu keputusan project Supabase |
-| **4** | Lisensi & aktivasi, installer NSIS, auto-update — **setelah ini produk bisa dijual** | Belum mulai; sebaiknya menunggu calon pembeli pertama |
+| **4** | Lisensi & aktivasi, installer NSIS, auto-update — **setelah ini produk bisa dijual** | ✅ Inti selesai — lisensi Ed25519 offline + installer NSIS, diverifikasi pada `.exe` terpaket. Pembaruan otomatis tersambung tetapi belum aktif (menunggu kolom `publish`); penandatanganan kode belum dibeli. Lihat `docs/LISENSI-DAN-INSTALLER.md` |
 | **5** | Kedalaman domain: SATUSEHAT/RME, connector dua arah, QC/EQA, TAT analytics | ◐ Dimulai — gerbang SATUSEHAT sisi server + pencatatan jejak siap; converter baru Patient & Observation |
 | **6** | Kemasan komersial: edisi produk, tenant demo, dokumentasi, materi training | Belum mulai |
 
@@ -254,6 +254,8 @@ Tiga bug terpisah punya akar yang sama: **kode yang lolos di `run-local.js` teta
 Pola kedua yang berulang: **kegagalan yang menyamar jadi keberhasilan** — `sbGet()` mengembalikan array kosong saat query gagal, `syncToSatuSehat()` melaporkan sukses tanpa mengirim apa pun, `catch(e){}` kosong menyembunyikan tabel yang gagal dibuat, dan kunci yang ditolak dilabeli "kuota habis". Setiap kali ditemukan, kegagalan dibuat berisik.
 
 Pola ketiga: **penyaringan cakupan lewat teks bebas, bukan kunci relasi.** Portal korporat sempat menyaring tagihan dengan `partner_name = corporate_name`. Saat diuji, token satu klien menampilkan tagihan milik *mitra rujukan* yang kebetulan bernama sama — data keuangan pihak ketiga terbuka lewat tautan yang justru dirancang membatasi. Nama tidak unik dan bisa berubah; cakupan wajib memakai kunci yang dijamin unik. Diperbaiki di `0017_portal_tagihan_kunci_relasi.sql`.
+
+Pola keenam — **varian dari pola pertama, dan terjadi lagi.** Berkas pendamping baru `electron/lisensi.js` ikut di-require oleh engine tetapi tidak ikut disalin ke `dist-electron/`, karena skrip build menyalin satu nama berkas yang ditulis manual. Mode pengembangan sehat; build terpaket selalu galat lisensi. Sekarang seluruh `.js` di `electron/` disalin — daftar nama yang harus diingat manusia akan terlupa lagi. **Verifikasi akhir tetap wajib di `.exe` terpaket.**
 
 Pola kelima: **urutan pemeriksaan kata kunci yang saling mengandung.** `mapCatFromQ()` di Maps Prospecting memeriksa `klinik` sebelum `lab`, sehingga "laboratorium klinik" tergolong Klinik Pratama — dan karena fungsi yang sama dipakai saat Import ke Leads, setiap lab yang pernah diimpor tersimpan sebagai klinik. "klinik gigi" dan "klinik mata" kena hal yang sama. Aturannya: yang paling khusus diperiksa lebih dulu, yang paling umum terakhir.
 

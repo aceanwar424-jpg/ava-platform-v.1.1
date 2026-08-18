@@ -239,6 +239,49 @@ async function createWindow() {
                                  view ? { search: query } : undefined);
 }
 
+// ── Pembaruan otomatis ──────────────────────────────────────────────────────
+//
+// Sengaja TIDAK memasang sendiri tanpa persetujuan. Aplikasi ini dipakai saat
+// pasien sedang dilayani; memasang pembaruan lalu me-restart di tengah
+// pendaftaran adalah gangguan operasional, bukan pelayanan yang baik.
+// Pembaruan diunduh di latar belakang, lalu dipasang saat aplikasi ditutup.
+//
+// Diam bila belum dikonfigurasi. Tanpa `publish` di package.json,
+// electron-updater akan melempar galat setiap kali dijalankan — dan galat
+// yang muncul terus-menerus tanpa bisa ditindaklanjuti akan cepat diabaikan,
+// termasuk saat ia akhirnya penting.
+function siapkanPembaruan(): void {
+  if (!app.isPackaged) return;                     // build pengembangan
+  if (process.env.ONELAB_NO_UPDATE) return;        // bisa dimatikan di klinik
+
+  let autoUpdater: any;
+  try {
+    ({ autoUpdater } = require('electron-updater'));
+  } catch (e) {
+    console.warn('[update] electron-updater tidak tersedia — pembaruan dilewati');
+    return;
+  }
+
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on('update-available', (i: any) =>
+    console.log(`[update] versi baru tersedia: ${i && i.version}`));
+  autoUpdater.on('update-downloaded', (i: any) =>
+    console.log(`[update] ${i && i.version} siap dipasang saat aplikasi ditutup`));
+  // Galat pembaruan TIDAK dibungkam. Instalasi klinik yang berbulan-bulan
+  // gagal memperbarui tanpa jejak apa pun adalah cara paling sunyi untuk
+  // tertinggal dari perbaikan keamanan.
+  autoUpdater.on('error', (e: any) =>
+    console.error('[update] gagal memeriksa/mengunduh pembaruan:', e && e.message ? e.message : e));
+
+  try {
+    autoUpdater.checkForUpdates();
+  } catch (e: any) {
+    console.error('[update] pemeriksaan pembaruan gagal dimulai:', e && e.message ? e.message : e);
+  }
+}
+
 app.whenReady().then(async () => {
   if (!ONELAB_PLATFORM_PATH) {
     console.error('[main] Folder platform OneLab tidak ditemukan. ' +
@@ -249,11 +292,31 @@ app.whenReady().then(async () => {
   startLocalPlatformServer();
   registerIpc();
   try {
-    const eng = await createEngine({ platformDir: ONELAB_PLATFORM_PATH, dataDir: PGLITE_DATA_DIR, port: ENGINE_PORT, log: console.log });
+    const eng = await createEngine({
+      platformDir: ONELAB_PLATFORM_PATH, dataDir: PGLITE_DATA_DIR,
+      port: ENGINE_PORT, log: console.log,
+      // Pada instalasi yang dikirim ke klien, migrasi yang hilang berarti
+      // paketnya cacat — dan basis data yang terbentuk akan separuh jadi.
+      migrasiWajib: app.isPackaged,
+    });
     pg = eng.pg;
-  } catch (err) {
+  } catch (err: any) {
     console.error('[main] gagal start local engine:', err);
+
+    // Paket cacat tidak boleh berakhir sebagai jendela kosong yang
+    // membingungkan. Klinik harus tahu bahwa yang salah adalah instalasinya,
+    // bukan datanya — dan bahwa memakainya justru berbahaya.
+    if (app.isPackaged && /Paket instalasi cacat/.test(String(err && err.message))) {
+      const { dialog } = require('electron');
+      dialog.showErrorBox('Instalasi OneLab tidak lengkap',
+        String(err.message) +
+        '\n\nAplikasi ditutup untuk mencegah basis data terbentuk separuh jadi.');
+      app.quit();
+      return;
+    }
   }
+
+  siapkanPembaruan();
   await createWindow();
 
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });

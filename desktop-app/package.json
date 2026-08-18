@@ -7,16 +7,19 @@
   "license": "MIT",
   "scripts": {
     "dev:vite": "vite",
-    "copy:engine": "node -e \"require('fs').copyFileSync('electron/local-engine.js','dist-electron/local-engine.js')\"",
+    "copy:engine": "node scripts/salin-js-electron.js",
     "dev:electron": "tsc -p tsconfig.electron.json && npm run copy:engine && electron dist-electron/main.js",
     "build:electron": "tsc -p tsconfig.electron.json && npm run copy:engine",
     "build:react": "vite build",
     "build": "npm run build:react && npm run build:electron",
     "build:exe": "npm run build && electron-builder --win --dir",
-    "package:exe": "npm run build && electron-builder --win portable"
+    "package:exe": "npm run build && electron-builder --win portable",
+    "package:installer": "npm run build && electron-builder --win nsis",
+    "lisensi": "node ../scripts/lisensi-buat.js"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.5.4",
+    "electron-updater": "^6.8.9",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -48,8 +51,56 @@
       "**/node_modules/@electric-sql/**"
     ],
     "win": {
-      "target": "portable",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "verifyUpdateCodeSignature": false
+    },
+    "extraResources": [
+      {
+        "from": "../onelab-platform-main/onelab-platform",
+        "to": "platform",
+        "filter": [
+          "**/*",
+          "!**/node_modules/**",
+          "!**/graphify-out/**",
+          "!**/.claude/**",
+          "!**/config.local.js"
+        ]
+      },
+      {
+        "from": "../db",
+        "to": "db"
+      },
+      {
+        "from": "lisensi-publik.pem",
+        "to": "lisensi-publik.pem"
+      }
+    ],
+    "nsis": {
+      "oneClick": false,
+      "perMachine": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "OneLab",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "installerLanguages": [
+        "id_ID",
+        "en_US"
+      ]
     }
   }
 }

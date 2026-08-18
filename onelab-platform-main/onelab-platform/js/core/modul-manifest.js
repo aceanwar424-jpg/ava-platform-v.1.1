@@ -123,6 +123,9 @@ window.MODUL_HALAMAN = {
  "perujuk": [
   "modules/perujuk.js"
  ],
+ "lisensi": [
+  "modules/lisensi.js"
+ ],
  "lab-tat": [
   "modules/lab/qcEngine.js",
   "modules/lab/index.js",
@@ -363,5 +366,6 @@ window.MODUL_SEMUA = [
  "modules/ops_kendali.js",
  "modules/sales_corong.js",
  "modules/portal_akses.js",
- "modules/perujuk.js"
+ "modules/perujuk.js",
+ "modules/lisensi.js"
 ];

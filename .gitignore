@@ -43,3 +43,10 @@ graphify-out/
 *.log
 .DS_Store
 Thumbs.db
+
+# Kunci privat penerbit lisensi. Siapa pun yang memegangnya bisa menerbitkan
+# lisensi OneLab yang sah untuk siapa saja — nilainya setara seluruh
+# pendapatan lisensi produk ini. Simpan cadangannya di luar komputer kerja;
+# kalau hilang, seluruh lisensi yang sudah terbit tidak bisa diperbarui.
+.lisensi-privat.pem
+*.privat.pem

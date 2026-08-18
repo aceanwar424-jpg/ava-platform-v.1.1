@@ -533,7 +533,14 @@ function ringkasanKunciLLM() {
 // "belum ada data".
 // ═══════════════════════════════════════════════════════════════════════════
 
+// Pada build terpaket, migrasi dikirim sebagai extraResources ke
+// resources/db/migrations. Itu diperiksa LEBIH DULU: menelusuri ke atas dari
+// folder platform bisa saja menemukan folder db milik repo lain di komputer
+// yang sama, lalu memasang skema yang salah ke basis data klinik.
 function cariFolderMigrasi(platformDir) {
+  const terpaket = path.join(process.resourcesPath || '', 'db', 'migrations');
+  if (process.resourcesPath && fs.existsSync(terpaket)) return terpaket;
+
   let dir = platformDir || process.cwd();
   for (let i = 0; i < 8; i++) {
     const kandidat = path.join(dir, 'db', 'migrations');
@@ -549,9 +556,20 @@ function checksumSql(teks) {
   return crypto.createHash('sha256').update(teks).digest('hex').slice(0, 16);
 }
 
-async function jalankanMigrasi(pg, platformDir, log = () => {}) {
+async function jalankanMigrasi(pg, platformDir, log = () => {}, wajib = false) {
   const dir = cariFolderMigrasi(platformDir);
-  if (!dir) { log('[migrasi] folder db/migrations tidak ditemukan — dilewati'); return { terpasang: 0 }; }
+  if (!dir) {
+    // Pada instalasi yang dikirim ke klien, tidak adanya folder migrasi berarti
+    // paketnya cacat. Melanjutkan diam-diam akan menghasilkan basis data
+    // separuh jadi yang baru ketahuan berbulan-bulan kemudian — saat sudah
+    // berisi rekam medis. Lebih baik gagal sekarang, keras dan jelas.
+    if (wajib) {
+      throw new Error('Paket instalasi cacat: folder db/migrations tidak ada. ' +
+        'Jangan pakai instalasi ini — hubungi penyedia aplikasi.');
+    }
+    log('[migrasi] folder db/migrations tidak ditemukan — dilewati');
+    return { terpasang: 0 };
+  }
 
   await pg.exec(`
     CREATE TABLE IF NOT EXISTS public.schema_migrations (
@@ -1139,7 +1157,7 @@ function jsonRes(res, status, payload, extraHeaders = {}) {
   res.end(body);
 }
 
-async function createEngine({ platformDir, dataDir, port = 54329, log = console.log }) {
+async function createEngine({ platformDir, dataDir, port = 54329, log = console.log, migrasiWajib = false }) {
   DIR_DATA_ENGINE = dataDir || '';            // jangkar pencarian .env (lihat muatKunciLLM)
   const { PGlite } = await import('@electric-sql/pglite');   // ESM dari CJS
   const pg = dataDir ? await PGlite.create({ dataDir }) : await new PGlite();
@@ -1156,8 +1174,13 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
   // Migrasi bernomor dijalankan tiap boot; hanya yang belum tercatat yang dipasang.
   // Ini jalur resmi pemutakhiran skema, termasuk untuk basis data klien yang sudah berisi data.
   try {
-    await jalankanMigrasi(pg, platformDir, log);
+    await jalankanMigrasi(pg, platformDir, log, migrasiWajib);
   } catch (e) {
+    // Paket instalasi cacat BUKAN "satu migrasi bermasalah". Tidak ada yang
+    // bisa diselamatkan jaring pengaman di bawah, dan melanjutkan justru
+    // membangun basis data yang salah. Dilempar ke atas supaya terlihat.
+    if (/Paket instalasi cacat/.test(String(e && e.message))) throw e;
+
     // Sudah dicatat & di-ROLLBACK di dalam runner. Jaring pengaman di bawah tetap
     // dijalankan agar aplikasi tidak mati total karena satu migrasi bermasalah.
     log('[local-engine] migrasi gagal — memakai jaring pengaman DDL bawaan');
@@ -1500,6 +1523,24 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
         // ── SYNC ENDPOINTS (Git Push & Cloud Supabase Sync) ──
         // Keadaan antrean sinkronisasi — dipakai penanda di antarmuka agar
         // pengguna tahu masih ada perubahan yang belum terkirim ke cloud.
+        // Status lisensi instalasi ini. Dibaca ulang setiap kali diminta,
+        // bukan disimpan saat boot: berkas lisensi bisa dipasang atau
+        // diperbarui tanpa menutup aplikasi, dan klinik yang baru menerima
+        // perpanjangan tidak boleh disuruh me-restart untuk melihatnya.
+        if (p === '/rest/v1/lisensi') {
+          try {
+            const { bacaLisensi, sidikMesin } = require('./lisensi.js');
+            const l = bacaLisensi(dataDir);
+            // Jalur berkas TIDAK dikirim ke peramban — ia menyebutkan struktur
+            // folder mesin, dan tidak ada gunanya untuk tampilan.
+            const { berkas, ...aman } = l;
+            return jsonRes(res, 200, { ...aman, sidik_mesin: sidikMesin() });
+          } catch (e) {
+            return jsonRes(res, 500, { status: 'galat', sah: false,
+              pesan: 'Pemeriksaan lisensi gagal: ' + (e && e.message ? e.message : e) });
+          }
+        }
+
         if (p === '/rest/v1/sync/status') {
           return jsonRes(res, 200, await ringkasanSync(pg));
         }
