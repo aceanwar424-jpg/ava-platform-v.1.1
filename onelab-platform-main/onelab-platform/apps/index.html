@@ -2,6 +2,13 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
+  <!-- Halaman ini disajikan di dua alamat sekaligus: /apps/index.html pada
+       instalasi lokal, dan akar app.avahealth.sbs di produksi. Tanpa <base>,
+       style.css dan app.js di alamat kedua akan dicari di akar situs dan
+       halaman tampil tanpa gaya sama sekali.
+       Nilainya harus sama dengan "basis" pada config/domain.json —
+       scripts/bangun-vercel.js menolak membangun bila keduanya berbeda. -->
+  <base href="/apps/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AvaHealth Mobile Portal</title>
   <!-- Google Fonts -->

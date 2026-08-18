@@ -33,6 +33,51 @@ Cukup di-push; tidak perlu menyentuh dashboard Vercel.
 git -C D:/onelab-platform-main push
 ```
 
+## Pemisahan subdomain
+
+Peta domain ada di **satu berkas**: config/domain.json. Berkas itu dibaca dua tempat sekaligus —
+scripts/bangun-vercel.js (membangkitkan vercel.json) dan server statis lokal :5174. Satu sumber
+untuk lokal dan produksi, supaya "di lokal jalan kok" tidak pernah terjadi.
+
+| Host | Isi |
+|---|---|
+| avahealth.sbs (+www, +ejaan terbalik) | Web Utama — sementara halaman hub Portal Apps |
+| his.avahealth.sbs | Sistem Utama (aplikasi staf) |
+| app.avahealth.sbs, apps.avahealth.sbs | Portal Customer & Korporat |
+| kiosk.avahealth.sbs | Kiosk Antrian |
+| nakes.avahealth.sbs | Portal Nakes Home Care |
+| cek.avahealth.sbs | Lacak Pesanan & Hasil |
+
+### Menambah subdomain
+
+1. Tambah satu entri di config/domain.json
+2. Jalankan: node scripts/bangun-vercel.js
+3. Uji lokal: http://<lokal>.localhost:5174/ — semua *.localhost otomatis ke 127.0.0.1,
+   tidak perlu menyunting berkas hosts
+4. Push, lalu tambahkan domainnya di dashboard Vercel (Settings → Domains)
+
+Skrip menolak membangun bila entri menunjuk berkas yang tidak ada, dua situs memakai host yang
+sama, atau halaman di dalam subfolder belum punya <base href>. Sudah diuji dengan sengaja
+merusak ketiganya.
+
+### Mengapa <base href>, dan mengapa satu proyek Vercel
+
+apps/index.html memuat ../js/core/api.js — lapisan API bersama yang memuat konfigurasi Supabase.
+Kalau tiap subdomain jadi proyek Vercel sendiri dengan akar sendiri, berkas itu harus digandakan,
+dan salinan akan menyimpang. Satu proyek menjaga satu salinan.
+
+Konsekuensinya berkas subdomain tetap berada di subfolder (/apps/, /kiosk/) sementara alamatnya
+adalah akar. <base href="/apps/"> yang menjembatani: style.css dan app.js miliknya tetap ketemu,
+sementara ../js/core/api.js tetap naik ke akar. Aman di sini karena semua panggilan jaringan
+memakai SUPABASE_URL absolut dan tidak ada aset yang dirujuk dari akar.
+
+### Yang TIDAK diberikan pemisahan ini
+
+**Subdomain bukan pembatas akses.** his.avahealth.sbs tetap bisa dibuka siapa pun; yang menjaga
+sistem staf adalah login, bukan alamatnya. Seluruh berkas juga tetap dapat diambil dari host mana
+pun — misalnya app.avahealth.sbs/index.html tetap menyajikan sistem staf. Pemisahan ini soal
+kejelasan dan citra, bukan keamanan.
+
 ## Aturan yang mengikat sesudah ini
 
 > **Jangan mengubah Root Directory proyek Vercel.** Ia harus tetap di akar

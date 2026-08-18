@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { createEngine } = require('./electron/local-engine.js');
+const { buatServerStatis } = require('./electron/server-statis.js');
 
 // Diturunkan dari lokasi berkas ini — jangan tulis path absolut.
 const PLATFORM = process.env.ONELAB_PLATFORM_PATH ||
@@ -12,13 +13,9 @@ const mime = { '.html':'text/html','.css':'text/css','.js':'application/javascri
 
 (async () => {
   await createEngine({ platformDir: PLATFORM, dataDir: path.join(__dirname, '.pglite-dev'), port: 54329, log: console.log });
-  http.createServer((req, res) => {
-    const raw = (req.url || '/').split('?')[0];
-    const fp = path.join(PLATFORM, raw === '/' ? 'index.html' : raw);
-    const ext = path.extname(fp).toLowerCase();
-    fs.readFile(fp, (err, c) => {
-      if (err) { res.writeHead(err.code === 'ENOENT' ? 404 : 500); res.end('err ' + err.code); }
-      else { res.writeHead(200, { 'Content-Type': mime[ext] || 'text/plain', 'Access-Control-Allow-Origin': '*' }); res.end(c); }
-    });
-  }).listen(5174, '127.0.0.1', () => console.log('PLATFORM_READY http://127.0.0.1:5174'));
+  // Server statis dipakai bersama dengan aplikasi desktop — lihat
+  // electron/server-statis.js. Dulu ditulis ulang di sini, dan salinannya
+  // kehilangan penjaga path traversal serta tidak tahu apa-apa soal subdomain.
+  buatServerStatis({ platformDir: PLATFORM, port: 5174, log: console.log });
+  console.log('PLATFORM_READY http://127.0.0.1:5174');
 })().catch(e => { console.error('LAUNCH FAIL', e); process.exit(1); });

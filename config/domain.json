@@ -1,0 +1,85 @@
+{
+  "_catatan": [
+    "PETA DOMAIN — satu-satunya sumber kebenaran untuk pemisahan subdomain.",
+    "",
+    "Dibaca oleh dua tempat sekaligus, supaya lokal dan produksi tidak bisa berbeda:",
+    "  1. scripts/bangun-vercel.js  → membangkitkan vercel.json di akar repo",
+    "  2. desktop-app/electron/main.ts → server statis lokal (:5174)",
+    "",
+    "Menambah subdomain = tambah satu entri di 'situs', lalu jalankan:",
+    "  node scripts/bangun-vercel.js",
+    "",
+    "JANGAN menyunting vercel.json dengan tangan — ia dibangkitkan dan akan tertimpa.",
+    "",
+    "Kolom tiap entri:",
+    "  host   : daftar hostname produksi yang mengarah ke sini",
+    "  lokal  : subdomain untuk pengujian di komputer sendiri (<lokal>.localhost:5174)",
+    "  masuk  : berkas yang dibuka saat host itu diakses di jalur '/'",
+    "  basis  : nilai <base href> yang HARUS ada di berkas masuk bila ia berada",
+    "           di dalam subfolder. Tanpa itu, style.css dan app.js miliknya akan",
+    "           dicari di akar dan gagal. Kosongkan untuk berkas yang memang di akar.",
+    "  nama   : untuk manusia; muncul di ringkasan skrip",
+    "",
+    "Ejaan 'avahelath.sbs' yang terbalik disengaja — domain salah ketik itu",
+    "dimiliki juga dan diarahkan ke tempat yang sama."
+  ],
+
+  "domain_utama": "avahealth.sbs",
+
+  "situs": [
+    {
+      "kunci": "web",
+      "nama": "Web Utama",
+      "host": ["avahealth.sbs", "www.avahealth.sbs", "avahelath.sbs", "www.avahelath.sbs"],
+      "lokal": "web",
+      "masuk": "/portal.html",
+      "basis": "",
+      "keterangan": "Sementara memakai halaman hub Portal Apps. Ganti 'masuk' ke halaman landing begitu tersedia."
+    },
+    {
+      "kunci": "his",
+      "nama": "Sistem Utama (HIS)",
+      "host": ["his.avahealth.sbs", "his.avahelath.sbs"],
+      "lokal": "his",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Aplikasi operasional staf klinik & laboratorium."
+    },
+    {
+      "kunci": "app",
+      "nama": "Portal Customer & Korporat",
+      "host": ["app.avahealth.sbs", "apps.avahealth.sbs", "app.avahelath.sbs", "apps.avahelath.sbs"],
+      "lokal": "app",
+      "masuk": "/apps/index.html",
+      "basis": "/apps/",
+      "keterangan": "apps.* ikut diarahkan ke sini karena sudah dipakai sebelumnya."
+    },
+    {
+      "kunci": "kiosk",
+      "nama": "Kiosk Antrian",
+      "host": ["kiosk.avahealth.sbs", "kiosk.avahelath.sbs"],
+      "lokal": "kiosk",
+      "masuk": "/kiosk/index.html",
+      "basis": "/kiosk/",
+      "keterangan": "Layar sentuh di pintu masuk klinik."
+    },
+    {
+      "kunci": "nakes",
+      "nama": "Portal Nakes Home Care",
+      "host": ["nakes.avahealth.sbs", "nakes.avahelath.sbs"],
+      "lokal": "nakes",
+      "masuk": "/nakes.html",
+      "basis": "",
+      "keterangan": "Petugas lapangan; dibuka lewat tautan bertoken."
+    },
+    {
+      "kunci": "cek",
+      "nama": "Lacak Pesanan & Hasil",
+      "host": ["cek.avahealth.sbs", "cek.avahelath.sbs"],
+      "lokal": "cek",
+      "masuk": "/track.html",
+      "basis": "",
+      "keterangan": "Halaman publik pasien memantau status."
+    }
+  ]
+}

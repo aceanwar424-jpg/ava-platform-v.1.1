@@ -86,6 +86,10 @@
       {
         "from": "lisensi-publik.pem",
         "to": "lisensi-publik.pem"
+      },
+      {
+        "from": "../config",
+        "to": "config"
       }
     ],
     "nsis": {

@@ -1,7 +1,6 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import fs from 'fs';
-import http from 'http';
 
 const ENGINE_PORT = 54329;   // shim PostgREST lokal (lihat local-engine.js)
 const PLATFORM_PORT = 5174;  // server statis platform
@@ -81,50 +80,13 @@ const { createEngine } = require('./local-engine.js');
 let pg: any = null;                 // handle PGlite (Postgres WASM)
 let mainWindow: BrowserWindow | null = null;
 
-// ── Server statis untuk platform OneLab (dipakai iframe di React shell) ──────
-const mimeTypes: Record<string, string> = {
-  '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
-  '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
-  '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff': 'font/woff',
-  '.woff2': 'font/woff2', '.ttf': 'font/ttf',
-};
 
-function startLocalPlatformServer() {
-  const server = http.createServer((req, res) => {
-    const rawUrl = (req.url || '/').split('?')[0];
-
-    // Tanpa pesan ini, folder platform yang tak ketemu muncul sebagai
-    // "403 Forbidden" yang menyesatkan (path menjadi relatif → keluar folder).
-    if (!ONELAB_PLATFORM_PATH) {
-      res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
-      return res.end('<h1>Folder platform OneLab tidak ditemukan</h1>' +
-        '<p>Setel variabel <code>ONELAB_PLATFORM_PATH</code> ke folder yang berisi ' +
-        '<code>index.html</code>, atau jalankan lewat <code>ONELAB.bat</code>.</p>');
-    }
-
-    const filePath = path.join(ONELAB_PLATFORM_PATH, rawUrl === '/' ? 'index.html' : rawUrl);
-
-    // Tahan path traversal (../). Penting begitu server ini dibuka ke LAN.
-    if (!path.resolve(filePath).startsWith(path.resolve(ONELAB_PLATFORM_PATH))) {
-      res.writeHead(403, { 'Content-Type': 'text/html' });
-      return res.end('<h1>403 Forbidden</h1>');
-    }
-
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = mimeTypes[ext] || 'text/plain';
-    fs.readFile(filePath, (err, content) => {
-      if (err) {
-        res.writeHead(err.code === 'ENOENT' ? 404 : 500, { 'Content-Type': 'text/html' });
-        res.end(err.code === 'ENOENT' ? '<h1>404 File Not Found</h1>' : `Server Error: ${err.code}`);
-      } else {
-        res.writeHead(200, { 'Content-Type': contentType, 'Access-Control-Allow-Origin': '*' });
-        res.end(content, 'utf-8');
-      }
-    });
-  });
-  server.listen(PLATFORM_PORT, '127.0.0.1', () => {
-    console.log(`OneLab Platform static server → http://127.0.0.1:${PLATFORM_PORT}`);
-  });
+// Server statis platform dipakai bersama run-local.js — lihat
+// electron/server-statis.js. Dua salinan sebelumnya sudah mulai menyimpang.
+function startLocalPlatformServer(): void {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { buatServerStatis } = require('./server-statis.js');
+  buatServerStatis({ platformDir: ONELAB_PLATFORM_PATH, port: PLATFORM_PORT, log: console.log });
 }
 
 // ── IPC untuk React shell (GUI Table Editor + SQL Studio) di atas PGlite ─────
