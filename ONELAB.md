@@ -112,6 +112,9 @@ DiagnosticReport sudah ada; kredensial dan converter lanjutan menyusul.
   `user_profiles`, dan pencabutan akses yang baru berlaku 12 jam kemudian.
 - **Outbox offline-first**, cadangan, dan pemulihan yang sudah diuji pulih.
 - **Gerbang SATUSEHAT** menggantikan integrasi lama yang melaporkan sukses palsu.
+- **Portal klien korporat & portal dokter perujuk** — akses bertoken bercakupan, hanya-baca, bisa dicabut. Menampilkan status pemeriksaan, bukan hasil medis.
+- **Komisi rujukan dihitung, bukan disimpan.** Tarif dibekukan per pendaftaran lewat pemicu basis data, sehingga perubahan tarif tidak menggeser komisi yang sudah disepakati. Angka karangan di portal customer dikosongkan.
+- **Maps Prospecting**: ekspor CSV/GeoJSON lengkap dengan koordinat, dan warna penanda per kategori dari palet yang lolos uji keterbedaan warna.
 
 ---
 
