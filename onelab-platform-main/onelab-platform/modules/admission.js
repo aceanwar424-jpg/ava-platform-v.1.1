@@ -942,6 +942,16 @@ async function openAdmissionForm(id=null) {
           <select id="af-paystatus">${['Unpaid','DP','Paid','Billed'].map(s=>`<option${(a.payment_status||'Unpaid')===s?' selected':''}>${s}</option>`).join('')}</select></div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group" style="flex:1">
+          <label>Dirujuk oleh <span style="color:var(--text3);font-weight:400">(opsional)</span></label>
+          <select id="af-perujuk"><option value="">— Tidak dirujuk —</option></select>
+          <div class="form-hint" id="af-perujuk-hint">
+            Komisi rujukan dihitung dari kolom ini. Tarif yang berlaku saat ini
+            dibekukan di pendaftaran ini dan tidak berubah bila tarif diperbarui.</div>
+        </div>
+      </div>
+
       <div id="af-bill-summary" style="margin-top:14px"></div>
     </div>
 
@@ -974,6 +984,36 @@ async function openAdmissionForm(id=null) {
   if (admFormState.scheme==='family')   { const s=document.getElementById('af-family'); if(s&&s.value) onFamilyChange(s); }
   if (admFormState.scheme==='corporate'){ const s=document.getElementById('af-corp');   if(s&&s.value) onCorporateChange(s); }
   recalcServiceTotals();
+  isiPilihanPerujuk(a.perujuk_id);
+}
+
+// Daftar perujuk diisi setelah formulir tampil, bukan saat menyusun HTML-nya:
+// kegagalan mengambil daftar ini tidak boleh membuat seluruh formulir
+// pendaftaran gagal terbuka. Kalau gagal, pilihannya tetap "tidak dirujuk"
+// dan pendaftaran tetap bisa berjalan.
+async function isiPilihanPerujuk(terpilih) {
+  const sel = document.getElementById('af-perujuk');
+  if (!sel) return;
+  try {
+    const rows = await sbGet('perujuk',
+      'select=id,nama,jenis,komisi_persen,komisi_tetap&aktif=eq.true&order=nama&limit=300') || [];
+    if (!Array.isArray(rows) || !rows.length) {
+      const h = document.getElementById('af-perujuk-hint');
+      if (h) h.textContent = 'Belum ada perujuk aktif. Tambahkan di menu Dokter & Klinik Perujuk.';
+      return;
+    }
+    sel.innerHTML = '<option value="">— Tidak dirujuk —</option>' + rows.map(p => {
+      const tarif = [
+        Number(p.komisi_persen) ? Number(p.komisi_persen) + '%' : '',
+        Number(p.komisi_tetap)  ? 'Rp' + Number(p.komisi_tetap).toLocaleString('id-ID') : '',
+      ].filter(Boolean).join(' + ');
+      return `<option value="${p.id}"${String(terpilih) === String(p.id) ? ' selected' : ''}>` +
+             `${p.nama}${p.jenis ? ' · ' + p.jenis : ''}${tarif ? ' — ' + tarif : ''}</option>`;
+    }).join('');
+  } catch (e) {
+    const h = document.getElementById('af-perujuk-hint');
+    if (h) h.textContent = 'Daftar perujuk gagal dimuat: ' + (e.message || e);
+  }
 }
 
 function switchAdmTab(tab) {
@@ -1281,6 +1321,11 @@ async function saveAdmission(id) {
     discount_amount:   Math.round(bill.totalDisc)||0,
     net_amount:        Math.round(bill.net)||0,
     payment_status:    document.getElementById('af-paystatus')?.value||'Unpaid',
+    // Tarif komisinya sengaja TIDAK dikirim dari sini. Pemicu basis data
+    // (0020_bekukan_tarif_rujukan.sql) yang membekukannya, supaya semua
+    // jalur penulisan — formulir ini, impor massal, panggilan API — punya
+    // perilaku yang sama tanpa perlu saling mengingatkan.
+    perujuk_id:        parseInt(document.getElementById('af-perujuk')?.value, 10) || null,
     status:            id ? undefined : 'Registered',
     registered_by:     user,
     updated_at:        new Date().toISOString(),

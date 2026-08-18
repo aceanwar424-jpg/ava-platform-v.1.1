@@ -128,6 +128,12 @@
           <p>Halaman khusus PIC perusahaan: kontrak, kuota MCU, status pemeriksaan karyawan, dan tagihan.</p>
           <span class="lencana token">Perlu tautan bertoken</span>
         </span>
+        <span class="kartu nonaktif" title="Dibuka lewat tautan bertoken yang dikirim ke dokter perujuk">
+          <span class="ikon">🩺</span>
+          <h3>Portal Dokter Perujuk</h3>
+          <p>Halaman khusus dokter atau klinik perujuk: pasien yang dirujuk, status pendaftaran, komisi terkumpul, dan riwayat pencairan.</p>
+          <span class="lencana token">Perlu tautan bertoken</span>
+        </span>
         <a class="kartu" href="apps/index.html#rujukan">
           <span class="ikon">🔄</span>
           <h3>Dokter &amp; Lab Referral</h3>
@@ -142,7 +148,7 @@
       hanya membuka data satu perusahaan, hanya-baca, bisa dicabut, dan punya masa berlaku.
       Cakupannya ditentukan di sisi server dari token — tidak ada identitas perusahaan yang
       diterima dari peramban. Tautannya dibuat dari menu <code>Akses Portal</code> di aplikasi utama.
-      <br><br>Portal dokter perujuk menyusul memakai mekanisme yang sama.
+      <br><br><strong>Portal Dokter Perujuk</strong> memakai mekanisme yang sama persis: satu token satu perujuk, hanya-baca, bisa dicabut. Komisinya dihitung ulang dari pendaftaran yang tercatat, bukan angka yang disimpan — dan setiap rujukan memakai tarif yang dibekukan saat pasiennya didaftarkan.
     </footer>
   </div>
 </body>

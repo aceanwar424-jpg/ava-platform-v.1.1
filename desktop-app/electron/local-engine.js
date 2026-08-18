@@ -1378,7 +1378,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             return jsonRes(res, 200, { error: PORTAL_PESAN_TOLAK });
           }
           try {
-            const r = await pg.query(`SELECT public.portal_korporat($1) AS d`, [token]);
+            const r = await pg.query(`SELECT public.portal_data($1) AS d`, [token]);
             return jsonRes(res, 200, (r.rows[0] && r.rows[0].d) || { error: 'Tidak ada data' });
           } catch (e) {
             log(`[portal] galat: ${e && e.message ? e.message : e}`);
@@ -1446,6 +1446,10 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             'user_profiles', 'local_auth_users', 'roles', 'permissions',
             'role_permissions', 'role_pages', 'user_pages', 'tenants',
             'portal_akses',
+            // Tarif komisi menentukan uang yang keluar ke pihak luar, dan
+            // pencairan adalah catatan pembayaran. Keduanya bukan data
+            // operasional harian.
+            'perujuk', 'perujuk_pencairan',
           ]);
 
           let perluIzin = null;

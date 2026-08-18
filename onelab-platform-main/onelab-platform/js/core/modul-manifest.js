@@ -120,6 +120,9 @@ window.MODUL_HALAMAN = {
  "portal-akses": [
   "modules/portal_akses.js"
  ],
+ "perujuk": [
+  "modules/perujuk.js"
+ ],
  "lab-tat": [
   "modules/lab/qcEngine.js",
   "modules/lab/index.js",
@@ -359,5 +362,6 @@ window.MODUL_SEMUA = [
  "modules/quotation.js",
  "modules/ops_kendali.js",
  "modules/sales_corong.js",
- "modules/portal_akses.js"
+ "modules/portal_akses.js",
+ "modules/perujuk.js"
 ];

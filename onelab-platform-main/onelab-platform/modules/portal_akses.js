@@ -18,6 +18,7 @@
 
 let pakDaftar = [];
 let pakKorporat = [];
+let pakPerujuk = [];
 
 const pakTgl = (d) => d ? new Date(d).toLocaleDateString('id-ID',
   { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -27,7 +28,7 @@ async function renderPortalAkses() {
     <div class="page-header">
       <div><h1>Akses Portal</h1>
         <p style="color:var(--text3);font-size:13px">
-          Tautan bertoken untuk klien korporat — hanya-baca, bisa dicabut, berbatas waktu</p></div>
+          Tautan bertoken untuk klien korporat dan dokter perujuk — hanya-baca, bisa dicabut, berbatas waktu</p></div>
       <div class="btn-row">
         <button class="btn btn-teal btn-sm" onclick="pakBuat()">+ Buat Tautan</button>
         <button class="btn btn-ghost btn-sm" onclick="renderPortalAkses()">Muat Ulang</button>
@@ -53,6 +54,10 @@ async function pakMuat() {
     pakKorporat = await sbGet('corporates', 'select=id,corporate_name,kode_corp&order=corporate_name&limit=300') || [];
     if (!Array.isArray(pakKorporat)) pakKorporat = [];
   } catch (e) { pakKorporat = []; }
+  try {
+    pakPerujuk = await sbGet('perujuk', 'select=id,nama,jenis&aktif=eq.true&order=nama&limit=300') || [];
+    if (!Array.isArray(pakPerujuk)) pakPerujuk = [];
+  } catch (e) { pakPerujuk = []; }
 }
 
 function pakGambar() {
@@ -66,7 +71,7 @@ function pakGambar() {
     <div class="card" style="padding:12px 15px;margin-bottom:14px;font-size:12.5px;line-height:1.6;
          background:var(--warn-soft);border-color:var(--gold)">
       <strong>Tautan ini setara kunci.</strong> Siapa pun yang memilikinya dapat melihat data
-      perusahaan yang bersangkutan tanpa perlu masuk. Kirim hanya kepada PIC yang berhak,
+      perusahaan atau perujuk yang bersangkutan tanpa perlu masuk. Kirim hanya kepada pihak yang berhak,
       dan cabut segera begitu kerja sama berakhir atau PIC berganti.
     </div>
 
@@ -78,13 +83,15 @@ function pakGambar() {
       ${pakDaftar.length ? `<div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse;font-size:12.5px">
           <thead><tr style="color:var(--text3);text-align:left">
-            <th style="padding:9px 16px">Perusahaan</th><th>Token</th><th>Berlaku s/d</th>
+            <th style="padding:9px 16px">Tujuan</th><th>Jenis</th><th>Token</th><th>Berlaku s/d</th>
             <th>Dipakai</th><th>Status</th><th style="padding-right:16px">Aksi</th></tr></thead>
           <tbody>${pakDaftar.map(a => {
             const lewat = a.berlaku_sampai && new Date(a.berlaku_sampai) < new Date();
             const hidup = a.aktif && !lewat;
             return `<tr style="border-top:1px solid var(--border)">
               <td style="padding:9px 16px">${a.label || '(tanpa label)'}</td>
+              <td><span class="badge" style="font-size:10.5px">${
+                a.jenis === 'perujuk' ? 'perujuk' : 'korporat'}</span></td>
               <td style="font-family:monospace;color:var(--text3)">${a.token_petunjuk || '—'}</td>
               <td style="color:${lewat ? 'var(--danger-strong)' : 'inherit'}">${pakTgl(a.berlaku_sampai)}</td>
               <td>${a.jumlah_akses || 0}×
@@ -101,18 +108,49 @@ function pakGambar() {
     </div>`;
 }
 
+// Dua jenis portal, satu mekanisme token. Halaman tujuan dan daftar pilihan
+// berbeda, tetapi pembuatan, pencabutan, masa berlaku, dan pembatasan
+// percobaan persis sama — cakupannya sama-sama ditentukan server dari token.
+const PAK_JENIS = {
+  korporat: { label: 'Klien korporat', halaman: 'portal_korporat.html',
+              kosong: 'Belum ada data perusahaan korporat. Tambahkan lebih dulu di Corporate Management.' },
+  perujuk:  { label: 'Dokter / klinik perujuk', halaman: 'portal_perujuk.html',
+              kosong: 'Belum ada perujuk aktif. Tambahkan lebih dulu di menu Dokter & Klinik Perujuk.' },
+};
+
+function pakDaftarTujuan(jenis) {
+  return jenis === 'perujuk'
+    ? pakPerujuk.map(p => ({ id: p.id, teks: p.nama + (p.jenis ? ' (' + p.jenis + ')' : '') }))
+    : pakKorporat.map(c => ({ id: c.id, teks: c.corporate_name + (c.kode_corp ? ' (' + c.kode_corp + ')' : '') }));
+}
+
+function pakGantiJenis() {
+  const jenis = document.getElementById('pak-jenis')?.value || 'korporat';
+  const sel = document.getElementById('pak-corp');
+  if (!sel) return;
+  const daftar = pakDaftarTujuan(jenis);
+  sel.innerHTML = daftar.length
+    ? daftar.map(d => `<option value="${d.id}">${d.teks}</option>`).join('')
+    : `<option value="">— ${PAK_JENIS[jenis].kosong} —</option>`;
+}
+
 function pakBuat() {
-  if (!pakKorporat.length) {
-    toast('Belum ada data perusahaan korporat. Tambahkan lebih dulu di Corporate Management.', 'warn');
+  if (!pakKorporat.length && !pakPerujuk.length) {
+    toast('Belum ada perusahaan korporat maupun perujuk aktif untuk dibuatkan tautan.', 'warn');
     return;
   }
   openModal(`
     <h3 style="margin:0 0 4px">Buat Tautan Portal</h3>
     <p style="font-size:12px;color:var(--text3);margin:0 0 14px">
-      Tautan hanya-baca untuk PIC perusahaan. Token akan ditampilkan sekali saja.</p>
-    <div class="input-group"><label>Perusahaan</label>
-      <select id="pak-corp">${pakKorporat.map(c =>
-        `<option value="${c.id}">${c.corporate_name}${c.kode_corp ? ' (' + c.kode_corp + ')' : ''}</option>`).join('')}</select></div>
+      Tautan hanya-baca untuk pihak luar. Token akan ditampilkan sekali saja.</p>
+    <div class="input-group"><label>Jenis portal</label>
+      <select id="pak-jenis" onchange="pakGantiJenis()">
+        ${Object.entries(PAK_JENIS).map(([k, v]) =>
+          `<option value="${k}">${v.label}</option>`).join('')}
+      </select></div>
+    <div class="input-group"><label>Tujuan</label>
+      <select id="pak-corp">${pakDaftarTujuan('korporat').map(d =>
+        `<option value="${d.id}">${d.teks}</option>`).join('')}</select></div>
     <div class="input-group"><label>Masa berlaku</label>
       <select id="pak-hari">
         <option value="30">30 hari</option>
@@ -127,15 +165,18 @@ function pakBuat() {
 }
 
 async function pakSimpan() {
+  const jenis = document.getElementById('pak-jenis')?.value || 'korporat';
   const sel = document.getElementById('pak-corp');
   const id = parseInt(sel?.value, 10);
   const label = sel?.options[sel.selectedIndex]?.text || '';
   const hari = parseInt(document.getElementById('pak-hari')?.value, 10) || 180;
+  if (!id) { toast('Pilih tujuan tautan lebih dulu', 'warn'); return; }
   try {
-    const r = await sbRpc('portal_akses_buat', { p_jenis: 'korporat', p_ref_id: id, p_label: label, p_hari: hari });
+    const r = await sbRpc('portal_akses_buat', { p_jenis: jenis, p_ref_id: id, p_label: label, p_hari: hari });
     if (!r || !r.ok || !r.token) { toast('Gagal membuat tautan', 'err'); return; }
 
-    const url = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}portal_korporat.html?t=${r.token}`;
+    const halaman = (PAK_JENIS[jenis] || PAK_JENIS.korporat).halaman;
+    const url = `${location.origin}${location.pathname.replace(/[^/]*$/, '')}${halaman}?t=${r.token}`;
     openModal(`
       <h3 style="margin:0 0 4px">Tautan siap dikirim</h3>
       <p style="font-size:12px;color:var(--text3);margin:0 0 12px">
@@ -173,6 +214,7 @@ async function pakCabut(id) {
 
 window.renderPortalAkses = renderPortalAkses;
 window.pakBuat = pakBuat;
+window.pakGantiJenis = pakGantiJenis;
 window.pakSimpan = pakSimpan;
 window.pakSalin = pakSalin;
 window.pakCabut = pakCabut;

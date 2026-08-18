@@ -20,7 +20,7 @@ const PAGE_TITLES = {
   settings:'Pengaturan', users:'User Management',
   audit:'Jejak Audit', 'db-studio':'Database Studio (Supabase GUI)',
   satusehat:'SATUSEHAT — Kemenkes RI',
-  'ar-aging':'Umur Piutang', 'lab-tat':'Turnaround Time Lab', penawaran:'Penawaran Harga', 'ops-kendali':'Pusat Kendali Operasional', 'sales-corong':'Corong Penjualan', 'portal-akses':'Akses Portal',
+  'ar-aging':'Umur Piutang', 'lab-tat':'Turnaround Time Lab', penawaran:'Penawaran Harga', 'ops-kendali':'Pusat Kendali Operasional', 'sales-corong':'Corong Penjualan', 'portal-akses':'Akses Portal', perujuk:'Dokter & Klinik Perujuk',
   'hc-schedule':'Home Care — Jadwal', 'hc-staff':'Home Care — Petugas',
   'hc-tariff':'Home Care — Tarif', 'hc-billing':'Home Care — Penagihan',
   'hc-report':'Home Care — Laporan',
@@ -109,6 +109,7 @@ async function navigate(page, params={}) {
     case 'ops-kendali': safeRun('renderOpsKendali');               break;
     case 'sales-corong':safeRun('renderSalesCorong');              break;
     case 'portal-akses':safeRun('renderPortalAkses');              break;
+    case 'perujuk':     safeRun('renderPerujuk');                  break;
     case 'lab-tat':     safeRun('renderLabTat');                  break;
 
     // Home Care: sub-halaman ini dulu memanggil renderHC*() LANGSUNG dari
