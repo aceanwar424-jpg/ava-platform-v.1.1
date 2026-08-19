@@ -25,11 +25,12 @@ const fs = require('fs');
 const path = require('path');
 
 const AKAR = path.resolve(__dirname, '..');
-// 'release' dan 'win-unpacked' = keluaran electron-builder. Isinya salinan
+// 'release'/'win-unpacked' = keluaran electron-builder, 'dist-situs' = keluaran
+// ekspor-situs.js. Isinya salinan
 // berkas yang sudah diperiksa dari sumbernya, plus HTML pihak ketiga dari
 // Electron. Memeriksanya hanya menggandakan hasil dan menyamarkan angka.
 const LEWATI = new Set(['node_modules', '.git', 'dist', 'dist-electron',
-                        'build', 'backup', 'release', 'win-unpacked']);
+                        'build', 'backup', 'release', 'win-unpacked', 'dist-situs']);
 
 function kumpulkanHtml(dir, hasil = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

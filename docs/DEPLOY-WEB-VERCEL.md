@@ -71,6 +71,35 @@ adalah akar. <base href="/apps/"> yang menjembatani: style.css dan app.js milikn
 sementara ../js/core/api.js tetap naik ke akar. Aman di sini karena semua panggilan jaringan
 memakai SUPABASE_URL absolut dan tidak ada aset yang dirujuk dari akar.
 
+### Memisah jadi repo sendiri
+
+Tiap situs bisa diekspor jadi folder mandiri yang siap di-git init:
+
+    node scripts/ekspor-situs.js
+
+Hasilnya di dist-situs/<kunci>/ — lengkap dengan vercel.json dan README sendiri.
+
+Yang perlu diketahui sebelum memutuskan memisah permanen:
+
+- **Ketergantungan antar-situs sangat kecil.** Diukur, bukan dikira: 91 modul dan seluruh
+  css itu milik his saja. Hanya SATU berkas melintasi batas — js/core/api.js (138 baris),
+  dipakai app untuk sbGet/sbPost/sbPatch dan SUPABASE_URL.
+- **Produk desktop menahan pemisahan penuh.** Aplikasi .exe menyajikan SELURUH folder
+  platform sebagai satu akar. Kalau situs benar-benar tersebar di enam repo, build desktop
+  harus menyatukannya kembali — langkah build baru pada proyek yang sengaja tidak punya
+  langkah build, tepat di bagian yang dijual.
+- **Karena itu repo induk tetap sumber kebenaran** dan situs mandiri dibangkitkan darinya.
+  Yang didapat sama dengan repo terpisah (deploy sendiri, domain sendiri, bisa didorong ke
+  repo sendiri) tanpa membuat produk desktop bergantung pada penyatuan ulang.
+
+Pengekspor menolak berkas yang diblokir .gitignore, memakai aturan git sendiri — bukan daftar
+nama buatan tangan yang akan ketinggalan. Ini ketahuan saat pengujian: ekspor pertama membawa
+js/config.local.js, tempat kunci LLM disimpan. Kebetulan sedang kosong.
+
+Satu kopling yang harus dibereskan bila portal bertoken dipindah ke host lain:
+modules/portal_akses.js membuat tautan dengan location.origin + nama berkas, mengandaikan
+portal_korporat.html bersebelahan. Untuk sekarang keduanya ikut situs his, jadi tautannya tetap benar.
+
 ### Yang TIDAK diberikan pemisahan ini
 
 **Subdomain bukan pembatas akses.** his.avahealth.sbs tetap bisa dibuka siapa pun; yang menjaga

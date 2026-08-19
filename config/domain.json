@@ -21,65 +21,122 @@
     "  nama   : untuk manusia; muncul di ringkasan skrip",
     "",
     "Ejaan 'avahelath.sbs' yang terbalik disengaja — domain salah ketik itu",
-    "dimiliki juga dan diarahkan ke tempat yang sama."
+    "dimiliki juga dan diarahkan ke tempat yang sama.",
+    "",
+    "berkas  : isi yang menjadi milik situs ini bila dipisah jadi repo sendiri.",
+    "bersama : berkas milik situs LAIN yang tetap dibutuhkan. Disalin saat ekspor,",
+    "          dan scripts/ekspor-situs.js membandingkan isinya supaya salinan yang",
+    "          menyimpang ketahuan — bukan baru terasa saat produksi berbeda perilaku."
   ],
-
   "domain_utama": "avahealth.sbs",
-
   "situs": [
     {
       "kunci": "web",
       "nama": "Web Utama",
-      "host": ["avahealth.sbs", "www.avahealth.sbs", "avahelath.sbs", "www.avahelath.sbs"],
+      "host": [
+        "avahealth.sbs",
+        "www.avahealth.sbs",
+        "avahelath.sbs",
+        "www.avahelath.sbs"
+      ],
       "lokal": "web",
       "masuk": "/portal.html",
       "basis": "",
-      "keterangan": "Sementara memakai halaman hub Portal Apps. Ganti 'masuk' ke halaman landing begitu tersedia."
+      "keterangan": "Sementara memakai halaman hub Portal Apps. Ganti 'masuk' ke halaman landing begitu tersedia.",
+      "berkas": [
+        "portal.html",
+        "apps_portal.html"
+      ],
+      "bersama": []
     },
     {
       "kunci": "his",
       "nama": "Sistem Utama (HIS)",
-      "host": ["his.avahealth.sbs", "his.avahelath.sbs"],
+      "host": [
+        "his.avahealth.sbs",
+        "his.avahelath.sbs"
+      ],
       "lokal": "his",
       "masuk": "/index.html",
       "basis": "",
-      "keterangan": "Aplikasi operasional staf klinik & laboratorium."
+      "keterangan": "Aplikasi operasional staf klinik & laboratorium.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/",
+        "portal_korporat.html",
+        "portal_perujuk.html"
+      ],
+      "bersama": []
     },
     {
       "kunci": "app",
       "nama": "Portal Customer & Korporat",
-      "host": ["app.avahealth.sbs", "apps.avahealth.sbs", "app.avahelath.sbs", "apps.avahelath.sbs"],
+      "host": [
+        "app.avahealth.sbs",
+        "apps.avahealth.sbs",
+        "app.avahelath.sbs",
+        "apps.avahelath.sbs"
+      ],
       "lokal": "app",
       "masuk": "/apps/index.html",
       "basis": "/apps/",
-      "keterangan": "apps.* ikut diarahkan ke sini karena sudah dipakai sebelumnya."
+      "keterangan": "apps.* ikut diarahkan ke sini karena sudah dipakai sebelumnya.",
+      "berkas": [
+        "apps/"
+      ],
+      "bersama": [
+        "js/core/api.js"
+      ]
     },
     {
       "kunci": "kiosk",
       "nama": "Kiosk Antrian",
-      "host": ["kiosk.avahealth.sbs", "kiosk.avahelath.sbs"],
+      "host": [
+        "kiosk.avahealth.sbs",
+        "kiosk.avahelath.sbs"
+      ],
       "lokal": "kiosk",
       "masuk": "/kiosk/index.html",
       "basis": "/kiosk/",
-      "keterangan": "Layar sentuh di pintu masuk klinik."
+      "keterangan": "Layar sentuh di pintu masuk klinik.",
+      "berkas": [
+        "kiosk/"
+      ],
+      "bersama": []
     },
     {
       "kunci": "nakes",
       "nama": "Portal Nakes Home Care",
-      "host": ["nakes.avahealth.sbs", "nakes.avahelath.sbs"],
+      "host": [
+        "nakes.avahealth.sbs",
+        "nakes.avahelath.sbs"
+      ],
       "lokal": "nakes",
       "masuk": "/nakes.html",
       "basis": "",
-      "keterangan": "Petugas lapangan; dibuka lewat tautan bertoken."
+      "keterangan": "Petugas lapangan; dibuka lewat tautan bertoken.",
+      "berkas": [
+        "nakes.html"
+      ],
+      "bersama": []
     },
     {
       "kunci": "cek",
       "nama": "Lacak Pesanan & Hasil",
-      "host": ["cek.avahealth.sbs", "cek.avahelath.sbs"],
+      "host": [
+        "cek.avahealth.sbs",
+        "cek.avahelath.sbs"
+      ],
       "lokal": "cek",
       "masuk": "/track.html",
       "basis": "",
-      "keterangan": "Halaman publik pasien memantau status."
+      "keterangan": "Halaman publik pasien memantau status.",
+      "berkas": [
+        "track.html"
+      ],
+      "bersama": []
     }
   ]
 }
