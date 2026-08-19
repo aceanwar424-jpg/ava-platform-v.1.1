@@ -156,8 +156,22 @@ function testMcpTool(toolId) {
   if (!tool) return;
 
   if (toolId === 'mcp_fhir_satusehat' && window.fhirConverter) {
-    const fhirPat = window.fhirConverter.convertToFhirPatient({ nik: '3171234567890001', patient_name: 'Dr. Ahmad Pratama' });
-    alert(`[MCP Executed - HL7 FHIR SATUSEHAT]\nResource: Patient\nFHIR Payload:\n${JSON.stringify(fhirPat, null, 2)}`);
+    // Data CONTOH, bukan pasien sungguhan — dan ditulis apa adanya di layar
+    // supaya tidak ada yang mengira ini hasil konversi rekam medis nyata.
+    // NIK-nya sengaja memakai blok 0000-0000 yang tidak diterbitkan.
+    const contoh = {
+      nik: '0000000000000000', patient_name: '(CONTOH) Ahmad Pratama',
+      birth_date: '1985-03-12', gender: 'L', phone: '',
+    };
+    try {
+      const fhirPat = window.fhirConverter.convertToFhirPatient(contoh);
+      alert('[MCP — HL7 FHIR SATUSEHAT]\nResource: Patient\n\n' +
+            'DATA CONTOH, bukan pasien nyata.\n\n' + JSON.stringify(fhirPat, null, 2));
+    } catch (e) {
+      // Converter menolak data yang tidak lengkap. Kalau contoh di atas pun
+      // ditolak, berarti syaratnya berubah dan contohnya yang harus diperbarui.
+      alert('[MCP — HL7 FHIR SATUSEHAT]\nKonversi contoh DITOLAK converter:\n\n' + e.message);
+    }
     return;
   }
 
@@ -173,7 +187,13 @@ function testMcpTool(toolId) {
     return;
   }
 
-  alert(`[MCP Executed Successfully]\nTool: ${tool.name}\nServer: ${tool.server}\nLatency: ${tool.latencyMs}ms\nStatus: 200 OK`);
+  // Alat ini BELUM tersambung ke apa pun. Sebelumnya baris ini menampilkan
+  // "Executed Successfully … Status: 200 OK" beserta angka latensi — ketiganya
+  // karangan, untuk pemanggilan yang tidak pernah terjadi. Layar yang
+  // melaporkan sukses palsu membuat orang berhenti memeriksa.
+  alert(`[MCP — ${tool.name}]\nServer: ${tool.server}\n\n` +
+        'Alat ini belum tersambung. Tombol ini hanya menampilkan keterangannya, ' +
+        'tidak memanggil apa pun.');
 }
 
 window.renderAgMcpTab = renderAgMcpTab;

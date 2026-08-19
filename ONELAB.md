@@ -171,7 +171,7 @@ Bagian ini tidak boleh dilanggar tanpa persetujuan manusia yang eksplisit.
 | **2** | Multi-tenant + RBAC — agar klien ke-2 tidak perlu menyalin kode | ✅ Inti selesai — matriks peran-izin di DB, penegakan sisi server. Kolom `tenant_id` per tabel operasional menunggu cloud multi-klinik benar-benar digelar |
 | **3** | Sync engine offline-first + backup/restore | ◐ ±60% — outbox, cadangan, dan pemulihan terverifikasi. Pendorong ke cloud menunggu keputusan project Supabase |
 | **4** | Lisensi & aktivasi, installer NSIS, auto-update — **setelah ini produk bisa dijual** | ✅ Inti selesai — lisensi Ed25519 offline + installer NSIS, diverifikasi pada `.exe` terpaket. Pembaruan otomatis tersambung tetapi belum aktif (menunggu kolom `publish`); penandatanganan kode belum dibeli. Lihat `docs/LISENSI-DAN-INSTALLER.md` |
-| **5** | Kedalaman domain: SATUSEHAT/RME, connector dua arah, QC/EQA, TAT analytics | ◐ Dimulai — gerbang SATUSEHAT sisi server + pencatatan jejak siap; converter baru Patient & Observation |
+| **5** | Kedalaman domain: SATUSEHAT/RME, connector dua arah, QC/EQA, TAT analytics | ◐ Berlanjut — gerbang SATUSEHAT + jejak siap. Converter: Patient, Observation, Encounter, DiagnosticReport, Condition, Composition (6, diuji 35 pemeriksaan). Procedure BELUM dibuat karena tidak ada tabel tindakan — converter tanpa sumber data hanya akan mengarang |
 | **6** | Kemasan komersial: edisi produk, tenant demo, dokumentasi, materi training | Belum mulai |
 
 ### 6.2 Jalur fungsional — lima fase OneLab
