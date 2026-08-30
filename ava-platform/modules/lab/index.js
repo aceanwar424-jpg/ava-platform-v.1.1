@@ -12,8 +12,8 @@
 //   lab/qc.js          · Quality Control & manajemen analyzer
 // ═══════════════════════════════════════════════════════════════
 
-// Worklist & TAT dihapus — fungsinya menyatu ke Check-in (satu tabel + detail TAT).
-const LAB_TABS = ['checkin','result','validation','approval','report','qc','integrasi'];
+// Worklist & Check-in dipisah menjadi 2 alur mandiri
+const LAB_TABS = ['checkin','worklist','result','validation','approval','report','qc','integrasi'];
 
 // State bersama (dibaca/ditulis lintas sub-modul)
 let labSamples  = [];
@@ -259,13 +259,14 @@ function injectLisStyle(){
 // dirender SATU tab yang diminta, dengan judul & tautan kembali ke indeks.
 // ═══════════════════════════════════════════════════════════════
 const LAB_TAB_META = {
-  checkin:    { label:'Penerimaan Sampel', ico:'🧪' },
-  result:     { label:'Input Hasil',       ico:'📝' },
-  validation: { label:'Validasi',          ico:'✅' },
-  approval:   { label:'Approval',          ico:'🔏' },
-  report:     { label:'Rekam Medis Lab',   ico:'📁' },
-  qc:         { label:'QC & Analyzer',     ico:'🎛️' },
-  integrasi:  { label:'Integrasi Alat',    ico:'🔌' },
+  checkin:    { label:'Penerimaan & Barcode',     ico:'🩸' },
+  worklist:   { label:'Worklist Mesin Analyzer',  ico:'🔬' },
+  result:     { label:'Input Hasil & Delta Check',ico:'📝' },
+  validation: { label:'Otorisasi Dokter Sp.PK',   ico:'✅' },
+  approval:   { label:'Approval & TTE QR',        ico:'🔏' },
+  report:     { label:'Rekam Medis Lab & Arsip',  ico:'📁' },
+  qc:         { label:'QC & Kendali Mutu',        ico:'📊' },
+  integrasi:  { label:'Integrasi Alat (:9999)',   ico:'🔌' },
 };
 
 async function renderLab(tab='checkin'){
@@ -309,8 +310,13 @@ async function renderLab(tab='checkin'){
 
   // Render HANYA tab yang diminta.
   ({
-    checkin:renderCheckinTab, result:renderResultTab,
-    validation:renderValidationTab, approval:renderApprovalTab, report:renderReportTab, qc:renderQCTab,
+    checkin:renderCheckinTab,
+    worklist:renderWorklistTab,
+    result:renderResultTab,
+    validation:renderValidationTab,
+    approval:renderApprovalTab,
+    report:renderReportTab,
+    qc:renderQCTab,
     integrasi:renderAnalyzerHub,
   }[tab] || renderCheckinTab)();
 }

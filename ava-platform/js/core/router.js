@@ -274,9 +274,9 @@ async function navigate(page, params={}) {
     case 'registrasi':
     case 'admission':   safeRun('renderAdmission');              break;
     case 'laboratorium':
-    case 'worklist':
-    case 'validasi':
-    case 'lab':         safeRun('renderLab', params.tab||(page==='validasi'?'validate':'checkin')); break;
+    case 'lab':         safeRun('renderLab', params.tab || 'checkin'); break;
+    case 'worklist':    safeRun('renderLab', 'worklist'); break;
+    case 'validasi':    safeRun('renderLab', 'validation'); break;
     case 'product':     safeRun('renderConfigProduct');          break;
     case 'config':      safeRun('renderSettings', 'masterdata');   break;
     case 'refrange':    safeRun('renderConfigRefRange');          break;
