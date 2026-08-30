@@ -23,13 +23,9 @@
   <div class="sidebar-brand-box" onclick="navigate('dashboard')" title="Kembali ke Dashboard Utama">
     <img src="css/logo-ava-global.png" class="sidebar-brand-logo" alt="AVA Logo">
     <div class="sidebar-brand-text">
-      <div class="sidebar-brand-title">AVA GLOBAL</div>
-      <div class="sidebar-brand-sub">✨ Health &amp; Wellness</div>
+      <div class="sidebar-brand-title" id="sidebar-brand-title">AVA LAB</div>
+      <div class="sidebar-brand-sub" id="sidebar-brand-sub">🔬 Diagnostic Laboratory</div>
     </div>
-  </div>
-
-  <div class="sidebar-unit-wrapper">
-    <select id="portfolio-workspace-switcher" class="sidebar-unit-select" onchange="switchPortfolioWorkspace(this.value)"></select>
   </div>
 
   <nav class="rail-nav" id="rail-nav"></nav>
@@ -39,7 +35,7 @@
       <span class="conn-dot ok" id="conn-dot" title="Status Sistem: Online"></span>
       <span style="font-size:11px; font-weight:700; color:#94a3b8;">AVA ENGINE v5.1</span>
     </div>
-    <span style="font-size:10px; font-weight:800; color:#D4AF37; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); padding:2px 6px; border-radius:4px;">ISO 15189</span>
+    <span id="sidebar-brand-tag" style="font-size:10px; font-weight:800; color:#D4AF37; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); padding:2px 6px; border-radius:4px;">ISO 15189:2022</span>
   </div>
 
   <!-- User info — hidden compat refs -->
@@ -247,21 +243,34 @@ window.addEventListener('DOMContentLoaded', async () => {
   const hash = window.location.hash.toLowerCase();
   const situsIni = (typeof window.situsSaatIni === 'function') ? window.situsSaatIni() : null;
 
-  const isLisDomain = host.startsWith('lis.') || urlParams.get('app') === 'lis'
+  const isLisDomain = host.startsWith('lis.') || host.startsWith('lab.') || urlParams.get('app') === 'lis'
                    || urlParams.get('preset') === 'lis' || hash === '#lab';
+  const isHisDomain = host.startsWith('his.') || urlParams.get('app') === 'his';
+  const isTechDomain = host.startsWith('tech.') || host.startsWith('console.') || urlParams.get('app') === 'tech';
+  const isWellnessDomain = host.startsWith('wellness.') || host.startsWith('care.') || host.startsWith('nutri.') || host.startsWith('sanctuary.') || urlParams.get('app') === 'wellness';
+  const isOpsDomain = host.startsWith('ops.') || urlParams.get('app') === 'ops';
+
   const customView = urlParams.get('view');
+
+  const defaultSubdomainWorkspace = isLisDomain ? 'lis'
+                                 : isHisDomain ? 'his'
+                                 : isTechDomain ? 'tech'
+                                 : isWellnessDomain ? 'wellness'
+                                 : isOpsDomain ? 'ops'
+                                 : 'lis';
 
   // Workspace efektif: dipakai untuk menyempitkan rel menu.
   const workspaceAktif = urlParams.get('workspace')
                       || (situsIni && situsIni.workspace)
-                      || (hash.startsWith('#') ? hash.substring(1) : null)
-                      || 'holding';
+                      || defaultSubdomainWorkspace;
 
   function determineInitialPage() {
     if (customView) return customView;
     if (hash.startsWith('#')) return hash.substring(1);
     if (situsIni && situsIni.awal) return situsIni.awal;
     if (isLisDomain) return 'lab';
+    if (isHisDomain) return 'emr-soap';
+    if (isTechDomain) return 'saas-console';
     return 'dashboard';
   }
 
@@ -647,73 +656,61 @@ const RUANG_ALIAS = {
   corporate: 'his',       // MCU korporat terintegrasi utamanya ke HIS
 };
 
+const WORKSPACE_BRAND_INFO = {
+  lis: {
+    title: 'AVA LAB',
+    subtitle: '🔬 Diagnostic Laboratory',
+    tag: 'ISO 15189:2022'
+  },
+  his: {
+    title: 'AVA CLINIC',
+    subtitle: '🩺 Hospital & Clinical System',
+    tag: 'PMK 24/2022'
+  },
+  tech: {
+    title: 'AVA TECH',
+    subtitle: '💻 Healthcare Solutions & SaaS',
+    tag: 'B2B Edition'
+  },
+  wellness: {
+    title: 'AVA WELLNESS',
+    subtitle: '🌿 Nutrition & Sanctuary Spa',
+    tag: 'D2C Ecosystem'
+  },
+  ops: {
+    title: 'AVA HOLDING',
+    subtitle: '👑 Enterprise Cockpit & HQ',
+    tag: 'Master Admin'
+  }
+};
+
 function ruangKanonik(ws) {
-  if (!ws) return 'ops';
+  if (!ws) return 'lis';
   return RUANG_ALIAS[ws] || ws;
 }
 window.ruangKanonik = ruangKanonik;
 
-// Menggambar ulang rel navigasi sesuai ruang. Rel yang bukan milik ruang
-// itu TIDAK dibuat sama sekali — bukan dibuat lalu disembunyikan.
+// Menggambar ulang rel navigasi sesuai ruang dan memperbarui branding unit
 function applyWorkspaceScope(ws) {
   const ruang = ruangKanonik(ws);
-  if (typeof gambarRail === 'function') gambarRail(ruang);
+  const brand = WORKSPACE_BRAND_INFO[ruang] || WORKSPACE_BRAND_INFO.lis;
 
-  const switcher = document.getElementById('portfolio-workspace-switcher');
-  if (switcher && switcher.value !== ruang) switcher.value = ruang;
+  const titleEl = document.getElementById('sidebar-brand-title');
+  const subEl = document.getElementById('sidebar-brand-sub');
+  const tagEl = document.getElementById('sidebar-brand-tag');
+
+  if (titleEl) titleEl.textContent = brand.title;
+  if (subEl) subEl.textContent = brand.subtitle;
+  if (tagEl) tagEl.textContent = brand.tag;
+
+  if (typeof gambarRail === 'function') gambarRail(ruang);
 }
 window.applyWorkspaceScope = applyWorkspaceScope;
 
-// Berpindah ruang: gambar ulang rel, lalu buka halaman awal ruang itu.
-//
-// Halaman awal diambil dari config/menu.json (lewat peta-subdomain.js),
-// bukan dari rantai if-else yang harus disunting setiap kali ada ruang baru.
-function switchPortfolioWorkspace(val) {
-  const ruang = ruangKanonik(val);
-  applyWorkspaceScope(ruang);
-
-  const def = (window.PETA_MENU && window.PETA_MENU.ruang && window.PETA_MENU.ruang[ruang]) || null;
-  const kategoriPertama = def && def.kategori && def.kategori.length
-    ? def.kategori[0]
-    : (window.kategoriRuang ? window.kategoriRuang(ruang)[0] : 'utama');
-
-  // Halaman awal: entri pertama yang benar-benar sudah ada di kategori itu.
-  const kat = FLYOUT_MENUS[kategoriPertama];
-  const pertama = kat && kat.items.find(function (i) { return !i.soon; });
-
-  if (pertama && typeof navigate === 'function') {
-    navigate(pertama.page);
-  }
-}
-window.switchPortfolioWorkspace = switchPortfolioWorkspace;
-
-// Mengisi pemilih ruang dari peta. Dipanggil saat aplikasi siap, sesudah
-// peta-menu.js termuat.
-function isiPemilihRuang(ruangAktif) {
-  const sel = document.getElementById('portfolio-workspace-switcher');
-  if (!sel || !window.PETA_MENU) return;
-
-  const IKON = { ops: '👑', tech: '💻', his: '🩺', lis: '🔬', wellness: '🌿' };
-  const daftar = Object.entries(window.PETA_MENU.ruang);
-
-  sel.innerHTML = daftar.map(function (pair) {
-    const k = pair[0], r = pair[1];
-    return '<option value="' + k + '">' + (IKON[k] || '•') + ' ' + r.nama + '</option>';
-  }).join('');
-
-  const aktif = ruangKanonik(ruangAktif);
-  if (window.PETA_MENU.ruang[aktif]) sel.value = aktif;
-}
-window.isiPemilihRuang = isiPemilihRuang;
-
 // Menyiapkan navigasi untuk ruang tempat halaman ini disajikan.
-// Satu pintu masuk supaya kedua jalur boot (master token & login biasa)
-// tidak bisa mengerjakan langkah yang berbeda — persoalan yang sebelumnya
-// membuat staf biasa selalu melihat seluruh rel.
 function siapkanNavigasi(ws) {
   if (!menuTersusun) susunMenu();
   const ruang = ruangKanonik(ws);
-  isiPemilihRuang(ruang);
   applyWorkspaceScope(ruang);
 }
 window.siapkanNavigasi = siapkanNavigasi;
