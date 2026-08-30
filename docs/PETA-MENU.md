@@ -16,7 +16,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | `ops.avahealth.sbs` | Holding HQ — CEO Cockpit | Pemantauan penuh lintas seluruh unit usaha. SATU-SATUNYA ruang yang melihat semua kategori. | **semua kategori** |
 | `tech.avahealth.sbs` | AVA Tech — Pembangun & Penjual Sistem | Tim brand Tech: penguasa pengembangan sistem sekaligus komersialisasinya. Langsung ke halaman masuk. | tech, marketing, keuangan, sdm, konfigurasi, agentic |
-| `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium. | his, avahealth, korporat, keuangan, mutu, sdm, konfigurasi |
+| `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium. | his, avahealth, korporat, marketing, keuangan, mutu, sdm, konfigurasi |
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis, logistik, mutu, konfigurasi |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
@@ -353,7 +353,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 ---
 
-### Mutu, Legal & Administrasi
+### Administrasi, Mutu & Legal
 
 `mutu`
 

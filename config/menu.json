@@ -69,6 +69,7 @@
         "his",
         "avahealth",
         "korporat",
+        "marketing",
         "keuangan",
         "mutu",
         "sdm",
@@ -1063,7 +1064,7 @@
       "pendek": "SDM"
     },
     "mutu": {
-      "label": "Mutu, Legal & Administrasi",
+      "label": "Administrasi, Mutu & Legal",
       "ikon": "shield-check",
       "grup": [
         {
@@ -1114,7 +1115,7 @@
           ]
         }
       ],
-      "pendek": "Mutu & Legal"
+      "pendek": "Administrasi"
     },
     "agentic": {
       "label": "AI Agentic Suite",

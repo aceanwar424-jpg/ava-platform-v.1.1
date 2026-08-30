@@ -52,6 +52,7 @@ window.PETA_MENU = {
         "his",
         "avahealth",
         "korporat",
+        "marketing",
         "keuangan",
         "mutu",
         "sdm",
@@ -1046,7 +1047,7 @@ window.PETA_MENU = {
       "pendek": "SDM"
     },
     "mutu": {
-      "label": "Mutu, Legal & Administrasi",
+      "label": "Administrasi, Mutu & Legal",
       "ikon": "shield-check",
       "grup": [
         {
@@ -1097,7 +1098,7 @@ window.PETA_MENU = {
           ]
         }
       ],
-      "pendek": "Mutu & Legal"
+      "pendek": "Administrasi"
     },
     "agentic": {
       "label": "AI Agentic Suite",
