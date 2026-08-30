@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Product, SqlResult, TableColumn } from './types';
+import { Product, SqlResult, TableColumn, SitusPeta } from './types';
 import { 
   Database, 
   FlaskConical, 
@@ -147,14 +147,97 @@ export default function App() {
     }
   };
 
-  // Platform disajikan oleh server statis Electron di 127.0.0.1:5174 (main.ts).
-  // Pakai URL absolut ini agar iframe berfungsi di dev maupun di build .exe
-  // (file:// tidak bisa melayani /onelab-app).
-  const PLATFORM_URL = 'http://127.0.0.1:5174/index.html';
-  const PORTAL_URL = 'http://127.0.0.1:5174/portal.html';
+  // ── Bilah simulator subdomain ────────────────────────────────────────────
+  //
+  // Daftarnya DIBANGUN dari config/domain.json (lewat IPC platform:getSitus),
+  // bukan ditulis ulang di sini. Dua daftar terpisah sudah pernah menyimpang:
+  // simulator sempat punya corporate/crm/antrian yang tidak ada peta domainnya
+  // — jadi jalan di simulator tapi 404 di produksi — sementara console punya
+  // peta tapi tidak punya tombol.
+  //
+  // Alamatnya memakai <lokal>.localhost:5174, BUKAN 127.0.0.1:5174. Ini inti
+  // gunanya: server statis memilih berkas masuk berdasarkan header Host, jadi
+  // membuka path mentah di 127.0.0.1 melewati seluruh aturan subdomain yang
+  // justru sedang ingin diuji. Peramban mengarahkan semua *.localhost ke
+  // 127.0.0.1 tanpa perlu menyunting berkas hosts.
+  const [situs, setSitus] = useState<SitusPeta[]>([]);
+  const [platformPort, setPlatformPort] = useState<number>(5174);
 
-  // Cek apakah layanan connector hidup. Dipanggil saat tab dibuka dan saat
-  // tombol "Cek Ulang" ditekan — bukan polling, supaya tidak membebani boot.
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await window.api?.getSitus?.();
+        if (r?.situs?.length) { setSitus(r.situs); setPlatformPort(r.port || 5174); }
+      } catch (err) { console.error('[simulator] peta domain tidak terbaca', err); }
+    })();
+  }, []);
+
+  // Hiasan per subdomain: ikon, kelompok, dan warna aktif. Murni tampilan —
+  // kunci yang tidak terdaftar di sini tetap muncul dengan gaya bawaan,
+  // sehingga menambah subdomain di domain.json tidak menuntut sunting di sini.
+  const HIAS: Record<string, { ico: string; grup: string; warna: string; label?: string }> = {
+    ops:       { ico: '👑', grup: 'Holding',            warna: 'amber',   label: 'ops (CEO)' },
+    tech:      { ico: '💻', grup: 'Holding',            warna: 'sky',     label: 'tech (SaaS)' },
+    web:       { ico: '🌐', grup: 'Holding',            warna: 'teal',    label: 'web (SSO)' },
+    console:   { ico: '🎛️', grup: 'Holding',            warna: 'violet',  label: 'console' },
+    his:       { ico: '🩺', grup: 'Faskes & Lab',       warna: 'teal',    label: 'his (Klinik)' },
+    lis:       { ico: '🔬', grup: 'Faskes & Lab',       warna: 'sky',     label: 'lis (Lab)' },
+    sanctuary: { ico: '🏛️', grup: 'Faskes & Lab',       warna: 'amber',   label: 'sanctuary' },
+    app:       { ico: '📱', grup: 'Consumer & B2B',     warna: 'sky',     label: 'apps (Pasien)' },
+    corporate: { ico: '🏢', grup: 'Consumer & B2B',     warna: 'indigo',  label: 'corporate' },
+    care:      { ico: '🌸', grup: 'Consumer & B2B',     warna: 'rose',    label: 'care (FMCG)' },
+    nutri:     { ico: '🌿', grup: 'Consumer & B2B',     warna: 'amber',   label: 'nutri' },
+    kiosk:     { ico: '🖥️', grup: 'Hardware & Monitor', warna: 'sky',     label: 'kiosk' },
+    antrian:   { ico: '📺', grup: 'Hardware & Monitor', warna: 'amber',   label: 'antrian tv' },
+    crm:       { ico: '📊', grup: 'Hardware & Monitor', warna: 'violet',  label: 'crm monitor' },
+    nakes:     { ico: '🧑‍⚕️', grup: 'Hardware & Monitor', warna: 'teal',  label: 'nakes' },
+    lacak:     { ico: '📍', grup: 'Hardware & Monitor', warna: 'teal',    label: 'lacak' },
+  };
+  const URUT_GRUP = ['Holding', 'Faskes & Lab', 'Consumer & B2B', 'Hardware & Monitor', 'Lainnya'];
+
+  const SUB_APPS = situs.map(s => {
+    const h = HIAS[s.kunci] || { ico: '🔗', grup: 'Lainnya', warna: 'slate' };
+    return {
+      id: s.kunci,
+      name: s.nama || s.kunci,
+      // Host lokal + '/' — berkas masuknya ditentukan server dari peta, sama
+      // persis seperti yang akan terjadi di produksi.
+      url: `http://${s.lokal}.localhost:${platformPort}/`,
+      host: (s.host && s.host[0]) || `${s.lokal}.localhost`,
+      masuk: s.masuk || '/',
+      ket: s.keterangan || '',
+      ico: h.ico, grup: h.grup, warna: h.warna,
+      label: h.label || s.kunci,
+    };
+  });
+
+  const [selectedSubAppId, setSelectedSubAppId] = useState<string>('web');
+  const [deviceMode, setDeviceMode] = useState<'responsive' | 'mobile' | 'tablet'>('responsive');
+
+  const subAppAktif = SUB_APPS.find(s => s.id === selectedSubAppId);
+  const currentPreviewUrl = subAppAktif?.url || `http://web.localhost:${platformPort}/`;
+
+  // Kelas ditulis utuh, bukan dirangkai (`bg-${warna}-500/20`). Tailwind
+  // memindai kode sebagai teks; kelas yang baru terbentuk saat runtime tidak
+  // pernah ikut terbangun, dan tombolnya akan tampil tanpa warna sama sekali.
+  const WARNA_AKTIF: Record<string, string> = {
+    amber:  'bg-amber-500/20 border-amber-500 text-amber-300 shadow-sm',
+    sky:    'bg-sky-500/20 border-sky-500 text-sky-300 shadow-sm',
+    teal:   'bg-teal-500/20 border-teal-500 text-teal-300 shadow-sm',
+    rose:   'bg-rose-500/20 border-rose-500 text-rose-300 shadow-sm',
+    indigo: 'bg-indigo-500/20 border-indigo-500 text-indigo-300 shadow-sm',
+    violet: 'bg-violet-500/20 border-violet-500 text-violet-300 shadow-sm',
+    slate:  'bg-slate-500/20 border-slate-500 text-slate-200 shadow-sm',
+  };
+
+  const kelasTombol = (id: string, warna: string) =>
+    `flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold border transition whitespace-nowrap ${
+      selectedSubAppId === id
+        ? (WARNA_AKTIF[warna] || WARNA_AKTIF.slate)
+        : 'bg-slate-950/60 border-slate-800 text-slate-300 hover:border-slate-700'
+    }`;
+
+  // Cek apakah layanan connector hidup
   const probeConnector = async () => {
     try {
       const ac = new AbortController();
@@ -169,7 +252,7 @@ export default function App() {
 
   const handleReloadIframe = () => {
     if (iframeRef.current) {
-      iframeRef.current.src = PLATFORM_URL + '?t=' + Date.now();
+      iframeRef.current.src = currentPreviewUrl + (currentPreviewUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
     }
   };
 
@@ -206,11 +289,6 @@ export default function App() {
       alert('Kode Internal dan Nama Tes wajib diisi!');
       return;
     }
-    // harga_normal disimpan sebagai teks di formulir (input HTML selalu
-    // menghasilkan string) tetapi bertipe angka di Product. Konversi
-    // dilakukan di sini agar tipe cocok, bukan dibiarkan lolos — engine
-    // memang mem-parse ulang, tetapi ketidakcocokan ini menutupi kesalahan
-    // lain karena `vite build` tidak menjalankan type-check.
     const dataProduk = {
       ...formData,
       harga_normal: parseFloat(formData.harga_normal) || 0,
@@ -256,125 +334,224 @@ export default function App() {
   });
 
   return (
-    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 select-none">
-      {/* Electron Title Bar */}
+    <div className="flex flex-col h-screen bg-slate-950 text-slate-100 select-none font-sans">
+      {/* ═══ MASTER ELECTRON TITLEBAR ═══ */}
       <div 
-        className="h-10 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-4 text-xs font-medium text-slate-400"
+        className="h-12 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 flex items-center justify-between px-4 text-xs shadow-md z-50"
         style={{ WebkitAppRegion: 'drag' } as any}
       >
+        {/* Brand & Engine Badge */}
         <div className="flex items-center gap-3" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <div className="flex items-center gap-2">
-            <FlaskConical className="w-4 h-4 text-sky-400" />
-            <span className="text-slate-100 font-bold tracking-wide">OneLab Platform</span>
+            <span className="text-lg">👑</span>
+            <span className="text-slate-100 font-extrabold tracking-wide text-sm bg-gradient-to-r from-amber-200 via-amber-400 to-amber-100 bg-clip-text text-transparent">
+              AVA GLOBAL ECOSYSTEM
+            </span>
           </div>
-          <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-semibold">
-            DESKTOP ENGINE (PGLITE · POSTGRES)
+          <span className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider">
+            ● PGLITE WASM ACTIVE
           </span>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex items-center gap-1 bg-slate-950/70 p-1 rounded-lg border border-slate-800" style={{ WebkitAppRegion: 'no-drag' } as any}>
+        {/* Primary Workspace Navigation Switcher */}
+        <div className="flex items-center gap-1.5 bg-slate-950/80 p-1 rounded-xl border border-slate-800/80" style={{ WebkitAppRegion: 'no-drag' } as any}>
           <button
             onClick={() => setActiveTab('app')}
-            className={`flex items-center gap-2 px-3.5 py-1 rounded-md text-xs font-bold transition ${
-              activeTab === 'app' ? 'bg-sky-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-150 ${
+              activeTab === 'app' 
+                ? 'bg-gradient-to-r from-sky-600 to-teal-600 text-white shadow-lg shadow-sky-900/30' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
             <LayoutDashboard className="w-3.5 h-3.5" />
-            UI Software (OneLab App)
-          </button>
-          <button
-            onClick={() => setActiveTab('portal')}
-            className={`flex items-center gap-2 px-3.5 py-1 rounded-md text-xs font-bold transition ${
-              activeTab === 'portal' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-            Portal Apps
-          </button>
-          <button
-            onClick={() => setActiveTab('connector')}
-            className={`flex items-center gap-2 px-3.5 py-1 rounded-md text-xs font-bold transition ${
-              activeTab === 'connector' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <FlaskConical className="w-3.5 h-3.5" />
-            Lab Connector
+            Simulator {SUB_APPS.length} Subdomain
           </button>
           <button
             onClick={() => setActiveTab('tableEditor')}
-            className={`flex items-center gap-2 px-3.5 py-1 rounded-md text-xs font-bold transition ${
-              activeTab === 'tableEditor' ? 'bg-sky-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-150 ${
+              activeTab === 'tableEditor' 
+                ? 'bg-sky-600 text-white shadow-md' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
             <TableIcon className="w-3.5 h-3.5" />
-            GUI Table Editor ({tablesList.length} Tabel)
+            Table Editor ({tablesList.length})
           </button>
           <button
             onClick={() => setActiveTab('sql')}
-            className={`flex items-center gap-2 px-3.5 py-1 rounded-md text-xs font-bold transition ${
-              activeTab === 'sql' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-200'
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-150 ${
+              activeTab === 'sql' 
+                ? 'bg-purple-600 text-white shadow-md' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
             }`}
           >
             <Code2 className="w-3.5 h-3.5" />
-            SQL Studio & Console
+            SQL Studio
+          </button>
+          <button
+            onClick={() => setActiveTab('connector')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition duration-150 ${
+              activeTab === 'connector' 
+                ? 'bg-amber-600 text-white shadow-md' 
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+            }`}
+          >
+            <FlaskConical className="w-3.5 h-3.5" />
+            Lab Connector (:9999)
           </button>
         </div>
 
-        <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' } as any}>
-          <span className="flex items-center gap-1.5 text-emerald-400 text-[11px] font-mono">
-            <CheckCircle2 className="w-3.5 h-3.5" /> SQLite Ready
+        {/* Engine Status */}
+        <div className="flex items-center gap-3" style={{ WebkitAppRegion: 'no-drag' } as any}>
+          <span className="flex items-center gap-1.5 text-emerald-400 text-[11px] font-mono font-bold bg-emerald-950/40 border border-emerald-800/40 px-2 py-1 rounded-md">
+            <CheckCircle2 className="w-3.5 h-3.5" /> 127.0.0.1:5174
           </span>
         </div>
       </div>
 
-      {/* Main Container */}
+      {/* ═══ MAIN WORKSPACE VIEWPORT ═══ */}
       <div className="flex flex-1 overflow-hidden">
-        {/* TAB 1: UI SOFTWARE ONELAB PLATFORM */}
+        {/* TAB 1: UI SIMULATOR EKOSISTEM */}
         {activeTab === 'app' && (
           <div className="flex-1 flex flex-col bg-slate-950 overflow-hidden">
-            <div className="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-sky-400" />
-                <span className="font-bold text-slate-200">Live Software Preview:</span>
-                <span className="font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800 text-[11px]">
-                  {PLATFORM_URL}
-                </span>
+            {/* Subdomain Toolbar (Categorized & Modern) */}
+            <div className="bg-slate-900/90 border-b border-slate-800/80 px-4 py-2 flex flex-col gap-2 shadow-sm">
+              {/* Row 1: Address Bar + Device Controls */}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                {/* Simulated URL Address Bar */}
+                <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800/90 flex-1 max-w-2xl shadow-inner">
+                  <span className="text-emerald-400 font-mono text-[11px] font-bold flex items-center gap-1">
+                    🔒 https://
+                  </span>
+                  <select
+                    value={selectedSubAppId}
+                    onChange={(e) => setSelectedSubAppId(e.target.value)}
+                    className="bg-transparent text-sky-300 font-mono font-bold text-xs focus:outline-none flex-1 cursor-pointer"
+                  >
+                    {URUT_GRUP.map((grup) => {
+                      const anggota = SUB_APPS.filter((s) => s.grup === grup);
+                      if (!anggota.length) return null;
+                      return (
+                        <optgroup key={grup} label={grup}>
+                          {anggota.map((s) => (
+                            <option key={s.id} value={s.id} className="bg-slate-900 text-white">
+                              {s.host} — {s.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      );
+                    })}
+                  </select>
+                </div>
+
+                {/* Viewport Modes & Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+                    <button
+                      onClick={() => setDeviceMode('responsive')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${deviceMode === 'responsive' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+                      title="Desktop Full View"
+                    >
+                      🖥️ Desktop
+                    </button>
+                    <button
+                      onClick={() => setDeviceMode('tablet')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${deviceMode === 'tablet' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+                      title="Tablet iPad View"
+                    >
+                      💻 Tablet
+                    </button>
+                    <button
+                      onClick={() => setDeviceMode('mobile')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${deviceMode === 'mobile' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+                      title="Mobile Phone View"
+                    >
+                      📱 Mobile
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleReloadIframe}
+                    className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 transition active:scale-95"
+                    title="Segarkan halaman simulasi"
+                  >
+                    <RotateCw className="w-3.5 h-3.5 text-sky-400" />
+                    Refresh
+                  </button>
+                  <a
+                    href={currentPreviewUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-sky-500/30 transition"
+                    title="Buka di peramban sistem (Chrome/Edge)"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Tab Baru
+                  </a>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleReloadIframe}
-                  className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded-lg text-xs font-medium border border-slate-700 transition"
-                >
-                  <RotateCw className="w-3.5 h-3.5 text-sky-400" />
-                  Refresh Tampilan UI
-                </button>
-                <a
-                  href={PLATFORM_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-300 px-3 py-1 rounded-lg text-xs font-medium border border-sky-500/30 transition"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  Buka di Tab Baru
-                </a>
+              {/* Row 2: Subdomain Clusters (Grouped Pills) */}
+              <div className="flex items-center gap-2 overflow-x-auto py-0.5 scrollbar-thin">
+                {SUB_APPS.length === 0 && (
+                  <span className="text-[11px] text-slate-500 pl-1">
+                    Memuat peta subdomain dari config/domain.json…
+                  </span>
+                )}
+                {URUT_GRUP.map((grup) => {
+                  const anggota = SUB_APPS.filter((s) => s.grup === grup);
+                  if (!anggota.length) return null;
+                  return (
+                    <React.Fragment key={grup}>
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider pl-1 whitespace-nowrap">
+                        {grup}:
+                      </span>
+                      {anggota.map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => setSelectedSubAppId(s.id)}
+                          className={kelasTombol(s.id, s.warna)}
+                          title={`${s.host} → ${s.masuk}${s.ket ? ' — ' + s.ket : ''}`}
+                        >
+                          {s.ico} {s.label}
+                        </button>
+                      ))}
+                      <div className="h-3 w-px bg-slate-800 mx-1"></div>
+                    </React.Fragment>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="flex-1 w-full bg-slate-900 relative">
-              <iframe
-                ref={iframeRef}
-                src={PLATFORM_URL}
-                title="OneLab Growth Platform Live App"
-                className="w-full h-full border-none bg-slate-950"
-              />
+            {/* Simulation Canvas Viewport */}
+            <div className="flex-1 w-full bg-slate-950 relative flex items-center justify-center p-3 overflow-hidden">
+              <div 
+                className={`transition-all duration-200 h-full flex flex-col ${
+                  deviceMode === 'mobile'
+                    ? 'w-[414px] max-w-[414px] rounded-[36px] border-[6px] border-slate-800 shadow-2xl overflow-hidden bg-slate-900 p-1.5'
+                    : deviceMode === 'tablet'
+                    ? 'w-[840px] max-w-[840px] rounded-[24px] border-[6px] border-slate-800 shadow-2xl overflow-hidden bg-slate-900 p-1.5'
+                    : 'w-full rounded-xl border border-slate-800/80 shadow-xl overflow-hidden'
+                }`}
+              >
+                {deviceMode !== 'responsive' && (
+                  <div className="h-5 bg-slate-900 flex items-center justify-center">
+                    <div className="w-20 h-1 bg-slate-700 rounded-full"></div>
+                  </div>
+                )}
+                <iframe
+                  key={selectedSubAppId}
+                  ref={iframeRef}
+                  src={currentPreviewUrl}
+                  title="AVA GLOBAL ECOSYSTEM Simulator"
+                  className="w-full flex-1 border-none bg-slate-950"
+                />
+              </div>
             </div>
           </div>
         )}
 
-        {/* TAB 2: PORTAL APPS (PASIEN / DOKTER / VENDOR)
-            iframe hanya dipasang saat tab aktif, jadi tidak menambah waktu boot. */}
+        {/* TAB 2: PORTAL APPS */}
         {activeTab === 'portal' && (
           <div className="flex-1 flex flex-col bg-slate-950 overflow-hidden">
             <div className="bg-slate-900/90 border-b border-slate-800 px-4 py-2 flex items-center justify-between text-xs">
@@ -384,7 +561,7 @@ export default function App() {
                 <span className="text-slate-400">Pasien / Customer, Dokter Telehealth, Vendor Alkes</span>
               </div>
               <a
-                href={PORTAL_URL}
+                href="http://127.0.0.1:5174/apps/index.html"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-1.5 bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 px-3 py-1 rounded-lg text-xs font-medium border border-teal-500/30 transition"
@@ -393,12 +570,17 @@ export default function App() {
                 Buka di Tab Baru
               </a>
             </div>
-            <div className="flex-1 w-full bg-slate-900 relative">
-              <iframe
-                src={PORTAL_URL}
-                title="AVA Health Mobile Apps Portal"
-                className="w-full h-full border-none bg-slate-950"
-              />
+            <div className="flex-1 w-full bg-slate-900 relative flex items-center justify-center p-4">
+              <div className="w-[410px] h-full max-h-[840px] rounded-3xl border-4 border-slate-800 shadow-2xl overflow-hidden bg-slate-900 flex flex-col">
+                <div className="h-4 bg-slate-900 flex items-center justify-center">
+                  <div className="w-16 h-1 bg-slate-700 rounded-full"></div>
+                </div>
+                <iframe
+                  src="http://127.0.0.1:5174/apps/index.html"
+                  title="AVA GLOBAL ECOSYSTEM Mobile Apps Portal"
+                  className="w-full flex-1 border-none bg-slate-950"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -433,7 +615,7 @@ export default function App() {
               {connectorUp ? (
                 <iframe
                   src={CONNECTOR_URL}
-                  title="OneLab Lab Connector"
+                  title="AVA Lab Connector"
                   className="w-full h-full border-none bg-slate-950"
                 />
               ) : (
@@ -448,16 +630,11 @@ export default function App() {
                         <p className="text-slate-400 text-sm mb-4">
                           Connector adalah jembatan yang menangkap kiriman hasil dari alat lab.
                           Ia berjalan sebagai layanan terpisah agar alat tetap terlayani
-                          walaupun jendela aplikasi ini ditutup.
+                          walaupun antarmuka desktop sedang ditutup.
                         </p>
-                        <div className="text-left bg-slate-950 border border-slate-800 rounded-lg p-3 text-[11px] font-mono text-slate-400 mb-4">
-                          <div className="text-slate-500 mb-1"># jalankan lewat launcher</div>
-                          <div className="text-amber-300">ONELAB.bat</div>
-                          <div className="text-slate-500 mt-2 mb-1"># atau manual, dari folder connector</div>
-                          <div className="text-amber-300">node onelab-connector.js</div>
-                        </div>
-                        <p className="text-slate-500 text-xs">
-                          Perlu Node.js terpasang dan berkas <span className="font-mono">connector/config.json</span> sudah diisi.
+                        <p className="text-slate-400 text-xs font-mono bg-slate-900 p-2.5 rounded border border-slate-800">
+                          Nyalakan lewat <code>AVAPLATFORM.bat</code> atau jalankan manual:{' '}
+                          <code className="text-amber-400">node ava-platform/connector/ava-connector.js</code>
                         </p>
                       </>
                     )}

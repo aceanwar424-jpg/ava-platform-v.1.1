@@ -11,4 +11,5 @@ contextBridge.exposeInMainWorld('api', {
   getTableData: (tableName: string) => ipcRenderer.invoke('db:getTableData', tableName),
   getTableColumns: (tableName: string) => ipcRenderer.invoke('db:getTableColumns', tableName),
   getAppVersion: () => ipcRenderer.invoke('app:getVersion'),
+  getSitus: () => ipcRenderer.invoke('platform:getSitus'),
 });

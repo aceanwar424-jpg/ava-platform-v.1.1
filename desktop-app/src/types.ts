@@ -31,6 +31,21 @@ export interface SqlResult {
   error?: string;
 }
 
+// Satu entri subdomain di config/domain.json. Bentuknya sengaja mengikuti
+// berkas itu apa adanya (bahasa Indonesia) supaya tidak perlu lapisan
+// penerjemah yang bisa ikut menyimpang.
+export interface SitusPeta {
+  kunci: string;
+  nama?: string;
+  host?: string[];
+  lokal: string;
+  masuk?: string;
+  basis?: string;
+  keterangan?: string;
+  berkas?: string[];
+  bersama?: string[];
+}
+
 declare global {
   interface Window {
     api?: {
@@ -44,6 +59,7 @@ declare global {
       getTableData: (tableName: string) => Promise<any[]>;
       getTableColumns: (tableName: string) => Promise<TableColumn[]>;
       getAppVersion: () => Promise<string>;
+      getSitus: () => Promise<{ port: number; situs: SitusPeta[] }>;
     };
   }
 }

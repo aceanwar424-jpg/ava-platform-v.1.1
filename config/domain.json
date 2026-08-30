@@ -21,18 +21,13 @@
     "  nama   : untuk manusia; muncul di ringkasan skrip",
     "",
     "Ejaan 'avahelath.sbs' yang terbalik disengaja — domain salah ketik itu",
-    "dimiliki juga dan diarahkan ke tempat yang sama.",
-    "",
-    "berkas  : isi yang menjadi milik situs ini bila dipisah jadi repo sendiri.",
-    "bersama : berkas milik situs LAIN yang tetap dibutuhkan. Disalin saat ekspor,",
-    "          dan scripts/ekspor-situs.js membandingkan isinya supaya salinan yang",
-    "          menyimpang ketahuan — bukan baru terasa saat produksi berbeda perilaku."
+    "dimiliki juga dan diarahkan ke tempat yang sama."
   ],
   "domain_utama": "avahealth.sbs",
   "situs": [
     {
       "kunci": "web",
-      "nama": "Web Utama",
+      "nama": "Web Utama (Company Profile)",
       "host": [
         "avahealth.sbs",
         "www.avahealth.sbs",
@@ -42,16 +37,17 @@
       "lokal": "web",
       "masuk": "/portal.html",
       "basis": "",
-      "keterangan": "Sementara memakai halaman hub Portal Apps. Ganti 'masuk' ke halaman landing begitu tersedia.",
+      "keterangan": "Website Company Profile holding, 6 pilar, artikel, dan universal login gateway.",
       "berkas": [
         "portal.html",
         "apps_portal.html"
       ],
-      "bersama": []
+      "bersama": [],
+      "sorot": "semua"
     },
     {
       "kunci": "his",
-      "nama": "Sistem Utama (HIS)",
+      "nama": "Sistem Utama (HIS + RIS + PACS)",
       "host": [
         "his.avahealth.sbs",
         "his.avahelath.sbs"
@@ -59,7 +55,7 @@
       "lokal": "his",
       "masuk": "/index.html",
       "basis": "",
-      "keterangan": "Aplikasi operasional staf klinik & laboratorium.",
+      "keterangan": "Aplikasi operasional staf medis faskes (HIS + RME SOAP + Radiologi RIS & PACS + Farmasi).",
       "berkas": [
         "index.html",
         "js/",
@@ -68,27 +64,174 @@
         "portal_korporat.html",
         "portal_perujuk.html"
       ],
-      "bersama": []
+      "bersama": [],
+      "workspace": "his",
+      "awal": "emr-soap"
+    },
+    {
+      "kunci": "lis",
+      "nama": "Sistem Laboratorium (LIS)",
+      "host": [
+        "lis.avahealth.sbs",
+        "lis.avahelath.sbs",
+        "lab.avahealth.sbs",
+        "lab.avahelath.sbs"
+      ],
+      "lokal": "lis",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Aplikasi operasional laboratorium diagnostik presisi, QC Westgard, & bridge analyzer.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
+      ],
+      "bersama": [],
+      "workspace": "lis",
+      "awal": "lab"
+    },
+    {
+      "kunci": "ops",
+      "nama": "Master Holding & CEO Cockpit",
+      "host": [
+        "ops.avahealth.sbs",
+        "ops.avahelath.sbs"
+      ],
+      "lokal": "ops",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Master Console CEO / Founder, konsolidasi holding, shared logistics & ops unit usaha.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
+      ],
+      "bersama": [],
+      "workspace": "ops",
+      "awal": "dashboard"
     },
     {
       "kunci": "app",
-      "nama": "Portal Customer & Korporat",
+      "nama": "Portal Pasien & MCU All-in-One",
       "host": [
         "app.avahealth.sbs",
         "apps.avahealth.sbs",
         "app.avahelath.sbs",
-        "apps.avahelath.sbs"
+        "apps.avahelath.sbs",
+        "cek.avahealth.sbs",
+        "cek.avahelath.sbs"
       ],
       "lokal": "app",
       "masuk": "/apps/index.html",
       "basis": "/apps/",
-      "keterangan": "apps.* ikut diarahkan ke sini karena sudah dipakai sebelumnya.",
+      "keterangan": "Portal pasien: booking, telekonsul, MCU B2B, lacak pesanan dan unduh PDF hasil lab.",
       "berkas": [
         "apps/"
       ],
       "bersama": [
         "js/core/api.js"
       ]
+    },
+    {
+      "kunci": "care",
+      "nama": "AVA Care (Personal Care)",
+      "host": [
+        "care.avahealth.sbs",
+        "care.avahelath.sbs"
+      ],
+      "lokal": "care",
+      "masuk": "/portal.html",
+      "basis": "",
+      "keterangan": "Showcase produk D2C intimate care organik & konsultasi personal.",
+      "berkas": [
+        "portal.html"
+      ],
+      "bersama": [],
+      "workspace": "wellness",
+      "awal": "ecommerce-oms",
+      "sorot": "care"
+    },
+    {
+      "kunci": "nutri",
+      "nama": "AVA Nutrition (Nutraseutikal & Pabrik)",
+      "host": [
+        "nutri.avahealth.sbs",
+        "nutri.avahelath.sbs"
+      ],
+      "lokal": "nutri",
+      "masuk": "/nutri.html",
+      "basis": "",
+      "keterangan": "Katalog nutraseutikal, formulasi R&D & kemitraan maklon B2B.",
+      "berkas": [
+        "nutri.html"
+      ],
+      "bersama": [],
+      "workspace": "wellness",
+      "awal": "ecommerce-oms",
+      "sorot": "nutri"
+    },
+    {
+      "kunci": "sanctuary",
+      "nama": "AVA Sanctuary (Medical Spa)",
+      "host": [
+        "sanctuary.avahealth.sbs",
+        "sanctuary.avahelath.sbs"
+      ],
+      "lokal": "sanctuary",
+      "masuk": "/portal.html",
+      "basis": "",
+      "keterangan": "Reservasi Empress Ratus, Pelvic Reformer & VIP membership.",
+      "berkas": [
+        "portal.html"
+      ],
+      "bersama": [],
+      "workspace": "wellness",
+      "awal": "sanctuary-booking",
+      "sorot": "sanctuary"
+    },
+    {
+      "kunci": "tech",
+      "nama": "AVA Tech (Pembangun & Penjual Sistem)",
+      "host": [
+        "tech.avahealth.sbs",
+        "tech.avahelath.sbs"
+      ],
+      "lokal": "tech",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Cockpit AVA Tech: tenant klien faskes, lisensi, kuota pemakaian, dan penjualan sistem.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
+      ],
+      "bersama": [],
+      "workspace": "tech",
+      "awal": "saas-console"
+    },
+    {
+      "kunci": "console",
+      "nama": "AVA Tech Console (Lisensi & Telemetri)",
+      "host": [
+        "console.avahealth.sbs",
+        "console.avahelath.sbs"
+      ],
+      "lokal": "console",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Manajemen lisensi Ed25519 & monitoring client faskes luar.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
+      ],
+      "bersama": [],
+      "workspace": "tech",
+      "awal": "lisensi"
     },
     {
       "kunci": "kiosk",
@@ -123,20 +266,95 @@
       "bersama": []
     },
     {
-      "kunci": "cek",
-      "nama": "Lacak Pesanan & Hasil",
+      "kunci": "corporate",
+      "nama": "Portal Klien Korporat (Login PIC)",
       "host": [
-        "cek.avahealth.sbs",
-        "cek.avahelath.sbs"
+        "corporate.avahealth.sbs",
+        "corporate.avahelath.sbs",
+        "korporat.avahealth.sbs",
+        "korporat.avahelath.sbs"
       ],
-      "lokal": "cek",
+      "lokal": "corporate",
+      "masuk": "/apps/index.html",
+      "basis": "/apps/",
+      "keterangan": "Portal PIC perusahaan klien: login akun korporat, kelola roster karyawan, ajukan & setujui jadwal MCU.",
+      "berkas": [
+        "apps/",
+        "portal_korporat.html"
+      ],
+      "bersama": [
+        "js/core/api.js"
+      ],
+      "peran": "corporate"
+    },
+    {
+      "kunci": "lacak",
+      "nama": "Pelacakan Kunjungan Nakes (Publik)",
+      "host": [
+        "lacak.avahealth.sbs",
+        "lacak.avahelath.sbs"
+      ],
+      "lokal": "lacak",
       "masuk": "/track.html",
       "basis": "",
-      "keterangan": "Halaman publik pasien memantau status.",
+      "keterangan": "Halaman publik bertoken: pasien memantau posisi nakes home care secara langsung.",
       "berkas": [
         "track.html"
       ],
       "bersama": []
+    },
+    {
+      "kunci": "antrian",
+      "nama": "Display TV Antrian Ruang Tunggu",
+      "host": [
+        "antrian.avahealth.sbs",
+        "antrian.avahelath.sbs"
+      ],
+      "lokal": "antrian",
+      "masuk": "/monitor/antrian.html",
+      "basis": "/monitor/",
+      "keterangan": "Layar TV ruang tunggu: nomor antrian poli dan panggilan suara.",
+      "berkas": [
+        "monitor/"
+      ],
+      "bersama": []
+    },
+    {
+      "kunci": "crm",
+      "nama": "CRM Live Monitor Penjualan",
+      "host": [
+        "crm.avahealth.sbs",
+        "crm.avahelath.sbs"
+      ],
+      "lokal": "crm",
+      "masuk": "/monitor/crm.html",
+      "basis": "/monitor/",
+      "keterangan": "Layar monitor target omzet, closing rate, dan pipeline sales harian.",
+      "berkas": [
+        "monitor/"
+      ],
+      "bersama": []
+    },
+    {
+      "kunci": "wellness",
+      "nama": "Wellness (Nutrition & Personal Care)",
+      "host": [
+        "wellness.avahealth.sbs",
+        "wellness.avahelath.sbs"
+      ],
+      "lokal": "wellness",
+      "masuk": "/index.html",
+      "basis": "",
+      "keterangan": "Ruang kerja unit Wellness: gabungan Nutrition, Personal Care (FMCG), dan Sanctuary.",
+      "berkas": [
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
+      ],
+      "bersama": [],
+      "workspace": "wellness",
+      "awal": "ecommerce-oms"
     }
   ]
 }

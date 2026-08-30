@@ -89,9 +89,9 @@ function buatServerStatis({ platformDir, port = 5174, host = '127.0.0.1', log = 
 
     if (!platformDir) {
       res.writeHead(500, { 'Content-Type': 'text/html; charset=utf-8' });
-      return res.end('<h1>Folder platform OneLab tidak ditemukan</h1>' +
-        '<p>Setel <code>ONELAB_PLATFORM_PATH</code> ke folder yang berisi ' +
-        '<code>index.html</code>, atau jalankan lewat <code>ONELAB.bat</code>.</p>');
+      return res.end('<h1>Folder platform AVA tidak ditemukan</h1>' +
+        '<p>Setel <code>AVA_PLATFORM_PATH</code> ke folder yang berisi ' +
+        '<code>index.html</code>, atau jalankan lewat <code>AVAPLATFORM.bat</code>.</p>');
     }
 
     // Urutan sama dengan Vercel: berkas nyata lebih dulu, aturan host hanya
@@ -130,8 +130,16 @@ function buatServerStatis({ platformDir, port = 5174, host = '127.0.0.1', log = 
     });
   });
 
+  server.on('error', (err) => {
+    if (err && err.code === 'EADDRINUSE') {
+      log(`[platform] Porta ${port} sudah digunakan oleh proses lain (server statis sudah aktif). Melanjutkan...`);
+    } else {
+      log(`[platform] Server statis galat: ${err && err.message ? err.message : err}`);
+    }
+  });
+
   server.listen(port, host, () => {
-    log(`OneLab Platform static server → http://${host}:${port}`);
+    log(`AVA Platform static server → http://${host}:${port}`);
     if (situs.length) {
       log('[platform] subdomain lokal: ' +
         situs.map(s => `http://${s.lokal}.localhost:${port}/`).join('  '));

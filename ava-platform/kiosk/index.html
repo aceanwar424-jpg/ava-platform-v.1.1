@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <base href="/kiosk/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kiosk Antrian Layanan Mandiri — AVA GLOBAL ECOSYSTEM</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20260826b">
+</head>
+<body>
+  <div class="kiosk-container">
+    <!-- Header -->
+    <header class="kiosk-header">
+      <div class="logo-area" style="display:flex;align-items:center;gap:14px;">
+        <img src="../css/logo-ava-global.png" style="width:52px;height:52px;border-radius:50%;border:2px solid #d4af37;object-fit:cover;box-shadow:0 0 12px rgba(212,175,55,0.4);" alt="Logo">
+        <div class="logo-text">
+          <h1 style="font-size:22px;font-weight:800;color:#0A2342;">PT AVA HEALTH SOLUTION</h1>
+          <span style="font-size:12px;color:#0E7C86;font-weight:700;">AVA GLOBAL ECOSYSTEM · Kiosk Layanan Mandiri Lobi</span>
+        </div>
+      </div>
+      <div class="time-area">
+        <div id="kiosk-date" class="kiosk-date">...</div>
+        <div id="kiosk-time" class="kiosk-time">00:00:00</div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="kiosk-main">
+      <div class="welcome-banner">
+        <h2>Selamat Datang di Portal Layanan Mandiri</h2>
+        <p>Sentuh salah satu layanan di bawah ini untuk mengambil nomor antrian Anda</p>
+      </div>
+
+      <div class="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:18px;">
+        <!-- Button 1: Pendaftaran Klinik -->
+        <button class="kiosk-card card-primary" onclick="ambilAntrian('Umum')">
+          <div class="card-icon">🏥</div>
+          <div class="card-content">
+            <h3>Pendaftaran Poliklinik</h3>
+            <p>Pemeriksaan Dokter Umum, Dokter Gigi, Rekam Medis &amp; Rawat Jalan</p>
+          </div>
+          <div class="card-badge">SENTUH</div>
+        </button>
+
+        <!-- Button 2: Check-in Lab -->
+        <button class="kiosk-card card-success" onclick="ambilAntrian('Laboratorium')">
+          <div class="card-icon">🧪</div>
+          <div class="card-content">
+            <h3>Laboratorium Diagnostik</h3>
+            <p>Pengambilan Sampel Darah/Urin, Tes Patologi &amp; Pengambilan Hasil</p>
+          </div>
+          <div class="card-badge">SENTUH</div>
+        </button>
+
+        <!-- Button 3: Medical Check Up (MCU) -->
+        <button class="kiosk-card card-warning" onclick="ambilAntrian('MCU')">
+          <div class="card-icon">💼</div>
+          <div class="card-content">
+            <h3>Medical Check Up (MCU)</h3>
+            <p>Pemeriksaan Berkala Mandiri, Karyawan Korporat &amp; Surat Sehat</p>
+          </div>
+          <div class="card-badge">SENTUH</div>
+        </button>
+
+        <!-- Button 4: Queen Sanctuary VIP -->
+        <button class="kiosk-card card-gold" onclick="ambilAntrian('Sanctuary')" style="border-left:5px solid #D4AF37;">
+          <div class="card-icon" style="background:rgba(212,175,55,0.12);color:#D4AF37;">👑</div>
+          <div class="card-content">
+            <h3 style="color:#B45309;">Queen Sanctuary VIP</h3>
+            <p>Wellness Spa, Terapi Pelvic Floor, Biosensor Scan &amp; VIP Lounge</p>
+          </div>
+          <div class="card-badge" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">VIP</div>
+        </button>
+
+        <!-- Button 5: Spesialis & Telehealth -->
+        <button class="kiosk-card card-purple" onclick="ambilAntrian('Spesialis')" style="border-left:5px solid #7C3AED;">
+          <div class="card-icon" style="background:rgba(124,58,237,0.1);color:#7C3AED;">🩺</div>
+          <div class="card-content">
+            <h3 style="color:#6D28D9;">Dokter Spesialis</h3>
+            <p>Spesialis Penyakit Dalam (Sp.PD), Jantung, Anak, Obgyn &amp; Konsultasi</p>
+          </div>
+          <div class="card-badge">SENTUH</div>
+        </button>
+
+        <!-- Button 6: Farmasi & Kasir -->
+        <button class="kiosk-card card-teal" onclick="ambilAntrian('Farmasi')" style="border-left:5px solid #0E7C86;">
+          <div class="card-icon" style="background:rgba(14,124,134,0.1);color:#0E7C86;">💊</div>
+          <div class="card-content">
+            <h3 style="color:#0E7C86;">Farmasi &amp; Kasir</h3>
+            <p>Pengambilan Resep Obat, Pelunasan Tagihan Kasir POS &amp; Asuransi</p>
+          </div>
+          <div class="card-badge">SENTUH</div>
+        </button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="kiosk-footer">
+      <p>Butuh bantuan? Silakan dekati petugas Customer Care &amp; Admisi di lobi utama. Hubungi Call Center: <strong>0812-AVA-HEALTH</strong></p>
+    </footer>
+  </div>
+
+  <!-- Modal Konfirmasi Cetak Tiket -->
+  <div id="print-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="print-animation">🖨️</div>
+      <h2>Mencetak Tiket Antrian...</h2>
+      <div class="ticket-preview" id="ticket-preview">
+        <!-- Content injected dynamically -->
+      </div>
+      <p class="modal-note">Silakan ambil tiket Anda di dispenser bawah mesin printer.</p>
+      <button class="btn btn-close" onclick="closeModal()">Selesai &amp; Tutup</button>
+    </div>
+  </div>
+
+  <script src="../js/core/escposPrinter.js"></script>
+  <script src="app.js?v=20260826b"></script>
+</body>
+</html>

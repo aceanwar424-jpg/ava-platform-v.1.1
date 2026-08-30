@@ -2,7 +2,8 @@
 // Modul dalam subfolder dimuat SEKELOMPOK (index.js sering memanggil fungsi
 // di berkas saudaranya), modul berkas-tunggal dimuat sendiri.
 const fs = require('fs'), path = require('path');
-process.chdir('D:/onelab-platform-main/onelab-platform-main/onelab-platform');
+const AKAR = path.resolve(__dirname, '..', 'ava-platform');
+process.chdir(AKAR);
 
 // Urutan muat.
 //
@@ -48,10 +49,10 @@ for (const f of urutan) {
 
 // Modul yang WAJIB eager: dipakai sebelum navigasi pertama (boot/login/menu).
 const EAGER = new Set([
-  'modules/settings_users.js',        // ROLES, applyRoleMenu, loadServerAccess
-  'modules/dashboard/index.js',       // halaman pertama sesudah login
-  'modules/executive_dashboard.js',   // injectExecToggle dipanggil saat boot
-  'modules/mou.js',                   // checkMOURenewals dipanggil saat boot
+  'modules/system/settings_users.js',        // ROLES, applyRoleMenu, loadServerAccess
+  'modules/dashboard/index.js',              // halaman pertama sesudah login
+  'modules/dashboard/executive_dashboard.js',// injectExecToggle dipanggil saat boot
+  'modules/crm/mou.js',                      // checkMOURenewals dipanggil saat boot
 ]);
 
 const grup = (f) => {

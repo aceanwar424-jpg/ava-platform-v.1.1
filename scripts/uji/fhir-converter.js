@@ -2,7 +2,7 @@ const fs = require('fs');
 const vm = require('vm');
 
 const src = fs.readFileSync(
-  'D:/onelab-platform-main/onelab-platform-main/onelab-platform/js/core/fhirConverter.js', 'utf8');
+  'D:/ava-platform-main/ava-platform/js/core/fhirConverter.js', 'utf8');
 
 const sandbox = { console, fetch: async () => ({ ok: false }), JSON, Date, Math, Object, Array,
   String, Number, parseFloat, parseInt, isNaN, Set, Map, RegExp, Error };

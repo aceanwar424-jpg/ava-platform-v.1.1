@@ -1,9 +1,9 @@
 {
-  "name": "onelab-desktop",
+  "name": "ava-desktop",
   "version": "1.0.0",
-  "description": "OneLab Desktop App - Aplikasi Lokal dengan PGlite (Postgres WASM) & Electron",
+  "description": "AVA Desktop App - Aplikasi Lokal dengan PGlite (Postgres WASM) & Electron",
   "main": "dist-electron/main.js",
-  "author": "OneLab",
+  "author": "AVA",
   "license": "MIT",
   "scripts": {
     "dev:vite": "vite",
@@ -38,8 +38,8 @@
     "vite": "^5.1.4"
   },
   "build": {
-    "appId": "com.onelab.desktop",
-    "productName": "OneLab Desktop",
+    "appId": "com.avaglobal.desktop",
+    "productName": "AVA GLOBAL ECOSYSTEM Desktop",
     "directories": {
       "output": "release"
     },
@@ -51,6 +51,7 @@
       "**/node_modules/@electric-sql/**"
     ],
     "win": {
+      "executableName": "AVA Desktop",
       "target": [
         {
           "target": "nsis",
@@ -69,7 +70,7 @@
     },
     "extraResources": [
       {
-        "from": "../onelab-platform-main/onelab-platform",
+        "from": "../ava-platform",
         "to": "platform",
         "filter": [
           "**/*",
@@ -98,7 +99,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "OneLab",
+      "shortcutName": "AVA GLOBAL ECOSYSTEM",
       "deleteAppDataOnUninstall": false,
       "runAfterFinish": true,
       "installerLanguages": [

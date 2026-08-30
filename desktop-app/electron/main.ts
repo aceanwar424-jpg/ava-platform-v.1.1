@@ -37,30 +37,33 @@ function findUp(start: string, kandidat: string[][], probe?: string): string {
   return '';
 }
 
-// Lokasi frontend OneLab (platform statis) — disajikan ke iframe React shell.
-// 1. ONELAB_PLATFORM_PATH  → override manual / bundle klien
-// 2. resources/platform    → hasil paket produksi (electron-builder extraResources)
-// 3. telusuri ke atas      → tata letak repo saat ini
+// Lokasi frontend AVA (platform statis) — disajikan ke iframe React shell.
+// 1. AVA_PLATFORM_PATH   → override manual / bundle klien
+// 2. resources/platform  → hasil paket produksi (electron-builder extraResources)
+// 3. telusuri ke atas    → tata letak repo saat ini
+//
+// Nama folder lama (ava-platform-main/ava-platform) tetap dicari sebagai
+// cadangan supaya salinan repo yang belum ikut berganti nama masih bisa jalan.
 function resolvePlatformDir(): string {
-  const fromEnv = process.env.ONELAB_PLATFORM_PATH;
+  const fromEnv = process.env.AVA_PLATFORM_PATH || process.env.AVA_PLATFORM_PATH;
   if (fromEnv && fs.existsSync(fromEnv)) return fromEnv;
 
   const packaged = path.join(process.resourcesPath || '', 'platform');
   if (fs.existsSync(path.join(packaged, 'index.html'))) return packaged;
 
   return findUp(anchorDir(),
-    [['onelab-platform-main', 'onelab-platform'], ['onelab-platform']],
+    [['ava-platform'], ['ava-platform-main', 'ava-platform'], ['ava-platform']],
     'index.html');
 }
 
 // DB PGlite persisten. Dipisah dari kode supaya update aplikasi tidak menyentuh data.
-// 1. ONELAB_DATA_DIR            → override manual (mis. drive data klien)
+// 1. AVA_DATA_DIR               → override manual (mis. drive data klien)
 // 2. desktop-app/pglite-data    → instalasi yang sudah ada; WAJIB ditemukan
 //                                 lebih dulu, kalau tidak aplikasi akan diam-diam
 //                                 membuat basis data kosong baru
 // 3. userData/pglite-data       → instalasi benar-benar baru
 function resolveDataDir(): string {
-  const fromEnv = process.env.ONELAB_DATA_DIR;
+  const fromEnv = process.env.AVA_DATA_DIR || process.env.AVA_DATA_DIR;
   if (fromEnv) return fromEnv;
 
   const lama = findUp(anchorDir(), [['desktop-app', 'pglite-data'], ['pglite-data']], 'PG_VERSION');
@@ -69,7 +72,7 @@ function resolveDataDir(): string {
   return path.join(app.getPath('userData'), 'pglite-data');
 }
 
-const ONELAB_PLATFORM_PATH = resolvePlatformDir();
+const AVA_PLATFORM_PATH = resolvePlatformDir();
 const PGLITE_DATA_DIR = resolveDataDir();
 
 // local-engine.js = CommonJS murni (PGlite dimuat lewat dynamic import ESM).
@@ -86,12 +89,26 @@ let mainWindow: BrowserWindow | null = null;
 function startLocalPlatformServer(): void {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const { buatServerStatis } = require('./server-statis.js');
-  buatServerStatis({ platformDir: ONELAB_PLATFORM_PATH, port: PLATFORM_PORT, log: console.log });
+  buatServerStatis({ platformDir: AVA_PLATFORM_PATH, port: PLATFORM_PORT, log: console.log });
 }
 
 // ── IPC untuk React shell (GUI Table Editor + SQL Studio) di atas PGlite ─────
 function registerIpc() {
   ipcMain.handle('app:getVersion', () => app.getVersion());
+
+  // Peta subdomain untuk bilah simulator.
+  //
+  // Dibaca dari config/domain.json lewat fungsi yang SAMA dengan yang dipakai
+  // server statis. Sebelumnya daftar subdomain ditulis ulang di App.tsx, dan
+  // kedua salinan itu sudah menyimpang: simulator punya corporate/crm/antrian
+  // yang tidak ada peta domainnya (404 di produksi), sementara console punya
+  // peta tapi tidak punya tombol.
+  ipcMain.handle('platform:getSitus', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { muatPetaDomain } = require('./server-statis.js');
+    const situs = muatPetaDomain(AVA_PLATFORM_PATH, console.log) || [];
+    return { port: PLATFORM_PORT, situs };
+  });
 
   ipcMain.handle('db:getTables', async () => {
     if (!pg) return [];
@@ -178,7 +195,7 @@ function registerIpc() {
 async function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1400, height: 900, minWidth: 1024, minHeight: 650,
-    title: 'OneLab Desktop Platform',
+    title: 'AVA Desktop Platform',
     titleBarStyle: 'hidden',
     titleBarOverlay: { color: '#0f172a', symbolColor: '#94a3b8', height: 38 },
     webPreferences: {
@@ -190,15 +207,19 @@ async function createWindow() {
   mainWindow.once('ready-to-show', () => mainWindow?.show());
 
   // Tab awal dipilih lewat argumen: --view=app | tableEditor | sql
-  // Dipakai ONELAB.bat agar satu exe melayani beberapa pintu masuk menu.
+  // Dipakai AVAPLATFORM.bat agar satu exe melayani beberapa pintu masuk menu.
   const viewArg = process.argv.find(a => a.startsWith('--view='));
   const view = viewArg ? viewArg.split('=')[1] : '';
   const query = view ? `?view=${encodeURIComponent(view)}` : '';
 
-  const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
-  if (isDev) await mainWindow.loadURL(`http://localhost:5173/${query}`);
-  else await mainWindow.loadFile(path.join(__dirname, '../dist/index.html'),
-                                 view ? { search: query } : undefined);
+  const distHtml = path.join(__dirname, '../dist/index.html');
+  if (process.env.VITE_DEV_SERVER_URL) {
+    await mainWindow.loadURL(`${process.env.VITE_DEV_SERVER_URL}/${query}`);
+  } else if (fs.existsSync(distHtml)) {
+    await mainWindow.loadFile(distHtml, view ? { search: query } : undefined);
+  } else {
+    await mainWindow.loadURL(`http://localhost:5173/${query}`);
+  }
 }
 
 // ── Pembaruan otomatis ──────────────────────────────────────────────────────
@@ -214,7 +235,7 @@ async function createWindow() {
 // termasuk saat ia akhirnya penting.
 function siapkanPembaruan(): void {
   if (!app.isPackaged) return;                     // build pengembangan
-  if (process.env.ONELAB_NO_UPDATE) return;        // bisa dimatikan di klinik
+  if (process.env.AVA_NO_UPDATE) return;        // bisa dimatikan di klinik
 
   let autoUpdater: any;
   try {
@@ -245,17 +266,17 @@ function siapkanPembaruan(): void {
 }
 
 app.whenReady().then(async () => {
-  if (!ONELAB_PLATFORM_PATH) {
-    console.error('[main] Folder platform OneLab tidak ditemukan. ' +
-      'Setel ONELAB_PLATFORM_PATH ke folder berisi index.html, atau jalankan lewat ONELAB.bat.');
+  if (!AVA_PLATFORM_PATH) {
+    console.error('[main] Folder platform AVA tidak ditemukan. ' +
+      'Setel AVA_PLATFORM_PATH ke folder berisi index.html, atau jalankan lewat AVAPLATFORM.bat.');
   }
-  console.log(`[main] platform: ${ONELAB_PLATFORM_PATH || '(tidak ketemu)'}`);
+  console.log(`[main] platform: ${AVA_PLATFORM_PATH || '(tidak ketemu)'}`);
   console.log(`[main] data    : ${PGLITE_DATA_DIR}`);
   startLocalPlatformServer();
   registerIpc();
   try {
     const eng = await createEngine({
-      platformDir: ONELAB_PLATFORM_PATH, dataDir: PGLITE_DATA_DIR,
+      platformDir: AVA_PLATFORM_PATH, dataDir: PGLITE_DATA_DIR,
       port: ENGINE_PORT, log: console.log,
       // Pada instalasi yang dikirim ke klien, migrasi yang hilang berarti
       // paketnya cacat — dan basis data yang terbentuk akan separuh jadi.
@@ -270,7 +291,7 @@ app.whenReady().then(async () => {
     // bukan datanya — dan bahwa memakainya justru berbahaya.
     if (app.isPackaged && /Paket instalasi cacat/.test(String(err && err.message))) {
       const { dialog } = require('electron');
-      dialog.showErrorBox('Instalasi OneLab tidak lengkap',
+      dialog.showErrorBox('Instalasi AVA tidak lengkap',
         String(err.message) +
         '\n\nAplikasi ditutup untuk mencegah basis data terbentuk separuh jadi.');
       app.quit();

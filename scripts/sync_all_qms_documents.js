@@ -153,7 +153,7 @@ ON CONFLICT (doc_number) DO UPDATE SET
   console.log(`✅ Saved SQL Seed: ${outSqlPath}\n`);
 
   console.log('[4/4] Mengintegrasikan langsung ke modules/agentic/index.js...');
-  const indexJsPath = path.join(__dirname, '../onelab-platform-main/onelab-platform/modules/agentic/index.js');
+  const indexJsPath = path.join(__dirname, '../ava-platform/modules/agentic/index.js');
   if (fs.existsSync(indexJsPath)) {
     let indexContent = fs.readFileSync(indexJsPath, 'utf-8');
     const newRegistrySnippet = `window.agRegistry = window.agRegistry && window.agRegistry.length > 50 ? window.agRegistry : ${JSON.stringify(registryItems, null, 2)};`;

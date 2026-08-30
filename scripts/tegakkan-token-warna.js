@@ -23,7 +23,7 @@
 // ═══════════════════════════════════════════════════════════════
 const fs = require('fs'), path = require('path');
 
-const AKAR = path.resolve(__dirname, '..', 'onelab-platform-main', 'onelab-platform');
+const AKAR = path.resolve(__dirname, '..', 'ava-platform');
 const HANYA_UJI = process.argv.includes('--uji');
 
 // Heksa 3-digit dinormalkan ke 6-digit agar #fff dan #ffffff dianggap sama.

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // ═══════════════════════════════════════════════════════════════
-// Terbitkan berkas lisensi OneLab.
+// Terbitkan berkas lisensi AVA.
 //
 // Dijalankan OLEH PENJUAL, di komputer penjual. Tidak pernah ikut dikirim
 // ke klien — ia butuh kunci privat, dan siapa pun yang memegang kunci itu

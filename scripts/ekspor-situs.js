@@ -37,7 +37,7 @@ const path = require('path');
 const crypto = require('crypto');
 
 const AKAR = path.resolve(__dirname, '..');
-const PLATFORM = path.join(AKAR, 'onelab-platform-main', 'onelab-platform');
+const PLATFORM = path.join(AKAR, 'ava-platform');
 const PETA = path.join(AKAR, 'config', 'domain.json');
 
 function arg(nama, bawaan = null) {
@@ -138,7 +138,7 @@ function readmeSitus(s, berkas, bersama) {
   return `# ${s.nama}
 
 Folder ini **dibangkitkan** oleh \`scripts/ekspor-situs.js\` dari repo induk
-OneLab. Jangan menyunting isinya langsung — suntingan akan hilang pada ekspor
+AVA. Jangan menyunting isinya langsung — suntingan akan hilang pada ekspor
 berikutnya. Ubah sumbernya di repo induk, lalu ekspor ulang.
 
 ## Isi

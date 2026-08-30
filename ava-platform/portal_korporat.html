@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Klien Korporat — AVA GLOBAL</title>
+<!-- Halaman ini dibuka pihak LUAR (PIC perusahaan klien), bukan staf klinik.
+     Karena itu berdiri sendiri: tidak memuat modul operasional apa pun, dan
+     satu-satunya jalan ke data adalah endpoint portal bertoken.
+
+     Tidak ada kunci, id perusahaan, atau kredensial apa pun di berkas ini.
+     Cakupan data sepenuhnya ditentukan server dari token — lihat
+     db/migrations/0028_portal_korporat_kelola_karyawan.sql. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F1F5F9; --surface:#FFFFFF; --surface2:#F8FAFC; --line:#E2E8F0; --line2:#CBD5E1;
+    --text:#0F172A; --text2:#475569; --text3:#94A3B8;
+    --navy:#0B1F3A; --navy2:#16324F; --teal:#0E7C86; --teal2:#0B646D;
+    --gold:#D4AF37;
+    --ok:#15803D; --ok-bg:#DCFCE7; --warn:#B45309; --warn-bg:#FEF3C7;
+    --bad:#B91C1C; --bad-bg:#FEE2E2; --info:#1D4ED8; --info-bg:#DBEAFE;
+    --r:10px; --r-lg:16px;
+    --shadow:0 1px 2px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.05);
+    --shadow-lg:0 10px 40px rgba(15,23,42,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1220; --surface:#131C2E; --surface2:#0F1727; --line:#22304A; --line2:#31415F;
+      --text:#E8EEF7; --text2:#A9BAD1; --text3:#6D809B;
+      --navy:#0A1626; --navy2:#132340;
+      --ok:#4ADE80; --ok-bg:rgba(34,197,94,.14);
+      --warn:#FBBF24; --warn-bg:rgba(245,158,11,.14);
+      --bad:#F87171; --bad-bg:rgba(239,68,68,.14);
+      --info:#93C5FD; --info-bg:rgba(59,130,246,.16);
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 4px 18px rgba(0,0,0,.35);
+      --shadow-lg:0 12px 44px rgba(0,0,0,.55);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--text); line-height:1.55;
+    font-family:'Plus Jakarta Sans',system-ui,-apple-system,Segoe UI,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input,select,textarea{font:inherit;color:inherit}
+
+  /* ── Kepala halaman ───────────────────────────────────────── */
+  .bar{
+    background:linear-gradient(135deg,var(--navy),var(--navy2));
+    color:#fff; padding:18px 24px; box-shadow:var(--shadow);
+    display:flex; align-items:center; gap:16px; flex-wrap:wrap;
+  }
+  .bar-brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .bar-mark{
+    width:36px;height:36px;border-radius:10px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--gold),#B8912B);
+    display:grid;place-items:center;font-size:17px;
+    box-shadow:0 2px 10px rgba(212,175,55,.35);
+  }
+  .bar h1{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .bar .sub{font-size:11.5px;color:#9DB4D0;font-weight:500}
+  .bar-corp{margin-left:auto;text-align:right;min-width:0}
+  .bar-corp .nm{font-size:13.5px;font-weight:700;color:#fff}
+  .bar-corp .meta{font-size:11px;color:#9DB4D0}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;
+    background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.5);
+    color:#F5D77A;font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .chip.baca{background:rgba(148,163,184,.16);border-color:rgba(148,163,184,.45);color:#CBD5E1}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:22px 20px 48px}
+
+  /* ── Kartu angka ──────────────────────────────────────────── */
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:20px}
+  .kpi>div{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    padding:15px 17px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .kpi>div::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent,var(--teal))}
+  .kpi .l{font-size:10.5px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+  .kpi .v{font-size:23px;font-weight:800;margin-top:3px;letter-spacing:-.02em}
+  .kpi .n{font-size:11.5px;color:var(--text3);margin-top:1px}
+
+  /* ── Tab ──────────────────────────────────────────────────── */
+  .tabs{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px}
+  .tab{
+    background:transparent;border:1px solid transparent;color:var(--text2);
+    font-size:13px;font-weight:700;padding:9px 16px;border-radius:var(--r);
+    cursor:pointer;white-space:nowrap;transition:all .15s;
+  }
+  .tab:hover{background:var(--surface);color:var(--text)}
+  .tab.active{background:var(--surface);border-color:var(--line);color:var(--text);box-shadow:var(--shadow)}
+  .tab .cnt{
+    display:inline-block;margin-left:6px;background:var(--surface2);border:1px solid var(--line);
+    border-radius:999px;padding:0 7px;font-size:10.5px;font-weight:800;color:var(--text3);
+  }
+  .tab.active .cnt{background:var(--teal);border-color:var(--teal);color:#fff}
+
+  /* ── Kartu isi ────────────────────────────────────────────── */
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);
+  }
+  .card-h{
+    padding:14px 18px;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .card-h h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em}
+  .card-h .sp{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .pad{padding:16px 18px}
+
+  /* ── Tabel ────────────────────────────────────────────────── */
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
+  th{
+    text-align:left;color:var(--text3);font-weight:700;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.05em;padding:10px 16px;
+    background:var(--surface2);border-bottom:1px solid var(--line);white-space:nowrap;
+  }
+  td{padding:11px 16px;border-top:1px solid var(--line);vertical-align:middle}
+  tbody tr:hover{background:var(--surface2)}
+  td .nm{font-weight:700}
+  td .sm{font-size:11px;color:var(--text3)}
+
+  .badge{
+    display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;
+    border-radius:999px;background:var(--surface2);color:var(--text2);
+    border:1px solid var(--line);white-space:nowrap;
+  }
+  .badge.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+  .badge.warn{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+  .badge.bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+  .badge.info{background:var(--info-bg);color:var(--info);border-color:transparent}
+
+  /* ── Kontrol ──────────────────────────────────────────────── */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:8px 14px;border-radius:var(--r);font-size:12.5px;font-weight:700;
+    cursor:pointer;border:1px solid var(--line);background:var(--surface);
+    color:var(--text2);transition:all .15s;white-space:nowrap;
+  }
+  .btn:hover:not(:disabled){border-color:var(--line2);color:var(--text)}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .btn-teal{background:var(--teal);border-color:var(--teal);color:#fff}
+  .btn-teal:hover:not(:disabled){background:var(--teal2);border-color:var(--teal2);color:#fff}
+  .btn-navy{background:var(--navy);border-color:var(--navy);color:#fff}
+  .btn-navy:hover:not(:disabled){background:var(--navy2);border-color:var(--navy2);color:#fff}
+  .btn-sm{padding:5px 10px;font-size:11.5px;border-radius:8px}
+  .btn-bahaya:hover:not(:disabled){border-color:var(--bad);color:var(--bad)}
+
+  .inp,select.inp{
+    width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:var(--r);
+    background:var(--surface2);color:var(--text);font-size:13px;transition:border-color .15s;
+  }
+  .inp:focus{outline:none;border-color:var(--teal);background:var(--surface)}
+  select.inp{cursor:pointer}
+  .lbl{font-size:10.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px}
+  .grid{display:grid;gap:12px}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+
+  .sel-paket{
+    padding:5px 8px;border:1px solid var(--line);border-radius:8px;
+    background:var(--surface2);font-size:11.5px;font-weight:600;max-width:210px;cursor:pointer;
+  }
+  .sel-paket:focus{outline:none;border-color:var(--teal)}
+
+  /* ── Pemberitahuan ────────────────────────────────────────── */
+  .catatan{
+    padding:12px 18px;font-size:11.5px;color:var(--text2);line-height:1.6;
+    background:var(--surface2);border-top:1px solid var(--line);
+  }
+  .catatan b{color:var(--text)}
+  .peringatan{
+    display:flex;gap:11px;align-items:flex-start;padding:13px 16px;border-radius:var(--r);
+    background:var(--warn-bg);border:1px solid transparent;font-size:12.5px;
+    color:var(--warn);margin-bottom:16px;line-height:1.55;
+  }
+  .peringatan .ic{font-size:15px;line-height:1.2}
+
+  .kosong{padding:34px 20px;text-align:center;color:var(--text3);font-size:12.5px}
+  .kosong .ic{font-size:30px;opacity:.4;display:block;margin-bottom:8px}
+
+  /* ── Layar pesan penuh ────────────────────────────────────── */
+  .pesan{
+    max-width:440px;margin:14vh auto;text-align:center;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-lg);padding:36px 30px;box-shadow:var(--shadow-lg);
+  }
+  .pesan .ic{font-size:34px;display:block;margin-bottom:14px}
+  .pesan h2{font-size:16px;font-weight:800;margin-bottom:8px}
+  .pesan p{font-size:13px;color:var(--text3);line-height:1.65}
+  .spin{
+    width:26px;height:26px;border:2.5px solid var(--line);border-top-color:var(--teal);
+    border-radius:50%;animation:putar .7s linear infinite;margin:0 auto 14px;
+  }
+  @keyframes putar{to{transform:rotate(360deg)}}
+
+  /* ── Modal ────────────────────────────────────────────────── */
+  .tirai{
+    position:fixed;inset:0;background:rgba(2,6,23,.62);backdrop-filter:blur(3px);
+    display:none;place-items:center;padding:20px;z-index:60;
+  }
+  .tirai.buka{display:grid}
+  .modal{
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    width:100%;max-width:600px;max-height:88vh;overflow:auto;box-shadow:var(--shadow-lg);
+    animation:naik .18s ease;
+  }
+  @keyframes naik{from{opacity:0;transform:translateY(10px)}}
+  .modal-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center}
+  .modal-h h3{font-size:14.5px;font-weight:800}
+  .modal-h button{background:none;border:0;font-size:19px;color:var(--text3);cursor:pointer;margin-left:auto;line-height:1}
+  .modal-b{padding:20px}
+  .modal-f{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:9px;justify-content:flex-end;background:var(--surface2)}
+
+  /* ── Roti panggang ────────────────────────────────────────── */
+  #roti{position:fixed;right:18px;bottom:18px;z-index:90;display:flex;flex-direction:column;gap:8px}
+  .roti{
+    background:var(--navy);color:#fff;padding:11px 16px;border-radius:var(--r);
+    font-size:12.5px;font-weight:600;box-shadow:var(--shadow-lg);max-width:340px;
+    animation:naik .18s ease;
+  }
+  .roti.ok{background:var(--ok);color:#04220F}
+  .roti.err{background:var(--bad);color:#fff}
+
+  .kaki{text-align:center;font-size:11.5px;color:var(--text3);padding:6px 0 0;line-height:1.7}
+
+  @media(max-width:640px){
+    .bar{padding:14px 16px}
+    .bar-corp{margin-left:0;text-align:left;width:100%}
+    .wrap{padding:16px 14px 40px}
+    .kpi>div{padding:13px 15px}
+    .kpi .v{font-size:20px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-brand">
+    <div class="bar-mark">🏢</div>
+    <div>
+      <h1>AVA GLOBAL · Portal Klien Korporat</h1>
+      <div class="sub">Roster karyawan, kontrak MCU &amp; tagihan</div>
+    </div>
+  </div>
+  <div class="bar-corp" id="bar-corp"></div>
+</div>
+
+<div class="wrap" id="isi">
+  <div class="pesan"><div class="spin"></div><h2>Memuat</h2><p>Mengambil data perusahaan Anda.</p></div>
+</div>
+
+<div class="tirai" id="tirai"><div class="modal" id="modal"></div></div>
+<div id="roti"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// Endpoint dipilih sesuai tempat halaman ini dibuka: instalasi lokal
+// klinik atau Supabase cloud. Tidak ada kunci apa pun di halaman ini —
+// token dari tautan adalah satu-satunya kredensial, dan cakupannya
+// ditentukan server.
+//
+// TOKEN TIDAK PERNAH DITULIS KE localStorage. Halaman ini bisa dibuka
+// di komputer bersama di kantor klien; menyimpannya berarti orang
+// berikutnya yang memakai peramban itu ikut mendapat akses.
+// ═══════════════════════════════════════════════════════════════
+const LOKAL = ['127.0.0.1', 'localhost'].includes(location.hostname)
+           || location.hostname.endsWith('.localhost');
+const BASIS = LOKAL ? `${location.protocol}//${location.hostname}:54329`
+                    : 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+
+const TOKEN = new URLSearchParams(location.search).get('t') || '';
+
+const rp   = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
+const tgl  = (d) => d ? new Date(d).toLocaleDateString('id-ID', { day:'numeric', month:'short', year:'numeric' }) : '—';
+const esc  = (s) => String(s == null ? '' : s).replace(/[&<>"']/g,
+                    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const el   = (id) => document.getElementById(id);
+
+let D = null;            // muatan terakhir dari server
+let tabAktif = 'roster';
+let cariRoster = '';
+
+function roti(teks, jenis) {
+  const n = document.createElement('div');
+  n.className = 'roti ' + (jenis || '');
+  n.textContent = teks;
+  el('roti').appendChild(n);
+  setTimeout(() => n.remove(), 4200);
+}
+
+function pesan(ikon, judul, teks) {
+  el('isi').innerHTML =
+    `<div class="pesan"><span class="ic">${ikon}</span><h2>${esc(judul)}</h2><p>${esc(teks)}</p></div>`;
+}
+
+function tutupModal() { el('tirai').classList.remove('buka'); el('modal').innerHTML = ''; }
+el('tirai').addEventListener('click', (e) => { if (e.target.id === 'tirai') tutupModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') tutupModal(); });
+
+// ── Panggilan server ────────────────────────────────────────────
+async function baca() {
+  const res = await fetch(`${BASIS}/functions/v1/portal`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: TOKEN }),
+  });
+  return res.json();
+}
+
+async function tulis(aksi, muatan) {
+  const res = await fetch(`${BASIS}/functions/v1/portal/karyawan/${aksi}`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: TOKEN, ...muatan }),
+  });
+  return res.json();
+}
+
+// Setiap penulisan diikuti pembacaan ulang. Menebak keadaan baru di sisi
+// peramban lebih cepat, tapi kuota kontrak dan status dihitung server —
+// tebakan yang meleset akan tampil sebagai angka yang salah.
+async function segarkan() {
+  const d = await baca();
+  if (d && !d.error) { D = d; gambar(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TINDAKAN ROSTER
+// ═══════════════════════════════════════════════════════════════
+function formTambah() {
+  el('modal').innerHTML = `
+    <div class="modal-h"><h3>Tambah Karyawan</h3><button onclick="tutupModal()">✕</button></div>
+    <div class="modal-b">
+      <div class="grid g2" style="margin-bottom:12px">
+        <div><label class="lbl">Nama lengkap *</label><input class="inp" id="f-nama" placeholder="Nama sesuai KTP" autofocus></div>
+        <div><label class="lbl">NIK / ID karyawan</label><input class="inp" id="f-nik" placeholder="Opsional"></div>
+      </div>
+      <div class="grid g3" style="margin-bottom:12px">
+        <div><label class="lbl">Departemen</label><input class="inp" id="f-dept" placeholder="Opsional"></div>
+        <div><label class="lbl">Jenis kelamin</label>
+          <select class="inp" id="f-gender"><option value="">—</option><option value="M">Laki-laki</option><option value="F">Perempuan</option></select></div>
+        <div><label class="lbl">Tanggal lahir</label><input class="inp" id="f-lahir" type="date"></div>
+      </div>
+      <div class="grid g2">
+        <div><label class="lbl">Telepon</label><input class="inp" id="f-telepon" placeholder="Opsional"></div>
+        <div><label class="lbl">Surel</label><input class="inp" id="f-surel" type="email" placeholder="Opsional"></div>
+      </div>
+      <p style="font-size:11.5px;color:var(--text3);margin-top:14px;line-height:1.6">
+        Karyawan baru masuk sebagai <b>belum dijadwalkan</b>. Setelah paket MCU
+        ditetapkan, tim AVA GLOBAL yang mengatur jadwal pemeriksaannya.
+      </p>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="tutupModal()">Batal</button>
+      <button class="btn btn-teal" id="f-simpan" onclick="simpanTambah()">Simpan Karyawan</button>
+    </div>`;
+  el('tirai').classList.add('buka');
+  setTimeout(() => el('f-nama')?.focus(), 60);
+}
+
+async function simpanTambah() {
+  const nama = el('f-nama').value.trim();
+  if (nama.length < 2) { roti('Nama karyawan wajib diisi.', 'err'); el('f-nama').focus(); return; }
+
+  const tbl = el('f-simpan');
+  tbl.disabled = true; tbl.textContent = 'Menyimpan…';
+  const r = await tulis('tambah', {
+    nama, nik: el('f-nik').value.trim(), departemen: el('f-dept').value.trim(),
+    gender: el('f-gender').value, lahir: el('f-lahir').value || null,
+    telepon: el('f-telepon').value.trim(), surel: el('f-surel').value.trim(),
+  });
+  tbl.disabled = false; tbl.textContent = 'Simpan Karyawan';
+
+  if (r.error) { roti(r.error, 'err'); return; }
+  tutupModal(); roti(`${nama} ditambahkan ke roster.`, 'ok');
+  await segarkan();
+}
+
+function formImpor() {
+  el('modal').innerHTML = `
+    <div class="modal-h"><h3>Impor Roster dari Excel</h3><button onclick="tutupModal()">✕</button></div>
+    <div class="modal-b">
+      <p style="font-size:12.5px;color:var(--text2);margin-bottom:12px;line-height:1.6">
+        Salin kolom dari Excel lalu tempel di bawah. Satu baris satu karyawan,
+        antar kolom dipisah <b>Tab</b> (hasil salin Excel sudah begitu) atau
+        tanda titik koma.
+      </p>
+      <div style="background:var(--surface2);border:1px solid var(--line);border-radius:var(--r);
+                  padding:11px 13px;font-size:11.5px;color:var(--text3);margin-bottom:12px;
+                  font-family:ui-monospace,monospace;line-height:1.7;overflow-x:auto;white-space:pre">Nama	NIK	Departemen	L/P	Telepon	Surel
+Budi Santoso	EMP-001	Produksi	M	08123456789	budi@contoh.co.id</div>
+      <textarea class="inp" id="f-tempel" rows="9" placeholder="Tempel di sini (Ctrl+V)…"
+        style="font-family:ui-monospace,monospace;font-size:12px;resize:vertical"></textarea>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:11px;font-size:12.5px;color:var(--text2);cursor:pointer">
+        <input type="checkbox" id="f-judul" checked style="width:15px;height:15px;cursor:pointer">
+        Baris pertama adalah judul kolom, lewati
+      </label>
+    </div>
+    <div class="modal-f">
+      <button class="btn" onclick="tutupModal()">Batal</button>
+      <button class="btn btn-teal" id="f-impor" onclick="jalankanImpor()">Impor</button>
+    </div>`;
+  el('tirai').classList.add('buka');
+  setTimeout(() => el('f-tempel')?.focus(), 60);
+}
+
+// Pemisah kolom dideteksi, bukan diasumsikan. Salin dari Excel menghasilkan
+// Tab; orang yang mengetik manual hampir selalu memakai titik koma atau koma.
+function belahBaris(baris) {
+  if (baris.includes('\t')) return baris.split('\t');
+  if (baris.includes(';'))  return baris.split(';');
+  return baris.split(',');
+}
+
+async function jalankanImpor() {
+  const mentah = el('f-tempel').value.split(/\r?\n/).filter(b => b.trim());
+  if (!mentah.length) { roti('Belum ada data yang ditempel.', 'err'); return; }
+  if (el('f-judul').checked) mentah.shift();
+  if (!mentah.length) { roti('Tidak ada baris data setelah judul dilewati.', 'err'); return; }
+  if (mentah.length > 1000) { roti('Maksimal 1.000 baris sekali impor.', 'err'); return; }
+
+  const baris = mentah.map(b => {
+    const k = belahBaris(b).map(x => x.trim());
+    return { nama:k[0]||'', nik:k[1]||'', departemen:k[2]||'', gender:k[3]||'', telepon:k[4]||'', surel:k[5]||'' };
+  });
+
+  const tbl = el('f-impor');
+  tbl.disabled = true; tbl.textContent = 'Mengimpor…';
+  const r = await tulis('impor', { baris });
+  tbl.disabled = false; tbl.textContent = 'Impor';
+
+  if (r.error) { roti(r.error, 'err'); return; }
+  tutupModal();
+
+  const lewat = r.dilewati || [];
+  roti(`${r.masuk} karyawan masuk${lewat.length ? `, ${lewat.length} dilewati` : ''}.`,
+       r.masuk ? 'ok' : 'err');
+
+  // Baris yang gagal ditampilkan, bukan dibuang diam-diam — PIC perlu tahu
+  // persis siapa yang belum masuk agar rosternya tidak diam-diam kurang.
+  if (lewat.length) {
+    el('modal').innerHTML = `
+      <div class="modal-h"><h3>${lewat.length} baris dilewati</h3><button onclick="tutupModal()">✕</button></div>
+      <div class="modal-b">
+        <p style="font-size:12.5px;color:var(--text2);margin-bottom:12px">
+          Sisanya (${r.masuk}) berhasil masuk. Perbaiki baris berikut lalu impor ulang bagian ini saja.</p>
+        <div class="scroll"><table style="min-width:auto">
+          <thead><tr><th>Baris</th><th>Nama</th><th>Sebab</th></tr></thead>
+          <tbody>${lewat.map(x => `<tr><td>${esc(x.baris)}</td><td>${esc(x.nama) || '—'}</td>
+            <td><span class="badge warn">${esc(x.sebab)}</span></td></tr>`).join('')}</tbody>
+        </table></div>
+      </div>
+      <div class="modal-f"><button class="btn btn-navy" onclick="tutupModal()">Mengerti</button></div>`;
+    el('tirai').classList.add('buka');
+  }
+  await segarkan();
+}
+
+async function assignPaket(id, nilai, sel) {
+  const asal = sel.dataset.asal || '';
+  sel.disabled = true;
+  const r = await tulis('assign', { id, paket: nilai ? Number(nilai) : null });
+  sel.disabled = false;
+
+  if (r.error) {
+    roti(r.error, 'err');
+    sel.value = asal;                 // kembalikan ke pilihan sebelumnya
+    return;
+  }
+  roti(nilai ? `Paket ditetapkan: ${r.paket}` : 'Paket dilepas.', 'ok');
+  await segarkan();
+}
+
+async function nonaktifkan(id, nama) {
+  if (!confirm(`Keluarkan ${nama} dari roster?\n\nRiwayat pemeriksaannya tetap tersimpan; ia hanya tidak lagi ikut proyek MCU berjalan.`)) return;
+  const r = await tulis('nonaktif', { id });
+  if (r.error) { roti(r.error, 'err'); return; }
+  roti(`${nama} dikeluarkan dari roster.`, 'ok');
+  await segarkan();
+}
+
+function cari(v) {
+  cariRoster = v.toLowerCase();
+  el('roster-body').innerHTML = barisRoster();
+}
+
+function gantiTab(t) { tabAktif = t; gambar(); }
+
+// ═══════════════════════════════════════════════════════════════
+// PENGGAMBARAN
+// ═══════════════════════════════════════════════════════════════
+function statusBadge(s) {
+  const peta = { 'Aktif':'ok', 'Non-Aktif':'warn', 'Keluar':'bad' };
+  const teks = s === 'Non-Aktif' ? 'Belum dijadwalkan' : (s || '—');
+  return `<span class="badge ${peta[s] || ''}">${esc(teks)}</span>`;
+}
+
+function barisRoster() {
+  const tulisBoleh = !!D.boleh_tulis;
+  const paket = D.paket_tersedia || [];
+  let daftar = D.karyawan || [];
+
+  if (cariRoster) {
+    daftar = daftar.filter(k =>
+      [k.nama, k.nik, k.departemen, k.paket].some(x => String(x || '').toLowerCase().includes(cariRoster)));
+  }
+
+  if (!daftar.length) {
+    return `<tr><td colspan="${tulisBoleh ? 5 : 4}"><div class="kosong"><span class="ic">👥</span>
+      ${cariRoster ? 'Tidak ada karyawan yang cocok dengan pencarian.'
+                   : 'Roster masih kosong. Tambahkan karyawan atau impor dari Excel.'}</div></td></tr>`;
+  }
+
+  return daftar.map(k => `
+    <tr>
+      <td><div class="nm">${esc(k.nama)}</div>
+          <div class="sm">${esc(k.nik || 'Tanpa NIK')}${k.gender ? ' · ' + (k.gender === 'M' ? 'L' : 'P') : ''}</div></td>
+      <td>${esc(k.departemen || '—')}</td>
+      <td>${tulisBoleh
+            ? `<select class="sel-paket" data-asal="${k.paket_id || ''}"
+                       onchange="assignPaket(${k.id}, this.value, this)">
+                 <option value="">— belum ditetapkan —</option>
+                 ${paket.map(p => `<option value="${p.id}" ${String(p.id) === String(k.paket_id) ? 'selected' : ''}>
+                   ${esc(p.nama)}</option>`).join('')}
+               </select>`
+            : esc(k.paket || '—')}</td>
+      <td>${statusBadge(k.status)}</td>
+      ${tulisBoleh ? `<td style="text-align:right"><button class="btn btn-sm btn-bahaya"
+            onclick="nonaktifkan(${k.id}, ${JSON.stringify(k.nama)})">Keluarkan</button></td>` : ''}
+    </tr>`).join('');
+}
+
+function panelRoster() {
+  const tulisBoleh = !!D.boleh_tulis;
+  return `
+    ${tulisBoleh ? '' : `<div class="peringatan"><span class="ic">🔒</span><div>
+      <b>Tautan ini bersifat hanya-baca.</b> Anda dapat melihat roster dan status
+      pemeriksaan, tetapi tidak dapat menambah atau mengubah karyawan. Hubungi
+      tim AVA GLOBAL bila perusahaan Anda ingin mengelola rosternya sendiri.</div></div>`}
+
+    <div class="card">
+      <div class="card-h">
+        <h2>Roster Karyawan</h2>
+        <div class="sp">
+          <input class="inp" style="width:200px;padding:7px 11px;font-size:12.5px"
+                 placeholder="Cari nama, NIK, departemen…" oninput="cari(this.value)">
+          ${tulisBoleh ? `<button class="btn" onclick="formImpor()">Impor Excel</button>
+                          <button class="btn btn-teal" onclick="formTambah()">+ Tambah Karyawan</button>` : ''}
+        </div>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Karyawan</th><th>Departemen</th><th>Paket MCU</th><th>Status</th>
+            ${tulisBoleh ? '<th style="text-align:right">Aksi</th>' : ''}</tr></thead>
+          <tbody id="roster-body">${barisRoster()}</tbody>
+        </table>
+      </div>
+      <div class="catatan">
+        Portal ini mengelola <b>identitas dan penugasan paket</b> karyawan Anda.
+        Hasil pemeriksaan kesehatan <b>tidak ditampilkan di sini</b> — hasil bersifat
+        rahasia dan hanya diserahkan kepada karyawan yang bersangkutan sesuai
+        UU No. 27/2022 tentang Perlindungan Data Pribadi.
+      </div>
+    </div>`;
+}
+
+function panelKontrak() {
+  const kontrak = D.kontrak || [];
+  if (!kontrak.length) {
+    return `<div class="card"><div class="card-h"><h2>Kontrak</h2></div>
+      <div class="kosong"><span class="ic">📜</span>Belum ada kontrak tercatat.</div></div>`;
+  }
+  return `<div class="card"><div class="card-h"><h2>Kontrak &amp; Kuota MCU</h2></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Nomor</th><th>Jenis</th><th>Periode</th><th>Kuota terpakai</th><th>Nilai</th><th>Status</th></tr></thead>
+      <tbody>${kontrak.map(k => {
+        const kuota = Number(k.kuota || 0), pakai = Number(k.terpakai || 0);
+        const persen = kuota ? Math.min(100, Math.round(pakai / kuota * 100)) : 0;
+        return `<tr>
+          <td><div class="nm">${esc(k.nomor)}</div></td>
+          <td>${esc(k.jenis || '—')}</td>
+          <td class="sm">${tgl(k.mulai)} – ${tgl(k.selesai)}</td>
+          <td style="min-width:150px">
+            <div style="font-weight:700;font-size:12px">${pakai}${kuota ? ' / ' + kuota : ''}</div>
+            ${kuota ? `<div style="height:5px;background:var(--line);border-radius:99px;margin-top:5px;overflow:hidden">
+              <div style="height:100%;width:${persen}%;border-radius:99px;
+                background:${persen >= 90 ? 'var(--bad)' : persen >= 70 ? 'var(--warn)' : 'var(--teal)'}"></div></div>` : ''}
+          </td>
+          <td>${rp(k.nilai)}</td>
+          <td><span class="badge ${k.status === 'Active' ? 'ok' : ''}">${esc(k.status || '—')}</span></td>
+        </tr>`; }).join('')}</tbody>
+    </table></div></div>`;
+}
+
+function panelPemeriksaan() {
+  const periksa = D.pemeriksaan || [];
+  if (!periksa.length) {
+    return `<div class="card"><div class="card-h"><h2>Pemeriksaan</h2></div>
+      <div class="kosong"><span class="ic">🩺</span>Belum ada pemeriksaan tercatat.</div></div>`;
+  }
+  return `<div class="card"><div class="card-h"><h2>Riwayat Pemeriksaan Karyawan</h2></div>
+    <div class="scroll" style="max-height:520px"><table>
+      <thead><tr><th>Tanggal</th><th>Nama</th><th>Departemen</th><th>Paket</th><th>Status</th></tr></thead>
+      <tbody>${periksa.map(x => `<tr>
+        <td class="sm">${tgl(x.tanggal)}</td>
+        <td><div class="nm">${esc(x.nama)}</div>${x.batch ? `<div class="sm">${esc(x.batch)}</div>` : ''}</td>
+        <td>${esc(x.departemen || '—')}</td>
+        <td>${esc(x.paket || '—')}</td>
+        <td>${statusBadge(x.status)}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <div class="catatan">
+      Kolom status menunjukkan <b>tahap proses</b>, bukan kondisi kesehatan.
+      Hasil pemeriksaan tidak dapat diakses melalui portal perusahaan.
+    </div></div>`;
+}
+
+function panelTagihan() {
+  const tagihan = D.tagihan || [];
+  if (!tagihan.length) {
+    return `<div class="card"><div class="card-h"><h2>Tagihan</h2></div>
+      <div class="kosong"><span class="ic">🧾</span>Belum ada tagihan.</div></div>`;
+  }
+  return `<div class="card"><div class="card-h"><h2>Tagihan &amp; Faktur</h2></div>
+    <div class="scroll"><table>
+      <thead><tr><th>Nomor</th><th>Tanggal</th><th>Jatuh tempo</th><th>Nilai</th><th>Status</th></tr></thead>
+      <tbody>${tagihan.map(t => {
+        const lunas = ['Dibayar','Dibatalkan'].includes(t.status || '');
+        const lewat = t.jatuh_tempo && new Date(t.jatuh_tempo) < new Date() && !lunas;
+        return `<tr>
+          <td><div class="nm">${esc(t.nomor)}</div></td>
+          <td class="sm">${tgl(t.tanggal)}</td>
+          <td class="sm" style="color:${lewat ? 'var(--bad)' : 'inherit'};font-weight:${lewat ? 700 : 400}">
+            ${tgl(t.jatuh_tempo)}${lewat ? ' · lewat tempo' : ''}</td>
+          <td style="font-weight:700">${rp(t.nilai)}</td>
+          <td><span class="badge ${lunas ? 'ok' : lewat ? 'bad' : 'warn'}">${esc(t.status || '—')}</span></td>
+        </tr>`; }).join('')}</tbody>
+    </table></div></div>`;
+}
+
+function gambar() {
+  const p = D.perusahaan || {};
+  const kar = D.karyawan_ringkas || {};
+  const kontrakAktif = (D.kontrak || []).filter(k => (k.status || '') === 'Active');
+  const kuota = kontrakAktif.reduce((s, k) => s + Number(k.kuota || 0), 0);
+  const belumLunas = (D.tagihan || []).filter(t => !['Dibayar','Dibatalkan'].includes(t.status || ''));
+  const nilaiBelum = belumLunas.reduce((s, t) => s + Number(t.nilai || 0), 0);
+
+  el('bar-corp').innerHTML = `
+    <span class="chip ${D.boleh_tulis ? '' : 'baca'}">${D.boleh_tulis ? 'Kelola Roster' : 'Hanya Baca'}</span>
+    <div class="nm">${esc(p.nama || '—')}</div>
+    <div class="meta">${esc(p.pic ? 'PIC: ' + p.pic : '')}${p.kode ? ' · ' + esc(p.kode) : ''}</div>`;
+
+  const tabs = [
+    ['roster',     'Roster Karyawan', (D.karyawan || []).length],
+    ['kontrak',    'Kontrak',         (D.kontrak || []).length],
+    ['pemeriksaan','Pemeriksaan',     (D.pemeriksaan || []).length],
+    ['tagihan',    'Tagihan',         (D.tagihan || []).length],
+  ];
+
+  el('isi').innerHTML = `
+    <div class="kpi">
+      <div style="--accent:var(--info)">
+        <div class="l">Karyawan terdaftar</div><div class="v">${kar.total || 0}</div>
+        <div class="n">${kar.belum || 0} belum dijadwalkan</div></div>
+      <div style="--accent:var(--teal)">
+        <div class="l">Paket MCU ditetapkan</div>
+        <div class="v">${kar.aktif || 0}${kuota ? ' / ' + kuota : ''}</div>
+        <div class="n">${kuota ? `sisa kuota ${Math.max(0, kuota - (kar.aktif || 0))}` : 'kuota kontrak belum diatur'}</div></div>
+      <div style="--accent:var(--gold)">
+        <div class="l">Pemeriksaan tercatat</div><div class="v">${(D.pemeriksaan || []).length}</div>
+        <div class="n">${kontrakAktif.length} kontrak aktif</div></div>
+      <div style="--accent:${belumLunas.length ? 'var(--bad)' : 'var(--ok)'}">
+        <div class="l">Tagihan belum lunas</div>
+        <div class="v" style="font-size:${nilaiBelum > 0 ? '19px' : '23px'};color:${belumLunas.length ? 'var(--bad)' : 'var(--ok)'}">${rp(nilaiBelum)}</div>
+        <div class="n">${belumLunas.length ? belumLunas.length + ' faktur terbuka' : 'seluruh tagihan lunas'}</div></div>
+    </div>
+
+    <div class="tabs">
+      ${tabs.map(([id, label, n]) => `<button class="tab ${tabAktif === id ? 'active' : ''}"
+        onclick="gantiTab('${id}')">${label}<span class="cnt">${n}</span></button>`).join('')}
+    </div>
+
+    ${tabAktif === 'roster' ? panelRoster()
+    : tabAktif === 'kontrak' ? panelKontrak()
+    : tabAktif === 'pemeriksaan' ? panelPemeriksaan()
+    : panelTagihan()}
+
+    <div class="kaki">
+      Akses portal ini${D.berlaku_sampai ? ' berlaku sampai <b>' + tgl(D.berlaku_sampai) + '</b>' : ''}.
+      Jangan bagikan tautan ini — siapa pun yang memilikinya dapat melihat halaman ini.
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+(async () => {
+  if (!TOKEN) {
+    pesan('🔗', 'Tautan tidak lengkap',
+          'Buka portal melalui tautan yang dikirimkan AVA GLOBAL kepada Anda.');
+    return;
+  }
+
+  let d;
+  try {
+    d = await baca();
+  } catch (e) {
+    pesan('📡', 'Tidak dapat terhubung',
+          'Periksa sambungan internet Anda, lalu muat ulang halaman ini.');
+    return;
+  }
+
+  if (!d || d.error) {
+    pesan('🔒', 'Tautan tidak berlaku', (d && d.error) || 'Silakan hubungi AVA GLOBAL.');
+    return;
+  }
+
+  D = d;
+  gambar();
+})();
+</script>
+</body>
+</html>

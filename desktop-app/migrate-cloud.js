@@ -12,8 +12,8 @@ const { createEngine } = require('./electron/local-engine.js');
 const CLOUD_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
 const CLOUD_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
 // Diturunkan dari lokasi berkas ini — jangan tulis path absolut.
-const PLATFORM = process.env.ONELAB_PLATFORM_PATH ||
-  path.resolve(__dirname, '..', 'onelab-platform-main', 'onelab-platform');
+const PLATFORM = process.env.AVA_PLATFORM_PATH ||
+  path.resolve(__dirname, '..', 'ava-platform');
 const DATA_DIR = path.join(__dirname, 'pglite-data');
 const LOG = path.join(__dirname, 'migrate-progress.log');
 const PAGE = 1000;

@@ -1,0 +1,942 @@
+// ═══════════════════════════════════════════════════════════════
+// DIBANGKITKAN OTOMATIS — jangan disunting tangan.
+// Sumber: scripts/bangun-manifest.js  (jalankan ulang bila menu/route berubah)
+//
+// Peta halaman → berkas modul untuk pemuatan saat dibutuhkan.
+// Sebelumnya 82 berkas modul (3,1 MB) dimuat pada SETIAP kali aplikasi
+// dibuka, bahkan ketika pengguna hanya melihat Dashboard.
+// ═══════════════════════════════════════════════════════════════
+window.MODUL_HALAMAN = {
+ "partners": [
+  "modules/partners/index.js",
+  "modules/partners/deals.js"
+ ],
+ "maps": [
+  "modules/maps/index.js"
+ ],
+ "marketing": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "voucher": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "surat": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "mou": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "test-reviewer": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "leads": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "okr": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "mcu": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "avahealth": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-consult": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-devices": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-calibration": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-marketplace": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-caregiver": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-corporate": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "ava-portals": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "finance": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "inventory": [
+  "modules/logistics/assets.js",
+  "modules/logistics/catalog_export.js",
+  "modules/logistics/inventory.js"
+ ],
+ "hrd": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "work-schedule": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "shift-calendar": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "tasks": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "wiki": [
+  "modules/wiki/index.js",
+  "modules/wiki/sop.js",
+  "modules/wiki/fix.js",
+  "modules/wiki/studio.js"
+ ],
+ "agentic": [
+  "modules/agentic/mcp.js",
+  "modules/agentic/orchestrator.js",
+  "modules/agentic/clinical_agent.js",
+  "modules/agentic/index.js",
+  "modules/agentic/inbox.js",
+  "modules/agentic/docs.js",
+  "modules/agentic/overlap.js",
+  "modules/agentic/aieditor.js",
+  "modules/agentic/rag.js",
+  "modules/agentic/docxfill.js",
+  "modules/agentic/studio.js",
+  "modules/agentic/render.js",
+  "modules/agentic/org.js",
+  "modules/agentic/canvas.js"
+ ],
+ "ar-aging": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "lab-tat": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js"
+ ],
+ "penawaran": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "ops-kendali": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "sales-corong": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "portal-akses": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "perujuk": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "lisensi": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "hc-schedule": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "hc-staff": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "hc-tariff": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "hc-billing": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "hc-report": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "attendance": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "org-structure": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "regulatory": [
+  "modules/compliance/audit.js",
+  "modules/compliance/bpjs_claim.js",
+  "modules/compliance/compliance_tracker.js",
+  "modules/compliance/import_excel.js",
+  "modules/compliance/regulatory_reports.js",
+  "modules/compliance/rl_reports.js",
+  "modules/compliance/satusehat.js",
+  "modules/compliance/catalog_exporter.js"
+ ],
+ "audit": [
+  "modules/compliance/audit.js",
+  "modules/compliance/bpjs_claim.js",
+  "modules/compliance/compliance_tracker.js",
+  "modules/compliance/import_excel.js",
+  "modules/compliance/regulatory_reports.js",
+  "modules/compliance/rl_reports.js",
+  "modules/compliance/satusehat.js",
+  "modules/compliance/catalog_exporter.js"
+ ],
+ "campaigns": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "rl-reports": [
+  "modules/compliance/audit.js",
+  "modules/compliance/bpjs_claim.js",
+  "modules/compliance/compliance_tracker.js",
+  "modules/compliance/import_excel.js",
+  "modules/compliance/regulatory_reports.js",
+  "modules/compliance/rl_reports.js",
+  "modules/compliance/satusehat.js",
+  "modules/compliance/catalog_exporter.js"
+ ],
+ "homecare": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "admission": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "lab": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js"
+ ],
+ "product": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js"
+ ],
+ "config": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "refrange": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js"
+ ],
+ "labreport": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "corporate": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js"
+ ],
+ "radiology": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js"
+ ],
+ "supportive": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "spirometry": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "medrecord": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "inpatient": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "farmasi": [
+  "modules/pharmacy/farmasi_eprescription.js",
+  "modules/pharmacy/pharmacy.js"
+ ],
+ "emr-soap": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "subscription": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "sanctuary-booking": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "holding-finance": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "ecommerce-oms": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "bpjs-claim": [
+  "modules/compliance/audit.js",
+  "modules/compliance/bpjs_claim.js",
+  "modules/compliance/compliance_tracker.js",
+  "modules/compliance/import_excel.js",
+  "modules/compliance/regulatory_reports.js",
+  "modules/compliance/rl_reports.js",
+  "modules/compliance/satusehat.js",
+  "modules/compliance/catalog_exporter.js"
+ ],
+ "compliance-tracker": [
+  "modules/compliance/audit.js",
+  "modules/compliance/bpjs_claim.js",
+  "modules/compliance/compliance_tracker.js",
+  "modules/compliance/import_excel.js",
+  "modules/compliance/regulatory_reports.js",
+  "modules/compliance/rl_reports.js",
+  "modules/compliance/satusehat.js",
+  "modules/compliance/catalog_exporter.js"
+ ],
+ "pacs-viewer": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js"
+ ],
+ "catalog-export": [
+  "modules/logistics/assets.js",
+  "modules/logistics/catalog_export.js",
+  "modules/logistics/inventory.js"
+ ],
+ "crm-pipeline": [
+  "modules/crm/crm_pipeline.js",
+  "modules/crm/leads.js",
+  "modules/crm/marketing.js",
+  "modules/crm/perujuk.js",
+  "modules/crm/quotation.js",
+  "modules/crm/sales_corong.js",
+  "modules/crm/voucher.js"
+ ],
+ "queue": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "queue-kiosk": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "appointments": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "cashier": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "accounting": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "payables": [
+  "modules/finance/accounting.js",
+  "modules/finance/cashier.js",
+  "modules/finance/finance.js",
+  "modules/finance/finance_aging.js",
+  "modules/finance/holding_finance.js",
+  "modules/finance/payables.js",
+  "modules/finance/subscription.js"
+ ],
+ "assets": [
+  "modules/logistics/assets.js",
+  "modules/logistics/catalog_export.js",
+  "modules/logistics/inventory.js"
+ ],
+ "referral": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js"
+ ],
+ "payroll": [
+  "modules/hrd/attendance.js",
+  "modules/hrd/hrd.js",
+  "modules/hrd/org_structure.js",
+  "modules/hrd/payroll.js",
+  "modules/hrd/task_management.js",
+  "modules/hrd/work_schedule.js"
+ ],
+ "package": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js"
+ ],
+ "family": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js"
+ ],
+ "anamnesa": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js"
+ ],
+ "import": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "settings": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ],
+ "saas-console": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "tenants": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js"
+ ],
+ "db-studio": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/db_studio.js",
+  "modules/system/lisensi.js",
+  "modules/system/ops_kendali.js",
+  "modules/system/portal_akses.js",
+  "modules/system/settings.js",
+  "modules/system/supportive.js",
+  "modules/system/surat.js",
+  "modules/system/test_reviewer.js",
+  "modules/system/timeline.js"
+ ]
+};
+
+// Semua modul yang dapat ditunda — dipakai sebagai jaring pengaman bila
+// sebuah halaman memanggil fungsi milik modul lain yang belum termuat.
+window.MODUL_SEMUA = [
+ "modules/partners/index.js",
+ "modules/partners/deals.js",
+ "modules/maps/index.js",
+ "modules/lab/qcEngine.js",
+ "modules/radiology/dicomViewer.js",
+ "modules/lab/index.js",
+ "modules/lab/checkin.js",
+ "modules/lab/worklist.js",
+ "modules/lab/results.js",
+ "modules/lab/validation.js",
+ "modules/lab/impression.js",
+ "modules/lab/report.js",
+ "modules/lab/qc.js",
+ "modules/lab/autoverify.js",
+ "modules/lab/integration.js",
+ "modules/lab/parser_config.js",
+ "modules/wiki/index.js",
+ "modules/wiki/sop.js",
+ "modules/wiki/fix.js",
+ "modules/wiki/studio.js",
+ "modules/agentic/mcp.js",
+ "modules/agentic/orchestrator.js",
+ "modules/agentic/clinical_agent.js",
+ "modules/agentic/index.js",
+ "modules/agentic/inbox.js",
+ "modules/agentic/docs.js",
+ "modules/agentic/overlap.js",
+ "modules/agentic/aieditor.js",
+ "modules/agentic/rag.js",
+ "modules/agentic/docxfill.js",
+ "modules/agentic/studio.js",
+ "modules/agentic/render.js",
+ "modules/agentic/org.js",
+ "modules/agentic/canvas.js",
+ "modules/lab/tat.js",
+ "modules/business_units/ava_health.js",
+ "modules/business_units/ecommerce_oms.js",
+ "modules/business_units/sanctuary_booking.js",
+ "modules/compliance/audit.js",
+ "modules/compliance/bpjs_claim.js",
+ "modules/compliance/compliance_tracker.js",
+ "modules/compliance/import_excel.js",
+ "modules/compliance/regulatory_reports.js",
+ "modules/compliance/rl_reports.js",
+ "modules/compliance/satusehat.js",
+ "modules/crm/crm_pipeline.js",
+ "modules/crm/leads.js",
+ "modules/crm/marketing.js",
+ "modules/crm/perujuk.js",
+ "modules/crm/quotation.js",
+ "modules/crm/sales_corong.js",
+ "modules/crm/voucher.js",
+ "modules/finance/accounting.js",
+ "modules/finance/cashier.js",
+ "modules/finance/finance.js",
+ "modules/finance/finance_aging.js",
+ "modules/finance/holding_finance.js",
+ "modules/finance/payables.js",
+ "modules/finance/subscription.js",
+ "modules/his/admission.js",
+ "modules/his/anamnesa.js",
+ "modules/his/clinicflow.js",
+ "modules/his/emr_soap.js",
+ "modules/his/homecare.js",
+ "modules/his/inpatient.js",
+ "modules/his/mcu.js",
+ "modules/his/medrecord.js",
+ "modules/hrd/attendance.js",
+ "modules/hrd/hrd.js",
+ "modules/hrd/org_structure.js",
+ "modules/hrd/payroll.js",
+ "modules/hrd/task_management.js",
+ "modules/hrd/work_schedule.js",
+ "modules/lab/referral.js",
+ "modules/logistics/assets.js",
+ "modules/logistics/catalog_export.js",
+ "modules/logistics/inventory.js",
+ "modules/pharmacy/farmasi_eprescription.js",
+ "modules/pharmacy/pharmacy.js",
+ "modules/radiology/pacs.js",
+ "modules/radiology/pacs_viewer.js",
+ "modules/radiology/ris.js",
+ "modules/system/config/config_family.js",
+ "modules/system/config/config_home.js",
+ "modules/system/config/config_labreport.js",
+ "modules/system/config/config_package.js",
+ "modules/system/config/config_product.js",
+ "modules/system/db_studio.js",
+ "modules/system/lisensi.js",
+ "modules/system/ops_kendali.js",
+ "modules/system/portal_akses.js",
+ "modules/system/settings.js",
+ "modules/system/supportive.js",
+ "modules/system/surat.js",
+ "modules/system/test_reviewer.js",
+ "modules/system/timeline.js",
+ "modules/business_units/tech_saas.js",
+ "modules/compliance/catalog_exporter.js",
+ "modules/business_units/tenants.js"
+];

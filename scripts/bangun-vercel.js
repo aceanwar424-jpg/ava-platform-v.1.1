@@ -30,7 +30,7 @@ const KELUAR = path.join(AKAR, 'vercel.json');
 
 // Folder platform relatif terhadap akar repo. Vercel menyajikan folder ini
 // sebagai akar situs; lihat docs/DEPLOY-WEB-VERCEL.md.
-const FOLDER_PLATFORM = 'onelab-platform-main/onelab-platform';
+const FOLDER_PLATFORM = 'ava-platform';
 
 const peta = JSON.parse(fs.readFileSync(PETA, 'utf8'));
 const situs = peta.situs || [];
@@ -117,18 +117,74 @@ const konfig = {
 
 const teks = JSON.stringify(konfig, null, 2) + '\n';
 
+// ══════════════════════════════════════════════════════════════════
+// KELUARAN KEDUA: js/core/peta-subdomain.js
+//
+// index.html melayani empat subdomain sekaligus (his, lis, ops, console)
+// dan harus tahu ia sedang disajikan di mana. Tanpa itu keempatnya
+// menampilkan seluruh 14 rel menu dan terlihat persis sama — persis
+// keluhan yang muncul saat menelusuri simulator.
+//
+// Pembeda sebelumnya adalah query string ?workspace= yang ditempelkan
+// simulator. Itu TIDAK PERNAH berlaku di produksi: his.avahealth.sbs
+// menyajikan /index.html tanpa query apa pun, sehingga di produksi keempat
+// subdomain memang selalu identik sejak awal.
+//
+// Dibangkitkan dari config/domain.json supaya tidak ada daftar kedua yang
+// bisa menyimpang — alasan yang sama dengan vercel.json.
+// ══════════════════════════════════════════════════════════════════
+const PETA_JS = path.join(AKAR, FOLDER_PLATFORM, 'js', 'core', 'peta-subdomain.js');
+
+const petaSubdomain = {};
+for (const s of situs) {
+  if (!s.workspace && !s.awal && !s.sorot && !s.peran) continue;
+  const isi = { nama: s.nama || s.kunci };
+  if (s.workspace) isi.workspace = s.workspace;
+  if (s.awal)      isi.awal      = s.awal;
+  if (s.sorot)     isi.sorot     = s.sorot;
+  if (s.peran)     isi.peran     = s.peran;
+
+  // Didaftarkan di bawah SELURUH hostname produksi sekaligus nama lokalnya,
+  // supaya pencocokan di peramban cukup satu pencarian tanpa menebak pola.
+  for (const h of (s.host || [])) petaSubdomain[h] = isi;
+  petaSubdomain[`${s.lokal}.localhost`] = isi;
+}
+
+const petaTeks = [
+  '// ═══════════════════════════════════════════════════════════════',
+  '// DIBANGKITKAN OTOMATIS dari config/domain.json — jangan disunting tangan.',
+  '// Jalankan ulang: node scripts/bangun-vercel.js',
+  '//',
+  '// Memberi tahu index.html dan portal.html subdomain mana yang sedang',
+  '// membukanya, sehingga lingkup menu dan halaman awalnya mengikuti',
+  '// pembagian di config/domain.json — bukan menampilkan semuanya.',
+  '// ═══════════════════════════════════════════════════════════════',
+  'window.PETA_SUBDOMAIN = ' + JSON.stringify(petaSubdomain, null, 2) + ';',
+  '',
+  '// Mengembalikan { nama, workspace, awal, sorot, peran } untuk host ini, atau',
+  '// null bila host-nya tidak terdaftar (mis. dibuka lewat 127.0.0.1 langsung).',
+  'window.situsSaatIni = function () {',
+  '  const h = String(location.hostname || \'\').toLowerCase();',
+  '  return window.PETA_SUBDOMAIN[h] || null;',
+  '};',
+  '',
+].join('\n');
+
 if (process.argv.includes('--periksa')) {
   const lama = fs.existsSync(KELUAR) ? fs.readFileSync(KELUAR, 'utf8') : '';
-  if (lama !== teks) {
-    console.error('✗ vercel.json sudah basi terhadap config/domain.json.');
+  const lamaPeta = fs.existsSync(PETA_JS) ? fs.readFileSync(PETA_JS, 'utf8') : '';
+  if (lama !== teks || lamaPeta !== petaTeks) {
+    console.error('✗ vercel.json / peta-subdomain.js sudah basi terhadap config/domain.json.');
     console.error('  Jalankan: node scripts/bangun-vercel.js');
     process.exit(1);
   }
-  console.log('✓ vercel.json sesuai dengan config/domain.json.');
+  console.log('✓ vercel.json & js/core/peta-subdomain.js sesuai dengan config/domain.json.');
   process.exit(0);
 }
 
 fs.writeFileSync(KELUAR, teks);
+fs.mkdirSync(path.dirname(PETA_JS), { recursive: true });
+fs.writeFileSync(PETA_JS, petaTeks);
 
 console.log(`✓ vercel.json ditulis — ${situs.length} situs, ${hostTerpakai.size} host, ${rewrites.length} aturan\n`);
 for (const s of situs) {

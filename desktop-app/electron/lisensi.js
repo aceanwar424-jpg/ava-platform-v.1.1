@@ -45,7 +45,7 @@ const path = require('path');
 //
 // Tidak ketemu = build pengembangan: lisensi tidak diperiksa sama sekali.
 function muatKunciPublik() {
-  if (process.env.ONELAB_LICENSE_PUBKEY) return process.env.ONELAB_LICENSE_PUBKEY.trim();
+  if (process.env.AVA_LICENSE_PUBKEY) return process.env.AVA_LICENSE_PUBKEY.trim();
   const kandidat = [
     process.resourcesPath && path.join(process.resourcesPath, 'lisensi-publik.pem'),
     path.join(__dirname, 'lisensi-publik.pem'),
@@ -81,7 +81,7 @@ function sidikMesin() {
 // pengujian.
 function cariBerkasLisensi(dataDir) {
   const kandidat = [
-    process.env.ONELAB_LICENSE_FILE,
+    process.env.AVA_LICENSE_FILE,
     dataDir && path.join(dataDir, 'lisensi.json'),
     dataDir && path.join(path.dirname(dataDir), 'lisensi.json'),
     process.resourcesPath && path.join(process.resourcesPath, 'lisensi.json'),

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVA GLOBAL ECOSYSTEM — Support Systems Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090e17;
+      --card-bg: #111a2e;
+      --accent: #d4af37;
+      --teal: #00d2b4;
+      --blue: #2563eb;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(212, 175, 55, 0.25);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header {
+      padding: 20px 40px;
+      background: rgba(17, 26, 46, 0.95);
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 16px; }
+    .brand img { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--accent); }
+    .brand-title h1 { font-size: 20px; font-weight: 800; color: #fff; }
+    .brand-title p { font-size: 12px; color: var(--accent); font-weight: 600; }
+    
+    .nav-tabs { display: flex; gap: 12px; }
+    .nav-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { background: var(--accent); color: #000; }
+
+    main {
+      flex: 1;
+      padding: 40px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-title { margin-bottom: 32px; text-align: center; }
+    .hero-title h2 { font-size: 30px; font-weight: 800; margin-bottom: 8px; }
+    .hero-title p { color: var(--text-muted); font-size: 15px; }
+
+    .grid-support {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .support-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .support-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(212, 175, 55, 0.15);
+    }
+    .card-top { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px; }
+    .card-icon {
+      font-size: 32px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 14px;
+      border-radius: 14px;
+      line-height: 1;
+    }
+    .card-info h3 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .card-info p { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+    
+    .card-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge-device {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(0, 210, 180, 0.15);
+      color: var(--teal);
+    }
+    .btn-launch {
+      background: linear-gradient(135deg, var(--accent), #b8972e);
+      color: #000;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 8px 18px;
+      border-radius: 8px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-launch:hover { filter: brightness(1.1); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <img src="css/logo-ava-global.png" alt="Logo">
+      <div class="brand-title">
+        <h1>AVA GLOBAL ECOSYSTEM</h1>
+        <p>Support Systems & Dedicated Hardware Monitors</p>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <a href="index.html" class="nav-btn">← Kembali ke Sistem Utama</a>
+      <a href="portal.html" class="nav-btn">Portal Apps</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-title">
+      <h2>Pusat Support System & Dedicated Monitors</h2>
+      <p>Layanan pendukung faskes untuk display TV ruang tunggu, kiosk mandiri, monitor sales, dan driver alat lab.</p>
+    </div>
+
+    <div class="grid-support">
+      <!-- 1. Kiosk Antrian -->
+      <div class="support-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">🖨️</div>
+            <div class="card-info">
+              <h3>Kiosk Antrian Mandiri</h3>
+              <p>Layar sentuh touchscreen mandiri di lobi faskes untuk pengambilan nomor tiket antrian pasien (Poli, Lab, Farmasi, Kasir).</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="badge-device">Touchscreen Kiosk</span>
+          <a href="kiosk/index.html" target="_blank" class="btn-launch">Buka Kiosk ↗</a>
+        </div>
+      </div>
+
+      <!-- 2. Web Monitor Antrian TV -->
+      <div class="support-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">📺</div>
+            <div class="card-info">
+              <h3>Display TV Antrian Ruang Tunggu</h3>
+              <p>Tampilan layar TV ruang tunggu pasien dengan pemanggilan suara audio otomatis (*text-to-speech*) dan running text promo.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="badge-device">Smart TV Display</span>
+          <a href="monitor/antrian.html" target="_blank" class="btn-launch">Buka TV Antrian ↗</a>
+        </div>
+      </div>
+
+      <!-- 3. CRM & Sales Pipeline Monitor -->
+      <div class="support-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">📊</div>
+            <div class="card-info">
+              <h3>CRM & Deals Live Monitor</h3>
+              <p>Display TV operasional tim sales & B2B untuk memantau performa corong leads, status penandatanganan MOU, dan closing deal.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="badge-device">Marketing Screen</span>
+          <a href="monitor/crm.html" target="_blank" class="btn-launch">Buka Monitor CRM ↗</a>
+        </div>
+      </div>
+
+      <!-- 4. Lab Analyzer Connector -->
+      <div class="support-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">🔬</div>
+            <div class="card-info">
+              <h3>Lab Analyzer Connector (Porta 9999)</h3>
+              <p>Driver jembatan alat laboratorium (Hematologi, Kimia Darah, Urinalisis) berbasis protokol ASTM E1381/E1394 & HL7 v2.5.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span class="badge-device">Node Background Engine</span>
+          <a href="http://127.0.0.1:9999" target="_blank" class="btn-launch">Buka Connector ↗</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</body>
+</html>

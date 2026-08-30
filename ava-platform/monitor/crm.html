@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <!-- Wajib: halaman ini disajikan di akar subdomain antrian/crm,
+       sedangkan berkasnya berada di /monitor/. Tanpa base, ../css/... salah arah. -->
+  <base href="/monitor/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #151f38;
+      --accent: #d4af37;
+      --teal: #10b981;
+      --blue: #3b82f6;
+      --purple: #8b5cf6;
+      --orange: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding: 20px 32px; gap: 20px; }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--accent);
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--accent); }
+    .title h1 { font-size: 20px; font-weight: 800; }
+    .title p { font-size: 12px; color: var(--accent); font-weight: 600; }
+    .live-badge {
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--teal);
+      color: var(--teal);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .kpi-box {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 16px 20px;
+    }
+    .kpi-box p { font-size: 13px; color: var(--text-muted); }
+    .kpi-val { font-size: 32px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+
+    .main-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 20px;
+      min-height: 0;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 16px; display: flex; justify-content: space-between; }
+    
+    .pipeline-bar-wrapper { margin-bottom: 20px; }
+    .pipeline-bar { display: flex; height: 16px; border-radius: 8px; overflow: hidden; background: #222e4c; margin: 8px 0; }
+    .pipe-seg { height: 100%; }
+    .legend-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 13px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+    .deals-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    .deal-item {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--teal);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .deal-name { font-weight: 700; font-size: 14px; }
+    .deal-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .deal-val { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--teal); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <img src="../css/logo-ava-global.png" alt="Logo">
+      <div class="title">
+        <h1>AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor</h1>
+        <p>B2B Partnerships · Faskes Referral Network · Corporate Accounts</p>
+      </div>
+    </div>
+    <div class="live-badge">
+      <div class="dot"></div> LIVE PIPELINE MONITOR
+    </div>
+  </header>
+
+  <div class="kpi-row">
+    <div class="kpi-box">
+      <p>Total Leads Aktif</p>
+      <div class="kpi-val" style="color:var(--blue)">37 <span style="font-size:14px;color:var(--text-muted)">Leads</span></div>
+    </div>
+    <div class="kpi-box">
+      <p>Mitra Faskes Terikat MOU</p>
+      <div class="kpi-val" style="color:var(--teal)">24 <span style="font-size:14px;color:var(--text-muted)">Klinik/RS</span></div>
+    </div>
+    <div class="kpi-box">
+      <p>Pipeline Potential Value</p>
+      <div class="kpi-val" style="color:var(--accent)">Rp 480 <span style="font-size:14px;color:var(--text-muted)">Juta</span></div>
+    </div>
+    <div class="kpi-box">
+      <p>Closed Won Bulan Ini</p>
+      <div class="kpi-val" style="color:var(--purple)">Rp 145 <span style="font-size:14px;color:var(--text-muted)">Juta</span></div>
+    </div>
+  </div>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-title">
+        <span>Distribusi Corong Pipeline Kemitraan</span>
+        <span style="font-size:13px;color:var(--text-muted)">Target Q3 2026</span>
+      </div>
+
+      <div class="pipeline-bar-wrapper">
+        <div class="pipeline-bar">
+          <div class="pipe-seg" style="width:30%;background:var(--blue)" title="Prospect"></div>
+          <div class="pipe-seg" style="width:25%;background:var(--orange)" title="Meeting & Demo"></div>
+          <div class="pipe-seg" style="width:20%;background:var(--purple)" title="Proposal / MOU"></div>
+          <div class="pipe-seg" style="width:25%;background:var(--teal)" title="Won Deal"></div>
+        </div>
+      </div>
+
+      <div class="legend-grid">
+        <div class="legend-item"><div class="leg-dot" style="background:var(--blue)"></div> <span>1. Prospek Baru (12)</span></div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--orange)"></div> <span>2. Demo Platform (9)</span></div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--purple)"></div> <span>3. Negosiasi PKS (8)</span></div>
+        <div class="legend-item"><div class="leg-dot" style="background:var(--teal)"></div> <span>4. MOU Deal (8)</span></div>
+      </div>
+
+      <div style="margin-top:24px;border-top:1px solid rgba(255,255,255,0.08);padding-top:16px">
+        <div class="panel-title" style="margin-bottom:8px">Target Penyerapan Produk SaaS & Nutrisi B2B</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.6">
+          • Lisensi Starter LIS: <b>14 / 20 Lab</b> (70%)<br>
+          • Lisensi Enterprise Faskes: <b>5 / 8 RS</b> (62.5%)<br>
+          • Dispensing Queen Nutrition ke Apotek: <b>420 / 1.000 Apotek Target</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">
+        <span>🏆 Deal & MOU Terbaru</span>
+        <span style="font-size:12px;color:var(--teal)">Terverifikasi</span>
+      </div>
+
+      <div class="deals-list">
+        <div class="deal-item">
+          <div>
+            <div class="deal-name">Klinik Pratama Sehat Mandiri</div>
+            <div class="deal-meta">Paket: Enterprise Faskes + Rujukan Lab Hormon</div>
+          </div>
+          <div class="deal-val">Rp 25.000.000</div>
+        </div>
+
+        <div class="deal-item">
+          <div>
+            <div class="deal-name">Lab Diagnostik Utama Medika</div>
+            <div class="deal-meta">Paket: Starter LIS + Lab Connector Bi-Directional</div>
+          </div>
+          <div class="deal-val">Rp 18.500.000</div>
+        </div>
+
+        <div class="deal-item">
+          <div>
+            <div class="deal-name">Apotek Kimia Prima Farma</div>
+            <div class="deal-meta">Paket: Pharmacy Suite & Konsinyasi Q-NUT-01</div>
+          </div>
+          <div class="deal-val">Rp 35.000.000</div>
+        </div>
+
+        <div class="deal-item">
+          <div>
+            <div class="deal-name">Griya Spa & Wellness Harmony</div>
+            <div class="deal-meta">Paket: Sanctuary Suite & Aromatherapy Supply</div>
+          </div>
+          <div class="deal-val">Rp 15.000.000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

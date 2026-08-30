@@ -1,0 +1,176 @@
+# AVA Connector — Integrasi Alat Lab (ASTM / HL7)
+
+Jembatan antara **alat lab** (yang bicara TCP mentah di jaringan lokal) dan
+**AVA/Supabase** (cloud, HTTPS). Alat lab tak bisa mengirim langsung ke cloud —
+connector inilah perantaranya.
+
+```
+Alat Lab ──TCP(ASTM/HL7)──► AVA Connector (PC di lab) ──HTTPS──► Supabase ──► AVA
+   ▲                              (framing + ACK + push)                          (parse & validasi)
+   └──────────── ACK ─────────────┘
+```
+
+## Prasyarat
+- **PC/mini-PC Windows** yang selalu nyala, **satu jaringan (LAN)** dengan alat.
+- **Node.js 18+** (`node --version`). Unduh: https://nodejs.org
+- SQL `supabase_analyzer_bridge.sql` sudah dijalankan di Supabase.
+- Master alat di AVA sudah diisi **IP, Port, Mode, Protokol** (menu Alat).
+
+## Setup (sekali)
+1. Salin folder `connector/` ini ke PC lab.
+2. Salin `config.example.json` → `config.json`, isi `supabase_key` (anon key dari AVA).
+3. Jalankan:
+   ```
+   cd connector
+   node ava-connector.js
+   ```
+4. Terminal akan menampilkan: `🟢 <alat>: LISTEN :<port>` dan `🖥  Status lokal: http://localhost:9999`.
+
+## Halaman status lokal (di PC connector)
+Buka **http://localhost:9999** di PC connector untuk memantau tanpa membaca terminal:
+- **IP PC connector** ditampilkan di atas — isikan IP ini + port di master Alat AVA (mode server),
+- daftar alat + indikator 🟢 tersambung / ⚪ belum,
+- jumlah pesan & waktu pesan terakhir per alat,
+- log langsung (auto-refresh 3 dtk),
+- tombol **Muat ulang config** (menarik alat baru dari AVA tanpa restart).
+
+### Tab "LIS — Parsing Manual" (mode offline)
+Dipakai saat **cloud sedang maintenance/offline**: alat tetap mengirim ke connector,
+tapi pengolahan dilakukan manual di PC ini.
+- Tempel pesan mentah alat (ASTM / HL7) → **Parse** → tabel **ID · Kode Item · Hasil · Satuan · Ref Range · Flag**.
+- Centang **Auto ambil dari alat** agar kiriman terbaru dari alat langsung masuk & terparse.
+- **Export Excel** (.xls) untuk arsip / entri ulang saat cloud kembali.
+- Kode item diambil dari komponen non-kosong pertama (mendukung `^WBC^`, `GLU^Glukosa`, `^^^GLU`).
+
+Hanya bisa dibuka **di PC connector** (`127.0.0.1`) — log bisa memuat identitas
+pasien, jadi sengaja tidak diekspos ke jaringan. Ganti port lewat `status_port` di `config.json`.
+Manajemen penuh (status semua alat, pesan masuk, terapkan hasil) tetap di **AVA → LIS → Integrasi Alat**.
+
+## Tab LIS — parsing manual (mode offline)
+Di halaman status ada tab **LIS — Parsing Manual** untuk dipakai saat cloud/AVA
+sedang **maintenance atau offline**. Tempel pesan mentah alat (ASTM atau HL7),
+klik **Parse** → tabel berisi **ID Sampel · Kode Item · Hasil · Satuan · Ref Range · Flag**,
+lalu **Export Excel** (.xls). Sepenuhnya lokal di browser — tidak butuh koneksi cloud.
+- ASTM: ID dari record `O` (specimen/barcode), tiap record `R` jadi 1 baris.
+- HL7: ID dari `OBR`/`PID`, tiap segmen `OBX` jadi 1 baris.
+- Protokol bisa **Auto-deteksi** atau dipilih manual.
+
+## Konfigurasi alat (di AVA, bukan di sini)
+Isi di master Alat AVA per analyzer:
+- **Mode `server`** (paling umum): connector membuka port; **di menu alat isi IP = IP PC connector** + port yang sama. Alat mengirim hasil ke connector.
+- **Mode `client`**: connector yang menghubungi alat — isi **IP + port alat**.
+- **Protokol**: `ASTM` atau `HL7`.
+- **Arah**: `oneway` (hasil masuk saja) atau `twoway` (+ AVA kirim order ke alat).
+
+Untuk cari IP PC connector di Windows: `ipconfig` → IPv4 Address (mis. `192.168.1.50`).
+
+## Alur data
+1. Alat kirim hasil → connector balas **ACK** (wajib) → teruskan mentah ke `analyzer_ingest`.
+2. Pesan masuk ke tabel `analyzer_messages` (status `RECEIVED`).
+3. AVA mem-parse (HL7 OBX / ASTM R / CSV) & mencocokkan ke sampel via **host_code** →
+   isi `lab_results` (draft, `is_auto`) → **analis validasi (manusia)**.
+4. Monitor "alat diam" otomatis oleh agentic `INTEGRATION_HEALTH`.
+
+## Jalankan otomatis saat PC nyala (Windows)
+Opsi mudah — Task Scheduler:
+1. Buka **Task Scheduler** → Create Basic Task → Trigger: *When the computer starts*.
+2. Action: *Start a program* → Program: `node`, Arguments: `ava-connector.js`,
+   Start in: path folder `connector`.
+3. (Opsional) centang *Run whether user is logged on or not*.
+
+Atau pakai `pm2` (`npm i -g pm2 && pm2 start ava-connector.js && pm2 save && pm2-startup install`).
+
+## Dua-arah (host query → order ke alat)
+
+Mode `twoway`: alat menanyakan "sampel barcode X mau diperiksa apa?", connector
+menjawab dengan order dari AVA.
+
+**Barcode yang ditanyakan dibaca dan dipakai menyaring order:**
+
+| Protokol | Sumber barcode |
+|---|---|
+| ASTM E1394 | record `Q`, field ke-3 (`Q\|1\|^^123456^\|…`) |
+| HL7 `QRY^Q02` | `QRD-8` |
+| HL7 `QBP^Q11` | `QPD-3` |
+
+Bila alat bertanya tanpa menyebut barcode, seluruh order tertunda dikirim.
+
+Catatan penting:
+
+- **`ORM^O01` tidak dianggap query.** Itu pesan *order* yang dikirim host ke alat,
+  bukan pertanyaan dari alat.
+- **Balasan kosong tetap dikirim** (header + terminator). Banyak alat berhenti
+  memproses bila host diam — lebih buruk daripada dijawab "tidak ada order".
+- **Handshake ASTM dipatuhi**: ENQ menunggu ACK, tiap frame menunggu ACK, NAK
+  diulang sampai 6 kali sesuai E1381. Timeout 15 detik.
+
+Susunan record order tetap **spesifik per alat** — cocokkan `sendAstmOrders()` /
+`sendHl7Orders()` dengan manual alat Anda. Mulai dari `oneway`, aktifkan `twoway`
+setelah pola order alat dipastikan.
+
+## Auto-upload QC
+
+Hasil bahan kontrol dialihkan otomatis ke tabel `lab_qc_runs`, tidak dicampur ke
+jalur hasil pasien. Dua penanda yang dikenali:
+
+1. **Kode aksi `Q`** pada record `O` ASTM (field ke-12) — cara paling baku.
+2. **Pola barcode**, bawaan `^(QC|CTRL|CONTROL)`.
+
+Level QC dan nomor lot diambil dari ID spesimen atau nama "pasien" bila ada
+(mis. `QC-LEVEL 2 LOT:A77`). Hasil tanpa nilai numerik **tidak** dikirim — lebih
+baik kosong daripada angka karangan pada catatan mutu.
+
+Penandaan QC berbeda tiap alat. Sesuaikan lewat `config.json`:
+
+```json
+{ "qc_pattern": "^(QC|CTRL|CONTROL)", "order_timeout_ms": 5000 }
+```
+
+### Penilaian Westgard otomatis
+
+Bila lot bahan kontrol sudah terdaftar di **`lab_qc_lots`** (alat + tes + level →
+target & SD), connector langsung menghitung z-score dan menilai aturan Westgard,
+lalu mengisi kolom `target`, `sd`, `z_score`, dan `verdict` di `lab_qc_runs`.
+
+| Aturan | Arti | Hasil |
+|---|---|---|
+| `1-2s` | satu run >2 SD | WARNING |
+| `1-3s` | satu run >3 SD | REJECT |
+| `2-2s` | dua run berturut >2 SD searah | REJECT |
+| `R-4s` | rentang dua run >4 SD berlawanan | REJECT |
+| `4-1s` | empat run berturut >1 SD searah | REJECT |
+| `10x` | sepuluh run berturut di sisi sama | REJECT |
+
+Aturan yang butuh rentetan membaca 10 run terakhir untuk alat, tes, dan level
+yang sama. **Bila lot belum terdaftar, nilainya tetap disimpan tetapi tidak
+dinilai** — memberi verdict tanpa target dan SD sama saja mengarang bukti mutu.
+
+## Simulator alat — uji tanpa hardware
+
+Verifikasi connector tidak perlu menunggu berhadapan dengan alat sungguhan di
+lab yang sedang berjalan. `simulator-alat.js` berperan sebagai alat:
+
+```bash
+node simulator-alat.js hasil --port 5001 --barcode 778899
+node simulator-alat.js query --port 5001 --barcode 778899
+node simulator-alat.js qc    --port 5001 --level "LEVEL 2" --lot A77
+```
+
+Pilihan lain: `--host`, `--protokol HL7`, `--tes`, `--nilai`.
+Connector harus dalam mode `server` (listen) pada porta yang dituju.
+
+Keluarannya menampilkan tiap frame dua arah (`→` keluar, `←` masuk), sehingga
+handshake ASTM dan jawaban order bisa diperiksa langsung.
+
+## Keamanan
+- Connector menulis ke **staging** (`analyzer_messages`), bukan langsung `lab_results`.
+- Pengisian hasil final tetap lewat parse + validasi manusia (tidak ada hasil klinis
+  yang otomatis dirilis).
+- Simpan `config.json` (berisi key) hanya di PC lab; jangan commit.
+
+## Troubleshooting
+- **Alat tak konek**: pastikan IP PC benar (`ipconfig`), port sama, firewall Windows
+  mengizinkan Node.js pada port itu (Inbound Rule), PC & alat satu subnet.
+- **`RPC ... HTTP 401/403`**: `supabase_key` salah.
+- **Konek tapi tak ada data**: cek protokol (ASTM vs HL7) di master alat; lihat log mentah
+  di AVA (`analyzer_messages`).

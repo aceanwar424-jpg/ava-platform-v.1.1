@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <!-- Wajib: halaman ini disajikan di akar subdomain antrian/crm,
+       sedangkan berkasnya berada di /monitor/. Tanpa base, ../css/... salah arah. -->
+  <base href="/monitor/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVA GLOBAL ECOSYSTEM — Display Antrian Ruang Tunggu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090e17;
+      --card-bg: #111a2e;
+      --accent: #d4af37;
+      --teal: #00d2b4;
+      --blue: #2563eb;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(212, 175, 55, 0.25);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+    body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    
+    header {
+      padding: 16px 32px;
+      background: rgba(17, 26, 46, 0.95);
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 16px; }
+    .brand img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--accent); }
+    .brand-title h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; color: #fff; }
+    .brand-title p { font-size: 13px; color: var(--accent); font-weight: 600; }
+    .clock-widget { text-align: right; }
+    .clock-time { font-size: 28px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--teal); }
+    .clock-date { font-size: 14px; color: var(--text-muted); }
+
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 24px;
+      padding: 24px 32px;
+    }
+
+    .main-call-box {
+      background: linear-gradient(135deg, #162444, #0f172a);
+      border: 2px solid var(--accent);
+      border-radius: 20px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+    }
+    .call-badge {
+      background: var(--accent);
+      color: #000;
+      font-size: 16px;
+      font-weight: 800;
+      padding: 6px 24px;
+      border-radius: 30px;
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+    .active-number {
+      font-size: 110px;
+      font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 16px;
+      text-shadow: 0 0 20px rgba(0, 210, 180, 0.5);
+    }
+    .target-destination {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--teal);
+    }
+    .call-meta {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-top: 8px;
+    }
+
+    .grid-counters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .counter-card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .counter-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 8px;
+    }
+    .counter-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .counter-num { font-size: 48px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--accent); margin: 12px 0; }
+    .counter-footer { font-size: 13px; color: var(--text-muted); }
+
+    .test-controls {
+      position: fixed;
+      bottom: 60px;
+      right: 32px;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid #334155;
+      padding: 10px 16px;
+      border-radius: 10px;
+      display: flex;
+      gap: 8px;
+    }
+    .btn-test {
+      background: var(--teal);
+      border: none;
+      color: #000;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    footer {
+      background: #060911;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 32px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-label {
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 4px;
+      margin-right: 16px;
+      text-transform: uppercase;
+    }
+    .marquee-text {
+      display: inline-block;
+      animation: marquee 25s linear infinite;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    @keyframes marquee {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <img src="../css/logo-ava-global.png" alt="AVA GLOBAL ECOSYSTEM">
+      <div class="brand-title">
+        <h1>AVA GLOBAL ECOSYSTEM</h1>
+        <p>Layanan Terpadu Klinik · Laboratorium · Farmasi · Sanctuary</p>
+      </div>
+    </div>
+    <div class="clock-widget">
+      <div class="clock-time" id="clock">00:00:00</div>
+      <div class="clock-date" id="date">Memuat tanggal...</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="main-call-box">
+      <div class="call-badge">SEDANG DILAYANI / DIPANGGIL</div>
+      <div class="active-number" id="call-number">A-014</div>
+      <div class="target-destination" id="call-dest">POLIKLINIK OBGYN & HORMON</div>
+      <div class="call-meta" id="call-meta">Ruang Konsultasi 01 — dr. Siti Rahma, Sp.OG</div>
+    </div>
+
+    <div class="grid-counters">
+      <div class="counter-card">
+        <div class="counter-header">
+          <span class="counter-title">Poli Umum & Spesialis</span>
+          <span style="color:var(--teal)">Loket 1</span>
+        </div>
+        <div class="counter-num" id="cnt-1">A-014</div>
+        <div class="counter-footer">Pasien: Ny. Siska M.</div>
+      </div>
+
+      <div class="counter-card">
+        <div class="counter-header">
+          <span class="counter-title">Laboratorium Diagnostik</span>
+          <span style="color:var(--teal)">Loket 2</span>
+        </div>
+        <div class="counter-num" id="cnt-2">B-008</div>
+        <div class="counter-footer">Sampling & Darah Lengkap</div>
+      </div>
+
+      <div class="counter-card">
+        <div class="counter-header">
+          <span class="counter-title">Instalasi Farmasi</span>
+          <span style="color:var(--teal)">Loket 3</span>
+        </div>
+        <div class="counter-num" id="cnt-3">C-021</div>
+        <div class="counter-footer">Penyerahan Obat & Edukasi</div>
+      </div>
+
+      <div class="counter-card">
+        <div class="counter-header">
+          <span class="counter-title">Kasir & Pembayaran</span>
+          <span style="color:var(--teal)">Loket 4</span>
+        </div>
+        <div class="counter-num" id="cnt-4">K-035</div>
+        <div class="counter-footer">Billing & Validasi Asuransi</div>
+      </div>
+    </div>
+  </main>
+
+  <div class="test-controls">
+    <span style="font-size:12px;color:#aaa;align-self:center">Simulasi Panggilan:</span>
+    <button class="btn-test" onclick="panggilAntrian('A-015', 'Poliklinik Obgyn', 'Ruang 01')">Panggil Poli</button>
+    <button class="btn-test" onclick="panggilAntrian('B-009', 'Laboratorium Diagnostik', 'Sampling Room')">Panggil Lab</button>
+    <button class="btn-test" onclick="panggilAntrian('C-022', 'Instalasi Farmasi', 'Loket 3')">Panggil Farmasi</button>
+  </div>
+
+  <footer>
+    <div class="marquee-label">INFO SEHAT</div>
+    <div class="marquee-text">
+      Selamat datang di AVA GLOBAL ECOSYSTEM. Tetap jaga protokol kesehatan. Dapatkan diskon 15% untuk pemeriksaan panel hormon wanita & evaluasi mikrobioma usus bulan ini. Konsultasikan dengan nakes kami.
+    </div>
+  </footer>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock').textContent = now.toLocaleTimeString('id-ID');
+      document.getElementById('date').textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    function panggilSuara(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'id-ID';
+        utter.rate = 0.9;
+        utter.pitch = 1.0;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function panggilAntrian(nomor, tujuan, ruang) {
+      document.getElementById('call-number').textContent = nomor;
+      document.getElementById('call-dest').textContent = tujuan.toUpperCase();
+      document.getElementById('call-meta').textContent = `${ruang} — Silakan Menuju Loket`;
+      
+      const audioText = `Nomor antrian, ${nomor.replace('-', ' ')}, silakan menuju ke ${tujuan}`;
+      panggilSuara(audioText);
+    }
+  </script>
+</body>
+</html>

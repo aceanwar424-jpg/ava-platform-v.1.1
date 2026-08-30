@@ -9,14 +9,14 @@
 
 ## 1. Konteks Proyek
 
-- **Pemilik:** Ace Anwar — Head of Operations, OneLab Diagnostics. Latar: analis lab
+- **Pemilik:** Ace Anwar — Head of Operations, AVA Diagnostics. Latar: analis lab
   + informatika (LIS/HIS/SIMRS) + sistem mutu (ISO 15189:2022) + membangun tooling sendiri.
 - **Misi:** Memaksimalkan aset yang sudah ada agar menjadi produk/jasa yang bisa
   dijual berulang ke klinik & lab lain — bukan sekali pakai untuk satu lab.
 - **Prinsip operasi (wajib dipegang agent):**
   1. **Validasi sebelum bangun besar.** Utamakan MVP tipis yang bisa diuji ke 1 klien
      nyata sebelum menambah fitur.
-  2. **Multi-tenant / parameterized sejak hari pertama.** Tidak ada asumsi "OneLab" yang
+  2. **Multi-tenant / parameterized sejak hari pertama.** Tidak ada asumsi "AVA" yang
      ter-hardcode.
   3. **Leverage.** Tiap output jadi template/modul yang menambah pustaka aset, bukan pekerjaan sekali pakai.
   4. **Reversibilitas.** Keputusan yang bisa dibatalkan → cepat. Yang tidak (skema data,
@@ -32,7 +32,7 @@
   (lihat §4) sebelum mulai koding.
 - **Human checkpoint wajib** (jangan lanjut tanpa persetujuan) sebelum:
   - Mengubah skema data master (kolom katalog, kunci relasional).
-  - Menyertakan/menyalin data spesifik OneLab ke dalam produk generik.
+  - Menyertakan/menyalin data spesifik AVA ke dalam produk generik.
   - Integrasi ke sistem eksternal (LIS/SIMRS klien, API vendor, DB produksi).
   - Mengubah dependensi ke satu vendor LLM tertentu.
 - Kerjakan sesuai **urutan prioritas** di §3 (P1 dulu). P1 adalah pengganda semua yang lain.
@@ -42,11 +42,11 @@
 ## 3. Sistem yang Dimaksimalkan (Work Items, berurut prioritas)
 
 ### P1 — Document Reengineering Engine → *multi-lab*
-**Sekarang:** Node.js + LLM, mengubah dokumen QMS OneLab ke format HTML standar.
+**Sekarang:** Node.js + LLM, mengubah dokumen QMS AVA ke format HTML standar.
 **Target:** Engine yang bisa memproses dokumen **lab mana pun** menjadi keluaran SMM
 patuh ISO 15189:2022.
 **Sub-tasks:**
-- Ekstrak semua konstanta/asumsi khusus OneLab ke konfigurasi per-tenant (`tenant.config`).
+- Ekstrak semua konstanta/asumsi khusus AVA ke konfigurasi per-tenant (`tenant.config`).
 - Bangun **pustaka template modular** yang dipetakan ke klausul ISO 15189:2022.
 - Tambah **lapisan "compliance check"** yang menandai klausul/section yang belum terpenuhi
   pada dokumen masukan, lengkap dengan referensi klausul.
@@ -57,7 +57,7 @@ patuh ISO 15189:2022.
 **Acceptance criteria:**
 - Bisa memproses ≥ 2 set dokumen lab berbeda tanpa perubahan kode (hanya config).
 - Output lolos "compliance check" internal dengan laporan gap yang bisa dibaca.
-- Tidak ada string/ID OneLab yang ter-hardcode di kode inti.
+- Tidak ada string/ID AVA yang ter-hardcode di kode inti.
 
 ### P2 — Master Test Catalog → produk *siap-LIS*
 **Sekarang:** Katalog ~530+ tes dengan reference range, matriks spesimen/stabilitas,
@@ -65,7 +65,7 @@ LOINC/UCUM, dan lembar "Status Verifikasi Acuan".
 **Target:** Dataset yang bisa **dilisensikan** untuk menyemai LIS/SIMRS klien + jasa
 penyesuaian ke menu tes klien.
 **Sub-tasks:**
-- Pisahkan **catalog inti (generik, produk)** dari **mapping harga/menu OneLab (privat)**.
+- Pisahkan **catalog inti (generik, produk)** dari **mapping harga/menu AVA (privat)**.
 - Buat generator export multi-format (XLSX/CSV/TSV) yang mempertahankan struktur relasional.
 - Sediakan skema validasi otomatis (lihat aturan integritas data di §4.3).
 - Jadikan lembar **"Status Verifikasi Acuan"** sebagai fitur jual (audit traceability):
@@ -104,10 +104,10 @@ situs/lab klien + bahan otoritas LinkedIn.
 > Agent **tidak boleh** melanggar tanpa konfirmasi manusia eksplisit.
 
 ### 4.1 Legal & IP
-- **JANGAN** menggabungkan aset milik OneLab (data, dokumen, kode yang dibuat untuk kantor)
+- **JANGAN** menggabungkan aset milik AVA (data, dokumen, kode yang dibuat untuk kantor)
   ke dalam produk generik tanpa kejelasan kepemilikan/lisensi. Tandai asal tiap aset:
-  `OWNED_BY: onelab | personal | generic`.
-- **JANGAN** menyalin data harga, kontrak (PKS/MoU), atau daftar klien OneLab ke repo produk.
+  `OWNED_BY: ava | personal | generic`.
+- **JANGAN** menyalin data harga, kontrak (PKS/MoU), atau daftar klien AVA ke repo produk.
 - Default: bangun IP baru sebagai **generik/parameterized** agar netral secara kepemilikan.
 
 ### 4.2 Kepatuhan (ISO 15189 & data)
@@ -166,7 +166,7 @@ situs/lab klien + bahan otoritas LinkedIn.
 5. **P5** Lapisan compounding (SSOT + sistem bukti + pipa konten).
 
 ## 7. Definition of Done (global)
-- Tidak ada data/ID milik OneLab yang ter-hardcode di aset generik.
+- Tidak ada data/ID milik AVA yang ter-hardcode di aset generik.
 - Lolos aturan §4.3 (integritas data) via validator otomatis.
 - Ada `walkthrough.md` berisi bukti (screenshot/log) tiap Work Item.
 - Setiap fitur punya section "Implikasi IP & Kepatuhan" yang sudah ditinjau.

@@ -38,7 +38,7 @@ function mb(n) { return (n / 1048576).toFixed(1) + ' MB'; }
   if (!arg) {
     if (!daftar.length) {
       console.log('Belum ada cadangan di ' + DIR_CADANGAN);
-      console.log('Buat lewat aplikasi (Backup Database) atau: ONELAB.bat backup');
+      console.log('Buat lewat aplikasi (Backup Database) atau: AVAPLATFORM.bat backup');
       process.exit(0);
     }
     console.log('Cadangan tersedia:\n');
@@ -68,13 +68,13 @@ function mb(n) { return (n / 1048576).toFixed(1) + ' MB'; }
       catch (e) { hidup = (e.code === 'EPERM'); }        // EPERM = ada, tapi milik pengguna lain
     }
     if (hidup) {
-      console.error(`OneLab masih berjalan (proses ${pid}). Tutup aplikasi lebih dulu, lalu ulangi.`);
+      console.error(`AVA masih berjalan (proses ${pid}). Tutup aplikasi lebih dulu, lalu ulangi.`);
       process.exit(1);
     }
     console.log('  catatan: postmaster.pid tertinggal dari penghentian tidak wajar — dilanjutkan.');
   }
 
-  // Cadangan membawa nama basis data asalnya (mis. onelab-pglite-data-…).
+  // Cadangan membawa nama basis data asalnya (mis. ava-pglite-data-…).
   // Memulihkan cadangan basis data PENGEMBANGAN ke folder produksi akan
   // menimpa data klinik dengan data uji — dan itu tidak kentara karena
   // keduanya berisi katalog produk yang sama.
@@ -120,5 +120,5 @@ function mb(n) { return (n / 1048576).toFixed(1) + ' MB'; }
   await pg.close();
 
   console.log(`\nSelesai. ${cek.rows[0].c} tabel dipulihkan ke ${DIR_DATA}`);
-  console.log('Jalankan ONELAB.bat seperti biasa.');
+  console.log('Jalankan AVAPLATFORM.bat seperti biasa.');
 })().catch(e => { console.error('GAGAL: ' + (e && e.message ? e.message : e)); process.exit(1); });

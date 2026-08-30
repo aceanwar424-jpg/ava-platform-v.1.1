@@ -1,0 +1,49 @@
+{
+  "name": "AvaHealth — Unified Global Wellness & Patient Portal",
+  "short_name": "AvaHealth",
+  "description": "Portal pasien, member VIP, konsultasi dokter, hasil laboratorium, dan nutraseutikal terpadu PT AVA Health Solution.",
+  "start_url": "/apps/index.html",
+  "scope": "/apps/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#020617",
+  "theme_color": "#0A2342",
+  "categories": ["medical", "health", "lifestyle"],
+  "icons": [
+    {
+      "src": "/css/logo-ava-global.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/css/logo-ava-global.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Hasil Lab Saya",
+      "short_name": "Hasil Lab",
+      "description": "Buka riwayat dan unduh PDF hasil laboratorium",
+      "url": "/apps/index.html#results",
+      "icons": [{ "src": "/css/logo-ava-global.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Queen Sanctuary",
+      "short_name": "Sanctuary",
+      "description": "Booking sesi wellness spa dan pelvic movement",
+      "url": "/apps/index.html#member",
+      "icons": [{ "src": "/css/logo-ava-global.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Portal Korporat MCU",
+      "short_name": "Korporat",
+      "description": "Akses dashboard kesehatan karyawan perusahaan",
+      "url": "/apps/index.html#korporat",
+      "icons": [{ "src": "/css/logo-ava-global.png", "sizes": "96x96" }]
+    }
+  ]
+}

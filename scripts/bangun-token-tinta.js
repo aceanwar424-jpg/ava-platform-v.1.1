@@ -14,7 +14,7 @@
 //   node scripts/bangun-token-tinta.js
 // ═══════════════════════════════════════════════════════════════
 const fs = require('fs'), path = require('path');
-const AKAR = path.resolve(__dirname, '..', 'onelab-platform-main', 'onelab-platform');
+const AKAR = path.resolve(__dirname, '..', 'ava-platform');
 
 const ke255 = h => { h = h.replace('#',''); if (h.length===3) h = h.split('').map(c=>c+c).join('');
   return [0,2,4].map(i => parseInt(h.slice(i,i+2),16)); };

@@ -1,0 +1,181 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "platform": "AVA GLOBAL ECOSYSTEM",
+  "version": "3.0.0",
+  "organization": "PT AVA HEALTH SOLUTION",
+  "licensing_provider": "AVA Tech",
+  "active_preset": "master_holding",
+  "presets": {
+    "starter_lis": {
+      "name": "Starter LIS (Diagnostic Laboratory)",
+      "description": "Paket khusus laboratorium klinik & rujukan patologi",
+      "target_market": "Laboratorium Mandiri / Klinik Lab Pratama",
+      "enabled_modules": [
+        "lab",
+        "inventory",
+        "produktivitas",
+        "wiki",
+        "konfigurasi"
+      ],
+      "features": {
+        "worklist": true,
+        "barcode_sampling": true,
+        "lab_connector_astm_hl7": true,
+        "smart_qc_westgard": true,
+        "delta_check": true,
+        "critical_alarm": true,
+        "satusehat_integration": false,
+        "emr_soap": false,
+        "pharmacy": false,
+        "wellness_spa": false,
+        "ceo_cockpit": false
+      }
+    },
+    "clinic_pratama": {
+      "name": "Clinic Pratama HIS",
+      "description": "Paket klinik rawat jalan, pendaftaran, kasir, dan rekam medis dasar",
+      "target_market": "Klinik Pratama / Dokter Praktik Bersama",
+      "enabled_modules": [
+        "utama",
+        "klinik",
+        "finance",
+        "produktivitas",
+        "konfigurasi"
+      ],
+      "features": {
+        "pendaftaran": true,
+        "kiosk_antrian": true,
+        "emr_soap": true,
+        "billing_pos": true,
+        "lab_connector_astm_hl7": false,
+        "satusehat_integration": true,
+        "pharmacy": false,
+        "wellness_spa": false,
+        "ceo_cockpit": false
+      }
+    },
+    "pharmacy_suite": {
+      "name": "Pharmacy Suite (Apotek Klinis)",
+      "description": "Paket instalasi farmasi & apotek dengan e-prescription dan skrining interaksi",
+      "target_market": "Instalasi Farmasi Klinik / Apotek Mandiri",
+      "enabled_modules": [
+        "klinik",
+        "inventory",
+        "finance",
+        "konfigurasi"
+      ],
+      "features": {
+        "e_prescription": true,
+        "kfa_sync": true,
+        "drug_interaction_screening": true,
+        "fefo_batch_inventory": true,
+        "lab_connector_astm_hl7": false,
+        "wellness_spa": false,
+        "ceo_cockpit": false
+      }
+    },
+    "enterprise_faskes": {
+      "name": "Enterprise Faskes (Klinik Utama / RS)",
+      "description": "Solusi terpadu faskes: LIS + SIMRS + Farmasi + Logistik MM + Keuangan FI/CO + HRIS",
+      "target_market": "Klinik Utama / RS Khusus / Jaringan Faskes",
+      "enabled_modules": [
+        "utama",
+        "marketing",
+        "administration",
+        "lab",
+        "klinik",
+        "homecare",
+        "finance",
+        "inventory",
+        "hrd",
+        "produktivitas",
+        "wiki",
+        "agentic",
+        "konfigurasi"
+      ],
+      "features": {
+        "worklist": true,
+        "lab_connector_astm_hl7": true,
+        "emr_soap": true,
+        "e_prescription": true,
+        "satusehat_integration": true,
+        "corporate_portal": true,
+        "doctor_referral_portal": true,
+        "sap_mm_logistics": true,
+        "sap_fico_finance": true,
+        "sap_hcm_hrd": true,
+        "wellness_spa": false,
+        "ceo_cockpit": false
+      }
+    },
+    "wellness_sanctuary": {
+      "name": "Wellness & Sanctuary Suite",
+      "description": "Paket manajemen medical spa, pelvic movement, dan telemedicine home care",
+      "target_market": "Medical Spa / Wellness Center / Home Care Agency",
+      "enabled_modules": [
+        "utama",
+        "avahealth",
+        "homecare",
+        "finance",
+        "marketing",
+        "konfigurasi"
+      ],
+      "features": {
+        "teleconsultation": true,
+        "home_service_dispatch": true,
+        "vip_membership": true,
+        "session_booking": true,
+        "lab_connector_astm_hl7": false,
+        "ceo_cockpit": false
+      }
+    },
+    "master_holding": {
+      "name": "AVA GLOBAL ECOSYSTEM — Master Holding (Internal & CEO Console)",
+      "description": "Seluruh modul dan kapabilitas ekosistem aktif 100% untuk operasional PT AVA Health Solution",
+      "target_market": "PT AVA Health Solution (Internal Holding & CEO/Founder Orchestration)",
+      "enabled_modules": [
+        "utama",
+        "ceo_cockpit",
+        "marketing",
+        "administration",
+        "lab",
+        "klinik",
+        "homecare",
+        "avahealth",
+        "finance",
+        "inventory",
+        "hrd",
+        "produktivitas",
+        "wiki",
+        "agentic",
+        "konfigurasi"
+      ],
+      "features": {
+        "all_modules": true,
+        "worklist": true,
+        "lab_connector_astm_hl7": true,
+        "emr_soap": true,
+        "e_prescription": true,
+        "satusehat_integration": true,
+        "corporate_portal": true,
+        "doctor_referral_portal": true,
+        "sap_mm_logistics": true,
+        "sap_fico_finance": true,
+        "sap_hcm_hrd": true,
+        "teleconsultation": true,
+        "home_service_dispatch": true,
+        "vip_membership": true,
+        "session_booking": true,
+        "d2c_ecommerce_oms": true,
+        "holding_financial_consolidation": true,
+        "ceo_cockpit": true
+      }
+    }
+  },
+  "custom_client_config": {
+    "client_id": "INTERNAL-AVA-001",
+    "client_name": "PT AVA HEALTH SOLUTION",
+    "license_tier": "master_holding",
+    "custom_enabled_modules": null
+  }
+}
