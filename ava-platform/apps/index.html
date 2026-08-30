@@ -830,128 +830,47 @@
       </div>
 
       <!-- ──────── VIEW: HOME CARE TRACKING & RESULTS ──────── -->
+      <!-- ──────── VIEW: LACAK KUNJUNGAN & HASIL HOME CARE ────────
+           Kartu pelacakan di sini DULU statis: nomor order, nama
+           flebotomis, dan estimasi tiba ("± 12 Menit") ditulis sebagai
+           teks tetap. Estimasi yang tidak pernah berubah adalah yang
+           paling menyesatkan — pasien menunggu di rumah berdasarkan
+           angka yang tidak terhubung ke apa pun.
+           Sekarang diisi renderHomecareResults() dari homecare_orders. -->
       <div id="homecare-results-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">🏠 Lacak Kunjungan &amp; Hasil Home Care</div>
-        
-        <div class="glass-card" style="padding:20px; background:#ffffff; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
-            <div>
-              <span class="badge" style="background:#fef3c7; color:#b45309; font-size:11px;">Kunjungan Aktif Hari Ini</span>
-              <h3 style="font-size:17px; font-weight:800; color:#0f2963; margin:8px 0 4px 0;">Home Blood Sampling &amp; Hormon Panel</h3>
-              <p style="font-size:12px; color:#64748b; margin:0;">Petugas Flebotomis: <b>Ns. Tari Nuraini, S.Kep</b> &bull; No. Order: <code>HC-2026-081</code></p>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:11px; color:#64748b;">Estimasi Tiba di Lokasi:</div>
-              <strong style="font-size:20px; color:var(--teal);">± 12 Menit</strong>
-            </div>
-          </div>
-
-          <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
-            <a href="track.html" target="_blank" class="btn btn-sm btn-teal" style="text-decoration:none; padding:10px 16px; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
-              📡 Buka Peta Pelacakan GPS Langsung
-            </a>
-            <a href="tel:081299887711" class="btn btn-sm" style="background:#f1f5f9; color:#0f2963; text-decoration:none; padding:10px 16px; font-weight:700; border:1px solid #cbd5e1;">
-              📞 Hubungi Petugas Nakes
-            </a>
-          </div>
-        </div>
-
-        <div class="glass-card" style="padding:20px; background:#ffffff;">
-          <h4 style="font-size:15px; font-weight:700; color:#0f2963; margin-bottom:12px;">Riwayat Kunjungan Home Care &amp; Hasil Lab</h4>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div style="border:1px solid #e2e8f0; border-radius:10px; padding:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-              <div>
-                <b style="font-size:13.5px; color:#0f2963;">Panel Pemeriksaan Darah Lengkap &amp; Profil Lipid</b><br>
-                <span style="font-size:11.5px; color:#64748b;">Kunjungan 15 Juli 2026 &bull; Nakes: Ns. Dimas Setiawan</span>
-              </div>
-              <button class="btn btn-sm" disabled title="Tersedia setelah hasil dirilis dokter penanggung jawab" style="opacity:.55;cursor:not-allowed">📄 Unduh Hasil Lab (PDF)</button>
-            </div>
-          </div>
-        </div>
+        <div class="section-title" style="margin-bottom:16px; color:#0f2963;">
+          Lacak Kunjungan &amp; Hasil Home Care</div>
+        <div id="hc-lacak"></div>
       </div>
 
       <!-- ──────── VIEW: MEMBER SANCTUARY ──────── -->
+      <!-- ──────── VIEW: QUEEN SANCTUARY & VIP MEMBER ────────
+           Isi panel ini DULU tertanam langsung di HTML: nama pemegang
+           kartu, nomor kartu, dan sisa sesi ditulis sebagai teks tetap.
+           Akibatnya setiap member yang masuk melihat nama dan nomor kartu
+           orang lain — bukan sekadar tampilan yang salah, tapi data satu
+           pelanggan yang dipertunjukkan ke semua pelanggan lain.
+           Sekarang diisi renderMemberSanctuary() dari spa_member,
+           spa_saldo, dan spa_reservasi. ──────── -->
       <div id="member-sanctuary-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">👑 Queen Sanctuary &amp; VIP Membership</div>
-        
-        <!-- VIP Card Banner -->
-        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); border:2px solid #d4af37; border-radius:16px; padding:24px; color:#fff; box-shadow:0 10px 30px rgba(0,0,0,0.2); margin-bottom:20px; position:relative; overflow:hidden;">
-          <div style="position:absolute; top:-20px; right:-20px; font-size:120px; opacity:0.05;">👑</div>
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <span style="font-size:11px; letter-spacing:1px; color:#d4af37; font-weight:800;">QUEEN SANCTUARY VIP MEMBER</span>
-              <h2 style="font-size:22px; font-weight:800; margin:6px 0 0 0; color:#fff;">Ny. Siska Melani</h2>
-              <span style="font-size:12px; color:#94a3b8;">Card ID: <b>VIP-GLD-88201</b> &bull; Exp: 12/2027</span>
-            </div>
-            <span style="background:rgba(212,175,55,0.2); color:#d4af37; border:1px solid #d4af37; padding:4px 12px; border-radius:99px; font-weight:800; font-size:11px;">GOLD STATUS</span>
-          </div>
-
-          <div style="margin-top:24px; display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;">
-            <div>
-              <div style="font-size:11px; color:#94a3b8;">Sisa Sesi Spa &amp; Ratus</div>
-              <strong style="font-size:18px; color:#38bdf8;">4 Sesi Tersedia</strong>
-            </div>
-            <div>
-              <div style="font-size:11px; color:#94a3b8;">Pelvic Reformer Gym</div>
-              <strong style="font-size:18px; color:#34d399;">6 Sesi Tersedia</strong>
-            </div>
-            <div>
-              <div style="font-size:11px; color:#94a3b8;">Private Suite Privilege</div>
-              <strong style="font-size:18px; color:#d4af37;">Suite Rose 01</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-card" style="padding:20px; background:#ffffff;">
-          <h4 style="font-size:15px; font-weight:700; color:#0f2963; margin-bottom:12px;">Reservasi Sesi Terapi Baru</h4>
-          <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:14px;">
-            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:14px; background:#f8fafc;">
-              <b style="font-size:13px; color:#0f2963;">Empress Ratus Herbal Steam</b>
-              <p style="font-size:11px; color:#64748b; margin:4px 0 10px 0;">Terapi uap rempah keraton untuk kesehatan intim &bull; 45 Menit</p>
-              <button class="btn btn-sm" disabled title="Modul reservasi Sanctuary belum tersambung" style="width:100%;opacity:.55;cursor:not-allowed">Pesan Sesi</button>
-            </div>
-            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:14px; background:#f8fafc;">
-              <b style="font-size:13px; color:#0f2963;">Pelvic Reformer Pilates</b>
-              <p style="font-size:11px; color:#64748b; margin:4px 0 10px 0;">Latihan penguatan otot dasar panggul &amp; postur &bull; 60 Menit</p>
-              <button class="btn btn-sm" disabled title="Modul reservasi Sanctuary belum tersambung" style="width:100%;opacity:.55;cursor:not-allowed">Pesan Sesi</button>
-            </div>
-          </div>
-        </div>
+        <div class="section-title" style="margin-bottom:16px; color:#0f2963;">
+          Queen Sanctuary &amp; VIP Membership</div>
+        <div id="spa-kartu"></div>
+        <div id="spa-jadwal"></div>
+        <div id="spa-katalog"></div>
       </div>
 
       <!-- ──────── VIEW: STAFF HOME CARE VISIT PORTAL ──────── -->
+      <!-- ──────── VIEW: PORTAL TUGAS NAKES HOME CARE ────────
+           Kartu tugas di sini DULU statis: nama petugas, nama pasien,
+           nomor HP, alamat, dan jenis pemeriksaan ditulis sebagai teks
+           tetap. Setiap nakes yang masuk melihat tugas yang sama untuk
+           pasien yang sama — dan pasien itu tidak pernah ada.
+           Sekarang diisi renderStaffHomecare() dari homecare_orders. -->
       <div id="staff-homecare-view" class="view-panel">
-        <div class="section-title" style="margin-bottom: 16px; color:#0f2963;">🩺 Portal Tugas Lapangan Nakes &amp; Flebotomis Home Care</div>
-        
-        <div class="glass-card" style="padding:20px; background:#ffffff; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <div>
-              <h4 style="font-size:16px; font-weight:800; color:#0f2963; margin:0;">Jadwal Penugasan Visit Hari Ini</h4>
-              <p style="font-size:12px; color:#64748b; margin-top:2px;">Petugas Bertugas: <b>Ns. Tari Nuraini, S.Kep</b> (ID: NKS-041)</p>
-            </div>
-            <span class="badge badge-fit">GPS Aktif</span>
-          </div>
-
-          <div style="display:flex; flex-direction:column; gap:14px;">
-            <div style="border:1px solid #e2e8f0; border-radius:12px; padding:16px; background:#f8fafc; border-left:4px solid var(--teal);">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div>
-                  <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10px;">Kunjungan 1 &bull; 10:00 WIB</span>
-                  <h4 style="font-size:15px; font-weight:800; color:#0f2963; margin:6px 0 2px 0;">Ny. Siska Melani (0812-9988-7711)</h4>
-                  <p style="font-size:12px; color:#64748b; margin:0;">📍 Jl. Metro Pondok Indah Blok TB No. 12, Jakarta Selatan</p>
-                  <p style="font-size:12px; color:#0f2963; margin-top:4px; font-weight:600;">Paket: Sampling Darah Hormon &amp; Profil Lipid (Tabung Ungu + Merah)</p>
-                </div>
-                <span class="badge badge-fit" id="staff-task-status">Dalam Perjalanan</span>
-              </div>
-
-              <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
-                <button class="btn btn-sm btn-teal" onclick="updateStaffStatus('Tiba di Rumah Pasien')">📍 Konfirmasi Tiba</button>
-                <button class="btn btn-sm" disabled title="Perlu perangkat pemindai; belum tersambung" style="background:#334155;color:#94a3b8;border:none;border-radius:6px;cursor:not-allowed">📷 Scan Barcode Tabung</button>
-                <button class="btn btn-sm" style="background:#16a34a; color:#fff; border:none; border-radius:6px;" onclick="updateStaffStatus('Sampling Selesai & Kirim Lab')">✓ Selesai Sampling</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div class="section-title" style="margin-bottom:16px; color:#0f2963;">
+          Portal Tugas Lapangan Nakes &amp; Flebotomis Home Care</div>
+        <div id="staff-tugas"></div>
       </div>
 
       <!-- ──────── VIEW: BOOK LAB TEST (VIRTU STYLE) ──────── -->

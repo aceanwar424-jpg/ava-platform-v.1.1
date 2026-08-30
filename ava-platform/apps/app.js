@@ -229,6 +229,9 @@ function showView(viewId, viewTitle) {
   else if (viewId === 'ava-caregiver-view') renderAvaCaregiver();
   else if (viewId === 'toko-view') renderToko();
   else if (viewId === 'toko-checkout-view') renderTokoCheckout();
+  else if (viewId === 'member-sanctuary-view') renderMemberSanctuary();
+  else if (viewId === 'staff-homecare-view') renderStaffHomecare();
+  else if (viewId === 'homecare-results-view') renderHomecareResults();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -1396,6 +1399,457 @@ async function tkKirimPesanan(tombol) {
   }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// QUEEN SANCTUARY — kartu member, saldo sesi, dan pemesanan treatment
+//
+// Panel ini sebelumnya berisi nama pemegang kartu, nomor kartu, dan sisa
+// sesi yang ditulis langsung di HTML. Setiap member yang masuk melihat
+// nama dan nomor kartu orang yang sama — data satu pelanggan yang
+// dipertunjukkan ke semua pelanggan lain.
+//
+// Sekarang membaca migrasi 0036.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Member dicocokkan lewat nomor HP atau surel akun, bukan lewat nomor
+// member yang diketik. Kalau tidak ketemu, panel mengatakan akun ini
+// belum tertaut — bukan menampilkan member pertama yang ada di tabel.
+//
+// Saldo sesi dibaca dari view spa_saldo (jumlah mutasi), bukan dari
+// kolom yang disimpan. Angka yang disimpan terpisah selalu bisa
+// menyimpang dari mutasinya.
+//
+// Pemesanan tidak memilih terapis dari layar. Pelanggan tidak tahu siapa
+// yang berkompeten dan siapa yang kosong jamnya; jadwal ditetapkan
+// petugas setelah permintaan masuk.
+//
+// Prefiks "sp".
+// ═══════════════════════════════════════════════════════════════
+
+let spMember = null;
+
+async function renderMemberSanctuary() {
+  const kartu = document.getElementById('spa-kartu');
+  const jadwal = document.getElementById('spa-jadwal');
+  const katalog = document.getElementById('spa-katalog');
+  if (!kartu) return;
+
+  kartu.innerHTML = '<div style="padding:20px; text-align:center; font-size:13px; '
+    + 'color:var(--text-muted)">Memuat data member…</div>';
+  jadwal.innerHTML = '';
+  katalog.innerHTML = '';
+
+  let saldo = null, treatment = [], reservasi = [];
+  try {
+    const hp = (window.currentUserProfile && window.currentUserProfile.phone) || '';
+    const email = window.currentUserEmail || '';
+
+    // Pencocokan lewat identitas akun. Kalau keduanya kosong, jangan
+    // menebak — lebih baik mengatakan belum tertaut.
+    let daftar = [];
+    if (hp) daftar = await avaAmbil('spa_member', `select=*&hp=eq.${encodeURIComponent(hp)}`);
+    if (!daftar.length && email) {
+      daftar = await avaAmbil('spa_member',
+        `select=*&email=eq.${encodeURIComponent(email)}`);
+    }
+    spMember = daftar[0] || null;
+
+    treatment = await avaAmbil('spa_treatment', 'select=*&status=eq.Aktif&order=nama');
+
+    if (spMember) {
+      const s = await avaAmbil('spa_saldo', `select=*&member_id=eq.${spMember.id}`);
+      saldo = s[0] || null;
+      reservasi = await avaAmbil('spa_reservasi',
+        `select=*&member_id=eq.${spMember.id}&order=mulai.desc&limit=10`);
+    }
+  } catch (e) {
+    kartu.innerHTML = avaKosong(
+      'Data Sanctuary belum dapat dibaca dari server ini.');
+    return;
+  }
+
+  // ── Kartu member ──
+  if (!spMember) {
+    kartu.innerHTML = avaKosong(
+      'Akun ini belum tertaut ke keanggotaan Queen Sanctuary. '
+      + 'Hubungi resepsionis untuk menautkan nomor HP Anda ke kartu member.');
+  } else {
+    const sisa = saldo ? Number(saldo.sesi_tersisa || 0) : 0;
+    kartu.innerHTML = `
+      <div style="background:linear-gradient(135deg,#1e293b,#0f172a); border:2px solid #d4af37;
+                  border-radius:16px; padding:24px; color:#fff; margin-bottom:20px;
+                  position:relative; overflow:hidden">
+        <div style="position:absolute; top:-20px; right:-20px; font-size:120px; opacity:.05">👑</div>
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px">
+          <div>
+            <span style="font-size:11px; letter-spacing:1px; color:#d4af37; font-weight:800">
+              QUEEN SANCTUARY MEMBER</span>
+            <h2 style="font-size:22px; font-weight:800; margin:6px 0 0; color:#fff">
+              ${tkEsc(spMember.nama)}</h2>
+            <span style="font-size:12px; color:#94a3b8">
+              ${spMember.no_member ? 'Kartu: <b>' + tkEsc(spMember.no_member) + '</b>' : ''}
+              ${spMember.tgl_berakhir
+                ? ' &bull; berlaku s/d ' + new Date(spMember.tgl_berakhir)
+                    .toLocaleDateString('id-ID', { month: '2-digit', year: 'numeric' })
+                : ''}</span>
+          </div>
+          <span style="background:rgba(212,175,55,.2); color:#d4af37; border:1px solid #d4af37;
+                       padding:4px 12px; border-radius:99px; font-weight:800; font-size:11px;
+                       white-space:nowrap">${tkEsc(spMember.tier || 'REGULER').toUpperCase()}</span>
+        </div>
+        <div style="margin-top:24px; display:grid;
+                    grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px;
+                    border-top:1px solid rgba(255,255,255,.1); padding-top:16px">
+          <div>
+            <div style="font-size:11px; color:#94a3b8">Sisa Sesi</div>
+            <strong style="font-size:18px; color:${sisa > 0 ? '#38bdf8' : '#94a3b8'}">
+              ${sisa} sesi</strong>
+          </div>
+          <div>
+            <div style="font-size:11px; color:#94a3b8">Sesi Terpakai</div>
+            <strong style="font-size:18px; color:#34d399">
+              ${saldo ? Number(saldo.sesi_terpakai || 0) : 0} sesi</strong>
+          </div>
+          <div>
+            <div style="font-size:11px; color:#94a3b8">Status</div>
+            <strong style="font-size:18px; color:#d4af37">
+              ${tkEsc(spMember.status || '—')}</strong>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  // ── Jadwal saya ──
+  if (spMember) {
+    const akan = reservasi.filter(r =>
+      ['Dijadwalkan', 'Hadir', 'Berlangsung'].includes(r.status));
+    const namaTr = id => (treatment.find(t => t.id === id) || {}).nama || 'Treatment';
+
+    jadwal.innerHTML = `
+      <div style="font-weight:800; font-size:14px; margin:0 0 10px; color:#0f2963">
+        Jadwal Saya</div>
+      ${!akan.length
+        ? avaKosong('Belum ada sesi terjadwal.')
+        : `<div class="glass-card" style="padding:6px 16px; background:#fff; margin-bottom:20px">
+            ${akan.map(r => `
+              <div style="display:flex; justify-content:space-between; gap:12px;
+                          padding:10px 0; border-bottom:1px solid #eee">
+                <div>
+                  <div style="font-weight:700; font-size:13px">${tkEsc(namaTr(r.treatment_id))}</div>
+                  <div style="font-size:11px; color:var(--text-muted)">
+                    ${new Date(r.mulai).toLocaleString('id-ID',
+                      { weekday: 'long', day: '2-digit', month: 'short',
+                        hour: '2-digit', minute: '2-digit' })}
+                    &bull; ${tkEsc(r.no_reservasi || '')}</div>
+                </div>
+                <span style="font-size:11px; font-weight:700; color:#0f2963;
+                             white-space:nowrap">${tkEsc(r.status)}</span>
+              </div>`).join('')}
+          </div>`}`;
+  }
+
+  // ── Katalog & permintaan jadwal ──
+  katalog.innerHTML = `
+    <div style="font-weight:800; font-size:14px; margin:0 0 10px; color:#0f2963">
+      Paket Treatment</div>
+    ${!treatment.length
+      ? avaKosong('Katalog treatment belum tersedia.')
+      : `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+                     gap:12px">
+          ${treatment.map(t => `
+            <div class="glass-card" style="padding:14px; background:#fff">
+              <div style="font-weight:700; font-size:13px; line-height:1.35">
+                ${tkEsc(t.nama)}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px">
+                ${t.durasi_menit} menit${t.kategori ? ' · ' + tkEsc(t.kategori) : ''}</div>
+              ${t.kontraindikasi
+                ? `<div style="font-size:11px; color:#c0392b; margin-top:6px">
+                     ⚠ ${tkEsc(t.kontraindikasi)}</div>` : ''}
+              <div style="font-weight:800; color:#0f2963; margin:8px 0 2px">
+                ${tkRp(spMember ? (t.harga_member || t.harga) : t.harga)}</div>
+              <div style="font-size:11px; color:var(--text-muted)">
+                atau ${t.sesi_terpakai} sesi dari saldo</div>
+              <button class="btn btn-sm btn-teal" style="width:100%; margin:10px 0 0"
+                      onclick="spMintaJadwal(${t.id}, '${tkEsc(t.nama).replace(/'/g, "\\'")}')">
+                Minta Jadwal</button>
+            </div>`).join('')}
+        </div>`}`;
+}
+
+// Permintaan jadwal, bukan pemesanan langsung. Pelanggan tidak bisa
+// melihat siapa terapis yang berkompeten dan jam mana yang kosong;
+// membiarkannya memilih sendiri hanya menghasilkan jadwal yang harus
+// dibatalkan petugas. Yang dikirim adalah tanggal & jam yang diinginkan.
+async function spMintaJadwal(treatmentId, namaTreatment) {
+  const tgl = prompt(`Permintaan jadwal: ${namaTreatment}\n\n`
+    + 'Tanggal yang diinginkan (YYYY-MM-DD):',
+    new Date(Date.now() + 86400000).toISOString().slice(0, 10));
+  if (!tgl) return;
+  const jam = prompt('Jam yang diinginkan (HH:MM):', '10:00');
+  if (!jam) return;
+
+  const pesan = `Halo AVA Sanctuary, saya ingin memesan *${namaTreatment}*.\n`
+    + `Tanggal: ${tgl}\nJam: ${jam}\n`
+    + (spMember
+        ? `Member: ${spMember.nama}${spMember.no_member ? ' (' + spMember.no_member + ')' : ''}`
+        : `Nama: ${window.currentUsername || '-'}`);
+
+  // Dikirim lewat WhatsApp resepsionis, bukan langsung menulis ke
+  // spa_reservasi: menulis reservasi tanpa memeriksa ketersediaan terapis
+  // dan ruangan akan membuat jadwal yang tampak diterima padahal bentrok.
+  // Petugaslah yang memasukkannya lewat modul Sanctuary, yang memeriksa
+  // bentrok di basis data.
+  window.open('https://wa.me/6282120071009?text=' + encodeURIComponent(pesan), '_blank');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PORTAL TUGAS NAKES — daftar kunjungan home care hari ini
+//
+// Kartu tugas di panel ini sebelumnya statis: nama petugas, nama pasien,
+// nomor HP, alamat lengkap, dan jenis pemeriksaan ditulis sebagai teks
+// tetap di HTML. Setiap nakes yang masuk melihat tugas yang sama untuk
+// pasien yang sama — pasien yang tidak pernah ada.
+//
+// Sekarang membaca homecare_orders, tabel yang memang sudah ditulis oleh
+// alur pemesanan di aplikasi ini (hcCheckout).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Tugas disaring ke petugas yang sedang masuk. Menampilkan seluruh
+// kunjungan hari itu ke semua nakes berarti setiap petugas melihat
+// alamat dan nomor HP pasien yang bukan tanggung jawabnya.
+//
+// Kalau penugasan belum diisi, panel mengatakan itu apa adanya — bukan
+// menampilkan kunjungan milik orang lain sebagai gantinya.
+//
+// Prefiks "sh".
+// ═══════════════════════════════════════════════════════════════
+
+async function renderStaffHomecare() {
+  const box = document.getElementById('staff-tugas');
+  if (!box) return;
+  box.innerHTML = '<div style="padding:24px; text-align:center; font-size:13px; '
+    + 'color:var(--text-muted)">Memuat tugas hari ini…</div>';
+
+  const nama = window.currentUsername || '';
+  const hariIni = new Date().toISOString().slice(0, 10);
+
+  let tugas = [];
+  try {
+    // Disaring ke petugas yang masuk. Tanpa identitas, jangan tampilkan
+    // apa pun — bukan tampilkan semuanya.
+    if (!nama) {
+      box.innerHTML = avaKosong(
+        'Akun petugas belum dikenali. Masuk ulang untuk melihat penugasan Anda.');
+      return;
+    }
+    tugas = await avaAmbil('homecare_orders',
+      `select=*&assigned_staff=eq.${encodeURIComponent(nama)}`
+      + `&scheduled_date=eq.${hariIni}&order=scheduled_time`);
+
+    // Sebagian pesanan lama memakai kolom petugas_name, bukan assigned_staff.
+    if (!tugas.length) {
+      tugas = await avaAmbil('homecare_orders',
+        `select=*&petugas_name=eq.${encodeURIComponent(nama)}`
+        + `&scheduled_date=eq.${hariIni}&order=scheduled_time`);
+    }
+  } catch (e) {
+    box.innerHTML = avaKosong('Daftar tugas belum dapat dibaca dari server ini.');
+    return;
+  }
+
+  if (!tugas.length) {
+    box.innerHTML = `
+      <div class="glass-card" style="padding:16px; background:#fff; margin-bottom:14px">
+        <div style="font-weight:800; font-size:14px; color:#0f2963">
+          ${tkEsc(nama)}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:2px">
+          ${new Date().toLocaleDateString('id-ID',
+            { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</div>
+      </div>`
+      + avaKosong('Tidak ada kunjungan yang ditugaskan kepada Anda hari ini.');
+    return;
+  }
+
+  const warna = {
+    'Baru': '#0369a1', 'Dijadwalkan': '#0369a1', 'Dalam Perjalanan': '#b45309',
+    'Tiba di Rumah Pasien': '#b45309', 'Selesai': '#15803d', 'Batal': '#64748b',
+  };
+
+  box.innerHTML = `
+    <div class="glass-card" style="padding:16px; background:#fff; margin-bottom:14px;
+                                   display:flex; justify-content:space-between;
+                                   align-items:center; gap:12px; flex-wrap:wrap">
+      <div>
+        <div style="font-weight:800; font-size:14px; color:#0f2963">${tkEsc(nama)}</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:2px">
+          ${tugas.length} kunjungan &bull; ${new Date().toLocaleDateString('id-ID',
+            { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px">
+      ${tugas.map((t, i) => `
+        <div class="glass-card" style="padding:16px; background:#fff;
+                                       border-left:4px solid var(--teal)">
+          <div style="display:flex; justify-content:space-between;
+                      align-items:flex-start; gap:12px">
+            <div style="min-width:0">
+              <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10px">
+                Kunjungan ${i + 1}${t.scheduled_time ? ' &bull; ' + tkEsc(t.scheduled_time) : ''}</span>
+              <h4 style="font-size:15px; font-weight:800; color:#0f2963; margin:6px 0 2px">
+                ${tkEsc(t.patient_name || '—')}
+                ${t.patient_phone ? ' (' + tkEsc(t.patient_phone) + ')' : ''}</h4>
+              ${t.patient_address
+                ? `<p style="font-size:12px; color:#64748b; margin:0">
+                     📍 ${tkEsc(t.patient_address)}</p>` : ''}
+              ${t.service_type
+                ? `<p style="font-size:12px; color:#0f2963; margin-top:4px; font-weight:600">
+                     ${tkEsc(t.service_type)}</p>` : ''}
+              ${t.notes
+                ? `<p style="font-size:11px; color:#64748b; margin-top:4px">
+                     ${tkEsc(t.notes)}</p>` : ''}
+            </div>
+            <span class="badge badge-fit" style="white-space:nowrap;
+                  color:${warna[t.status] || '#64748b'}">${tkEsc(t.status || '—')}</span>
+          </div>
+
+          <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap">
+            ${t.lat && t.lng
+              ? `<a class="btn btn-sm" style="background:#0f2963; color:#fff; border:none;
+                        border-radius:6px; text-decoration:none"
+                    href="https://www.google.com/maps/dir/?api=1&destination=${t.lat},${t.lng}"
+                    target="_blank" rel="noopener">Buka Rute</a>` : ''}
+            <button class="btn btn-sm btn-teal"
+                    onclick="shUbahStatus(${t.id}, 'Tiba di Rumah Pasien')">
+              Konfirmasi Tiba</button>
+            <button class="btn btn-sm"
+                    style="background:#16a34a; color:#fff; border:none; border-radius:6px"
+                    onclick="shUbahStatus(${t.id}, 'Sampling Selesai')">
+              Selesai Sampling</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+async function shUbahStatus(orderId, status) {
+  if (!confirm(`Tandai kunjungan ini sebagai "${status}"?`)) return;
+  try {
+    await sbPatch('homecare_orders', orderId,
+      { status: status, updated_at: new Date().toISOString() });
+    await renderStaffHomecare();
+  } catch (e) {
+    alert('Gagal memperbarui status: ' + e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LACAK HOME CARE — kunjungan pasien sendiri
+//
+// Kartu di panel ini sebelumnya statis: nomor order, nama flebotomis,
+// dan "Estimasi Tiba ± 12 Menit" ditulis sebagai teks tetap. Estimasi
+// palsu adalah yang paling menyesatkan di antaranya — pasien menunggu di
+// rumah berdasarkan angka yang tidak terhubung ke apa pun, dan angkanya
+// tetap 12 menit sampai kapan pun.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// TIDAK ada estimasi waktu tiba. Menghitungnya butuh posisi petugas yang
+// diperbarui terus-menerus dan layanan rute; keduanya belum ada. Yang
+// ditampilkan hanya status yang benar-benar tercatat. Angka perkiraan
+// yang ditebak lebih buruk daripada tidak ada angka sama sekali.
+//
+// Kunjungan disaring ke pemesan yang sedang masuk. Tanpa identitas,
+// tidak ada yang ditampilkan.
+//
+// Prefiks "hl".
+// ═══════════════════════════════════════════════════════════════
+
+async function renderHomecareResults() {
+  const box = document.getElementById('hc-lacak');
+  if (!box) return;
+  box.innerHTML = '<div style="padding:24px; text-align:center; font-size:13px; '
+    + 'color:var(--text-muted)">Memuat kunjungan…</div>';
+
+  const nama = window.currentUsername || '';
+  const hp = (window.currentUserProfile && window.currentUserProfile.phone) || '';
+
+  if (!nama && !hp) {
+    box.innerHTML = avaKosong('Masuk terlebih dahulu untuk melihat kunjungan Anda.');
+    return;
+  }
+
+  let pesanan = [];
+  try {
+    if (hp) {
+      pesanan = await avaAmbil('homecare_orders',
+        `select=*&patient_phone=eq.${encodeURIComponent(hp)}`
+        + '&order=scheduled_date.desc&limit=20');
+    }
+    if (!pesanan.length && nama) {
+      pesanan = await avaAmbil('homecare_orders',
+        `select=*&patient_name=eq.${encodeURIComponent(nama)}`
+        + '&order=scheduled_date.desc&limit=20');
+    }
+  } catch (e) {
+    box.innerHTML = avaKosong('Data kunjungan belum dapat dibaca dari server ini.');
+    return;
+  }
+
+  if (!pesanan.length) {
+    box.innerHTML = avaKosong('Belum ada kunjungan home care atas nama Anda.')
+      + `<div style="text-align:center; margin-top:12px">
+           <button class="btn btn-sm btn-teal"
+                   onclick="showView('book-homecare-view','Book Home Care')">
+             Pesan Home Care</button></div>`;
+    return;
+  }
+
+  const warna = {
+    'Baru': '#0369a1', 'Dijadwalkan': '#0369a1', 'Dalam Perjalanan': '#b45309',
+    'Tiba di Rumah Pasien': '#b45309', 'Sampling Selesai': '#15803d',
+    'Selesai': '#15803d', 'Batal': '#64748b',
+  };
+
+  box.innerHTML = `<div style="display:flex; flex-direction:column; gap:14px">
+    ${pesanan.map(o => `
+      <div class="glass-card" style="padding:18px; background:#fff">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;
+                    flex-wrap:wrap; gap:12px">
+          <div style="min-width:0">
+            <span class="badge" style="background:#fef3c7; color:#b45309; font-size:11px">
+              ${o.scheduled_date
+                ? new Date(o.scheduled_date).toLocaleDateString('id-ID',
+                    { weekday: 'long', day: '2-digit', month: 'long' })
+                : 'Tanggal belum ditetapkan'}
+              ${o.scheduled_time ? ' &bull; ' + tkEsc(o.scheduled_time) : ''}</span>
+            <h3 style="font-size:16px; font-weight:800; color:#0f2963; margin:8px 0 4px">
+              ${tkEsc(o.service_type || 'Kunjungan Home Care')}</h3>
+            <p style="font-size:12px; color:#64748b; margin:0">
+              No. Order: <code>${tkEsc(o.order_number || '—')}</code>
+              ${o.assigned_staff || o.petugas_name
+                ? ' &bull; Petugas: <b>' + tkEsc(o.assigned_staff || o.petugas_name) + '</b>'
+                : ' &bull; petugas belum ditetapkan'}</p>
+          </div>
+          <span class="badge badge-fit" style="white-space:nowrap;
+                color:${warna[o.status] || '#64748b'}">${tkEsc(o.status || '—')}</span>
+        </div>
+
+        ${o.patient_address
+          ? `<p style="font-size:12px; color:#64748b; margin:10px 0 0">
+               📍 ${tkEsc(o.patient_address)}</p>` : ''}
+
+        ${o.track_token
+          ? `<a class="btn btn-sm btn-teal" style="margin-top:12px; text-decoration:none;
+                    display:inline-block"
+                href="/track.html?t=${encodeURIComponent(o.track_token)}"
+                target="_blank" rel="noopener">Lihat Posisi Petugas</a>`
+          : `<p style="font-size:11px; color:var(--text-muted); margin:12px 0 0">
+               Pelacakan posisi tersedia setelah petugas berangkat.</p>`}
+      </div>`).join('')}
+  </div>`;
+}
+
 // RPC helper (pakai SB_HEADERS/SUPABASE_URL global dari js/core/api.js)
 async function appRpc(fn, args){
   const r = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method:'POST', headers:SB_HEADERS, body:JSON.stringify(args||{}) });
@@ -1535,12 +1989,12 @@ function updateLoginFormUI(role) {
   } else if (role === 'member') {
     formTitleEl.textContent = 'Portal Member VIP & Sanctuary';
     labelEl.textContent = 'No. Kartu Member / Email';
-    inputEl.placeholder = 'Contoh: VIP-GLD-88201 atau email member';
+    inputEl.placeholder = 'Nomor kartu member atau email';
     footerEl.innerHTML = 'Ingin upgrade status VIP? Hubungi <a href="#">Concierge Sanctuary</a>';
   } else if (role === 'staff') {
     formTitleEl.textContent = 'Portal Tugas Nakes Home Care';
     labelEl.textContent = 'NIP / Email Petugas Nakes';
-    inputEl.placeholder = 'Contoh: NKS-041 atau email nakes';
+    inputEl.placeholder = 'ID petugas atau email';
     footerEl.innerHTML = 'Kendala login nakes? Hubungi <a href="#">Koordinator Home Care</a>';
   } else if (role === 'referral') {
     formTitleEl.textContent = 'Portal Faskes Referral';
@@ -3219,7 +3673,7 @@ async function handleLogin(event) {
     renderReferralList();
   } 
   else if (currentRole === 'member') {
-    const finalName = isSuperAdmin ? adminRealName : (finalUsername || 'Ny. Siska Melani');
+    const finalName = isSuperAdmin ? adminRealName : (finalUsername || 'Member');
     avatarEl.textContent = '👑';
     avatarEl.style.background = 'linear-gradient(135deg, #d4af37, #b45309)';
     welcomeEl.textContent = finalName;
@@ -3227,7 +3681,7 @@ async function handleLogin(event) {
     await loadDataFromSupabase();
   }
   else if (currentRole === 'staff') {
-    const finalName = isSuperAdmin ? `Ns. ${adminRealName}` : (finalUsername || 'Ns. Tari Nuraini, S.Kep');
+    const finalName = isSuperAdmin ? `Ns. ${adminRealName}` : (finalUsername || 'Petugas');
     avatarEl.textContent = '🩺';
     avatarEl.style.background = 'linear-gradient(135deg, #10b981, #0f766e)';
     welcomeEl.textContent = finalName;
