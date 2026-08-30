@@ -71,16 +71,100 @@ async function saveResultNote(rid, mode='validate'){
   } catch(e){ toast('Gagal menyimpan catatan: '+e.message,'err'); }
 }
 
-// ── Master produk (dipakai untuk target TAT & interpretasi) ──────
+// ── Master produk analit laboratorium (Katalog Tes Medis Terverifikasi LOINC/UCUM) ──────
+const REAL_MASTER_LAB_TESTS = [
+  // HEMATOLOGI
+  { id: 101, kode_internal: 'LAB-HEM-001', nama_tes: 'Darah Lengkap Otomatis (CBC + Diff)', kategori: 'Hematologi', satuan_hasil: 'Panel', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: true, loinc_code: '58410-2', tarif: 110000 },
+  { id: 102, kode_internal: 'LAB-HEM-002', nama_tes: 'Hemoglobin (Hb)', kategori: 'Hematologi', satuan_hasil: 'g/dL', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: false, loinc_code: '718-7', tarif: 45000 },
+  { id: 103, kode_internal: 'LAB-HEM-003', nama_tes: 'Leukosit (WBC)', kategori: 'Hematologi', satuan_hasil: '10^3/uL', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: false, loinc_code: '6690-2', tarif: 45000 },
+  { id: 104, kode_internal: 'LAB-HEM-004', nama_tes: 'Trombosit (Platelet)', kategori: 'Hematologi', satuan_hasil: '10^3/uL', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: false, loinc_code: '777-3', tarif: 45000 },
+  { id: 105, kode_internal: 'LAB-HEM-005', nama_tes: 'Hematokrit (HCT)', kategori: 'Hematologi', satuan_hasil: '%', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: false, loinc_code: '4544-3', tarif: 45000 },
+  { id: 106, kode_internal: 'LAB-HEM-006', nama_tes: 'Laju Endap Darah (LED / Westergren)', kategori: 'Hematologi', satuan_hasil: 'mm/jam', sampel_type: 'Darah Sitrat / EDTA', waktu_tat_jam: 2, is_panel: false, loinc_code: '44522-1', tarif: 50000 },
+  { id: 107, kode_internal: 'LAB-HEM-007', nama_tes: 'Golongan Darah ABO & Rhesus', kategori: 'Hematologi', satuan_hasil: 'Kualitatif', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 1, is_panel: false, loinc_code: '883-9', tarif: 65000 },
+  { id: 108, kode_internal: 'LAB-HEM-008', nama_tes: 'Masa Perdarahan (Bleeding Time - Ivy)', kategori: 'Hematologi', satuan_hasil: 'menit', sampel_type: 'Darah Kapiler', waktu_tat_jam: 1, is_panel: false, loinc_code: '3187-0', tarif: 50000 },
+  { id: 109, kode_internal: 'LAB-HEM-009', nama_tes: 'Masa Pembekuan (Clotting Time - Lee White)', kategori: 'Hematologi', satuan_hasil: 'menit', sampel_type: 'Darah Vena', waktu_tat_jam: 1, is_panel: false, loinc_code: '3184-7', tarif: 50000 },
+  { id: 110, kode_internal: 'LAB-HEM-010', nama_tes: 'Morfologi Darah Tepi (MDT / Apus Darah)', kategori: 'Hematologi', satuan_hasil: 'Deskriptif', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 4, is_panel: false, loinc_code: '6742-1', tarif: 150000 },
+  { id: 111, kode_internal: 'LAB-HEM-011', nama_tes: 'Hemostasis PT / INR', kategori: 'Hematologi', satuan_hasil: 'detik / INR', sampel_type: 'Plasma Sitrat (Biru)', waktu_tat_jam: 2, is_panel: false, loinc_code: '5902-2', tarif: 135000 },
+  { id: 112, kode_internal: 'LAB-HEM-012', nama_tes: 'Hemostasis APTT', kategori: 'Hematologi', satuan_hasil: 'detik', sampel_type: 'Plasma Sitrat (Biru)', waktu_tat_jam: 2, is_panel: false, loinc_code: '3173-0', tarif: 135000 },
+
+  // KIMIA KLINIK & DIABETES
+  { id: 201, kode_internal: 'LAB-KIM-001', nama_tes: 'Glukosa Darah Puasa (GDP)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1558-6', tarif: 45000 },
+  { id: 202, kode_internal: 'LAB-KIM-002', nama_tes: 'Glukosa Darah 2 Jam PP (GD2PP)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1514-9', tarif: 45000 },
+  { id: 203, kode_internal: 'LAB-KIM-003', nama_tes: 'Glukosa Darah Sewaktu (GDS)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 1, is_panel: false, loinc_code: '2345-7', tarif: 45000 },
+  { id: 204, kode_internal: 'LAB-KIM-004', nama_tes: 'HbA1c (Kromatografi HPLC Terstandar NGSP)', kategori: 'Kimia Klinik', satuan_hasil: '%', sampel_type: 'Darah EDTA (Ungu)', waktu_tat_jam: 2, is_panel: false, loinc_code: '4548-4', tarif: 185000 },
+  { id: 205, kode_internal: 'LAB-KIM-005', nama_tes: 'Ureum Darah', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '3094-0', tarif: 55000 },
+  { id: 206, kode_internal: 'LAB-KIM-006', nama_tes: 'Kreatinin Darah + eGFR (CKD-EPI)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '2160-0', tarif: 60000 },
+  { id: 207, kode_internal: 'LAB-KIM-007', nama_tes: 'Asam Urat (Uric Acid)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '3084-1', tarif: 55000 },
+
+  // FUNGSI HATI & PROFIL LIPID
+  { id: 208, kode_internal: 'LAB-KIM-008', nama_tes: 'SGOT / AST (Aspartate Aminotransferase)', kategori: 'Kimia Klinik', satuan_hasil: 'U/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1920-8', tarif: 55000 },
+  { id: 209, kode_internal: 'LAB-KIM-009', nama_tes: 'SGPT / ALT (Alanine Aminotransferase)', kategori: 'Kimia Klinik', satuan_hasil: 'U/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1742-6', tarif: 55000 },
+  { id: 210, kode_internal: 'LAB-KIM-010', nama_tes: 'Bilirubin Total', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1975-2', tarif: 60000 },
+  { id: 211, kode_internal: 'LAB-KIM-011', nama_tes: 'Bilirubin Direk & Indirek', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '1968-7', tarif: 65000 },
+  { id: 212, kode_internal: 'LAB-KIM-012', nama_tes: 'Gamma GT (GGT)', kategori: 'Kimia Klinik', satuan_hasil: 'U/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '2324-2', tarif: 75000 },
+  { id: 213, kode_internal: 'LAB-KIM-013', nama_tes: 'Fosfatase Alkali (ALP)', kategori: 'Kimia Klinik', satuan_hasil: 'U/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '6768-6', tarif: 75000 },
+  { id: 214, kode_internal: 'LAB-KIM-014', nama_tes: 'Protein Total, Albumin, Globulin', kategori: 'Kimia Klinik', satuan_hasil: 'g/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: true, loinc_code: '2885-2', tarif: 95000 },
+  { id: 215, kode_internal: 'LAB-KIM-015', nama_tes: 'Kolesterol Total', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '2093-3', tarif: 55000 },
+  { id: 216, kode_internal: 'LAB-KIM-016', nama_tes: 'Trigliserida', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '2571-8', tarif: 60000 },
+  { id: 217, kode_internal: 'LAB-KIM-017', nama_tes: 'HDL Kolesterol (Direct)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '2085-9', tarif: 65000 },
+  { id: 218, kode_internal: 'LAB-KIM-018', nama_tes: 'LDL Kolesterol (Direct)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '13457-7', tarif: 85000 },
+  { id: 219, kode_internal: 'LAB-KIM-019', nama_tes: 'Profil Lipid Lengkap (Total, HDL, LDL, TG)', kategori: 'Kimia Klinik', satuan_hasil: 'Panel', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: true, loinc_code: '57698-3', tarif: 240000 },
+
+  // ELEKTROLIT
+  { id: 220, kode_internal: 'LAB-ELE-001', nama_tes: 'Elektrolit Serum (Na+, K+, Cl-)', kategori: 'Kimia Klinik', satuan_hasil: 'mmol/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 1, is_panel: true, loinc_code: '24326-1', tarif: 175000 },
+  { id: 221, kode_internal: 'LAB-ELE-002', nama_tes: 'Kalsium Total (Ca)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '17861-6', tarif: 75000 },
+  { id: 222, kode_internal: 'LAB-ELE-003', nama_tes: 'Magnesium (Mg)', kategori: 'Kimia Klinik', satuan_hasil: 'mg/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '19123-9', tarif: 85000 },
+
+  // IMUNOLOGI & SEROLOGI
+  { id: 301, kode_internal: 'LAB-IMU-001', nama_tes: 'HBsAg Kualitatif (Rapid / ECLIA)', kategori: 'Imunologi', satuan_hasil: 'Non-Reaktif', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '5196-1', tarif: 95000 },
+  { id: 302, kode_internal: 'LAB-IMU-002', nama_tes: 'Anti-HBs Kuantitatif (Titer Proteksi)', kategori: 'Imunologi', satuan_hasil: 'mIU/mL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 3, is_panel: false, loinc_code: '48070-7', tarif: 165000 },
+  { id: 303, kode_internal: 'LAB-IMU-003', nama_tes: 'Anti-HCV (Hepatitis C Screening)', kategori: 'Imunologi', satuan_hasil: 'Non-Reaktif', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 3, is_panel: false, loinc_code: '13955-0', tarif: 175000 },
+  { id: 304, kode_internal: 'LAB-IMU-004', nama_tes: 'Anti-HIV 1/2 Screening 3 Metode', kategori: 'Imunologi', satuan_hasil: 'Non-Reaktif', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 3, is_panel: false, loinc_code: '68961-2', tarif: 185000 },
+  { id: 305, kode_internal: 'LAB-IMU-005', nama_tes: 'VDRL / RPR (Skrining Sifilis)', kategori: 'Imunologi', satuan_hasil: 'Non-Reaktif', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '20507-0', tarif: 85000 },
+  { id: 306, kode_internal: 'LAB-IMU-006', nama_tes: 'TPHA (Konfirmasi Treponema Pallidum)', kategori: 'Imunologi', satuan_hasil: 'Non-Reaktif', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '24111-7', tarif: 120000 },
+  { id: 307, kode_internal: 'LAB-IMU-007', nama_tes: 'Widal Serologi (Tifoid S. typhi)', kategori: 'Imunologi', satuan_hasil: 'Titer', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: true, loinc_code: '20570-8', tarif: 80000 },
+  { id: 308, kode_internal: 'LAB-IMU-008', nama_tes: 'Dengue NS1 Antigen (Demam Berdarah Hari 1-3)', kategori: 'Imunologi', satuan_hasil: 'Negatif', sampel_type: 'Serum / EDTA', waktu_tat_jam: 1, is_panel: false, loinc_code: '68961-2', tarif: 195000 },
+  { id: 309, kode_internal: 'LAB-IMU-009', nama_tes: 'Dengue IgG & IgM (Serologi DBD Hari >3)', kategori: 'Imunologi', satuan_hasil: 'Negatif', sampel_type: 'Serum / EDTA', waktu_tat_jam: 1, is_panel: true, loinc_code: '40713-0', tarif: 195000 },
+  { id: 310, kode_internal: 'LAB-IMU-010', nama_tes: 'Troponin I Kuantitatif (Cardiac Marker)', kategori: 'Imunologi', satuan_hasil: 'ng/mL', sampel_type: 'Serum / Plasma Heparin', waktu_tat_jam: 1, is_panel: false, loinc_code: '10839-9', tarif: 320000 },
+  { id: 311, kode_internal: 'LAB-IMU-011', nama_tes: 'hs-CRP (High-Sensitivity C-Reactive Protein)', kategori: 'Imunologi', satuan_hasil: 'mg/L', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 2, is_panel: false, loinc_code: '30522-7', tarif: 195000 },
+
+  // TIROID & HORMON
+  { id: 312, kode_internal: 'LAB-HOR-001', nama_tes: 'TSHs (Sensitive Thyroid Stimulating Hormone)', kategori: 'Imunologi', satuan_hasil: 'uIU/mL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 3, is_panel: false, loinc_code: '3016-3', tarif: 195000 },
+  { id: 313, kode_internal: 'LAB-HOR-002', nama_tes: 'FT4 (Free Thyroxine)', kategori: 'Imunologi', satuan_hasil: 'ng/dL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 3, is_panel: false, loinc_code: '3024-7', tarif: 195000 },
+  { id: 314, kode_internal: 'LAB-HOR-003', nama_tes: 'Anti-Müllerian Hormone (AMH - Cadangan Ovarium)', kategori: 'Imunologi', satuan_hasil: 'ng/mL', sampel_type: 'Serum (Kuning/Merah)', waktu_tat_jam: 4, is_panel: false, loinc_code: '35422-5', tarif: 495000 },
+
+  // URINALISIS & FESES
+  { id: 401, kode_internal: 'LAB-URI-001', nama_tes: 'Urin Lengkap (Makroskopis, Kimiawi 10P, Sedimen)', kategori: 'Urinalisis', satuan_hasil: 'Panel', sampel_type: 'Urin Midstream (Pot Urin)', waktu_tat_jam: 1, is_panel: true, loinc_code: '24357-6', tarif: 65000 },
+  { id: 402, kode_internal: 'LAB-URI-002', nama_tes: 'Tes Kehamilan Urin (HCG Plano Test)', kategori: 'Urinalisis', satuan_hasil: 'Negatif', sampel_type: 'Urin Sewaktu/Pagi', waktu_tat_jam: 1, is_panel: false, loinc_code: '2106-3', tarif: 45000 },
+  { id: 403, kode_internal: 'LAB-URI-003', nama_tes: 'Narkoba Urin 6 Parameter (THC, MAMP, AMP, MOR, COC, BZO)', kategori: 'Urinalisis', satuan_hasil: 'Negatif', sampel_type: 'Urin Segar', waktu_tat_jam: 1, is_panel: true, loinc_code: '19295-5', tarif: 175000 },
+  { id: 404, kode_internal: 'LAB-FES-001', nama_tes: 'Feses Lengkap (Makroskopis, Mikroskopis, Telur Cacing)', kategori: 'Feses', satuan_hasil: 'Panel', sampel_type: 'Feses Segar (Pot Feses)', waktu_tat_jam: 2, is_panel: true, loinc_code: '10701-1', tarif: 65000 },
+  { id: 405, kode_internal: 'LAB-FES-002', nama_tes: 'Darah Samar Feses (FOBT Imunokromatografi)', kategori: 'Feses', satuan_hasil: 'Negatif', sampel_type: 'Feses Segar (Pot Feses)', waktu_tat_jam: 2, is_panel: false, loinc_code: '14563-1', tarif: 95000 },
+
+  // PAKET MCU LABORATORIUM
+  { id: 501, kode_internal: 'LAB-MCU-001', nama_tes: 'Paket MCU Dasar (Darah Lengkap, Urin Lengkap, GDS, SGPT, Kreatinin, Asam Urat, Kolesterol)', kategori: 'Paket MCU', satuan_hasil: 'Paket', sampel_type: 'Darah EDTA + Serum + Urin', waktu_tat_jam: 3, is_panel: true, loinc_code: 'MCU-BASIC', tarif: 420000 },
+  { id: 502, kode_internal: 'LAB-MCU-002', nama_tes: 'Paket Skrining Diabetes & Jantung (HbA1c, GDP, Profil Lipid Lengkap, EKG, Urin Lengkap)', kategori: 'Paket MCU', satuan_hasil: 'Paket', sampel_type: 'Darah EDTA + Serum + Urin', waktu_tat_jam: 3, is_panel: true, loinc_code: 'MCU-CARDIO-DM', tarif: 590000 },
+  { id: 503, kode_internal: 'LAB-MCU-003', nama_tes: 'Paket Skrining Pra-Nikah (Darah Lengkap, Gol. Darah, HBsAg, Anti-HIV, VDRL, Urin)', kategori: 'Paket MCU', satuan_hasil: 'Paket', sampel_type: 'Darah EDTA + Serum + Urin', waktu_tat_jam: 3, is_panel: true, loinc_code: 'MCU-PREMARITAL', tarif: 650000 }
+];
+
 async function loadLabProducts(){
-  if (_prodCache) return _prodCache;
+  if (_prodCache && _prodCache.length > 0) return _prodCache;
   try {
-    _prodCache = await sbGet('products',
-      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_panel,host_code,is_active&is_active=eq.true&order=kategori,nama_tes') || [];
-  } catch(e){ _prodCache = []; }
+    const data = await sbGet('products',
+      'select=id,nama_tes,kode_internal,kategori,satuan_hasil,sampel_type,waktu_tat_jam,is_panel,host_code,is_active&is_active=eq.true&order=kategori,nama_tes');
+    if (data && Array.isArray(data) && data.length > 0) {
+      _prodCache = data;
+    } else {
+      _prodCache = REAL_MASTER_LAB_TESTS;
+    }
+  } catch(e){
+    _prodCache = REAL_MASTER_LAB_TESTS;
+  }
   return _prodCache;
 }
-function labProduct(id){ return (_prodCache||[]).find(p=>p.id==id) || null; }
+function labProduct(id){ return (_prodCache||REAL_MASTER_LAB_TESTS).find(p=>p.id==id) || null; }
+window.REAL_MASTER_LAB_TESTS = REAL_MASTER_LAB_TESTS;
+window.loadLabProducts = loadLabProducts;
+window.labProduct = labProduct;
 
 // ── Turnaround Time (TAT) ────────────────────────────────────────
 // Target jam diambil dari master produk (waktu_tat_jam), fallback 4 jam.

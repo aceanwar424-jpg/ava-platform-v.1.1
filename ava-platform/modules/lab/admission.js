@@ -23,8 +23,9 @@ async function renderLisAdmission() {
   const main = document.getElementById('main-content');
   if (!main) return;
 
-  if (!_lisAllProducts.length && typeof loadLabProducts === 'function') {
-    _lisAllProducts = (await loadLabProducts()) || [];
+  _lisAllProducts = (typeof loadLabProducts === 'function') ? (await loadLabProducts()) : (window.REAL_MASTER_LAB_TESTS || []);
+  if (!_lisAllProducts || !_lisAllProducts.length) {
+    _lisAllProducts = window.REAL_MASTER_LAB_TESTS || [];
   }
 
   const today = new Date();
@@ -212,8 +213,15 @@ function renderLisAdmissionTestCatalog() {
     const matchQ = !q || (p.nama_tes && p.nama_tes.toLowerCase().includes(q))
                       || (p.kode_internal && p.kode_internal.toLowerCase().includes(q))
                       || (p.loinc_code && p.loinc_code.toLowerCase().includes(q));
-    const matchCat = cat === 'ALL' || (p.kategori && p.kategori.toUpperCase().includes(cat))
-                                  || (p.kode_internal && p.kode_internal.toUpperCase().includes(cat));
+    const kat = (p.kategori || '').toLowerCase();
+    const matchCat = cat === 'ALL' ||
+      (cat === 'HEM' && kat.includes('hematologi')) ||
+      (cat === 'KIM' && kat.includes('kimia')) ||
+      (cat === 'IMU' && (kat.includes('imun') || kat.includes('sero') || kat.includes('hor'))) ||
+      (cat === 'URI' && kat.includes('urin')) ||
+      (cat === 'FES' && kat.includes('feses')) ||
+      (cat === 'MIK' && kat.includes('mikro')) ||
+      (cat === 'MCU' && (kat.includes('mcu') || kat.includes('paket')));
     return matchQ && matchCat;
   });
 
