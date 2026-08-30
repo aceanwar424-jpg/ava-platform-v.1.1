@@ -34,7 +34,7 @@ function renderCheckinTab(){
       <input class="table-search" id="barcode-input" placeholder="🔍 Scan / ketik barcode tabung (L260830-001) atau nama pasien..."
         onkeydown="if(event.key==='Enter')checkInBarcode(this.value)" style="flex:1;min-width:240px">
       <button class="btn btn-teal" onclick="checkInBarcode(document.getElementById('barcode-input').value)">Check In Barcode</button>
-      <button class="btn btn-ghost" style="border:1px solid var(--teal);color:var(--teal);font-weight:750" onclick="openWalkinLabModal()">+ Order Walk-In LIS (Mandiri)</button>
+      <button class="btn btn-ghost" style="border:1px solid var(--teal);color:var(--teal);font-weight:750" onclick="navigate('anamnesa')">+ Order Walk-In LIS (Mandiri)</button>
       <button class="btn btn-ghost" style="border:1px solid var(--border);font-weight:700" onclick="openSampleForm()">🏥 Tarik Order HIS</button>
     </div>
     <div id="lab-pending-labels"></div>

@@ -227,6 +227,8 @@ function showView(viewId, viewTitle) {
   else if (viewId === 'ava-marketplace-view') renderAvaMarketplace();
   else if (viewId === 'ava-devices-view') renderAvaDevices();
   else if (viewId === 'ava-caregiver-view') renderAvaCaregiver();
+  else if (viewId === 'toko-view') renderToko();
+  else if (viewId === 'toko-checkout-view') renderTokoCheckout();
 
   // Update Breadcrumb
   const breadcrumbActive = document.getElementById('breadcrumb-active-view');
@@ -320,6 +322,7 @@ function renderSidebarMenu() {
       <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
       <a class="sidebar-link" onclick="showView('ava-consult-view', 'Telekonsultasi Dokter')">${I.consult}<span>Telekonsultasi</span></a>
       <a class="sidebar-link" onclick="showView('ava-marketplace-view', 'Sewa &amp; Beli Alkes')">${I.market}<span>Sewa &amp; Beli Alkes</span></a>
+      <a class="sidebar-link" onclick="showView('toko-view', 'Toko AVA')">${I.package}<span>Toko AVA</span></a>
 
       <div class="sidebar-section">Kesehatan Saya</div>
       <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">${I.dashboard}<span>Dashboard Utama</span></a>
@@ -1091,6 +1094,306 @@ function checkoutLabBooking() {
       }
     }
   }, 10000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOKO AVA — belanja produk wellness dari aplikasi konsumen (B2C)
+//
+// Kanal "web" pada migrasi 0035. Pesanan yang lahir di sini masuk ke
+// tabel yang sama dengan pesanan Shopee/TikTok/Tokopedia, sehingga
+// laporan penjualan tetap satu dan stoknya tetap satu.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Harga TIDAK dikirim dari sini. Keranjang hanya mengirim produk_id dan
+// jumlah; harga ditentukan wellness_buat_pesanan() dari master harga
+// kanal. Harga yang dikirim layar bisa disetel siapa saja lewat alat
+// pengembang peramban.
+//
+// Stok yang ditampilkan adalah stok_siap_jual — barang yang sudah lolos
+// uji mutu. Barang karantina tidak muncul sama sekali, bukan muncul
+// dengan label "belum tersedia": menampilkannya hanya mengundang
+// pertanyaan yang tidak bisa dijawab kasir.
+//
+// Keranjang disimpan di localStorage supaya tidak hilang saat aplikasi
+// ditutup, TAPI isinya diperiksa ulang terhadap stok setiap kali toko
+// dibuka — barang yang sempat masuk keranjang bisa habis sementara
+// pengguna pergi.
+//
+// Prefiks "tk".
+// ═══════════════════════════════════════════════════════════════
+
+const TK_KUNCI = 'ava_keranjang';
+let tkProduk = null;      // null = gagal baca
+
+function tkKeranjang() {
+  try { return JSON.parse(localStorage.getItem(TK_KUNCI) || '[]'); }
+  catch (_) { return []; }
+}
+function tkSimpanKeranjang(k) {
+  localStorage.setItem(TK_KUNCI, JSON.stringify(k));
+}
+function tkJumlahItem() {
+  return tkKeranjang().reduce((a, x) => a + Number(x.qty || 0), 0);
+}
+function tkRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+function tkEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function tkMuatProduk() {
+  try {
+    const [produk, stok, harga] = await Promise.all([
+      avaAmbil('wellness_produk', 'select=*&status=eq.Aktif&order=merek,nama'),
+      avaAmbil('wellness_stok', 'select=*'),
+      avaAmbil('wellness_harga_kanal', 'select=*&kanal=eq.web&aktif=is.true'),
+    ]);
+    tkProduk = produk.map(p => {
+      const st = stok.find(x => x.produk_id === p.id) || {};
+      const hg = harga.find(x => x.produk_id === p.id);
+      return {
+        ...p,
+        stok: Number(st.stok_siap_jual || 0),
+        harga_web: hg ? Number(hg.harga) : Number(p.harga_normal || 0),
+      };
+    });
+  } catch (e) {
+    tkProduk = null;
+  }
+}
+
+async function renderToko() {
+  const box = document.getElementById('toko-list');
+  if (!box) return;
+  box.innerHTML = '<div style="padding:24px; text-align:center; font-size:13px; '
+    + 'color:var(--text-muted)">Memuat produk…</div>';
+
+  await tkMuatProduk();
+
+  if (tkProduk === null) {
+    box.innerHTML = avaKosong(
+      'Katalog produk belum dapat dibaca. Tabel <code>wellness_produk</code> '
+      + 'belum tersedia di server ini.');
+    document.getElementById('toko-keranjang-bar').innerHTML = '';
+    return;
+  }
+
+  // Bersihkan keranjang dari barang yang sudah tidak ada atau habis.
+  const k = tkKeranjang();
+  const bersih = k.filter(it => {
+    const p = tkProduk.find(x => x.id === it.produk_id);
+    return p && p.stok > 0;
+  }).map(it => {
+    const p = tkProduk.find(x => x.id === it.produk_id);
+    return { ...it, qty: Math.min(Number(it.qty), p.stok) };
+  });
+  if (JSON.stringify(bersih) !== JSON.stringify(k)) tkSimpanKeranjang(bersih);
+
+  tkGambarBar();
+
+  const tersedia = tkProduk.filter(p => p.stok > 0);
+  if (!tersedia.length) {
+    box.innerHTML = avaKosong(
+      'Belum ada produk yang siap dikirim. Stok yang sedang dalam '
+      + 'pemeriksaan mutu belum bisa dipesan.');
+    return;
+  }
+
+  box.innerHTML = `<div style="display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px">
+    ${tersedia.map(p => {
+      const diKeranjang = (tkKeranjang().find(x => x.produk_id === p.id) || {}).qty || 0;
+      return `<div class="glass-card" style="padding:14px; background:#fff">
+        <div style="font-size:11px; color:var(--text-muted)">${tkEsc(p.merek || '')}</div>
+        <div style="font-weight:700; font-size:13px; margin:2px 0 4px; line-height:1.35">
+          ${tkEsc(p.nama)}</div>
+        <div style="font-size:11px; color:var(--text-muted)">
+          ${tkEsc(p.netto || '')}${p.no_bpom ? ' · BPOM ' + tkEsc(p.no_bpom) : ''}</div>
+        <div style="font-weight:800; color:#0f2963; margin:8px 0 2px">
+          ${tkRp(p.harga_web)}</div>
+        <div style="font-size:11px; color:${p.stok <= 5 ? '#c0392b' : 'var(--text-muted)'}">
+          ${p.stok <= 5 ? 'tinggal ' + p.stok : 'stok ' + p.stok}</div>
+        ${diKeranjang ? `
+          <div style="display:flex; align-items:center; gap:8px; margin-top:10px">
+            <button class="btn btn-sm" style="margin:0; padding:4px 10px"
+                    onclick="tkUbahQty(${p.id}, -1)">−</button>
+            <b style="font-size:13px">${diKeranjang}</b>
+            <button class="btn btn-sm" style="margin:0; padding:4px 10px"
+                    onclick="tkUbahQty(${p.id}, 1)">+</button>
+          </div>` : `
+          <button class="btn btn-sm btn-teal" style="margin:10px 0 0; width:100%"
+                  onclick="tkUbahQty(${p.id}, 1)">Tambah</button>`}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function tkGambarBar() {
+  const bar = document.getElementById('toko-keranjang-bar');
+  if (!bar) return;
+  const n = tkJumlahItem();
+  if (!n) { bar.innerHTML = ''; return; }
+
+  const total = tkKeranjang().reduce((a, it) => {
+    const p = (tkProduk || []).find(x => x.id === it.produk_id);
+    return a + (p ? p.harga_web * it.qty : 0);
+  }, 0);
+
+  bar.innerHTML = `<div class="glass-card" style="padding:12px 16px; margin-bottom:14px;
+      background:#0f2963; color:#fff; display:flex; justify-content:space-between;
+      align-items:center; gap:12px; flex-wrap:wrap">
+    <div>
+      <div style="font-size:12px; opacity:.85">${n} barang di keranjang</div>
+      <div style="font-weight:800">${tkRp(total)}</div>
+    </div>
+    <button class="btn btn-sm" style="margin:0; background:#fff; color:#0f2963"
+            onclick="showView('toko-checkout-view','Keranjang')">Lanjut Pesan</button>
+  </div>`;
+}
+
+function tkUbahQty(produkId, delta) {
+  const p = (tkProduk || []).find(x => x.id === produkId);
+  if (!p) return;
+
+  const k = tkKeranjang();
+  const idx = k.findIndex(x => x.produk_id === produkId);
+  const sekarang = idx >= 0 ? Number(k[idx].qty) : 0;
+  const baru = sekarang + delta;
+
+  // Dibatasi stok siap jual. Membiarkan pengguna memesan lebih banyak
+  // daripada yang ada hanya memindahkan kekecewaan ke tahap pengemasan,
+  // saat uangnya sudah terlanjur dibayar.
+  if (baru > p.stok) {
+    alert(`Stok ${p.nama} tinggal ${p.stok}.`);
+    return;
+  }
+
+  if (baru <= 0) { if (idx >= 0) k.splice(idx, 1); }
+  else if (idx >= 0) { k[idx].qty = baru; }
+  else { k.push({ produk_id: produkId, qty: baru }); }
+
+  tkSimpanKeranjang(k);
+  renderToko();
+}
+
+function renderTokoCheckout() {
+  const box = document.getElementById('toko-checkout-isi');
+  if (!box) return;
+
+  const k = tkKeranjang();
+  if (!k.length || !tkProduk) {
+    box.innerHTML = avaKosong('Keranjang masih kosong.')
+      + `<div style="text-align:center; margin-top:12px">
+           <button class="btn btn-sm btn-teal" onclick="showView('toko-view','Toko AVA')">
+             Lihat Produk</button></div>`;
+    return;
+  }
+
+  const baris = k.map(it => {
+    const p = tkProduk.find(x => x.id === it.produk_id) || {};
+    return { ...it, nama: p.nama, harga: p.harga_web || 0, sub: (p.harga_web || 0) * it.qty };
+  });
+  const subtotal = baris.reduce((a, b) => a + b.sub, 0);
+
+  box.innerHTML = `
+    <div class="glass-card" style="padding:16px; background:#fff; margin-bottom:14px">
+      ${baris.map(b => `
+        <div style="display:flex; justify-content:space-between; gap:12px;
+                    padding:8px 0; border-bottom:1px solid #eee">
+          <div><div style="font-weight:600; font-size:13px">${tkEsc(b.nama)}</div>
+            <div style="font-size:11px; color:var(--text-muted)">
+              ${b.qty} × ${tkRp(b.harga)}</div></div>
+          <div style="font-weight:700; font-size:13px">${tkRp(b.sub)}</div>
+        </div>`).join('')}
+      <div style="display:flex; justify-content:space-between; padding-top:12px;
+                  font-weight:800; color:#0f2963">
+        <span>Subtotal</span><span>${tkRp(subtotal)}</span>
+      </div>
+      <div style="font-size:11px; color:var(--text-muted); margin-top:6px">
+        Ongkir dihitung petugas setelah paket ditimbang, lalu ditagihkan
+        bersama pembayaran.
+      </div>
+    </div>
+
+    <div class="glass-card" style="padding:16px; background:#fff">
+      <div style="font-weight:700; font-size:13px; margin-bottom:10px">Alamat Pengiriman</div>
+      <input id="tk-nama"  placeholder="Nama penerima" style="width:100%; margin-bottom:8px">
+      <input id="tk-hp"    placeholder="No. HP aktif"  style="width:100%; margin-bottom:8px">
+      <textarea id="tk-alamat" placeholder="Alamat lengkap (jalan, nomor, RT/RW, patokan)"
+                rows="3" style="width:100%; margin-bottom:8px"></textarea>
+      <div style="display:flex; gap:8px; margin-bottom:8px">
+        <input id="tk-kota"     placeholder="Kota"     style="flex:1">
+        <input id="tk-provinsi" placeholder="Provinsi" style="flex:1">
+        <input id="tk-pos"      placeholder="Kode pos" style="width:90px">
+      </div>
+      <textarea id="tk-catatan" placeholder="Catatan untuk kurir (opsional)"
+                rows="2" style="width:100%"></textarea>
+      <button class="btn btn-teal" style="width:100%; margin-top:12px"
+              onclick="tkKirimPesanan(this)">Buat Pesanan</button>
+    </div>`;
+
+  // Isi otomatis dari profil kalau ada — mengetik ulang alamat di ponsel
+  // adalah tempat paling sering pesanan ditinggalkan.
+  const isi = (id, nilai) => {
+    const el = document.getElementById(id);
+    if (el && nilai && !el.value) el.value = nilai;
+  };
+  const prof = window.currentUserProfile || {};
+  isi('tk-nama',   prof.full_name || window.currentUsername);
+  isi('tk-hp',     prof.phone);
+  isi('tk-alamat', prof.address);
+}
+
+async function tkKirimPesanan(tombol) {
+  const nama   = (document.getElementById('tk-nama').value || '').trim();
+  const hp     = (document.getElementById('tk-hp').value || '').trim();
+  const alamat = (document.getElementById('tk-alamat').value || '').trim();
+
+  if (!nama || !hp || !alamat) {
+    alert('Nama, nomor HP, dan alamat wajib diisi agar paket bisa dikirim.');
+    return;
+  }
+
+  const k = tkKeranjang();
+  if (!k.length) { alert('Keranjang kosong.'); return; }
+
+  // Tombol dikunci selama permintaan berjalan. Tanpa ini, ketukan ganda
+  // di ponsel yang lambat membuat DUA pesanan untuk keranjang yang sama.
+  if (tombol) { tombol.disabled = true; tombol.textContent = 'Mengirim…'; }
+
+  try {
+    // Harga sengaja TIDAK dikirim — server yang menentukannya.
+    const r = await appRpc('wellness_buat_pesanan', {
+      p_data: {
+        kanal: 'web',
+        pembeli_nama: nama,
+        pembeli_hp: hp,
+        pembeli_email: (window.currentUserEmail || null),
+        alamat: alamat,
+        kota: (document.getElementById('tk-kota').value || '').trim(),
+        provinsi: (document.getElementById('tk-provinsi').value || '').trim(),
+        kode_pos: (document.getElementById('tk-pos').value || '').trim(),
+        catatan: (document.getElementById('tk-catatan').value || '').trim(),
+        item: k.map(x => ({ produk_id: x.produk_id, qty: x.qty })),
+      },
+    });
+
+    if (r && r.error) { alert(r.error); return; }
+
+    // Keranjang baru dikosongkan SESUDAH server memastikan pesanan
+    // tersimpan. Mengosongkannya lebih dulu berarti pengguna kehilangan
+    // pilihannya kalau jaringan putus di tengah.
+    tkSimpanKeranjang([]);
+    alert(`Pesanan ${r.no_pesanan} diterima.\n\n`
+      + `Subtotal ${tkRp(r.total)}. Petugas akan menghubungi Anda untuk `
+      + `konfirmasi ongkir dan pembayaran.`);
+    showView('orders-tracking-view', 'Lacak Pesanan & Refill');
+  } catch (e) {
+    alert('Pesanan gagal dibuat: ' + e.message);
+  } finally {
+    if (tombol) { tombol.disabled = false; tombol.textContent = 'Buat Pesanan'; }
+  }
 }
 
 // RPC helper (pakai SB_HEADERS/SUPABASE_URL global dari js/core/api.js)

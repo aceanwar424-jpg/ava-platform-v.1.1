@@ -15,7 +15,14 @@ const testSuites = [
   { name: '6. B2B SaaS & Holding Cockpit Fase 4', file: 'test_fase4_e2e.js' },
   { name: '7. Akselerator Sistem Lab Produktisasi Aset (P1–P5)', file: 'test_akselerator_p1_p5.js' },
   { name: '8. LIS Super Suite ISO 15189:2022 (6 Modul Strategis)', file: 'test_lis_super_suite.js' },
-  { name: '9. Ekspansi Strategis 3 Pilar (HIS/Rad, Tech SaaS, B2C Super-App)', file: 'test_expansion_super_suite.js' }
+  { name: '9. Ekspansi Strategis 3 Pilar (HIS/Rad, Tech SaaS, B2C Super-App)', file: 'test_expansion_super_suite.js' },
+  // Suite di bawah ditambahkan belakangan. Didaftarkan di sini supaya ikut
+  // berjalan bersama yang lain — uji yang hanya bisa dipanggil manual akan
+  // berhenti dijalankan begitu orang yang menulisnya lupa.
+  { name: '10. Portal Korporat & Roster Karyawan', file: 'test_portal_korporat_roster.js' },
+  { name: '11. AVA Tech — Lisensi & Tenant', file: 'test_ava_tech_tenant.js' },
+  { name: '12. Antrean — Loket, Prioritas & Panggilan', file: 'test_antrian_panggilan.js' },
+  { name: '13. Wellness, Sanctuary & Pabrik', file: 'test_wellness_pabrik.js' }
 ];
 
 console.log('╔═══════════════════════════════════════════════════════════════╗');

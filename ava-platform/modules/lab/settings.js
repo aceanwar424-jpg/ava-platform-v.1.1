@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // MODULE: PENGATURAN & KONFIGURASI LABORATORIUM (LIS SETTINGS)
-// Profil Faskes, dr. Sp.PK, Ambang Kritis, Format Hasil PDF, & Connector (:9999)
+// Profil Faskes, dr. Sp.PK, Ambang Kritis per Parameter, Format Hasil PDF, & Connector (:9999)
 // ═══════════════════════════════════════════════════════════════════════════
 
 let _lisActiveSettingsTab = 'profil';
@@ -21,6 +21,17 @@ const LIS_DEFAULT_SETTINGS = {
   satusehat_active: true
 };
 
+const DEFAULT_CRITICAL_PARAMETERS = [
+  { id: 1, code: 'GLU', name: 'Glukosa Darah Sewaktu/Puasa', low: 45, high: 450, unit: 'mg/dL', alert: 'Hipoglikemia Akut / Koma KAD', action: 'Lapor DPJP via TBaK <15m' },
+  { id: 2, code: 'K', name: 'Kalium Serum (K+)', low: 2.8, high: 6.2, unit: 'mmol/L', alert: 'Aritmia Jantung Fatal', action: 'Lapor DPJP via TBaK <15m' },
+  { id: 3, code: 'NA', name: 'Natrium Serum (Na+)', low: 120, high: 160, unit: 'mmol/L', alert: 'Edema Serebral / Dehidrasi Berat', action: 'Lapor DPJP <15m' },
+  { id: 4, code: 'HGB', name: 'Hemoglobin (Hb)', low: 7.0, high: 20.0, unit: 'g/dL', alert: 'Anemia Gravis / Polisitemia', action: 'Konfirmasi Transfusi Darah' },
+  { id: 5, code: 'PLT', name: 'Trombosit (Platelet)', low: 20000, high: 1000000, unit: '/uL', alert: 'Risiko Perdarahan Spontan / DIC', action: 'Lapor DPJP <15m' },
+  { id: 6, code: 'WBC', name: 'Leukosit', low: 2000, high: 30000, unit: '/uL', alert: 'Leukopenia Berat / Leukemoid', action: 'Lapor DPJP <15m' },
+  { id: 7, code: 'CA', name: 'Kalsium Ion / Total', low: 6.5, high: 13.0, unit: 'mg/dL', alert: 'Tetani / Krisis Hiperkalsemia', action: 'Lapor DPJP <15m' },
+  { id: 8, code: 'TROP', name: 'Troponin I Kuantitatif', low: null, high: 0.04, unit: 'ng/mL', alert: 'Sindrom Koroner Akut (STEMI)', action: 'Hubungi Dokter Jaga IGD/ICU Segera' }
+];
+
 function getLisSettings() {
   try {
     const saved = localStorage.getItem('AVA_LIS_SETTINGS');
@@ -28,6 +39,19 @@ function getLisSettings() {
   } catch (e) {
     return LIS_DEFAULT_SETTINGS;
   }
+}
+
+function getCriticalParameters() {
+  try {
+    const saved = localStorage.getItem('AVA_LIS_CRITICAL_PARAMS');
+    return saved ? JSON.parse(saved) : DEFAULT_CRITICAL_PARAMETERS;
+  } catch (e) {
+    return DEFAULT_CRITICAL_PARAMETERS;
+  }
+}
+
+function saveCriticalParameters(params) {
+  localStorage.setItem('AVA_LIS_CRITICAL_PARAMS', JSON.stringify(params));
 }
 
 function saveLisSettings(data) {
@@ -45,23 +69,23 @@ async function renderLisSettings() {
   const cfg = getLisSettings();
 
   main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif; max-width:1200px; margin:0 auto;">
+    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif; max-width:1250px; margin:0 auto;">
       <!-- HEADER -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:14px; flex-wrap:wrap; gap:12px;">
         <div>
           <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#FBBF24; margin-bottom:4px;">
             ⚙️ KONFIGURASI LIS &bull; ISO 15189:2022
           </div>
           <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 2px 0;">
-            Pengaturan Laboratorium &amp; LIS Connector
+            Pengaturan Laboratorium &amp; LIS Master Config
           </h1>
           <p style="font-size:13px; color:var(--text3); margin:0;">
-            Kelola profil faskes, dokter penanggung jawab Sp.PK, batas nilai kritis, dan unduh paket connector server alat.
+            Konfigurasi profil faskes, dr. Sp.PK, ambang nilai kritis per analit, katalog tes, dan connector alat server :9999.
           </p>
         </div>
 
         <div style="display:flex; gap:10px;">
-          <button class="btn btn-teal" onclick="downloadConnectorZip()" style="display:flex; align-items:center; gap:6px;">
+          <button class="btn btn-teal" onclick="downloadConnectorZip()" style="display:flex; align-items:center; gap:6px; font-weight:800;">
             <span>⬇️</span> <span>Download Connector (.ZIP)</span>
           </button>
         </div>
@@ -70,13 +94,16 @@ async function renderLisSettings() {
       <!-- TABS -->
       <div style="display:flex; gap:8px; border-bottom:1px solid var(--border); margin-bottom:20px; overflow-x:auto;">
         <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'profil' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'profil' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('profil')">
-          🏥 Profil Laboratorium &amp; Sp.PK
-        </button>
-        <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'connector' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'connector' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('connector')">
-          🔌 Analyzer Connector (:9999)
+          🏥 Profil Lab &amp; Sp.PK
         </button>
         <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'critical' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'critical' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('critical')">
-          🚨 Nilai Kritis &amp; Delta Check
+          🚨 Nilai Kritis per Parameter
+        </button>
+        <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'connector' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'connector' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('connector')">
+          🔌 Alat &amp; Connector (:9999)
+        </button>
+        <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'catalog' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'catalog' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('catalog')">
+          🧪 Master Katalog Tes (530+)
         </button>
         <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'pdf' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'pdf' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('pdf')">
           📄 Format Lembar Hasil PDF
@@ -153,6 +180,84 @@ function renderLisSettingsTabContent(tab, cfg) {
     `;
   }
 
+  if (tab === 'critical') {
+    const params = getCriticalParameters();
+    return `
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        <!-- GENERAL SLA & DELTA CHECK -->
+        <div class="card" style="padding:20px;">
+          <h3 style="font-size:15px; font-weight:800; color:var(--text); margin:0 0 14px 0;">
+            ⏱️ Standar Waktu &amp; Aturan Delta Check
+          </h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="form-group">
+              <label style="font-size:12px; font-weight:750; color:var(--text2);">SLA Maksimal Pelaporan Nilai Kritis ke DPJP (Menit)</label>
+              <input type="number" id="cfg-critical-sla" value="${cfg.critical_alert_sla}" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">
+              <span style="font-size:11px; color:var(--text3);">Standar ISO 15189 / KARS: maksimal &le; 15 menit dengan metode TBaK (Tulis, Baca, Konfirmasi).</span>
+            </div>
+
+            <div class="form-group">
+              <label style="font-size:12px; font-weight:750; color:var(--text2);">Ambang Batas Delta Check (% Lonjakan vs Hasil Sebelumnya)</label>
+              <input type="number" id="cfg-delta-threshold" value="${cfg.delta_check_threshold}" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">
+              <span style="font-size:11px; color:var(--text3);">Peringatan otomatis saat hasil pasien melonjak drastis dari riwayat sebelumnya.</span>
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; justify-content:flex-end;">
+            <button class="btn btn-teal btn-sm" onclick="submitCriticalSettings()">💾 Simpan Aturan SLA</button>
+          </div>
+        </div>
+
+        <!-- TABEL AMBANG KRITIS PER PARAMETER / ANALIT -->
+        <div class="card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h3 style="font-size:15px; font-weight:800; color:var(--text); margin:0 0 2px 0;">
+                🚨 Matriks Ambang Batas Nilai Kritis per Parameter / Analit
+              </h3>
+              <p style="font-size:12px; color:var(--text3); margin:0;">
+                Daftar nilai batas bahaya yang mewajibkan analis segera menghubungi DPJP dan dicatat di logbook.
+              </p>
+            </div>
+            <button class="btn btn-teal btn-sm" onclick="openAddCriticalParamModal()">+ Tambah Parameter Kritis</button>
+          </div>
+
+          <div class="table-wrap" style="overflow-x:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Kode</th>
+                  <th>Nama Pemeriksaan / Analit</th>
+                  <th>Batas Bawah (Low)</th>
+                  <th>Batas Atas (High)</th>
+                  <th>Satuan</th>
+                  <th>Peringatan Klinis</th>
+                  <th>Instruksi Analis</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${params.map(p => `
+                  <tr>
+                    <td><code>${p.code}</code></td>
+                    <td style="font-weight:750; color:var(--text);">${p.name}</td>
+                    <td style="color:#EF4444; font-weight:800;">${p.low !== null ? `&le; ${p.low}` : '—'}</td>
+                    <td style="color:#EF4444; font-weight:800;">${p.high !== null ? `&ge; ${p.high}` : '—'}</td>
+                    <td style="color:var(--text3); font-size:12px;">${p.unit}</td>
+                    <td style="font-size:12px; color:#F59E0B; font-weight:600;">${p.alert}</td>
+                    <td style="font-size:11.5px; color:var(--text2);">${p.action}</td>
+                    <td>
+                      <button class="btn btn-ghost btn-xs" onclick="deleteCriticalParam(${p.id})" style="color:#EF4444;" title="Hapus Parameter">&times;</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   if (tab === 'connector') {
     return `
       <div style="display:flex; flex-direction:column; gap:16px;">
@@ -213,62 +318,36 @@ function renderLisSettingsTabContent(tab, cfg) {
             </div>
           </div>
         </div>
-
-        <!-- DAFTAR DRIVER ALAT TERPASANG -->
-        <div class="card" style="padding:22px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-            <h3 style="font-size:15px; font-weight:800; color:var(--text); margin:0;">
-              🎛️ Driver Alat Laboratorium yang Didukung
-            </h3>
-            <button class="btn btn-ghost btn-xs" onclick="navigate('lis-analyzer')">Buka Master Alat &rarr;</button>
-          </div>
-
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px;">
-            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; border:1px solid var(--border);">
-              <b style="font-size:13px; color:var(--text);">Sysmex XN Series</b>
-              <div style="font-size:11.5px; color:var(--text3);">Hematologi 5-Diff &bull; ASTM E1381</div>
-            </div>
-            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; border:1px solid var(--border);">
-              <b style="font-size:13px; color:var(--text);">Mindray BS Series (BS-240 / 430)</b>
-              <div style="font-size:11.5px; color:var(--text3);">Kimia Klinik &bull; ASTM E1394</div>
-            </div>
-            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; border:1px solid var(--border);">
-              <b style="font-size:13px; color:var(--text);">Roche Cobas e411 / c311</b>
-              <div style="font-size:11.5px; color:var(--text3);">Imunologi &amp; Kimia &bull; HL7 / ASTM</div>
-            </div>
-            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; border:1px solid var(--border);">
-              <b style="font-size:13px; color:var(--text);">Uriscan Pro / Urilyzer</b>
-              <div style="font-size:11.5px; color:var(--text3);">Urinalisis Otomatis &bull; Serial RS-232</div>
-            </div>
-          </div>
-        </div>
       </div>
     `;
   }
 
-  if (tab === 'critical') {
+  if (tab === 'catalog') {
     return `
       <div class="card" style="padding:22px;">
-        <h3 style="font-size:15px; font-weight:800; color:var(--text); margin:0 0 16px 0;">
-          Pengaturan Ambang Batas Nilai Kritis &amp; Delta Check
-        </h3>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-          <div class="form-group">
-            <label style="font-size:12px; font-weight:750; color:var(--text2);">SLA Maksimal Pelaporan Nilai Kritis ke DPJP (Menit)</label>
-            <input type="number" id="cfg-critical-sla" value="${cfg.critical_alert_sla}" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">
-            <span style="font-size:11px; color:var(--text3);">Standar Akreditasi KARS / ISO 15189: maksimal 15-30 menit.</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="font-size:15px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
+              🧪 Master Katalog Tes &amp; Nilai Rujukan (530+ Parameter LOINC/UCUM)
+            </h3>
+            <p style="font-size:13px; color:var(--text3); margin:0;">
+              Seluruh parameter analit terstandarisasi HL7 v2 / FHIR (OBX-3 LOINC, OBX-6 UCUM).
+            </p>
           </div>
-
-          <div class="form-group">
-            <label style="font-size:12px; font-weight:750; color:var(--text2);">Ambang Batas Delta Check (% Lonjakan vs Hasil Sebelumnya)</label>
-            <input type="number" id="cfg-delta-threshold" value="${cfg.delta_check_threshold}" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">
-            <span style="font-size:11px; color:var(--text3);">Jika hasil melonjak melebihi persentase ini, analis wajib verifikasi ulang.</span>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal" onclick="navigate('product')">Buka Katalog Tes &rarr;</button>
+            <button class="btn btn-ghost" onclick="navigate('refrange')">Nilai Rujukan &rarr;</button>
+            <button class="btn btn-ghost" onclick="navigate('catalog-export')">Ekspor LOINC/UCUM &rarr;</button>
           </div>
         </div>
 
-        <div style="margin-top:20px; display:flex; justify-content:flex-end;">
-          <button class="btn btn-teal" onclick="submitCriticalSettings()">💾 Simpan Parameter Kritis</button>
+        <div style="background:var(--bg2); border-radius:10px; padding:16px; border:1px solid var(--border); font-size:13px; color:var(--text2);">
+          <p style="margin:0 0 8px 0;"><b>Standar Kepatuhan Integritas Data ISO 15189:2022:</b></p>
+          <ul style="margin:0; padding-left:20px; line-height:1.6;">
+            <li>Panel tes dipecah menjadi baris analit individual dengan kode unik masing-masing.</li>
+            <li>Rentang rujukan dipisah per kelompok usia, jenis kelamin, dan instrumen metode.</li>
+            <li>Tersedia fitur verifikasi lot-to-lot reagen baru (CLSI EP26-A) sebelum digunakan operasional.</li>
+          </ul>
         </div>
       </div>
     `;
@@ -292,6 +371,93 @@ function renderLisSettingsTabContent(tab, cfg) {
   }
 
   return '';
+}
+
+function openAddCriticalParamModal() {
+  if (typeof openModal !== 'function') return;
+  openModal(`
+    <div class="modal-header">
+      <div class="modal-title">Tambah Parameter Nilai Kritis Baru</div>
+      <button class="modal-close" onclick="closeModalForce()">&times;</button>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px; padding:6px 0;">
+      <div class="form-group">
+        <label style="font-size:12px; font-weight:750;">Nama Parameter / Pemeriksaan *</label>
+        <input type="text" id="new-crit-name" placeholder="Contoh: Bilirubin Total Neonatus" required style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-group">
+          <label style="font-size:12px; font-weight:750;">Kode Parameter</label>
+          <input type="text" id="new-crit-code" placeholder="Contoh: BIL-TOT" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+        </div>
+        <div class="form-group">
+          <label style="font-size:12px; font-weight:750;">Satuan (UCUM)</label>
+          <input type="text" id="new-crit-unit" placeholder="mg/dL, mmol/L..." style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <div class="form-group">
+          <label style="font-size:12px; font-weight:750;">Batas Kritis Bawah (Low &le;)</label>
+          <input type="number" id="new-crit-low" placeholder="Kosongkan jika tidak ada" step="any" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+        </div>
+        <div class="form-group">
+          <label style="font-size:12px; font-weight:750;">Batas Kritis Atas (High &ge;)</label>
+          <input type="number" id="new-crit-high" placeholder="Contoh: 15.0" step="any" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+        </div>
+      </div>
+      <div class="form-group">
+        <label style="font-size:12px; font-weight:750;">Peringatan Klinis</label>
+        <input type="text" id="new-crit-alert" placeholder="Contoh: Risiko Kernikterus" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+      </div>
+      <div class="form-group">
+        <label style="font-size:12px; font-weight:750;">Instruksi Tindakan Analis</label>
+        <input type="text" id="new-crit-action" placeholder="Lapor Dokter Sp.A / DPJP <15m" value="Lapor DPJP via TBaK <15m" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" onclick="submitNewCriticalParam()">Simpan Parameter Kritis</button>
+    </div>
+  `);
+}
+
+function submitNewCriticalParam() {
+  const name = document.getElementById('new-crit-name')?.value?.trim();
+  const code = document.getElementById('new-crit-code')?.value?.trim() || 'PARAM';
+  const unit = document.getElementById('new-crit-unit')?.value?.trim() || '';
+  const lowVal = document.getElementById('new-crit-low')?.value;
+  const highVal = document.getElementById('new-crit-high')?.value;
+  const alert = document.getElementById('new-crit-alert')?.value?.trim() || 'Nilai Kritis Terdeteksi';
+  const action = document.getElementById('new-crit-action')?.value?.trim() || 'Lapor DPJP <15m';
+
+  if (!name) {
+    if (typeof toast === 'function') toast('Nama Parameter wajib diisi', 'err');
+    return;
+  }
+
+  const params = getCriticalParameters();
+  params.push({
+    id: Date.now(),
+    code,
+    name,
+    low: lowVal !== '' && !isNaN(parseFloat(lowVal)) ? parseFloat(lowVal) : null,
+    high: highVal !== '' && !isNaN(parseFloat(highVal)) ? parseFloat(highVal) : null,
+    unit,
+    alert,
+    action
+  });
+
+  saveCriticalParameters(params);
+  if (typeof closeModalForce === 'function') closeModalForce();
+  if (typeof toast === 'function') toast('✓ Parameter Nilai Kritis berhasil ditambahkan', 'ok');
+  renderLisSettings();
+}
+
+function deleteCriticalParam(paramId) {
+  const params = getCriticalParameters().filter(p => p.id !== paramId);
+  saveCriticalParameters(params);
+  if (typeof toast === 'function') toast('Parameter nilai kritis dihapus', 'ok');
+  renderLisSettings();
 }
 
 function submitProfileSettings() {
@@ -348,9 +514,6 @@ async function testConnectorSocket() {
   }
 }
 
-/**
- * Download Generator for Lab Connector Daemon Package
- */
 function downloadConnectorZip() {
   const serverCode = `// ══════════════════════════════════════════════════════════════════
 // AVA LAB ANALYZER CONNECTOR DAEMON (Port :9999)
@@ -365,7 +528,6 @@ const TCP_PORT = 9998;
 
 console.log('👑 [AVA Lab Connector] Starting Service on Port ' + HTTP_PORT + '...');
 
-// HTTP Status Server
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -396,12 +558,10 @@ server.listen(HTTP_PORT, '0.0.0.0', () => {
   console.log('✓ HTTP Server Ready at http://127.0.0.1:' + HTTP_PORT);
 });
 
-// TCP Socket for Analyzer Machines (ASTM E1381)
 const tcpServer = net.createServer((socket) => {
   console.log('🔌 Mesin Analyzer Terhubung dari:', socket.remoteAddress);
   socket.on('data', (data) => {
     console.log('[ASTM RAW]', data.toString('utf-8'));
-    // ACK (0x06)
     socket.write(Buffer.from([0x06]));
   });
 });
@@ -466,6 +626,10 @@ window.renderLisSettings = renderLisSettings;
 window.getLisSettings = getLisSettings;
 window.saveLisSettings = saveLisSettings;
 window.switchLisSettingsTab = switchLisSettingsTab;
+window.getCriticalParameters = getCriticalParameters;
+window.openAddCriticalParamModal = openAddCriticalParamModal;
+window.submitNewCriticalParam = submitNewCriticalParam;
+window.deleteCriticalParam = deleteCriticalParam;
 window.submitProfileSettings = submitProfileSettings;
 window.submitCriticalSettings = submitCriticalSettings;
 window.testConnectorSocket = testConnectorSocket;
