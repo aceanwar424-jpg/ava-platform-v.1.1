@@ -3117,9 +3117,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Subdomain ikut menentukan peran yang dituju.
   //
   // Berkas ini melayani apps.avahealth.sbs (portal pasien) DAN
-  // corporate.avahealth.sbs (portal PIC korporat). Hash #korporat sudah
+  // corp.avahealth.sbs (portal PIC korporat). Hash #korporat sudah
   // dikenali di bawah, tetapi hash tidak pernah sampai ke server — pengunjung
-  // corporate.avahealth.sbs mendarat tanpa hash apa pun dan melihat layar
+  // corp.avahealth.sbs mendarat tanpa hash apa pun dan melihat layar
   // pasien. Peta subdomain menutup celah itu.
   const situsIni = (typeof window.situsSaatIni === 'function') ? window.situsSaatIni() : null;
   const peranSubdomain = situsIni && situsIni.peran ? situsIni.peran : null;

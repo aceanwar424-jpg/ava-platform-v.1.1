@@ -1151,7 +1151,7 @@ window.PETA_MENU = {
               "id": "portal-korporat",
               "label": "Portal Klien Korporat",
               "status": "ada",
-              "ket": "corporate.avahealth.sbs — kelola karyawan, requestor & approver"
+              "ket": "corp.avahealth.sbs — kelola karyawan, requestor & approver"
             },
             {
               "id": "portal-wellness",

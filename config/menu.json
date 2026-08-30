@@ -1168,7 +1168,7 @@
               "id": "portal-korporat",
               "label": "Portal Klien Korporat",
               "status": "ada",
-              "ket": "corporate.avahealth.sbs — kelola karyawan, requestor & approver"
+              "ket": "corp.avahealth.sbs — kelola karyawan, requestor & approver"
             },
             {
               "id": "portal-wellness",
@@ -1417,7 +1417,7 @@
     },
     "korporat": {
       "nama": "Portal Klien Korporat",
-      "subdomain": "corporate.avahealth.sbs",
+      "subdomain": "corp.avahealth.sbs",
       "masuk": "akun korporat — peran requestor / approver diatur di HIS",
       "integrasi": "Terintegrasi utamanya ke HIS: peserta MCU masuk sebagai pasien klinik.",
       "menu": [

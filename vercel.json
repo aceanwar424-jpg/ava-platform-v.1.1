@@ -647,7 +647,7 @@
       "has": [
         {
           "type": "host",
-          "value": "corporate.avahealth.sbs"
+          "value": "corp.avahealth.sbs"
         }
       ],
       "destination": "/apps/index.html"
@@ -657,7 +657,7 @@
       "has": [
         {
           "type": "host",
-          "value": "corporate.avahealth.sbs"
+          "value": "corp.avahealth.sbs"
         }
       ],
       "destination": "/apps/index.html"
@@ -667,7 +667,7 @@
       "has": [
         {
           "type": "host",
-          "value": "corporate.avahelath.sbs"
+          "value": "corp.avahelath.sbs"
         }
       ],
       "destination": "/apps/index.html"
@@ -677,7 +677,7 @@
       "has": [
         {
           "type": "host",
-          "value": "corporate.avahelath.sbs"
+          "value": "corp.avahelath.sbs"
         }
       ],
       "destination": "/apps/index.html"

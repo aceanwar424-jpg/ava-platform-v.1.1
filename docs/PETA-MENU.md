@@ -400,7 +400,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Portal Pasien Individual | `portal-pasien` | apps.avahealth.sbs — booking, hasil, telekonsul |
-| 🟢 | Portal Klien Korporat | `portal-korporat` | corporate.avahealth.sbs — kelola karyawan, requestor & approver |
+| 🟢 | Portal Klien Korporat | `portal-korporat` | corp.avahealth.sbs — kelola karyawan, requestor & approver |
 | ⚪ | Portal Wellness | `portal-wellness` | wellness.avahealth.sbs — nutrition & personal care |
 
 ---
@@ -501,7 +501,7 @@ Aplikasi konsumen berdiri sendiri di luar rel menu internal. Struktur menunya di
 
 ### Portal Klien Korporat
 
-- **Subdomain:** `corporate.avahealth.sbs`
+- **Subdomain:** `corp.avahealth.sbs`
 - **Cara masuk:** akun korporat — peran requestor / approver diatur di HIS
 - **Integrasi:** Terintegrasi utamanya ke HIS: peserta MCU masuk sebagai pasien klinik.
 

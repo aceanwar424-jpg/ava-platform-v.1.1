@@ -269,12 +269,12 @@
       "kunci": "corporate",
       "nama": "Portal Klien Korporat (Login PIC)",
       "host": [
-        "corporate.avahealth.sbs",
-        "corporate.avahelath.sbs",
+        "corp.avahealth.sbs",
+        "corp.avahelath.sbs",
         "korporat.avahealth.sbs",
         "korporat.avahelath.sbs"
       ],
-      "lokal": "corporate",
+      "lokal": "corp",
       "masuk": "/apps/index.html",
       "basis": "/apps/",
       "keterangan": "Portal PIC perusahaan klien: login akun korporat, kelola roster karyawan, ajukan & setujui jadwal MCU.",

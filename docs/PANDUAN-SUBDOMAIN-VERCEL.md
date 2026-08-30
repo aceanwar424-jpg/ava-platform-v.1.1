@@ -65,7 +65,7 @@ Tanpa ini staf tidak bisa bekerja.
 | 2 | `his.avahealth.sbs` | Klinik & seluruh layanan non-lab | Dokter, perawat, admisi, farmasi, radiologi |
 | 3 | `lis.avahealth.sbs` | Laboratorium | Analis, dr. Sp.PK |
 | 4 | `tech.avahealth.sbs` | AVA Tech — lisensi, tenant, penjualan sistem | Tim Tech |
-| 5 | `corporate.avahealth.sbs` | Portal klien korporat (login PIC) | PIC perusahaan klien |
+| 5 | `corp.avahealth.sbs` | Portal klien korporat (login PIC) | PIC perusahaan klien |
 
 ### GELOMBANG 2 — Layanan lapangan & konsumen (4)
 
@@ -98,7 +98,7 @@ Boleh dilewati. Tambahkan hanya kalau alamatnya memang dipakai/dicetak.
 | # | Subdomain | Sama dengan | Redirect? |
 |---|---|---|---|
 | 15 | `lab.avahealth.sbs` | `lis.` | **Ya** → `lis.avahealth.sbs` |
-| 16 | `korporat.avahealth.sbs` | `corporate.` | **Ya** → `corporate.avahealth.sbs` |
+| 16 | `korporat.avahealth.sbs` | `corp.` | **Ya** → `corp.avahealth.sbs` |
 | 17 | `cek.avahealth.sbs` | `app.` | Tidak — biarkan menyajikan langsung |
 | 18 | `console.avahealth.sbs` | `tech.` (mendarat di layar Lisensi) | Tidak |
 
@@ -134,7 +134,7 @@ Setelah tiap gelombang, buka alamatnya di peramban. Yang harus terlihat:
 | `his.` | Rel menu **7 kategori** (Klinik, AVA Health, Korporat, Keuangan, Mutu, SDM, Pengaturan) |
 | `lis.` | Rel menu **4 kategori** (Lab LIS, Inventori, Mutu, Pengaturan) |
 | `tech.` | Rel menu **6 kategori**, mendarat di Cockpit AVA Tech |
-| `corporate.` | Portal PIC korporat, **bukan** layar pasien |
+| `corp.` | Portal PIC korporat, **bukan** layar pasien |
 | `antrian.` | Layar antrian penuh, tanpa menu |
 | `lacak.` | "Tautan tidak lengkap" — benar, halaman ini butuh token |
 

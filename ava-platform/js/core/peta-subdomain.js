@@ -166,11 +166,11 @@ window.PETA_SUBDOMAIN = {
     "workspace": "tech",
     "awal": "lisensi"
   },
-  "corporate.avahealth.sbs": {
+  "corp.avahealth.sbs": {
     "nama": "Portal Klien Korporat (Login PIC)",
     "peran": "corporate"
   },
-  "corporate.avahelath.sbs": {
+  "corp.avahelath.sbs": {
     "nama": "Portal Klien Korporat (Login PIC)",
     "peran": "corporate"
   },
@@ -182,7 +182,7 @@ window.PETA_SUBDOMAIN = {
     "nama": "Portal Klien Korporat (Login PIC)",
     "peran": "corporate"
   },
-  "corporate.localhost": {
+  "corp.localhost": {
     "nama": "Portal Klien Korporat (Login PIC)",
     "peran": "corporate"
   },

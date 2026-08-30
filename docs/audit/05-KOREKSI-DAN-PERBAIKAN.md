@@ -81,7 +81,7 @@ Sempat ada kesalahpahaman bahwa portal korporat "belum ada". Kenyataannya ada
 **Cacat sesungguhnya:** tombol `corporate` di bilah simulator menunjuk
 `portal_korporat.html` — portal tautan yang tipis — padahal portal login yang
 lengkap ada di `apps/index.html`. Itu sebabnya menu terasa dangkal.
-`config/domain.json` kini mengarahkan `corporate.avahealth.sbs` ke portal login.
+`config/domain.json` kini mengarahkan `corp.avahealth.sbs` ke portal login.
 
 ### Yang ditambahkan: pengelolaan roster di portal bertoken
 
