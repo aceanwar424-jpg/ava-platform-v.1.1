@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 161 — 🟢 141 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
+**Total menu terpetakan:** 162 — 🟢 142 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
 
 ---
 
@@ -269,9 +269,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Formulasi & R&D Produk | `wellness-rnd` | Pengembangan formula nutraseutikal |
-| 🟢 | Kemitraan Maklon | `wellness-maklon` | Produksi CPOTB/CPKB pihak ketiga |
-| 🟢 | Uji Mutu Produk ke Lab | `wellness-mutu` | Order uji mikrobiologi ke AVA Lab |
+| 🟢 | Perintah Produksi | `pabrik` | Work order, pemakaian bahan baku, rendemen, dan hasil batch |
+| 🟢 | Formulasi & R&D Produk | `wellness-rnd` | Resep berversi + BOM. Versi baru = baris baru, supaya batch lama tetap terlacak resepnya. |
+| 🟢 | Kemitraan Maklon | `wellness-maklon` | Produksi untuk merek pihak lain. Hasilnya milik klien, tidak masuk stok AVA. |
+| 🟢 | Uji Mutu Produk ke Lab | `wellness-mutu` | Batch karantina sampai SELURUH uji lulus, bukan uji pertama. |
 
 ---
 

@@ -833,22 +833,28 @@
           "nama": "Formulasi & Produksi",
           "menu": [
             {
+              "id": "pabrik",
+              "label": "Perintah Produksi",
+              "status": "ada",
+              "ket": "Work order, pemakaian bahan baku, rendemen, dan hasil batch"
+            },
+            {
               "id": "wellness-rnd",
               "label": "Formulasi & R&D Produk",
               "status": "ada",
-              "ket": "Pengembangan formula nutraseutikal"
+              "ket": "Resep berversi + BOM. Versi baru = baris baru, supaya batch lama tetap terlacak resepnya."
             },
             {
               "id": "wellness-maklon",
               "label": "Kemitraan Maklon",
               "status": "ada",
-              "ket": "Produksi CPOTB/CPKB pihak ketiga"
+              "ket": "Produksi untuk merek pihak lain. Hasilnya milik klien, tidak masuk stok AVA."
             },
             {
               "id": "wellness-mutu",
               "label": "Uji Mutu Produk ke Lab",
               "status": "ada",
-              "ket": "Order uji mikrobiologi ke AVA Lab"
+              "ket": "Batch karantina sampai SELURUH uji lulus, bukan uji pertama."
             }
           ]
         }

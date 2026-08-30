@@ -41,8 +41,84 @@ const rute = new Set(
   [...isiRouter.matchAll(/case '([a-z0-9_-]+)':/gi)].map((m) => m[1])
 );
 
+// ── Pemeriksaan kedua: rute yang ADA belum tentu MENAMPILKAN DATA ───
+//
+// Pemeriksaan di atas hanya membuktikan routernya punya case. Itu tidak
+// cukup. Ditemukan 14 modul — sebagian di atas 600 baris — yang punya
+// case, tampil mulus, dan seluruh isinya array yang ditulis tangan:
+// jadwal terapis, saldo member, angka stok, bahkan nomor resi. Layar
+// semacam ini lebih berbahaya daripada layar yang jelas-jelas kosong,
+// karena tidak ada yang tahu datanya karangan sampai ada yang memakainya
+// untuk bekerja.
+//
+// Karena itu status "ada" juga menuntut modulnya benar-benar memanggil
+// data. Modul yang memang murni tampilan bisa didaftarkan di
+// TANPA_DATA_WAJAR di bawah, dengan alasannya — supaya pengecualian
+// menjadi keputusan yang tercatat, bukan celah yang diam.
+const POLA_DATA = /\b(sbGet|sbRpc|sbPost|sbPatch|sbDelete|fetch)\s*\(/;
+
+const TANPA_DATA_WAJAR = {
+  // 'id-menu': 'alasan kenapa layar ini memang tidak membaca data',
+};
+
+// Halaman → nama fungsi render, dibaca dari router.js:
+//   case 'pabrik': safeRun('renderPabrik', …)
+//
+// Sengaja TIDAK memakai modul-manifest.js: manifest memetakan satu FOLDER
+// penuh ke tiap halaman, sehingga satu berkas tetangga yang punya panggilan
+// data akan menutupi modul di sebelahnya yang seluruhnya karangan. Yang
+// diperiksa harus berkas yang fungsinya benar-benar dipanggil router.
+const petaRender = {};
+{
+  const re = /case\s+'([a-z0-9_-]+)'\s*:\s*(?:[^\n]*?safeRun\(\s*'([A-Za-z0-9_]+)')?/gi;
+  let m, tertunda = [];
+  while ((m = re.exec(isiRouter)) !== null) {
+    if (m[2]) {
+      // case yang bertumpuk berbagi satu safeRun di baris terakhir
+      for (const h of tertunda) petaRender[h] = m[2];
+      petaRender[m[1]] = m[2];
+      tertunda = [];
+    } else {
+      tertunda.push(m[1]);
+    }
+  }
+}
+
+// Fungsi render → berkas yang mendefinisikannya.
+const petaBerkas = {};
+{
+  const telusuri = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const penuh = path.join(dir, e.name);
+      if (e.isDirectory()) { telusuri(penuh); continue; }
+      if (!e.name.endsWith('.js')) continue;
+      const isi = fs.readFileSync(penuh, 'utf8');
+      for (const m of isi.matchAll(
+        /(?:async\s+)?function\s+(render[A-Za-z0-9_]*)\s*\(/g)) {
+        if (!petaBerkas[m[1]]) petaBerkas[m[1]] = penuh;
+      }
+    }
+  };
+  try { telusuri(path.join(PLATFORM, 'modules')); } catch (_) {}
+}
+
+const _cacheData = new Map();
+function modulPunyaData(halaman) {
+  if (_cacheData.has(halaman)) return _cacheData.get(halaman);
+  let hasil = null;                       // null = tak bisa diperiksa
+  const fn = petaRender[halaman];
+  const berkas = fn && petaBerkas[fn];
+  if (berkas) {
+    try { hasil = POLA_DATA.test(fs.readFileSync(berkas, 'utf8')); }
+    catch (_) { hasil = null; }
+  }
+  _cacheData.set(halaman, hasil);
+  return hasil;
+}
+
 const galat = [];
 const peringatan = [];
+const tanpaData = [];
 
 for (const [kunciKat, kat] of Object.entries(peta.kategori || {})) {
   for (const grup of kat.grup || []) {
@@ -62,6 +138,9 @@ for (const [kunciKat, kat] of Object.entries(peta.kategori || {})) {
       const portalKonsumen = kunciKat === 'konsumen';
       if (m.status === 'ada' && !rute.has(halaman) && !portalKonsumen) {
         peringatan.push(`"${m.id}" (${kat.label}) ditandai "ada" tetapi halaman "${halaman}" tidak punya case di router.js`);
+      } else if (m.status === 'ada' && !portalKonsumen
+                 && !TANPA_DATA_WAJAR[m.id] && modulPunyaData(halaman) === false) {
+        tanpaData.push(`"${m.id}" (${kat.label}) → ${halaman}`);
       }
       if (m.status === 'belum' && rute.has(halaman)) {
         peringatan.push(`"${m.id}" ditandai "belum" padahal rute "${halaman}" sudah ada — perbarui statusnya`);
@@ -260,4 +339,13 @@ console.log(`  keluaran  : js/core/peta-menu.js, docs/PETA-MENU.md`);
 if (peringatan.length) {
   console.log(`\n  ${peringatan.length} hal perlu diperiksa:`);
   for (const w of peringatan) console.log('   ! ' + w);
+}
+
+if (tanpaData.length) {
+  console.log(`\n  ⚠ ${tanpaData.length} menu berstatus "ada" tetapi modulnya tidak`);
+  console.log('    memanggil data sama sekali — layarnya kemungkinan besar berisi');
+  console.log('    angka karangan:');
+  for (const t of tanpaData) console.log('      · ' + t);
+  console.log('    Perbaiki modulnya, turunkan statusnya, atau daftarkan di');
+  console.log('    TANPA_DATA_WAJAR beserta alasannya.');
 }
