@@ -1,0 +1,162 @@
+/* ═══════════════════════════════════════════════════════════════
+   TOKEN DESAIN AVA GLOBAL — satu-satunya sumber warna, jarak, dan huruf
+
+   MENGAPA BERKAS INI ADA
+   Sebelum ini ada dua sistem gaya yang berdiri sendiri: css/style.css
+   untuk aplikasi internal, dan blok <style> di dalam portal.html untuk
+   situs publik. Keduanya memakai NAMA token yang sama dengan NILAI yang
+   berbeda — "--gold" berarti #F59E0B di aplikasi dan #D4AF37 di situs.
+   Akibatnya merek yang sama tampil sebagai dua warna berbeda, tergantung
+   halaman mana yang sedang dibuka.
+
+   IDENTITAS RESMI
+   Dokumen induk (AVA HEALTH SOLUTION THE FUTURE.md §6.4) menetapkan
+   aplikasi publik berkarakter "ultra-premium (Gold, Navy, Emerald)".
+   Lambang perusahaan adalah Lingkaran Emas (Golden Ring of Excellence).
+   Tiga warna itu yang dipegang di sini; #D4AF37 dipilih sebagai emas
+   karena itulah emas sejati — #F59E0B adalah amber, bukan emas.
+
+   ATURAN PAKAI
+   1. Jangan menulis heksa langsung di HTML atau modul. Pakai token.
+   2. Tiga warna merek dipakai dengan peran tetap:
+        Navy    = dasar dan bidang gelap
+        Emas    = kehormatan — judul, aksen, lencana, garis pemisah
+        Emerald = tindakan — tombol utama, keadaan berhasil
+      Warna keempat hanya untuk keadaan (peringatan, bahaya, informasi).
+   3. Jarak dan ukuran huruf memakai tangga di bawah. Angka di luar
+      tangga membuat halaman terlihat "hampir rapi" — dan itu justru
+      lebih terasa berantakan daripada berantakan yang konsisten.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── 1. WARNA MEREK ──────────────────────────────────────────── */
+
+  /* Emas — Lingkaran Emas. Warna kehormatan, bukan warna tombol.
+     Dipakai untuk judul, lencana, garis, dan aksen. Dipakai terlalu
+     luas, emas berhenti terasa istimewa. */
+  --emas-900: #6B5310;
+  --emas-700: #8F6F16;
+  --emas-500: #B8912B;
+  --emas:     #D4AF37;   /* inti merek */
+  --emas-300: #E3C766;
+  --emas-100: #F5E4A8;
+  --emas-050: #FDF8E7;
+
+  /* Navy — dasar. Latar bidang gelap, kop, dan teks utama di terang. */
+  --navy-900: #050F1E;
+  --navy-800: #071729;
+  --navy:     #0A2342;   /* inti merek */
+  --navy-600: #16324F;
+  --navy-400: #37506F;
+  --navy-200: #7E92AB;
+  --navy-050: #EEF2F7;
+
+  /* Emerald — tindakan. Tombol utama, konfirmasi, keadaan berhasil. */
+  --zamrud-900: #064E3B;
+  --zamrud-700: #047857;
+  --zamrud:     #10B981;   /* inti merek */
+  --zamrud-300: #6EE7B7;
+  --zamrud-100: #D1FAE5;
+
+  /* ── 2. NETRAL ───────────────────────────────────────────────── */
+  --netral-950: #020617;
+  --netral-900: #0F172A;
+  --netral-700: #334155;
+  --netral-500: #64748B;
+  --netral-400: #94A3B8;
+  --netral-300: #CBD5E1;
+  --netral-200: #E2E8F0;
+  --netral-100: #F1F5F9;
+  --netral-050: #F8FAFC;
+  --putih:      #FFFFFF;
+
+  /* ── 3. KEADAAN ──────────────────────────────────────────────────
+     Bukan warna merek. Hanya untuk menyampaikan keadaan, dan tidak
+     boleh dipakai sebagai hiasan — kalau merah muncul di tempat yang
+     bukan masalah, merah berhenti berarti masalah. */
+  --bahaya:      #DC2626;
+  --bahaya-lemah:#FEE2E2;
+  --awas:        #B45309;
+  --awas-lemah:  #FEF3C7;
+  --info:        #1D4ED8;
+  --info-lemah:  #DBEAFE;
+
+  /* ── 4. PERAN (dipakai komponen, bukan warna mentah) ───────────── */
+  --dasar:          var(--netral-950);
+  --dasar-naik:     #0B1220;
+  --bidang:         rgba(255, 255, 255, 0.03);
+  --bidang-tepi:    rgba(255, 255, 255, 0.09);
+  --garis-emas:     rgba(212, 175, 55, 0.30);
+
+  --teks:           var(--netral-050);
+  --teks-redup:     var(--netral-400);
+  --teks-samar:     var(--netral-500);
+
+  --aksi:           var(--zamrud);
+  --aksi-teks:      #04241A;
+  --kehormatan:     var(--emas);
+
+  /* ── 5. TANGGA JARAK ─────────────────────────────────────────────
+     Kelipatan 4. Nilai di luar tangga ini tidak dipakai. */
+  --j-1:  4px;
+  --j-2:  8px;
+  --j-3:  12px;
+  --j-4:  16px;
+  --j-5:  24px;
+  --j-6:  32px;
+  --j-7:  48px;
+  --j-8:  64px;
+  --j-9:  96px;
+
+  /* ── 6. TANGGA HURUF ─────────────────────────────────────────────
+     Lima tingkat. Sebelumnya halaman memakai 38/26/17/15/13.5/12/11.5px
+     tanpa aturan — mata membaca ketidakteraturan itu sebagai "kurang
+     rapi" jauh sebelum menyadari sebabnya. */
+  --h-xs:  12px;   /* keterangan, lencana        */
+  --h-sm:  13px;   /* teks pendukung             */
+  --h-md:  15px;   /* teks isi                   */
+  --h-lg:  20px;   /* judul kartu                */
+  --h-xl:  28px;   /* judul seksi                */
+  --h-2xl: 40px;   /* judul halaman              */
+
+  --tinggi-rapat:  1.3;
+  --tinggi-normal: 1.6;
+  --tinggi-lega:   1.75;
+
+  --tebal-normal: 500;
+  --tebal-tegas:  700;
+  --tebal-berat:  800;
+
+  /* ── 7. SUDUT ────────────────────────────────────────────────── */
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --r-bulat: 999px;
+
+  /* ── 8. BAYANG ───────────────────────────────────────────────────
+     Tiga tingkat saja. Bayang yang terlalu beragam membuat bidang
+     tampak melayang di ketinggian yang tidak beraturan. */
+  --bayang-1: 0 1px 2px rgba(2, 6, 23, 0.28);
+  --bayang-2: 0 8px 24px rgba(2, 6, 23, 0.35);
+  --bayang-3: 0 20px 50px rgba(2, 6, 23, 0.50);
+  --bayang-emas: 0 4px 16px rgba(212, 175, 55, 0.30);
+
+  /* ── 9. GERAK ────────────────────────────────────────────────── */
+  --gerak-cepat:  120ms;
+  --gerak:        180ms;
+  --gerak-lambat: 300ms;
+  --lengkung: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Menghormati pengguna yang mematikan animasi di sistemnya. Bukan
+   sekadar kesantunan: gerak dapat memicu pusing dan mual pada sebagian
+   orang, dan halaman kesehatan adalah tempat terakhir yang pantas
+   mengabaikannya. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --gerak-cepat: 0ms;
+    --gerak: 0ms;
+    --gerak-lambat: 0ms;
+  }
+}

@@ -9,25 +9,48 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <style>
+  <!-- Token desain: satu-satunya sumber warna, jarak, dan huruf.
+     WAJIB dimuat sebelum <style> di bawah, karena blok itu memetakan
+     nama lama halaman ini ke token resmi. -->
+<link rel="stylesheet" href="css/token.css?v=20260830a">
+
+<style>
+    /* ── Pemetaan nama lama halaman ini ke token merek ─────────────
+       Halaman ini dulu mendefinisikan warnanya sendiri, dan nilainya
+       berbeda dari css/style.css milik aplikasi: "--gold" berarti
+       #D4AF37 di sini tetapi #F59E0B di sana. Satu merek, dua warna.
+
+       Nama lama DIPERTAHANKAN sebagai alias, bukan dicari-ganti di
+       ratusan pemakaian. Satu blok yang bisa dibaca sekali lihat jauh
+       lebih mudah ditinjau daripada 400 suntingan tersebar.
+
+       --sky SENGAJA diarahkan ke zamrud. Biru langit bukan warna merek;
+       ia terlanjur menjadi warna tombol utama di sini, sementara emerald
+       yang justru warna tindakan menurut dokumen induk hampir tidak
+       terpakai. Pemetaan ini yang mengembalikannya. */
     :root {
-      --bg: #020617;
-      --bg-surface: rgba(15, 23, 42, 0.75);
-      --bg-surface-hover: rgba(30, 41, 59, 0.85);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-border-gold: rgba(212, 175, 55, 0.35);
-      --gold: #D4AF37;
-      --gold-light: #FDE047;
-      --emerald: #10B981;
-      --emerald-glow: rgba(16, 185, 129, 0.25);
-      --sky: #0EA5E9;
-      --sky-glow: rgba(14, 165, 233, 0.25);
-      --navy: #0A2342;
-      --text: #F8FAFC;
-      --text-muted: #94A3B8;
-      --text-dim: #64748B;
-      --radius: 16px;
-      --radius-sm: 10px;
+      --bg:                var(--dasar);
+      --bg-surface:        rgba(11, 18, 32, 0.75);
+      --bg-surface-hover:  rgba(22, 50, 79, 0.85);
+      --card-border:       var(--bidang-tepi);
+      --card-border-gold:  var(--garis-emas);
+
+      --gold:          var(--emas);
+      --gold-light:    var(--emas-300);
+      --emerald:       var(--zamrud);
+      --emerald-glow:  rgba(16, 185, 129, 0.25);
+      --sky:           var(--zamrud);
+      --sky-glow:      rgba(16, 185, 129, 0.25);
+      /* --navy TIDAK didefinisikan ulang di sini. token.css sudah
+         memegangnya (#0A2342), dan mendefinisikannya lagi hanya
+         menciptakan tabrakan nama yang persis ingin dihapus. */
+
+      --text:        var(--teks);
+      --text-muted:  var(--teks-redup);
+      --text-dim:    var(--teks-samar);
+
+      --radius:      var(--r-lg);
+      --radius-sm:   var(--r-md);
       --font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     }
 
