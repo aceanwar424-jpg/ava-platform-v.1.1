@@ -22,7 +22,8 @@ const testSuites = [
   { name: '10. Portal Korporat & Roster Karyawan', file: 'test_portal_korporat_roster.js' },
   { name: '11. AVA Tech — Lisensi & Tenant', file: 'test_ava_tech_tenant.js' },
   { name: '12. Antrean — Loket, Prioritas & Panggilan', file: 'test_antrian_panggilan.js' },
-  { name: '13. Wellness, Sanctuary & Pabrik', file: 'test_wellness_pabrik.js' }
+  { name: '13. Wellness, Sanctuary & Pabrik', file: 'test_wellness_pabrik.js' },
+  { name: '14. LIS, AVA Tech & Order Terintegrasi', file: 'test_lis_tech_order.js' }
 ];
 
 console.log('╔═══════════════════════════════════════════════════════════════╗');
