@@ -297,25 +297,112 @@ function updateLisSelectedSummary() {
   const tubeTypes = new Set();
 
   tagsEl.innerHTML = _lisOrderSelectedTests.map(t => {
+function getRequiredTubesForTests(tests = []) {
+  const tubes = {};
+  tests.forEach(t => {
+    const samp = (t.sampel_type || '').toLowerCase();
+    const kat = (t.kategori || '').toLowerCase();
+    let tubeKey = 'SST';
+    let tubeName = 'Serum SST Gel (Tutup Kuning)';
+    let tubeColor = '#FBBF24';
+    let tubeSuffix = 'S';
+    let tubeOrder = 2;
+
+    if (samp.includes('edta') || kat.includes('hematologi') || t.nama_tes.includes('HbA1c')) {
+      tubeKey = 'EDTA';
+      tubeName = 'Darah EDTA K2 (Tutup Ungu)';
+      tubeColor = '#A855F7';
+      tubeSuffix = 'E';
+      tubeOrder = 4;
+    } else if (samp.includes('sitrat') || t.nama_tes.includes('PT') || t.nama_tes.includes('APTT')) {
+      tubeKey = 'CIT';
+      tubeName = 'Plasma Sitrat 3.2% (Tutup Biru)';
+      tubeColor = '#38BDF8';
+      tubeSuffix = 'C';
+      tubeOrder = 1;
+    } else if (samp.includes('urin') || kat.includes('urinalisis')) {
+      tubeKey = 'URI';
+      tubeName = 'Pot Urin Steril';
+      tubeColor = '#F59E0B';
+      tubeSuffix = 'U';
+      tubeOrder = 5;
+    } else if (samp.includes('feses') || kat.includes('feses')) {
+      tubeKey = 'FES';
+      tubeName = 'Pot Feses';
+      tubeColor = '#D97706';
+      tubeSuffix = 'F';
+      tubeOrder = 6;
+    }
+
+    if (!tubes[tubeKey]) {
+      tubes[tubeKey] = {
+        key: tubeKey,
+        name: tubeName,
+        color: tubeColor,
+        suffix: tubeSuffix,
+        order: tubeOrder,
+        tests: []
+      };
+    }
+    tubes[tubeKey].tests.push(t);
+  });
+
+  return Object.values(tubes).sort((a, b) => a.order - b.order);
+}
+
+function updateLisSelectedSummary() {
+  const tagsEl = document.getElementById('adm-selected-tests-tags');
+  const countBadge = document.getElementById('adm-selected-count-badge');
+  const priceEl = document.getElementById('adm-total-price');
+  const tubeEl = document.getElementById('adm-tube-reqs');
+
+  if (!tagsEl) return;
+
+  if (!_lisOrderSelectedTests.length) {
+    tagsEl.innerHTML = `<span style="color:var(--text3); font-size:12.5px;">Belum ada pemeriksaan yang dipilih. Silakan centang tes di atas.</span>`;
+    if (countBadge) countBadge.textContent = '0 Tes Terpilih';
+    if (priceEl) priceEl.textContent = 'Rp 0';
+    if (tubeEl) tubeEl.innerHTML = '<b>Kebutuhan Tabung:</b> <span>-</span>';
+    return;
+  }
+
+  if (countBadge) countBadge.textContent = `${_lisOrderSelectedTests.length} Tes Terpilih`;
+
+  let totalPrice = 0;
+  _lisOrderSelectedTests.forEach(t => {
     const price = t.harga_dasar || t.tarif || 0;
     totalPrice += Number(price);
-    const samp = t.sampel_type || 'Darah Vena';
-    tubeTypes.add(samp.includes('EDTA') ? '1x Tabung Ungu (EDTA)' : (samp.includes('Urin') ? '1x Pot Urine' : '1x Tabung Kuning/Merah (Serum)'));
+  });
 
-    return `
-      <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:999px; font-size:12px; font-weight:750; color:#10B981;">
-        <span>${t.nama_tes}</span>
-        <span onclick="removeLisSelectedTest(${t.id})" style="cursor:pointer; font-weight:900; margin-left:4px; opacity:0.7;" title="Hapus">&times;</span>
-      </span>
-    `;
-  }).join('');
+  tagsEl.innerHTML = _lisOrderSelectedTests.map(t => `
+    <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); padding:4px 10px; border-radius:999px; font-size:12px; font-weight:750; color:#10B981;">
+      <span>${t.nama_tes}</span>
+      <span onclick="removeLisSelectedTest(${t.id})" style="cursor:pointer; font-weight:900; margin-left:4px; opacity:0.7;" title="Hapus">&times;</span>
+    </span>
+  `).join('');
 
   if (priceEl) {
     priceEl.textContent = typeof formatCurrency === 'function' ? formatCurrency(totalPrice) : 'Rp ' + Number(totalPrice).toLocaleString('id-ID');
   }
 
+  const requiredTubes = getRequiredTubesForTests(_lisOrderSelectedTests);
   if (tubeEl) {
-    tubeEl.innerHTML = `<b>Kebutuhan Tabung:</b> <span style="color:var(--text); font-weight:700;">${Array.from(tubeTypes).join(' + ')}</span>`;
+    tubeEl.innerHTML = `
+      <div style="margin-top:6px;">
+        <div style="font-size:11.5px; font-weight:800; color:var(--text); margin-bottom:6px;">
+          🧪 Kebutuhan Tabung &amp; Order of Draw (CLSI GP41-A6):
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          ${requiredTubes.map(tb => `
+            <div style="display:inline-flex; align-items:center; gap:6px; background:var(--bg); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:11.5px; border-left:4px solid ${tb.color};">
+              <span style="width:8px; height:8px; border-radius:50%; background:${tb.color}; display:inline-block;"></span>
+              <b>${tb.name}</b>
+              <span style="font-size:10px; color:var(--text3); font-family:monospace;">(${tb.tests.length} tes)</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
   }
 }
 
@@ -328,7 +415,7 @@ async function submitFullPageLisOrder(visitNumber) {
   const patient_phone = document.getElementById('adm-phone')?.value?.trim() || null;
   const doctor = document.getElementById('adm-doctor')?.value?.trim() || 'APS';
   const priority = document.getElementById('adm-priority')?.value || 'RUTIN';
-  const barcode = document.getElementById('adm-barcode')?.value?.trim();
+  const baseBarcode = document.getElementById('adm-barcode')?.value?.trim() || `L${Date.now().toString().slice(-8)}`;
   const notes = document.getElementById('adm-notes')?.value?.trim() || null;
 
   if (!patient_name) {
@@ -360,16 +447,21 @@ async function submitFullPageLisOrder(visitNumber) {
 
     const admId = Array.isArray(adm) ? adm[0]?.id : adm?.id;
 
-    // 2. Buat lab_samples per tes terpilih
-    for (const test of _lisOrderSelectedTests) {
+    // 2. Smart Tube Splitting
+    const requiredTubes = getRequiredTubesForTests(_lisOrderSelectedTests);
+    const barcodeLabelsToPrint = [];
+
+    for (const tube of requiredTubes) {
+      const tubeBarcode = `${baseBarcode}-${tube.suffix}`;
+      const tubeTestNames = tube.tests.map(t => t.nama_tes).join(', ');
+
       const sample = await sbPost('lab_samples', {
-        barcode,
+        barcode: tubeBarcode,
         admission_id: admId || null,
         visit_number: visitNumber,
         patient_name,
-        product_id: test.id,
-        product_name: test.nama_tes,
-        sampel_type: test.sampel_type || 'Darah Vena',
+        product_name: tubeTestNames,
+        sampel_type: tube.name,
         volume_ml: 3.0,
         collected_at: new Date().toISOString(),
         collected_by: typeof labUser === 'function' ? labUser() : 'Analis',
@@ -380,28 +472,32 @@ async function submitFullPageLisOrder(visitNumber) {
 
       const sampleId = Array.isArray(sample) ? sample[0]?.id : sample?.id;
 
-      // Buat draft analitik
-      if (typeof labCreateDraftResults === 'function') {
-        await labCreateDraftResults(
-          { admission_id: admId, sample_id: sampleId, visit_number: visitNumber, patient_name },
-          test.id,
-          test.nama_tes
-        );
+      // Buat draft analitik per tes di tabung ini
+      for (const test of tube.tests) {
+        if (typeof labCreateDraftResults === 'function') {
+          await labCreateDraftResults(
+            { admission_id: admId, sample_id: sampleId, visit_number: visitNumber, patient_name },
+            test.id,
+            test.nama_tes
+          );
+        }
       }
+
+      barcodeLabelsToPrint.push({
+        barcode: tubeBarcode,
+        patient_name,
+        product_name: tubeTestNames,
+        visit_number: visitNumber,
+        sample_type: tube.name
+      });
     }
 
-    if (typeof toast === 'function') toast('✅ Pendaftaran Walk-in & Order Lab Berhasil Disimpan!', 'ok');
+    if (typeof toast === 'function') toast(`✅ Order Lab berhasil dibuat (${requiredTubes.length} Tabung Spesimen)`, 'ok');
 
-    // 3. Print barcode tabung otomatis
+    // 3. Print barcode tabung multi-label
     if (typeof printLabBarcodes === 'function') {
       setTimeout(() => {
-        printLabBarcodes([{
-          barcode,
-          patient_name,
-          product_name: _lisOrderSelectedTests.map(t => t.nama_tes).join(', '),
-          visit_number: visitNumber,
-          sample_type: 'Darah Vena'
-        }]);
+        printLabBarcodes(barcodeLabelsToPrint);
       }, 300);
     }
 

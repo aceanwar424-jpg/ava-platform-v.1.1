@@ -155,22 +155,47 @@ async function resPickRow(rid){
   const r=labResults.find(x=>x.id==rid)||{};
   const notes=document.getElementById('res-notes'); if(!notes) return;
   const noteVal=(_resNotes[rid]!=null?_resNotes[rid]:(r.notes||''));
+  const currentVal = tr.querySelector('.res-val')?.value || '';
+
   notes.innerHTML=`
-    <div style="font-size:12.5px;font-weight:800;color:var(--navy)">${r.item_name||r.product_name||''}</div>
+    <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:2px">${r.item_name||r.product_name||''}</div>
     <div style="font-size:10.5px;color:var(--gray);margin-bottom:10px">${r.product_name||''}${r.loinc_code?' · LOINC '+r.loinc_code:''}${r.host_code?' · Host '+r.host_code:''}</div>
     <div id="res-prevbox" style="font-size:11px;color:var(--gray);margin-bottom:12px">memuat riwayat…</div>
-    <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Per Test</label>
-    <div style="font-size:10px;color:var(--gray);margin:2px 0 4px">Pilih dari daftar atau ketik sendiri:</div>
+
+    <!-- KALKULATOR PENGENCERAN (DILUTION FACTOR) -->
+    <div style="background:var(--bg2);padding:10px;border-radius:8px;margin-bottom:12px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:6px">🧪 Faktor Pengenceran (Dilution):</div>
+      <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:4px;margin-bottom:6px">
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 1)" style="font-weight:700">1x (Normal)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 2)" style="font-weight:700">1:2 (x2)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 5)" style="font-weight:700">1:5 (x5)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 10)" style="font-weight:700">1:10 (x10)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 20)" style="font-weight:700">1:20 (x20)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 50)" style="font-weight:700">1:50 (x50)</button>
+        <button class="btn btn-ghost btn-xs" onclick="applyDilutionFactor(${rid}, 100)" style="font-weight:700">1:100 (x100)</button>
+        <button class="btn btn-teal btn-xs" onclick="promptCustomDilution(${rid})" style="font-weight:800">Custom...</button>
+      </div>
+      <div id="dilution-badge-${rid}" style="font-size:10px;color:var(--teal);font-weight:750"></div>
+    </div>
+
+    <!-- CATATAN & PRESETS -->
+    <label style="font-size:11px;color:var(--gray);font-weight:700">Catatan Analis / Flebotomi</label>
     <input list="res-note-presets" id="res-note-input"
       value="${noteVal.replace(/"/g,'&quot;')}"
-      placeholder="mis. Duplo, sampel lipemik…"
-      style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:6px"
+      placeholder="mis. Duplo, sampel lipemik, pengenceran 1:5…"
+      style="width:100%;font-size:11.5px;padding:7px;border:1px solid var(--border);border-radius:6px;margin-top:3px"
       oninput="_resNotes[${rid}]=this.value">
     <datalist id="res-note-presets">
       ${LAB_NOTE_PRESETS.map(p=>`<option value="${p.replace(/"/g,'&quot;')}">`).join('')}
     </datalist>
-    <button class="btn btn-teal btn-sm" style="margin-top:6px;width:100%" onclick="saveResultNote(${rid},'result')">Simpan Catatan</button>
-    <div style="font-size:10px;color:var(--gray);margin-top:6px">Catatan tersimpan akan tampil pada lembar hasil cetak.</div>`;
+    <button class="btn btn-teal btn-sm" style="margin-top:8px;width:100%;font-weight:750" onclick="saveResultNote(${rid},'result')">Simpan Catatan</button>
+
+    <!-- AUDIT TRAIL LOG REVISI (ISO 15189 §8.4) -->
+    <div id="res-audit-trail-${rid}" style="margin-top:12px;font-size:10.5px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">
+      <b>Jejak Audit Hasil:</b> Terakhir diubah oleh ${r.entered_by || 'Sistem'}
+    </div>
+  `;
+
   try {
     const prev=await sbGet('lab_results',
       `select=result_value,unit,created_at&patient_name=eq.${encodeURIComponent(r.patient_name||'')}&product_id=eq.${r.product_id}${r.product_item_id?`&product_item_id=eq.${r.product_item_id}`:''}&result_value=not.is.null&status=in.(Approved,Released,Validated)&order=created_at.desc&limit=1`).catch(()=>[]);
@@ -180,6 +205,46 @@ async function resPickRow(rid){
     const prevCell=tr.querySelector('.res-prev'); if(prevCell&&p) prevCell.textContent=p.result_value;
   } catch(e){}
 }
+
+function applyDilutionFactor(rid, factor) {
+  const tr = document.querySelector(`#res-grid tr[data-rid="${rid}"]`);
+  if (!tr) return;
+  const valInput = tr.querySelector('.res-val');
+  if (!valInput) return;
+
+  const currentRaw = parseFloat(valInput.dataset.raw || valInput.value);
+  if (isNaN(currentRaw) || currentRaw <= 0) {
+    if (typeof toast === 'function') toast('Masukkan nilai pembacaan alat terlebih dahulu', 'warn');
+    return;
+  }
+
+  valInput.dataset.raw = String(currentRaw);
+  const calculated = currentRaw * factor;
+  valInput.value = calculated.toFixed(calculated % 1 === 0 ? 0 : 2);
+  resInterpret(valInput);
+
+  const noteInput = document.getElementById('res-note-input');
+  if (noteInput && factor > 1) {
+    noteInput.value = `Pengenceran 1:${factor} (Nilai Mentah: ${currentRaw})`;
+    _resNotes[rid] = noteInput.value;
+  }
+
+  const badge = document.getElementById(`dilution-badge-${rid}`);
+  if (badge) badge.textContent = factor > 1 ? `✓ Dihitung dengan Pengenceran 1:${factor} (${currentRaw} × ${factor} = ${valInput.value})` : '✓ Nilai Murni (1x)';
+
+  if (typeof toast === 'function') toast(`✓ Nilai dihitung dengan pengenceran 1:${factor}`, 'ok');
+}
+
+function promptCustomDilution(rid) {
+  const custom = prompt('Masukkan faktor pengenceran (misal: 25 untuk 1:25):', '25');
+  const factor = parseFloat(custom);
+  if (!isNaN(factor) && factor > 0) {
+    applyDilutionFactor(rid, factor);
+  }
+}
+
+window.applyDilutionFactor = applyDilutionFactor;
+window.promptCustomDilution = promptCustomDilution;
 
 async function resSaveAll(){
   const trs=[...document.querySelectorAll('#res-grid tr[data-rid]')];

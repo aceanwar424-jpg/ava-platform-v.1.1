@@ -1,175 +1,211 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: MANAJEMEN ARSIP & RETENSI SPESIMEN (SAMPLE ARCHIVING)
-// Standar ISO 15189:2022 Klausul 7.5 (Sample Retention & Disposal)
+// MODUL: Arsip & Retensi Sampel
+//
+// Versi sebelumnya tidak punya panggilan data. Sekarang membaca
+// public.lab_arsip_papan dan public.lab_samples (migrasi 0038).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Pemusnahan sebelum masa simpan habis ditolak — dijaga di basis data,
+// bukan hanya di layar. Sampel adalah satu-satunya cara memeriksa ulang
+// hasil yang dipertanyakan; membuangnya lebih cepat dari jadwal
+// menghapus kemungkinan itu untuk selamanya.
+//
+// Arsip tanpa lokasi ditolak. Sampel yang tercatat "diarsipkan" tapi
+// tidak diketahui ada di rak mana sama saja dengan hilang, hanya dengan
+// tambahan rasa aman yang keliru.
+//
+// Sampel yang lewat masa simpan ditandai "Siap Dimusnahkan", bukan
+// dimusnahkan otomatis. Pemusnahan butuh orang yang bertanggung jawab
+// dan berita acara.
+//
+// Prefiks "sa".
 // ═══════════════════════════════════════════════════════════════
 
-let sampleArchives = [
-  {
-    accession_no: 'L260830-0001',
-    patient_name: 'Tn. Budi Setiawan',
-    sample_type: 'Serum Sisa (0.8 mL)',
-    freezer_id: 'FREEZER-A (-20°C)',
-    rack_id: 'RACK-02',
-    box_id: 'BOX-KIM-04',
-    grid_position: 'C5',
-    stored_at: '2026-08-30 11:30',
-    retention_days: 7,
-    dispose_due_date: '2026-09-06',
-    status: 'STORED_ACTIVE'
-  },
-  {
-    accession_no: 'L260830-0002',
-    patient_name: 'Ny. Ratna Dewi',
-    sample_type: 'Whole Blood EDTA (1.2 mL)',
-    freezer_id: 'KULKAS-B (4°C)',
-    rack_id: 'RACK-01',
-    box_id: 'BOX-HEM-01',
-    grid_position: 'A2',
-    stored_at: '2026-08-30 10:45',
-    retention_days: 3,
-    dispose_due_date: '2026-09-02',
-    status: 'STORED_ACTIVE'
-  }
-];
+let saData = null;
+let saFilter = 'tersimpan';
 
-/**
- * Simpan arsip spesimen ke lokasi rak freezer
- */
-function archiveSpecimen(accessionNo, archiveDetails = {}) {
-  const {
-    patient_name = 'Pasien',
-    sample_type = 'Serum',
-    freezer_id = 'FREEZER-A (-20°C)',
-    rack_id = 'RACK-01',
-    box_id = 'BOX-01',
-    grid_position = 'A1',
-    retention_days = 7
-  } = archiveDetails;
-
-  const now = new Date();
-  const dueDate = new Date(now.getTime() + (retention_days * 86400000)).toISOString().slice(0, 10);
-
-  const archiveEntry = {
-    accession_no: accessionNo,
-    patient_name,
-    sample_type,
-    freezer_id,
-    rack_id,
-    box_id,
-    grid_position,
-    stored_at: now.toISOString().slice(0, 16).replace('T', ' '),
-    retention_days,
-    dispose_due_date: dueDate,
-    status: 'STORED_ACTIVE'
-  };
-
-  sampleArchives.unshift(archiveEntry);
-
-  return {
-    success: true,
-    entry: archiveEntry,
-    message: `Spesimen ${accessionNo} berhasil diarsipkan di ${freezer_id} [${rack_id} / ${box_id} Posisi ${grid_position}].`
-  };
+function saEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function saTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID',
+    { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-/**
- * Cari lokasi tabung spesimen untuk Add-on Test (Tes Susulan)
- */
-function findArchivedSpecimen(accessionNo) {
-  const item = sampleArchives.find(s => s.accession_no === accessionNo && s.status === 'STORED_ACTIVE');
-  if (!item) {
-    return { found: false, message: `Spesimen ${accessionNo} tidak ditemukan di rak aktif / sudah dimusnahkan.` };
-  }
-
-  return {
-    found: true,
-    accession_no: item.accession_no,
-    patient_name: item.patient_name,
-    location_summary: `${item.freezer_id} ➔ ${item.rack_id} ➔ ${item.box_id} ➔ Grid [${item.grid_position}]`,
-    sample_type: item.sample_type,
-    stored_at: item.stored_at,
-    expires_at: item.dispose_due_date
-  };
+async function saMuat() {
+  if (typeof sbGet !== 'function') { saData = null; return; }
+  try {
+    saData = await sbGet('lab_arsip_papan', 'select=*&order=simpan_sampai&limit=500');
+  } catch (e) { saData = null; }
 }
 
 async function renderSampleArchiving() {
   const main = document.getElementById('main-content');
-  if (!main) return;
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div class="page-header">
-        <div>
-          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#0284c7; margin-bottom:6px;">
-            🧊 ISO 15189:2022 KLAUSUL 7.5 &bull; RETENSI &amp; ARSIP SPESIMEN
-          </div>
-          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
-            Manajemen Lokasi Rak &amp; Retensi Spesimen Freezer (-20°C)
-          </h1>
-          <p style="font-size:13px; color:var(--text3); margin:0;">
-            Pemetaan lokasi fisik tabung sisa untuk permintaan tes susulan (Add-on Tests) dan kepatuhan jadwal pemusnahan limbah.
-          </p>
-        </div>
-      </div>
+  await saMuat();
 
-      <div class="card" style="padding:20px; margin-top:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-          <h3 style="font-size:15px; font-weight:800; margin:0;">Daftar Spesimen Tersimpan di Freezer Laboratorium</h3>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="find-acc-input" placeholder="Cari No. Accession (Add-on)..." class="input" style="font-size:12px; width:220px;">
-            <button class="btn btn-teal btn-sm" onclick="
-              const acc = document.getElementById('find-acc-input').value;
-              const res = findArchivedSpecimen(acc);
-              alert(res.found ? '📍 LOKASI SPESIMEN DITEMUKAN:\\n' + res.location_summary : res.message);
-            ">🔍 Cari Lokasi</button>
-          </div>
-        </div>
+  if (saData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Arsip &amp; Retensi Sampel</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data arsip tidak dapat dibaca.</strong><br>
+        View <code>lab_arsip_papan</code> belum ada — jalankan ulang aplikasi
+        agar migrasi <code>0038_lis_flebotomi_kelayakan_pme_arsip.sql</code>
+        terpasang.
+      </div>`;
+    return;
+  }
+  saGambar();
+}
 
-        <table class="table" style="width:100%; font-size:12.5px;">
-          <thead>
-            <tr style="background:var(--bg2);">
-              <th>Accession</th>
-              <th>Pasien</th>
-              <th>Tipe Sampel</th>
-              <th>Lokasi Freezer &amp; Box</th>
-              <th>Grid Posisi</th>
-              <th>Waktu Simpan</th>
-              <th>Batas Retensi</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${sampleArchives.map(s => `
-              <tr>
-                <td style="font-family:monospace; font-weight:700; color:var(--sky);">${s.accession_no}</td>
-                <td><b>${s.patient_name}</b></td>
-                <td>${s.sample_type}</td>
-                <td>${s.freezer_id} &bull; ${s.box_id}</td>
-                <td><span class="badge" style="background:#0284c7; color:#fff; font-family:monospace;">${s.grid_position}</span></td>
-                <td style="font-family:monospace;">${s.stored_at}</td>
-                <td style="font-family:monospace; color:#f59e0b;">${s.dispose_due_date}</td>
-                <td><span class="badge badge-success">Aktif Tersimpan</span></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+function saGambar() {
+  const A = saData || [];
+  const belum = A.filter(x => x.status_arsip === 'Belum Diarsipkan');
+  const tersimpan = A.filter(x => x.status_arsip === 'Tersimpan');
+  const siap = A.filter(x => x.status_arsip === 'Siap Dimusnahkan');
+  const musnah = A.filter(x => x.status_arsip === 'Dimusnahkan');
+
+  const daftar = saFilter === 'belum' ? belum
+               : saFilter === 'tersimpan' ? tersimpan
+               : saFilter === 'siap' ? siap : musnah;
+
+  const warna = {
+    'Belum Diarsipkan': 'var(--warning)', 'Tersimpan': 'var(--success)',
+    'Siap Dimusnahkan': 'var(--danger)', 'Dimusnahkan': 'var(--text3)',
+  };
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Arsip &amp; Retensi Sampel</h1>
+        <p class="muted">Penyimpanan sampel selesai periksa, masa simpan, dan pemusnahan.</p>
       </div>
     </div>
-  `;
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+                gap:12px; margin-bottom:16px">
+      ${saKartu('Belum diarsipkan', belum.length, 'belum', warna['Belum Diarsipkan'])}
+      ${saKartu('Tersimpan', tersimpan.length, 'tersimpan', warna['Tersimpan'])}
+      ${saKartu('Siap dimusnahkan', siap.length, 'siap', warna['Siap Dimusnahkan'])}
+      ${saKartu('Sudah dimusnahkan', musnah.length, 'musnah', warna['Dimusnahkan'])}
+    </div>
+
+    ${siap.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--danger)">
+        <b>${siap.length} sampel sudah lewat masa simpan.</b>
+        Pemusnahan tidak berjalan otomatis — ia butuh petugas yang
+        bertanggung jawab dan berita acara.
+      </div>` : ''}
+
+    ${!daftar.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">🗄️</div>
+        <div style="font-weight:700">Tidak ada sampel pada kelompok ini</div>
+      </div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Barcode</th><th>Pasien</th><th>Pemeriksaan</th><th>Jenis</th>
+          <th>Lokasi</th><th>Diarsipkan</th><th>Simpan s/d</th>
+          <th style="text-align:right">Sisa</th><th>Status</th><th></th>
+        </tr></thead><tbody>
+        ${daftar.map(x => `<tr>
+          <td><b>${saEsc(x.barcode || '—')}</b></td>
+          <td>${saEsc(x.patient_name || '—')}</td>
+          <td>${saEsc(x.product_name || '—')}</td>
+          <td>${saEsc(x.sampel_type || '—')}</td>
+          <td style="font-size:12px">${saLokasi(x)}</td>
+          <td>${saTgl(x.diarsipkan_at)}</td>
+          <td>${saTgl(x.simpan_sampai)}</td>
+          <td style="text-align:right; color:${Number(x.sisa_hari) < 0
+            ? 'var(--danger)' : 'inherit'}">
+            ${x.sisa_hari == null ? '—'
+              : Number(x.sisa_hari) < 0 ? 'lewat ' + Math.abs(x.sisa_hari) + 'h'
+              : x.sisa_hari + ' hari'}</td>
+          <td><span style="font-weight:600; color:${warna[x.status_arsip] || 'var(--text3)'}">
+            ${saEsc(x.status_arsip)}</span></td>
+          <td style="white-space:nowrap">
+            ${x.status_arsip === 'Belum Diarsipkan'
+              ? `<button class="btn btn-sm btn-primary" onclick="saArsipkan(${x.id})">
+                   Arsipkan</button>` : ''}
+            ${x.status_arsip === 'Siap Dimusnahkan'
+              ? `<button class="btn btn-sm" onclick="saMusnahkan(${x.id})">
+                   Musnahkan</button>` : ''}
+            ${x.status_arsip === 'Dimusnahkan' && x.dimusnahkan_oleh
+              ? `<span style="font-size:11px; color:var(--text3)">
+                   oleh ${saEsc(x.dimusnahkan_oleh)}</span>` : ''}
+          </td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>`}`;
 }
 
-if (typeof window !== 'undefined') {
-  window.renderSampleArchiving = renderSampleArchiving;
-  window.archiveSpecimen = archiveSpecimen;
-  window.findArchivedSpecimen = findArchivedSpecimen;
-  window.sampleArchives = sampleArchives;
+// Lokasi ditulis sebagai satu baris: tempat, lalu rak/boks/posisi yang
+// terisi saja. Menampilkan "· · ·" untuk bagian kosong membuat rak yang
+// belum dicatat terlihat seperti sudah dicatat.
+function saLokasi(x) {
+  if (!x.lokasi_arsip) return '—';
+  const rinci = [x.rak, x.boks, x.posisi].filter(Boolean).map(saEsc);
+  return saEsc(x.lokasi_arsip) + (rinci.length ? ' · ' + rinci.join(' · ') : '');
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    renderSampleArchiving,
-    archiveSpecimen,
-    findArchivedSpecimen,
-    sampleArchives
-  };
+function saKartu(label, angka, kunci, warna) {
+  return `<div class="card" style="padding:14px; cursor:pointer;
+            ${saFilter === kunci ? 'outline:2px solid var(--primary)' : ''}"
+            onclick="saSaring('${kunci}')">
+    <div style="font-size:12px; color:var(--text3)">${label}</div>
+    <div style="font-size:22px; font-weight:800; color:${warna}">${angka}</div>
+  </div>`;
 }
+
+function saSaring(k) { saFilter = k; saGambar(); }
+
+async function saArsipkan(id) {
+  const lokasi = prompt('Lokasi penyimpanan (mis. Freezer -20°C, Kulkas 4°C):');
+  if (!lokasi) return;
+  const rak = prompt('Rak:', '');
+  if (rak === null) return;
+  const boks = prompt('Boks:', '');
+  if (boks === null) return;
+  const posisi = prompt('Posisi dalam boks (mis. A5):', '');
+  if (posisi === null) return;
+  const hari = prompt('Masa simpan (hari):', '7');
+  if (hari === null) return;
+
+  try {
+    const r = await sbRpc('lab_arsipkan_sampel', {
+      p_sample_id: id, p_lokasi: lokasi, p_rak: rak || null,
+      p_boks: boks || null, p_posisi: posisi || null,
+      p_simpan_hari: parseInt(hari, 10) || 7,
+      p_oleh: (window.currentUsername || 'analis'),
+    });
+    if (r && r.error) { alert(r.error); return; }
+    alert(`Sampel ${r.barcode} diarsipkan. Simpan sampai ${r.simpan_sampai}.`);
+    await renderSampleArchiving();
+  } catch (e) { alert('Gagal mengarsipkan: ' + e.message); }
+}
+
+async function saMusnahkan(id) {
+  const ba = prompt('Nomor berita acara pemusnahan:');
+  if (!ba) return;
+  const oleh = prompt('Dimusnahkan oleh (nama petugas):', window.currentUsername || '');
+  if (!oleh) return;
+  if (!confirm('Pemusnahan tidak bisa dibatalkan. Lanjutkan?')) return;
+
+  try {
+    const r = await sbRpc('lab_musnahkan_sampel', {
+      p_sample_id: id, p_berita_acara: ba, p_oleh: oleh,
+    });
+    if (r && r.error) { alert(r.error); return; }
+    await renderSampleArchiving();
+  } catch (e) { alert('Gagal mencatat pemusnahan: ' + e.message); }
+}
+
+window.renderSampleArchiving = renderSampleArchiving;
+window.saSaring    = saSaring;
+window.saArsipkan  = saArsipkan;
+window.saMusnahkan = saMusnahkan;

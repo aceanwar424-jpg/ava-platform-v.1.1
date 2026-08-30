@@ -83,32 +83,63 @@ function lpiDetect(rows){
   if (hdl  && lpiLow(hdl))   lipidBits.push(`HDL ${lpiValStr(hdl)} (rendah)`);
   if (lipidBits.length) add('dislipidemia','Dislipidemia', lipidBits.length>=2?'tinggi':'sedang', lipidBits.join(', '));
 
-  // — Hematologi —
+  // — Hematologi & Infeksi —
   const hgb = lpiFind(rows, 'hemoglobin', 'hgb');
   if (hgb && lpiLow(hgb))  add('anemia','Anemia','sedang',`Hemoglobin ${lpiValStr(hgb)}`);
   if (hgb && lpiHigh(hgb)) add('eritrositosis','Eritrositosis / polisitemia','sedang',`Hemoglobin ${lpiValStr(hgb)}`);
   const leu = lpiFind(rows, 'leukosit', 'wbc');
-  if (leu && lpiHigh(leu)) add('leukositosis','Leukositosis','sedang',`Leukosit ${lpiValStr(leu)}`);
-  if (leu && lpiLow(leu))  add('leukopenia','Leukopenia','sedang',`Leukosit ${lpiValStr(leu)}`);
+  const neu = lpiFind(rows, 'neutrofil', 'segmen');
+  const lim = lpiFind(rows, 'limfosit');
+  if (leu && lpiHigh(leu)) {
+    if (neu && lpiHigh(neu)) add('infeksi_bakteri','Leukositosis ec. Kecurigaan Infeksi Bakteri Akut','tinggi',`Leukosit ${lpiValStr(leu)}, Neutrofil ${lpiValStr(neu)}`);
+    else add('leukositosis','Leukositosis','sedang',`Leukosit ${lpiValStr(leu)}`);
+  } else if (leu && lpiLow(leu)) {
+    if (lim && lpiHigh(lim)) add('infeksi_virus','Leukopenia dengan Limfositosis Relatif (Susp. Infeksi Virus)','sedang',`Leukosit ${lpiValStr(leu)}, Limfosit ${lpiValStr(lim)}`);
+    else add('leukopenia','Leukopenia','sedang',`Leukosit ${lpiValStr(leu)}`);
+  }
   const plt = lpiFind(rows, 'trombosit', 'platelet', 'plt');
-  if (plt && lpiLow(plt))  add('trombositopenia','Trombositopenia','tinggi',`Trombosit ${lpiValStr(plt)}`);
+  if (plt && lpiLow(plt))  add('trombositopenia','Trombositopenia (Waspada Risiko Perdarahan / DHF)','tinggi',`Trombosit ${lpiValStr(plt)}`);
 
   // — Ginjal & asam urat —
   const kre = lpiFind(rows, 'kreatinin');
   const ure = lpiFind(rows, 'ureum', 'urea', 'bun');
-  if ((kre && lpiHigh(kre)) || (ure && lpiHigh(ure))) add('ginjal','Peningkatan penanda fungsi ginjal','tinggi',
+  if ((kre && lpiHigh(kre)) || (ure && lpiHigh(ure))) add('ginjal','Penurunan Fungsi Ekskresi Ginjal (Azotemia / Renal Impairment)','tinggi',
     [kre&&lpiHigh(kre)&&`kreatinin ${lpiValStr(kre)}`, ure&&lpiHigh(ure)&&`ureum ${lpiValStr(ure)}`].filter(Boolean).join(', '));
   const au = lpiFind(rows, 'asam urat', 'uric');
-  if (au && lpiHigh(au)) add('hiperurisemia','Hiperurisemia','sedang',`Asam urat ${lpiValStr(au)}`);
+  if (au && lpiHigh(au)) add('hiperurisemia','Hiperurisemia (Faktor Risiko Gout Arthritis & Batu Asam Urat)','sedang',`Asam urat ${lpiValStr(au)}`);
 
-  // — Hati —
+  // — Hati & Saluran Empedu —
   const sgot = lpiFind(rows, 'sgot', 'ast', 'aspartat');
   const sgpt = lpiFind(rows, 'sgpt', 'alt', 'alanin');
-  if ((sgot && lpiHigh(sgot)) || (sgpt && lpiHigh(sgpt))) add('hati','Peningkatan enzim hati','sedang',
-    [sgot&&lpiHigh(sgot)&&`SGOT ${lpiValStr(sgot)}`, sgpt&&lpiHigh(sgpt)&&`SGPT ${lpiValStr(sgpt)}`].filter(Boolean).join(', '));
+  const bili = lpiFind(rows, 'bilirubin total', 'bili total');
+  if ((sgot && lpiHigh(sgot)) || (sgpt && lpiHigh(sgpt))) {
+    add('hepatoselular','Peningkatan Enzim Transaminase (Cedera Hepatoselular)','tinggi',
+      [sgot&&lpiHigh(sgot)&&`SGOT ${lpiValStr(sgot)}`, sgpt&&lpiHigh(sgpt)&&`SGPT ${lpiValStr(sgpt)}`].filter(Boolean).join(', '));
+  }
+  if (bili && lpiHigh(bili)) add('hiperbilirubinemia','Hiperbilirubinemia (Kecurigaan Ikterus / Kolestasis)','tinggi',`Bilirubin ${lpiValStr(bili)}`);
+
+  // — Elektrolit & Kardiovaskular —
+  const kal = lpiFind(rows, 'kalium', 'k+');
+  if (kal && lpiHigh(kal)) add('hiperkalemia','Hiperkalemia (Peringatan Aritmia Jantung)','tinggi',`Kalium ${lpiValStr(kal)}`);
+  else if (kal && lpiLow(kal)) add('hipokalemia','Hipokalemia','tinggi',`Kalium ${lpiValStr(kal)}`);
+
+  const nat = lpiFind(rows, 'natrium', 'na+');
+  if (nat && lpiLow(nat)) add('hiponatremia','Hiponatremia','sedang',`Natrium ${lpiValStr(nat)}`);
+  else if (nat && lpiHigh(nat)) add('hipernatremia','Hipernatremia','sedang',`Natrium ${lpiValStr(nat)}`);
+
+  const trop = lpiFind(rows, 'troponin');
+  if (trop && (lpiHigh(trop) || (trop.result_value && /reaktif|positif/i.test(trop.result_value)))) {
+    add('sindrom_koroner','Peningkatan Biomarker Nekrosis Miokard (Susp. Sindrom Koroner Akut)','tinggi',`Troponin ${lpiValStr(trop)}`);
+  }
+
+  // — Serologi Hepatitis —
+  const hbsag = lpiFind(rows, 'hbsag');
+  if (hbsag && /reaktif|positif/i.test(hbsag.result_value || '')) {
+    add('hepatitis_b','HBsAg Reaktif (Infeksi Hepatitis B Aktif / Carrier)','tinggi',`HBsAg: ${hbsag.result_value}`);
+  }
 
   // — Kelainan lain yang belum terpetakan ke sindrom, agar tidak hilang —
-  const known = new Set([gdp,gd2,a1c,kol,ldl,trig,hdl,hgb,leu,plt,kre,ure,au,sgot,sgpt].filter(Boolean));
+  const known = new Set([gdp,gd2,a1c,kol,ldl,trig,hdl,hgb,leu,neu,lim,plt,kre,ure,au,sgot,sgpt,bili,kal,nat,trop,hbsag].filter(Boolean));
   const lainAbn = rows.filter(r => !known.has(r) && lpiDir(r) !== 0);
   const critAny = rows.some(r => r.is_critical);
 
@@ -116,17 +147,17 @@ function lpiDetect(rows){
   const abnormalCount = rows.filter(r => lpiDir(r) !== 0).length;
   let impression;
   if (!findings.length && !lainAbn.length) {
-    impression = 'Kesan: seluruh parameter dalam batas rujukan. Tidak ditemukan kelainan bermakna pada panel ini.';
+    impression = 'Kesan:\n• Seluruh parameter pemeriksaan laboratorium dalam batas nilai rujukan normal.\n• Tidak ditemukan kelainan patologis bermakna pada panel ini.';
   } else {
-    const lines = findings.map(f => `• ${f.label} (${f.basis})`);
+    const lines = findings.map(f => `• ${f.label} [${f.basis}]`);
     if (lainAbn.length) {
-      lines.push('• Nilai di luar rujukan lain: ' +
+      lines.push('• Parameter di luar rentang rujukan lainnya: ' +
         lainAbn.map(r => `${r.item_name||r.product_name} ${lpiValStr(r)}`).join(', '));
     }
-    impression = 'Kesan:\n' + lines.join('\n');
+    impression = 'Kesan Klinis:\n' + lines.join('\n');
   }
-  if (critAny) impression = '⚠️ Terdapat NILAI KRITIS pada panel ini — perlu perhatian segera.\n\n' + impression;
-  impression += '\n\nSaran: korelasikan dengan keadaan klinis pasien.';
+  if (critAny) impression = '🚨 PERINGATAN: Terdapat NILAI KRITIS pada panel ini — Wajib konfirmasi DPJP segera.\n\n' + impression;
+  impression += '\n\nSaran Dokter Sp.PK:\n• Korelasikan dengan anamnesis, gejala klinis, dan riwayat pengobatan pasien.\n• Evaluasi ulang berkala / pemeriksaan konfirmasi lanjutan bila ada indikasi.';
 
   return { findings, impression, abnormalCount, critAny };
 }

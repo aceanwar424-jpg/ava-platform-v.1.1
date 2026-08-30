@@ -1,135 +1,227 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: FLEBOTOMI & CHECKLIST SAMPLING (ISO 15189:2022 Klausul 7.2.4 & 7.2.5)
-// Pencatatan waktu pengambilan darah, verifikasi tabung & identitas pasien
+// MODUL: Flebotomi — pengambilan sampel & urutan tabung
+//
+// Versi sebelumnya tidak punya panggilan data: daftar tabung dan
+// antrean pengambilan ditulis tangan sebagai array.
+//
+// Sekarang membaca public.lab_tabung (migrasi 0038) dan
+// public.lab_samples yang sudah ada.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Katalog tabung dibiarkan KOSONG sampai lab mengisinya. Volume dan
+// jumlah inversi berbeda antar merek tabung, dan urutan pengambilan
+// bergantung tabung apa saja yang dipakai lab ini. Mengisinya dengan
+// angka contoh berarti petugas mengambil darah menurut angka yang tidak
+// pernah dicocokkan dengan tabung di rak.
+//
+// Urutan pengambilan penting bukan karena kerapian: aditif dari tabung
+// sebelumnya yang terbawa mengubah hasil tabung berikutnya. Karena itu
+// daftar diurutkan berdasarkan kolom urutan_ambil dan nomornya
+// ditampilkan besar.
+//
+// Prefiks "ph".
 // ═══════════════════════════════════════════════════════════════
 
-const PHLEBOTOMY_TUBES = {
-  EDTA: { name: 'EDTA K2/K3 (Ungu)', volume_ml: 3.0, department: 'Hematologi', inversions: 8 },
-  CLOT_SERUM: { name: 'Serum Clot Activator / Gel (Kuning/Merah)', volume_ml: 5.0, department: 'Kimia & Imunologi', inversions: 5 },
-  CITRATE: { name: 'Sodium Citrate 3.2% (Biru)', volume_ml: 2.7, department: 'Koagulasi', inversions: 4 },
-  HEPARIN: { name: 'Lithium Heparin (Hijau)', volume_ml: 4.0, department: 'Gas Darah / Elektrolit', inversions: 8 },
-  FLUORIDE: { name: 'Sodium Fluoride / NaF (Abu-abu)', volume_ml: 2.0, department: 'Glukosa Puasa', inversions: 8 }
-};
+let phData = null;
+let phTab = 'antrean';
 
-let phlebotomyQueue = [
-  {
-    accession_no: 'L260830-0001',
-    patient_name: 'Tn. Budi Setiawan',
-    ava_id: 'AVA-7K3M2P9QX4',
-    fasting_status: 'Puasa 10 Jam (Sejak 22:00)',
-    sampling_site: 'Vena Mediana Cubiti Dextra',
-    tubes_required: ['EDTA', 'CLOT_SERUM'],
-    status: 'Selesai Sampling',
-    sampled_at: '2026-08-30 08:15',
-    officer: 'Siti Rahma, A.Md.AK'
-  },
-  {
-    accession_no: 'L260830-0002',
-    patient_name: 'Ny. Ratna Dewi',
-    ava_id: 'AVA-9M2K8P4TY1',
-    fasting_status: 'Tidak Puasa',
-    sampling_site: 'Vena Cephalica Sinistra',
-    tubes_required: ['EDTA', 'CLOT_SERUM', 'CITRATE'],
-    status: 'Menunggu Sampling',
-    sampled_at: null,
-    officer: '-'
-  }
-];
+function phEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function phJam(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
 
-/**
- * Catat proses flebotomi selesai
- */
-function recordPhlebotomySampling(accessionNo, details = {}) {
-  const item = phlebotomyQueue.find(q => q.accession_no === accessionNo);
-  if (!item) throw new Error(`Antrean flebotomi dengan Accession ${accessionNo} tidak ditemukan.`);
-
-  const timestamp = details.sampled_at || new Date().toISOString().slice(0, 16).replace('T', ' ');
-  item.status = 'Selesai Sampling';
-  item.sampled_at = timestamp;
-  item.officer = details.officer || 'Petugas Flebotomis';
-  item.sampling_site = details.sampling_site || 'Vena Mediana Cubiti';
-  item.tubes_collected = details.tubes_collected || item.tubes_required;
-  item.notes = details.notes || 'Flebotomi lancar, tidak ada hematoma.';
-
-  return {
-    success: true,
-    accession_no: accessionNo,
-    sampled_at: item.sampled_at,
-    status: item.status,
-    message: `Sampling pasien ${item.patient_name} (${accessionNo}) berhasil dicatat.`
-  };
+async function phMuat() {
+  if (typeof sbGet !== 'function') { phData = null; return; }
+  try {
+    const [tabung, sampel] = await Promise.all([
+      sbGet('lab_tabung', 'select=*&order=urutan_ambil'),
+      sbGet('lab_samples',
+        'select=*&order=id.desc&limit=200'),
+    ]);
+    phData = { tabung, sampel };
+  } catch (e) { phData = null; }
 }
 
 async function renderPhlebotomy() {
   const main = document.getElementById('main-content');
-  if (!main) return;
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div class="page-header">
-        <div>
-          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#ef4444; margin-bottom:6px;">
-            🩸 ISO 15189:2022 KLAUSUL 7.2.4 &bull; PRA-ANALITIK
-          </div>
-          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
-            Flebotomi &amp; Checklist Sampling Pasien
-          </h1>
-          <p style="font-size:13px; color:var(--text3); margin:0;">
-            Pencatatan waktu tusukan vena, checklist tabung darah (EDTA/Serum/Citrate), dan identitas flebotomis.
-          </p>
-        </div>
-        <button class="btn btn-teal" onclick="renderPhlebotomy()">↻ Refresh Antrean</button>
-      </div>
+  await phMuat();
 
-      <div class="card" style="padding:20px; margin-top:16px;">
-        <h3 style="font-size:15px; font-weight:800; margin-bottom:12px;">Antrean Sampling Meja Flebotomi</h3>
-        <table class="table" style="width:100%; font-size:12.5px;">
-          <thead>
-            <tr style="background:var(--bg2);">
-              <th>No. Accession</th>
-              <th>Nama Pasien (AVA-ID)</th>
-              <th>Status Puasa</th>
-              <th>Tabung Dibutuhkan</th>
-              <th>Waktu Sampling</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${phlebotomyQueue.map(q => `
-              <tr>
-                <td style="font-family:monospace; font-weight:700; color:var(--sky);">${q.accession_no}</td>
-                <td><b>${q.patient_name}</b><div style="font-size:11px; color:var(--text3); font-family:monospace;">${q.ava_id}</div></td>
-                <td>${q.fasting_status}</td>
-                <td>${q.tubes_required.map(t => `<span class="badge" style="background:#334155; color:#f8fafc; font-size:10px; margin-right:4px;">${t}</span>`).join('')}</td>
-                <td style="font-family:monospace;">${q.sampled_at || '-'}</td>
-                <td><span class="badge ${q.status === 'Selesai Sampling' ? 'badge-success' : 'badge-warning'}">${q.status}</span></td>
-                <td>
-                  ${q.status === 'Menunggu Sampling' ? `
-                    <button class="btn btn-teal btn-xs" onclick="recordPhlebotomySampling('${q.accession_no}'); renderPhlebotomy();">
-                      ✓ Konfirmasi Selesai
-                    </button>
-                  ` : `<span style="color:#10b981; font-weight:700; font-size:11px;">✓ Di Meja Analis</span>`}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+  if (phData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Flebotomi</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data flebotomi tidak dapat dibaca.</strong><br>
+        Tabel <code>lab_tabung</code> belum ada — jalankan ulang aplikasi
+        agar migrasi <code>0038_lis_flebotomi_kelayakan_pme_arsip.sql</code>
+        terpasang.
+      </div>`;
+    return;
+  }
+  phGambar();
+}
+
+function phGambar() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Flebotomi</h1>
+        <p class="muted">Pengambilan sampel dan urutan tabung.</p>
       </div>
     </div>
-  `;
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab ${phTab === 'antrean' ? 'active' : ''}"
+              onclick="phGantiTab('antrean')">Menunggu Pengambilan</button>
+      <button class="tab ${phTab === 'tabung' ? 'active' : ''}"
+              onclick="phGantiTab('tabung')">Urutan Tabung</button>
+    </div>
+
+    ${phTab === 'antrean' ? phTabAntrean() : phTabTabung()}`;
 }
 
-if (typeof window !== 'undefined') {
-  window.renderPhlebotomy = renderPhlebotomy;
-  window.recordPhlebotomySampling = recordPhlebotomySampling;
-  window.PHLEBOTOMY_TUBES = PHLEBOTOMY_TUBES;
+function phGantiTab(t) { phTab = t; phGambar(); }
+
+function phTabAntrean() {
+  const belum = (phData.sampel || []).filter(s => !s.collected_at
+    && (s.status || 'Pending') === 'Pending');
+  const sudah = (phData.sampel || []).filter(s => s.collected_at).slice(0, 40);
+
+  return `
+    ${!belum.length ? `
+      <div class="card" style="padding:32px; text-align:center; margin-bottom:16px">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">💉</div>
+        <div style="font-weight:700; margin-bottom:4px">
+          Tidak ada sampel yang menunggu diambil</div>
+        <div style="font-size:13px; color:var(--text3)">
+          Permintaan pemeriksaan yang sudah terdaftar akan muncul di sini.</div>
+      </div>` : `
+      <div class="card" style="margin-bottom:16px; overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Barcode</th><th>Pasien</th><th>Pemeriksaan</th>
+          <th>Jenis Sampel</th><th></th>
+        </tr></thead><tbody>
+        ${belum.map(s => `<tr>
+          <td><b>${phEsc(s.barcode || '—')}</b></td>
+          <td>${phEsc(s.patient_name || '—')}</td>
+          <td>${phEsc(s.product_name || '—')}</td>
+          <td>${phEsc(s.sampel_type || '—')}</td>
+          <td><button class="btn btn-sm btn-primary" onclick="phAmbil(${s.id})">
+            Catat Pengambilan</button></td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>`}
+
+    <h3 style="font-size:14px; margin:16px 0 8px">Sudah Diambil (terbaru)</h3>
+    ${!sudah.length ? `
+      <div class="card" style="padding:24px; text-align:center; font-size:13px;
+                               color:var(--text3)">Belum ada pengambilan tercatat.</div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Barcode</th><th>Pasien</th><th>Diambil</th><th>Oleh</th>
+          <th style="text-align:right">Volume</th>
+          <th>Lokasi Tusuk</th>
+          <th style="text-align:right">Percobaan</th>
+          <th>Puasa</th><th>Status</th>
+        </tr></thead><tbody>
+        ${sudah.map(s => `<tr>
+          <td>${phEsc(s.barcode || '—')}</td>
+          <td>${phEsc(s.patient_name || '—')}</td>
+          <td style="white-space:nowrap">${phJam(s.collected_at)}</td>
+          <td>${phEsc(s.collected_by || '—')}</td>
+          <td style="text-align:right">${s.volume_ml ? s.volume_ml + ' mL' : '—'}</td>
+          <td>${phEsc(s.lokasi_tusuk || '—')}</td>
+          <td style="text-align:right; ${Number(s.jml_percobaan) > 1
+            ? 'color:var(--warning); font-weight:700' : ''}">
+            ${s.jml_percobaan || 1}</td>
+          <td>${s.puasa === true ? 'ya' : s.puasa === false ? 'tidak' : '—'}</td>
+          <td>${phEsc(s.status || '—')}</td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>`}`;
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    renderPhlebotomy,
-    recordPhlebotomySampling,
-    PHLEBOTOMY_TUBES
-  };
+function phTabTabung() {
+  const T = phData.tabung || [];
+  if (!T.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🧪</div>
+      <div style="font-weight:700; margin-bottom:6px">Katalog tabung belum diisi</div>
+      <div style="font-size:13px; color:var(--text3); line-height:1.8; max-width:520px;
+                  margin:0 auto">
+        Daftar ini sengaja dibiarkan kosong sampai lab mengisinya sendiri.
+        Volume dan jumlah inversi berbeda antar merek tabung, dan urutan
+        pengambilan bergantung tabung apa saja yang dipakai di sini.
+        Mengisinya dengan angka contoh berarti petugas mengambil darah
+        menurut angka yang tidak pernah dicocokkan dengan tabung di rak.
+      </div>
+    </div>`;
+  }
+
+  return `
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Urut dari atas ke bawah. Urutan ini penting bukan karena kerapian:
+      aditif dari tabung sebelumnya yang terbawa mengubah hasil tabung
+      berikutnya — EDTA yang masuk ke tabung kimia menaikkan kalium dan
+      menurunkan kalsium.
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th style="width:60px">Urutan</th><th>Tabung</th><th>Warna Tutup</th>
+        <th>Aditif</th><th style="text-align:right">Volume</th>
+        <th style="text-align:right">Inversi</th>
+        <th>Departemen</th><th>Penyimpanan</th>
+      </tr></thead><tbody>
+      ${T.map(t => `<tr>
+        <td style="text-align:center; font-size:20px; font-weight:800; color:var(--primary)">
+          ${t.urutan_ambil ?? '—'}</td>
+        <td><b>${phEsc(t.nama)}</b>
+          <div style="font-size:11px; color:var(--text3)">${phEsc(t.kode)}</div></td>
+        <td>${phEsc(t.warna_tutup || '—')}</td>
+        <td>${phEsc(t.aditif || '—')}</td>
+        <td style="text-align:right">${t.volume_ml ? t.volume_ml + ' mL' : '—'}</td>
+        <td style="text-align:right">${t.jml_bolak_balik ?? '—'}</td>
+        <td>${phEsc(t.departemen || '—')}</td>
+        <td style="font-size:12px">${phEsc(t.suhu_simpan || '—')}
+          ${t.stabil_jam ? `<div style="font-size:11px; color:var(--text3)">
+            stabil ${t.stabil_jam} jam</div>` : ''}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`;
 }
+
+async function phAmbil(sampleId) {
+  const oleh = prompt('Diambil oleh (nama flebotomis):', window.currentUsername || '');
+  if (!oleh) return;
+  const vol = prompt('Volume yang berhasil diambil (mL):', '');
+  if (vol === null) return;
+  const lokasi = prompt('Lokasi tusukan (mis. vena mediana cubiti kanan):', '');
+  if (lokasi === null) return;
+  const percobaan = prompt('Jumlah percobaan tusukan:', '1');
+  if (percobaan === null) return;
+  const puasa = confirm('Pasien dalam keadaan puasa?\n\nOK = ya, Batal = tidak');
+
+  try {
+    await sbPatch('lab_samples', sampleId, {
+      collected_at: new Date().toISOString(),
+      collected_by: oleh,
+      volume_ml: vol ? parseFloat(vol) : null,
+      lokasi_tusuk: lokasi || null,
+      jml_percobaan: parseInt(percobaan, 10) || 1,
+      puasa: puasa,
+    });
+    await renderPhlebotomy();
+  } catch (e) { alert('Gagal mencatat pengambilan: ' + e.message); }
+}
+
+window.renderPhlebotomy = renderPhlebotomy;
+window.phGantiTab = phGantiTab;
+window.phAmbil    = phAmbil;
