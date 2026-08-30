@@ -1,627 +1,474 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: AVA HEALTH — TRUST LAYER & TELEHEALTH ECOSYSTEM (KBLI 86910)
-// Orkestrator Hulu ke Hilir: Telekonsultasi Dokter, Pemantauan IoT/Wearables,
-// Badge Kalibrasi AVA Verified, Alkes Marketplace, Caregiver & Corporate B2B.
+// MODUL: AVA Health — Telehealth & Trust Layer
+//
+// Satu berkas, tujuh sub-modul, tujuh menu. Versi sebelumnya (627 baris)
+// tidak punya satu pun panggilan data: sesi telekonsultasi, pembacaan
+// alat, sertifikat kalibrasi, dan daftar caregiver seluruhnya array yang
+// ditulis tangan.
+//
+// Yang paling berbahaya di antaranya adalah badge kalibrasi. "AVA
+// Verified" pada alat kesehatan adalah pernyataan bahwa sertifikat
+// kalibrasinya sudah diperiksa. Menampilkannya dari array yang ditulis
+// tangan berarti menjamin alat yang tidak pernah diperiksa siapa pun.
+//
+// Kelima tabelnya sudah ada di basis data sejak lama dan tidak pernah
+// dibaca: ava_consultations, ava_device_readings, ava_calibration_badges,
+// ava_marketplace_items, ava_caregiver_links.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Badge kalibrasi yang kedaluwarsa TIDAK ditampilkan sebagai terverifikasi,
+// berapa pun isi kolom badge_status-nya. Tanggal berakhir yang sudah
+// lewat mengalahkan status yang tersimpan — status tidak berubah sendiri
+// saat sertifikat habis.
+//
+// Cakupan izin caregiver ditampilkan apa adanya. Caregiver melihat data
+// kesehatan orang lain; siapa boleh melihat apa harus terbaca sekali
+// lihat, bukan tersembunyi di balik kata "aktif".
+//
+// Prefiks "av".
 // ═══════════════════════════════════════════════════════════════
 
-let _avaTabActive = 'consult';
-let _avaPortalActive = 'admin'; // admin | customer | doctor | vendor
+let AVA_TAB = 'consult';
+let avData = null;
 
-const AVA_TABS = [
-  { id: 'consult',     label: '🩺 Telekonsultasi Dokter', badge: 'Halodoc Style' },
-  { id: 'devices',     label: '📟 Alat Medis & Wearables', badge: 'IoT Telemetri' },
-  { id: 'calibration', label: '🛠️ Badge AVA Verified',    badge: 'Lab Kalibrasi' },
-  { id: 'marketplace', label: '🏬 Marketplace Alkes',     badge: 'Vendor Portal' },
-  { id: 'caregiver',   label: '👥 Caregiver & Keluarga', badge: 'Emergency Alert' },
-  { id: 'corporate',   label: '🏢 Corporate Wellness',   badge: 'K-Anonymity' },
-  { id: 'portals',     label: '🌐 Multi-Portal Switcher',badge: '3 Peran User' }
-];
-
-function renderAVAHealth(tab = 'consult') {
-  const main = document.getElementById('main-content');
-  if (!main) return;
-
-  if (tab && AVA_TABS.some(t => t.id === tab)) _avaTabActive = tab;
-
-  main.innerHTML = `
-    <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
-      <!-- AVA HEALTH HEADER -->
-      <div style="background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:14px;">
-        <div style="display:flex; align-items:center; gap:16px;">
-          <div style="width:50px; height:50px; border-radius:14px; background:linear-gradient(135deg, #10B981, #0EA5E9); display:flex; align-items:center; justify-content:center; color:var(--on-accent); font-size:24px; font-weight:800; shadow:0 10px 25px rgba(16,185,129,0.3);">
-            🩺
-          </div>
-          <div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <h2 style="margin:0; font-size:19px; font-weight:800; color:var(--bg);">AVA Health Ecosystem</h2>
-              <span style="background:linear-gradient(90deg, #34D399, #38BDF8); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-size:11px; font-weight:800; border:1px solid rgba(52,211,153,0.4); padding:2px 8px; border-radius:6px;">
-                KBLI 86910 · TRUST & TELEHEALTH LAYER
-              </span>
-            </div>
-            <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Orkestrator Telekonsultasi · Pemantauan Wearable IoT · Badge Kalibrasi Alkes · Marketplace & Caregiver Network</p>
-          </div>
-        </div>
-
-        <!-- Telemetry Metrics Badge -->
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:var(--accent2); font-weight:700;">
-            ● 24 Dokter Standby
-          </div>
-          <div style="background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:var(--sky); font-weight:700;">
-            📡 142 Alat IoT Terhubung
-          </div>
-          <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.25); padding:6px 12px; border-radius:10px; font-size:11px; color:#FBBF24; font-weight:700;">
-            🛡️ 89 Alkes AVA Verified
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB NAVIGATION -->
-      <div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:20px; overflow-x:auto;">
-        ${AVA_TABS.map(tab => `
-          <button 
-            onclick="switchAVATab('${tab.id}')"
-            style="
-              background:${_avaTabActive === tab.id ? 'rgba(16,185,129,0.18)' : 'rgba(30,41,59,0.5)'};
-              color:${_avaTabActive === tab.id ? '#34D399' : '#94A3B8'};
-              border:1px solid ${_avaTabActive === tab.id ? 'rgba(52,211,153,0.4)' : 'rgba(255,255,255,0.06)'};
-              padding:8px 16px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.2s ease; whitespace:nowrap;
-            "
-          >
-            <span>${tab.label}</span>
-            <span style="background:${_avaTabActive === tab.id ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.05)'}; font-size:10px; padding:1px 6px; border-radius:4px; font-weight:600;">
-              ${tab.badge}
-            </span>
-          </button>
-        `).join('')}
-      </div>
-
-      <!-- TAB CONTENT CONTAINER -->
-      <div id="ava-tab-content" style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:16px; min-height:500px; padding:20px;">
-      </div>
-    </div>
-  `;
-
-  renderActiveAVATabContent();
+function avEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function avRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+function avTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID',
+    { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function avJam(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-function switchAVATab(tabId) {
-  _avaTabActive = tabId;
-  renderAVAHealth(tabId);
+async function avMuat() {
+  if (typeof sbGet !== 'function') { avData = null; return; }
+  const aman = (t, q) => sbGet(t, q).catch(() => []);
+  try {
+    const [konsul, alat, badge, market, caregiver, korporat, akses] = await Promise.all([
+      sbGet('ava_consultations', 'select=*&order=created_at.desc&limit=200'),
+      aman('ava_device_readings', 'select=*&order=created_at.desc&limit=200'),
+      aman('ava_calibration_badges', 'select=*&order=expiry_date'),
+      aman('ava_marketplace_items', 'select=*&order=created_at.desc&limit=200'),
+      aman('ava_caregiver_links', 'select=*&order=created_at.desc&limit=200'),
+      aman('corporates', 'select=id,corporate_name,status,kode_corp&order=corporate_name'),
+      aman('portal_akses', 'select=*&limit=500'),
+    ]);
+    avData = { konsul, alat, badge, market, caregiver, korporat, akses };
+  } catch (e) { avData = null; }
+}
+
+async function renderAVAHealth(tab) {
+  if (tab) AVA_TAB = tab;
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
+
+  await avMuat();
+
+  if (avData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>AVA Health</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data AVA Health tidak dapat dibaca.</strong><br>
+        Tabel <code>ava_consultations</code> dan kawan-kawannya belum tersedia.
+      </div>`;
+    return;
+  }
+  avGambar();
+}
+
+function switchAVATab(tabId) { AVA_TAB = tabId; avGambar(); }
+
+function avGambar() {
+  const tabs = [
+    ['consult',     'Telekonsultasi'],
+    ['devices',     'Perangkat & Wearables'],
+    ['calibration', 'Badge Kalibrasi'],
+    ['marketplace', 'Marketplace Alkes'],
+    ['caregiver',   'Caregiver & Keluarga'],
+    ['corporate',   'Korporat B2B'],
+    ['portals',     'Portal & Akses'],
+  ];
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>AVA Health</h1>
+        <p class="muted">Telehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.</p>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:16px; flex-wrap:wrap">
+      ${tabs.map(([k, l]) => `
+        <button class="tab ${AVA_TAB === k ? 'active' : ''}"
+                onclick="switchAVATab('${k}')">${l}</button>`).join('')}
+    </div>
+
+    <div id="ava-isi">${renderActiveAVATabContent()}</div>`;
 }
 
 function renderActiveAVATabContent() {
-  const container = document.getElementById('ava-tab-content');
-  if (!container) return;
-
-  switch (_avaTabActive) {
-    case 'consult':     renderAVAConsult(container);     break;
-    case 'devices':     renderAVADevices(container);     break;
-    case 'calibration': renderAVACalibration(container); break;
-    case 'marketplace': renderAVAMarketplace(container); break;
-    case 'caregiver':   renderAVACaregiver(container);   break;
-    case 'corporate':   renderAVACorporate(container);   break;
-    case 'portals':     renderAVAPortals(container);     break;
-    default:            renderAVAConsult(container);
+  switch (AVA_TAB) {
+    case 'devices':     return avTabDevices();
+    case 'calibration': return avTabCalibration();
+    case 'marketplace': return avTabMarketplace();
+    case 'caregiver':   return avTabCaregiver();
+    case 'corporate':   return avTabCorporate();
+    case 'portals':     return avTabPortals();
+    default:            return avTabConsult();
   }
 }
 
-// ── SUB-MODUL 1: TELEKONSULTASI DOKTER (HALODOC STYLE) ──────────────
-function renderAVAConsult(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🩺 Konsol Telekonsultasi Dokter (Halodoc-Style)</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">State Machine Konsultasi: Confirm → Complete → E-Resep → Rujukan Lab → Komisi Dokter.</p>
-        </div>
-        <button class="btn btn-teal btn-sm" onclick="avaStartConsultModal()">+ Sesi Konsultasi Baru</button>
-      </div>
-
-      <!-- Active Sessions & Waiting Queue -->
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:16px;">
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <strong style="font-size:13px; color:var(--accent2);">🟢 Sesi Aktif Berjalan (3 Sesi)</strong>
-            <span style="font-size:11px; background:rgba(52,211,153,0.15); color:var(--accent2); padding:2px 8px; border-radius:6px;">Live Chat & Video</span>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;">
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--bg);">
-                <span>Pasien: Bpk. Bambang S. (48 th)</span>
-                <span style="color:var(--sky);">dr. Rizky Pratama, Sp.PD</span>
-              </div>
-              <p style="font-size:11.5px; color:var(--text4); margin:4px 0 8px 0;">Keluhan: Hasil tes HbA1c 8.2%, pusing & lemas harian.</p>
-              <div style="display:flex; gap:6px;">
-                <button class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px;" onclick="toast('Buka Sesi Chat Medis','info')">💬 Chat & Video</button>
-                <button class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px;" onclick="toast('Terbitkan E-Resep','ok')">💊 Buat E-Resep</button>
-                <button class="btn btn-ghost btn-sm" style="font-size:11px; padding:4px 8px;" onclick="toast('Buat Rujukan Lab','info')">🧪 Rujukan Lab</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <strong style="font-size:13px; color:#FBBF24;">⏰ Antrian Pasien Menunggu (2 Pasien)</strong>
-            <span style="font-size:11px; background:rgba(251,191,36,0.15); color:#FBBF24; padding:2px 8px; border-radius:6px;">Auto Assign</span>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div style="background:rgba(30,41,59,0.6); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px;">
-              <div style="display:flex; justify-content:space-between; font-size:12.5px; font-weight:700; color:var(--bg);">
-                <span>Ibu Siti Aminah (56 th)</span>
-                <span style="color:#FBBF24;">Triase: PERHATIAN</span>
-              </div>
-              <p style="font-size:11.5px; color:var(--text4); margin:4px 0 8px 0;">Telemetri Tensimeter IoT: 155/95 mmHg (Hipertensi Gr 1)</p>
-              <button class="btn btn-teal btn-sm" style="font-size:11px; padding:4px 10px; width:100%;" onclick="toast('Terima & Konfirmasi Konsultasi','ok')">✔ Terima Konsultasi</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+function avKosong(ikon, judul, ket) {
+  return `<div class="card" style="padding:32px; text-align:center">
+    <div style="font-size:28px; opacity:.4; margin-bottom:8px">${ikon}</div>
+    <div style="font-weight:700; margin-bottom:4px">${judul}</div>
+    ${ket ? `<div style="font-size:13px; color:var(--text3); max-width:520px;
+                          margin:0 auto; line-height:1.8">${ket}</div>` : ''}
+  </div>`;
 }
 
-// ── SUB-MODUL 2: PEMANTAUAN ALAT MEDIS & WEARABLES ─────────────────
-function renderAVADevices(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">📟 Telemetri Alat Medis Rumah & Wearable IoT</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Normalisasi data smartwatch (Detak Jantung, SpO2, Tensi, Tidur) & pemicu Alert Emergency Perawat.</p>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Hubungkan Alat IoT Baru','info')">+ Hubungkan Alat IoT</button>
-      </div>
-
-      <!-- Real-time Device Cards -->
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px;">
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(16,185,129,0.3); border-radius:14px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13px; font-weight:800; color:var(--bg);">⌚ Smartwatch Pasien #102</span>
-            <span style="font-size:10px; background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 6px; border-radius:4px;">Normal</span>
-          </div>
-          <div style="margin:14px 0; font-size:24px; font-weight:800; color:var(--sky);">
-            78 <span style="font-size:12px; color:var(--text4); font-weight:400;">BPM (Detak Jantung)</span>
-          </div>
-          <div style="font-size:11.5px; color:var(--text4); display:flex; justify-content:space-between;">
-            <span>SpO2: 98%</span>
-            <span>Tidur: 7.2 Jam</span>
-          </div>
-        </div>
-
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(239,68,68,0.4); border-radius:14px; padding:16px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:13px; font-weight:800; color:var(--bg);">🩺 Tensimeter Bluetooth Rumah</span>
-            <span style="font-size:10px; background:rgba(239,68,68,0.2); color:var(--danger-tint); padding:2px 6px; border-radius:4px;">🚨 SEGERA (Alert Perawat)</span>
-          </div>
-          <div style="margin:14px 0; font-size:24px; font-weight:800; color:var(--danger-tint);">
-            165/102 <span style="font-size:12px; color:var(--text4); font-weight:400;">mmHg</span>
-          </div>
-          <div style="font-size:11.5px; color:var(--text4); display:flex; justify-content:space-between; align-items:center;">
-            <span>Bpk. Hendra S.</span>
-            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--danger); border-color:var(--danger);" onclick="toast('Kirim Perawat Home Care ke Rumah Pasien','warn')">🚑 Kirim Nakes</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── SUB-MODUL 3: BADGE KALIBRASI AVA VERIFIED ──────────────────────
-function renderAVACalibration(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(245,158,11,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🛠️ Sertifikasi & Badge Kalibrasi AVA Verified</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Verifikasi sertifikat kalibrasi lab terakreditasi KAN/Kemenkes & penerbitan badge kepercayaan alkes.</p>
-        </div>
-        <button class="btn btn-teal btn-sm" onclick="toast('Input Sertifikat Kalibrasi Baru','info')">+ Input Sertifikat Kalibrasi</button>
-      </div>
-
-      <!-- Verified Devices List -->
-      <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-        <table style="width:100%; border-collapse:collapse; font-size:12.5px; color:var(--bg);">
-          <thead>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.1); color:var(--text4); text-align:left;">
-              <th style="padding:10px;">Nama Alat Medis</th>
-              <th style="padding:10px;">Lab Kalibrasi</th>
-              <th style="padding:10px;">No. Sertifikat</th>
-              <th style="padding:10px;">Masa Berlaku</th>
-              <th style="padding:10px;">Status Badge</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-              <td style="padding:10px; font-weight:700;">Centrifuge Lab Pro-5000</td>
-              <td style="padding:10px;">Balai Kalibrasi Kemenkes RI</td>
-              <td style="padding:10px; font-family:monospace;">KAL-2026-9901</td>
-              <td style="padding:10px; color:var(--accent2);">s/d 14 Des 2026</td>
-              <td style="padding:10px;"><span style="background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 8px; border-radius:6px; font-weight:700;">🛡️ AVA VERIFIED</span></td>
-            </tr>
-            <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-              <td style="padding:10px; font-weight:700;">Syringe Pump Clinic-X</td>
-              <td style="padding:10px;">Lab Kalibrasi Medika Utama</td>
-              <td style="padding:10px; font-family:monospace;">KAL-2025-4421</td>
-              <td style="padding:10px; color:#FBBF24;">s/d 20 Sep 2026 (Segera)</td>
-              <td style="padding:10px;"><span style="background:rgba(245,158,11,0.2); color:#FBBF24; padding:2px 8px; border-radius:6px; font-weight:700;">🛡️ AVA VERIFIED</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-// ── SUB-MODUL 4: MARKETPLACE ALKES & VENDOR ────────────────────────
-function renderAVAMarketplace(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🏬 Marketplace Alat Kesehatan & Vendor Portal</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Etalase penyewaan/pembelian alkes ber-badge "AVA Verified" & verifikasi supplier resmi.</p>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Tambah Produk Alkes Baru','info')">+ Tambah Produk Alkes</button>
-      </div>
-
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px;">
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <span style="font-size:10px; background:rgba(16,185,129,0.2); color:var(--accent2); padding:2px 6px; border-radius:4px; font-weight:700;">🛡️ AVA VERIFIED</span>
-          <h4 style="margin:8px 0 4px 0; color:var(--bg);">Konsentrasi Oksigen Medis 5L</h4>
-          <p style="margin:0; font-size:12px; color:var(--text4);">Vendor: PT Medika Alkes Indonesia</p>
-          <div style="margin:12px 0 8px 0; font-size:16px; font-weight:800; color:var(--sky);">Rp 350.000 <span style="font-size:11px; color:var(--text4); font-weight:400;">/ bulan (Sewa)</span></div>
-          <button class="btn btn-teal btn-sm" style="width:100%; font-size:11px;" onclick="toast('Order Sewa Alkes Berhasil','ok')">🛒 Pesan Sekarang</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── SUB-MODUL 5: CAREGIVER & NETWORK KELUARGA ──────────────────────
-function renderAVACaregiver(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(168,85,247,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">👥 Caregiver & Emergency Family Network</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Akses pendampingan keluarga berbasis RLS scope-gated & pengiriman alert darurat otomatis.</p>
-        </div>
-        <button class="btn btn-ghost btn-sm" onclick="toast('Tautkan Akun Pendamping/Keluarga','info')">+ Tautkan Pendamping</button>
-      </div>
-
-      <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-        <strong style="font-size:13px; color:#C084FC;">Daftar Pendamping Pasien Terverifikasi</strong>
-        <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
-          <div style="background:rgba(30,41,59,0.6); padding:10px; border-radius:8px; display:flex; justify-content:space-between; align-items:center; font-size:12px;">
-            <span>Anak: <strong>Dewi Lestari</strong> (Izin: Baca Tensi & SpO2)</span>
-            <button class="btn btn-ghost btn-sm" style="font-size:10px; color:var(--danger);" onclick="toast('Akses Pendamping Dicabut','warn')">Cabut Akses</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── SUB-MODUL 6: CORPORATE B2B WELLNESS ────────────────────────────
-function renderAVACorporate(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(56,189,248,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🏢 Corporate B2B Wellness (K-Anonymity Engine)</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Analitik agregat kesehatan karyawan perusahaan tanpa membuka identitas individu (Garansi Privasi ISO 27001).</p>
-        </div>
-      </div>
-
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <div style="font-size:12px; color:var(--text4);">Karyawan Berpartisipasi</div>
-          <div style="font-size:24px; font-weight:800; color:var(--sky); margin:6px 0;">340 <span style="font-size:12px; font-weight:400; color:var(--accent2);">(85% Total)</span></div>
-        </div>
-        <div style="background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:16px;">
-          <div style="font-size:12px; color:var(--text4);">Skor Wellness Perusahaan</div>
-          <div style="font-size:24px; font-weight:800; color:var(--accent2); margin:6px 0;">82.4 <span style="font-size:12px; font-weight:400; color:var(--accent2);">/ 100</span></div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-// ── SUB-MODUL 7: MULTI-PORTAL SWITCHER ──────────────────────────────
-function renderAVAPortals(container) {
-  container.innerHTML = `
-    <div style="display:flex; flex-direction:column; gap:20px;">
-      <div style="background:rgba(30,41,59,0.8); border:1px solid rgba(52,211,153,0.3); border-radius:14px; padding:18px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div>
-          <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--bg);">🌐 Switcher Portal Khusus Peran User</h3>
-          <p style="margin:4px 0 0 0; font-size:12px; color:var(--text4);">Pilih tampilan portal khusus sesuai peran pengguna (Pasien, Dokter Telehealth, atau Vendor Alkes).</p>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-ghost btn-sm" onclick="switchAVAPortalView('customer')">📱 Portal Pasien</button>
-          <button class="btn btn-ghost btn-sm" onclick="switchAVAPortalView('doctor')">🩺 Portal Dokter</button>
-          <button class="btn btn-ghost btn-sm" onclick="switchAVAPortalView('vendor')">🏬 Portal Vendor</button>
-        </div>
-      </div>
-
-      <div id="ava-portal-view" style="background:rgba(15,23,42,0.9); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:20px;">
-      </div>
-    </div>
-  `;
-
-  switchAVAPortalView(_avaPortalActive);
-}
-
-function switchAVAPortalView(portalRole) {
-  _avaPortalActive = portalRole;
-  const viewEl = document.getElementById('ava-portal-view');
-  if (!viewEl) return;
-
-  if (portalRole === 'customer') {
-    viewEl.innerHTML = `
-      <div style="color:var(--accent2); font-weight:800; font-size:15px; margin-bottom:12px;">📱 Portal Pasien & Pelanggan AVA Health</div>
-      <p style="font-size:12.5px; color:var(--text4);">Antarmuka ramah pengguna untuk booking konsultasi dokter, cek grafik vital harian, sewa alkes, & kelola pendamping keluarga.</p>
-      <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-        <button class="btn btn-teal btn-sm" onclick="avaStartConsultModal()">🩺 Booking Konsultasi Dokter</button>
-        <button class="btn btn-ghost btn-sm" onclick="avaAddDeviceModal()">📊 Tambah Perangkat Wearable/IoT</button>
-        <button class="btn btn-ghost btn-sm" onclick="avaAddCaregiverModal()">👥 Kelola Pendamping Keluarga</button>
-      </div>
-    `;
-  } else if (portalRole === 'doctor') {
-    viewEl.innerHTML = `
-      <div style="color:var(--sky); font-weight:800; font-size:15px; margin-bottom:12px;">🩺 Portal Kerja Dokter Telehealth</div>
-      <p style="font-size:12.5px; color:var(--text4);">Konsol khusus dokter untuk menerima antrian pasien online, meninjau grafik telemetri alat rumah, menerbitkan e-resep, & cek saldo fee.</p>
-      <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-        <button class="btn btn-teal btn-sm" onclick="avaStartConsultModal()">💬 Sesi Konsultasi Baru</button>
-        <button class="btn btn-ghost btn-sm" onclick="avaAddEPrescriptionModal('SESI-101')">💊 Terbitkan E-Resep</button>
-        <button class="btn btn-ghost btn-sm" onclick="avaAddLabReferralModal('SESI-101')">🧪 Buat Rujukan Tes Lab</button>
-      </div>
-    `;
-  } else {
-    viewEl.innerHTML = `
-      <div style="color:#FBBF24; font-weight:800; font-size:15px; margin-bottom:12px;">🏬 Portal Mitra Vendor & Lab Kalibrasi</div>
-      <p style="font-size:12.5px; color:var(--text4);">Dashboard mitra untuk mengunggah katalog alkes, mendaftarkan nomor sertifikat kalibrasi, & mengklaim badge AVA Verified.</p>
-      <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
-        <button class="btn btn-teal btn-sm" onclick="avaAddCalibrationModal()">🛡️ Registrasi Sertifikat Kalibrasi</button>
-        <button class="btn btn-ghost btn-sm" onclick="avaAddMarketplaceItemModal()">🏬 Upload Produk Alkes Baru</button>
-      </div>
-    `;
-  }
-}
-
-// ── INTERACTIVE MODAL WINDOWS FOR ALL AVA HEALTH ACTIONS ─────────────
-function avaStartConsultModal() {
-  const modalId = 'modal-ava-consult';
-  let existing = document.getElementById(modalId);
-  if (existing) existing.remove();
-
-  const modal = document.createElement('div');
-  modal.id = modalId;
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-  
-  modal.innerHTML = `
-    <div style="background:var(--text); border:1px solid rgba(52,211,153,0.4); border-radius:16px; padding:24px; width:100%; max-width:520px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--accent2);">🩺 Buat Sesi Telekonsultasi Baru</h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer;">✕</button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Nama Pasien *</label>
-          <input type="text" id="ac-patient" placeholder="Contoh: Bpk. Bambang S." style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Dokter Spesialis Tujuan *</label>
-          <select id="ac-doctor" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-            <option value="dr. Rizky Pratama, Sp.PD">dr. Rizky Pratama, Sp.PD (Penyakit Dalam)</option>
-            <option value="dr. Amanda Putri, Sp.JP">dr. Amanda Putri, Sp.JP (Jantung & Pembuluh)</option>
-            <option value="dr. Maya Sari, Sp.A">dr. Maya Sari, Sp.A (Kesehatan Anak)</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Keluhan Utama *</label>
-          <textarea id="ac-complaint" rows="3" placeholder="Tuliskan keluhan atau gejala yang dirasakan..." style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none; resize:none;"></textarea>
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Tingkat Triase AI (Edukatif)</label>
-          <select id="ac-triage" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-            <option value="normal">🟢 NORMAL (Konsultasi Rutin)</option>
-            <option value="perhatian">🟡 PERHATIAN (Perlu Evaluasi Dokter)</option>
-            <option value="segera">🔴 SEGERA (Butuh Tindakan Cepat)</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('${modalId}').remove()">Batal</button>
-        <button class="btn btn-teal btn-sm" onclick="avaSubmitConsult('${modalId}')">Mulai Konsultasi</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-function avaSubmitConsult(modalId) {
-  const patient = document.getElementById('ac-patient')?.value.trim();
-  const doctor = document.getElementById('ac-doctor')?.value;
-  const complaint = document.getElementById('ac-complaint')?.value.trim();
-  const triage = document.getElementById('ac-triage')?.value;
-
-  if (!patient || !complaint) {
-    toast('Isi nama pasien dan keluhan utama', 'warn');
-    return;
+// ── 1. Telekonsultasi ────────────────────────────────────────────
+function avTabConsult() {
+  const K = avData.konsul || [];
+  if (!K.length) {
+    return avKosong('🩺', 'Belum ada sesi telekonsultasi',
+      'Sesi yang dibuat dari aplikasi pasien akan muncul di sini.');
   }
 
-  document.getElementById(modalId)?.remove();
-  toast(`✅ Sesi konsultasi ${patient} bersama ${doctor} berhasil dibuat!`, 'ok');
-  renderAVAHealth('consult');
+  const antre = K.filter(k => (k.status || '').toLowerCase().includes('menunggu')
+                           || (k.status || '').toLowerCase() === 'baru');
+  const warnaTriase = { 'merah': 'var(--danger)', 'kuning': 'var(--warning)',
+                        'hijau': 'var(--success)' };
+
+  return `
+    ${antre.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--info)">
+        <b>${antre.length} sesi menunggu dokter.</b>
+      </div>` : ''}
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Waktu</th><th>Pasien</th><th>Dokter</th><th>Keluhan</th>
+        <th>Triase</th><th>e-Resep</th><th>Rujukan Lab</th>
+        <th style="text-align:right">Jasa Dokter</th><th>Status</th>
+      </tr></thead><tbody>
+      ${K.map(k => `<tr>
+        <td style="white-space:nowrap">${avJam(k.created_at)}</td>
+        <td>${avEsc(k.patient_name || '—')}</td>
+        <td>${avEsc(k.doctor_name || '—')}</td>
+        <td style="font-size:12px; max-width:260px">${avEsc(k.complaint || '—')}</td>
+        <td><span style="font-weight:700;
+              color:${warnaTriase[String(k.triage_level || '').toLowerCase()] || 'var(--text3)'}">
+          ${avEsc(k.triage_level || '—')}</span></td>
+        <td>${k.e_prescription ? '✓' : '—'}</td>
+        <td>${k.lab_referral ? '✓' : '—'}</td>
+        <td style="text-align:right">${avRp(k.doctor_fee)}</td>
+        <td>${avEsc(k.status || '—')}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`;
 }
 
-function avaAddEPrescriptionModal(sessionId = 'SESI-101') {
-  const modalId = 'modal-ava-prescription';
-  let existing = document.getElementById(modalId);
-  if (existing) existing.remove();
+// ── 2. Perangkat & wearables ─────────────────────────────────────
+function avTabDevices() {
+  const D = avData.alat || [];
+  if (!D.length) {
+    return avKosong('⌚', 'Belum ada pembacaan perangkat',
+      'Pembacaan dari alat dan wearable yang tertaut ke akun pasien akan muncul di sini.');
+  }
 
-  const modal = document.createElement('div');
-  modal.id = modalId;
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const waspada = D.filter(d => d.alert_status
+    && !/normal|aman|ok/i.test(d.alert_status));
 
-  modal.innerHTML = `
-    <div style="background:var(--text); border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--sky);">💊 Penerbitan E-Resep Digital</h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer;">✕</button>
+  return `
+    ${waspada.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--danger)">
+        <b>${waspada.length} pembacaan di luar rentang normal.</b>
+        Pembacaan alat rumahan bukan diagnosis — ia alasan untuk menghubungi
+        pasien, bukan untuk mengambil kesimpulan klinis dari layar ini.
+      </div>` : ''}
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Waktu</th><th>Pasien</th><th>Perangkat</th><th>Jenis</th>
+        <th style="text-align:right">Nilai</th><th>Status</th>
+      </tr></thead><tbody>
+      ${D.map(d => {
+        const alert = d.alert_status && !/normal|aman|ok/i.test(d.alert_status);
+        return `<tr>
+          <td style="white-space:nowrap">${avJam(d.created_at)}</td>
+          <td>${avEsc(d.patient_id || '—')}</td>
+          <td>${avEsc(d.device_name || '—')}</td>
+          <td>${avEsc(d.device_type || '—')}</td>
+          <td style="text-align:right; font-weight:700;
+                     color:${alert ? 'var(--danger)' : 'inherit'}">
+            ${avEsc(d.reading_value)} ${avEsc(d.unit || '')}</td>
+          <td>${avEsc(d.alert_status || '—')}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+// ── 3. Badge kalibrasi ───────────────────────────────────────────
+// Tanggal berakhir mengalahkan kolom status. Sertifikat tidak
+// memperbarui statusnya sendiri saat habis masa berlaku.
+function avBadge(b) {
+  if (b.expiry_date && new Date(b.expiry_date) < new Date()) {
+    return { teks: 'Kedaluwarsa', warna: 'var(--danger)', sah: false };
+  }
+  const s = String(b.badge_status || '').toLowerCase();
+  if (/verified|aktif|valid/.test(s)) {
+    return { teks: 'AVA Verified', warna: 'var(--success)', sah: true };
+  }
+  return { teks: b.badge_status || 'Belum diverifikasi',
+           warna: 'var(--text3)', sah: false };
+}
+
+function avTabCalibration() {
+  const B = avData.badge || [];
+  if (!B.length) {
+    return avKosong('🏅', 'Belum ada sertifikat kalibrasi terdaftar',
+      '"AVA Verified" adalah pernyataan bahwa sertifikat kalibrasi alat '
+      + 'sudah diperiksa. Daftar ini kosong sampai ada yang benar-benar '
+      + 'diperiksa — menampilkannya lebih awal berarti menjamin alat yang '
+      + 'tidak pernah dilihat siapa pun.');
+  }
+
+  const exp = B.filter(b => !avBadge(b).sah);
+  const segera = B.filter(b => {
+    if (!b.expiry_date) return false;
+    const h = Math.round((new Date(b.expiry_date) - new Date()) / 86400000);
+    return h >= 0 && h <= 60;
+  });
+
+  return `
+    ${exp.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--danger)">
+        <b>${exp.length} alat tidak berbadge sah</b> — kedaluwarsa atau belum
+        diverifikasi. Alat ini tidak boleh ditampilkan sebagai AVA Verified
+        di mana pun.
+      </div>` : ''}
+    ${segera.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--warning)">
+        <b>${segera.length} sertifikat berakhir dalam 60 hari.</b>
+      </div>` : ''}
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Alat</th><th>Lab Kalibrasi</th><th>No. Sertifikat</th>
+        <th>Berlaku s/d</th><th style="text-align:right">Sisa</th><th>Badge</th>
+      </tr></thead><tbody>
+      ${B.map(b => {
+        const st = avBadge(b);
+        const sisa = b.expiry_date
+          ? Math.round((new Date(b.expiry_date) - new Date()) / 86400000) : null;
+        return `<tr>
+          <td><b>${avEsc(b.device_name || '—')}</b></td>
+          <td>${avEsc(b.lab_name || '—')}</td>
+          <td style="font-size:12px">${avEsc(b.cert_number || '—')}</td>
+          <td>${avTgl(b.expiry_date)}</td>
+          <td style="text-align:right; color:${sisa !== null && sisa < 0
+            ? 'var(--danger)' : sisa !== null && sisa <= 60 ? 'var(--warning)' : 'inherit'}">
+            ${sisa === null ? '—'
+              : sisa < 0 ? 'lewat ' + Math.abs(sisa) + 'h' : sisa + ' hari'}</td>
+          <td><span style="font-weight:700; color:${st.warna}">${avEsc(st.teks)}</span></td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>
+    </div>
+
+    <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
+                             color:var(--text3); line-height:1.7">
+      Badge dihitung dari tanggal berakhir sertifikat, bukan dari kolom
+      status: sertifikat tidak memperbarui statusnya sendiri saat habis
+      masa berlaku. Alat yang sertifikatnya lewat ditandai kedaluwarsa
+      berapa pun isi kolom statusnya.
+    </div>`;
+}
+
+// ── 4. Marketplace alkes ─────────────────────────────────────────
+function avTabMarketplace() {
+  const M = avData.market || [];
+  if (!M.length) {
+    return avKosong('🛒', 'Belum ada alat yang ditawarkan',
+      'Alat sewa dan jual dari vendor mitra akan muncul di sini.');
+  }
+
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>Alat</th><th>Vendor</th><th>Jenis</th>
+      <th style="text-align:right">Harga</th><th>Verifikasi</th><th>Ditambahkan</th>
+    </tr></thead><tbody>
+    ${M.map(m => {
+      const ver = /verified|aktif/i.test(String(m.badge_status || ''));
+      return `<tr>
+        <td><b>${avEsc(m.title || '—')}</b></td>
+        <td>${avEsc(m.vendor_name || '—')}</td>
+        <td>${avEsc(m.type || '—')}</td>
+        <td style="text-align:right">${avRp(m.price)}</td>
+        <td>${ver
+          ? '<span style="color:var(--success); font-weight:600">AVA Verified</span>'
+          : `<span style="color:var(--text3)">${avEsc(m.badge_status || 'belum diverifikasi')}</span>`}</td>
+        <td>${avTgl(m.created_at)}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+// ── 5. Caregiver & keluarga ──────────────────────────────────────
+function avTabCaregiver() {
+  const C = avData.caregiver || [];
+  if (!C.length) {
+    return avKosong('👨‍👩‍👧', 'Belum ada caregiver tertaut',
+      'Caregiver adalah orang yang diberi izin memantau kesehatan pasien lain.');
+  }
+
+  return `
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Cakupan izin ditampilkan apa adanya, bukan diringkas jadi "aktif".
+      Caregiver melihat data kesehatan orang lain — siapa boleh melihat apa
+      harus terbaca sekali lihat.
+    </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Pasien</th><th>Caregiver</th><th>Hubungan</th>
+        <th>Cakupan Izin</th><th>Ditautkan</th>
+      </tr></thead><tbody>
+      ${C.map(c => `<tr>
+        <td>${avEsc(c.patient_id || '—')}</td>
+        <td><b>${avEsc(c.caregiver_name || '—')}</b></td>
+        <td>${avEsc(c.relation || '—')}</td>
+        <td style="font-size:12px">${
+          c.permission_scope
+            ? (Array.isArray(c.permission_scope)
+                ? c.permission_scope.map(avEsc).join(', ')
+                : avEsc(typeof c.permission_scope === 'object'
+                    ? JSON.stringify(c.permission_scope) : c.permission_scope))
+            : '<span style="color:var(--warning)">cakupan belum ditetapkan</span>'}</td>
+        <td>${avTgl(c.created_at)}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>`;
+}
+
+// ── 6. Korporat B2B ──────────────────────────────────────────────
+function avTabCorporate() {
+  const K = avData.korporat || [];
+  if (!K.length) {
+    return avKosong('🏢', 'Belum ada perusahaan klien terdaftar',
+      'Perusahaan klien dikelola di modul Corporate Management (HIS).');
+  }
+
+  const aktif = K.filter(k => k.status === 'Aktif');
+
+  return `
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+                gap:12px; margin-bottom:16px">
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Perusahaan terdaftar</div>
+        <div style="font-size:22px; font-weight:800">${K.length}</div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Rincian Obat & Dosis *</label>
-          <textarea id="ep-drugs" rows="3" placeholder="Contoh: Metformin 500mg (2x1 sesudah makan), Captopril 25mg (1x1 pagi)" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none; resize:none;"></textarea>
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Catatan Penggunaan Dokter</label>
-          <input type="text" id="ep-notes" placeholder="Diminum teratur selama 30 hari" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('${modalId}').remove()">Batal</button>
-        <button class="btn btn-teal btn-sm" onclick="document.getElementById('${modalId}').remove(); toast('✅ E-Resep Digital resmi diterbitkan & dikirim ke farmasi!','ok');">Terbitkan E-Resep</button>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Aktif</div>
+        <div style="font-size:22px; font-weight:800; color:var(--success)">${aktif.length}</div>
       </div>
     </div>
-  `;
-  document.body.appendChild(modal);
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Perusahaan</th><th>Kode Korporat</th><th>Status</th>
+      </tr></thead><tbody>
+      ${K.map(k => `<tr>
+        <td><b>${avEsc(k.corporate_name || '—')}</b></td>
+        <td style="font-size:12px">${avEsc(k.kode_corp || '—')}</td>
+        <td>${avEsc(k.status || '—')}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
+                             color:var(--text3); line-height:1.7">
+      Kode korporat dipakai PIC perusahaan untuk masuk ke portalnya. Kode
+      ini <b>bukan rahasia</b> — ia tercetak di invoice dan dokumen PKS —
+      sehingga akses portal diperiksa dari akun yang masuk, bukan dari
+      kode yang diketik.
+    </div>`;
 }
 
-function avaAddLabReferralModal(sessionId = 'SESI-101') {
-  const modalId = 'modal-ava-referral';
-  let existing = document.getElementById(modalId);
-  if (existing) existing.remove();
+// ── 7. Portal & akses ────────────────────────────────────────────
+function avTabPortals() {
+  const A = avData.akses || [];
+  if (!A.length) {
+    return avKosong('🔗', 'Belum ada tautan portal diterbitkan',
+      'Portal bertoken diterbitkan per perusahaan atau per pasien, dan '
+      + 'masa berlakunya terbatas.');
+  }
 
-  const modal = document.createElement('div');
-  modal.id = modalId;
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  const kini = new Date();
+  const kadaluarsa = A.filter(a =>
+    (a.berlaku_sampai && new Date(a.berlaku_sampai) < kini) || a.aktif === false);
+  const aktif = A.filter(a => !kadaluarsa.includes(a));
 
-  modal.innerHTML = `
-    <div style="background:var(--text); border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:#FBBF24;">🧪 Surat Rujukan Pemeriksaan Lab</h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer;">✕</button>
+  return `
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+                gap:12px; margin-bottom:16px">
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Tautan aktif</div>
+        <div style="font-size:22px; font-weight:800; color:var(--success)">${aktif.length}</div>
       </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Pilih Jenis Tes Laboratorium *</label>
-          <select id="lr-test" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-            <option value="HbA1c & Diabetes Panel">HbA1c & Diabetes Panel</option>
-            <option value="Profil Lipid Lengkap">Profil Lipid Lengkap (Kolesterol, HDL, LDL, Trigliserida)</option>
-            <option value="Fungsi Ginjal (Ureum & Kreatinin)">Fungsi Ginjal (Ureum & Kreatinin)</option>
-            <option value="Paket MCU Eksekutif">Paket MCU Eksekutif</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Diagnosa Kerja / Pengantar Dokter</label>
-          <input type="text" id="lr-notes" placeholder="Evaluasi kontrol glikemik pasien rutin" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('${modalId}').remove()">Batal</button>
-        <button class="btn btn-teal btn-sm" onclick="document.getElementById('${modalId}').remove(); toast('✅ Surat Rujukan Lab terbit & tersambung ke LIS AVA!','ok');">Terbitkan Rujukan Lab</button>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Mati / kedaluwarsa</div>
+        <div style="font-size:22px; font-weight:800;
+                    color:${kadaluarsa.length ? 'var(--warning)' : 'var(--text3)'}">
+          ${kadaluarsa.length}</div>
       </div>
     </div>
-  `;
-  document.body.appendChild(modal);
-}
 
-function avaAddDeviceModal() {
-  const modalId = 'modal-ava-device';
-  let existing = document.getElementById(modalId);
-  if (existing) existing.remove();
-
-  const modal = document.createElement('div');
-  modal.id = modalId;
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-
-  modal.innerHTML = `
-    <div style="background:var(--text); border:1px solid rgba(56,189,248,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:var(--sky);">📟 Registrasi Alat Medis / Wearable IoT</h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer;">✕</button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Nama Perangkat *</label>
-          <input type="text" id="dev-name" placeholder="Contoh: Smartwatch Health-Pro X" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Tipe Telemetri *</label>
-          <select id="dev-type" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-            <option value="Heart Rate (BPM)">Heart Rate (Detak Jantung)</option>
-            <option value="SpO2 (%)">SpO2 (Saturasi Oksigen)</option>
-            <option value="Blood Pressure (mmHg)">Blood Pressure (Tensimeter Bluetooth)</option>
-            <option value="Glukometer (mg/dL)">Glukometer (Gula Darah IoT)</option>
-          </select>
-        </div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('${modalId}').remove()">Batal</button>
-        <button class="btn btn-teal btn-sm" onclick="document.getElementById('${modalId}').remove(); toast('✅ Perangkat IoT berhasil terhubung!','ok'); renderAVAHealth('devices');">Hubungkan Alat</button>
-      </div>
+    <div class="card" style="overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Jenis</th><th>Untuk</th><th>Boleh Tulis</th>
+        <th>Berlaku s/d</th><th>Terakhir Dipakai</th>
+        <th style="text-align:right">Dipakai</th><th>Status</th>
+      </tr></thead><tbody>
+      ${A.slice(0, 200).map(a => {
+        const mati = a.berlaku_sampai && new Date(a.berlaku_sampai) < kini;
+        return `<tr style="${mati ? 'opacity:.6' : ''}">
+          <td>${avEsc(a.jenis || '—')}</td>
+          <td>${avEsc(a.label || a.ref_id || '—')}</td>
+          <td>${a.boleh_tulis
+            ? '<span style="color:var(--warning); font-weight:600">ya</span>'
+            : 'tidak'}</td>
+          <td>${avTgl(a.berlaku_sampai)}</td>
+          <td>${avJam(a.terakhir_dipakai)}</td>
+          <td style="text-align:right">${Number(a.jumlah_akses || 0)}</td>
+          <td>${mati
+            ? `<span style="color:var(--text3)">${a.aktif === false
+                 ? 'dinonaktifkan' : 'kedaluwarsa'}</span>`
+            : '<span style="color:var(--success)">aktif</span>'}</td>
+        </tr>`;
+      }).join('')}
+      </tbody></table>
     </div>
-  `;
-  document.body.appendChild(modal);
-}
 
-function avaAddCalibrationModal() {
-  const modalId = 'modal-ava-calibration';
-  let existing = document.getElementById(modalId);
-  if (existing) existing.remove();
-
-  const modal = document.createElement('div');
-  modal.id = modalId;
-  modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-
-  modal.innerHTML = `
-    <div style="background:var(--text); border:1px solid rgba(245,158,11,0.4); border-radius:16px; padding:24px; width:100%; max-width:500px; color:var(--bg); box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);">
-      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:14px; margin-bottom:18px;">
-        <h3 style="margin:0; font-size:17px; font-weight:800; color:#FBBF24;">🛡️ Registrasi Sertifikat Kalibrasi AVA Verified</h3>
-        <button onclick="document.getElementById('${modalId}').remove()" style="background:none; border:none; color:var(--text4); font-size:20px; cursor:pointer;">✕</button>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:14px; font-size:13px;">
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Nama Alat Medis *</label>
-          <input type="text" id="cal-dev" placeholder="Contoh: Centrifuge Pro-5000" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">Nama Lab Kalibrasi Terakreditasi *</label>
-          <input type="text" id="cal-lab" placeholder="Contoh: Balai Kalibrasi Kemenkes RI" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none;">
-        </div>
-        <div>
-          <label style="display:block; margin-bottom:4px; font-weight:700; color:var(--text4);">No. Sertifikat Kalibrasi *</label>
-          <input type="text" id="cal-cert" placeholder="KAL-2026-XXXX" style="width:100%; padding:10px; background:rgba(30,41,59,0.8); border:1px solid rgba(255,255,255,0.1); border-radius:8px; color:var(--on-accent); outline:none; font-family:monospace;">
-        </div>
-      </div>
-      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; border-top:1px solid rgba(255,255,255,0.1); padding-top:14px;">
-        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('${modalId}').remove()">Batal</button>
-        <button class="btn btn-teal btn-sm" onclick="document.getElementById('${modalId}').remove(); toast('✅ Badge AVA Verified berhasil disetujui & terbit!','ok'); renderAVAHealth('calibration');">Terbitkan Badge</button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(modal);
-}
-
-function avaAddMarketplaceItemModal() {
-  toast('Membuka Form Katalog Alkes Baru...', 'info');
-}
-
-function avaAddCaregiverModal() {
-  toast('Membuka Form Tautan Pendamping Keluarga...', 'info');
+    <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
+                             color:var(--text3); line-height:1.7">
+      Kolom <b>boleh tulis</b> ditandai karena tautan yang bisa mengubah
+      data berbeda risikonya dari tautan yang hanya membaca. Tautan
+      bertoken beredar lewat surel dan pesan — yang bisa menulis harus
+      sesedikit mungkin dan semasa-berlaku-pendek mungkin.
+    </div>`;
 }
 
 window.renderAVAHealth = renderAVAHealth;
 window.switchAVATab = switchAVATab;
-window.switchAVAPortalView = switchAVAPortalView;
-window.avaStartConsultModal = avaStartConsultModal;
-window.avaSubmitConsult = avaSubmitConsult;
-window.avaAddEPrescriptionModal = avaAddEPrescriptionModal;
-window.avaAddLabReferralModal = avaAddLabReferralModal;
-window.avaAddDeviceModal = avaAddDeviceModal;
-window.avaAddCalibrationModal = avaAddCalibrationModal;
-
+window.renderActiveAVATabContent = renderActiveAVATabContent;

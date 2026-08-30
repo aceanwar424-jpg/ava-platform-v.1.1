@@ -341,6 +341,49 @@ if (peringatan.length) {
   for (const w of peringatan) console.log('   ! ' + w);
 }
 
+// ── Layar yatim: punya rute, tidak punya menu ──────────────────────
+//
+// Pemeriksaan di atas berangkat dari menu. Yang tidak tertangkapnya:
+// modul yang PUNYA case di router tapi tidak ditunjuk menu mana pun.
+// Ia tidak muncul di navigasi, tetapi tetap bisa dibuka dengan mengetik
+// rutenya — dan kalau isinya karangan, ia karangan yang tidak terlihat
+// oleh audit menu.
+//
+// Dilaporkan terpisah karena keputusannya berbeda: yang ini biasanya
+// dihapus atau disambungkan ke menu, bukan sekadar diperbaiki datanya.
+const rutePunyaMenu = new Set();
+for (const kat of Object.values(peta.kategori || {})) {
+  for (const grup of kat.grup || []) {
+    for (const m of grup.menu || []) rutePunyaMenu.add(m.rute || m.id);
+  }
+}
+
+const yatim = [];
+for (const [halaman, fn] of Object.entries(petaRender)) {
+  if (rutePunyaMenu.has(halaman)) continue;
+  if (modulPunyaData(halaman) !== false) continue;   // null = tak terperiksa
+  const berkas = petaBerkas[fn];
+  if (!berkas) continue;
+  let baris = 0;
+  try { baris = fs.readFileSync(berkas, 'utf8').split('\n').length; } catch (_) {}
+  if (baris < 120) continue;        // berkas kecil: kemungkinan memang penunjuk
+  yatim.push({ halaman, fn, berkas: path.relative(PLATFORM, berkas), baris });
+}
+
+// Satu berkas bisa dituju beberapa rute; laporkan sekali per berkas.
+const yatimUnik = [...new Map(yatim.map(y => [y.berkas, y])).values()]
+  .sort((a, b) => b.baris - a.baris);
+
+if (yatimUnik.length) {
+  console.log(`\n  ⚠ ${yatimUnik.length} modul punya rute tapi TIDAK ditunjuk menu`);
+  console.log('    mana pun, dan tidak memanggil data. Layar semacam ini tidak');
+  console.log('    terlihat di navigasi tetapi tetap bisa dibuka lewat rutenya:');
+  for (const y of yatimUnik) {
+    console.log(`      · ${y.berkas} (${y.baris} baris) → rute "${y.halaman}"`);
+  }
+  console.log('    Sambungkan ke menu, isi datanya, atau hapus modulnya.');
+}
+
 if (tanpaData.length) {
   console.log(`\n  ⚠ ${tanpaData.length} menu berstatus "ada" tetapi modulnya tidak`);
   console.log('    memanggil data sama sekali — layarnya kemungkinan besar berisi');
