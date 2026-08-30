@@ -89,30 +89,67 @@ if (galat.length) {
 
 // ── Susun aturan rute ──────────────────────────────────────────
 //
-// Dua aturan per host:
-//   1. "/"      → berkas masuk situs itu
-//   2. "/(.*)"  → berkas masuk juga, sebagai jaring untuk tautan dalam
+// MENGAPA "routes", BUKAN "rewrites"
 //
-// Keduanya REWRITE, bukan redirect: alamat di bilah peramban tetap bersih
-// (app.avahealth.sbs/ bukan app.avahealth.sbs/apps/index.html).
+// Versi sebelumnya memakai `rewrites`, dan itu TIDAK PERNAH BEKERJA di
+// produksi. Vercel memeriksa berkas nyata LEBIH DULU, baru menerapkan
+// rewrites. Karena ava-platform/index.html ada di akar deploy, setiap
+// permintaan ke "/" langsung disajikan berkas itu — aturan host tidak
+// pernah sempat dievaluasi.
 //
-// Vercel memeriksa berkas nyata LEBIH DULU, jadi /style.css, /js/core/api.js,
-// dan /portal_korporat.html tetap tersaji apa adanya di host mana pun. Yang
-// jatuh ke aturan kedua hanya jalur yang memang tidak berwujud berkas.
-const rewrites = [];
+// Akibatnya SELURUH subdomain menyajikan aplikasi HIS: www menampilkan
+// aplikasi alih-alih etalase, kiosk menampilkan aplikasi alih-alih layar
+// sentuh, nakes dan lacak juga. Diperiksa langsung ke produksi pada
+// 30 Agustus 2026: 16 dari 16 subdomain menyajikan index.html.
+//
+// `routes` (larik lawas) dievaluasi BERURUTAN, dan penanda
+// { "handle": "filesystem" } menentukan di titik mana berkas nyata dicari.
+// Apa pun yang ditulis SEBELUM penanda itu menang atas berkas. Itulah yang
+// dibutuhkan untuk routing berbasis host dalam satu project.
+//
+// Konsekuensinya: `routes` tidak boleh dicampur dengan rewrites, redirects,
+// headers, cleanUrls, atau trailingSlash dalam satu vercel.json. Berkas ini
+// memang hanya memakai routes, jadi tidak ada yang hilang. Pengalihan
+// apex → www diatur di dashboard Vercel (tingkat domain), bukan di sini.
+//
+// Susunannya tiga lapis:
+//   1. "^/$" per host   → berkas masuk situs itu, MENDAHULUI berkas nyata
+//   2. handle: filesystem → /css/style.css, /js/core/api.js, dsb. apa adanya
+//   3. "^/(.*)$" per host → jaring untuk jalur yang bukan berkas
+const routes = [];
 
+// Lapis 1 — akar tiap host. Harus mendahului filesystem, kalau tidak
+// "/" akan selalu jatuh ke index.html milik aplikasi.
 for (const s of situs) {
   for (const h of s.host) {
-    const has = [{ type: 'host', value: h }];
-    rewrites.push({ source: '/', has, destination: s.masuk });
-    rewrites.push({ source: '/(.*)', has, destination: s.masuk });
+    routes.push({
+      src: '^/$',
+      has: [{ type: 'host', value: h }],
+      dest: s.masuk,
+    });
+  }
+}
+
+// Lapis 2 — berkas nyata. Tanpa baris ini, seluruh aset akan tertelan
+// jaring di lapis 3 dan halaman tampil tanpa gaya sama sekali.
+routes.push({ handle: 'filesystem' });
+
+// Lapis 3 — jalur yang tidak berwujud berkas. Dipakai tautan dalam dan
+// alamat yang diketik langsung.
+for (const s of situs) {
+  for (const h of s.host) {
+    routes.push({
+      src: '^/(.*)$',
+      has: [{ type: 'host', value: h }],
+      dest: s.masuk,
+    });
   }
 }
 
 const konfig = {
   $schema: 'https://openapi.vercel.sh/vercel.json',
   outputDirectory: FOLDER_PLATFORM,
-  rewrites,
+  routes,
 };
 
 const teks = JSON.stringify(konfig, null, 2) + '\n';
@@ -186,7 +223,7 @@ fs.writeFileSync(KELUAR, teks);
 fs.mkdirSync(path.dirname(PETA_JS), { recursive: true });
 fs.writeFileSync(PETA_JS, petaTeks);
 
-console.log(`✓ vercel.json ditulis — ${situs.length} situs, ${hostTerpakai.size} host, ${rewrites.length} aturan\n`);
+console.log(`✓ vercel.json ditulis — ${situs.length} situs, ${hostTerpakai.size} host, ${routes.length} aturan\n`);
 for (const s of situs) {
   console.log(`  ${String(s.kunci).padEnd(6)} ${String(s.nama).padEnd(30)} ${s.masuk}`);
   console.log(`         ${s.host.join(', ')}`);

@@ -1,886 +1,889 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "outputDirectory": "ava-platform",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/",
+      "src": "^/$",
       "has": [
         {
           "type": "host",
           "value": "avahealth.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.avahealth.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "avahelath.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.avahelath.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "his.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "his.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lis.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lis.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lab.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lab.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "ops.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "ops.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.avahealth.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahealth.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "app.avahelath.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "apps.avahelath.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "cek.avahealth.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "cek.avahelath.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "care.avahealth.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "care.avahelath.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "nutri.avahealth.sbs"
+        }
+      ],
+      "dest": "/nutri.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "nutri.avahelath.sbs"
+        }
+      ],
+      "dest": "/nutri.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "sanctuary.avahealth.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "sanctuary.avahelath.sbs"
+        }
+      ],
+      "dest": "/portal.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "tech.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "tech.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "console.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "console.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahealth.sbs"
+        }
+      ],
+      "dest": "/kiosk/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "kiosk.avahelath.sbs"
+        }
+      ],
+      "dest": "/kiosk/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "nakes.avahealth.sbs"
+        }
+      ],
+      "dest": "/nakes.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "nakes.avahelath.sbs"
+        }
+      ],
+      "dest": "/nakes.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "corp.avahealth.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "corp.avahelath.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "korporat.avahealth.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "korporat.avahelath.sbs"
+        }
+      ],
+      "dest": "/apps/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lacak.avahealth.sbs"
+        }
+      ],
+      "dest": "/track.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "lacak.avahelath.sbs"
+        }
+      ],
+      "dest": "/track.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "antrian.avahealth.sbs"
+        }
+      ],
+      "dest": "/monitor/antrian.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "antrian.avahelath.sbs"
+        }
+      ],
+      "dest": "/monitor/antrian.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "crm.avahealth.sbs"
+        }
+      ],
+      "dest": "/monitor/crm.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "crm.avahelath.sbs"
+        }
+      ],
+      "dest": "/monitor/crm.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "wellness.avahealth.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "src": "^/$",
+      "has": [
+        {
+          "type": "host",
+          "value": "wellness.avahelath.sbs"
+        }
+      ],
+      "dest": "/index.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "avahealth.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "www.avahealth.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.avahealth.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "avahelath.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "avahelath.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "www.avahelath.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "www.avahelath.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "his.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "his.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "his.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "his.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lis.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lis.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lis.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lis.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lab.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lab.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lab.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lab.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "ops.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "ops.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "ops.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "ops.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "app.avahealth.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "app.avahealth.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "apps.avahealth.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "apps.avahealth.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "app.avahelath.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "app.avahelath.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "apps.avahelath.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "apps.avahelath.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "cek.avahealth.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "cek.avahealth.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "cek.avahelath.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "cek.avahelath.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "care.avahealth.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "care.avahealth.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "care.avahelath.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "care.avahelath.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "nutri.avahealth.sbs"
         }
       ],
-      "destination": "/nutri.html"
+      "dest": "/nutri.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "nutri.avahealth.sbs"
-        }
-      ],
-      "destination": "/nutri.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "nutri.avahelath.sbs"
         }
       ],
-      "destination": "/nutri.html"
+      "dest": "/nutri.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "nutri.avahelath.sbs"
-        }
-      ],
-      "destination": "/nutri.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "sanctuary.avahealth.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "sanctuary.avahealth.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "sanctuary.avahelath.sbs"
         }
       ],
-      "destination": "/portal.html"
+      "dest": "/portal.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "sanctuary.avahelath.sbs"
-        }
-      ],
-      "destination": "/portal.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "tech.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "tech.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "tech.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "tech.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "console.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "console.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "console.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "console.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "kiosk.avahealth.sbs"
         }
       ],
-      "destination": "/kiosk/index.html"
+      "dest": "/kiosk/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "kiosk.avahealth.sbs"
-        }
-      ],
-      "destination": "/kiosk/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "kiosk.avahelath.sbs"
         }
       ],
-      "destination": "/kiosk/index.html"
+      "dest": "/kiosk/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "kiosk.avahelath.sbs"
-        }
-      ],
-      "destination": "/kiosk/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "nakes.avahealth.sbs"
         }
       ],
-      "destination": "/nakes.html"
+      "dest": "/nakes.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "nakes.avahealth.sbs"
-        }
-      ],
-      "destination": "/nakes.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "nakes.avahelath.sbs"
         }
       ],
-      "destination": "/nakes.html"
+      "dest": "/nakes.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "nakes.avahelath.sbs"
-        }
-      ],
-      "destination": "/nakes.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "corp.avahealth.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "corp.avahealth.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "corp.avahelath.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "corp.avahelath.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "korporat.avahealth.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "korporat.avahealth.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "korporat.avahelath.sbs"
         }
       ],
-      "destination": "/apps/index.html"
+      "dest": "/apps/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "korporat.avahelath.sbs"
-        }
-      ],
-      "destination": "/apps/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lacak.avahealth.sbs"
         }
       ],
-      "destination": "/track.html"
+      "dest": "/track.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lacak.avahealth.sbs"
-        }
-      ],
-      "destination": "/track.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "lacak.avahelath.sbs"
         }
       ],
-      "destination": "/track.html"
+      "dest": "/track.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "lacak.avahelath.sbs"
-        }
-      ],
-      "destination": "/track.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "antrian.avahealth.sbs"
         }
       ],
-      "destination": "/monitor/antrian.html"
+      "dest": "/monitor/antrian.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "antrian.avahealth.sbs"
-        }
-      ],
-      "destination": "/monitor/antrian.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "antrian.avahelath.sbs"
         }
       ],
-      "destination": "/monitor/antrian.html"
+      "dest": "/monitor/antrian.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "antrian.avahelath.sbs"
-        }
-      ],
-      "destination": "/monitor/antrian.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "crm.avahealth.sbs"
         }
       ],
-      "destination": "/monitor/crm.html"
+      "dest": "/monitor/crm.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "crm.avahealth.sbs"
-        }
-      ],
-      "destination": "/monitor/crm.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "crm.avahelath.sbs"
         }
       ],
-      "destination": "/monitor/crm.html"
+      "dest": "/monitor/crm.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "crm.avahelath.sbs"
-        }
-      ],
-      "destination": "/monitor/crm.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "wellness.avahealth.sbs"
         }
       ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     },
     {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "wellness.avahealth.sbs"
-        }
-      ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/",
+      "src": "^/(.*)$",
       "has": [
         {
           "type": "host",
           "value": "wellness.avahelath.sbs"
         }
       ],
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "wellness.avahelath.sbs"
-        }
-      ],
-      "destination": "/index.html"
+      "dest": "/index.html"
     }
   ]
 }
