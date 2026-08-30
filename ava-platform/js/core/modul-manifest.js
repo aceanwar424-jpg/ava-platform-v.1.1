@@ -292,7 +292,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "penawaran": [
   "modules/crm/crm_pipeline.js",
@@ -375,7 +376,33 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
+ ],
+ "order-lab": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js",
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "lisensi": [
   "modules/system/config/config_family.js",
@@ -568,7 +595,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "worklist": [
   "modules/lab/qcEngine.js",
@@ -592,7 +620,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "validasi": [
   "modules/lab/qcEngine.js",
@@ -616,7 +645,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "product": [
   "modules/system/config/config_family.js",
@@ -994,7 +1024,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "payroll": [
   "modules/hrd/attendance.js",
@@ -1097,7 +1128,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "specimen-verification": [
   "modules/lab/qcEngine.js",
@@ -1121,7 +1153,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "analyzer-interfacing": [
   "modules/lab/qcEngine.js",
@@ -1145,7 +1178,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "lot-verification": [
   "modules/lab/qcEngine.js",
@@ -1169,7 +1203,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "proficiency-testing": [
   "modules/lab/qcEngine.js",
@@ -1193,7 +1228,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "critical-value": [
   "modules/lab/qcEngine.js",
@@ -1217,7 +1253,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "sample-archiving": [
   "modules/lab/qcEngine.js",
@@ -1241,7 +1278,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/pmeProficiency.js",
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
-  "modules/lab/settings.js"
+  "modules/lab/settings.js",
+  "modules/lab/admission.js"
  ],
  "his-orders": [
   "modules/his/admission.js",
@@ -1458,5 +1496,6 @@ window.MODUL_SEMUA = [
  "modules/his/integratedOrders.js",
  "modules/his/mpiManagement.js",
  "modules/radiology/radiologyExpertise.js",
- "modules/lab/settings.js"
+ "modules/lab/settings.js",
+ "modules/lab/admission.js"
 ];
