@@ -74,7 +74,25 @@ function collectSchemaFiles(repoDir) {
 async function loadSchema(pg, repoDir, log = () => {}) {
   await pg.exec(`CREATE SCHEMA IF NOT EXISTS auth; CREATE SCHEMA IF NOT EXISTS storage;`);
   for (const r of ['anon', 'authenticated', 'service_role']) { try { await pg.exec(`CREATE ROLE ${r};`); } catch (_) {} }
-  try { await pg.exec(`CREATE FUNCTION auth.uid() RETURNS uuid AS $$ SELECT NULL::uuid $$ LANGUAGE sql;`); } catch (_) {}
+  // auth.uid() membaca identitas pemanggil dari setelan sesi, bukan
+  // mengembalikan NULL tetap.
+  //
+  // Versi lama selalu NULL, dan itu MEMATAHKAN setiap fungsi yang menolak
+  // pemanggil anonim. issue_queue_ticket() misalnya diawali
+  // `IF auth.uid() IS NULL THEN RAISE EXCEPTION 'Harus login'` — sehingga
+  // menerbitkan nomor antrean SELALU gagal di instalasi desktop, dan
+  // pesannya menyesatkan: petugas sudah masuk.
+  //
+  // Ada 43 pemakaian auth.uid() di 21 berkas skema. Semuanya ikut pulih.
+  //
+  // Nilainya diisi per permintaan lewat SET LOCAL di dalam transaksi —
+  // lihat jalankanDenganIdentitas(). STABLE, bukan IMMUTABLE: nilainya
+  // berubah antar transaksi.
+  try {
+    await pg.exec(`CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
+      AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
+      LANGUAGE sql STABLE;`);
+  } catch (_) {}
   try { await pg.exec(`CREATE FUNCTION auth.role() RETURNS text AS $$ SELECT 'authenticated'::text $$ LANGUAGE sql;`); } catch (_) {}
 
   await siapkanTabelAva(pg, log);
@@ -991,8 +1009,24 @@ function stripReserved(params) {
 }
 function normVal(v) { return (v && typeof v === 'object') ? JSON.stringify(v) : v; }
 
+// Menjalankan sebuah kueri dengan identitas pemanggil terpasang, supaya
+// auth.uid() di dalam fungsi basis data mengembalikan pengguna yang benar.
+//
+// Dibungkus transaksi dan memakai SET LOCAL, BUKAN SET biasa: PGlite hanya
+// punya satu sambungan, dan setelan yang tidak dibatasi transaksi akan
+// bocor ke permintaan berikutnya — permintaan tanpa sesi akan mewarisi
+// identitas pengguna sebelumnya. Itu kesalahan yang jauh lebih berbahaya
+// daripada auth.uid() yang kosong.
+async function jalankanDenganIdentitas(pg, uid, fn) {
+  if (!uid) return fn(pg);
+  return pg.transaction(async (tx) => {
+    await tx.query(`SELECT set_config('request.jwt.claim.sub', $1, true)`, [String(uid)]);
+    return fn(tx);
+  });
+}
+
 // ── RPC: fungsi Postgres sudah ada di PGlite → panggil dengan named args
-async function handleRpc(pg, fn, bodyText) {
+async function handleRpc(pg, fn, bodyText, uid) {
   const args = bodyText ? JSON.parse(bodyText) : {};
   const keys = Object.keys(args);
   const sp = []; const namedPh = keys.map(k => { sp.push(normVal(args[k])); return `${qid(k)} => $${sp.length}`; });
@@ -1000,7 +1034,8 @@ async function handleRpc(pg, fn, bodyText) {
   // Coba sebagai set-returning (TABLE/SETOF); jika hasilnya kolom-tunggal bernama
   // sama dengan fungsi → itu fungsi scalar, unwrap sesuai perilaku PostgREST.
   try {
-    const res = await pg.query(`SELECT * FROM ${call}`, sp);
+    const res = await jalankanDenganIdentitas(pg, uid, (db) =>
+      db.query(`SELECT * FROM ${call}`, sp));
     const rows = res.rows;
     const keys = rows[0] ? Object.keys(rows[0]) : [];
     if (keys.length === 1 && keys[0] === fn) {
@@ -1009,7 +1044,10 @@ async function handleRpc(pg, fn, bodyText) {
     }
     return { status: 200, rows };
   } catch (_) {
-    const res = await pg.query(`SELECT ${call} AS result`, sp);
+    // Fungsi scalar. Identitas HARUS ikut di sini juga — sebagian besar
+    // fungsi yang memeriksa auth.uid() justru jatuh ke jalur ini.
+    const res = await jalankanDenganIdentitas(pg, uid, (db) =>
+      db.query(`SELECT ${call} AS result`, sp));
     return { status: 200, rows: res.rows[0]?.result ?? null };
   }
 }
@@ -1764,7 +1802,16 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
         }
         // ── RPC ──
         const rpc = /^\/rest\/v1\/rpc\/([a-zA-Z0-9_]+)$/.exec(p);
-        if (rpc) { const out = await handleRpc(pg, rpc[1], bodyText); return jsonRes(res, out.status, out.rows); }
+        if (rpc) {
+          // Token dibaca ULANG di sini, bukan memakai variabel `sesi` di
+          // atas — deklarasinya block-scoped dan tidak terjangkau dari sini.
+          // Membiarkannya akan membuat uid selalu null dan perbaikan
+          // auth.uid() tidak berpengaruh apa pun, tanpa galat yang terlihat.
+          const sesiRpc = bacaToken(SECRET, tokenDariHeader(req));
+          const uid = sesiRpc ? sesiRpc.sub : null;
+          const out = await handleRpc(pg, rpc[1], bodyText, uid);
+          return jsonRes(res, out.status, out.rows);
+        }
         // ── REST tabel ──
         const rest = /^\/rest\/v1\/([a-zA-Z0-9_]+)$/.exec(p);
         if (rest) {
