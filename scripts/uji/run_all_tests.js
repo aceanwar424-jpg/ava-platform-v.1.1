@@ -23,7 +23,8 @@ const testSuites = [
   { name: '11. AVA Tech — Lisensi & Tenant', file: 'test_ava_tech_tenant.js' },
   { name: '12. Antrean — Loket, Prioritas & Panggilan', file: 'test_antrian_panggilan.js' },
   { name: '13. Wellness, Sanctuary & Pabrik', file: 'test_wellness_pabrik.js' },
-  { name: '14. LIS, AVA Tech & Order Terintegrasi', file: 'test_lis_tech_order.js' }
+  { name: '14. LIS, AVA Tech & Order Terintegrasi', file: 'test_lis_tech_order.js' },
+  { name: '15. Klaim Penjamin (BPJS/Asuransi/TPA)', file: 'test_klaim_penjamin.js' }
 ];
 
 console.log('╔═══════════════════════════════════════════════════════════════╗');

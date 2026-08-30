@@ -1,480 +1,469 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: Klaim Asuransi, BPJS INA-CBG & TPA Corporate — AVA GLOBAL
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Grouper Tarif INA-CBG v6.0 (Diagnosa ICD-10 & Prosedur ICD-9-CM)
-// - Penerbitan & Validasi SEP (Surat Eligibilitas Peserta) BPJS VClaim v2.0
-// - Manajemen Klaim Asuransi Swasta & TPA (AdMedika, Inhealth, Prudential)
-// - Verifikasi Kelengkapan Berkas Medis (Resume Medis, Billing, Hasil Lab)
-// - Rekapitulasi Settlement & Piutang Klaim B2B
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: Klaim Penjamin — BPJS, Asuransi, dan TPA
+//
+// Versi sebelumnya (481 baris) tidak punya panggilan data, dan yang
+// dijanjikannya lebih dari yang bisa ditepati: "Grouper Tarif INA-CBG
+// v6.0" dan "Penerbitan SEP lewat VClaim". Keduanya ditampilkan sebagai
+// fitur yang berjalan, padahal tidak ada satu baris pun di belakangnya.
+//
+// Sekarang membaca migrasi 0040.
+//
+// ── Yang sengaja TIDAK dikerjakan di sini ────────────────────
+//
+// Tidak ada grouper INA-CBG. Tarif INA-CBG dihitung aplikasi E-Klaim
+// resmi Kemenkes dari tabel tarif ber-SK yang diperbarui berkala.
+// Menghitungnya sendiri menghasilkan angka yang berbeda dari yang diakui
+// verifikator — dan selisih yang lebih tinggi bisa dibaca sebagai
+// kelebihan tagih, bukan sekadar salah hitung.
+//
+// Kolomnya karena itu bernama "tarif dari E-Klaim": angkanya dimasukkan
+// dari keluaran E-Klaim, bukan lahir di sini. Begitu pula nomor SEP —
+// diterbitkan VClaim, disalin ke sini.
+//
+// Yang dikerjakan layar ini: kelengkapan berkas, status pengajuan, umur
+// klaim, dan selisih antara yang ditagih dengan yang dibayar. Itu bagian
+// yang selama ini dikerjakan di spreadsheet.
+//
+// Prefiks "bk".
+// ═══════════════════════════════════════════════════════════════
 
-let BPJS_STATE = {
-  activeTab: 'claims', // 'claims' | 'sep' | 'grouper' | 'tpa' | 'settlement'
-  claims: [
-    {
-      no_sep: '0032S0120826V0001',
-      pasien: 'Ny. Siska Melani',
-      no_rm: 'RM-2026-0041',
-      tgl_layanan: '2026-08-19',
-      poli: 'Poli Obgyn & Hormon',
-      icd10: 'E28.2 (Polycystic Ovarian Syndrome)',
-      icd9cm: '88.78 (Diagnostic Ultrasound of Gravid Uterus)',
-      kode_cbg: 'N-4-10-I',
-      deskripsi_cbg: 'Penyakit Ovarium & Tuba Ringan',
-      tarif_rs: 650000,
-      tarif_inacbg: 580000,
-      status: 'Siap Kirim e-Klaim',
-      kelengkapan: '100% (SEP, CPPT, Lab)'
-    },
-    {
-      no_sep: '0032S0120826V0002',
-      pasien: 'Bpk. Hendra Gunawan',
-      no_rm: 'RM-2026-0048',
-      tgl_layanan: '2026-08-18',
-      poli: 'Poli Penyakit Dalam',
-      icd10: 'E11.9 (Type 2 Diabetes Mellitus)',
-      icd9cm: '90.59 (Diagnostic Examination of Blood)',
-      kode_cbg: 'E-4-10-I',
-      deskripsi_cbg: 'Diabetes Melitus Tanpa Komplikasi',
-      tarif_rs: 450000,
-      tarif_inacbg: 420000,
-      status: 'Terverifikasi BPJS',
-      kelengkapan: '100%'
-    },
-    {
-      no_sep: '0032S0120826V0003',
-      pasien: 'Ibu Ratna Juwita',
-      no_rm: 'RM-2026-0052',
-      tgl_layanan: '2026-08-21',
-      poli: 'Poli Kulit & Estetika',
-      icd10: 'L70.0 (Acne Vulgaris)',
-      icd9cm: '86.28 (Nonexcisional Debridement)',
-      kode_cbg: 'L-4-12-I',
-      deskripsi_cbg: 'Kelainan Kulit Ringan',
-      tarif_rs: 550000,
-      tarif_inacbg: 490000,
-      status: 'Proses Verifikasi',
-      kelengkapan: '85% (Menunggu Resume Dokter)'
-    }
-  ],
-  sepList: [
-    { noSep: '0032S0120826V0001', noKartu: '000182910293', nama: 'Ny. Siska Melani', tglSep: '2026-08-19', poli: 'Obgyn', jnsPelayanan: 'Rawat Jalan', status: 'Terbit' },
-    { noSep: '0032S0120826V0002', noKartu: '000199201928', nama: 'Bpk. Hendra Gunawan', tglSep: '2026-08-18', poli: 'Penyakit Dalam', jnsPelayanan: 'Rawat Jalan', status: 'Terbit' },
-    { noSep: '0032S0120826V0003', noKartu: '000288192011', nama: 'Ibu Ratna Juwita', tglSep: '2026-08-21', poli: 'Kulit', jnsPelayanan: 'Rawat Jalan', status: 'Terbit' }
-  ],
-  tpaClaims: [
-    { noKlaim: 'CLM-ADM-8801', asuransi: 'AdMedika', perusahaan: 'PT Telkom Indonesia', pasien: 'dr. Amanda Clarissa', tagihan: 1250000, approved: 1250000, status: 'Approved' },
-    { noKlaim: 'CLM-INH-8802', asuransi: 'Mandiri Inhealth', perusahaan: 'Bank Mandiri (Persero)', pasien: 'Bpk. Rizky Pratama', tagihan: 890000, approved: 890000, status: 'Approved' },
-    { noKlaim: 'CLM-PRU-8803', asuransi: 'Prudential Corporate', perusahaan: 'PT Astra International', pasien: 'Ny. Maya Indah', tagihan: 2400000, approved: 2150000, status: 'Sebagian Disetujui' }
-  ]
-};
+let bkData = null;
+let bkTab = 'klaim';
+let bkFilter = 'semua';
+let bkPilih = null;
 
-async function renderBpjsClaim(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
-
-  if (params.tab) BPJS_STATE.activeTab = params.tab;
-
-  const totalKlaimBpjs = BPJS_STATE.claims.reduce((s, c) => s + c.tarif_inacbg, 0);
-  const totalKlaimTpa = BPJS_STATE.tpaClaims.reduce((s, t) => s + t.approved, 0);
-
-  content.innerHTML = `
-    <!-- Header Modul -->
-    <div class="page-header">
-      <div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-          <span class="badge" style="background:#ede9fe; color:#6d28d9; font-weight:800; font-size:10px;">PILAR 6 &bull; PT AVA MITRA KORPORAT &amp; ASURANSI</span>
-          <span class="badge" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:10px;">BPJS VCLAIM 2.0 &amp; ADMEDIKA BRIDGE</span>
-        </div>
-        <h1>📑 Klaim Asuransi, BPJS INA-CBG &amp; TPA</h1>
-        <p>Grouping tarif INA-CBG, verifikasi kelengkapan berkas rekam medis &amp; penagihan asuransi korporat</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderBpjsClaim()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="openSimulasiGrouperModal()">+ Simulasi Grouper INA-CBG</button>
-        <button class="btn btn-primary btn-sm" style="background:#0A2342; border-color:#0A2342; color:#fff;" onclick="openPenerbitanSepModal()">+ Terbitkan SEP Baru</button>
-      </div>
-    </div>
-
-    <!-- Ringkasan KPI Klaim -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-bottom:20px;">
-      <div class="kpi-card" style="border-left: 4px solid #8b5cf6;">
-        <div class="kpi-icon" style="background:rgba(139,92,246,0.15); color:#8b5cf6;">🛡️</div>
-        <div>
-          <div class="kpi-val">Rp ${((totalKlaimBpjs + totalKlaimTpa)/1000000).toFixed(1)} Jt</div>
-          <div class="kpi-label">Total Nilai Klaim Terbit</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">BPJS + Asuransi Swasta</div>
-        </div>
-      </div>
-
-      <div class="kpi-card" style="border-left: 4px solid #0ea5e9;">
-        <div class="kpi-icon" style="background:rgba(14,165,233,0.15); color:#0ea5e9;">📋</div>
-        <div>
-          <div class="kpi-val">${BPJS_STATE.claims.length + BPJS_STATE.tpaClaims.length} Berkas</div>
-          <div class="kpi-label">Berkas Klaim Diproses</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Kesesuaian Medis 100%</div>
-        </div>
-      </div>
-
-      <div class="kpi-card" style="border-left: 4px solid #22c55e;">
-        <div class="kpi-icon" style="background:rgba(34,197,94,0.15); color:#22c55e;">⚡</div>
-        <div>
-          <div class="kpi-val">0 Berkas</div>
-          <div class="kpi-label">Dispute / Pending Approval</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Zero Dispute Record</div>
-        </div>
-      </div>
-
-      <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
-        <div class="kpi-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">🎯</div>
-        <div>
-          <div class="kpi-val">100%</div>
-          <div class="kpi-label">Akurasi Grouping ICD-10</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Standar Kemenkes RI</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Sub-Menu Workspace Tabs (Navigasi Internal Modul) -->
-    <div style="display:flex; gap:8px; border-bottom:2px solid var(--border); margin-bottom:20px; overflow-x:auto; padding-bottom:2px;">
-      <button class="btn btn-sm ${BPJS_STATE.activeTab === 'claims' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabBpjs('claims')">
-        📑 1. Berkas e-Klaim BPJS (${BPJS_STATE.claims.length})
-      </button>
-      <button class="btn btn-sm ${BPJS_STATE.activeTab === 'sep' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabBpjs('sep')">
-        🪪 2. Bridging SEP VClaim (${BPJS_STATE.sepList.length})
-      </button>
-      <button class="btn btn-sm ${BPJS_STATE.activeTab === 'grouper' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabBpjs('grouper')">
-        🧮 3. Simulator Grouper INA-CBG
-      </button>
-      <button class="btn btn-sm ${BPJS_STATE.activeTab === 'tpa' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabBpjs('tpa')">
-        🏢 4. Asuransi Swasta &amp; TPA (${BPJS_STATE.tpaClaims.length})
-      </button>
-      <button class="btn btn-sm ${BPJS_STATE.activeTab === 'settlement' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabBpjs('settlement')">
-        💰 5. Rekap Settlement &amp; Piutang
-      </button>
-    </div>
-
-    <!-- Konten Tab Aktif -->
-    <div id="bpjs-tab-content">
-      ${renderBpjsTabContent()}
-    </div>
-  `;
+function bkEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function bkRp(n) {
+  if (n === null || n === undefined) return '—';
+  const v = Number(n);
+  return (v < 0 ? '−Rp ' : 'Rp ') + Math.abs(v).toLocaleString('id-ID');
+}
+function bkTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID',
+    { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
-function gantiTabBpjs(tab) {
-  BPJS_STATE.activeTab = tab;
-  renderBpjsClaim();
+async function bkMuat() {
+  if (typeof sbGet !== 'function') { bkData = null; return; }
+  const aman = (t, q) => sbGet(t, q).catch(() => []);
+  try {
+    const [papan, penjamin, berkas, wajib] = await Promise.all([
+      sbGet('klaim_papan', 'select=*&order=created_at.desc&limit=400'),
+      aman('penjamin', 'select=*&order=nama'),
+      aman('klaim_berkas', 'select=*'),
+      aman('penjamin_berkas_wajib', 'select=*'),
+    ]);
+    bkData = { papan, penjamin, berkas, wajib };
+  } catch (e) { bkData = null; }
 }
 
-function renderBpjsTabContent() {
-  // TAB 1: BERKAS E-KLAIM BPJS
-  if (BPJS_STATE.activeTab === 'claims') {
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Daftar Berkas Klaim Pasien BPJS INA-CBG</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Validasi koding ICD-10, ICD-9-CM &amp; kelengkapan resume medis</p>
-          </div>
-          <button class="btn btn-sm btn-teal" onclick="openSimulasiGrouperModal()">+ Tambah Klaim Baru</button>
-        </div>
+async function renderBpjsClaim() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>No. SEP &amp; Tanggal</th>
-                <th>Pasien &amp; No. RM</th>
-                <th>Poli Layanan</th>
-                <th>Diagnosa ICD-10 &amp; ICD-9-CM</th>
-                <th>Kode CBG &amp; Deskripsi</th>
-                <th>Tarif RS / INA-CBG</th>
-                <th>Kelengkapan Berkas</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${BPJS_STATE.claims.map(c => `
-                <tr>
-                  <td>
-                    <code style="font-weight:700; color:#0A2342;">${c.no_sep}</code>
-                    <div style="font-size:11px; color:var(--text3);">${c.tgl_layanan}</div>
-                  </td>
-                  <td>
-                    <b>${c.pasien}</b>
-                    <div style="font-size:11px; color:var(--text3);">${c.no_rm}</div>
-                  </td>
-                  <td>${c.poli}</td>
-                  <td>
-                    <b>${c.icd10}</b>
-                    <div style="font-size:11px; color:var(--text3);">${c.icd9cm}</div>
-                  </td>
-                  <td>
-                    <span class="badge badge-teal">${c.kode_cbg}</span>
-                    <div style="font-size:11px; color:var(--text);">${c.deskripsi_cbg}</div>
-                  </td>
-                  <td>
-                    <div>RS: Rp ${c.tarif_rs.toLocaleString('id-ID')}</div>
-                    <b style="color:var(--teal);">CBG: Rp ${c.tarif_inacbg.toLocaleString('id-ID')}</b>
-                  </td>
-                  <td><span class="badge ${c.kelengkapan.includes('100%') ? 'badge-success' : 'badge-warning'}">${c.kelengkapan}</span></td>
-                  <td><span class="badge ${c.status === 'Terverifikasi BPJS' ? 'badge-success' : 'badge-teal'}">${c.status}</span></td>
-                  <td>
-                    <button class="btn btn-xs btn-ghost" onclick="alert('Mengunggah berkas e-klaim untuk SEP ${c.no_sep}')">📤 e-Klaim</button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }
+  await bkMuat();
 
-  // TAB 2: BRIDGING SEP VCLAIM
-  if (BPJS_STATE.activeTab === 'sep') {
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Penerbitan &amp; Monitoring SEP (Surat Eligibilitas Peserta)</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Koneksi langsung ke BPJS Kesehatan VClaim API v2.0 via HMAC-SHA256</p>
-          </div>
-          <button class="btn btn-sm btn-teal" onclick="openPenerbitanSepModal()">+ Terbitkan SEP Baru</button>
-        </div>
-
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>No. SEP</th>
-                <th>No. Kartu BPJS</th>
-                <th>Nama Peserta</th>
-                <th>Tanggal Pelayanan</th>
-                <th>Poli Tujuan</th>
-                <th>Jenis Pelayanan</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${BPJS_STATE.sepList.map(s => `
-                <tr>
-                  <td><code style="font-weight:700; color:#0A2342;">${s.noSep}</code></td>
-                  <td>${s.noKartu}</td>
-                  <td><b>${s.nama}</b></td>
-                  <td>${s.tglSep}</td>
-                  <td>${s.poli}</td>
-                  <td>${s.jnsPelayanan}</td>
-                  <td><span class="badge badge-success">${s.status}</span></td>
-                  <td>
-                    <button class="btn btn-xs btn-ghost" onclick="alert('Cetak Lembar SEP ${s.noSep}')">🖨️ Cetak SEP</button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }
-
-  // TAB 3: SIMULATOR GROUPER INA-CBG
-  if (BPJS_STATE.activeTab === 'grouper') {
-    return `
-      <div class="card" style="padding:20px;">
-        <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0 0 14px 0;">🧮 Simulator INA-CBG Tariff Grouper Calculator</h3>
-        <div class="grid-2" style="grid-template-columns:1fr 1fr; gap:20px;">
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div class="form-group">
-              <label>Diagnosa Utama (ICD-10)</label>
-              <select id="grp-icd10" class="input">
-                <option value="E28.2|N-4-10-I|Penyakit Ovarium & Tuba Ringan|580000">E28.2 - Polycystic Ovarian Syndrome (PCOS)</option>
-                <option value="E11.9|E-4-10-I|Diabetes Melitus Tanpa Komplikasi|420000">E11.9 - Type 2 Diabetes Mellitus</option>
-                <option value="I10|I-4-10-I|Hipertensi Esensial Primer|390000">I10 - Essential Hypertension</option>
-                <option value="J06.9|J-4-10-I|Infeksi Saluran Pernapasan Akut|320000">J06.9 - Acute Upper Respiratory Infection</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Prosedur Tindakan (ICD-9-CM)</label>
-              <select id="grp-icd9" class="input">
-                <option value="88.78">88.78 - Diagnostic Ultrasound of Gravid Uterus</option>
-                <option value="90.59">90.59 - Diagnostic Examination of Blood</option>
-                <option value="89.52">89.52 - Electrocardiogram (EKG)</option>
-                <option value="None">Tidak Ada Tindakan Bedah/Invasif</option>
-              </select>
-            </div>
-            <button class="btn btn-teal" onclick="hitungGrouperSimulasi()">⚡ Hitung Tarif INA-CBG</button>
-          </div>
-
-          <div id="grp-result-box" style="background:var(--bg2); border-radius:12px; padding:20px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-            <span style="font-size:12px; color:var(--text3);">Hasil Estimasi Klaim INA-CBG</span>
-            <h2 id="grp-cbg-code" style="font-size:28px; font-weight:900; color:var(--teal); margin:8px 0 4px 0;">N-4-10-I</h2>
-            <h4 id="grp-cbg-desc" style="font-size:14px; font-weight:700; color:var(--navy); margin:0 0 12px 0;">Penyakit Ovarium &amp; Tuba Ringan</h4>
-            <div style="font-size:18px; font-weight:800; color:#22c55e;" id="grp-cbg-tariff">Rp 580.000</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // TAB 4: ASURANSI SWASTA & TPA
-  if (BPJS_STATE.activeTab === 'tpa') {
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Klaim Asuransi Swasta, Korporasi &amp; TPA Partner</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Integrasi portal klaim AdMedika, Mandiri Inhealth, Fullerton &amp; Prudential</p>
-          </div>
-          <button class="btn btn-sm btn-teal" onclick="alert('Form klaim TPA baru')">+ Input Klaim Asuransi</button>
-        </div>
-
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>No. Klaim TPA</th>
-                <th>Provider Asuransi</th>
-                <th>Perusahaan Klien</th>
-                <th>Nama Pasien</th>
-                <th>Total Tagihan RS</th>
-                <th>Disetujui (Approved)</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${BPJS_STATE.tpaClaims.map(t => `
-                <tr>
-                  <td><code>${t.noKlaim}</code></td>
-                  <td><b>${t.asuransi}</b></td>
-                  <td>${t.perusahaan}</td>
-                  <td><b>${t.pasien}</b></td>
-                  <td>Rp ${t.tagihan.toLocaleString('id-ID')}</td>
-                  <td><strong style="color:var(--teal);">Rp ${t.approved.toLocaleString('id-ID')}</strong></td>
-                  <td><span class="badge ${t.status === 'Approved' ? 'badge-success' : 'badge-warning'}">${t.status}</span></td>
-                  <td>
-                    <button class="btn btn-xs btn-ghost" onclick="alert('Kirim invoice tagihan klaim ${t.noKlaim}')">📑 Tagih</button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }
-
-  // TAB 5: REKAP SETTLEMENT & PIUTANG
-  return `
-    <div class="card" style="padding:20px;">
-      <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0 0 14px 0;">💰 Rekap Settlement Pembayaran Klaim BPJS &amp; TPA</h3>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:20px;">
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Total Klaim Diajukan</span>
-          <h2 style="font-size:22px; color:var(--navy); margin:4px 0 0 0;">Rp 184.200.000</h2>
-        </div>
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Settlement Diterima (Lunas)</span>
-          <h2 style="font-size:22px; color:#22c55e; margin:4px 0 0 0;">Rp 178.900.000</h2>
-        </div>
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Piutang Klaim Berjalan</span>
-          <h2 style="font-size:22px; color:#f59e0b; margin:4px 0 0 0;">Rp 5.300.000</h2>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function hitungGrouperSimulasi() {
-  const val = document.getElementById('grp-icd10')?.value || '';
-  const [icd, cbg, desc, tarif] = val.split('|');
-  document.getElementById('grp-cbg-code').textContent = cbg || 'N-4-10-I';
-  document.getElementById('grp-cbg-desc').textContent = desc || 'Penyakit Ovarium & Tuba Ringan';
-  document.getElementById('grp-cbg-tariff').textContent = 'Rp ' + Number(tarif || 580000).toLocaleString('id-ID');
-  if (typeof toast === 'function') toast('✅ Grouping tarif berhasil diperbarui', 'ok');
-}
-
-function openSimulasiGrouperModal() {
-  gantiTabBpjs('grouper');
-}
-
-function openPenerbitanSepModal() {
-  const modalHtml = `
-    <div class="modal-header" style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
-      <div class="modal-title" style="font-size:16px; font-weight:800;">+ Penerbitan SEP BPJS Baru (VClaim 2.0)</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div class="form-group">
-        <label>Nomor Kartu BPJS Pasien</label>
-        <input type="text" id="modal-sep-kartu" class="input" placeholder="000xxxxxxxx">
-      </div>
-      <div class="form-group">
-        <label>Nama Pasien</label>
-        <input type="text" id="modal-sep-nama" class="input" placeholder="Nama Pasien">
-      </div>
-      <div class="grid-2" style="gap:10px;">
-        <div class="form-group">
-          <label>Poli Tujuan</label>
-          <select id="modal-sep-poli" class="input">
-            <option value="Poli Obgyn">Poli Obgyn &amp; Hormon</option>
-            <option value="Poli Penyakit Dalam">Poli Penyakit Dalam</option>
-            <option value="Poli Kulit & Estetika">Poli Kulit &amp; Estetika</option>
-            <option value="Laboratorium PK">Laboratorium Patologi Klinik</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Jenis Pelayanan</label>
-          <select id="modal-sep-jns" class="input">
-            <option value="Rawat Jalan">Rawat Jalan Tingkat Lanjut (RJTL)</option>
-            <option value="Rawat Inap">Rawat Inap Tingkat Lanjut (RITL)</option>
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer" style="margin-top:10px;">
-        <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-        <button class="btn btn-teal" onclick="simpanSepBaru()">💾 Terbitkan SEP &amp; Verifikasi BPJS</button>
-      </div>
-    </div>
-  `;
-  if (typeof openModal === 'function') openModal(modalHtml, 'medium');
-}
-
-function simpanSepBaru() {
-  const kartu = document.getElementById('modal-sep-kartu')?.value;
-  const nama = document.getElementById('modal-sep-nama')?.value;
-  const poli = document.getElementById('modal-sep-poli')?.value;
-  const jns = document.getElementById('modal-sep-jns')?.value;
-
-  if (!nama || !kartu) {
-    if (typeof toast === 'function') toast('Nomor kartu dan nama wajib diisi', 'err');
+  if (bkData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Klaim Penjamin</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data klaim tidak dapat dibaca.</strong><br>
+        Tabel <code>klaim</code> belum ada — jalankan ulang aplikasi agar
+        migrasi <code>0040_klaim_penjamin.sql</code> terpasang.
+      </div>`;
     return;
   }
-
-  const newSep = {
-    noSep: '0032S0120826V' + String(BPJS_STATE.sepList.length + 1).padStart(4, '0'),
-    noKartu: kartu,
-    nama: nama,
-    tglSep: new Date().toISOString().slice(0,10),
-    poli: poli || 'Poli Umum',
-    jnsPelayanan: jns || 'Rawat Jalan',
-    status: 'Terbit'
-  };
-
-  BPJS_STATE.sepList.unshift(newSep);
-  if (typeof closeModalForce === 'function') closeModalForce();
-  if (typeof toast === 'function') toast(`✅ SEP ${newSep.noSep} berhasil diterbitkan!`, 'ok');
-  gantiTabBpjs('sep');
+  bkGambar();
 }
 
-window.renderBpjsClaim = renderBpjsClaim;
-window.gantiTabBpjs = gantiTabBpjs;
-window.hitungGrouperSimulasi = hitungGrouperSimulasi;
-window.openSimulasiGrouperModal = openSimulasiGrouperModal;
-window.openPenerbitanSepModal = openPenerbitanSepModal;
-window.simpanSepBaru = simpanSepBaru;
+function bkGambar() {
+  const K = bkData.papan || [];
+  const belumDiajukan = K.filter(x => ['Draf', 'Berkas Lengkap'].includes(x.status));
+  const berjalan = K.filter(x => ['Diajukan', 'Verifikasi'].includes(x.status));
+  const kembali = K.filter(x => ['Dikembalikan', 'Ditolak'].includes(x.status));
+  const dibayar = K.filter(x => x.status === 'Dibayar');
+  const tua = berjalan.filter(x => Number(x.umur_hari) > (Number(x.tempo_hari) || 30));
+
+  const totalTagih = K.reduce((a, x) => a + Number(x.tarif_rs || 0), 0);
+  const totalBayar = dibayar.reduce((a, x) => a + Number(x.dibayar || 0), 0);
+  const totalSelisih = dibayar.reduce((a, x) => a + Number(x.selisih || 0), 0);
+
+  const daftar = bkFilter === 'draf' ? belumDiajukan
+               : bkFilter === 'berjalan' ? berjalan
+               : bkFilter === 'kembali' ? kembali
+               : bkFilter === 'dibayar' ? dibayar : K;
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Klaim Penjamin</h1>
+        <p class="muted">BPJS, asuransi swasta, dan TPA — kelengkapan berkas dan status pembayaran.</p>
+      </div>
+      ${(bkData.penjamin || []).length
+        ? `<div><button class="btn btn-primary" onclick="bkKlaimBaru()">+ Klaim Baru</button></div>`
+        : ''}
+    </div>
+
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Layar ini <b>tidak menghitung tarif INA-CBG</b>. Tarif dihitung
+      aplikasi E-Klaim resmi dari tabel tarif ber-SK; angka di kolom
+      "Tarif E-Klaim" dimasukkan dari keluarannya. Nomor SEP juga
+      diterbitkan VClaim dan disalin ke sini. Menghitung sendiri
+      menghasilkan angka berbeda dari yang diakui verifikator, dan
+      selisih yang lebih tinggi bisa dibaca sebagai kelebihan tagih.
+    </div>
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab ${bkTab === 'klaim' ? 'active' : ''}"
+              onclick="bkGantiTab('klaim')">Klaim (${K.length})</button>
+      <button class="tab ${bkTab === 'penjamin' ? 'active' : ''}"
+              onclick="bkGantiTab('penjamin')">Penjamin &amp; Berkas Wajib</button>
+    </div>
+
+    ${bkTab === 'penjamin' ? bkTabPenjamin() : `
+      ${tua.length ? `
+        <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                                 border-left:3px solid var(--warning)">
+          <b>${tua.length} klaim melewati janji waktu bayar penjamin</b> dan
+          belum dibayar. Umur klaim dihitung sejak tanggal diajukan.
+        </div>` : ''}
+      ${kembali.length ? `
+        <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                                 border-left:3px solid var(--danger)">
+          <b>${kembali.length} klaim dikembalikan atau ditolak.</b>
+          Alasannya tercatat di tiap baris — tiap putaran bolak-balik
+          menambah minggu ke waktu pembayaran.
+        </div>` : ''}
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+                  gap:12px; margin-bottom:16px">
+        ${bkKartu('Semua klaim', K.length, 'semua', 'var(--text)')}
+        ${bkKartu('Belum diajukan', belumDiajukan.length, 'draf',
+                  belumDiajukan.length ? 'var(--warning)' : 'var(--text3)')}
+        ${bkKartu('Sedang berjalan', berjalan.length, 'berjalan', 'var(--info)')}
+        ${bkKartu('Dikembalikan', kembali.length, 'kembali',
+                  kembali.length ? 'var(--danger)' : 'var(--text3)')}
+        ${bkKartu('Sudah dibayar', dibayar.length, 'dibayar', 'var(--success)')}
+      </div>
+
+      ${K.length ? `
+        <div class="card" style="padding:14px 16px; margin-bottom:12px; display:flex;
+                                 gap:24px; flex-wrap:wrap; font-size:13px">
+          <div><span style="color:var(--text3)">Total ditagih</span><br>
+            <b style="font-size:17px">${bkRp(totalTagih)}</b></div>
+          <div><span style="color:var(--text3)">Sudah dibayar</span><br>
+            <b style="font-size:17px; color:var(--success)">${bkRp(totalBayar)}</b></div>
+          <div><span style="color:var(--text3)">Selisih pada yang dibayar</span><br>
+            <b style="font-size:17px; color:${totalSelisih > 0
+              ? 'var(--danger)' : 'inherit'}">${bkRp(totalSelisih)}</b></div>
+        </div>` : ''}
+
+      ${!daftar.length ? `
+        <div class="card" style="padding:32px; text-align:center">
+          <div style="font-size:28px; opacity:.4; margin-bottom:8px">🧾</div>
+          <div style="font-weight:700; margin-bottom:4px">
+            ${bkFilter === 'semua' ? 'Belum ada klaim tercatat'
+                                   : 'Tidak ada klaim pada kelompok ini'}</div>
+          ${!(bkData.penjamin || []).length ? `
+            <div style="font-size:13px; color:var(--text3); max-width:460px; margin:0 auto">
+              Daftarkan penjamin beserta berkas yang diwajibkannya lebih
+              dulu, di tab Penjamin &amp; Berkas Wajib.</div>` : ''}
+        </div>` : `
+        <div class="card" style="overflow-x:auto">
+          <table class="data-table"><thead><tr>
+            <th>No. Klaim</th><th>Pasien</th><th>Penjamin</th>
+            <th>SEP / Kartu</th><th>CBG</th>
+            <th style="text-align:right">Tarif RS</th>
+            <th style="text-align:right">Tarif E-Klaim</th>
+            <th style="text-align:right">Dibayar</th>
+            <th style="text-align:right">Selisih</th>
+            <th style="text-align:right">Berkas</th>
+            <th style="text-align:right">Umur</th>
+            <th>Status</th><th></th>
+          </tr></thead><tbody>
+          ${daftar.map(k => {
+            const lengkap = Number(k.berkas_ada) === Number(k.berkas_total)
+                         && Number(k.berkas_total) > 0;
+            const lewatTempo = Number(k.umur_hari) > (Number(k.tempo_hari) || 30);
+            return `<tr style="${bkPilih === k.id ? 'outline:2px solid var(--primary)' : ''}">
+              <td><b>${bkEsc(k.no_klaim)}</b>
+                <div style="font-size:11px; color:var(--text3)">${bkTgl(k.created_at)}</div></td>
+              <td>${bkEsc(k.patient_name || '—')}</td>
+              <td style="font-size:12px">${bkEsc(k.penjamin_nama || '—')}</td>
+              <td style="font-size:11px">${bkEsc(k.no_sep || '—')}
+                <div style="color:var(--text3)">${bkEsc(k.no_kartu || '')}</div></td>
+              <td style="font-size:12px">${bkEsc(k.kode_cbg || '—')}</td>
+              <td style="text-align:right">${bkRp(k.tarif_rs)}</td>
+              <td style="text-align:right">${bkRp(k.tarif_dari_eklaim)}</td>
+              <td style="text-align:right">${bkRp(k.dibayar)}</td>
+              <td style="text-align:right; font-weight:${k.selisih ? '700' : '400'};
+                         color:${Number(k.selisih) > 0 ? 'var(--danger)' : 'inherit'}">
+                ${bkRp(k.selisih)}</td>
+              <td style="text-align:right; color:${lengkap
+                ? 'var(--success)' : 'var(--warning)'}">
+                ${k.berkas_ada}/${k.berkas_total}</td>
+              <td style="text-align:right; color:${lewatTempo
+                ? 'var(--warning)' : 'inherit'}">
+                ${k.umur_hari != null ? k.umur_hari + ' hr' : '—'}</td>
+              <td><span style="font-weight:600">${bkEsc(k.status)}</span>
+                ${k.alasan_kembali ? `<div style="font-size:11px; color:var(--danger)">
+                  ${bkEsc(k.alasan_kembali)}</div>` : ''}</td>
+              <td style="white-space:nowrap">
+                <button class="btn btn-sm" onclick="bkBerkas(${k.id})">Berkas</button>
+                ${['Draf','Berkas Lengkap','Dikembalikan'].includes(k.status)
+                  ? `<button class="btn btn-sm btn-primary" onclick="bkAjukan(${k.id})">
+                       Ajukan</button>` : ''}
+                ${['Diajukan','Verifikasi','Disetujui'].includes(k.status)
+                  ? `<button class="btn btn-sm" onclick="bkStatus(${k.id})">
+                       Ubah Status</button>` : ''}
+              </td>
+            </tr>`;
+          }).join('')}
+          </tbody></table>
+        </div>`}
+
+      ${bkPilih ? bkPanelBerkas() : ''}`}`;
+}
+
+function bkKartu(label, angka, kunci, warna) {
+  return `<div class="card" style="padding:14px; cursor:pointer;
+            ${bkFilter === kunci ? 'outline:2px solid var(--primary)' : ''}"
+            onclick="bkSaring('${kunci}')">
+    <div style="font-size:12px; color:var(--text3)">${label}</div>
+    <div style="font-size:22px; font-weight:800; color:${warna}">${angka}</div>
+  </div>`;
+}
+
+function bkGantiTab(t) { bkTab = t; bkPilih = null; bkGambar(); }
+function bkSaring(k) { bkFilter = k; bkGambar(); }
+
+function bkTabPenjamin() {
+  const P = bkData.penjamin || [];
+  const W = bkData.wajib || [];
+
+  if (!P.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🏦</div>
+      <div style="font-weight:700; margin-bottom:6px">Belum ada penjamin terdaftar</div>
+      <div style="font-size:13px; color:var(--text3); max-width:520px; margin:0 auto 14px;
+                  line-height:1.8">
+        Tiap penjamin menuntut berkas yang berbeda. Daftarnya sengaja
+        dibiarkan kosong: menebak persyaratan lalu memakainya untuk
+        meloloskan pengajuan berarti klaim dikirim tanpa berkas yang
+        sebenarnya diminta, dan baru ketahuan saat dikembalikan
+        berminggu-minggu kemudian.
+      </div>
+      <button class="btn btn-primary" onclick="bkPenjaminBaru()">+ Daftarkan Penjamin</button>
+    </div>`;
+  }
+
+  return `
+    <div style="display:flex; justify-content:flex-end; margin-bottom:10px">
+      <button class="btn btn-sm btn-primary" onclick="bkPenjaminBaru()">
+        + Penjamin</button>
+    </div>
+    <div style="display:grid; gap:12px">
+      ${P.map(p => {
+        const w = W.filter(x => x.penjamin_id === p.id);
+        return `<div class="card" style="padding:16px">
+          <div style="display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap">
+            <div>
+              <div style="font-weight:700">${bkEsc(p.nama)}</div>
+              <div style="font-size:12px; color:var(--text3)">
+                ${bkEsc(p.kode)}${p.jenis ? ' · ' + bkEsc(p.jenis) : ''}
+                ${p.tempo_hari ? ' · janji bayar ' + p.tempo_hari + ' hari' : ''}</div>
+            </div>
+            <button class="btn btn-sm" onclick="bkBerkasWajib(${p.id})">
+              + Berkas Wajib</button>
+          </div>
+          <div style="margin-top:10px; font-size:12px; line-height:1.8">
+            ${w.length
+              ? 'Berkas wajib: ' + w.map(x =>
+                  bkEsc(x.jenis_berkas) + (x.wajib ? '' : ' (opsional)')).join(', ')
+              : '<span style="color:var(--warning)">Belum ada daftar berkas wajib — '
+                + 'kelengkapan klaim untuk penjamin ini belum bisa diperiksa.</span>'}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function bkBerkas(id) {
+  bkPilih = (bkPilih === id) ? null : id;
+  bkGambar();
+}
+
+function bkPanelBerkas() {
+  const k = (bkData.papan || []).find(x => x.id === bkPilih);
+  if (!k) return '';
+  const B = (bkData.berkas || []).filter(b => b.klaim_id === bkPilih);
+
+  return `
+    <div class="card" style="padding:18px; margin-top:16px">
+      <div style="font-weight:800; margin-bottom:2px">
+        Kelengkapan Berkas — ${bkEsc(k.no_klaim)}</div>
+      <div style="font-size:12px; color:var(--text3); margin-bottom:12px">
+        ${bkEsc(k.patient_name || '')} · ${bkEsc(k.penjamin_nama || '')}</div>
+
+      ${!B.length ? `
+        <div style="padding:16px; background:var(--bg2); border-radius:8px; font-size:13px;
+                    color:var(--text3)">
+          Belum ada daftar berkas. Tetapkan berkas wajib untuk penjamin ini
+          di tab Penjamin, lalu buat ulang klaimnya.
+        </div>` : `
+        <table class="data-table"><thead><tr>
+          <th>Jenis Berkas</th><th>Ada</th><th>Dicek</th><th>Catatan</th><th></th>
+        </tr></thead><tbody>
+        ${B.map(b => `<tr>
+          <td>${bkEsc(b.jenis_berkas)}</td>
+          <td>${b.ada
+            ? '<span style="color:var(--success); font-weight:700">✓ ada</span>'
+            : '<span style="color:var(--warning)">belum</span>'}</td>
+          <td style="font-size:12px">${bkEsc(b.dicek_oleh || '—')}</td>
+          <td style="font-size:12px">${bkEsc(b.catatan || '—')}</td>
+          <td><button class="btn btn-sm" onclick="bkTandaiBerkas(${b.id}, ${!b.ada})">
+            ${b.ada ? 'Batalkan' : 'Tandai Ada'}</button></td>
+        </tr>`).join('')}
+        </tbody></table>`}
+    </div>`;
+}
+
+async function bkTandaiBerkas(id, ada) {
+  try {
+    await sbPatch('klaim_berkas', id, {
+      ada: ada,
+      dicek_oleh: ada ? (window.currentUsername || 'petugas') : null,
+      dicek_at: ada ? new Date().toISOString() : null,
+    });
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal memperbarui berkas: ' + e.message); }
+}
+
+async function bkPenjaminBaru() {
+  const kode = prompt('Kode penjamin (mis. BPJS):');
+  if (!kode) return;
+  const nama = prompt('Nama penjamin:');
+  if (!nama) return;
+  const jenis = prompt('Jenis (BPJS / Asuransi / TPA / Korporat):', 'BPJS');
+  if (jenis === null) return;
+  const tempo = prompt('Janji waktu bayar (hari):', '');
+  if (tempo === null) return;
+
+  try {
+    await sbPost('penjamin', {
+      kode: kode.trim().toUpperCase(), nama: nama.trim(),
+      jenis: jenis || null,
+      tempo_hari: tempo ? parseInt(tempo, 10) : null,
+    });
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal menyimpan penjamin: ' + e.message); }
+}
+
+async function bkBerkasWajib(penjaminId) {
+  const jenis = prompt('Jenis berkas yang diwajibkan penjamin ini\n'
+    + '(mis. Resume Medis, Billing, Hasil Penunjang, Fotokopi Kartu):');
+  if (!jenis) return;
+  const wajib = confirm('Berkas ini WAJIB (menahan pengajuan bila belum ada)?\n\n'
+    + 'OK = wajib, Batal = opsional');
+  try {
+    await sbPost('penjamin_berkas_wajib', {
+      penjamin_id: penjaminId, jenis_berkas: jenis.trim(), wajib: wajib,
+    });
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal menyimpan berkas wajib: ' + e.message); }
+}
+
+async function bkKlaimBaru() {
+  const P = bkData.penjamin || [];
+  const pilihan = P.map((p, i) => `${i + 1}. ${p.nama}`).join('\n');
+  const n = prompt(`Penjamin:\n\n${pilihan}\n\nNomor:`);
+  if (!n) return;
+  const p = P[parseInt(n, 10) - 1];
+  if (!p) { alert('Nomor tidak dikenal.'); return; }
+
+  const pasien = prompt('Nama pasien:');
+  if (!pasien) return;
+  const kartu = prompt('Nomor kartu peserta:', '');
+  if (kartu === null) return;
+  const sep = prompt('Nomor SEP (dari VClaim, kosongkan bila belum terbit):', '');
+  if (sep === null) return;
+  const rawat = prompt('Jenis rawat (Rawat Jalan / Rawat Inap):', 'Rawat Jalan');
+  if (rawat === null) return;
+  const dx = prompt('Diagnosa utama (ICD-10):', '');
+  if (dx === null) return;
+  const tarif = prompt('Tarif rumah sakit (Rp):', '0');
+  if (tarif === null) return;
+
+  try {
+    const r = await sbRpc('klaim_buat', {
+      p_data: {
+        penjamin_id: String(p.id), patient_name: pasien,
+        no_kartu: kartu || null, no_sep: sep || null,
+        jenis_rawat: rawat || null, diagnosa_utama: dx || null,
+        tarif_rs: parseFloat(tarif) || 0,
+        oleh: (window.currentUsername || null),
+      },
+    });
+    if (r && r.error) { alert(r.error); return; }
+    alert(`Klaim ${r.no_klaim} dibuat.\n`
+      + `${r.berkas_disiapkan} berkas disiapkan untuk dilengkapi.`
+      + (r.catatan ? `\n\n${r.catatan}` : ''));
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal membuat klaim: ' + e.message); }
+}
+
+async function bkAjukan(id) {
+  try {
+    const r = await sbRpc('klaim_ajukan', {
+      p_klaim_id: id, p_oleh: (window.currentUsername || 'petugas'),
+    });
+    if (r && r.error) {
+      const kurang = Array.isArray(r.kurang) ? r.kurang.join('\n• ') : '';
+      alert(r.error + (kurang ? '\n\nBelum ada:\n• ' + kurang : ''));
+      return;
+    }
+    alert(`Klaim ${r.no_klaim} diajukan.`);
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal mengajukan klaim: ' + e.message); }
+}
+
+async function bkStatus(id) {
+  const st = prompt('Status baru:\n\n'
+    + 'Verifikasi / Disetujui / Dikembalikan / Ditolak / Dibayar');
+  if (!st) return;
+  let alasan = null, dibayar = null;
+  if (['Dikembalikan', 'Ditolak'].includes(st)) {
+    alasan = prompt('Alasan (wajib):');
+    if (!alasan) return;
+  }
+  if (st === 'Dibayar') {
+    const v = prompt('Jumlah yang dibayar penjamin (Rp):');
+    if (v === null) return;
+    dibayar = parseFloat(v);
+  }
+
+  try {
+    const r = await sbRpc('klaim_ubah_status', {
+      p_klaim_id: id, p_status: st, p_alasan: alasan,
+      p_dibayar: dibayar, p_oleh: (window.currentUsername || 'petugas'),
+    });
+    if (r && r.error) { alert(r.error); return; }
+    await renderBpjsClaim();
+  } catch (e) { alert('Gagal mengubah status: ' + e.message); }
+}
+
+window.renderBpjsClaim  = renderBpjsClaim;
+window.bkGantiTab       = bkGantiTab;
+window.bkSaring         = bkSaring;
+window.bkBerkas         = bkBerkas;
+window.bkTandaiBerkas   = bkTandaiBerkas;
+window.bkPenjaminBaru   = bkPenjaminBaru;
+window.bkBerkasWajib    = bkBerkasWajib;
+window.bkKlaimBaru      = bkKlaimBaru;
+window.bkAjukan         = bkAjukan;
+window.bkStatus         = bkStatus;
