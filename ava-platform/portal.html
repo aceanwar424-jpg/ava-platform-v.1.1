@@ -891,7 +891,25 @@
       transform: scale(1.08);
       box-shadow: 0 12px 30px rgba(37, 211, 102, 0.6);
     }
-  </style>
+  
+  /* ── Menu turun pada bilah atas ────────────────────────────────── */
+  .menu-turun {
+    display: none;
+    position: absolute; top: calc(100% + 8px); left: 0; z-index: 120;
+    min-width: 230px; padding: 6px;
+    background: #0b2342; border: 1px solid rgba(212,175,55,0.28);
+    border-radius: 12px; box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+  }
+  .menu-turun.buka { display: block; }
+  .menu-turun a {
+    display: block; padding: 9px 12px; border-radius: 8px;
+    font-size: 13px; font-weight: 600; color: #cbd5e1; text-decoration: none;
+  }
+  .menu-turun a:hover { background: rgba(212,175,55,0.14); color: #f5d77a; }
+  @media (max-width: 720px) {
+    .menu-turun { position: static; min-width: 0; box-shadow: none; margin: 6px 0; }
+  }
+</style>
 </head>
 <body>
   <div class="ambient-glow"></div>
@@ -910,15 +928,41 @@
         </div>
       </div>
 
-      <nav class="header-links" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-        <a href="#hero" class="btn-header btn-header-ghost">🏠 Beranda</a>
-        <a href="#pillars" class="btn-header btn-header-ghost">🏛️ 6 Pilar Bisnis</a>
-        <a href="#packages" class="btn-header btn-header-ghost">🧪 Paket Medis</a>
-        <a href="#stats" class="btn-header btn-header-ghost">📊 Capaian</a>
-        <a href="#founder" class="btn-header btn-header-ghost">👤 Founder</a>
-        <a href="#quick-hub" class="btn-header btn-header-ghost">🌐 Portal Hub</a>
-        <a href="#login-box" class="btn-header btn-header-primary" style="background:linear-gradient(135deg, #d4af37 0%, #b45309 100%); color:#0a2342; font-weight:800; border:none; box-shadow:0 4px 14px rgba(212,175,55,0.4);">
-          🔐 Masuk Portal (SSO)
+      <nav class="header-links" style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+        <a href="#hero" class="btn-header btn-header-ghost">Beranda</a>
+
+        <!-- Menu dikelompokkan per AUDIENS, bukan per fitur. Pengunjung
+             datang sebagai pasien, perusahaan, atau faskes — bukan sebagai
+             "pengguna paket medis". Pola yang sama dipakai Virtu DigiLab. -->
+        <div class="menu-punya" style="position:relative;">
+          <button class="btn-header btn-header-ghost" onclick="alihMenu(event,'m-layanan')"
+            style="border:none; cursor:pointer; font:inherit;">Layanan &#9662;</button>
+          <div id="m-layanan" class="menu-turun">
+            <a href="#layanan-pasien">Untuk Pasien &amp; Keluarga</a>
+            <a href="#layanan-korporat">Untuk Perusahaan (MCU)</a>
+            <a href="#layanan-faskes">Untuk Faskes &amp; Lab</a>
+            <a href="#packages">Paket Pemeriksaan</a>
+          </div>
+        </div>
+
+        <div class="menu-punya" style="position:relative;">
+          <button class="btn-header btn-header-ghost" onclick="alihMenu(event,'m-tentang')"
+            style="border:none; cursor:pointer; font:inherit;">Tentang &#9662;</button>
+          <div id="m-tentang" class="menu-turun">
+            <a href="#pillars">6 Pilar Bisnis</a>
+            <a href="#founder">Founder</a>
+            <a href="#stats">Capaian &amp; Standar</a>
+            <a href="#kontak">Kontak &amp; Lokasi</a>
+          </div>
+        </div>
+
+        <a href="#artikel" class="btn-header btn-header-ghost">Artikel</a>
+        <a href="#quick-hub" class="btn-header btn-header-ghost">Portal Hub</a>
+
+        <a href="#" onclick="bukaMasuk();return false" class="btn-header btn-header-primary"
+           style="background:linear-gradient(135deg, #d4af37 0%, #b45309 100%); color:#0a2342;
+                  font-weight:800; border:none; box-shadow:0 4px 14px rgba(212,175,55,0.4);">
+          Masuk Portal
         </a>
       </nav>
     </header>
@@ -948,7 +992,7 @@
         <a href="#quick-hub" style="display:inline-flex; align-items:center; gap:8px; background:var(--sky); color:#fff; padding:12px 24px; border-radius:12px; font-size:13.5px; font-weight:700; text-decoration:none; box-shadow:0 4px 16px rgba(14,165,233,0.35); transition:all 0.2s;">
           🚀 Jelajahi Subdomain Hub &rarr;
         </a>
-        <a href="#login-box" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid var(--gold); color:var(--gold-light); padding:12px 24px; border-radius:12px; font-size:13.5px; font-weight:700; text-decoration:none;">
+        <a href="#" onclick="bukaMasuk();return false" style="display:inline-flex; align-items:center; gap:8px; background:rgba(212,175,55,0.15); border:1.5px solid var(--gold); color:var(--gold-light); padding:12px 24px; border-radius:12px; font-size:13.5px; font-weight:700; text-decoration:none;">
           🔐 Single Sign-On (SSO) Gateway
         </a>
         <a href="https://wa.me/628170648288?text=Halo%20AVA%20Health%2C%20saya%20ingin%20berkonsultasi%20layanan%20kesehatan." target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; background:rgba(37,211,102,0.12); border:1px solid rgba(37,211,102,0.35); color:#4ADE80; padding:12px 20px; border-radius:12px; font-size:13.5px; font-weight:700; text-decoration:none;">
@@ -982,7 +1026,23 @@
     </section>
 
     <!-- ═══ DEDICATED SSO LOGIN GATEWAY SECTION ═══ -->
-    <section id="login-box" style="max-width:880px; margin:0 auto 54px; padding:0 16px;">
+    <!-- ═══ MODAL MASUK PORTAL ═══
+     Kotak masuk dulu berada di urutan ketiga halaman, tepat di bawah hero —
+     sehingga pengunjung yang membuka avahealth.sbs langsung disambut formulir
+     login, bukan oleh situs perusahaannya. Situs publik seharusnya bisa
+     dibaca tanpa akun; yang butuh masuk hanya staf dan klien.
+     Isinya dipindahkan apa adanya ke sini — seluruh id (sso-email, sso-pass,
+     sso-btn, sso-err) dipertahankan supaya handleSSOLogin() tetap bekerja. -->
+<div id="sso-overlay" onclick="if(event.target===this) tutupMasuk()"
+     style="display:none; position:fixed; inset:0; z-index:200;
+            background:rgba(3,10,22,0.78); backdrop-filter:blur(6px);
+            padding:24px; overflow-y:auto;">
+  <div style="max-width:880px; margin:5vh auto; position:relative;">
+    <button onclick="tutupMasuk()" aria-label="Tutup"
+      style="position:absolute; top:-14px; right:-6px; z-index:2; width:36px; height:36px;
+             border-radius:50%; border:1px solid rgba(255,255,255,0.18);
+             background:#0a2342; color:#fff; font-size:17px; cursor:pointer;">&times;</button>
+
       <div class="sso-card" style="box-shadow:0 20px 50px rgba(0,0,0,0.5); border:1.5px solid rgba(212,175,55,0.35);">
         <div class="sso-card-header" style="border-bottom:1px solid var(--card-border); padding-bottom:14px; margin-bottom:18px;">
           <div>
@@ -1057,29 +1117,80 @@
           Kredensial Master Default: <code>admin@avahealth.sbs</code> / <code>12345678</code>
         </div>
       </div>
-    </section>
+    
+  </div>
+</div>
 
-    <!-- ═══ STATS SHOWCASE STRIP (Standar AVA & Virtu DigiLab) ═══ -->
-    <section class="stats-strip" id="stats">
-      <div class="stat-box">
-        <div class="stat-num">20.000+</div>
-        <div class="stat-lbl">Pasien &amp; Karyawan</div>
-        <div class="stat-sub">Terlayani aktif lintas industri manufaktur, perbankan, BUMN &amp; ritel.</div>
+
+    
+
+    
+    <!-- ═══ LAYANAN PER AUDIENS ═══
+         Pintu masuk berdasarkan SIAPA pengunjungnya. Tiap kartu mengarah ke
+         portal yang memang melayani mereka — bukan ke daftar fitur. -->
+    <section id="layanan" style="max-width:1200px; margin:0 auto 56px; padding:0 16px;">
+      <div style="text-align:center; margin-bottom:26px;">
+        <h2 style="font-size:26px; font-weight:800; color:#fff; margin-bottom:8px;">
+          Anda datang sebagai&hellip;
+        </h2>
+        <p style="font-size:14px; color:var(--text-muted); max-width:620px; margin:0 auto;">
+          Tiap kelompok punya pintu masuk dan layanannya sendiri.
+        </p>
       </div>
-      <div class="stat-box">
-        <div class="stat-num">530+</div>
-        <div class="stat-lbl">Parameter Uji Terstandarisasi</div>
-        <div class="stat-sub">Katalog master terpetakan LOINC (OBX-3) &amp; UCUM (OBX-6) siap integrasi LIS.</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">10.700</div>
-        <div class="stat-lbl">Kapasitas MCU On-Site Massal</div>
-        <div class="stat-sub">Rekor penyelesaian medical check-up ribuan karyawan dalam 1 project on-site.</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">100%</div>
-        <div class="stat-lbl">Kepatuhan Regulasi Nasional</div>
-        <div class="stat-sub">SATUSEHAT HL7 FHIR Kemenkes RI, ISO 15189:2022 &amp; UU PDP No. 27/2022.</div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:18px;">
+
+        <div id="layanan-pasien" class="card-audiens" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:24px;">
+          <div style="font-size:30px; margin-bottom:12px;">&#129658;</div>
+          <h3 style="font-size:17px; font-weight:800; color:#fff; margin-bottom:8px;">Pasien &amp; Keluarga</h3>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+            Pemeriksaan laboratorium, konsultasi poliklinik, dan kunjungan
+            perawat ke rumah. Hasil dapat diunduh sendiri setelah dirilis dokter.
+          </p>
+          <ul style="list-style:none; padding:0; margin:0 0 16px; font-size:12.5px; color:var(--text-dim); line-height:2;">
+            <li>&bull; Pendaftaran &amp; antrian poliklinik</li>
+            <li>&bull; Pemeriksaan lab &amp; unduh hasil</li>
+            <li>&bull; Home care &mdash; sampling ke rumah</li>
+          </ul>
+          <a href="https://apps.avahealth.sbs" style="display:inline-flex; align-items:center; gap:7px; background:var(--sky); color:#fff; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none;">
+            Buka Portal Pasien &rarr;
+          </a>
+        </div>
+
+        <div id="layanan-korporat" class="card-audiens" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:24px;">
+          <div style="font-size:30px; margin-bottom:12px;">&#127970;</div>
+          <h3 style="font-size:17px; font-weight:800; color:#fff; margin-bottom:8px;">Perusahaan &amp; Institusi</h3>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+            Medical check-up karyawan, di kantor Anda maupun di klinik kami.
+            PIC perusahaan mengelola roster karyawannya sendiri lewat portal.
+          </p>
+          <ul style="list-style:none; padding:0; margin:0 0 16px; font-size:12.5px; color:var(--text-dim); line-height:2;">
+            <li>&bull; MCU massal on-site &amp; walk-in</li>
+            <li>&bull; Kelola karyawan &amp; paket sendiri</li>
+            <li>&bull; Tagihan, kuota kontrak &amp; sertifikat</li>
+          </ul>
+          <a href="https://corp.avahealth.sbs" style="display:inline-flex; align-items:center; gap:7px; background:rgba(212,175,55,0.16); border:1.5px solid var(--gold); color:var(--gold-light); padding:10px 18px; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none;">
+            Portal Klien Korporat &rarr;
+          </a>
+        </div>
+
+        <div id="layanan-faskes" class="card-audiens" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:24px;">
+          <div style="font-size:30px; margin-bottom:12px;">&#128187;</div>
+          <h3 style="font-size:17px; font-weight:800; color:#fff; margin-bottom:8px;">Faskes &amp; Laboratorium</h3>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+            Sistem yang kami pakai sendiri, dilisensikan untuk klinik dan
+            laboratorium lain. Berjalan lokal &mdash; data tetap di komputer Anda.
+          </p>
+          <ul style="list-style:none; padding:0; margin:0 0 16px; font-size:12.5px; color:var(--text-dim); line-height:2;">
+            <li>&bull; HIS, LIS &amp; RIS terintegrasi</li>
+            <li>&bull; Jembatan SATUSEHAT &amp; analyzer ASTM</li>
+            <li>&bull; Katalog 532 parameter siap pakai</li>
+          </ul>
+          <a href="https://tech.avahealth.sbs" style="display:inline-flex; align-items:center; gap:7px; background:rgba(56,189,248,0.14); border:1px solid rgba(56,189,248,0.4); color:#7dd3fc; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none;">
+            AVA Tech &mdash; Lisensi Sistem &rarr;
+          </a>
+        </div>
+
       </div>
     </section>
 
@@ -1564,6 +1675,77 @@
       </div>
     </section>
 
+    
+    <!-- ═══ ARTIKEL ═══
+         Ketiga situs rujukan punya kanal artikel/rilis. Kerangkanya
+         disiapkan di sini, TANPA artikel karangan: menulis tiga judul palsu
+         hanya untuk mengisi ruang membuat situs tampak aktif padahal tidak,
+         dan pengunjung yang mengkliknya menemukan halaman kosong. -->
+    <section id="artikel" style="max-width:1200px; margin:0 auto 56px; padding:0 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:22px;">
+        <div>
+          <h2 style="font-size:26px; font-weight:800; color:#fff; margin-bottom:6px;">Artikel &amp; Edukasi Kesehatan</h2>
+          <p style="font-size:14px; color:var(--text-muted); margin:0;">Panduan pemeriksaan, informasi layanan, dan kabar dari AVA GLOBAL.</p>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:36px 24px; text-align:center;">
+        <div style="font-size:30px; opacity:0.5; margin-bottom:10px;">&#128220;</div>
+        <div style="font-size:14.5px; font-weight:700; color:#fff; margin-bottom:6px;">Belum ada artikel terbit</div>
+        <p style="font-size:13px; color:var(--text-dim); max-width:520px; margin:0 auto; line-height:1.7;">
+          Artikel yang sudah ditulis di modul <em>Wiki &amp; Dokumen Mutu</em> akan
+          tampil di sini setelah ditandai terbit.
+        </p>
+      </div>
+    </section>
+
+    <!-- ═══ KONTAK & LOKASI ═══
+         Situs perusahaan tanpa alamat dan nomor telepon yang bisa dihubungi
+         sulit dipercaya calon klien korporat. Alamat kantor SENGAJA belum
+         diisi — data itu tidak ada di repositori, dan alamat karangan pada
+         badan usaha berizin adalah kekeliruan yang mahal. -->
+    <section id="kontak" style="max-width:1200px; margin:0 auto 56px; padding:0 16px;">
+      <div style="text-align:center; margin-bottom:26px;">
+        <h2 style="font-size:26px; font-weight:800; color:#fff; margin-bottom:8px;">Hubungi Kami</h2>
+        <p style="font-size:14px; color:var(--text-muted); margin:0;">Untuk pertanyaan layanan, kerja sama korporat, atau lisensi sistem.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px;">
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:22px;">
+          <div style="font-size:11px; font-weight:800; color:var(--gold-light); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">WhatsApp</div>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+            Cara tercepat. Untuk janji temu, pertanyaan hasil, dan permintaan penawaran.
+          </p>
+          <a href="https://wa.me/628170648288" target="_blank" rel="noopener"
+             style="display:inline-flex; align-items:center; gap:7px; background:rgba(37,211,102,0.14); border:1px solid rgba(37,211,102,0.4); color:#4ADE80; padding:10px 18px; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none;">
+            Chat WhatsApp &rarr;
+          </a>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.09); border-radius:16px; padding:22px;">
+          <div style="font-size:11px; font-weight:800; color:var(--gold-light); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Surel</div>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.65; margin-bottom:14px;">
+            Untuk kerja sama, penawaran resmi, dan dokumen kontrak.
+          </p>
+          <a href="mailto:admin@avahealth.sbs"
+             style="display:inline-block; font-size:13.5px; font-weight:700; color:#7dd3fc; text-decoration:none;">
+            admin@avahealth.sbs
+          </a>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.14); border-radius:16px; padding:22px;">
+          <div style="font-size:11px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">Kantor &amp; Cabang</div>
+          <p style="font-size:13px; color:var(--text-dim); line-height:1.65; margin:0;">
+            Alamat kantor dan daftar cabang belum diisi.
+            Lengkapi di <code style="font-size:12px;">portal.html</code> bagian
+            <em>Kontak &amp; Lokasi</em> sebelum situs dipakai menghadap klien.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
     <!-- ═══ FOOTER ═══ -->
     <footer class="site-footer">
       <div class="footer-flex">
@@ -1698,7 +1880,54 @@
       setTimeout(() => { t.style.display = 'none'; }, 3500);
     }
 
-    async function handleSSOLogin(event) {
+    // ── Menu turun bilah atas ─────────────────────────────────────────────
+function alihMenu(ev, id) {
+  ev.preventDefault();
+  ev.stopPropagation();
+  const t = document.getElementById(id);
+  const sedangBuka = t && t.classList.contains('buka');
+  document.querySelectorAll('.menu-turun').forEach(function (m) { m.classList.remove('buka'); });
+  if (t && !sedangBuka) t.classList.add('buka');
+}
+window.alihMenu = alihMenu;
+
+// Klik di mana pun menutup menu — tanpa ini menu tertinggal terbuka
+// saat pengunjung menggulir ke bawah.
+document.addEventListener('click', function () {
+  document.querySelectorAll('.menu-turun').forEach(function (m) { m.classList.remove('buka'); });
+});
+
+// ── Modal masuk portal ────────────────────────────────────────────────
+//
+// Situs publik harus bisa dibaca tanpa akun. Formulir masuk dipanggil
+// hanya ketika diminta, bukan menghadang di layar pertama.
+function bukaMasuk() {
+  const o = document.getElementById('sso-overlay');
+  if (!o) return;
+  o.style.display = 'block';
+  document.body.style.overflow = 'hidden';   // cegah dua bilah gulir
+  setTimeout(function () {
+    const el = document.getElementById('sso-email');
+    if (el) el.focus();
+  }, 60);
+}
+
+function tutupMasuk() {
+  const o = document.getElementById('sso-overlay');
+  if (!o) return;
+  o.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+window.bukaMasuk = bukaMasuk;
+window.tutupMasuk = tutupMasuk;
+
+// Esc menutup — pengunjung yang salah klik tidak perlu mencari tombol tutup.
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') tutupMasuk();
+});
+
+async function handleSSOLogin(event) {
       event.preventDefault();
       const email = document.getElementById('sso-email').value.trim();
       const pass = document.getElementById('sso-pass').value;
