@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis, logistik, mutu, konfigurasi |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 162 — 🟢 131 ada · 🟡 4 sebagian · ⚪ 27 belum dibuat
+**Total menu terpetakan:** 167 — 🟢 147 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
 
 ---
 
@@ -69,8 +69,8 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | 🟢 | Tenant & Klien Faskes | `tenants` | Faskes pemakai sistem, paket, kuota & pemakaian |
 | 🟢 | Lisensi Instalasi | `lisensi` | Status lisensi Ed25519 & sidik mesin |
-| ⚪ | Penerbitan & Aktivasi Lisensi | `tech-aktivasi` | Buat berkas lisensi untuk mesin klien |
-| ⚪ | Telemetri Instalasi Klien | `tech-telemetri` | Versi terpasang, kesehatan, dan pemakaian per klien |
+| 🟢 | Penerbitan & Aktivasi Lisensi | `tech-aktivasi` | Buat berkas lisensi untuk mesin klien |
+| 🟢 | Telemetri Instalasi Klien | `tech-telemetri` | Versi terpasang, kesehatan, dan pemakaian per klien |
 
 **Komersial Sistem**
 
@@ -79,7 +79,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Prospek Klien SaaS | `leads` | Faskes calon pengguna, dari perkenalan ke kontrak |
 | 🟢 | Penawaran Lisensi | `penawaran` | Surat penawaran paket SaaS HIS/LIS |
 | 🟢 | Kontrak & PKS Lisensi | `mou` | Perjanjian lisensi & pengingat perpanjangan |
-| ⚪ | Paket & Daftar Harga | `tech-harga` | Definisi paket lisensi beserta kuota dan tarifnya |
+| 🟢 | Paket & Daftar Harga | `tech-harga` | Definisi paket lisensi beserta kuota dan tarifnya |
 | 🟢 | Tagihan Langganan | `finance` | Faktur langganan klien & status pelunasan |
 
 **Interoperabilitas**
@@ -123,7 +123,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Anamnesa & Tanda Vital | `anamnesa` | Keluhan, riwayat, dan pemeriksaan awal |
 | 🟢 | Rawat Inap & Bed Management | `inpatient` | Mutasi tempat tidur & resume pulang |
 | 🟢 | Arsip Rekam Medis | `medrecord` | Riwayat kunjungan dan berkas pasien |
-| ⚪ | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
+| 🟢 | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
 | ⚪ | Tindakan & Prosedur | `his-procedures` | Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya |
 | ⚪ | Vaksinasi & Imunisasi | `his-immunization` | Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT |
 
@@ -152,7 +152,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟡 | Integrasi SATUSEHAT | `satusehat` | Pengiriman Encounter & Condition ke Kemenkes |
 | 🟢 | Izin & Kepatuhan Faskes | `compliance-tracker` | Masa berlaku izin operasional dan SIP nakes |
 | 🟢 | Laporan RL Kemenkes | `rl-reports` | Rekapitulasi RL terisi dari data operasional |
-| ⚪ | Master Rekam Medis (MPI) | `his-mpi` | Penggabungan pasien duplikat, riwayat merge, dan penomoran rekam medis. Layanannya sudah ada di js/core/mpiService.js — layarnya belum |
+| 🟢 | Master Rekam Medis (MPI) | `his-mpi` | Penggabungan pasien duplikat, riwayat merge, dan penomoran rekam medis |
 | ⚪ | Kelengkapan &amp; Retensi Rekam Medis | `his-mr-governance` | Audit kelengkapan RM, jadwal retensi/pemusnahan, dan permintaan salinan oleh pasien atau asuransi |
 
 ---
@@ -161,58 +161,73 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 `lis`
 
-**Pra-Analitik**
+**1. Pra-Analitik & Sampling**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Penerimaan Sampel & Barcode | `lab` | Check-in spesimen dan cetak label tabung |
-| 🟢 | Order Lab & Label Sampel | `anamnesa` | Pembentukan order dan label dari admisi |
-| ⚪ | Verifikasi Kelayakan Spesimen | `lis-kelayakan` | Penolakan spesimen ISO 15189 klausul 7.2.6 |
+| 🟢 | Penerimaan Sampel & Barcode | `lab` | Check-in spesimen dan cetak label tabung L{YYMMDD} |
+| 🟢 | Flebotomi & Checklist Sampling | `lis-phlebotomy` | Verifikasi tabung, lokasi tusukan & waktu sampling |
+| 🟢 | Verifikasi Kelayakan Spesimen (ISO 7.2.6) | `lis-kelayakan` | Kriteria penolakan spesimen hemolisis/lipemik/bekuan |
+| 🟢 | Order Lab & Label Sampel | `anamnesa` | Pembentukan order dan label dari admisi faskes |
 
-**Analitik**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | Worklist Analyzer | `worklist` | Antrean kerja per alat |
-| 🟢 | Input Hasil & Delta Check | `lab` › lab-result | Entry hasil dan peringatan terhadap riwayat |
-| 🟢 | QC Westgard & Levey-Jennings | `lab` › lab-qc | Kendali mutu harian dan telemetri alat |
-| ⚪ | Master Alat & Interfacing | `lis-analyzer` | Konfigurasi analyzer dan pemetaan kanal |
-
-**Pasca-Analitik**
+**2. Analitik & Interfacing**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Validasi dr. Sp.PK | `lab` › lab-validation | Verifikasi medis nilai kritis dan interpretasi |
-| 🟢 | Approval & Rilis PDF | `lab` › lab-approval | TTE QR dan pengiriman hasil ke pasien |
-| 🟢 | Arsip Hasil Laboratorium | `lab` › lab-report | Riwayat hasil dan tren analit |
-| 🟢 | Turnaround Time (TAT) | `lab-tat` | Durasi tiap tahap dan bottleneck |
+| 🟢 | Worklist Analyzer | `worklist` | Antrean kerja per alat analyzer |
+| 🟢 | Input Hasil & Delta Check | `lab` › lab-result | Entry hasil dan deteksi lonjakan riwayat pasien |
+| 🟢 | Master Interfacing Alat (ASTM :9999) | `lis-analyzer` | Konfigurasi analyzer ASTM E1381/E1394 & channel mapping |
+| 🟢 | Verifikasi Lot-to-Lot Reagen Baru | `lis-lot-verification` | Uji paralel 5-10 sampel & deteksi pergeseran bias |
 
-**Master Data Lab**
+**3. Mutu & Kendali Kualitas (QC)**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Katalog Tes & Tarif | `product` | 530+ parameter, kunci kode_material terjaga |
+| 🟢 | QC Westgard & Levey-Jennings | `lab` › lab-qc | Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma |
+| 🟢 | Uji Profisiensi & PME Eksternal | `lis-pme` | Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score |
+
+**4. Pasca-Analitik & Validasi**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Validasi dr. Sp.PK & Nilai Kritis | `lab` › lab-validation | Otorisasi klinis dokter spesialis patologi klinik |
+| 🟢 | Logbook Notifikasi Nilai Kritis (<15m) | `lis-critical-value` | Pencatatan lapor telepon dokter & bukti read-back |
+| 🟢 | Approval & Rilis PDF TTE QR | `lab` › lab-approval | Tanda tangan kriptografis QR & rilis ke portal pasien |
+| 🟢 | Turnaround Time (TAT) & Bottleneck | `lab-tat` | Durasi tiap tahap pra-analitik, analitik, rilis |
+
+**5. Manajemen Arsip & Spesimen**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Lokasi Rak Spesimen & Freezer (-20°C) | `lis-sample-archive` | Grid rak 10x10, add-on test retrieval & auto-dispose |
+| 🟢 | Arsip Hasil & Tren Pasien | `lab` › lab-report | Riwayat hasil kumulatif dan grafik tren analit |
+
+**6. Master Data Tes (530+ Parameter)**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Katalog Tes & Tarif | `product` | 530+ parameter terstandar LOINC/UCUM |
 | 🟢 | Paket & Panel Pemeriksaan | `package` | Susunan panel dan paket MCU |
-| 🟢 | Nilai Rujukan | `refrange` | Rentang per usia, jenis kelamin, satuan |
+| 🟢 | Nilai Rujukan Relasional | `refrange` | Rentang per usia, jenis kelamin, satuan |
 | 🟢 | Ekspor Katalog LOINC/UCUM | `catalog-export` | Katalog terstandarisasi siap-LIS |
 | 🟢 | Format Hasil PDF Lab | `labreport` | Kop surat, tanda tangan, dan tata letak lembar hasil |
 | 🟢 | Peninjau Deskripsi Tes | `test-reviewer` | Penyuntingan massal deskripsi 530+ tes ke bahasa awam |
 
-**Rujukan & Perujuk**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | Rujukan Lab Rekanan | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya |
-| 🟢 | Dokter & Klinik Perujuk | `perujuk` | Tarif komisi rujukan dan pencairan |
-| 🟢 | Akses Portal Perujuk | `portal-akses` | Tautan bertoken untuk pihak luar |
-
-**Reagen & BHP**
+**7. Reagen & BHP (FEFO)**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Stok Reagen & BHP | `inventory` | Saldo stok per gudang dan unit |
 | 🟢 | Resep BHP per Pemeriksaan | `inventory` › inventory-recipe | Pemotongan stok otomatis per tes |
 | 🟢 | Pesanan Pembelian Reagen | `inventory` › inventory-po | PO ke supplier dan penerimaan barang |
+
+**8. Rujukan Lab Rekanan**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Rujukan Lab Rekanan | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya |
+| 🟢 | Dokter & Klinik Perujuk | `perujuk` | Tarif komisi rujukan dan pencairan |
+| 🟢 | Akses Portal Perujuk | `portal-akses` | Tautan bertoken untuk pihak luar |
 
 ---
 
@@ -270,9 +285,9 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| ⚪ | Formulasi & R&D Produk | `wellness-rnd` | Pengembangan formula nutraseutikal |
-| ⚪ | Kemitraan Maklon | `wellness-maklon` | Produksi CPOTB/CPKB pihak ketiga |
-| ⚪ | Uji Mutu Produk ke Lab | `wellness-mutu` | Order uji mikrobiologi ke AVA Lab |
+| 🟢 | Formulasi & R&D Produk | `wellness-rnd` | Pengembangan formula nutraseutikal |
+| 🟢 | Kemitraan Maklon | `wellness-maklon` | Produksi CPOTB/CPKB pihak ketiga |
+| 🟢 | Uji Mutu Produk ke Lab | `wellness-mutu` | Order uji mikrobiologi ke AVA Lab |
 
 ---
 
@@ -498,7 +513,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Order & Worklist Radiologi | `radiology` | Permintaan foto dari poli, antrean kerja per modalitas, dan status pengerjaan |
 | 🟡 | PACS & DICOM Viewer | `pacs-viewer` | Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung |
 | ⚪ | Unggah Citra & Studi | `rad-unggah` | Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan |
-| ⚪ | Bacaan & Ekspertise Radiolog | `rad-ekspertise` | Lembar bacaan dokter Sp.Rad, tanda tangan elektronik, dan rilis hasil ke pengirim order |
+| 🟢 | Bacaan & Ekspertise Radiolog | `rad-ekspertise` | Lembar bacaan dokter Sp.Rad, tanda tangan elektronik, dan rilis hasil ke pengirim order |
 
 **Master & Alat**
 

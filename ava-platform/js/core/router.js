@@ -115,6 +115,10 @@ const PAGE_TITLES = {
   'sanctuary-booking':'Queen Sanctuary & Spa',
   'holding-finance':'Konsolidasi Finansial Holding',
   'ecommerce-oms':'E-Commerce OMS & Apotek',
+  'pabrik':'Pabrik — Produksi & Maklon',
+  'wellness-rnd':'Formulasi & R&D Produk',
+  'wellness-maklon':'Kemitraan Maklon',
+  'wellness-mutu':'Uji Mutu Produk',
   'bpjs-claim':'Klaim Asuransi & BPJS INA-CBG',
   'compliance-tracker':'Compliance & Legal Tracker',
   'pacs-viewer':'PACS & DICOM Imaging Viewer',
@@ -296,6 +300,10 @@ async function navigate(page, params={}) {
     case 'd2c':
     case 'ecommerce_oms':
     case 'ecommerce-oms':     safeRun('renderEcommerceOms', params);     break;
+    case 'pabrik':
+    case 'wellness-rnd':      safeRun('renderPabrik', { tab: 'formula' });  break;
+    case 'wellness-maklon':   safeRun('renderPabrik', { tab: 'maklon' });   break;
+    case 'wellness-mutu':     safeRun('renderPabrik', { tab: 'mutu' });     break;
     case 'bpjs':
     case 'bpjs_claim':
     case 'bpjs-claim':        safeRun('renderBpjsClaim', params);        break;
@@ -329,6 +337,27 @@ async function navigate(page, params={}) {
     case 'tech_saas':
     case 'license-manager':
     case 'saas-console':safeRun('renderTechSaas', params);           break;
+    case 'lis-phlebotomy':
+    case 'phlebotomy':  safeRun('renderPhlebotomy');                 break;
+    case 'lis-kelayakan':
+    case 'specimen-verification': safeRun('renderSpecimenVerification'); break;
+    case 'lis-analyzer':
+    case 'analyzer-interfacing': safeRun('renderAnalyzerInterfacing'); break;
+    case 'lis-lot-verification':
+    case 'lot-verification': safeRun('renderLotVerification');       break;
+    case 'lis-pme':
+    case 'pme':
+    case 'proficiency-testing': safeRun('renderPmeProficiency');      break;
+    case 'lis-critical-value':
+    case 'critical-value': safeRun('renderCriticalValue');           break;
+    case 'lis-sample-archive':
+    case 'sample-archiving': safeRun('renderSampleArchiving');       break;
+    case 'his-orders':  safeRun('renderIntegratedOrders');           break;
+    case 'rad-ekspertise': safeRun('renderRadiologyExpertise');      break;
+    case 'his-mpi':     safeRun('renderMpiManagement');              break;
+    case 'tech-aktivasi': safeRun('renderTechLicenseActivation');    break;
+    case 'tech-telemetri': safeRun('renderTechTelemetry');           break;
+    case 'tech-harga':  safeRun('renderTechPricingPlans');           break;
     case 'tenants':     safeRun('renderTenants');                    break;
     case 'db-studio':    safeRun('renderDatabaseStudio');           break;
     default:

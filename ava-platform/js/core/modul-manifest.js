@@ -101,63 +101,97 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-consult": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-devices": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-calibration": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-marketplace": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-caregiver": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-corporate": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "ava-portals": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "finance": [
   "modules/finance/accounting.js",
@@ -250,7 +284,14 @@ window.MODUL_HALAMAN = {
   "modules/lab/integration.js",
   "modules/lab/parser_config.js",
   "modules/lab/tat.js",
-  "modules/lab/referral.js"
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
  ],
  "penawaran": [
   "modules/crm/crm_pipeline.js",
@@ -337,7 +378,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -349,7 +392,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -361,7 +406,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -373,7 +420,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -385,7 +434,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -452,7 +503,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -464,7 +517,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "lab": [
   "modules/lab/qcEngine.js",
@@ -480,7 +535,14 @@ window.MODUL_HALAMAN = {
   "modules/lab/integration.js",
   "modules/lab/parser_config.js",
   "modules/lab/tat.js",
-  "modules/lab/referral.js"
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
  ],
  "product": [
   "modules/system/config/config_family.js",
@@ -539,7 +601,8 @@ window.MODUL_HALAMAN = {
   "modules/radiology/dicomViewer.js",
   "modules/radiology/pacs.js",
   "modules/radiology/pacs_viewer.js",
-  "modules/radiology/ris.js"
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js"
  ],
  "supportive": [
   "modules/system/config/config_family.js",
@@ -583,7 +646,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -595,7 +660,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "farmasi": [
   "modules/pharmacy/farmasi_eprescription.js",
@@ -611,7 +678,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -627,7 +696,11 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "holding-finance": [
   "modules/finance/accounting.js",
@@ -643,7 +716,44 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "wellness-rnd": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "wellness-maklon": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "wellness-mutu": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "bpjs-claim": [
   "modules/compliance/audit.js",
@@ -669,7 +779,8 @@ window.MODUL_HALAMAN = {
   "modules/radiology/dicomViewer.js",
   "modules/radiology/pacs.js",
   "modules/radiology/pacs_viewer.js",
-  "modules/radiology/ris.js"
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js"
  ],
  "catalog-export": [
   "modules/logistics/assets.js",
@@ -695,7 +806,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "queue-console": [
   "modules/his/admission.js",
@@ -707,7 +820,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "queue-config": [
   "modules/his/admission.js",
@@ -719,7 +834,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -731,7 +848,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -743,7 +862,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "cashier": [
   "modules/finance/accounting.js",
@@ -791,7 +912,14 @@ window.MODUL_HALAMAN = {
   "modules/lab/integration.js",
   "modules/lab/parser_config.js",
   "modules/lab/tat.js",
-  "modules/lab/referral.js"
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
  ],
  "payroll": [
   "modules/hrd/attendance.js",
@@ -825,7 +953,9 @@ window.MODUL_HALAMAN = {
   "modules/his/mcu.js",
   "modules/his/medrecord.js",
   "modules/his/queue_config.js",
-  "modules/his/queue_console.js"
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -864,14 +994,251 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "phlebotomy": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "specimen-verification": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "analyzer-interfacing": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "lot-verification": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "proficiency-testing": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "critical-value": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "sample-archiving": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js"
+ ],
+ "his-orders": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
+ ],
+ "rad-ekspertise": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js"
+ ],
+ "his-mpi": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js"
+ ],
+ "tech-aktivasi": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "tech-telemetri": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
+ ],
+ "tech-harga": [
+  "modules/business_units/ava_health.js",
+  "modules/business_units/ecommerce_oms.js",
+  "modules/business_units/sanctuary_booking.js",
+  "modules/business_units/tech_saas.js",
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "tenants": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
   "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js"
+  "modules/business_units/tenants.js",
+  "modules/business_units/pabrik.js",
+  "modules/business_units/techLicenseActivation.js",
+  "modules/business_units/techPricingPlans.js",
+  "modules/business_units/techTelemetry.js"
  ],
  "db-studio": [
   "modules/system/config/config_family.js",
@@ -994,5 +1361,19 @@ window.MODUL_SEMUA = [
  "modules/compliance/catalog_exporter.js",
  "modules/business_units/tenants.js",
  "modules/his/queue_config.js",
- "modules/his/queue_console.js"
+ "modules/his/queue_console.js",
+ "modules/business_units/pabrik.js",
+ "modules/lab/analyzerInterfacing.js",
+ "modules/lab/criticalValue.js",
+ "modules/lab/lotVerification.js",
+ "modules/lab/phlebotomy.js",
+ "modules/lab/pmeProficiency.js",
+ "modules/lab/sampleArchiving.js",
+ "modules/lab/specimenVerification.js",
+ "modules/business_units/techLicenseActivation.js",
+ "modules/business_units/techPricingPlans.js",
+ "modules/business_units/techTelemetry.js",
+ "modules/his/integratedOrders.js",
+ "modules/his/mpiManagement.js",
+ "modules/radiology/radiologyExpertise.js"
 ];

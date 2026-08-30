@@ -3138,51 +3138,184 @@ function simulateAgeReversal() {
 }
 
 // Page load initialization
-document.addEventListener('DOMContentLoaded', () => {
-  // Sync token from URL params (SSO Cross-Subdomain)
-  const urlParams = new URLSearchParams(window.location.search);
-  const qToken = urlParams.get('token') || urlParams.get('access_token');
-  const qRefresh = urlParams.get('refresh') || urlParams.get('refresh_token');
-  if (qToken) {
-    localStorage.setItem('ol_token', qToken);
-    if (qRefresh) localStorage.setItem('ol_refresh', qRefresh);
-  }
-
-  // Subdomain ikut menentukan peran yang dituju.
-  //
-  // Berkas ini melayani apps.avahealth.sbs (portal pasien) DAN
-  // corp.avahealth.sbs (portal PIC korporat). Hash #korporat sudah
-  // dikenali di bawah, tetapi hash tidak pernah sampai ke server — pengunjung
-  // corp.avahealth.sbs mendarat tanpa hash apa pun dan melihat layar
-  // pasien. Peta subdomain menutup celah itu.
-  const situsIni = (typeof window.situsSaatIni === 'function') ? window.situsSaatIni() : null;
-  const peranSubdomain = situsIni && situsIni.peran ? situsIni.peran : null;
-
-  const hash = window.location.hash || (peranSubdomain === 'corporate' ? '#korporat' : '');
-  const storedRole = localStorage.getItem('AVA_CURRENT_USER_ROLE') || peranSubdomain;
-  const storedToken = localStorage.getItem('ol_token');
-
-  renderSidebarMenu();
-
-  if (storedToken) {
-    if (hash === '#member' || storedRole === 'member') {
-      currentRole = 'member';
-      showScreen('dashboard-screen');
-      showView('member-sanctuary-view', 'Queen Sanctuary & VIP Member');
-    } else if (hash === '#korporat' || hash === '#corp' || storedRole === 'corporate') {
-      currentRole = 'corporate';
-      showScreen('dashboard-screen');
-      showView('corporate-view', 'Portal Klien Korporat');
-    } else if (hash === '#rujukan') {
-      currentRole = 'corporate';
-      showScreen('dashboard-screen');
-      showView('referral-wallet-view', 'Dokter & Lab Referral');
-    } else {
-      currentRole = storedRole || 'patient';
-      showScreen('dashboard-screen');
-      showView('patient-view', 'Dashboard Utama');
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Sync token from URL params (SSO Cross-Subdomain)
+    const urlParams = new URLSearchParams(window.location.search);
+    const qToken = urlParams.get('token') || urlParams.get('access_token');
+    const qRefresh = urlParams.get('refresh') || urlParams.get('refresh_token');
+    if (qToken) {
+      localStorage.setItem('ol_token', qToken);
+      if (qRefresh) localStorage.setItem('ol_refresh', qRefresh);
     }
-  } else {
-    showScreen('login-screen');
+
+    // Subdomain ikut menentukan peran yang dituju.
+    const situsIni = (typeof window.situsSaatIni === 'function') ? window.situsSaatIni() : null;
+    const peranSubdomain = situsIni && situsIni.peran ? situsIni.peran : null;
+
+    const hash = window.location.hash || (peranSubdomain === 'corporate' ? '#korporat' : '');
+    const storedRole = localStorage.getItem('AVA_CURRENT_USER_ROLE') || peranSubdomain;
+    const storedToken = localStorage.getItem('ol_token');
+
+    if (typeof renderSidebarMenu === 'function') renderSidebarMenu();
+
+    if (storedToken) {
+      if (hash === '#member' || storedRole === 'member') {
+        currentRole = 'member';
+        showScreen('dashboard-screen');
+        showView('member-sanctuary-view', 'Queen Sanctuary & VIP Member');
+      } else if (hash === '#korporat' || hash === '#corp' || storedRole === 'corporate') {
+        currentRole = 'corporate';
+        showScreen('dashboard-screen');
+        showView('corporate-view', 'Portal Klien Korporat');
+      } else if (hash === '#rujukan') {
+        currentRole = 'corporate';
+        showScreen('dashboard-screen');
+        showView('referral-wallet-view', 'Dokter & Lab Referral');
+      } else {
+        currentRole = storedRole || 'patient';
+        showScreen('dashboard-screen');
+        showView('patient-view', 'Dashboard Utama');
+      }
+    } else {
+      if (typeof showScreen === 'function') showScreen('login-screen');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNIFIED B2C SUPER-APP CART & MULTI-PAYMENT ENGINE
+// ═══════════════════════════════════════════════════════════════
+
+let unifiedSuperCart = [
+  { id: 'PROD-COL-01', type: 'PRODUCT', name: 'Queen Royal Collagen Glow 250g', unitPrice: 285000, qty: 2, weightGram: 500 },
+  { id: 'SNC-RATUS-01', type: 'SPA', name: 'Empress Ratus Keraton + Suite Rose (90m)', unitPrice: 450000, qty: 1, date: '2026-09-02' },
+  { id: 'LAB-LIPID-01', type: 'LAB', name: 'Profil Lipid Lengkap (Kolesterol, HDL, LDL, TG)', unitPrice: 195000, qty: 1, branch: 'Klinik AVA Pusat' }
+];
+
+let unifiedOrderHistory = [];
+
+function addToUnifiedCart(item) {
+  if (!item || !item.name || !item.unitPrice) {
+    throw new Error('Item wajib memiliki nama dan harga.');
   }
-});
+  const existing = unifiedSuperCart.find(i => i.id === item.id);
+  if (existing) {
+    existing.qty = (existing.qty || 1) + (item.qty || 1);
+  } else {
+    unifiedSuperCart.push({
+      id: item.id || `ITEM-${Date.now()}`,
+      type: item.type || 'PRODUCT',
+      name: item.name,
+      unitPrice: Number(item.unitPrice),
+      qty: Number(item.qty || 1),
+      ...item
+    });
+  }
+  return { success: true, total_items: unifiedSuperCart.length, cart: unifiedSuperCart };
+}
+
+function calculateUnifiedCartTotal(courier = 'JNE_REG') {
+  let subtotalProduct = 0;
+  let subtotalSpa = 0;
+  let subtotalClinical = 0;
+  let totalWeight = 0;
+
+  unifiedSuperCart.forEach(item => {
+    const itemTotal = item.unitPrice * (item.qty || 1);
+    if (item.type === 'PRODUCT') {
+      subtotalProduct += itemTotal;
+      totalWeight += (item.weightGram || 250) * (item.qty || 1);
+    } else if (item.type === 'SPA') {
+      subtotalSpa += itemTotal;
+    } else {
+      subtotalClinical += itemTotal;
+    }
+  });
+
+  const subtotalItems = subtotalProduct + subtotalSpa + subtotalClinical;
+  const shippingFee = subtotalProduct > 0 ? (courier === 'JNE_YES' ? 28000 : 15000) : 0;
+  const adminFee = 2500;
+  const grandTotal = subtotalItems + shippingFee + adminFee;
+
+  return {
+    items_count: unifiedSuperCart.length,
+    subtotal_product: subtotalProduct,
+    subtotal_spa: subtotalSpa,
+    subtotal_clinical: subtotalClinical,
+    subtotal_items: subtotalItems,
+    shipping_fee: shippingFee,
+    admin_fee: adminFee,
+    grand_total: grandTotal
+  };
+}
+
+function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails = {}) {
+  if (!unifiedSuperCart.length) {
+    throw new Error('Keranjang belanja kosong.');
+  }
+
+  const totals = calculateUnifiedCartTotal(shippingDetails.courier || 'JNE_REG');
+  const orderId = `AVA-ORD-${Date.now().toString().slice(-6)}`;
+  const now = new Date().toISOString();
+
+  const newOrder = {
+    order_id: orderId,
+    customer_name: shippingDetails.customer_name || 'Pasien B2C',
+    phone: shippingDetails.phone || '081288990011',
+    address: shippingDetails.address || 'Jakarta Selatan',
+    items: [...unifiedSuperCart],
+    totals,
+    payment_method: paymentMethod,
+    payment_status: 'PAID_SUCCESS',
+    qris_reference: paymentMethod === 'QRIS_DYNAMIC' ? `NMID-9360052300-${orderId}` : null,
+    courier_tracking_no: totals.subtotal_product > 0 ? `JNE-RES-${orderId}` : null,
+    created_at: now,
+    status_timeline: [
+      { time: now, event: 'Pesanan dibuat & Pembayaran Terkonfirmasi' },
+      { time: now, event: 'Notifikasi diteruskan ke Gudang Nutri & Booking Spa' }
+    ]
+  };
+
+  unifiedOrderHistory.unshift(newOrder);
+  unifiedSuperCart = []; // Clear cart after checkout
+
+  return {
+    success: true,
+    order: newOrder,
+    message: `Checkout berhasil! Nomor Pesanan: ${orderId}. Total: Rp ${Number(totals.grand_total).toLocaleString('id-ID')}`
+  };
+}
+
+function trackUnifiedOrder(orderId) {
+  const ord = unifiedOrderHistory.find(o => o.order_id === orderId);
+  if (!ord) return { found: false, message: `Pesanan ${orderId} tidak ditemukan.` };
+
+  return {
+    found: true,
+    order_id: ord.order_id,
+    customer_name: ord.customer_name,
+    grand_total: ord.totals.grand_total,
+    payment_status: ord.payment_status,
+    courier_tracking: ord.courier_tracking_no,
+    timeline: ord.status_timeline
+  };
+}
+
+window.unifiedSuperCart = unifiedSuperCart;
+window.addToUnifiedCart = addToUnifiedCart;
+window.calculateUnifiedCartTotal = calculateUnifiedCartTotal;
+window.processUnifiedCheckout = processUnifiedCheckout;
+window.trackUnifiedOrder = trackUnifiedOrder;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    addToUnifiedCart,
+    calculateUnifiedCartTotal,
+    processUnifiedCheckout,
+    trackUnifiedOrder,
+    unifiedSuperCart,
+    unifiedOrderHistory
+  };
+}
+

@@ -13,7 +13,9 @@ const testSuites = [
   { name: '4. Kepatuhan & Keuangan Fase 2 (QC, SATUSEHAT, GL)', file: 'test_fase2_e2e.js' },
   { name: '5. Ekspansi Komersial Fase 3 (Nutrition, Sanctuary, Payroll, DICOM)', file: 'test_fase3_e2e.js' },
   { name: '6. B2B SaaS & Holding Cockpit Fase 4', file: 'test_fase4_e2e.js' },
-  { name: '7. Akselerator Sistem Lab Produktisasi Aset (P1–P5)', file: 'test_akselerator_p1_p5.js' }
+  { name: '7. Akselerator Sistem Lab Produktisasi Aset (P1–P5)', file: 'test_akselerator_p1_p5.js' },
+  { name: '8. LIS Super Suite ISO 15189:2022 (6 Modul Strategis)', file: 'test_lis_super_suite.js' },
+  { name: '9. Ekspansi Strategis 3 Pilar (HIS/Rad, Tech SaaS, B2C Super-App)', file: 'test_expansion_super_suite.js' }
 ];
 
 console.log('╔═══════════════════════════════════════════════════════════════╗');

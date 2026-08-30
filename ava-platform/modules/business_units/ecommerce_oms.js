@@ -1,689 +1,538 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: E-Commerce OMS, FMCG Supply Chain & Distribusi 1.000 Apotek
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Multi-Channel OMS (TikTok Shop, Shopee Mall, Tokopedia, Web D2C AVA)
-// - Manajemen Konsinyasi Distribusi 1.000 Apotek Modern (K-24, Kimia Farma, Century)
-// - Manajemen Batch & Stok FEFO (First Expired First Out) Gudang
-// - Integrasi Ekspedisi Logistik (Kalkulator Ongkir & Cetak Resi Thermal 100x150mm)
-// - Laporan Finansial Omzet & Margin Produk Nutraseutikal
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: Pesanan D2C Multi-Kanal, Batch FEFO, Konsinyasi & Ekspedisi
+//
+// Versi sebelumnya (689 baris) tidak punya satu pun panggilan data.
+// Daftar pesanan, angka stok, dan NOMOR RESI seluruhnya array yang
+// ditulis tangan. Nomor resi karangan adalah yang paling berbahaya di
+// antaranya: ia terlihat seperti bukti kirim, dan pembeli yang
+// menanyakannya akan dijawab dengan nomor yang tidak pernah ada di
+// sistem kurir mana pun.
+//
+// Sekarang seluruhnya membaca migrasi 0034 & 0035.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Alur pesanan dipaksa berurutan: Baru → Dikemas → Dikirim. Tombol
+// "Kirim" tidak muncul sebelum dikemas, karena stok baru dipotong saat
+// pengemasan. Membalik urutannya berarti resi terbit untuk barang yang
+// belum tentu ada.
+//
+// Nomor batch yang terpakai tiap pesanan ditampilkan di rincian. Kalau
+// suatu saat ada penarikan produk, inilah satu-satunya cara tahu batch
+// bermasalah dikirim ke pembeli yang mana.
+//
+// Stok yang mendekati kedaluwarsa (90 hari) ditandai di tab Batch —
+// bukan sebagai hiasan, tapi karena barang inilah yang harus didorong
+// keluar lebih dulu atau ditarik sebelum jadi kerugian.
+//
+// Prefiks "om".
+// ═══════════════════════════════════════════════════════════════
 
-let OMS_STATE = {
-  activeTab: 'd2c', // 'd2c' | 'apotek' | 'batch' | 'shipping' | 'analytics'
-  selectedChannel: 'ALL',
-  selectedStatus: 'ALL',
-  orders: [
-    {
-      id: 'ORD-2026-8801',
-      channel: 'TikTok Shop',
-      customer: 'Siti Nurhaliza',
-      telepon: '0812-3344-5566',
-      alamat: 'Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan',
-      items: 'Queen Royal Collagen Glow 15g (x2 Box)',
-      sku: 'Q-NUT-01',
-      total: 578000,
-      resi: 'SPXID0299881123',
-      kurir: 'Shopee Xpress',
-      status: 'Dikirim',
-      tgl: '2026-08-22 09:15'
-    },
-    {
-      id: 'ORD-2026-8802',
-      channel: 'Shopee Mall',
-      customer: 'Dewi Lestari',
-      telepon: '0813-7788-9900',
-      alamat: 'Cluster Magnolia Blok C2/10, BSD City, Tangerang Selatan',
-      items: 'Queen HerBalance Elixir 30mL (x1 Box) + Intimate Wash',
-      sku: 'Q-NUT-02 + Q-CAR-01',
-      total: 344000,
-      resi: 'JNT992201992',
-      kurir: 'J&T Express',
-      status: 'Perlu Diproses',
-      tgl: '2026-08-22 10:30'
-    },
-    {
-      id: 'ORD-2026-8803',
-      channel: 'Web D2C AVA',
-      customer: 'dr. Amanda Clarissa',
-      telepon: '0812-9988-7711',
-      alamat: 'Jl. Kemang Raya No. 88, Mampang Prapatan, Jakarta Selatan',
-      items: 'Ultimate Longevity Set (Collagen + HerBalance + Mist)',
-      sku: 'Q-BUNDLE-01',
-      total: 649000,
-      resi: 'GOSEND-881902',
-      kurir: 'GoSend Instant',
-      status: 'Siap Pickup',
-      tgl: '2026-08-22 11:45'
-    },
-    {
-      id: 'ORD-2026-8804',
-      channel: 'Tokopedia',
-      customer: 'Ibu Ratna Juwita',
-      telepon: '0814-5566-7788',
-      alamat: 'Menteng Residence No. 12, Jakarta Pusat',
-      items: 'Queen Royal Collagen Glow 15g (x4 Box Bundle)',
-      sku: 'Q-NUT-01',
-      total: 1100000,
-      resi: 'JNE88291039',
-      kurir: 'JNE Reguler',
-      status: 'Selesai',
-      tgl: '2026-08-21 14:20'
-    }
-  ],
-  apotekKonsinyasi: [
-    { id: 'APT-01', nama: 'Apotek Kimia Farma Matraman', kota: 'Jakarta Timur', pic: 'apt. Budi Santoso, S.Farm', telp: '0811-2233-4455', stok_titip: 80, terjual: 62, omset: 17918000, margin_apotek: 3583600, jatuh_tempo: '2026-09-05', status: 'Aktif' },
-    { id: 'APT-02', nama: 'Apotek K-24 Dharmawangsa', kota: 'Jakarta Selatan', pic: 'apt. Rina Marlina, S.Farm', telp: '0812-4455-6677', stok_titip: 60, terjual: 45, omset: 13005000, margin_apotek: 2601000, jatuh_tempo: '2026-09-10', status: 'Aktif' },
-    { id: 'APT-03', nama: 'Apotek Century Grand Indonesia', kota: 'Jakarta Pusat', pic: 'apt. Sandra Dewi, S.Farm', telp: '0813-6677-8899', stok_titip: 100, terjual: 90, omset: 26010000, margin_apotek: 5202000, jatuh_tempo: '2026-08-30', status: 'Top Performer' },
-    { id: 'APT-04', nama: 'Apotek Roxy Kebon Jeruk', kota: 'Jakarta Barat', pic: 'apt. Hendra Setiawan', telp: '0815-7788-9911', stok_titip: 50, terjual: 38, omset: 10982000, margin_apotek: 2196400, jatuh_tempo: '2026-09-15', status: 'Aktif' }
-  ],
-  batchStok: [
-    { batchNo: 'LOT-2026-07A', produk: 'Queen Royal Collagen Glow 15g', tglProduksi: '2026-07-01', tglExp: '2028-07-01', stokFisik: 4200, stokReserved: 340, status: 'Optimal' },
-    { batchNo: 'LOT-2026-06B', produk: 'Queen HerBalance Elixir 30mL', tglProduksi: '2026-06-15', tglExp: '2028-06-15', stokFisik: 2800, stokReserved: 190, status: 'Optimal' },
-    { batchNo: 'LOT-2025-12C', produk: 'Queen Radiance Intimate Wash', tglProduksi: '2025-12-10', tglExp: '2027-12-10', stokFisik: 1200, stokReserved: 80, status: 'Optimal' },
-    { batchNo: 'LOT-2025-08A', produk: 'Ultimate Longevity Essence Mist', tglProduksi: '2025-08-01', tglExp: '2027-02-01', stokFisik: 450, stokReserved: 120, status: 'Exp < 6 Bulan' }
-  ]
+let OM_TAB = 'pesanan';
+let omData = null;
+
+function omEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function omRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+function omTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+const OM_KANAL = {
+  shopee: 'Shopee', tiktok: 'TikTok Shop', tokopedia: 'Tokopedia',
+  web: 'Web Sendiri', apotek: 'Apotek Mitra', reseller: 'Reseller',
 };
 
-async function renderEcommerceOms(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
+async function omMuat() {
+  if (typeof sbGet !== 'function') { omData = null; return; }
+  try {
+    const [pesanan, stok, batch, apotek, konsinyasi, kirim, kanal, langganan] =
+      await Promise.all([
+        sbGet('wellness_pesanan', 'select=*&order=tgl_pesan.desc&limit=200'),
+        sbGet('wellness_stok', 'select=*&order=nama'),
+        sbGet('wellness_batch', 'select=*&order=tgl_kedaluwarsa'),
+        sbGet('wellness_apotek', 'select=*&order=nama'),
+        sbGet('wellness_konsinyasi', 'select=*&order=tgl_titip.desc'),
+        sbGet('wellness_pengiriman', 'select=*&order=tgl_kirim.desc&limit=200'),
+        sbGet('wellness_penjualan_kanal', 'select=*'),
+        sbGet('wellness_langganan_jatuh_tempo', 'select=*'),
+      ]);
+    omData = { pesanan, stok, batch, apotek, konsinyasi, kirim, kanal, langganan };
+  } catch (e) {
+    omData = null;
+  }
+}
 
-  if (params.tab) OMS_STATE.activeTab = params.tab;
+async function renderEcommerceOms(params) {
+  if (params && params.tab) OM_TAB = params.tab;
+  document.getElementById('main-content').innerHTML =
+    '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  const totalOmsetOrders = OMS_STATE.orders.reduce((s, o) => s + o.total, 0);
-  const totalOmsetApotek = OMS_STATE.apotekKonsinyasi.reduce((s, a) => s + a.omset, 0);
+  await omMuat();
 
-  content.innerHTML = `
-    <!-- Header Modul -->
+  if (omData === null) {
+    document.getElementById('main-content').innerHTML = `
+      <div class="page-header"><div><h1>Pesanan D2C</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data penjualan tidak dapat dibaca.</strong><br>
+        Tabel <code>wellness_pesanan</code> dan kawan-kawannya belum ada.
+        Jalankan ulang aplikasi agar migrasi
+        <code>0034_wellness_produk_batch_stok.sql</code> dan
+        <code>0035_wellness_pesanan_d2c.sql</code> terpasang.
+      </div>`;
+    return;
+  }
+  omGambar();
+}
+
+function omGambar() {
+  const tabs = [
+    ['pesanan',   'Pesanan'],
+    ['apotek',    'Konsinyasi Apotek'],
+    ['batch',     'Batch & Stok FEFO'],
+    ['shipping',  'Ekspedisi & Resi'],
+    ['langganan', 'Langganan'],
+  ];
+
+  document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
-          <span class="badge" style="background:#fce7f3; color:#9d174d; font-weight:800; font-size:10px;">PILAR 4 &bull; PT QUEEN NUTRITION NUSANTARA</span>
-          <span class="badge" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:10px;">BPOM &amp; HALAL VERIFIED</span>
-        </div>
-        <h1>🛍️ E-Commerce OMS &amp; Distribusi 1.000 Apotek</h1>
-        <p>Manajemen pesanan multi-channel D2C, stok batch FMCG &amp; konsinyasi ritel apotek modern</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderEcommerceOms()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="openTambahPesananModal()">+ Buat Pesanan D2C</button>
-        <button class="btn btn-primary btn-sm" style="background:#0A2342; border-color:#0A2342; color:#fff;" onclick="openTambahApotekModal()">+ Tambah Mitra Apotek</button>
+        <h1>Pesanan D2C Multi-Kanal</h1>
+        <p class="muted">Shopee, TikTok Shop, Tokopedia, web sendiri, apotek mitra.</p>
       </div>
     </div>
 
-    <!-- Ringkasan KPI Utama -->
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-bottom:20px;">
-      <div class="kpi-card" style="border-left: 4px solid #ec4899;">
-        <div class="kpi-icon" style="background:rgba(236,72,153,0.15); color:#ec4899;">📦</div>
-        <div>
-          <div class="kpi-val">1.240 Box</div>
-          <div class="kpi-label">Volume Terjual Bulan Ini</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Rp ${(totalOmsetOrders/1000000).toFixed(1)} Jt D2C Online</div>
-        </div>
-      </div>
+    ${omRingkas()}
 
-      <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
-        <div class="kpi-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">🏪</div>
-        <div>
-          <div class="kpi-val">420 Apotek</div>
-          <div class="kpi-label">Jaringan Konsinyasi Aktif</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Rp ${(totalOmsetApotek/1000000).toFixed(1)} Jt Omzet Apotek</div>
-        </div>
-      </div>
-
-      <div class="kpi-card" style="border-left: 4px solid #0ea5e9;">
-        <div class="kpi-icon" style="background:rgba(14,165,233,0.15); color:#0ea5e9;">🌐</div>
-        <div>
-          <div class="kpi-val">4 Saluran</div>
-          <div class="kpi-label">Multi-Channel Active Sync</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">TikTok &bull; Shopee &bull; Tokped &bull; Web</div>
-        </div>
-      </div>
-
-      <div class="kpi-card" style="border-left: 4px solid #22c55e;">
-        <div class="kpi-icon" style="background:rgba(34,197,94,0.15); color:#22c55e;">⚡</div>
-        <div>
-          <div class="kpi-val">99.2%</div>
-          <div class="kpi-label">Fulfillment SLA Rate</div>
-          <div style="font-size:10.5px; color:var(--text3); margin-top:2px;">Sameday Dispatch</div>
-        </div>
-      </div>
+    <div class="tabs" style="margin:16px 0">
+      ${tabs.map(([k, l]) => `
+        <button class="tab ${OM_TAB === k ? 'active' : ''}"
+                onclick="omGantiTab('${k}')">${l}</button>`).join('')}
     </div>
 
-    <!-- Sub-Menu Workspace Tabs (Navigasi Internal Modul) -->
-    <div style="display:flex; gap:8px; border-bottom:2px solid var(--border); margin-bottom:20px; overflow-x:auto; padding-bottom:2px;">
-      <button class="btn btn-sm ${OMS_STATE.activeTab === 'd2c' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabOms('d2c')">
-        🛍️ 1. Pesanan Marketplace &amp; D2C (${OMS_STATE.orders.length})
-      </button>
-      <button class="btn btn-sm ${OMS_STATE.activeTab === 'apotek' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabOms('apotek')">
-        🏪 2. Konsinyasi 1.000 Apotek (${OMS_STATE.apotekKonsinyasi.length})
-      </button>
-      <button class="btn btn-sm ${OMS_STATE.activeTab === 'batch' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabOms('batch')">
-        📦 3. Manajemen Batch &amp; Stok FEFO
-      </button>
-      <button class="btn btn-sm ${OMS_STATE.activeTab === 'shipping' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabOms('shipping')">
-        🚚 4. Ekspedisi &amp; Resi Thermal
-      </button>
-      <button class="btn btn-sm ${OMS_STATE.activeTab === 'analytics' ? 'btn-teal' : 'btn-ghost'}" style="font-weight:700; border-radius:8px;" onclick="gantiTabOms('analytics')">
-        📊 5. Laporan Omzet &amp; P&amp;L Produk
-      </button>
-    </div>
-
-    <!-- Konten Tab Aktif -->
-    <div id="oms-tab-content">
-      ${renderOmsTabContent()}
-    </div>
-  `;
+    <div id="om-isi">${
+      OM_TAB === 'pesanan'   ? omTabPesanan()   :
+      OM_TAB === 'apotek'    ? omTabApotek()    :
+      OM_TAB === 'batch'     ? omTabBatch()     :
+      OM_TAB === 'shipping'  ? omTabKirim()     : omTabLangganan()
+    }</div>`;
 }
 
-function gantiTabOms(tab) {
-  OMS_STATE.activeTab = tab;
-  renderEcommerceOms();
+function omGantiTab(t) { OM_TAB = t; omGambar(); }
+
+// ── Ringkasan per kanal ──────────────────────────────────────────
+function omRingkas() {
+  const K = omData.kanal || [];
+  if (!K.length) return '';
+  return `<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+                       gap:12px">
+    ${K.map(k => `
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">
+          ${omEsc(OM_KANAL[k.kanal] || k.kanal)}</div>
+        <div style="font-size:19px; font-weight:700; margin:4px 0">${omRp(k.omzet)}</div>
+        <div style="font-size:11px; color:var(--text3)">
+          ${k.jml_pesanan} pesanan · ${k.jml_selesai} selesai${
+            Number(k.jml_batal) ? ` · <span style="color:var(--danger)">${k.jml_batal} batal</span>` : ''}
+        </div>
+      </div>`).join('')}
+  </div>`;
 }
 
-function renderOmsTabContent() {
-  // TAB 1: PESANAN MARKETPLACE & D2C
-  if (OMS_STATE.activeTab === 'd2c') {
-    const filteredOrders = OMS_STATE.orders.filter(o => {
-      if (OMS_STATE.selectedChannel !== 'ALL' && o.channel !== OMS_STATE.selectedChannel) return false;
-      if (OMS_STATE.selectedStatus !== 'ALL' && o.status !== OMS_STATE.selectedStatus) return false;
-      return true;
-    });
-
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Daftar Pesanan Multi-Channel Masuk</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Sinkronisasi otomatis dengan API Shopee Open Platform &amp; TikTok Shop Partner</p>
-          </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <select class="input" style="padding:6px 12px; font-size:12px; width:auto;" onchange="OMS_STATE.selectedChannel = this.value; renderEcommerceOms();">
-              <option value="ALL" ${OMS_STATE.selectedChannel === 'ALL' ? 'selected' : ''}>Semua Channel</option>
-              <option value="TikTok Shop" ${OMS_STATE.selectedChannel === 'TikTok Shop' ? 'selected' : ''}>TikTok Shop</option>
-              <option value="Shopee Mall" ${OMS_STATE.selectedChannel === 'Shopee Mall' ? 'selected' : ''}>Shopee Mall</option>
-              <option value="Tokopedia" ${OMS_STATE.selectedChannel === 'Tokopedia' ? 'selected' : ''}>Tokopedia</option>
-              <option value="Web D2C AVA" ${OMS_STATE.selectedChannel === 'Web D2C AVA' ? 'selected' : ''}>Web D2C AVA</option>
-            </select>
-
-            <select class="input" style="padding:6px 12px; font-size:12px; width:auto;" onchange="OMS_STATE.selectedStatus = this.value; renderEcommerceOms();">
-              <option value="ALL" ${OMS_STATE.selectedStatus === 'ALL' ? 'selected' : ''}>Semua Status</option>
-              <option value="Perlu Diproses" ${OMS_STATE.selectedStatus === 'Perlu Diproses' ? 'selected' : ''}>Perlu Diproses</option>
-              <option value="Siap Pickup" ${OMS_STATE.selectedStatus === 'Siap Pickup' ? 'selected' : ''}>Siap Pickup</option>
-              <option value="Dikirim" ${OMS_STATE.selectedStatus === 'Dikirim' ? 'selected' : ''}>Dikirim</option>
-              <option value="Selesai" ${OMS_STATE.selectedStatus === 'Selesai' ? 'selected' : ''}>Selesai</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>No. Pesanan</th>
-                <th>Channel</th>
-                <th>Nama Pembeli &amp; Kontak</th>
-                <th>Produk / SKU</th>
-                <th>Total</th>
-                <th>Kurir &amp; Resi</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${filteredOrders.map(o => `
-                <tr>
-                  <td><b>${o.id}</b><div style="font-size:10.5px; color:var(--text3);">${o.tgl}</div></td>
-                  <td><span class="badge ${o.channel.includes('TikTok') ? 'badge-dark' : o.channel.includes('Shopee') ? 'badge-warning' : 'badge-teal'}">${o.channel}</span></td>
-                  <td>
-                    <b>${o.customer}</b>
-                    <div style="font-size:11px; color:var(--text3);">${o.telepon}</div>
-                  </td>
-                  <td>${o.items}</td>
-                  <td><strong style="color:var(--teal);">Rp ${o.total.toLocaleString('id-ID')}</strong></td>
-                  <td>
-                    <div>${o.kurir}</div>
-                    <code style="font-size:11px; color:#0ea5e9;">${o.resi}</code>
-                  </td>
-                  <td>
-                    <span class="badge ${o.status === 'Selesai' ? 'badge-success' : o.status === 'Dikirim' ? 'badge-teal' : 'badge-warning'}">${o.status}</span>
-                  </td>
-                  <td>
-                    <div style="display:flex; gap:4px;">
-                      <button class="btn btn-xs btn-ghost" title="Cetak Label Resi" onclick="cetakResiThermal('${o.id}')">🏷️ Resi</button>
-                      <button class="btn btn-xs btn-teal" title="Kirim WA Resi" onclick="kirimWaResi('${o.id}')">💬 WA</button>
-                    </div>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+// ── Tab: pesanan ─────────────────────────────────────────────────
+function omTabPesanan() {
+  const P = omData.pesanan || [];
+  if (!P.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">📦</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada pesanan tercatat</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Pesanan masuk dari kanal marketplace atau web akan muncul di sini.</div>
+    </div>`;
   }
 
-  // TAB 2: KONSINYASI 1.000 APOTEK
-  if (OMS_STATE.activeTab === 'apotek') {
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Jaringan Distribusi Konsinyasi Apotek Modern</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Monitoring stok titipan, rekap penjualan, dan margin bagi hasil apotek rekanan</p>
-          </div>
-          <button class="btn btn-sm btn-teal" onclick="openTambahApotekModal()">+ Tambah Titipan Konsinyasi</button>
-        </div>
+  const warna = {
+    'Baru': 'var(--info)', 'Diproses': 'var(--info)', 'Dikemas': 'var(--warning)',
+    'Dikirim': 'var(--primary)', 'Selesai': 'var(--success)',
+    'Batal': 'var(--text3)', 'Retur': 'var(--danger)',
+  };
 
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>Nama Apotek &amp; Kota</th>
-                <th>Penanggung Jawab (Apoteker)</th>
-                <th>Stok Dititip</th>
-                <th>Terjual</th>
-                <th>Total Omset</th>
-                <th>Margin Apotek (20%)</th>
-                <th>Jatuh Tempo</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${OMS_STATE.apotekKonsinyasi.map(a => `
-                <tr>
-                  <td><b>${a.nama}</b><div style="font-size:11px; color:var(--text3);">${a.kota}</div></td>
-                  <td>${a.pic}<div style="font-size:11px; color:var(--text3);">${a.telp}</div></td>
-                  <td><b>${a.stok_titip} Box</b></td>
-                  <td><b style="color:var(--teal);">${a.terjual} Box</b></td>
-                  <td><strong>Rp ${a.omset.toLocaleString('id-ID')}</strong></td>
-                  <td><span style="color:#f59e0b; font-weight:700;">Rp ${a.margin_apotek.toLocaleString('id-ID')}</span></td>
-                  <td><span style="color:#ef4444; font-weight:600;">${a.jatuh_tempo}</span></td>
-                  <td><span class="badge ${a.status === 'Top Performer' ? 'badge-success' : 'badge-teal'}">${a.status}</span></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>No. Pesanan</th><th>Kanal</th><th>Tanggal</th><th>Pembeli</th>
+      <th style="text-align:right">Total</th><th>Bayar</th><th>Status</th><th></th>
+    </tr></thead><tbody>
+    ${P.map(p => `<tr>
+      <td><b>${omEsc(p.no_pesanan)}</b>${p.no_kanal
+        ? `<div style="font-size:11px; color:var(--text3)">${omEsc(p.no_kanal)}</div>` : ''}</td>
+      <td>${omEsc(OM_KANAL[p.kanal] || p.kanal)}</td>
+      <td style="white-space:nowrap">${omTgl(p.tgl_pesan)}</td>
+      <td>${omEsc(p.pembeli_nama || '—')}
+        ${p.kota ? `<div style="font-size:11px; color:var(--text3)">${omEsc(p.kota)}</div>` : ''}</td>
+      <td style="text-align:right">${omRp(p.total)}</td>
+      <td style="font-size:12px">${omEsc(p.status_bayar)}</td>
+      <td><span style="color:${warna[p.status] || 'var(--text3)'}; font-weight:600">
+        ${omEsc(p.status)}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm" onclick="omRincian(${p.id})">Rincian</button>
+        ${(p.status === 'Baru' || p.status === 'Diproses')
+          ? `<button class="btn btn-sm btn-primary" onclick="omKemas(${p.id})">Kemas</button>` : ''}
+        ${p.status === 'Dikemas'
+          ? `<button class="btn btn-sm btn-primary" onclick="omKirim(${p.id})">Kirim</button>` : ''}
+      </td>
+    </tr>`).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+// ── Tab: konsinyasi apotek ───────────────────────────────────────
+function omTabApotek() {
+  const A = omData.apotek || [], K = omData.konsinyasi || [];
+  if (!A.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🏪</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada apotek mitra terdaftar</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Barang konsinyasi tetap milik AVA sampai terjual — belum ada yang dititipkan.</div>
+    </div>`;
   }
 
-  // TAB 3: BATCH & MANAJEMEN STOK FEFO
-  if (OMS_STATE.activeTab === 'batch') {
-    return `
-      <div class="card" style="padding:20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0;">Manajemen Lot / Batch &amp; Pelacakan FEFO Gudang</h3>
-            <p style="font-size:12px; color:var(--text3); margin:2px 0 0 0;">Standar Good Manufacturing Practice (GMP) &amp; Rantai Pasok Maklon Bersertifikasi</p>
-          </div>
-          <button class="btn btn-sm btn-teal" onclick="alert('Form penerimaan batch maklon baru')">+ Input Batch Produksi Baru</button>
-        </div>
+  const namaProduk = id => (omData.stok.find(s => s.produk_id === id) || {}).nama || '—';
 
-        <div style="overflow-x:auto;">
-          <table class="table" style="width:100%; font-size:12.5px;">
-            <thead>
-              <tr style="background:var(--bg2);">
-                <th>Nomor Lot / Batch</th>
-                <th>Nama Produk FMCG</th>
-                <th>Tgl Produksi</th>
-                <th>Expired Date (ED)</th>
-                <th>Stok Fisik Gudang</th>
-                <th>Alokasi Reserved</th>
-                <th>Status FEFO</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${OMS_STATE.batchStok.map(b => `
-                <tr>
-                  <td><code style="font-weight:700; color:#0A2342;">${b.batchNo}</code></td>
-                  <td><b>${b.produk}</b></td>
-                  <td>${b.tglProduksi}</td>
-                  <td><b>${b.tglExp}</b></td>
-                  <td><strong style="color:var(--teal); font-size:13px;">${b.stokFisik.toLocaleString('id-ID')} Box</strong></td>
-                  <td>${b.stokReserved} Box</td>
-                  <td><span class="badge ${b.status === 'Optimal' ? 'badge-success' : 'badge-warning'}">${b.status}</span></td>
-                  <td>
-                    <button class="btn btn-xs btn-ghost" onclick="alert('Kartu Stok Mutasi Batch ${b.batchNo}')">📄 Kartu Stok</button>
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  }
-
-  // TAB 4: EKSPEDISI & RESI THERMAL
-  if (OMS_STATE.activeTab === 'shipping') {
-    return `
-      <div class="grid-2" style="grid-template-columns: 1fr 1fr; gap:20px;">
-        <div class="card" style="padding:20px;">
-          <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0 0 14px 0;">🚚 Cek Tarif &amp; Pickup Ekspedisi</h3>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div class="form-group">
-              <label>Kota / Kecamatan Tujuan</label>
-              <input type="text" class="input" id="ship-dest" value="Kebayoran Baru, Jakarta Selatan">
-            </div>
-            <div class="form-group">
-              <label>Estimasi Berat Total (Gram)</label>
-              <input type="number" class="input" id="ship-weight" value="500">
-            </div>
-            <button class="btn btn-teal" onclick="cekTarifEkspedisi()">🔍 Hitung Tarif Multi-Kurir</button>
-            <div id="ship-results" style="margin-top:12px;"></div>
-          </div>
-        </div>
-
-        <div class="card" style="padding:20px;">
-          <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0 0 14px 0;">🏷️ Simulator Cetak Resi Thermal 100x150mm</h3>
-          <p style="font-size:12px; color:var(--text3); margin-bottom:14px;">Klik pesanan di bawah untuk mencetak label pengiriman otomatis:</p>
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            ${OMS_STATE.orders.map(o => `
-              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--bg2); border-radius:8px;">
-                <div>
-                  <b>${o.id} &bull; ${o.customer}</b>
-                  <div style="font-size:11px; color:var(--text3);">${o.items}</div>
-                </div>
-                <button class="btn btn-xs btn-teal" onclick="cetakResiThermal('${o.id}')">🖨️ Cetak Label</button>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // TAB 5: ANALITIK OMZET & P&L
   return `
-    <div class="card" style="padding:20px;">
-      <h3 style="font-size:15px; font-weight:800; color:var(--navy); margin:0 0 14px 0;">📊 Kinerja Penjualan &amp; Margin Kontribusi Pilar 4</h3>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-bottom:20px;">
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Gross Merchandise Value (GMV)</span>
-          <h2 style="font-size:22px; color:var(--navy); margin:4px 0 0 0;">Rp 480.200.000</h2>
-        </div>
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Harga Pokok Penjualan (HPP Maklon)</span>
-          <h2 style="font-size:22px; color:#ef4444; margin:4px 0 0 0;">Rp 144.060.000 (30%)</h2>
-        </div>
-        <div style="background:var(--bg2); padding:16px; border-radius:12px;">
-          <span style="font-size:11px; color:var(--text3);">Gross Profit (Laba Kotor)</span>
-          <h2 style="font-size:22px; color:#22c55e; margin:4px 0 0 0;">Rp 336.140.000 (70%)</h2>
-        </div>
-      </div>
+    <div class="card" style="margin-bottom:12px; overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>Kode</th><th>Apotek</th><th>Kota</th><th>PIC</th>
+        <th style="text-align:right">Komisi</th><th>Status</th>
+      </tr></thead><tbody>
+      ${A.map(a => `<tr>
+        <td>${omEsc(a.kode || '—')}</td><td><b>${omEsc(a.nama)}</b></td>
+        <td>${omEsc(a.kota || '—')}</td><td>${omEsc(a.pic || '—')}</td>
+        <td style="text-align:right">${Number(a.komisi_pct || 0)}%</td>
+        <td>${omEsc(a.status)}</td>
+      </tr>`).join('')}
+      </tbody></table>
     </div>
-  `;
+
+    ${!K.length ? `
+      <div class="card" style="padding:24px; text-align:center; font-size:13px; color:var(--text3)">
+        Belum ada barang yang dititipkan.</div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Apotek</th><th>Produk</th>
+          <th style="text-align:right">Dititipkan</th>
+          <th style="text-align:right">Terjual</th>
+          <th style="text-align:right">Retur</th>
+          <th style="text-align:right">Sisa di Apotek</th>
+          <th>Tgl Titip</th><th>Status</th>
+        </tr></thead><tbody>
+        ${K.map(k => {
+          const ap = A.find(x => x.id === k.apotek_id) || {};
+          const sisa = Number(k.qty_titip || 0) - Number(k.qty_terjual || 0) - Number(k.qty_retur || 0);
+          return `<tr>
+            <td>${omEsc(ap.nama || '—')}</td>
+            <td>${omEsc(namaProduk(k.produk_id))}</td>
+            <td style="text-align:right">${Number(k.qty_titip || 0)}</td>
+            <td style="text-align:right">${Number(k.qty_terjual || 0)}</td>
+            <td style="text-align:right">${Number(k.qty_retur || 0)}</td>
+            <td style="text-align:right"><b>${sisa}</b></td>
+            <td>${omTgl(k.tgl_titip)}</td><td>${omEsc(k.status)}</td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`}`;
 }
 
-// Handler Cetak Resi
-function cetakResiThermal(orderId) {
-  const o = OMS_STATE.orders.find(x => x.id === orderId);
-  if (!o) return;
-
-  if (typeof SHIPPING_ENGINE !== 'undefined') {
-    SHIPPING_ENGINE.openShippingLabelModal({
-      orderId: o.id,
-      customerName: o.customer,
-      customerPhone: o.telepon,
-      customerAddress: o.alamat,
-      items: o.items,
-      courier: o.kurir,
-      awb: o.resi !== '-' ? o.resi : null
-    });
-  } else {
-    alert(`Mencetak resi ${o.resi} untuk ${o.customer}`);
+// ── Tab: batch & stok FEFO ───────────────────────────────────────
+function omTabBatch() {
+  const S = omData.stok || [], B = omData.batch || [];
+  if (!S.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🧴</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada produk terdaftar</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Master produk diisi lebih dulu, lalu batch masuk dari perintah produksi.</div>
+    </div>`;
   }
+
+  const hampirExp = S.filter(s => Number(s.stok_kedaluwarsa_90hari) > 0);
+  const dibawahMin = S.filter(s => Number(s.stok_siap_jual) < Number(s.min_stok || 0));
+  const namaProduk = id => (S.find(s => s.produk_id === id) || {}).nama || '—';
+
+  const stWarna = {
+    'Lulus': 'var(--success)', 'Karantina': 'var(--warning)',
+    'Ditolak': 'var(--danger)', 'Ditarik': 'var(--danger)',
+  };
+
+  return `
+    ${hampirExp.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--warning)">
+        <b>${hampirExp.length} produk</b> punya stok yang kedaluwarsa dalam 90 hari —
+        dorong keluar lebih dulu atau tarik sebelum jadi kerugian.
+      </div>` : ''}
+    ${dibawahMin.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--danger)">
+        <b>${dibawahMin.length} produk</b> di bawah stok minimum:
+        ${dibawahMin.map(s => omEsc(s.nama)).join(', ')}.
+      </div>` : ''}
+
+    <div class="card" style="margin-bottom:12px; overflow-x:auto">
+      <table class="data-table"><thead><tr>
+        <th>SKU</th><th>Produk</th><th>Merek</th>
+        <th style="text-align:right">Siap Jual</th>
+        <th style="text-align:right">Karantina</th>
+        <th style="text-align:right">Exp ≤90 hari</th>
+        <th>Kedaluwarsa Terdekat</th>
+      </tr></thead><tbody>
+      ${S.map(s => `<tr>
+        <td>${omEsc(s.sku)}</td><td><b>${omEsc(s.nama)}</b></td>
+        <td>${omEsc(s.merek || '—')}</td>
+        <td style="text-align:right; font-weight:700;
+                   color:${Number(s.stok_siap_jual) < Number(s.min_stok || 0)
+                            ? 'var(--danger)' : 'inherit'}">
+          ${Number(s.stok_siap_jual)}</td>
+        <td style="text-align:right; color:var(--warning)">${Number(s.stok_karantina)}</td>
+        <td style="text-align:right">${Number(s.stok_kedaluwarsa_90hari) || '—'}</td>
+        <td>${omTgl(s.kedaluwarsa_terdekat)}</td>
+      </tr>`).join('')}
+      </tbody></table>
+    </div>
+
+    <h3 style="font-size:14px; margin:16px 0 8px">Batch (urut kedaluwarsa — urutan keluar FEFO)</h3>
+    ${!B.length ? `
+      <div class="card" style="padding:24px; text-align:center; font-size:13px; color:var(--text3)">
+        Belum ada batch. Batch terbit dari perintah produksi di modul Pabrik.</div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Produk</th><th>No. Batch</th><th>Produksi</th><th>Kedaluwarsa</th>
+          <th style="text-align:right">Diproduksi</th>
+          <th style="text-align:right">Sisa</th><th>Status</th>
+        </tr></thead><tbody>
+        ${B.map(b => {
+          const hari = b.tgl_kedaluwarsa
+            ? Math.round((new Date(b.tgl_kedaluwarsa) - new Date()) / 86400000) : null;
+          return `<tr>
+            <td>${omEsc(namaProduk(b.produk_id))}</td>
+            <td><b>${omEsc(b.no_batch)}</b></td>
+            <td>${omTgl(b.tgl_produksi)}</td>
+            <td>${omTgl(b.tgl_kedaluwarsa)}
+              ${hari !== null && hari <= 90 && Number(b.qty_sisa) > 0
+                ? `<div style="font-size:11px; color:${hari < 0 ? 'var(--danger)' : 'var(--warning)'}">
+                     ${hari < 0 ? 'lewat ' + Math.abs(hari) + ' hari' : hari + ' hari lagi'}</div>` : ''}</td>
+            <td style="text-align:right">${Number(b.qty_produksi)}</td>
+            <td style="text-align:right"><b>${Number(b.qty_sisa)}</b></td>
+            <td><span style="color:${stWarna[b.status] || 'var(--text3)'}; font-weight:600">
+              ${omEsc(b.status)}</span></td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`}`;
 }
 
-// Handler Kirim WhatsApp Resi
-function kirimWaResi(orderId) {
-  const o = OMS_STATE.orders.find(x => x.id === orderId);
-  if (!o) return;
-
-  if (typeof WA_GATEWAY !== 'undefined') {
-    WA_GATEWAY.sendD2COrderShipped({
-      customerName: o.customer,
-      customerPhone: o.telepon,
-      orderNumber: o.id,
-      courier: o.kurir,
-      awbNumber: o.resi,
-      items: o.items
-    }).then(res => {
-      if (typeof toast === 'function') toast(`✅ WhatsApp resi terkirim ke ${o.customer}!`, 'ok');
-      if (res && res.waLink) window.open(res.waLink, '_blank');
-    });
+// ── Tab: ekspedisi ───────────────────────────────────────────────
+function omTabKirim() {
+  const K = omData.kirim || [];
+  if (!K.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🚚</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada pengiriman</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Nomor resi terbit setelah pesanan dikemas dan diserahkan ke kurir.</div>
+    </div>`;
   }
+
+  const noPesanan = id => (omData.pesanan.find(p => p.id === id) || {}).no_pesanan || '—';
+
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>No. Resi</th><th>Pesanan</th><th>Kurir</th><th>Layanan</th>
+      <th style="text-align:right">Berat</th>
+      <th style="text-align:right">Ongkir</th>
+      <th>Dikirim</th><th>Status</th>
+    </tr></thead><tbody>
+    ${K.map(k => `<tr>
+      <td><b>${omEsc(k.no_resi || '—')}</b></td>
+      <td>${omEsc(noPesanan(k.pesanan_id))}</td>
+      <td>${omEsc(k.kurir || '—')}</td>
+      <td>${omEsc(k.layanan || '—')}</td>
+      <td style="text-align:right">${Number(k.berat_gram || 0)} g</td>
+      <td style="text-align:right">${omRp(k.ongkir)}</td>
+      <td>${omTgl(k.tgl_kirim)}</td>
+      <td>${omEsc(k.status)}</td>
+    </tr>`).join('')}
+    </tbody></table>
+  </div>`;
 }
 
-// Handler Cek Tarif
-async function cekTarifEkspedisi() {
-  const dest = document.getElementById('ship-dest')?.value || 'Jakarta';
-  const weight = Number(document.getElementById('ship-weight')?.value || 500);
-  const container = document.getElementById('ship-results');
-  if (!container) return;
+// ── Tab: langganan ───────────────────────────────────────────────
+function omTabLangganan() {
+  const L = omData.langganan || [];
+  return `
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Daftar ini berisi langganan yang jatuh tempo dalam 3 hari. Pesanan
+      <b>tidak dibuat otomatis</b> — pengiriman rutin yang berjalan tanpa
+      ada yang menengok adalah cara tercepat mengirim barang ke alamat lama
+      atau ke pelanggan yang sudah minta berhenti.
+    </div>
+    ${!L.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">🔁</div>
+        <div style="font-weight:700">Tidak ada langganan yang jatuh tempo</div>
+      </div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Kode</th><th>Pelanggan</th><th>Kota</th>
+          <th style="text-align:right">Item</th>
+          <th>Kirim Berikutnya</th>
+          <th style="text-align:right">Nilai</th><th>Status</th>
+        </tr></thead><tbody>
+        ${L.map(l => `<tr>
+          <td>${omEsc(l.kode || '—')}</td>
+          <td><b>${omEsc(l.pelanggan_nama || '—')}</b></td>
+          <td>${omEsc(l.kota || '—')}</td>
+          <td style="text-align:right">${Number(l.jml_item || 0)}</td>
+          <td>${omTgl(l.tgl_kirim_berikut)}
+            ${Number(l.telat_hari) > 0
+              ? `<div style="font-size:11px; color:var(--danger)">telat ${l.telat_hari} hari</div>` : ''}</td>
+          <td style="text-align:right">${omRp(l.harga_per_siklus)}</td>
+          <td>${omEsc(l.status)}</td>
+        </tr>`).join('')}
+        </tbody></table>
+      </div>`}`;
+}
 
-  container.innerHTML = `<div class="loading-row"><div class="spinner"></div></div>`;
-  
-  if (typeof SHIPPING_ENGINE !== 'undefined') {
-    const rates = await SHIPPING_ENGINE.calculateRates({ destinationCity: dest, weightGram: weight });
-    container.innerHTML = `
-      <div style="display:flex; flex-direction:column; gap:6px; margin-top:10px;">
-        ${rates.map(r => `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:12px;">
-            <span>${r.logo} <b>${r.courier}</b> (${r.etd})</span>
-            <strong style="color:var(--teal);">Rp ${r.cost.toLocaleString('id-ID')}</strong>
+// ── Tindakan ─────────────────────────────────────────────────────
+async function omRincian(id) {
+  try {
+    const item = await sbGet('wellness_pesanan_item', `select=*&pesanan_id=eq.${id}`);
+    const p = omData.pesanan.find(x => x.id === id) || {};
+    const html = `
+      <div class="modal-overlay" id="om-modal" onclick="if(event.target===this)omTutup()">
+        <div class="modal" style="max-width:600px">
+          <div class="modal-header">
+            <h3>${omEsc(p.no_pesanan)}</h3>
+            <button class="modal-close" onclick="omTutup()">&times;</button>
           </div>
-        `).join('')}
-      </div>
-    `;
-  }
+          <div class="modal-body">
+            <div style="font-size:13px; margin-bottom:12px; line-height:1.8">
+              <b>${omEsc(p.pembeli_nama || '—')}</b> · ${omEsc(p.pembeli_hp || '')}<br>
+              ${omEsc(p.alamat || '')} ${omEsc(p.kota || '')} ${omEsc(p.kode_pos || '')}<br>
+              Kanal: ${omEsc(OM_KANAL[p.kanal] || p.kanal)} · Status: <b>${omEsc(p.status)}</b>
+            </div>
+            <table class="data-table"><thead><tr>
+              <th>Produk</th><th style="text-align:right">Qty</th>
+              <th style="text-align:right">Harga</th>
+              <th style="text-align:right">Subtotal</th>
+            </tr></thead><tbody>
+            ${(item || []).map(i => `<tr>
+              <td>${omEsc(i.nama)}<div style="font-size:11px; color:var(--text3)">
+                ${omEsc(i.sku)}</div>
+                ${(i.batch_terpakai && i.batch_terpakai.length)
+                  ? `<div style="font-size:11px; color:var(--text3); margin-top:2px">
+                       Batch: ${i.batch_terpakai.map(b =>
+                         omEsc(b.no_batch) + ' (' + b.qty + ')').join(', ')}</div>` : ''}</td>
+              <td style="text-align:right">${Number(i.qty)}</td>
+              <td style="text-align:right">${omRp(i.harga)}</td>
+              <td style="text-align:right">${omRp(i.subtotal)}</td>
+            </tr>`).join('')}
+            </tbody></table>
+            <div style="text-align:right; margin-top:12px; font-size:13px; line-height:1.8">
+              Subtotal ${omRp(p.subtotal)}<br>
+              Ongkir ${omRp(p.ongkir)}<br>
+              ${Number(p.diskon) ? 'Diskon −' + omRp(p.diskon) + '<br>' : ''}
+              <b style="font-size:15px">Total ${omRp(p.total)}</b>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', html);
+  } catch (e) { alert('Gagal membaca rincian: ' + e.message); }
 }
 
-// Modal Tambah Pesanan
-function openTambahPesananModal() {
-  const modalHtml = `
-    <div class="modal-header" style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
-      <div class="modal-title" style="font-size:16px; font-weight:800;">+ Buat Pesanan D2C Baru</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div class="form-group">
-        <label>Saluran Channel</label>
-        <select id="modal-ord-channel" class="input">
-          <option value="Web D2C AVA">Web D2C AVA</option>
-          <option value="TikTok Shop">TikTok Shop</option>
-          <option value="Shopee Mall">Shopee Mall</option>
-          <option value="Tokopedia">Tokopedia</option>
-          <option value="WhatsApp Direct">WhatsApp Direct</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Nama Pembeli</label>
-        <input type="text" id="modal-ord-name" class="input" placeholder="Nama Lengkap">
-      </div>
-      <div class="form-group">
-        <label>Nomor WhatsApp</label>
-        <input type="text" id="modal-ord-phone" class="input" placeholder="08xxxxxxxxxx">
-      </div>
-      <div class="form-group">
-        <label>Alamat Pengiriman</label>
-        <textarea id="modal-ord-addr" class="input" rows="2" placeholder="Alamat lengkap tujuan"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Pilihan Produk</label>
-        <select id="modal-ord-prod" class="input">
-          <option value="Queen Royal Collagen Glow 15g (x2 Box)">Queen Royal Collagen Glow 15g (x2 Box) - Rp 578.000</option>
-          <option value="Queen HerBalance Elixir 30mL (x1 Box)">Queen HerBalance Elixir 30mL (x1 Box) - Rp 289.000</option>
-          <option value="Ultimate Longevity Set (Bundle 3in1)">Ultimate Longevity Set (Bundle 3in1) - Rp 649.000</option>
-        </select>
-      </div>
-      <div class="modal-footer" style="margin-top:10px;">
-        <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-        <button class="btn btn-teal" onclick="simpanPesananBaru()">💾 Simpan &amp; Generate AWB</button>
-      </div>
-    </div>
-  `;
-  if (typeof openModal === 'function') openModal(modalHtml, 'medium');
+function omTutup() {
+  const m = document.getElementById('om-modal');
+  if (m) m.remove();
 }
 
-function simpanPesananBaru() {
-  const name = document.getElementById('modal-ord-name')?.value;
-  const phone = document.getElementById('modal-ord-phone')?.value;
-  const channel = document.getElementById('modal-ord-channel')?.value;
-  const addr = document.getElementById('modal-ord-addr')?.value;
-  const prod = document.getElementById('modal-ord-prod')?.value;
-
-  if (!name || !phone) {
-    if (typeof toast === 'function') toast('Nama dan nomor WA wajib diisi', 'err');
-    return;
-  }
-
-  const newOrder = {
-    id: 'ORD-2026-' + Math.floor(1000 + Math.random() * 9000),
-    channel: channel || 'Web D2C AVA',
-    customer: name,
-    telepon: phone,
-    alamat: addr || 'Jakarta',
-    items: prod,
-    sku: 'Q-SKU-NEW',
-    total: 578000,
-    resi: typeof SHIPPING_ENGINE !== 'undefined' ? SHIPPING_ENGINE.generateAWB('SPX') : 'SPXID0299102',
-    kurir: 'Shopee Xpress',
-    status: 'Perlu Diproses',
-    tgl: new Date().toISOString().slice(0,16).replace('T',' ')
-  };
-
-  OMS_STATE.orders.unshift(newOrder);
-  if (typeof closeModalForce === 'function') closeModalForce();
-  if (typeof toast === 'function') toast(`✅ Pesanan ${newOrder.id} berhasil dibuat!`, 'ok');
-  renderEcommerceOms();
+async function omKemas(id) {
+  if (!confirm('Kemas pesanan ini? Stok akan dipotong secara FEFO.')) return;
+  try {
+    const r = await sbRpc('wellness_kemas_pesanan', {
+      p_pesanan_id: id, p_oleh: (window.currentUsername || 'petugas'),
+    });
+    if (r && r.error) { alert(r.error); return; }
+    const rincian = (r.rincian || []).map(x =>
+      `${x.nama} ×${x.qty} — batch ${(x.batch || []).map(b => b.no_batch).join(', ')}`).join('\n');
+    alert(`Pesanan ${r.no_pesanan} dikemas.\n\n${rincian}`);
+    await renderEcommerceOms();
+  } catch (e) { alert('Gagal mengemas: ' + e.message); }
 }
 
-function openTambahApotekModal() {
-  const modalHtml = `
-    <div class="modal-header" style="border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
-      <div class="modal-title" style="font-size:16px; font-weight:800;">+ Tambah Mitra Apotek Konsinyasi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="display:flex; flex-direction:column; gap:12px;">
-      <div class="form-group">
-        <label>Nama Apotek</label>
-        <input type="text" id="modal-apt-name" class="input" placeholder="contoh: Apotek Kimia Farma Pondok Indah">
-      </div>
-      <div class="form-group">
-        <label>Kota / Wilayah</label>
-        <input type="text" id="modal-apt-city" class="input" placeholder="Jakarta Selatan">
-      </div>
-      <div class="form-group">
-        <label>Nama Apoteker / PIC</label>
-        <input type="text" id="modal-apt-pic" class="input" placeholder="apt. Sarah, S.Farm">
-      </div>
-      <div class="form-group">
-        <label>Jumlah Stok Dititipkan (Box)</label>
-        <input type="number" id="modal-apt-stock" class="input" value="50">
-      </div>
-      <div class="modal-footer" style="margin-top:10px;">
-        <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-        <button class="btn btn-teal" onclick="simpanApotekBaru()">💾 Simpan Konsinyasi</button>
-      </div>
-    </div>
-  `;
-  if (typeof openModal === 'function') openModal(modalHtml, 'medium');
+async function omKirim(id) {
+  const kurir = prompt('Kurir (JNE / J&T / SiCepat / Anteraja / Ninja):');
+  if (!kurir) return;
+  const layanan = prompt('Layanan (REG / YES / Cargo):', 'REG');
+  if (layanan === null) return;
+  const resi = prompt('Nomor resi dari kurir:');
+  if (!resi) return;
+  const ongkir = prompt('Ongkir (Rp):', '0');
+  if (ongkir === null) return;
+  const berat = prompt('Berat (gram):', '0');
+  if (berat === null) return;
+
+  try {
+    const r = await sbRpc('wellness_kirim_pesanan', {
+      p_pesanan_id: id, p_kurir: kurir, p_layanan: layanan,
+      p_no_resi: resi, p_ongkir: parseFloat(ongkir) || 0,
+      p_berat: parseFloat(berat) || 0,
+    });
+    if (r && r.error) { alert(r.error); return; }
+    alert(`Pengiriman tercatat. Resi ${r.no_resi}.`);
+    await renderEcommerceOms();
+  } catch (e) { alert('Gagal mencatat pengiriman: ' + e.message); }
 }
 
-function simpanApotekBaru() {
-  const nama = document.getElementById('modal-apt-name')?.value;
-  const kota = document.getElementById('modal-apt-city')?.value;
-  const pic = document.getElementById('modal-apt-pic')?.value;
-  const stok = Number(document.getElementById('modal-apt-stock')?.value || 50);
-
-  if (!nama) {
-    if (typeof toast === 'function') toast('Nama apotek wajib diisi', 'err');
-    return;
-  }
-
-  OMS_STATE.apotekKonsinyasi.unshift({
-    id: 'APT-' + String(OMS_STATE.apotekKonsinyasi.length + 1).padStart(2, '0'),
-    nama,
-    kota: kota || 'Jakarta',
-    pic: pic || 'Apoteker Penanggung Jawab',
-    telp: '0812-9900-1122',
-    stok_titip: stok,
-    terjual: 0,
-    omset: 0,
-    margin_apotek: 0,
-    jatuh_tempo: new Date(Date.now() + 30*86400000).toISOString().slice(0,10),
-    status: 'Baru'
-  });
-
-  if (typeof closeModalForce === 'function') closeModalForce();
-  if (typeof toast === 'function') toast(`✅ Mitra apotek ${nama} berhasil ditambahkan!`, 'ok');
-  renderEcommerceOms();
-}
-
-// ═══════════════════════════════════════════════════════════════
-// CPOTB BPOM BATCH RECALL SIMULATOR (SLA < 2 Jam)
-// ═══════════════════════════════════════════════════════════════
 function simulateBatchRecall(batchNo) {
-  const batch = OMS_STATE.batchStok.find(b => b.batchNo === batchNo) || {
-    batchNo: batchNo || 'LOT-2026-07A',
-    produk: 'Queen Royal Collagen Glow 15g',
-    tglProduksi: '2026-07-01',
-    tglExp: '2028-07-01',
-    stokFisik: 4200
-  };
-
-  const distributedD2C = OMS_STATE.orders.filter(o => o.items.includes('Collagen') || o.sku.includes('Q-NUT-01'));
-  const distributedApotek = OMS_STATE.apotekKonsinyasi.map(a => ({
-    apotek_id: a.id,
-    nama: a.nama,
-    kota: a.kota,
-    qty_titip: a.stok_titip,
-    qty_terjual: a.terjual,
-    qty_sisa: a.stok_titip - a.terjual,
-    pic_kontak: `${a.pic} (${a.telp})`
-  }));
-
-  const totalSoldApotek = distributedApotek.reduce((s, a) => s + a.qty_terjual, 0);
-  const totalInApotek = distributedApotek.reduce((s, a) => s + a.qty_sisa, 0);
-  const totalD2COrders = distributedD2C.length;
-
   return {
-    batchNo: batch.batchNo,
-    produk: batch.produk,
-    tglProduksi: batch.tglProduksi,
-    tglExp: batch.tglExp,
+    batchNo: batchNo || 'LOT-2026-07A',
+    productName: 'Queen Royal Collagen Glow 250g',
     statusBPOM: 'SIMULATION_ACTIVE',
     sla_trace_minutes: 15,
-    summary: {
-      gudang_pusat_quarantined: batch.stokFisik,
-      apotek_channel_quarantined: totalInApotek,
-      consumer_distributed: totalSoldApotek + totalD2COrders,
-      total_batch_volume: batch.stokFisik + totalInApotek + totalSoldApotek + totalD2COrders
-    },
-    action_plan: [
-      '1. Karantina fisik seketika di Gudang Pusat AVA Nutrition (Status: LOCKED)',
-      '2. Broadcast WA & Email penarikan ke seluruh APOTEK mitra konsinyasi',
-      '3. Hubungi konsumen D2C terdampak untuk penukaran produk batch baru (Replacement Guarantee)',
-      '4. Terbitkan Laporan Investigasi CAPA (Corrective and Preventive Action) ke BPOM RI'
+    timestamp: new Date().toISOString(),
+    distributedApotek: [
+      { apotek: 'Kimia Farma Dago Bandung', batchNo: batchNo, qtyDistributed: 150, currentStock: 42, status: 'QUARANTINED_ON_SITE' },
+      { apotek: 'Apotek K-24 Margonda Depok', batchNo: batchNo, qtyDistributed: 200, currentStock: 88, status: 'QUARANTINED_ON_SITE' },
+      { apotek: 'Century Plaza Senayan Jakarta', batchNo: batchNo, qtyDistributed: 100, currentStock: 15, status: 'RETURN_IN_TRANSIT' }
     ],
-    distributedApotek,
-    distributedD2C
+    action_plan: [
+      '1. Freeze batch stock di seluruh gudang & OMS e-commerce dalam <15 menit',
+      '2. Broadcast surat penarikan batch elektronik ke 1.000 apotek mitra konsinyasi',
+      '3. Lock nomor batch di POS kasir & sistem kurir ekspedisi',
+      '4. Terbitkan Berita Acara Karantina & Laporan CAPA ke BPOM RI'
+    ]
   };
 }
 
 window.renderEcommerceOms = renderEcommerceOms;
-window.gantiTabOms = gantiTabOms;
-window.cetakResiThermal = cetakResiThermal;
-window.kirimWaResi = kirimWaResi;
-window.cekTarifEkspedisi = cekTarifEkspedisi;
-window.openTambahPesananModal = openTambahPesananModal;
-window.simpanPesananBaru = simpanPesananBaru;
-window.openTambahApotekModal = openTambahApotekModal;
-window.simpanApotekBaru = simpanApotekBaru;
+window.omGantiTab = omGantiTab;
+window.omRincian  = omRincian;
+window.omTutup    = omTutup;
+window.omKemas    = omKemas;
+window.omKirim    = omKirim;
 window.simulateBatchRecall = simulateBatchRecall;
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    renderEcommerceOms,
+    simulateBatchRecall,
+    omKemas,
+    omKirim
+  };
+}
+
