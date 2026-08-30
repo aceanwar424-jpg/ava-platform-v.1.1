@@ -45,7 +45,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "mou": [
@@ -56,22 +55,6 @@ window.MODUL_HALAMAN = {
   "modules/crm/quotation.js",
   "modules/crm/sales_corong.js",
   "modules/crm/voucher.js"
- ],
- "test-reviewer": [
-  "modules/system/config/config_family.js",
-  "modules/system/config/config_home.js",
-  "modules/system/config/config_labreport.js",
-  "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js",
-  "modules/system/db_studio.js",
-  "modules/system/lisensi.js",
-  "modules/system/ops_kendali.js",
-  "modules/system/portal_akses.js",
-  "modules/system/settings.js",
-  "modules/system/supportive.js",
-  "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
-  "modules/system/timeline.js"
  ],
  "leads": [
   "modules/crm/crm_pipeline.js",
@@ -317,7 +300,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "sales-corong": [
@@ -342,7 +324,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "perujuk": [
@@ -417,7 +398,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "hc-schedule": [
@@ -513,8 +493,7 @@ window.MODUL_HALAMAN = {
   "modules/compliance/import_excel.js",
   "modules/compliance/regulatory_reports.js",
   "modules/compliance/rl_reports.js",
-  "modules/compliance/satusehat.js",
-  "modules/compliance/catalog_exporter.js"
+  "modules/compliance/satusehat.js"
  ],
  "audit": [
   "modules/compliance/audit.js",
@@ -523,8 +502,7 @@ window.MODUL_HALAMAN = {
   "modules/compliance/import_excel.js",
   "modules/compliance/regulatory_reports.js",
   "modules/compliance/rl_reports.js",
-  "modules/compliance/satusehat.js",
-  "modules/compliance/catalog_exporter.js"
+  "modules/compliance/satusehat.js"
  ],
  "campaigns": [
   "modules/crm/crm_pipeline.js",
@@ -542,8 +520,7 @@ window.MODUL_HALAMAN = {
   "modules/compliance/import_excel.js",
   "modules/compliance/regulatory_reports.js",
   "modules/compliance/rl_reports.js",
-  "modules/compliance/satusehat.js",
-  "modules/compliance/catalog_exporter.js"
+  "modules/compliance/satusehat.js"
  ],
  "homecare": [
   "modules/his/admission.js",
@@ -668,7 +645,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "refrange": [
@@ -691,7 +667,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "corporate": [
@@ -721,7 +696,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "spirometry": [
@@ -737,7 +711,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "medrecord": [
@@ -769,7 +742,6 @@ window.MODUL_HALAMAN = {
   "modules/his/mpiManagement.js"
  ],
  "farmasi": [
-  "modules/pharmacy/farmasi_eprescription.js",
   "modules/pharmacy/pharmacy.js"
  ],
  "emr-soap": [
@@ -866,8 +838,7 @@ window.MODUL_HALAMAN = {
   "modules/compliance/import_excel.js",
   "modules/compliance/regulatory_reports.js",
   "modules/compliance/rl_reports.js",
-  "modules/compliance/satusehat.js",
-  "modules/compliance/catalog_exporter.js"
+  "modules/compliance/satusehat.js"
  ],
  "compliance-tracker": [
   "modules/compliance/audit.js",
@@ -876,8 +847,7 @@ window.MODUL_HALAMAN = {
   "modules/compliance/import_excel.js",
   "modules/compliance/regulatory_reports.js",
   "modules/compliance/rl_reports.js",
-  "modules/compliance/satusehat.js",
-  "modules/compliance/catalog_exporter.js"
+  "modules/compliance/satusehat.js"
  ],
  "pacs-viewer": [
   "modules/radiology/dicomViewer.js",
@@ -1076,7 +1046,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "settings": [
@@ -1092,7 +1061,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ],
  "saas-console": [
@@ -1373,7 +1341,6 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/test_reviewer.js",
   "modules/system/timeline.js"
  ]
 };
@@ -1458,7 +1425,6 @@ window.MODUL_SEMUA = [
  "modules/logistics/assets.js",
  "modules/logistics/catalog_export.js",
  "modules/logistics/inventory.js",
- "modules/pharmacy/farmasi_eprescription.js",
  "modules/pharmacy/pharmacy.js",
  "modules/radiology/pacs.js",
  "modules/radiology/pacs_viewer.js",
@@ -1475,10 +1441,8 @@ window.MODUL_SEMUA = [
  "modules/system/settings.js",
  "modules/system/supportive.js",
  "modules/system/surat.js",
- "modules/system/test_reviewer.js",
  "modules/system/timeline.js",
  "modules/business_units/tech_saas.js",
- "modules/compliance/catalog_exporter.js",
  "modules/business_units/tenants.js",
  "modules/his/queue_config.js",
  "modules/his/queue_console.js",

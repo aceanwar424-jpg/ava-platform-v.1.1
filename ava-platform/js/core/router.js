@@ -77,7 +77,6 @@ const ROUTE_ALIASES_3SEG = {
   'tech/platform/audit': 'audit',
   'tech/integration/satusehat': 'satusehat',
   'tech/ai/orchestrator': 'agentic',
-  'tech/ai/test-rewriter': 'test-reviewer',
 
   // AVA HQ
   'hq/cockpit/dashboard': 'dashboard',
@@ -90,7 +89,7 @@ const ROUTE_ALIASES_3SEG = {
 const PAGE_TITLES = {
   dashboard:'Dashboard', partners:'Partner Database', maps:'Maps Prospecting',
   marketing:'Marketing Kit', voucher:'Voucher Builder', surat:'Surat Masuk & Keluar',
-  mou:'MOU & Perjanjian', 'test-reviewer':'Peninjau Deskripsi Medis', administration:'Administrasi & Legal', leads:'Leads Management', okr:'OKR & Target Sales',
+  mou:'MOU & Perjanjian', administration:'Administrasi & Legal', leads:'Leads Management', okr:'OKR & Target Sales',
   mcu:'Project MCU', avahealth:'AVA Health Ecosystem', 'ava-consult':'Telekonsultasi Dokter',
   'ava-devices':'Alat Medis & Wearables', 'ava-calibration':'Badge AVA Verified', 'ava-marketplace':'Marketplace Alkes',
   'ava-caregiver':'Caregiver & Keluarga', 'ava-corporate':'Corporate B2B Wellness', 'ava-portals':'Multi-Portal Switcher', finance:'Finance & Billing',
@@ -203,7 +202,6 @@ async function navigate(page, params={}) {
     case 'voucher':     safeRun('renderVoucher');                break;
     case 'surat':       safeRun('renderSurat');                  break;
     case 'mou':         safeRun('renderMOU');                    break;
-    case 'test-reviewer': safeRun('renderTestReviewer');         break;
     case 'administration': if (typeof openCategory === 'function') openCategory('administration'); break;
     case 'leads':       safeRun('renderLeads');                  break;
     case 'okr':         safeRun('renderOKR');                    break;
@@ -293,8 +291,13 @@ async function navigate(page, params={}) {
     case 'spirometry':  safeRun('renderSupportive');             break;
     case 'medrecord':   safeRun('renderMedRecord');              break;
     case 'inpatient':   safeRun('renderInpatient');              break;
+    // Dulu menunjuk renderFarmasi di farmasi_eprescription.js — 367 baris
+    // tanpa satu pun panggilan data. Sementara itu pharmacy.js yang nyata
+    // (6 tabel, 6 RPC, termasuk skrining interaksi obat dan alergi) tidak
+    // punya rute sama sekali, jadi tidak pernah bisa dibuka. Yang tampil
+    // di layar justru yang karangan.
     case 'pharmacy':
-    case 'farmasi':     safeRun('renderFarmasi', params);        break;
+    case 'farmasi':     safeRun('renderPharmacy', params);       break;
     case 'emr':
     case 'emr_soap':
     case 'emr-soap':    safeRun('renderEmrSoap', params);        break;

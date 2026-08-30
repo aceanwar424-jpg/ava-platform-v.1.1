@@ -230,6 +230,7 @@ function lvGambar() {
       Aturan lain (4-1s, 10x, R-4s lintas level) butuh riwayat lintas level
       dan lintas hari yang belum lengkap; menampilkannya sebagai "lolos"
       padahal tidak pernah diperiksa akan memberi rasa aman yang keliru.
+    </div>`;
 }
 
 function lvPilihLot(lot) {
