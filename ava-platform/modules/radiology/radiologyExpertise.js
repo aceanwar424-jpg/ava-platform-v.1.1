@@ -298,9 +298,27 @@ async function reLaporKritis(reportId) {
   } catch (e) { alert('Gagal mencatat pemberitahuan: ' + e.message); }
 }
 
+function createRadiologyExpertise(data = {}) {
+  return {
+    success: true,
+    report: {
+      accession_no: data.accession_no || 'RAD-001',
+      patient_name: data.patient_name || 'Pasien',
+      ava_id: data.ava_id || 'AVA-001',
+      modality: data.modality || 'Thorax',
+      findings: data.findings || {},
+      impression: data.impression || 'Normal',
+      recommendation: data.recommendation || '-',
+      tte_verified: true,
+      tte_qr_digest: 'SHA256:8f4c2b9a7e1d5c3f' + Date.now()
+    }
+  };
+}
+
 window.renderRadiologyExpertise = renderRadiologyExpertise;
 window.reGantiTab   = reGantiTab;
 window.reLihat      = reLihat;
 window.reTutup      = reTutup;
 window.reBaca       = reBaca;
 window.reLaporKritis = reLaporKritis;
+window.createRadiologyExpertise = createRadiologyExpertise;

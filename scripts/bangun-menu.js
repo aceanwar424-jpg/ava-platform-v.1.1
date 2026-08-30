@@ -70,7 +70,16 @@ const TANPA_DATA_WAJAR = {
 // diperiksa harus berkas yang fungsinya benar-benar dipanggil router.
 const petaRender = {};
 {
-  const re = /case\s+'([a-z0-9_-]+)'\s*:\s*(?:[^\n]*?safeRun\(\s*'([A-Za-z0-9_]+)')?/gi;
+  // [ \t]* dan BUKAN \s* sesudah titik dua: \s ikut melahap baris baru,
+  // sehingga pada case bertumpuk —
+  //     case 'pharmacy':
+  //     case 'farmasi':  safeRun('renderFarmasi', …)
+  // — pencocokan pertama menelan sampai safeRun di baris berikutnya.
+  // Hanya alias PERTAMA yang terpetakan, sisanya tidak pernah tercocokkan
+  // dan modulPunyaData() mengembalikan null alias "tidak bisa diperiksa".
+  // Menu yang idnya alias kedua ke atas jadi dilewati diam-diam — persis
+  // jenis kelolosan yang pemeriksa ini dibuat untuk mencegahnya.
+  const re = /case\s+'([a-z0-9_-]+)'[ \t]*:[ \t]*(?:[^\n]*?safeRun\([ \t]*'([A-Za-z0-9_]+)')?/gi;
   let m, tertunda = [];
   while ((m = re.exec(isiRouter)) !== null) {
     if (m[2]) {

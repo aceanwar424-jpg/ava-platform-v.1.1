@@ -188,5 +188,15 @@ async function tpTambah() {
   } catch (e) { alert('Gagal menyimpan paket: ' + e.message); }
 }
 
+function calculateSubscriptionBilling(tier, ordersCount, cycle = 'MONTHLY') {
+  const base_price = (tier === 'TIER-PRO') ? 5500000 : 2500000;
+  const included = 5000;
+  const overage_orders = Math.max(0, ordersCount - included);
+  const overage_fee = overage_orders * 1000;
+  const total_bill = base_price + overage_fee;
+  return { base_price, overage_orders, total_bill };
+}
+
 window.renderTechPricingPlans = renderTechPricingPlans;
 window.tpTambah = tpTambah;
+window.calculateSubscriptionBilling = calculateSubscriptionBilling;

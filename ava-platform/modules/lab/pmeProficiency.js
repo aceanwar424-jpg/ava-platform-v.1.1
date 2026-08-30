@@ -330,9 +330,20 @@ async function pmIsiTindakan(hasilId) {
   } catch (e) { alert('Gagal menyimpan tindakan: ' + e.message); }
 }
 
+function calculatePmeZScore(labVal, peerMean, peerSd) {
+  const z = (labVal - peerMean) / peerSd;
+  const rounded = parseFloat(z.toFixed(2));
+  const absZ = Math.abs(rounded);
+  let evaluation = 'SATISFACTORY';
+  if (absZ > 3.0) evaluation = 'UNSATISFACTORY';
+  else if (absZ > 2.0) evaluation = 'QUESTIONABLE';
+  return { z_score: rounded, evaluation };
+}
+
 window.renderPmeProficiency = renderPmeProficiency;
 window.pmPilihSiklus   = pmPilihSiklus;
 window.pmTambahProgram = pmTambahProgram;
 window.pmTambahSiklus  = pmTambahSiklus;
 window.pmCatatHasil    = pmCatatHasil;
 window.pmIsiTindakan   = pmIsiTindakan;
+window.calculatePmeZScore = calculatePmeZScore;

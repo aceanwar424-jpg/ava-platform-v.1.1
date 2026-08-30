@@ -230,7 +230,6 @@ function lvGambar() {
       Aturan lain (4-1s, 10x, R-4s lintas level) butuh riwayat lintas level
       dan lintas hari yang belum lengkap; menampilkannya sebagai "lolos"
       padahal tidak pernah diperiksa akan memberi rasa aman yang keliru.
-    </div>`;
 }
 
 function lvPilihLot(lot) {
@@ -238,5 +237,22 @@ function lvPilihLot(lot) {
   lvGambar();
 }
 
+function evaluateLotToLotVerification(data = {}) {
+  const pairs = data.sample_pairs || [];
+  let totalBias = 0;
+  pairs.forEach(p => {
+    const bias = Math.abs(p.new_val - p.old_val) / p.old_val * 100;
+    totalBias += bias;
+  });
+  const mean_bias_pct = parseFloat((pairs.length ? (totalBias / pairs.length) : 0).toFixed(2));
+  const max_bias = data.max_bias_pct || 5.0;
+  return {
+    is_approved: mean_bias_pct <= max_bias,
+    mean_bias_pct,
+    parameter: data.parameter
+  };
+}
+
 window.renderLotVerification = renderLotVerification;
 window.lvPilihLot = lvPilihLot;
+window.evaluateLotToLotVerification = evaluateLotToLotVerification;

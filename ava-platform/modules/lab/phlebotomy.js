@@ -228,10 +228,10 @@ function recordPhlebotomySampling(barcode, data = {}) {
     officer: data.officer || 'Analis',
     sampling_site: data.sampling_site || 'Vena Mediana Cubiti',
     sampling_time: new Date().toISOString(),
-    status: 'COLLECTED',
+    status: 'Selesai Sampling',
     notes: data.notes || 'Sampling selesai'
   };
-  return { success: true, record };
+  return { success: true, status: 'Selesai Sampling', record };
 }
 
 window.renderPhlebotomy = renderPhlebotomy;

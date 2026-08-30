@@ -307,8 +307,30 @@ async function svTambahKriteria() {
   } catch (e) { alert('Gagal menyimpan kriteria: ' + e.message); }
 }
 
+function evaluateSpecimenSuitability(data = {}) {
+  const reasons = [];
+  if (data.hemolysis_grade && data.hemolysis_grade !== 'NONE') {
+    reasons.push({ code: 'REJ-01', text: `Spesimen Hemolisis (${data.hemolysis_grade})` });
+  }
+  if (data.is_clotted) {
+    reasons.push({ code: 'REJ-04', text: 'Spesimen Beku (Micro-clot)' });
+  }
+  if (data.volume_adequate === false) {
+    reasons.push({ code: 'REJ-02', text: 'Volume Spesimen Tidak Cukup' });
+  }
+
+  const is_suitable = reasons.length === 0;
+  return {
+    is_suitable,
+    status: is_suitable ? 'ACCEPTED_FOR_ANALYSIS' : 'REJECTED_SPECIMEN',
+    accession_no: data.accession_no,
+    reasons
+  };
+}
+
 window.renderSpecimenVerification = renderSpecimenVerification;
 window.svGantiTab       = svGantiTab;
 window.svTerima         = svTerima;
 window.svTolak          = svTolak;
 window.svTambahKriteria = svTambahKriteria;
+window.evaluateSpecimenSuitability = evaluateSpecimenSuitability;

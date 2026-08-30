@@ -361,9 +361,10 @@ function createIntegratedOrder(data = {}) {
   const lab_total = (data.lab_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
   const rad_total = (data.radiology_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
   const pharm_total = (data.pharmacy_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
-  const total = (data.total_amount != null) ? data.total_amount : (lab_total + rad_total + pharm_total);
+  const proc_total = (data.procedure_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
+  const total = (data.total_amount != null) ? data.total_amount : (lab_total + rad_total + pharm_total + proc_total);
 
-  return {
+  const order = {
     order_id: 'ORD-' + Date.now(),
     patient_name: data.patient_name || 'Pasien',
     ava_id: data.ava_id || 'AVA-001',
@@ -371,9 +372,18 @@ function createIntegratedOrder(data = {}) {
     lab_items: data.lab_items || [],
     radiology_items: data.radiology_items || [],
     pharmacy_items: data.pharmacy_items || [],
+    procedure_items: data.procedure_items || [],
     total_amount: total,
+    dispatches: {
+      lis_accession: data.lab_items?.length ? `LIS-${Date.now().toString().slice(-6)}` : null,
+      ris_order_no: data.radiology_items?.length ? `RIS-${Date.now().toString().slice(-6)}` : null,
+      pharmacy_dispense_id: data.pharmacy_items?.length ? `RX-${Date.now().toString().slice(-6)}` : null
+    },
+    payment_coverage: data.payment_coverage || 'Umum',
     status: 'ACTIVE'
   };
+
+  return { success: true, order };
 }
 
 window.renderIntegratedOrders = renderIntegratedOrders;

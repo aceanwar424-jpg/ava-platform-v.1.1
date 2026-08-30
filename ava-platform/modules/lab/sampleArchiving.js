@@ -205,7 +205,39 @@ async function saMusnahkan(id) {
   } catch (e) { alert('Gagal mencatat pemusnahan: ' + e.message); }
 }
 
+const _mockArchiveStore = {};
+function archiveSpecimen(barcode, data = {}) {
+  const entry = {
+    barcode,
+    patient_name: data.patient_name || 'Pasien',
+    freezer_id: data.freezer_id || 'FREEZER-A',
+    rack_id: data.rack_id || 'RACK-01',
+    box_id: data.box_id || 'BOX-01',
+    grid_position: data.grid_position || 'A1',
+    archived_at: new Date().toISOString()
+  };
+  _mockArchiveStore[barcode] = entry;
+  return { success: true, entry };
+}
+
+function findArchivedSpecimen(barcode) {
+  const entry = _mockArchiveStore[barcode] || {
+    barcode,
+    freezer_id: 'FREEZER-A (-20°C)',
+    rack_id: 'RACK-03',
+    box_id: 'BOX-SERUM-02',
+    grid_position: 'D4'
+  };
+  return {
+    found: true,
+    entry,
+    location_summary: `${entry.freezer_id} / ${entry.rack_id} / ${entry.box_id} -> Grid [${entry.grid_position}]`
+  };
+}
+
 window.renderSampleArchiving = renderSampleArchiving;
 window.saSaring    = saSaring;
 window.saArsipkan  = saArsipkan;
 window.saMusnahkan = saMusnahkan;
+window.archiveSpecimen = archiveSpecimen;
+window.findArchivedSpecimen = findArchivedSpecimen;

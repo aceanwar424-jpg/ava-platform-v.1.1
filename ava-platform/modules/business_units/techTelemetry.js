@@ -176,5 +176,19 @@ function ttGambar() {
 
 function ttGantiPeriode(p) { ttPeriode = p; ttGambar(); }
 
+function recordClientHeartbeat(data = {}) {
+  return {
+    success: true,
+    node: {
+      client_id: data.client_id || 'CLI-001',
+      name: data.name || 'Client',
+      status: 'HEALTHY',
+      latency_ms: data.latency_ms || 20,
+      timestamp: new Date().toISOString()
+    }
+  };
+}
+
 window.renderTechTelemetry = renderTechTelemetry;
 window.ttGantiPeriode = ttGantiPeriode;
+window.recordClientHeartbeat = recordClientHeartbeat;

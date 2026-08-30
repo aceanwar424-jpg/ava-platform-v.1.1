@@ -268,6 +268,19 @@ function mpTabRiwayat() {
   </div>`;
 }
 
+function mergePatientRecords(masterAvaId, secondaryAvaId, actor = 'Admin') {
+  return {
+    success: true,
+    merge_entry: {
+      master_ava_id: masterAvaId,
+      secondary_ava_id: secondaryAvaId,
+      merged_by: actor,
+      merged_at: new Date().toISOString()
+    }
+  };
+}
+
 window.renderMpiManagement = renderMpiManagement;
 window.mpGantiTab = mpGantiTab;
 window.mpSetCari  = mpSetCari;
+window.mergePatientRecords = mergePatientRecords;

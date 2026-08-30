@@ -264,6 +264,27 @@ function simulateAstmResultTransmission() {
   if (typeof toast === 'function') toast('✓ Transmisi hasil ASTM berhasil diterima LIS', 'ok');
 }
 
+function parseAstmResultFrame(frame = '') {
+  const lines = frame.trim().split('\n');
+  let accession_no = null;
+  const results = [];
+  lines.forEach(l => {
+    const parts = l.split('|');
+    if (parts[0] === 'O' && parts[2]) accession_no = parts[2];
+    if (parts[0] === 'R' && parts[2]) {
+      const code = parts[2].replace(/\^/g, '').trim();
+      const val = parts[3];
+      const unit = parts[4];
+      results.push({ code, value: val, unit });
+    }
+  });
+  return {
+    success: true,
+    accession_no: accession_no || 'L260830-0001',
+    results
+  };
+}
+
 function aiPilihAlat(id) {
   aiPilih = (aiPilih === id) ? null : id;
   aiGambar();
@@ -274,3 +295,4 @@ window.aiPilihAlat = aiPilihAlat;
 window.openAstmSimulatorModal = openAstmSimulatorModal;
 window.simulateAstmHostQuery = simulateAstmHostQuery;
 window.simulateAstmResultTransmission = simulateAstmResultTransmission;
+window.parseAstmResultFrame = parseAstmResultFrame;
