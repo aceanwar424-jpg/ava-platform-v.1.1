@@ -113,7 +113,12 @@ async function renderAnalyzerInterfacing() {
             Koneksi bi-directional antara mesin analyzer otomatis (Sysmex, Mindray, Cobas) dengan LIS.
           </p>
         </div>
-        <button class="btn btn-teal" onclick="renderAnalyzerInterfacing()">↻ Test Socket Connection</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-teal" onclick="if(typeof downloadConnectorZip==='function') downloadConnectorZip(); else alert('Download connector bundle')" style="font-weight:750;">
+            ⬇️ Download Connector (.ZIP)
+          </button>
+          <button class="btn btn-ghost" onclick="renderAnalyzerInterfacing()">↻ Test Socket</button>
+        </div>
       </div>
 
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; margin-top:16px;">

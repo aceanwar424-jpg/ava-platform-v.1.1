@@ -30,11 +30,12 @@ function renderCheckinTab(){
   if(!samples.some(s=>s.id==_ciSel)) _ciSel = samples.length?samples[0].id:null;
 
   el.innerHTML=`
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <input class="table-search" id="barcode-input" placeholder="Scan / ketik barcode label atau nama pasien..."
-        onkeydown="if(event.key==='Enter')checkInBarcode(this.value)" style="flex:1">
-      <button class="btn btn-teal" onclick="checkInBarcode(document.getElementById('barcode-input').value)">Check In</button>
-      <button class="btn btn-ghost" onclick="openSampleForm()">+ Manual</button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+      <input class="table-search" id="barcode-input" placeholder="🔍 Scan / ketik barcode tabung (L260830-001) atau nama pasien..."
+        onkeydown="if(event.key==='Enter')checkInBarcode(this.value)" style="flex:1;min-width:240px">
+      <button class="btn btn-teal" onclick="checkInBarcode(document.getElementById('barcode-input').value)">Check In Barcode</button>
+      <button class="btn btn-ghost" style="border:1px solid var(--teal);color:var(--teal);font-weight:750" onclick="openWalkinLabModal()">+ Order Walk-In LIS (Mandiri)</button>
+      <button class="btn btn-ghost" style="border:1px solid var(--border);font-weight:700" onclick="openSampleForm()">🏥 Tarik Order HIS</button>
     </div>
     <div id="lab-pending-labels"></div>
 
@@ -534,3 +535,188 @@ async function confirmRejectSample(id){
     await loadLabSamples(); renderCheckinTab(); renderLabKPI();
   } catch(e){ toast('❌ '+e.message,'err'); }
 }
+
+async function openWalkinLabModal() {
+  const prods = await loadLabProducts();
+  const prodOptions = (prods || []).map(p => `<option value="${p.id}" data-price="${p.harga_dasar || p.tarif || 0}" data-sample="${p.sampel_type || 'Darah Vena'}" data-name="${p.nama_tes}">${p.kode_internal || 'LAB'} — ${p.nama_tes} (${p.sampel_type || 'Darah'})</option>`).join('');
+
+  const today = new Date();
+  const dateStr = today.toISOString().slice(2, 10).replace(/-/g, '');
+  const randSeq = String(Math.floor(Math.random() * 900) + 100);
+  const autoBarcode = `L${dateStr}-${randSeq}`;
+  const autoVisit = `WALK-LAB-${dateStr}-${randSeq}`;
+
+  openModal(`
+    <div class="modal-header">
+      <div>
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); padding:2px 8px; border-radius:999px; font-size:10.5px; font-weight:800; color:#10B981; margin-bottom:4px;">
+          🩸 ADMISI LAB MANDIRI &bull; WALK-IN DIRECT
+        </div>
+        <div class="modal-title" style="font-size:17px; font-weight:800;">Registrasi Pasien &amp; Order Pemeriksaan Lab</div>
+      </div>
+      <button class="modal-close" onclick="closeModalForce()" style="font-size:14px; font-weight:700;">&times;</button>
+    </div>
+
+    <div style="max-height:75vh; overflow-y:auto; padding:2px 4px;">
+      <!-- DATA PASIEN -->
+      <div style="background:var(--bg2); padding:14px; border-radius:10px; border:1px solid var(--border); margin-bottom:14px;">
+        <div style="font-size:12.5px; font-weight:800; color:var(--text); margin-bottom:10px;">📋 Identitas Pasien Walk-in</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Nama Lengkap Pasien *</label>
+            <input type="text" id="walkin-name" placeholder="Contoh: Tn. Bambang Irawan" required style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">NIK / No. KTP</label>
+            <input type="text" id="walkin-nik" placeholder="16 Digit NIK" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Jenis Kelamin *</label>
+            <select id="walkin-gender" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+              <option value="L">Laki-laki (L)</option>
+              <option value="P">Perempuan (P)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Usia / Tgl Lahir *</label>
+            <input type="text" id="walkin-age" placeholder="Contoh: 35 th atau 1989-05-12" required style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">No. WhatsApp / HP</label>
+            <input type="tel" id="walkin-phone" placeholder="08xxxxxxxxxx" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Dokter / Faskes Perujuk</label>
+            <input type="text" id="walkin-doctor" placeholder="dr. Pengirim / Atas Permintaan Sendiri (APS)" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- PEMILIHAN TES LAB -->
+      <div style="background:var(--bg2); padding:14px; border-radius:10px; border:1px solid var(--border); margin-bottom:14px;">
+        <div style="font-size:12.5px; font-weight:800; color:var(--text); margin-bottom:10px;">🧪 Parameter Pemeriksaan Laboratorium</div>
+        <div class="form-group">
+          <label style="font-size:11.5px; font-weight:700;">Pilih Tes Lab (530+ Parameter LOINC) *</label>
+          <select id="walkin-test-select" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;" onchange="onWalkinTestSelected(this)">
+            <option value="">-- Pilih Tes dari Katalog --</option>
+            ${prodOptions}
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px;">
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Barcode Tabung (Auto Accession)</label>
+            <input type="text" id="walkin-barcode" value="${autoBarcode}" readonly style="width:100%; padding:8px 10px; background:var(--bg); border:1px solid var(--border); border-radius:6px; font-size:12.5px; font-weight:800; font-family:monospace; color:var(--teal);">
+          </div>
+          <div class="form-group">
+            <label style="font-size:11.5px; font-weight:700;">Tipe Spesimen</label>
+            <input type="text" id="walkin-sample-type" value="Darah Vena (EDTA / Serum)" style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:10px;">
+          <label style="font-size:11.5px; font-weight:700;">Diagnosis Klinis / Catatan Sampling</label>
+          <input type="text" id="walkin-notes" placeholder="Puasa 10 jam, evaluasi diabetes, dll..." style="width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:6px; font-size:12.5px;">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-teal" style="font-weight:800; padding:10px 20px;" onclick="submitWalkinLabOrder('${autoVisit}')">
+        💾 Simpan &amp; Cetak Barcode Tabung
+      </button>
+    </div>
+  `);
+}
+
+function onWalkinTestSelected(selectEl) {
+  const opt = selectEl.options[selectEl.selectedIndex];
+  if (opt && opt.dataset.sample) {
+    const sampEl = document.getElementById('walkin-sample-type');
+    if (sampEl) sampEl.value = opt.dataset.sample;
+  }
+}
+
+async function submitWalkinLabOrder(visitNumber) {
+  const patient_name = document.getElementById('walkin-name')?.value?.trim();
+  const nik = document.getElementById('walkin-nik')?.value?.trim() || null;
+  const patient_gender = document.getElementById('walkin-gender')?.value || 'L';
+  const ageVal = document.getElementById('walkin-age')?.value?.trim();
+  const patient_phone = document.getElementById('walkin-phone')?.value?.trim() || null;
+  const doctor = document.getElementById('walkin-doctor')?.value?.trim() || 'APS';
+  const barcode = document.getElementById('walkin-barcode')?.value?.trim();
+  const sample_type = document.getElementById('walkin-sample-type')?.value?.trim() || 'Darah Vena';
+  const notes = document.getElementById('walkin-notes')?.value?.trim() || null;
+
+  const testSel = document.getElementById('walkin-test-select');
+  const productId = parseInt(testSel?.value, 10);
+  const productName = testSel?.options[testSel.selectedIndex]?.dataset.name || 'Pemeriksaan Lab';
+
+  if (!patient_name) { toast('Nama Pasien wajib diisi', 'err'); return; }
+  if (!productId) { toast('Pilih tes laboratorium dulu', 'err'); return; }
+
+  try {
+    const adm = await sbPost('admissions', {
+      visit_number: visitNumber,
+      patient_name,
+      patient_nik: nik,
+      patient_gender,
+      patient_age: parseInt(ageVal, 10) || 30,
+      patient_phone,
+      doctor_name: doctor,
+      unit: 'Laboratorium',
+      status: 'In Progress',
+      created_at: new Date().toISOString()
+    });
+
+    const admId = Array.isArray(adm) ? adm[0]?.id : adm?.id;
+
+    const sample = await sbPost('lab_samples', {
+      barcode,
+      admission_id: admId || null,
+      visit_number: visitNumber,
+      patient_name,
+      product_id: productId,
+      product_name: productName,
+      sampel_type: sample_type,
+      volume_ml: 3.0,
+      collected_at: new Date().toISOString(),
+      collected_by: labUser(),
+      received_at: new Date().toISOString(),
+      status: 'Pending',
+      notes
+    });
+
+    const sampleId = Array.isArray(sample) ? sample[0]?.id : sample?.id;
+
+    await labCreateDraftResults(
+      { admission_id: admId, sample_id: sampleId, visit_number: visitNumber, patient_name },
+      productId,
+      productName
+    );
+
+    toast('✅ Pasien Walk-in & Order Lab berhasil dibuat!', 'ok');
+
+    if (typeof printLabBarcodes === 'function') {
+      setTimeout(() => {
+        printLabBarcodes([{
+          barcode,
+          patient_name,
+          product_name: productName,
+          visit_number: visitNumber,
+          sample_type
+        }]);
+      }, 400);
+    }
+
+    closeModalForce();
+    if (typeof labRefresh === 'function') labRefresh();
+  } catch (e) {
+    toast('❌ ' + e.message, 'err');
+  }
+}
+
+window.openWalkinLabModal = openWalkinLabModal;
+window.onWalkinTestSelected = onWalkinTestSelected;
+window.submitWalkinLabOrder = submitWalkinLabOrder;

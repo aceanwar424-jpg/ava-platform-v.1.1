@@ -123,6 +123,7 @@ const PAGE_TITLES = {
   'compliance-tracker':'Compliance & Legal Tracker',
   'pacs-viewer':'PACS & DICOM Imaging Viewer',
   'catalog-export':'Master Catalog & LIS Exporter',
+  'lis-settings':'Pengaturan LIS & Connector (:9999)',
   'executive-dashboard':'👑 CEO Master Orchestration Cockpit',
   cockpit:'👑 CEO Master Orchestration Cockpit',
   his:'Sistem Informasi Manajemen Rumah Sakit & Faskes (HIS)',
@@ -228,6 +229,7 @@ async function navigate(page, params={}) {
     case 'sales-corong':safeRun('renderSalesCorong');            break;
     case 'portal-akses':safeRun('renderPortalAkses');            break;
     case 'perujuk':     safeRun('renderPerujuk');                break;
+    case 'lis-settings':safeRun('renderLisSettings');            break;
     case 'lisensi':     safeRun('renderLisensi');                break;
     case 'executive_dashboard':
     case 'executive-dashboard': safeRun('renderExecutiveDashboard');     break;

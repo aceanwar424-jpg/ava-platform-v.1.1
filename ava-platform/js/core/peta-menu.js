@@ -658,6 +658,12 @@ window.PETA_MENU = {
               "label": "Ekspor Katalog LOINC",
               "status": "ada",
               "ket": "Katalog terstandarisasi siap-LIS"
+            },
+            {
+              "id": "lis-settings",
+              "label": "Pengaturan LIS & Connector",
+              "status": "ada",
+              "ket": "Profil lab, dr. Sp.PK, ambang kritis, dan unduh paket connector :9999"
             }
           ]
         }
