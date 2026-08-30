@@ -222,6 +222,19 @@ async function phAmbil(sampleId) {
   } catch (e) { alert('Gagal mencatat pengambilan: ' + e.message); }
 }
 
+function recordPhlebotomySampling(barcode, data = {}) {
+  const record = {
+    barcode,
+    officer: data.officer || 'Analis',
+    sampling_site: data.sampling_site || 'Vena Mediana Cubiti',
+    sampling_time: new Date().toISOString(),
+    status: 'COLLECTED',
+    notes: data.notes || 'Sampling selesai'
+  };
+  return { success: true, record };
+}
+
 window.renderPhlebotomy = renderPhlebotomy;
 window.phGantiTab = phGantiTab;
 window.phAmbil    = phAmbil;
+window.recordPhlebotomySampling = recordPhlebotomySampling;

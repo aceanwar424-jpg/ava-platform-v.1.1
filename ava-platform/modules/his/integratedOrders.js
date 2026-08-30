@@ -1,169 +1,387 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: ORDER TERINTEGRASI (INTEGRATED CLINICAL ORDERING)
-// Standar PMK 24/2022 — Satu Klik untuk Lab LIS, RIS Radiologi, Farmasi & Tindakan
+// MODUL: Order Terintegrasi — satu permintaan lintas layanan
+//
+// Versi sebelumnya tidak punya panggilan data: katalog pemeriksaan dan
+// daftar order ditulis tangan, termasuk harga dan kode LOINC.
+//
+// Sekarang membaca public.products (katalog tes yang sudah ada) dan
+// order_terintegrasi / order_terintegrasi_item (migrasi 0039).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Order ini INDUK, bukan pengganti. Lab tetap dikerjakan lewat
+// lab_samples dan radiologi lewat radiology_orders; yang ditambahkan
+// adalah satu tempat yang bisa menjawab "apa saja yang diminta untuk
+// pasien ini, dan mana yang belum selesai". Menggantikannya berarti
+// menulis ulang seluruh alur yang sudah berjalan.
+//
+// Harga tidak dikirim dari layar. Keranjang hanya mengirim product_id;
+// harga diambil server dari master. Harga yang dikirim layar bisa
+// disetel siapa saja lewat alat pengembang peramban.
+//
+// Status induk dihitung dari itemnya, tidak disetel terpisah. Dua angka
+// yang harus dijaga sinkron secara manual selalu berakhir berbeda.
+//
+// Prefiks "io".
 // ═══════════════════════════════════════════════════════════════
 
-let integratedOrders = [
-  {
-    order_id: 'ORD-2026-001',
-    encounter_id: 'ENC-20260830-01',
-    patient_name: 'Tn. Budi Setiawan',
-    ava_id: 'AVA-7K3M2P9QX4',
-    doctor_name: 'dr. Hendra Pratama, Sp.PD',
-    created_at: '2026-08-30 09:30',
-    lab_items: [
-      { code: 'LAB-HEM-001', name: 'Darah Lengkap / CBC', price: 120000, loinc: '58410-2' },
-      { code: 'LAB-KIM-010', name: 'Glukosa Darah Puasa', price: 45000, loinc: '1558-6' }
-    ],
-    radiology_items: [
-      { code: 'RAD-THORAX-01', name: 'Foto Thorax AP/PA', price: 185000, modality: 'CR/DR' }
-    ],
-    pharmacy_items: [
-      { code: 'MED-PCM-500', name: 'Paracetamol 500mg (10 Tab)', price: 15000, rule: '3x1 sesudah makan' },
-      { code: 'MED-AMX-500', name: 'Amoxicillin 500mg (10 Kap)', price: 35000, rule: '3x1 habiskan' }
-    ],
-    procedure_items: [
-      { code: 'PROC-NEB-01', name: 'Inhalasi Nebulizer Dewasa', price: 75000 }
-    ],
-    total_amount: 475000,
-    payment_coverage: 'BPJS Kesehatan (Ter-cover)',
-    status: 'DISPATCHED_TO_ALL_UNITS'
-  }
-];
+let ioData = null;
+let ioTab = 'daftar';
+let ioKeranjang = [];
+let ioCari = '';
 
-/**
- * Buat dan sebar order terpadu ke seluruh unit penunjang
- */
-function createIntegratedOrder(orderPayload) {
-  const {
-    encounter_id = `ENC-${Date.now().toString().slice(-6)}`,
-    patient_name,
-    ava_id = 'AVA-PATIENT',
-    doctor_name = 'dr. Jaga Poli',
-    lab_items = [],
-    radiology_items = [],
-    pharmacy_items = [],
-    procedure_items = [],
-    payment_coverage = 'Mandiri / Tunai'
-  } = orderPayload;
+function ioEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function ioRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+function ioJam(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
 
-  if (!patient_name) throw new Error('Nama pasien wajib diisi.');
-
-  const labTotal = lab_items.reduce((s, i) => s + (i.price || 0), 0);
-  const radTotal = radiology_items.reduce((s, i) => s + (i.price || 0), 0);
-  const pharmTotal = pharmacy_items.reduce((s, i) => s + (i.price || 0), 0);
-  const procTotal = procedure_items.reduce((s, i) => s + (i.price || 0), 0);
-  const grandTotal = labTotal + radTotal + pharmTotal + procTotal;
-
-  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
-  const orderId = `ORD-${new Date().getFullYear()}-${String(integratedOrders.length + 1).padStart(3, '0')}`;
-
-  const newOrder = {
-    order_id: orderId,
-    encounter_id,
-    patient_name,
-    ava_id,
-    doctor_name,
-    created_at: now,
-    lab_items,
-    radiology_items,
-    pharmacy_items,
-    procedure_items,
-    breakdown: {
-      lab: labTotal,
-      radiology: radTotal,
-      pharmacy: pharmTotal,
-      procedure: procTotal
-    },
-    total_amount: grandTotal,
-    payment_coverage,
-    dispatches: {
-      lis_accession: lab_items.length ? `L${now.slice(2, 4)}${now.slice(5, 7)}${now.slice(8, 10)}-${String(integratedOrders.length + 1).padStart(4, '0')}` : null,
-      ris_order_no: radiology_items.length ? `RAD-${now.slice(2, 4)}${now.slice(5, 7)}${now.slice(8, 10)}-${String(integratedOrders.length + 1).padStart(4, '0')}` : null,
-      pharmacy_rx: pharmacy_items.length ? `RX-${orderId}` : null
-    },
-    status: 'DISPATCHED_TO_ALL_UNITS'
-  };
-
-  integratedOrders.unshift(newOrder);
-
-  return {
-    success: true,
-    order: newOrder,
-    message: `Order terintegrasi ${orderId} untuk ${patient_name} berhasil diteruskan ke Lab, Radiologi, dan Farmasi.`
-  };
+async function ioMuat() {
+  if (typeof sbGet !== 'function') { ioData = null; return; }
+  try {
+    const [papan, item, produk] = await Promise.all([
+      sbGet('order_terintegrasi_papan', 'select=*&order=created_at.desc&limit=200'),
+      sbGet('order_terintegrasi_item', 'select=*'),
+      sbGet('products',
+        'select=id,kode_internal,nama_tes,kategori,harga_normal,loinc_code&order=nama_tes'),
+    ]);
+    ioData = { papan, item, produk };
+  } catch (e) { ioData = null; }
 }
 
 async function renderIntegratedOrders() {
   const main = document.getElementById('main-content');
-  if (!main) return;
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div class="page-header">
-        <div>
-          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#10b981; margin-bottom:6px;">
-            ⚡ PMK 24/2022 &bull; ORDER KLINIS TERINTEGRASI
-          </div>
-          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
-            Order Terintegrasi (Lab + Radiologi + Resep + Tindakan)
-          </h1>
-          <p style="font-size:13px; color:var(--text3); margin:0;">
-            Pemesanan satu pintu dari ruang dokter poliklinik langsung terdistribusi ke LIS, RIS, Antrean Farmasi, dan Billing Kasir.
-          </p>
+  await ioMuat();
+
+  if (ioData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Order Terintegrasi</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data order tidak dapat dibaca.</strong><br>
+        Tabel <code>order_terintegrasi</code> belum ada — jalankan ulang
+        aplikasi agar migrasi
+        <code>0039_tech_lisensi_harga_order_terintegrasi.sql</code> terpasang.
+      </div>`;
+    return;
+  }
+  ioGambar();
+}
+
+function ioGambar() {
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Order Terintegrasi</h1>
+        <p class="muted">Satu permintaan pemeriksaan lintas lab, radiologi, dan tindakan.</p>
+      </div>
+    </div>
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab ${ioTab === 'daftar' ? 'active' : ''}"
+              onclick="ioGantiTab('daftar')">Daftar Order</button>
+      <button class="tab ${ioTab === 'baru' ? 'active' : ''}"
+              onclick="ioGantiTab('baru')">Order Baru${
+                ioKeranjang.length ? ` (${ioKeranjang.length})` : ''}</button>
+    </div>
+
+    ${ioTab === 'daftar' ? ioTabDaftar() : ioTabBaru()}`;
+}
+
+function ioGantiTab(t) { ioTab = t; ioGambar(); }
+
+function ioTabDaftar() {
+  const P = ioData.papan || [];
+  if (!P.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">📋</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada order tercatat</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Buat order baru untuk meminta pemeriksaan lintas layanan sekaligus.</div>
+    </div>`;
+  }
+
+  const warna = {
+    'Draf': 'var(--text3)', 'Dikirim': 'var(--info)',
+    'Sebagian Selesai': 'var(--warning)', 'Selesai': 'var(--success)',
+    'Batal': 'var(--text3)',
+  };
+
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>No. Order</th><th>Pasien</th><th>Pengirim</th><th>Layanan</th>
+      <th>Prioritas</th><th style="text-align:right">Progres</th>
+      <th style="text-align:right">Total</th><th>Dibuat</th><th>Status</th><th></th>
+    </tr></thead><tbody>
+    ${P.map(o => {
+      const cito = (o.prioritas || '').toLowerCase() === 'cito';
+      return `<tr>
+        <td><b>${ioEsc(o.no_order)}</b></td>
+        <td>${ioEsc(o.patient_name || '—')}
+          ${o.mr_number ? `<div style="font-size:11px; color:var(--text3)">
+            ${ioEsc(o.mr_number)}</div>` : ''}</td>
+        <td style="font-size:12px">${ioEsc(o.dokter_perujuk || '—')}</td>
+        <td style="font-size:12px">${ioEsc(o.layanan || '—')}</td>
+        <td>${cito ? '<b style="color:var(--danger)">CITO</b>'
+                   : ioEsc(o.prioritas || 'Rutin')}</td>
+        <td style="text-align:right">${o.jml_selesai}/${o.jml_item}</td>
+        <td style="text-align:right">${ioRp(o.total)}</td>
+        <td style="white-space:nowrap">${ioJam(o.created_at)}</td>
+        <td><span style="font-weight:600; color:${warna[o.status] || 'var(--text3)'}">
+          ${ioEsc(o.status)}</span></td>
+        <td><button class="btn btn-sm" onclick="ioRincian(${o.id})">Rincian</button></td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>`;
+}
+
+function ioTabBaru() {
+  const Q = ioData.produk || [];
+  const q = ioCari.trim().toLowerCase();
+  const hasil = q
+    ? Q.filter(p => String(p.nama_tes || '').toLowerCase().includes(q)
+                 || String(p.kode_internal || '').toLowerCase().includes(q))
+    : Q.slice(0, 40);
+
+  const total = ioKeranjang.reduce((a, x) => a + Number(x.harga_normal || 0), 0);
+
+  if (!Q.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🧾</div>
+      <div style="font-weight:700; margin-bottom:4px">Katalog pemeriksaan masih kosong</div>
+      <div style="font-size:13px; color:var(--text3)">
+        Isi master pemeriksaan lebih dulu agar order bisa dibuat.</div>
+    </div>`;
+  }
+
+  return `
+    <div style="display:grid; grid-template-columns:1fr 320px; gap:16px; align-items:start">
+      <div>
+        <div class="card" style="padding:12px 16px; margin-bottom:12px">
+          <input placeholder="Cari pemeriksaan…" value="${ioEsc(ioCari)}"
+                 oninput="ioSetCari(this.value)"
+                 style="width:100%; padding:8px 12px; border:1px solid var(--border);
+                        border-radius:6px">
+        </div>
+        <div class="card" style="overflow-x:auto">
+          <table class="data-table"><thead><tr>
+            <th>Kode</th><th>Pemeriksaan</th><th>Kategori</th><th>LOINC</th>
+            <th style="text-align:right">Harga</th><th></th>
+          </tr></thead><tbody>
+          ${hasil.map(p => {
+            const ada = ioKeranjang.some(x => x.id === p.id);
+            return `<tr>
+              <td style="font-size:12px">${ioEsc(p.kode_internal || '—')}</td>
+              <td>${ioEsc(p.nama_tes)}</td>
+              <td style="font-size:12px">${ioEsc(p.kategori || '—')}</td>
+              <td style="font-size:12px">${ioEsc(p.loinc_code || '—')}</td>
+              <td style="text-align:right">${ioRp(p.harga_normal)}</td>
+              <td><button class="btn btn-sm ${ada ? '' : 'btn-primary'}"
+                          onclick="ioToggle(${p.id})">
+                ${ada ? 'Hapus' : 'Tambah'}</button></td>
+            </tr>`;
+          }).join('')}
+          </tbody></table>
         </div>
       </div>
 
-      <div class="card" style="padding:20px; margin-top:16px;">
-        <h3 style="font-size:15px; font-weight:800; margin-bottom:12px;">Riwayat Order Terpadu Terakhir</h3>
-        <table class="table" style="width:100%; font-size:12.5px;">
-          <thead>
-            <tr style="background:var(--bg2);">
-              <th>ID Order</th>
-              <th>Pasien (AVA-ID)</th>
-              <th>Dokter Pengirim</th>
-              <th>Rincian Layanan Dipesan</th>
-              <th>Total Biaya</th>
-              <th>Penjamin</th>
-              <th>Status Dispatched</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${integratedOrders.map(o => `
-              <tr>
-                <td style="font-family:monospace; font-weight:700; color:var(--sky);">${o.order_id}</td>
-                <td><b>${o.patient_name}</b><div style="font-size:11px; color:var(--text3); font-family:monospace;">${o.ava_id}</div></td>
-                <td>${o.doctor_name}</td>
-                <td>
-                  <div style="font-size:11.5px;">
-                    ${o.lab_items.length ? `<span class="badge" style="background:#0284c7; color:#fff; font-size:10px; margin-right:4px;">🔬 ${o.lab_items.length} Lab</span>` : ''}
-                    ${o.radiology_items.length ? `<span class="badge" style="background:#8b5cf6; color:#fff; font-size:10px; margin-right:4px;">🩻 ${o.radiology_items.length} Rad</span>` : ''}
-                    ${o.pharmacy_items.length ? `<span class="badge" style="background:#10b981; color:#fff; font-size:10px; margin-right:4px;">💊 ${o.pharmacy_items.length} Obat</span>` : ''}
-                    ${o.procedure_items.length ? `<span class="badge" style="background:#f59e0b; color:#fff; font-size:10px;">🩺 ${o.procedure_items.length} Tindakan</span>` : ''}
-                  </div>
-                </td>
-                <td><b>Rp ${Number(o.total_amount).toLocaleString('id-ID')}</b></td>
-                <td><span class="badge badge-success">${o.payment_coverage}</span></td>
-                <td><span style="color:#10b981; font-weight:700; font-size:11px;">✓ Otomatis ke LIS &amp; RIS</span></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+      <div class="card" style="padding:16px; position:sticky; top:12px">
+        <div style="font-weight:800; margin-bottom:10px">Order Baru</div>
+        <input id="io-pasien" placeholder="Nama pasien *"
+               style="width:100%; margin-bottom:8px">
+        <input id="io-mr" placeholder="No. rekam medis" style="width:100%; margin-bottom:8px">
+        <input id="io-dokter" placeholder="Dokter perujuk" style="width:100%; margin-bottom:8px">
+        <textarea id="io-klinis" rows="2" placeholder="Keterangan klinis / diagnosis kerja"
+                  style="width:100%; margin-bottom:8px"></textarea>
+        <select id="io-prioritas" style="width:100%; margin-bottom:12px">
+          <option value="Rutin">Rutin</option>
+          <option value="Cito">Cito</option>
+        </select>
+
+        <div style="border-top:1px solid var(--border); padding-top:10px">
+          ${!ioKeranjang.length
+            ? '<div style="font-size:12px; color:var(--text3)">Belum ada pemeriksaan dipilih.</div>'
+            : ioKeranjang.map(x => `
+              <div style="display:flex; justify-content:space-between; gap:8px;
+                          font-size:12px; padding:4px 0">
+                <span>${ioEsc(x.nama_tes)}</span>
+                <span style="white-space:nowrap">${ioRp(x.harga_normal)}
+                  <a onclick="ioToggle(${x.id})" style="cursor:pointer; color:var(--danger);
+                     margin-left:6px">×</a></span>
+              </div>`).join('')}
+        </div>
+
+        <div style="display:flex; justify-content:space-between; font-weight:800;
+                    margin-top:10px; padding-top:10px; border-top:1px solid var(--border)">
+          <span>Total</span><span>${ioRp(total)}</span>
+        </div>
+        <div style="font-size:11px; color:var(--text3); margin-top:4px">
+          Harga akhir ditentukan server dari master, bukan dari layar ini.
+        </div>
+
+        <button class="btn btn-primary" style="width:100%; margin-top:12px"
+                onclick="ioKirim(this)" ${ioKeranjang.length ? '' : 'disabled'}>
+          Kirim Order</button>
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-if (typeof window !== 'undefined') {
-  window.renderIntegratedOrders = renderIntegratedOrders;
-  window.createIntegratedOrder = createIntegratedOrder;
-  window.integratedOrders = integratedOrders;
+function ioSetCari(v) {
+  ioCari = v;
+  const isi = document.querySelector('#main-content input[placeholder="Cari pemeriksaan…"]');
+  const pos = isi && isi.selectionStart;
+  ioGambar();
+  const baru = document.querySelector('#main-content input[placeholder="Cari pemeriksaan…"]');
+  if (baru) { baru.focus(); if (pos != null) baru.setSelectionRange(pos, pos); }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    renderIntegratedOrders,
-    createIntegratedOrder,
-    integratedOrders
+// Isi formulir dipertahankan saat keranjang berubah — kalau tidak,
+// petugas kehilangan nama pasien yang sudah diketik tiap menambah tes.
+function ioToggle(produkId) {
+  const simpan = {};
+  for (const id of ['io-pasien', 'io-mr', 'io-dokter', 'io-klinis', 'io-prioritas']) {
+    const el = document.getElementById(id);
+    if (el) simpan[id] = el.value;
+  }
+
+  const i = ioKeranjang.findIndex(x => x.id === produkId);
+  if (i >= 0) ioKeranjang.splice(i, 1);
+  else {
+    const p = (ioData.produk || []).find(x => x.id === produkId);
+    if (p) ioKeranjang.push(p);
+  }
+  ioGambar();
+
+  for (const [id, v] of Object.entries(simpan)) {
+    const el = document.getElementById(id);
+    if (el) el.value = v;
+  }
+}
+
+async function ioKirim(tombol) {
+  const pasien = (document.getElementById('io-pasien').value || '').trim();
+  if (!pasien) { alert('Nama pasien wajib diisi.'); return; }
+  if (!ioKeranjang.length) { alert('Pilih minimal satu pemeriksaan.'); return; }
+
+  if (tombol) { tombol.disabled = true; tombol.textContent = 'Mengirim…'; }
+  try {
+    const r = await sbRpc('order_terintegrasi_buat', {
+      p_data: {
+        patient_name: pasien,
+        mr_number: (document.getElementById('io-mr').value || '').trim(),
+        dokter_perujuk: (document.getElementById('io-dokter').value || '').trim(),
+        klinis: (document.getElementById('io-klinis').value || '').trim(),
+        prioritas: document.getElementById('io-prioritas').value,
+        dibuat_oleh: (window.currentUsername || null),
+        // Harga sengaja tidak dikirim.
+        item: ioKeranjang.map(x => ({
+          layanan: /rad|thorax|usg|ct|mri/i.test(x.kategori || '') ? 'radiologi' : 'lab',
+          product_id: x.id,
+        })),
+      },
+    });
+    if (r && r.error) { alert(r.error); return; }
+    alert(`Order ${r.no_order} terkirim. Total ${ioRp(r.total)}.`);
+    ioKeranjang = [];
+    ioTab = 'daftar';
+    await renderIntegratedOrders();
+  } catch (e) {
+    alert('Gagal mengirim order: ' + e.message);
+  } finally {
+    if (tombol) { tombol.disabled = false; tombol.textContent = 'Kirim Order'; }
+  }
+}
+
+function ioRincian(orderId) {
+  const o = (ioData.papan || []).find(x => x.id === orderId);
+  const items = (ioData.item || []).filter(x => x.order_id === orderId);
+  if (!o) return;
+
+  const html = `
+    <div class="modal-overlay" id="io-modal" onclick="if(event.target===this)ioTutup()">
+      <div class="modal" style="max-width:620px">
+        <div class="modal-header">
+          <h3>${ioEsc(o.no_order)}</h3>
+          <button class="modal-close" onclick="ioTutup()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div style="font-size:13px; line-height:1.8; margin-bottom:12px">
+            <b>${ioEsc(o.patient_name || '—')}</b>
+            ${o.mr_number ? ' · ' + ioEsc(o.mr_number) : ''}<br>
+            Pengirim: ${ioEsc(o.dokter_perujuk || '—')}<br>
+            Klinis: ${ioEsc(o.klinis || '—')}<br>
+            Prioritas: <b>${ioEsc(o.prioritas)}</b> · Status: <b>${ioEsc(o.status)}</b>
+          </div>
+          <table class="data-table"><thead><tr>
+            <th>Layanan</th><th>Pemeriksaan</th>
+            <th style="text-align:right">Harga</th><th>Status</th><th></th>
+          </tr></thead><tbody>
+          ${items.map(i => `<tr>
+            <td>${ioEsc(i.layanan)}</td>
+            <td>${ioEsc(i.nama || '—')}
+              ${i.kode ? `<div style="font-size:11px; color:var(--text3)">
+                ${ioEsc(i.kode)}</div>` : ''}</td>
+            <td style="text-align:right">${ioRp(i.harga)}</td>
+            <td>${ioEsc(i.status)}</td>
+            <td>${i.status === 'Diminta' || i.status === 'Diproses'
+              ? `<button class="btn btn-sm" onclick="ioSelesaiItem(${i.id})">
+                   Tandai Selesai</button>` : ''}</td>
+          </tr>`).join('')}
+          </tbody></table>
+        </div>
+      </div>
+    </div>`;
+  document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function ioTutup() {
+  const m = document.getElementById('io-modal');
+  if (m) m.remove();
+}
+
+async function ioSelesaiItem(itemId) {
+  try {
+    const r = await sbRpc('order_terintegrasi_status_item', {
+      p_item_id: itemId, p_status: 'Selesai',
+    });
+    if (r && r.error) { alert(r.error); return; }
+    ioTutup();
+    await renderIntegratedOrders();
+  } catch (e) { alert('Gagal memperbarui status: ' + e.message); }
+}
+
+function createIntegratedOrder(data = {}) {
+  const lab_total = (data.lab_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
+  const rad_total = (data.radiology_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
+  const pharm_total = (data.pharmacy_items || []).reduce((acc, x) => acc + (x.price || 0), 0);
+  const total = (data.total_amount != null) ? data.total_amount : (lab_total + rad_total + pharm_total);
+
+  return {
+    order_id: 'ORD-' + Date.now(),
+    patient_name: data.patient_name || 'Pasien',
+    ava_id: data.ava_id || 'AVA-001',
+    doctor_name: data.doctor_name || 'dr. Jaga',
+    lab_items: data.lab_items || [],
+    radiology_items: data.radiology_items || [],
+    pharmacy_items: data.pharmacy_items || [],
+    total_amount: total,
+    status: 'ACTIVE'
   };
 }
+
+window.renderIntegratedOrders = renderIntegratedOrders;
+window.ioGantiTab    = ioGantiTab;
+window.ioSetCari     = ioSetCari;
+window.ioToggle      = ioToggle;
+window.ioKirim       = ioKirim;
+window.ioRincian     = ioRincian;
+window.ioTutup       = ioTutup;
+window.ioSelesaiItem = ioSelesaiItem;
+window.createIntegratedOrder = createIntegratedOrder;

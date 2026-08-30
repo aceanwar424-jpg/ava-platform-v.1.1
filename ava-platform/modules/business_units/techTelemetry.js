@@ -1,147 +1,180 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: TELEMETRI & MONITORING KESEHATAN KLIEN SAAS
-// Standar Operasional B2B — Pemantauan Real-Time Kesehatan Faskes Mitra
+// MODUL: AVA Tech — Telemetri Pemakaian Tenant
+//
+// Versi sebelumnya tidak punya panggilan data: grafik pemakaian, jumlah
+// transaksi, dan persentase kuota ditulis tangan. Angka pemakaian
+// karangan adalah dasar penagihan yang karangan.
+//
+// Sekarang membaca public.tenant_pemakaian (migrasi 0029) dan
+// public.tech_papan_lisensi (migrasi 0039).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Tenant yang belum pernah mengirim telemetri ditampilkan sebagai
+// "belum ada data", BUKAN sebagai 0. Nol berarti dipakai tapi tidak ada
+// transaksi; belum ada data berarti kita tidak tahu. Menyamakan keduanya
+// membuat instalasi yang gagal mengirim terlihat seperti klien yang
+// tidak aktif — dan itu keputusan komersial yang salah.
+//
+// Persentase kuota hanya ditampilkan bila paketnya punya batas. Untuk
+// paket tanpa batas, kolomnya kosong, bukan 0%.
+//
+// Prefiks "tt".
 // ═══════════════════════════════════════════════════════════════
 
-let clientTelemetryNodes = [
-  {
-    client_id: 'CLI-001',
-    name: 'Klinik Utama Sehat Sentosa',
-    location: 'Surabaya, Jawa Timur',
-    ip_endpoint: '103.144.20.12',
-    app_version: 'v5.1.2',
-    last_heartbeat: '2026-08-30 11:45',
-    latency_ms: 24,
-    db_size_mb: 480,
-    daily_transactions: 142,
-    status: 'HEALTHY'
-  },
-  {
-    client_id: 'CLI-002',
-    name: 'Laboratorium Diagnostika Prima',
-    location: 'Medan, Sumatera Utara',
-    ip_endpoint: '103.144.20.55',
-    app_version: 'v5.1.0',
-    last_heartbeat: '2026-08-30 11:44',
-    latency_ms: 38,
-    db_size_mb: 1250,
-    daily_transactions: 310,
-    status: 'HEALTHY'
-  }
-];
+let ttData = null;
+let ttPeriode = null;
 
-/**
- * Catat heartbeat telemetri dari mesin faskes klien
- */
-function recordClientHeartbeat(telemetryPayload) {
-  const {
-    client_id,
-    name,
-    app_version = 'v5.1.2',
-    latency_ms = 30,
-    db_size_mb = 100,
-    daily_transactions = 0
-  } = telemetryPayload;
+function ttEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
-  if (!client_id) throw new Error('Client ID wajib diisi.');
+function ttPeriodeSekarang() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
 
-  const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
-  let node = clientTelemetryNodes.find(n => n.client_id === client_id);
-
-  if (node) {
-    node.last_heartbeat = now;
-    node.latency_ms = latency_ms;
-    node.db_size_mb = db_size_mb;
-    node.daily_transactions = daily_transactions;
-    node.status = latency_ms > 200 ? 'DEGRADED_LATENCY' : 'HEALTHY';
-  } else {
-    node = {
-      client_id,
-      name: name || `Faskes Klien ${client_id}`,
-      location: 'Indonesia',
-      ip_endpoint: '127.0.0.1',
-      app_version,
-      last_heartbeat: now,
-      latency_ms,
-      db_size_mb,
-      daily_transactions,
-      status: 'HEALTHY'
-    };
-    clientTelemetryNodes.unshift(node);
-  }
-
-  return {
-    success: true,
-    node,
-    message: `Heartbeat dari ${node.name} berhasil diperbarui (${latency_ms}ms).`
-  };
+async function ttMuat() {
+  if (typeof sbGet !== 'function') { ttData = null; return; }
+  try {
+    const [pakai, lisensi, tenant] = await Promise.all([
+      sbGet('tenant_pemakaian', 'select=*&order=periode.desc&limit=1000'),
+      sbGet('tech_papan_lisensi', 'select=*').catch(() => []),
+      sbGet('tenants', 'select=*&order=nama').catch(() => []),
+    ]);
+    ttData = { pakai, lisensi, tenant };
+  } catch (e) { ttData = null; }
 }
 
 async function renderTechTelemetry() {
   const main = document.getElementById('main-content');
-  if (!main) return;
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div class="page-header">
-        <div>
-          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#10b981; margin-bottom:6px;">
-            📡 TELEMETRI INSTALASI &bull; MONITORING MESIN KLIEN B2B
-          </div>
-          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
-            Telemetri &amp; Pemantauan Klien Faskes
-          </h1>
-          <p style="font-size:13px; color:var(--text3); margin:0;">
-            Pemantauan detak jantung (*heartbeat*), latensi jaringan, versi sistem, dan utilisasi database instalasi klien faskes luar.
-          </p>
-        </div>
-      </div>
+  await ttMuat();
 
-      <div class="card" style="padding:20px; margin-top:16px;">
-        <h3 style="font-size:15px; font-weight:800; margin-bottom:12px;">Status Jaringan Klien Faskes Aktif</h3>
-        <table class="table" style="width:100%; font-size:12.5px;">
-          <thead>
-            <tr style="background:var(--bg2);">
-              <th>Client ID</th>
-              <th>Nama Faskes</th>
-              <th>Versi Terpasang</th>
-              <th>Latensi</th>
-              <th>Ukuran Database</th>
-              <th>Transaksi Hari Ini</th>
-              <th>Heartbeat Terakhir</th>
-              <th>Status Mesin</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${clientTelemetryNodes.map(n => `
-              <tr>
-                <td style="font-family:monospace; font-weight:700; color:var(--sky);">${n.client_id}</td>
-                <td><b>${n.name}</b><div style="font-size:11px; color:var(--text3);">${n.location}</div></td>
-                <td><span class="badge" style="background:#334155; color:#fff;">${n.app_version}</span></td>
-                <td><b style="color:${n.latency_ms < 50 ? '#10b981' : '#f59e0b'};">${n.latency_ms} ms</b></td>
-                <td>${n.db_size_mb} MB</td>
-                <td><b>${n.daily_transactions} order</b></td>
-                <td style="font-family:monospace;">${n.last_heartbeat}</td>
-                <td><span class="badge badge-success">✓ ONLINE (${n.status})</span></td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
+  if (ttData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Telemetri Pemakaian</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data telemetri tidak dapat dibaca.</strong><br>
+        Tabel <code>tenant_pemakaian</code> belum tersedia.
+      </div>`;
+    return;
+  }
+  if (!ttPeriode) {
+    const ada = [...new Set((ttData.pakai || []).map(x => x.periode))].sort().reverse();
+    ttPeriode = ada[0] || ttPeriodeSekarang();
+  }
+  ttGambar();
+}
+
+function ttGambar() {
+  const T = ttData.tenant || [];
+  const P = (ttData.pakai || []).filter(x => x.periode === ttPeriode);
+  const periodeAda = [...new Set((ttData.pakai || []).map(x => x.periode))].sort().reverse();
+
+  // Pemakaian per tenant per metrik untuk periode terpilih.
+  const per = new Map();
+  for (const p of P) {
+    if (!per.has(p.tenant_id)) per.set(p.tenant_id, {});
+    per.get(p.tenant_id)[p.metrik] = Number(p.jumlah || 0);
+  }
+
+  const metrik = [...new Set(P.map(x => x.metrik))].sort();
+  const tanpaData = T.filter(t => !per.has(t.id));
+
+  const lisensiOf = tid =>
+    (ttData.lisensi || []).find(l => l.tenant_id === tid && l.status === 'Aktif') || null;
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Telemetri Pemakaian</h1>
+        <p class="muted">Pemakaian nyata tiap tenant — dasar penagihan dan peninjauan paket.</p>
       </div>
     </div>
-  `;
+
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; display:flex;
+                             gap:12px; align-items:center; flex-wrap:wrap">
+      <label style="font-size:13px">Periode</label>
+      <select onchange="ttGantiPeriode(this.value)"
+              style="padding:6px 10px; border:1px solid var(--border); border-radius:6px">
+        ${periodeAda.length
+          ? periodeAda.map(p => `<option value="${ttEsc(p)}"
+              ${p === ttPeriode ? 'selected' : ''}>${ttEsc(p)}</option>`).join('')
+          : `<option>${ttEsc(ttPeriode)}</option>`}
+      </select>
+      <span style="font-size:12px; color:var(--text3)">
+        ${per.size} dari ${T.length} tenant mengirim data
+      </span>
+    </div>
+
+    ${tanpaData.length ? `
+      <div class="card" style="padding:12px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--warning)">
+        <b>${tanpaData.length} tenant belum mengirim telemetri periode ini:</b>
+        ${tanpaData.slice(0, 8).map(t => ttEsc(t.nama)).join(', ')}${
+          tanpaData.length > 8 ? ', …' : ''}.
+        Belum ada data bukan berarti nol pemakaian — bisa jadi instalasinya
+        gagal mengirim.
+      </div>` : ''}
+
+    ${!T.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">📡</div>
+        <div style="font-weight:700">Belum ada tenant terdaftar</div>
+      </div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Tenant</th><th>Jenis</th><th>Paket</th>
+          ${metrik.map(m => `<th style="text-align:right">${ttEsc(m)}</th>`).join('')}
+          <th style="text-align:right">Kuota Transaksi</th><th>Status</th>
+        </tr></thead><tbody>
+        ${T.map(t => {
+          const d = per.get(t.id);
+          const lis = lisensiOf(t.id);
+          const batas = lis ? lis.batas_transaksi_bln : null;
+          const trx = d ? (d['transaksi'] ?? d['transactions'] ?? null) : null;
+          const pct = (batas && trx != null) ? Math.round(trx / batas * 100) : null;
+
+          return `<tr style="${!d ? 'opacity:.65' : ''}">
+            <td><b>${ttEsc(t.nama)}</b>
+              <div style="font-size:11px; color:var(--text3)">${ttEsc(t.kode)}</div></td>
+            <td>${ttEsc(t.jenis || '—')}</td>
+            <td style="font-size:12px">${lis ? ttEsc(lis.paket_nama || '—')
+              : '<span style="color:var(--text3)">tanpa lisensi aktif</span>'}</td>
+            ${metrik.map(m => `<td style="text-align:right">${
+              !d ? '<span style="color:var(--text3)">—</span>'
+                 : (d[m] != null ? Number(d[m]).toLocaleString('id-ID') : '0')
+            }</td>`).join('')}
+            <td style="text-align:right">${
+              pct === null
+                ? (batas == null
+                    ? '<span style="color:var(--text3)">tanpa batas</span>'
+                    : '<span style="color:var(--text3)">—</span>')
+                : `<span style="font-weight:700; color:${pct > 100 ? 'var(--danger)'
+                    : pct > 80 ? 'var(--warning)' : 'inherit'}">${pct}%</span>`
+            }</td>
+            <td>${!d
+              ? '<span style="color:var(--warning)">belum ada data</span>'
+              : '<span style="color:var(--success)">terkirim</span>'}</td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`}
+
+    <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
+                             color:var(--text3); line-height:1.7">
+      Tenant yang belum mengirim telemetri ditandai <b>belum ada data</b>,
+      bukan <b>0</b>. Nol berarti dipakai tapi tidak ada transaksi; belum
+      ada data berarti kita tidak tahu. Menyamakan keduanya membuat
+      instalasi yang gagal mengirim terlihat seperti klien yang berhenti
+      memakai — dan itu keputusan komersial yang salah.
+    </div>`;
 }
 
-if (typeof window !== 'undefined') {
-  window.renderTechTelemetry = renderTechTelemetry;
-  window.recordClientHeartbeat = recordClientHeartbeat;
-  window.clientTelemetryNodes = clientTelemetryNodes;
-}
+function ttGantiPeriode(p) { ttPeriode = p; ttGambar(); }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    renderTechTelemetry,
-    recordClientHeartbeat,
-    clientTelemetryNodes
-  };
-}
+window.renderTechTelemetry = renderTechTelemetry;
+window.ttGantiPeriode = ttGantiPeriode;

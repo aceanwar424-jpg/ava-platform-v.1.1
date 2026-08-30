@@ -1,133 +1,192 @@
 // ═══════════════════════════════════════════════════════════════
-// MODULE: KONFIGURASI PAKET & HARGA SAAS B2B (PRICING & TIERS)
-// Standar Komersialisasi — Pengaturan Kuota Transaksi & Paket Langganan Faskes
+// MODUL: AVA Tech — Paket & Harga Berlangganan
+//
+// Versi sebelumnya tidak punya panggilan data: paket, harga, dan batas
+// pemakaian ditulis tangan. Harga karangan di layar penjualan adalah
+// harga yang bisa terlanjur disebutkan ke calon klien.
+//
+// Sekarang membaca public.tech_paket (migrasi 0039).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Batas pemakaian membedakan NULL dari 0. NULL berarti tanpa batas,
+// 0 berarti fitur itu tidak termasuk sama sekali. Menampilkan keduanya
+// sebagai "0" adalah salah satu cara termudah menjual sesuatu yang tidak
+// diberikan.
+//
+// Harga tahunan ditampilkan bersama hematnya dibanding 12× bulanan.
+// Kalau ternyata tidak lebih hemat, itu ikut terlihat — bukan
+// disembunyikan.
+//
+// Prefiks "tp".
 // ═══════════════════════════════════════════════════════════════
 
-const SAAS_PRICING_PLANS = [
-  {
-    tier_id: 'TIER-STARTER',
-    name: 'Starter Lab Edition',
-    target: 'Laboratorium Mandiri & Klinik Pratama Kecil',
-    monthly_price: 2500000,
-    annual_price: 25000000,
-    order_quota_monthly: 1000,
-    overage_per_order: 1500,
-    modules: ['lis', 'lab-qc', 'catalog-export', 'lab-tat'],
-    support_sla: 'Email Support (24 Jam)'
-  },
-  {
-    tier_id: 'TIER-PRO',
-    name: 'Pro Clinic & Lab Suite',
-    target: 'Klinik Utama & Laboratorium Rujukan Menengah',
-    monthly_price: 5500000,
-    annual_price: 55000000,
-    order_quota_monthly: 5000,
-    overage_per_order: 1000,
-    modules: ['his', 'lis', 'lab-qc', 'satusehat', 'farmasi', 'cashier', 'catalog-export'],
-    support_sla: 'Priority WhatsApp & Remote Assist (4 Jam)'
-  },
-  {
-    tier_id: 'TIER-ENTERPRISE',
-    name: 'Enterprise Health System',
-    target: 'Rumah Sakit & Jaringan Laboratorium Nasional',
-    monthly_price: 12500000,
-    annual_price: 125000000,
-    order_quota_monthly: 50000,
-    overage_per_order: 500,
-    modules: ['his', 'lis', 'radiology', 'pacs', 'lab-qc', 'satusehat', 'farmasi', 'accounting', 'payroll', 'agentic'],
-    support_sla: '24/7 Dedicated Account Manager & On-site SLA'
-  }
-];
+let tpData = null;
 
-/**
- * Kalkulasi Biaya Langganan & Tagihan Kelebihan Kuota (Overage)
- */
-function calculateSubscriptionBilling(tierId, actualMonthlyOrders = 0, billingCycle = 'MONTHLY') {
-  const plan = SAAS_PRICING_PLANS.find(p => p.tier_id === tierId);
-  if (!plan) throw new Error(`Paket dengan ID ${tierId} tidak ditemukan.`);
+function tpEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function tpRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
 
-  const basePrice = billingCycle === 'ANNUAL' ? plan.annual_price : plan.monthly_price;
-  const quota = plan.order_quota_monthly * (billingCycle === 'ANNUAL' ? 12 : 1);
-  const overageOrders = Math.max(0, actualMonthlyOrders - quota);
-  const overageCost = overageOrders * plan.overage_per_order;
-  const totalBill = basePrice + overageCost;
+// NULL = tanpa batas, 0 = tidak termasuk. Keduanya bukan hal yang sama.
+function tpBatas(v, satuan) {
+  if (v === null || v === undefined) return 'tanpa batas';
+  if (Number(v) === 0) return '<span style="color:var(--text3)">tidak termasuk</span>';
+  return Number(v).toLocaleString('id-ID') + (satuan ? ' ' + satuan : '');
+}
 
-  return {
-    tier_id: plan.tier_id,
-    plan_name: plan.name,
-    billing_cycle: billingCycle,
-    base_price: basePrice,
-    quota_limit: quota,
-    actual_orders: actualMonthlyOrders,
-    overage_orders: overageOrders,
-    overage_cost: overageCost,
-    total_bill: totalBill
-  };
+async function tpMuat() {
+  if (typeof sbGet !== 'function') { tpData = null; return; }
+  try {
+    const [paket, lisensi] = await Promise.all([
+      sbGet('tech_paket', 'select=*&order=urutan_tampil,harga_bulanan'),
+      sbGet('tech_papan_lisensi', 'select=*').catch(() => []),
+    ]);
+    tpData = { paket, lisensi };
+  } catch (e) { tpData = null; }
 }
 
 async function renderTechPricingPlans() {
   const main = document.getElementById('main-content');
-  if (!main) return;
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
 
-  main.innerHTML = `
-    <div style="padding:20px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div class="page-header">
-        <div>
-          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#f59e0b; margin-bottom:6px;">
-            💰 KOMERSIAL SAAS &bull; PAKET LANGGANAN &amp; DAFTAR HARGA
-          </div>
-          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 4px 0;">
-            Paket Lisensi &amp; Daftar Harga Faskes Klien
-          </h1>
-          <p style="font-size:13px; color:var(--text3); margin:0;">
-            Definisi tier lisensi, batasan kuota transaksi bulanan, tarif overage, dan bundling modul platform.
-          </p>
-        </div>
+  await tpMuat();
+
+  if (tpData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Paket &amp; Harga</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data paket tidak dapat dibaca.</strong><br>
+        Tabel <code>tech_paket</code> belum ada — jalankan ulang aplikasi
+        agar migrasi
+        <code>0039_tech_lisensi_harga_order_terintegrasi.sql</code> terpasang.
+      </div>`;
+    return;
+  }
+  tpGambar();
+}
+
+function tpGambar() {
+  const P = tpData.paket || [];
+  const L = tpData.lisensi || [];
+  const dipakai = id => L.filter(x => x.paket_kode
+    && (P.find(p => p.id === id) || {}).kode === x.paket_kode
+    && x.status === 'Aktif').length;
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>Paket &amp; Harga</h1>
+        <p class="muted">Paket berlangganan yang dijual AVA Tech beserta batas pemakaiannya.</p>
       </div>
+      ${P.length ? `<div><button class="btn btn-primary" onclick="tpTambah()">
+        + Paket Baru</button></div>` : ''}
+    </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:20px;">
-        ${SAAS_PRICING_PLANS.map(p => `
-          <div class="card" style="padding:24px; display:flex; flex-direction:column; justify-content:space-between; border-top:4px solid var(--sky);">
-            <div>
-              <b style="font-size:18px; color:var(--text);">${p.name}</b>
-              <div style="font-size:12px; color:var(--text3); margin-top:4px; margin-bottom:16px;">${p.target}</div>
-              
-              <div style="margin-bottom:16px;">
-                <span style="font-size:26px; font-weight:800; color:var(--text);">Rp ${Number(p.monthly_price).toLocaleString('id-ID')}</span>
-                <span style="font-size:12px; color:var(--text3);"> / bulan</span>
-                <div style="font-size:11.5px; color:#10b981; margin-top:2px;">Atau Rp ${Number(p.annual_price).toLocaleString('id-ID')} / tahun (Hemat 2 Bulan)</div>
+    ${!P.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">💠</div>
+        <div style="font-weight:700; margin-bottom:6px">Belum ada paket ditetapkan</div>
+        <div style="font-size:13px; color:var(--text3); max-width:460px; margin:0 auto 14px">
+          Tetapkan paket beserta harga dan batas pemakaiannya sebelum
+          menerbitkan lisensi untuk klien.</div>
+        <button class="btn btn-primary" onclick="tpTambah()">+ Tetapkan Paket</button>
+      </div>` : `
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+                  gap:14px">
+        ${P.map(p => {
+          const bln = Number(p.harga_bulanan || 0);
+          const thn = Number(p.harga_tahunan || 0);
+          const hemat = (bln && thn) ? Math.round((1 - thn / (bln * 12)) * 100) : null;
+          const modul = Array.isArray(p.modul_termasuk) ? p.modul_termasuk : [];
+          const n = dipakai(p.id);
+          return `<div class="card" style="padding:18px;
+                    ${p.status !== 'Aktif' ? 'opacity:.6' : ''}">
+            <div style="display:flex; justify-content:space-between; gap:8px">
+              <div>
+                <div style="font-weight:800; font-size:15px">${tpEsc(p.nama)}</div>
+                <div style="font-size:11px; color:var(--text3)">
+                  ${tpEsc(p.kode)}${p.untuk ? ' · untuk ' + tpEsc(p.untuk) : ''}</div>
               </div>
-
-              <div style="font-size:12.5px; margin-bottom:16px; border-top:1px solid var(--card-border); padding-top:12px;">
-                <div style="margin-bottom:6px;"><b>Kuota:</b> ${Number(p.order_quota_monthly).toLocaleString('id-ID')} order / bulan</div>
-                <div style="margin-bottom:6px;"><b>Overage:</b> Rp ${p.overage_per_order} / order kelebihan</div>
-                <div style="margin-bottom:6px;"><b>Support:</b> ${p.support_sla}</div>
-              </div>
-
-              <div style="background:var(--bg2); padding:10px; border-radius:8px; font-size:11.5px; margin-bottom:16px;">
-                <b style="display:block; margin-bottom:4px; color:var(--text);">Modul Termasuk:</b>
-                ${p.modules.map(m => `<span class="badge" style="background:#334155; color:#fff; font-size:10px; margin:2px;">${m}</span>`).join('')}
-              </div>
+              ${p.status !== 'Aktif'
+                ? `<span class="badge">${tpEsc(p.status)}</span>` : ''}
             </div>
 
-            <button class="btn btn-teal" style="width:100%;">Pilih &amp; Buat Penawaran</button>
-          </div>
-        `).join('')}
+            <div style="margin:14px 0 4px; font-size:24px; font-weight:800; color:var(--primary)">
+              ${tpRp(bln)}<span style="font-size:12px; font-weight:400;
+                                       color:var(--text3)"> /bulan</span></div>
+            ${thn ? `<div style="font-size:12px; color:var(--text3)">
+              ${tpRp(thn)} /tahun
+              ${hemat !== null
+                ? (hemat > 0
+                    ? `<span style="color:var(--success)"> — hemat ${hemat}%</span>`
+                    : `<span style="color:var(--warning)"> — tidak lebih hemat dari bulanan</span>`)
+                : ''}</div>` : ''}
+
+            <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border);
+                        font-size:12px; line-height:1.9">
+              Pengguna: <b>${tpBatas(p.batas_pengguna, 'akun')}</b><br>
+              Transaksi: <b>${tpBatas(p.batas_transaksi_bln, '/bulan')}</b><br>
+              Penyimpanan: <b>${tpBatas(p.batas_penyimpanan_gb, 'GB')}</b>
+            </div>
+
+            ${modul.length ? `
+              <div style="margin-top:10px; font-size:11px; color:var(--text3)">
+                Modul: ${modul.map(m => tpEsc(m)).join(', ')}</div>` : ''}
+            ${p.keterangan ? `<div style="margin-top:8px; font-size:11px; color:var(--text3)">
+              ${tpEsc(p.keterangan)}</div>` : ''}
+
+            <div style="margin-top:12px; font-size:11px; color:var(--text3)">
+              ${n ? `<b>${n}</b> lisensi aktif memakai paket ini`
+                  : 'belum ada lisensi aktif'}</div>
+          </div>`;
+        }).join('')}
       </div>
-    </div>
-  `;
+
+      <div class="card" style="padding:12px 16px; margin-top:14px; font-size:12px;
+                               color:var(--text3); line-height:1.7">
+        Batas pemakaian membedakan <b>tanpa batas</b> dari <b>tidak
+        termasuk</b>. Keduanya sering ditulis sebagai "0" di daftar harga,
+        dan itu salah satu cara termudah menjual sesuatu yang tidak
+        diberikan.
+      </div>`}`;
 }
 
-if (typeof window !== 'undefined') {
-  window.renderTechPricingPlans = renderTechPricingPlans;
-  window.calculateSubscriptionBilling = calculateSubscriptionBilling;
-  window.SAAS_PRICING_PLANS = SAAS_PRICING_PLANS;
+async function tpTambah() {
+  const kode = prompt('Kode paket (mis. PRO):');
+  if (!kode) return;
+  const nama = prompt('Nama paket:');
+  if (!nama) return;
+  const untuk = prompt('Untuk jenis usaha (klinik / lab / wellness / suite):', 'klinik');
+  if (untuk === null) return;
+  const bln = prompt('Harga per bulan (Rp):', '0');
+  if (bln === null) return;
+  const thn = prompt('Harga per tahun (Rp, kosongkan bila tidak dijual tahunan):', '');
+  if (thn === null) return;
+  const pengguna = prompt('Batas jumlah pengguna\n'
+    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  if (pengguna === null) return;
+  const trx = prompt('Batas transaksi per bulan\n'
+    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  if (trx === null) return;
+  const gb = prompt('Batas penyimpanan (GB)\n'
+    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  if (gb === null) return;
+
+  try {
+    await sbPost('tech_paket', {
+      kode: kode.trim().toUpperCase(), nama: nama.trim(),
+      untuk: untuk || null,
+      harga_bulanan: parseFloat(bln) || 0,
+      harga_tahunan: thn === '' ? 0 : (parseFloat(thn) || 0),
+      batas_pengguna: pengguna === '' ? null : parseInt(pengguna, 10),
+      batas_transaksi_bln: trx === '' ? null : parseInt(trx, 10),
+      batas_penyimpanan_gb: gb === '' ? null : parseFloat(gb),
+    });
+    await renderTechPricingPlans();
+  } catch (e) { alert('Gagal menyimpan paket: ' + e.message); }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = {
-    renderTechPricingPlans,
-    calculateSubscriptionBilling,
-    SAAS_PRICING_PLANS
-  };
-}
+window.renderTechPricingPlans = renderTechPricingPlans;
+window.tpTambah = tpTambah;

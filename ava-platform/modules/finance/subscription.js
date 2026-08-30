@@ -1,233 +1,265 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: Subscription & Auto-Refill Engine — Queen Nutrition & Care
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Manajemen Paket Langganan Nutrisi & Produk Intimate Care
-// - Auto-Refill Dispatch Schedule (Jadwal Kirim Bulanan Pasien)
-// - Pelacakan Monthly Recurring Revenue (MRR) & Churn Rate
-// - Integrasi Notifikasi Pengingat WhatsApp
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: Langganan & Auto-Refill
+//
+// Versi sebelumnya tidak punya panggilan data: daftar pelanggan
+// langganan, tanggal kirim, dan nilai berlangganan ditulis tangan.
+//
+// Sekarang membaca wellness_langganan, wellness_langganan_item, dan
+// view wellness_langganan_jatuh_tempo (migrasi 0035).
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Pesanan TIDAK dibuat otomatis saat jatuh tempo. Pengiriman rutin yang
+// berjalan tanpa ada yang menengok adalah cara tercepat mengirim barang
+// ke alamat lama, ke pelanggan yang sudah minta berhenti, atau untuk
+// produk yang stoknya kosong. Yang dilakukan layar ini adalah menyodorkan
+// daftar yang jatuh tempo untuk dijalankan petugas.
+//
+// Tanggal kirim berikutnya baru maju SESUDAH pesanan berhasil dibuat,
+// bukan sebelumnya. Memajukan lebih dulu berarti siklus yang gagal
+// terlewat diam-diam.
+//
+// Prefiks "sb" dipakai helper global, jadi modul ini memakai "lg".
+// ═══════════════════════════════════════════════════════════════
 
-let SUBSCRIPTION_STATE = {
-  activeTab: 'subscribers',
-  subscribers: [
-    {
-      id: 'SUB-2026-081',
-      pelanggan: 'dr. Amanda Clarissa',
-      telepon: '0812-9988-7711',
-      alamat: 'Menteng, Jakarta Pusat',
-      paket: 'Queen Royal Collagen Glow (2 Box/Bulan)',
-      sku: 'Q-NUT-01',
-      nilai_bulanan: 550000,
-      frekuensi: 'Setiap 30 Hari',
-      tgl_mulai: '2026-06-01',
-      next_dispatch: '2026-09-01',
-      status: 'Aktif',
-      siklus_ke: 3
-    },
-    {
-      id: 'SUB-2026-082',
-      pelanggan: 'Ny. Siska Melani',
-      telepon: '0811-2233-4455',
-      alamat: 'Pondok Indah, Jakarta Selatan',
-      paket: 'Queen HerBalance Elixir (3 Box/Bulan)',
-      sku: 'Q-NUT-02',
-      nilai_bulanan: 620000,
-      frekuensi: 'Setiap 30 Hari',
-      tgl_mulai: '2026-07-15',
-      next_dispatch: '2026-08-25',
-      status: 'Aktif',
-      siklus_ke: 2
-    },
-    {
-      id: 'SUB-2026-083',
-      pelanggan: 'Ibu Ratna Juwita',
-      telepon: '0813-4455-6677',
-      alamat: 'Surabaya Barat',
-      paket: 'Hormonal & Intimate Care Complete Combo',
-      sku: 'Q-NUT-02 + Q-CAR-01',
-      nilai_bulanan: 750000,
-      frekuensi: 'Setiap 30 Hari',
-      tgl_mulai: '2026-05-10',
-      next_dispatch: '2026-09-10',
-      status: 'Aktif',
-      siklus_ke: 4
-    }
-  ]
-};
+let lgData = null;
+let lgTab = 'jatuhtempo';
 
-async function renderSubscription(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
+function lgEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function lgRp(n) { return 'Rp ' + Number(n || 0).toLocaleString('id-ID'); }
+function lgTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID',
+    { day: '2-digit', month: 'short', year: 'numeric' });
+}
 
-  const totalMRR = SUBSCRIPTION_STATE.subscribers.reduce((s, x) => s + (x.status === 'Aktif' ? x.nilai_bulanan : 0), 0);
-  const activeCount = SUBSCRIPTION_STATE.subscribers.filter(x => x.status === 'Aktif').length;
+async function lgMuat() {
+  if (typeof sbGet !== 'function') { lgData = null; return; }
+  try {
+    const [semua, tempo, item, produk] = await Promise.all([
+      sbGet('wellness_langganan', 'select=*&order=tgl_kirim_berikut'),
+      sbGet('wellness_langganan_jatuh_tempo', 'select=*'),
+      sbGet('wellness_langganan_item', 'select=*'),
+      sbGet('wellness_produk', 'select=id,sku,nama,harga_normal').catch(() => []),
+    ]);
+    lgData = { semua, tempo, item, produk };
+  } catch (e) { lgData = null; }
+}
 
-  content.innerHTML = `
+async function renderSubscription() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
+
+  await lgMuat();
+
+  if (lgData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Langganan &amp; Auto-Refill</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data langganan tidak dapat dibaca.</strong><br>
+        Tabel <code>wellness_langganan</code> belum ada — jalankan ulang
+        aplikasi agar migrasi <code>0035_wellness_pesanan_d2c.sql</code>
+        terpasang.
+      </div>`;
+    return;
+  }
+  lgGambar();
+}
+
+function lgProduk(id) {
+  return (lgData.produk || []).find(p => p.id === id) || {};
+}
+function lgItemOf(langgananId) {
+  return (lgData.item || []).filter(i => i.langganan_id === langgananId);
+}
+
+function lgGambar() {
+  const S = lgData.semua || [];
+  const T = lgData.tempo || [];
+  const aktif = S.filter(x => x.status === 'Aktif');
+  const jeda = S.filter(x => x.status === 'Jeda');
+  const berhenti = S.filter(x => x.status === 'Berhenti');
+  const telat = T.filter(x => Number(x.telat_hari) > 0);
+
+  const nilaiBulanan = aktif.reduce((a, x) => {
+    const per = Number(x.harga_per_siklus || 0);
+    const hari = Number(x.interval_hari || 30) || 30;
+    return a + per * (30 / hari);
+  }, 0);
+
+  const daftar = lgTab === 'jatuhtempo' ? T
+               : lgTab === 'aktif' ? aktif
+               : lgTab === 'jeda' ? jeda : berhenti;
+
+  document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📦 Subscription &amp; Auto-Refill Engine</h1>
-        <p>Otomasi langganan rutin Queen Nutrition, Queen Care &amp; Membership Sanctuary</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderSubscription()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="openTambahLanggananModal()">+ Tambah Langganan Pasien</button>
+        <h1>Langganan &amp; Auto-Refill</h1>
+        <p class="muted">Pengiriman rutin produk wellness ke pelanggan tetap.</p>
       </div>
     </div>
 
-    <!-- KPI Row -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:20px;">
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(16,185,129,0.15);color:var(--teal)">🔄</div>
-        <div>
-          <div class="kpi-val" style="color:var(--teal)">Rp ${totalMRR.toLocaleString('id-ID')}</div>
-          <div class="kpi-label">Monthly Recurring Revenue (MRR)</div>
-        </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+                gap:12px; margin-bottom:16px">
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Langganan aktif</div>
+        <div style="font-size:22px; font-weight:800">${aktif.length}</div>
       </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(14,165,233,0.15);color:#0ea5e9">👥</div>
-        <div>
-          <div class="kpi-val">${activeCount} Member</div>
-          <div class="kpi-label">Pelanggan Aktif Auto-Refill</div>
-        </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Jatuh tempo ≤3 hari</div>
+        <div style="font-size:22px; font-weight:800;
+                    color:${T.length ? 'var(--warning)' : 'var(--text3)'}">${T.length}</div>
       </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(212,175,55,0.15);color:var(--accent)">📈</div>
-        <div>
-          <div class="kpi-val">94.8%</div>
-          <div class="kpi-label">Tingkat Retensi (Retention Rate)</div>
-        </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Terlambat kirim</div>
+        <div style="font-size:22px; font-weight:800;
+                    color:${telat.length ? 'var(--danger)' : 'var(--text3)'}">${telat.length}</div>
       </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(168,85,247,0.15);color:#a855f7">🚚</div>
-        <div>
-          <div class="kpi-val">1 Dispatch</div>
-          <div class="kpi-label">Jadwal Kirim Pekan Ini</div>
-        </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Perkiraan nilai / bulan</div>
+        <div style="font-size:19px; font-weight:800">${lgRp(Math.round(nilaiBulanan))}</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title" style="margin-bottom:14px;">Daftar Pelanggan Rutin &amp; Jadwal Auto-Refill</div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID Sub</th>
-              <th>Nama Pelanggan</th>
-              <th>Paket Formulasi SKU</th>
-              <th>Nilai / Bulan</th>
-              <th>Siklus Ke-</th>
-              <th>Next Dispatch</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${SUBSCRIPTION_STATE.subscribers.map(s => `
-              <tr>
-                <td><code>${s.id}</code></td>
-                <td>
-                  <b>${s.pelanggan}</b><br>
-                  <span style="font-size:11px;color:var(--text3);">${s.telepon} · ${s.alamat}</span>
-                </td>
-                <td>
-                  <b>${s.paket}</b><br>
-                  <span style="font-size:11px;color:var(--teal)">SKU: ${s.sku}</span>
-                </td>
-                <td><b>Rp ${s.nilai_bulanan.toLocaleString('id-ID')}</b></td>
-                <td><span class="badge badge-info">Bulan ke-${s.siklus_ke}</span></td>
-                <td><b>${s.next_dispatch}</b></td>
-                <td><span class="badge badge-success">${s.status}</span></td>
-                <td>
-                  <button class="btn btn-sm btn-ghost" onclick="prosesKirimSekarang('${s.id}')">Dispatch Now 🚀</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Pesanan <b>tidak dibuat otomatis</b>. Pengiriman rutin yang berjalan
+      tanpa ada yang menengok adalah cara tercepat mengirim barang ke
+      alamat lama, ke pelanggan yang sudah minta berhenti, atau untuk
+      produk yang stoknya kosong. Tanggal kirim berikutnya baru maju
+      sesudah pesanan berhasil dibuat.
     </div>
-  `;
+
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab ${lgTab === 'jatuhtempo' ? 'active' : ''}"
+              onclick="lgGantiTab('jatuhtempo')">Jatuh Tempo (${T.length})</button>
+      <button class="tab ${lgTab === 'aktif' ? 'active' : ''}"
+              onclick="lgGantiTab('aktif')">Aktif (${aktif.length})</button>
+      <button class="tab ${lgTab === 'jeda' ? 'active' : ''}"
+              onclick="lgGantiTab('jeda')">Dijeda (${jeda.length})</button>
+      <button class="tab ${lgTab === 'berhenti' ? 'active' : ''}"
+              onclick="lgGantiTab('berhenti')">Berhenti (${berhenti.length})</button>
+    </div>
+
+    ${!daftar.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">🔁</div>
+        <div style="font-weight:700">${
+          lgTab === 'jatuhtempo' ? 'Tidak ada langganan yang jatuh tempo'
+          : 'Tidak ada langganan pada kelompok ini'}</div>
+      </div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Kode</th><th>Pelanggan</th><th>Kota</th><th>Isi Paket</th>
+          <th style="text-align:right">Interval</th>
+          <th>Kirim Berikutnya</th>
+          <th style="text-align:right">Nilai</th><th>Status</th><th></th>
+        </tr></thead><tbody>
+        ${daftar.map(l => {
+          const isi = lgItemOf(l.id);
+          const telatHari = Number(l.telat_hari);
+          return `<tr>
+            <td><b>${lgEsc(l.kode || '—')}</b></td>
+            <td>${lgEsc(l.pelanggan_nama || '—')}
+              ${l.pelanggan_hp ? `<div style="font-size:11px; color:var(--text3)">
+                ${lgEsc(l.pelanggan_hp)}</div>` : ''}</td>
+            <td>${lgEsc(l.kota || '—')}</td>
+            <td style="font-size:12px">${isi.length
+              ? isi.map(i => `${lgEsc(lgProduk(i.produk_id).nama || '—')} ×${i.qty}`).join(', ')
+              : '<span style="color:var(--warning)">belum diisi</span>'}</td>
+            <td style="text-align:right">${l.interval_hari || 30} hari</td>
+            <td>${lgTgl(l.tgl_kirim_berikut)}
+              ${telatHari > 0 ? `<div style="font-size:11px; color:var(--danger)">
+                telat ${telatHari} hari</div>` : ''}</td>
+            <td style="text-align:right">${lgRp(l.harga_per_siklus)}</td>
+            <td>${lgEsc(l.status)}</td>
+            <td style="white-space:nowrap">
+              ${l.status === 'Aktif' && isi.length
+                ? `<button class="btn btn-sm btn-primary" onclick="lgBuatPesanan(${l.id})">
+                     Buat Pesanan</button>` : ''}
+              ${l.status === 'Aktif'
+                ? `<button class="btn btn-sm" onclick="lgUbahStatus(${l.id},'Jeda')">
+                     Jeda</button>` : ''}
+              ${l.status === 'Jeda'
+                ? `<button class="btn btn-sm" onclick="lgUbahStatus(${l.id},'Aktif')">
+                     Aktifkan</button>` : ''}
+              ${l.status !== 'Berhenti'
+                ? `<button class="btn btn-sm" onclick="lgBerhenti(${l.id})">
+                     Berhenti</button>` : ''}
+            </td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>`}`;
 }
 
-function prosesKirimSekarang(id) {
-  const s = SUBSCRIPTION_STATE.subscribers.find(x => x.id === id);
-  if (!s) return;
+function lgGantiTab(t) { lgTab = t; lgGambar(); }
 
-  toast(`Paket auto-refill ${s.paket} untuk ${s.pelanggan} telah dijadwalkan ke kurir & stok dipotong otomatis!`, 'ok');
+async function lgBuatPesanan(langgananId) {
+  const l = (lgData.semua || []).find(x => x.id === langgananId)
+         || (lgData.tempo || []).find(x => x.id === langgananId);
+  const isi = lgItemOf(langgananId);
+  if (!l || !isi.length) { alert('Isi paket langganan belum ditetapkan.'); return; }
+
+  const rincian = isi.map(i =>
+    `${lgProduk(i.produk_id).nama || '—'} ×${i.qty}`).join('\n');
+  if (!confirm(`Buat pesanan untuk ${l.pelanggan_nama}?\n\n${rincian}\n\n`
+    + `Kirim ke: ${l.alamat || '(alamat belum diisi)'}`)) return;
+
+  try {
+    const r = await sbRpc('wellness_buat_pesanan', {
+      p_data: {
+        kanal: 'web',
+        pembeli_nama: l.pelanggan_nama,
+        pembeli_hp: l.pelanggan_hp,
+        pembeli_email: l.pelanggan_email,
+        alamat: l.alamat, kota: l.kota,
+        langganan_id: String(langgananId),
+        catatan: 'Pengiriman rutin langganan ' + (l.kode || ''),
+        item: isi.map(i => ({ produk_id: i.produk_id, qty: i.qty })),
+      },
+    });
+    if (r && r.error) { alert(r.error); return; }
+
+    // Tanggal kirim berikutnya baru maju SESUDAH pesanan tersimpan.
+    const dasar = l.tgl_kirim_berikut ? new Date(l.tgl_kirim_berikut) : new Date();
+    dasar.setDate(dasar.getDate() + (Number(l.interval_hari) || 30));
+    await sbPatch('wellness_langganan', langgananId, {
+      tgl_kirim_berikut: dasar.toISOString().slice(0, 10),
+      updated_at: new Date().toISOString(),
+    });
+
+    alert(`Pesanan ${r.no_pesanan} dibuat. Kirim berikutnya: `
+      + dasar.toISOString().slice(0, 10) + '.');
+    await renderSubscription();
+  } catch (e) { alert('Gagal membuat pesanan: ' + e.message); }
 }
 
-function openTambahLanggananModal() {
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">Tambah Paket Langganan Nutrisi</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="padding:10px 0;">
-      <div class="form-group">
-        <label>Nama Pasien / Pelanggan</label>
-        <input type="text" id="sub-nama" class="input" placeholder="mis. Ny. Nadia Kartika">
-      </div>
-      <div class="form-group">
-        <label>Nomor WhatsApp &amp; Alamat</label>
-        <input type="text" id="sub-wa" class="input" placeholder="0812-xxxx-xxxx, Jakarta Selatan">
-      </div>
-      <div class="form-group">
-        <label>Pilihan Paket Formulasi</label>
-        <select id="sub-paket" class="input">
-          <option value="Queen Royal Collagen Glow (2 Box/Bln)">Queen Royal Collagen Glow (2 Box/Bulan) — Rp 550.000</option>
-          <option value="Queen HerBalance Elixir (3 Box/Bln)">Queen HerBalance Elixir (3 Box/Bulan) — Rp 620.000</option>
-          <option value="Ultimate Longevity Combo (Collagen + HerBalance + Mist)">Ultimate Longevity Combo — Rp 990.000</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Frekuensi Pengiriman</label>
-        <select id="sub-freq" class="input">
-          <option value="Setiap 30 Hari">Setiap 30 Hari (Bulanan)</option>
-          <option value="Setiap 14 Hari">Setiap 14 Hari (Dwi-Mingguan)</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="simpanLanggananBaru()">Aktifkan Langganan Auto-Refill</button>
-    </div>
-  `);
+async function lgUbahStatus(id, status) {
+  try {
+    await sbPatch('wellness_langganan', id,
+      { status, updated_at: new Date().toISOString() });
+    await renderSubscription();
+  } catch (e) { alert('Gagal mengubah status: ' + e.message); }
 }
 
-function simpanLanggananBaru() {
-  const nama = document.getElementById('sub-nama')?.value || 'Pelanggan Baru';
-  const wa = document.getElementById('sub-wa')?.value || '0812-0000-0000';
-  const paket = document.getElementById('sub-paket')?.value || 'Queen Royal Collagen Glow';
-  const freq = document.getElementById('sub-freq')?.value || 'Setiap 30 Hari';
-
-  const newId = `SUB-2026-0${SUBSCRIPTION_STATE.subscribers.length + 84}`;
-  
-  SUBSCRIPTION_STATE.subscribers.unshift({
-    id: newId,
-    pelanggan: nama,
-    telepon: wa,
-    alamat: 'Alamat Pasien Terdaftar',
-    paket: paket,
-    sku: 'Q-NUT-AUTO',
-    nilai_bulanan: 550000,
-    frekuensi: freq,
-    tgl_mulai: '2026-08-19',
-    next_dispatch: '2026-09-19',
-    status: 'Aktif',
-    siklus_ke: 1
-  });
-
-  toast(`Langganan auto-refill ${newId} berhasil diaktifkan!`, 'ok');
-  closeModalForce();
-  renderSubscription();
+async function lgBerhenti(id) {
+  const alasan = prompt('Alasan berhenti berlangganan:');
+  if (alasan === null) return;
+  try {
+    await sbPatch('wellness_langganan', id, {
+      status: 'Berhenti', alasan_berhenti: alasan || null,
+      updated_at: new Date().toISOString(),
+    });
+    await renderSubscription();
+  } catch (e) { alert('Gagal menghentikan langganan: ' + e.message); }
 }
 
 window.renderSubscription = renderSubscription;
-window.prosesKirimSekarang = prosesKirimSekarang;
-window.openTambahLanggananModal = openTambahLanggananModal;
-window.simpanLanggananBaru = simpanLanggananBaru;
+window.lgGantiTab    = lgGantiTab;
+window.lgBuatPesanan = lgBuatPesanan;
+window.lgUbahStatus  = lgUbahStatus;
+window.lgBerhenti    = lgBerhenti;
