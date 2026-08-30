@@ -797,6 +797,7 @@ window.susunMenu = susunMenu;
 // karena satu pemanggilan yang keliru, yang persis pernah terjadi lewat
 // listener hashchange.
 // Menggambar menu vertikal lengkap di sidebar kiri untuk ruang kerja aktif.
+// Menggambar menu vertikal berbentuk Accordion (Menu Utama -> Dropdown Sub Menu)
 function gambarRail(ruang) {
   if (!menuTersusun) susunMenu();
   const nav = document.getElementById('rail-nav');
@@ -810,6 +811,31 @@ function gambarRail(ruang) {
   const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
   const isSuperAdmin = role === 'super_admin';
   const allowedPages = window.roleConfig?.pages || null;
+  const currentPage = window.currentPage || '';
+
+  const GROUP_ICONS = {
+    '1. Pra-Analitik & Sampling': '🩸',
+    '2. Analitik & Interfacing': '🔬',
+    '3. Mutu & Kendali Kualitas (QC)': '📊',
+    '4. Pasca-Analitik & Validasi': '✅',
+    '5. Bank Sampel & Arsip': '🧊',
+    '6. Master Data & Tes': '📋',
+    '7. Reagen & BHP Lab': '🧪',
+    '8. Rujukan Lab Luar': '🤝',
+    'Alur Pelayanan': '🩺',
+    'Rawat Inap & Rekam Medis': '🏥',
+    'Farmasi': '💊',
+    'Home Care': '🚑',
+    'Kepatuhan & Klaim': '⚖️',
+    'Alur Pemeriksaan': '🩻',
+    'Master & Alat': '⚙️',
+    'Pengembangan Sistem': '💻',
+    'Klien & Lisensi': '🔐',
+    'Komersial Sistem': '💰',
+    'Interoperabilitas': '🌐'
+  };
+
+  let groupCounter = 0;
 
   boleh.forEach(function (k) {
     const kat = FLYOUT_MENUS[k];
@@ -827,48 +853,74 @@ function gambarRail(ruang) {
     // Kelompokkan item berdasarkan properti group
     const groups = {};
     items.forEach(function (it) {
-      const g = it.group || kat.label || 'Menu';
+      const g = it.group || kat.label || 'Menu Utama';
       if (!groups[g]) groups[g] = [];
       groups[g].push(it);
     });
 
     Object.entries(groups).forEach(function ([gName, gItems]) {
-      html += '<div class="sidebar-group-header"><span>' + gName + '</span></div>';
+      groupCounter++;
+      const groupId = 'acc-grp-' + groupCounter;
+      const hasActiveChild = gItems.some(function (it) { return it.page === currentPage; });
+      const isOpen = hasActiveChild || groupCounter === 1;
+      const gIco = GROUP_ICONS[gName] || (typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁');
+
+      html += '<div class="sidebar-accordion-group' + (isOpen ? ' open' : '') + '" id="' + groupId + '">';
+      html += '  <button class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
+      html += '    <div class="sidebar-main-left">';
+      html += '      <span class="sidebar-main-ico">' + gIco + '</span>';
+      html += '      <span class="sidebar-main-label">' + gName + '</span>';
+      html += '    </div>';
+      html += '    <span class="sidebar-chevron">▾</span>';
+      html += '  </button>';
+
+      html += '  <div class="sidebar-sub-menu-list">';
       gItems.forEach(function (it) {
-        const ico = typeof icon === 'function' ? icon(it.icon || 'list', 15) : '•';
         const isSoon = it.soon || it.status === 'belum';
+        const isActive = it.page === currentPage;
         const aksi = isSoon
           ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')"
           : it.action;
 
-        html += '<button class="sidebar-menu-btn' + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
-                ' onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">' +
-                '<span class="sidebar-menu-ico">' + ico + '</span>' +
-                '<span class="sidebar-menu-label">' + it.label + '</span>' +
-                (isSoon ? '<span class="sidebar-soon-tag">soon</span>' : '') +
-                '</button>';
+        html += '    <button class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
+                ' onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">';
+        html += '      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + it.label + '</span>';
+        if (isSoon) {
+          html += '      <span class="sidebar-soon-tag">soon</span>';
+        }
+        html += '    </button>';
       });
+      html += '  </div>';
+      html += '</div>';
     });
   });
 
   nav.innerHTML = html;
 
-  // Sorot halaman aktif yang sedang dibuka
   if (window.currentPage) {
     syncFlyoutToPage(window.currentPage);
   }
 }
 window.gambarRail = gambarRail;
 
+function toggleSidebarAccordion(groupId) {
+  const grp = document.getElementById(groupId);
+  if (!grp) return;
+  grp.classList.toggle('open');
+}
+window.toggleSidebarAccordion = toggleSidebarAccordion;
+
 function setActiveFlyoutItem(page) {
   window.currentPage = page;
-  document.querySelectorAll('.sidebar-menu-btn').forEach(function (b) {
+  document.querySelectorAll('.sidebar-sub-link').forEach(function (b) {
     b.classList.remove('active');
   });
-  const activeBtn = document.querySelector('.sidebar-menu-btn[data-page="' + page + '"]');
+  const activeBtn = document.querySelector('.sidebar-sub-link[data-page="' + page + '"]');
   if (activeBtn) {
     activeBtn.classList.add('active');
-    const label = activeBtn.querySelector('.sidebar-menu-label')?.textContent;
+    const grp = activeBtn.closest('.sidebar-accordion-group');
+    if (grp) grp.classList.add('open');
+    const label = activeBtn.querySelector('span')?.textContent;
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
   }
@@ -877,13 +929,15 @@ function setActiveFlyoutItem(page) {
 // Menyelaraskan menu aktif di sidebar saat berpindah halaman via navigate()
 function syncFlyoutToPage(page) {
   window.currentPage = page;
-  document.querySelectorAll('.sidebar-menu-btn').forEach(function (b) {
+  document.querySelectorAll('.sidebar-sub-link').forEach(function (b) {
     b.classList.remove('active');
   });
-  const activeBtn = document.querySelector('.sidebar-menu-btn[data-page="' + page + '"]');
+  const activeBtn = document.querySelector('.sidebar-sub-link[data-page="' + page + '"]');
   if (activeBtn) {
     activeBtn.classList.add('active');
-    const label = activeBtn.querySelector('.sidebar-menu-label')?.textContent;
+    const grp = activeBtn.closest('.sidebar-accordion-group');
+    if (grp) grp.classList.add('open');
+    const label = activeBtn.querySelector('span')?.textContent;
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
   }

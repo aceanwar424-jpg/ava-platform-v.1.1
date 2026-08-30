@@ -273,31 +273,25 @@ async function renderLab(tab='checkin'){
   injectLisStyle();
   const meta = LAB_TAB_META[tab] || { label:'LIS', ico:'' };
   document.getElementById('main-content').innerHTML = `
-    <div id="lab-shell" class="lis">
-      <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="display:flex;align-items:center;gap:12px">
-          <button class="btn btn-ghost btn-sm" onclick="openCategory('lab')" title="Kembali ke daftar menu LIS">← Menu LIS</button>
-          <div><h1 style="margin:0">${meta.ico} ${meta.label}</h1>
-            <span class="lis-sub">Diagnostic Laboratory Information System · ASTM / HL7 Active</span></div>
+    <div id="lab-shell" class="lis" style="font-family:'Plus Jakarta Sans',sans-serif;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:14px;">
+        <div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#10b981; margin-bottom:4px;">
+            🔬 LIS &bull; ISO 15189:2022
+          </div>
+          <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 2px 0;">
+            ${meta.ico} ${meta.label}
+          </h1>
+          <p style="font-size:13px; color:var(--text3); margin:0;">
+            Diagnostic Laboratory Information System &bull; ASTM E1381 / HL7 Integrated
+          </p>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div id="lab-connector-live-pill" style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#0284C7;cursor:pointer" onclick="switchLabTab('integrasi')" title="Status Lab Analyzer Connector (:9999)">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div id="lab-connector-live-pill" style="display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:11.5px;font-weight:700;background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.25);color:#0284C7;cursor:pointer" onclick="navigate('analyzer-interfacing')" title="Status Lab Analyzer Connector (:9999)">
             <span style="width:7px;height:7px;border-radius:50%;background:#0EA5E9;display:inline-block"></span>
             <span>Analyzer :9999</span>
           </div>
-          <span id="lab-date-badge" class="lis-date"></span>
         </div>
-      </div>
-
-      <div class="lab-sub-nav" style="display:flex;gap:4px;background:var(--bg);padding:4px;border:1px solid var(--border);border-radius:10px;margin-bottom:14px;flex-wrap:wrap">
-        ${Object.entries(LAB_TAB_META).map(([key, m]) => `
-          <button class="nav-tab-btn" onclick="switchLabTab('${key}')"
-            style="padding:6px 14px;border:none;background:${tab === key ? 'var(--teal)' : 'transparent'};
-            color:${tab === key ? '#fff' : 'var(--text3)'};font-weight:${tab === key ? '700' : '600'};
-            font-size:12px;border-radius:8px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:4px">
-            <span>${m.ico}</span> <span>${m.label}</span>
-          </button>
-        `).join('')}
       </div>
 
       <div id="lab-critical-banner"></div>
