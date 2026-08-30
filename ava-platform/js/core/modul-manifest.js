@@ -99,7 +99,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
@@ -333,7 +335,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -343,7 +347,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -353,7 +359,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -363,7 +371,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -373,7 +383,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -438,7 +450,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -448,7 +462,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "lab": [
   "modules/lab/qcEngine.js",
@@ -565,7 +581,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -575,7 +593,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "farmasi": [
   "modules/pharmacy/farmasi_eprescription.js",
@@ -589,7 +609,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -671,7 +693,33 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
+ ],
+ "queue-console": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
+ ],
+ "queue-config": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -681,7 +729,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -691,7 +741,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "cashier": [
   "modules/finance/accounting.js",
@@ -771,7 +823,9 @@ window.MODUL_HALAMAN = {
   "modules/his/homecare.js",
   "modules/his/inpatient.js",
   "modules/his/mcu.js",
-  "modules/his/medrecord.js"
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -938,5 +992,7 @@ window.MODUL_SEMUA = [
  "modules/system/timeline.js",
  "modules/business_units/tech_saas.js",
  "modules/compliance/catalog_exporter.js",
- "modules/business_units/tenants.js"
+ "modules/business_units/tenants.js",
+ "modules/his/queue_config.js",
+ "modules/his/queue_console.js"
 ];

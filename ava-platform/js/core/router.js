@@ -308,6 +308,8 @@ async function navigate(page, params={}) {
     case 'catalog-export':    safeRun('renderCatalogExport', params);    break;
     case 'crm-pipeline':safeRun('renderCrmPipeline');            break;
     case 'queue':       safeRun('renderQueuePage');                  break;
+    case 'queue-console': safeRun('renderQueueConsole');          break;
+    case 'queue-config':  safeRun('renderQueueConfig');           break;
     case 'queue-kiosk': safeRun('renderQueueKiosk');                 break;
     case 'appointments':safeRun('renderAppointments');           break;
     case 'kasir':

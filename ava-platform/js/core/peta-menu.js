@@ -326,6 +326,12 @@ window.PETA_MENU = {
               "ket": "Pemanggilan bersuara & layar ruang tunggu"
             },
             {
+              "id": "queue-console",
+              "label": "Konsol Panggilan Antrean",
+              "status": "ada",
+              "ket": "Panggil berikutnya, panggil ulang, tandai tidak hadir, dan pindah loket — dengan pemanggilan bersuara"
+            },
+            {
               "id": "queue-kiosk",
               "label": "Kiosk Mandiri Pasien",
               "status": "ada",
@@ -340,8 +346,8 @@ window.PETA_MENU = {
             {
               "id": "queue-config",
               "label": "Konfigurasi Antrean",
-              "status": "belum",
-              "ket": "Definisi loket/poli, prefiks nomor, kuota slot, dan prioritas (lansia, ibu hamil, cito)"
+              "status": "ada",
+              "ket": "Loket, prefiks nomor, kuota harian, dan urutan prioritas panggilan"
             }
           ]
         },
