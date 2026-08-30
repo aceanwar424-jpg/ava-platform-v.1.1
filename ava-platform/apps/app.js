@@ -1404,7 +1404,11 @@ async function loadCorporateData() {
   try {
     const isSuperAdmin = (currentUserEmail === 'admin@avahealth.sbs');
     // Prioritas resolusi corporate_id:
-    //  1) currentCorporateId yang sudah diverifikasi saat login via Kode Corporate,
+    //  1) currentCorporateId — kini HANYA diisi korporat_verifikasi_akses()
+    //     yang memeriksa hak akses di sisi server. Sebelumnya nilai ini
+    //     berasal dari kode yang diketik tanpa pemeriksaan pemilik, dan
+    //     karena ia mendahului tautan akun, siapa pun bisa membaca roster
+    //     perusahaan lain hanya dengan tahu kodenya.
     //  2) corporate_id dari profil akun (tautan user_profiles),
     //  3) superadmin/demo → perusahaan pertama yang aktif.
     let corpId = currentCorporateId || currentUserProfile?.corporate_id || null;
@@ -2730,42 +2734,58 @@ async function handleLogin(event) {
   let finalRole = selectedRole;
   let profileData = null;
 
-  // Verify Corporate Code if role is corporate
+  // ── Gerbang B2B: kode korporat ────────────────────────────────────
+  //
+  // Di sini HANYA diperiksa bahwa kodenya diisi. Pemeriksaan hak akses
+  // sesungguhnya dilakukan SESUDAH autentikasi, lewat RPC
+  // korporat_verifikasi_akses() — lihat catatan panjang di bawah.
+  let corpCodeInputVal = null;
   if (selectedRole === 'corporate') {
-    const corpCode = document.getElementById('login-corp-code')?.value.trim();
-    const isSuperAdmin = (usernameInput === 'admin@avahealth.sbs');
-    if (!corpCode && !isSuperAdmin) {
-      alert('Kode Corporate wajib diisi.');
+    corpCodeInputVal = (document.getElementById('login-corp-code')?.value || '').trim();
+    if (!corpCodeInputVal) {
+      alert('Kode Korporat wajib diisi. Kode diterbitkan tim AVA di modul Corporate Management (HIS).');
       return;
     }
-    if (corpCode) {
-      try {
-        const corps = await sbGet('corporates', `select=id,corporate_name,kode_corp,status&kode_corp=eq.${corpCode}`);
-        if (!corps || !corps.length) {
-          alert('Kode Corporate tidak terdaftar atau tidak valid.');
-          return;
-        }
-        const activeCorp = corps[0];
-        if (activeCorp.status !== 'Aktif') {
-          alert('Akun Corporate ini sedang dinonaktifkan atau ditangguhkan. Hubungi admin AVA.');
-          return;
-        }
-        currentCorporateId = activeCorp.id;
-        currentCorporateName = activeCorp.corporate_name;
-        console.log("Connected to Corporate:", currentCorporateName, "ID:", currentCorporateId);
-      } catch(err) {
-        alert('Gagal memverifikasi Kode Corporate: ' + err.message);
-        return;
+  }
+
+  // ── Verifikasi hak akses korporat (SESUDAH autentikasi) ───────────
+  //
+  // Versi sebelumnya memeriksa kode korporat SEBELUM pengguna masuk, dan
+  // yang diperiksa hanya "apakah kode ini ada dan aktif":
+  //
+  //     sbGet('corporates', 'kode_corp=eq.' + kodeYangDiketik)
+  //     if (ada && status === 'Aktif') currentCorporateId = hasil.id
+  //
+  // Tidak ada pemeriksaan bahwa orang yang masuk berhak atas perusahaan
+  // itu. Ditambah baris resolusi corporate_id yang mendahulukan nilai ini
+  // di atas tautan akunnya sendiri, siapa pun dengan akun sah bisa
+  // mengetik kode perusahaan lain dan membaca roster karyawannya: nama,
+  // NIK, departemen, riwayat pemeriksaan, dan tagihan.
+  //
+  // Kode korporat bukan rahasia — ia tercetak di invoice, penawaran, dan
+  // dokumen PKS.
+  //
+  // Sekarang pemeriksaan dilakukan di basis data oleh
+  // korporat_verifikasi_akses(), yang membaca auth.uid() sendiri sehingga
+  // pemanggil tidak bisa menyebut identitas orang lain. Karena butuh
+  // identitas, ia HARUS dipanggil sesudah token didapat — bukan sebelum.
+  async function verifikasiKorporat(kode) {
+    try {
+      const r = await sbRpc('korporat_verifikasi_akses', { p_kode: kode });
+      if (!r || r.error) {
+        alert(r?.error || 'Verifikasi kode korporat gagal.');
+        return false;
       }
-    } else if (isSuperAdmin) {
-      // Default to first active corporate
-      try {
-        const allCorps = await sbGet('corporates','select=id,corporate_name,status&status=eq.Aktif&limit=1');
-        if (allCorps && allCorps.length) {
-          currentCorporateId = allCorps[0].id;
-          currentCorporateName = allCorps[0].corporate_name;
-        }
-      } catch(e) {}
+      currentCorporateId   = r.id;
+      currentCorporateName = r.nama;
+      currentCorpRole      = r.corp_role || 'requestor';
+      return true;
+    } catch (e) {
+      // Gagal menghubungi server BUKAN alasan untuk meloloskan. Membiarkan
+      // masuk saat pemeriksaan tidak bisa dijalankan justru mengembalikan
+      // lubang yang baru ditutup.
+      alert('Tidak dapat memverifikasi kode korporat: ' + e.message);
+      return false;
     }
   }
 
@@ -2839,6 +2859,20 @@ async function handleLogin(event) {
     finalRole = selectedRole || 'patient';
     currentUserProfile = { id: 'local-' + Date.now(), full_name: finalUsername, role: finalRole };
     localStorage.setItem('ol_token', 'mock_token_' + finalRole);
+  }
+
+  // Gerbang B2B dijalankan DI SINI — sesudah token ada, sebelum layar
+  // dashboard dibuka. Kalau gagal, alur berhenti dan pengguna tetap di
+  // halaman masuk; ia tidak boleh sempat melihat data perusahaan mana pun.
+  if (selectedRole === 'corporate') {
+    const boleh = await verifikasiKorporat(corpCodeInputVal);
+    if (!boleh) {
+      // Sesi dibersihkan supaya percobaan berikutnya tidak mewarisi token
+      // yang sudah terlanjur tersimpan di langkah autentikasi.
+      localStorage.removeItem('ol_token');
+      localStorage.removeItem('ol_refresh');
+      return;
+    }
   }
 
   // Continue login flow
