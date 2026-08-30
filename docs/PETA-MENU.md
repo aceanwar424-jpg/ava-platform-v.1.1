@@ -17,10 +17,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `ops.avahealth.sbs` | Holding HQ — CEO Cockpit | Pemantauan penuh lintas seluruh unit usaha. SATU-SATUNYA ruang yang melihat semua kategori. | **semua kategori** |
 | `tech.avahealth.sbs` | AVA Tech — Pembangun & Penjual Sistem | Tim brand Tech: penguasa pengembangan sistem sekaligus komersialisasinya. Langsung ke halaman masuk. | tech, marketing, keuangan, sdm, konfigurasi, agentic |
 | `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium. | his, radiologi, support-medical, avahealth, korporat, marketing, keuangan, mutu, sdm, konfigurasi |
-| `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis, logistik, mutu, konfigurasi |
+| `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 167 — 🟢 147 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
+**Total menu terpetakan:** 160 — 🟢 140 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
 
 ---
 
@@ -161,73 +161,56 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 `lis`
 
-**1. Pra-Analitik & Sampling**
+**Penerimaan & Sampling**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Penerimaan Sampel & Barcode | `lab` | Check-in spesimen dan cetak label tabung L{YYMMDD} |
-| 🟢 | Flebotomi & Checklist Sampling | `lis-phlebotomy` | Verifikasi tabung, lokasi tusukan & waktu sampling |
-| 🟢 | Verifikasi Kelayakan Spesimen (ISO 7.2.6) | `lis-kelayakan` | Kriteria penolakan spesimen hemolisis/lipemik/bekuan |
-| 🟢 | Order Lab & Label Sampel | `anamnesa` | Pembentukan order dan label dari admisi faskes |
+| 🟢 | Penerimaan & Barcode | `lab` | Check-in spesimen dan cetak label tabung L{YYMMDD} |
+| 🟢 | Flebotomi & Tusukan | `lis-phlebotomy` | Verifikasi tabung, lokasi tusukan & waktu sampling |
+| 🟢 | Verifikasi Kelayakan | `lis-kelayakan` | Kriteria penolakan spesimen hemolisis/lipemik/bekuan |
+| 🟢 | Order Baru & Label | `anamnesa` | Pembentukan order dan label dari admisi faskes |
 
-**2. Analitik & Interfacing**
+**Pemeriksaan & Alat**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Worklist Analyzer | `worklist` | Antrean kerja per alat analyzer |
-| 🟢 | Input Hasil & Delta Check | `lab` › lab-result | Entry hasil dan deteksi lonjakan riwayat pasien |
-| 🟢 | Master Interfacing Alat (ASTM :9999) | `lis-analyzer` | Konfigurasi analyzer ASTM E1381/E1394 & channel mapping |
-| 🟢 | Verifikasi Lot-to-Lot Reagen Baru | `lis-lot-verification` | Uji paralel 5-10 sampel & deteksi pergeseran bias |
+| 🟢 | Input Hasil & Delta | `lab` › lab-result | Entry hasil dan deteksi lonjakan riwayat pasien |
+| 🟢 | Koneksi Alat (:9999) | `lis-analyzer` | Konfigurasi analyzer ASTM E1381/E1394 & channel mapping |
+| 🟢 | Uji Lot Reagen | `lis-lot-verification` | Uji paralel 5-10 sampel & deteksi pergeseran bias |
 
-**3. Mutu & Kendali Kualitas (QC)**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | QC Westgard & Levey-Jennings | `lab` › lab-qc | Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma |
-| 🟢 | Uji Profisiensi & PME Eksternal | `lis-pme` | Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score |
-
-**4. Pasca-Analitik & Validasi**
+**Validasi & Hasil**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Validasi dr. Sp.PK & Nilai Kritis | `lab` › lab-validation | Otorisasi klinis dokter spesialis patologi klinik |
-| 🟢 | Logbook Notifikasi Nilai Kritis (<15m) | `lis-critical-value` | Pencatatan lapor telepon dokter & bukti read-back |
-| 🟢 | Approval & Rilis PDF TTE QR | `lab` › lab-approval | Tanda tangan kriptografis QR & rilis ke portal pasien |
-| 🟢 | Turnaround Time (TAT) & Bottleneck | `lab-tat` | Durasi tiap tahap pra-analitik, analitik, rilis |
+| 🟢 | Otorisasi Sp.PK | `lab` › lab-validation | Otorisasi klinis dokter spesialis patologi klinik |
+| 🟢 | Alert Nilai Kritis | `lis-critical-value` | Pencatatan lapor telepon dokter & bukti read-back |
+| 🟢 | Approval & TTE QR | `lab` › lab-approval | Tanda tangan kriptografis QR & rilis ke portal pasien |
+| 🟢 | Turnaround Time (TAT) | `lab-tat` | Durasi tiap tahap pra-analitik, analitik, rilis |
 
-**5. Manajemen Arsip & Spesimen**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | Lokasi Rak Spesimen & Freezer (-20°C) | `lis-sample-archive` | Grid rak 10x10, add-on test retrieval & auto-dispose |
-| 🟢 | Arsip Hasil & Tren Pasien | `lab` › lab-report | Riwayat hasil kumulatif dan grafik tren analit |
-
-**6. Master Data Tes (530+ Parameter)**
+**Kontrol Mutu (QC)**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
+| 🟢 | QC Harian (Levey-Jennings) | `lab` › lab-qc | Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma |
+| 🟢 | Uji Profisiensi (PME) | `lis-pme` | Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score |
+| 🟢 | Verifikasi Acuan | `refrange` | Rentang per usia, jenis kelamin, satuan |
+
+**Bank Sampel**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Rak Arsip (-20°C) | `lis-sample-archive` | Grid rak 10x10, add-on test retrieval & auto-dispose |
+| 🟢 | Riwayat Hasil & Tren | `lab` › lab-report | Riwayat hasil kumulatif dan grafik tren analit |
+
+**Logistik & Rujukan**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Stok Reagen & Suhu | `inventory` | Saldo stok per gudang dan unit |
+| 🟢 | Lab Rujukan Luar | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya |
 | 🟢 | Katalog Tes & Tarif | `product` | 530+ parameter terstandar LOINC/UCUM |
-| 🟢 | Paket & Panel Pemeriksaan | `package` | Susunan panel dan paket MCU |
-| 🟢 | Nilai Rujukan Relasional | `refrange` | Rentang per usia, jenis kelamin, satuan |
-| 🟢 | Ekspor Katalog LOINC/UCUM | `catalog-export` | Katalog terstandarisasi siap-LIS |
-| 🟢 | Format Hasil PDF Lab | `labreport` | Kop surat, tanda tangan, dan tata letak lembar hasil |
-| 🟢 | Peninjau Deskripsi Tes | `test-reviewer` | Penyuntingan massal deskripsi 530+ tes ke bahasa awam |
-
-**7. Reagen & BHP (FEFO)**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | Stok Reagen & BHP | `inventory` | Saldo stok per gudang dan unit |
-| 🟢 | Resep BHP per Pemeriksaan | `inventory` › inventory-recipe | Pemotongan stok otomatis per tes |
-| 🟢 | Pesanan Pembelian Reagen | `inventory` › inventory-po | PO ke supplier dan penerimaan barang |
-
-**8. Rujukan Lab Rekanan**
-
-| | Menu | Halaman | Keterangan |
-|---|---|---|---|
-| 🟢 | Rujukan Lab Rekanan | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya |
-| 🟢 | Dokter & Klinik Perujuk | `perujuk` | Tarif komisi rujukan dan pencairan |
-| 🟢 | Akses Portal Perujuk | `portal-akses` | Tautan bertoken untuk pihak luar |
+| 🟢 | Ekspor Katalog LOINC | `catalog-export` | Katalog terstandarisasi siap-LIS |
 
 ---
 

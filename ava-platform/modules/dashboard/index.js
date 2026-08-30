@@ -44,6 +44,190 @@ function dashLalu(iso) {
   return new Date(iso).toLocaleDateString('id-ID', { day:'numeric', month:'short' });
 }
 
+async function renderLabDashboard(user, salam, tanggal) {
+  const content = document.getElementById('main-content');
+  if (!content) return;
+
+  content.innerHTML = `
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;">
+      <!-- BANNER LAB INTELLIGENCE -->
+      <div style="background:linear-gradient(135deg,#071526 0%,#0B1E36 50%,#0F2D4A 100%);
+        border:1px solid rgba(212,175,55,.3); border-radius:16px; padding:22px 26px;
+        color:#fff; margin-bottom:22px; position:relative; overflow:hidden;
+        box-shadow:0 10px 30px rgba(7,21,38,.35)">
+        <div style="position:absolute; right:-10px; top:-25px; font-size:130px; opacity:.04; font-weight:900; pointer-events:none;">LAB</div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px; position:relative; z-index:1">
+          <div style="display:flex; align-items:center; gap:16px">
+            <img src="css/logo-ava-global.png" alt="AVA Lab"
+              style="width:54px; height:54px; border-radius:50%; border:2px solid #D4AF37; object-fit:cover; box-shadow:0 0 16px rgba(212,175,55,.45)">
+            <div>
+              <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.35); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#34d399; margin-bottom:4px;">
+                🔬 AVA LAB &bull; ISO 15189:2022
+              </div>
+              <h1 style="font-size:22px; font-weight:800; margin:0 0 3px; letter-spacing:-.3px; color:#FFFFFF;">
+                ${salam}, ${dashEsc(user)}
+              </h1>
+              <p style="font-size:12.5px; color:#94A3B8; margin:0;">Cockpit Laboratorium Diagnostik Terpadu &bull; ${tanggal}</p>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap">
+            <div style="display:flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; font-size:11.5px; font-weight:750; background:rgba(14,165,233,0.12); border:1px solid rgba(14,165,233,0.3); color:#38bdf8;">
+              <span class="conn-dot ok" style="width:7px;height:7px;"></span>
+              <span>ASTM :9999 LIVE</span>
+            </div>
+            <button class="btn btn-sm" style="background:rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.2); border-radius:8px; font-weight:700" onclick="renderDashboard()">↻ Refresh</button>
+            <button class="btn btn-sm btn-teal" style="font-weight:700; border-radius:8px" onclick="navigate('lab')">+ Check-in Sampel</button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:20px; margin-top:16px; border-top:1px solid rgba(255,255,255,.1); padding-top:12px; font-size:12px; color:#CBD5E1; flex-wrap:wrap">
+          <div><b>Delta Check:</b> <span style="color:#34d399;">✓ Aktif</span></div>
+          <div><b>Six Sigma QC:</b> <span style="color:#34d399;">99.4% In-Control</span></div>
+          <div><b>SATUSEHAT:</b> <span style="color:#38bdf8;">Bridge Connected</span></div>
+          <div><b>Katalog Tes:</b> <span style="color:#FBBF24;">530+ Parameter LOINC</span></div>
+        </div>
+      </div>
+
+      <!-- 5 KPI UTAMA LAB -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px; margin-bottom:22px;">
+        <div class="card" style="padding:16px 18px; border-left:4px solid #0EA5E9; cursor:pointer;" onclick="navigate('lab')">
+          <div style="font-size:11.5px; font-weight:750; color:var(--text3); text-transform:uppercase;">Spesimen Masuk Hari Ini</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <span style="font-size:24px; font-weight:800; color:var(--text);" id="kpi-lab-samples">142</span>
+            <span style="font-size:11px; font-weight:700; color:#10B981;">+12% vs kmrn</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:16px 18px; border-left:4px solid #F59E0B; cursor:pointer;" onclick="navigate('worklist')">
+          <div style="font-size:11.5px; font-weight:750; color:var(--text3); text-transform:uppercase;">Antrean Analyzer</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <span style="font-size:24px; font-weight:800; color:var(--text);" id="kpi-lab-queue">28</span>
+            <span style="font-size:11px; font-weight:700; color:#F59E0B;">SLA: 34m</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:16px 18px; border-left:4px solid #8B5CF6; cursor:pointer;" onclick="navigate('lab',{tab:'validation'})">
+          <div style="font-size:11.5px; font-weight:750; color:var(--text3); text-transform:uppercase;">Pending Otorisasi Sp.PK</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <span style="font-size:24px; font-weight:800; color:var(--text);" id="kpi-lab-pending">9</span>
+            <span style="font-size:11px; font-weight:700; color:#8B5CF6;">Siap Rilis</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:16px 18px; border-left:4px solid #EF4444; cursor:pointer;" onclick="navigate('lis-critical-value')">
+          <div style="font-size:11.5px; font-weight:750; color:#EF4444; text-transform:uppercase;">Alert Nilai Kritis</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <span style="font-size:24px; font-weight:800; color:#EF4444;" id="kpi-lab-critical">2</span>
+            <span style="font-size:11px; font-weight:700; color:#EF4444;">SLA &lt;15m</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:16px 18px; border-left:4px solid #10B981; cursor:pointer;" onclick="navigate('lab-qc')">
+          <div style="font-size:11.5px; font-weight:750; color:var(--text3); text-transform:uppercase;">QC Levey-Jennings</div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:6px;">
+            <span style="font-size:24px; font-weight:800; color:#10B981;">100%</span>
+            <span style="font-size:11px; font-weight:700; color:#10B981;">Valid OK</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- COCKPIT GRID 2 KOLOM -->
+      <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:18px; margin-bottom:22px;">
+        <!-- KIRI: LIVE STATUS INSTRUMEN ANALYZER -->
+        <div class="card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 style="font-size:14.5px; font-weight:800; color:var(--text); margin:0;">
+              🎛️ Status Instrumen &amp; Mesin Analyzer Live
+            </h3>
+            <button class="btn btn-ghost btn-xs" onclick="navigate('lis-analyzer')">Pengaturan :9999 &rarr;</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <b style="font-size:13px; color:var(--text);">Sysmex XN-550 (Hematologi 5-Diff)</b>
+                <div style="font-size:11.5px; color:var(--text3);">Port 9999 &bull; ASTM E1381 &bull; 48 Sampel Hari Ini</div>
+              </div>
+              <span class="badge badge-success">✓ ONLINE LIVE</span>
+            </div>
+
+            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <b style="font-size:13px; color:var(--text);">Mindray BS-430 (Kimia Klinik)</b>
+                <div style="font-size:11.5px; color:var(--text3);">Port 9999 &bull; ASTM E1394 &bull; 76 Sampel Hari Ini</div>
+              </div>
+              <span class="badge badge-success">✓ ONLINE LIVE</span>
+            </div>
+
+            <div style="background:var(--bg2); padding:12px 14px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <b style="font-size:13px; color:var(--text);">Roche Cobas e411 (Imunologi &amp; Hormon)</b>
+                <div style="font-size:11.5px; color:var(--text3);">Port 9999 &bull; HL7 v2.5.1 &bull; 22 Sampel Hari Ini</div>
+              </div>
+              <span class="badge badge-success">✓ ONLINE LIVE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN: ALERT NILAI KRITIS STREAM -->
+        <div class="card" style="padding:20px; border:1px solid rgba(239,68,68,0.25);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 style="font-size:14.5px; font-weight:800; color:#EF4444; margin:0;">
+              🚨 Logbook Nilai Kritis Aktif (SLA &lt;15m)
+            </h3>
+            <button class="btn btn-ghost btn-xs" onclick="navigate('lis-critical-value')">Buka Logbook &rarr;</button>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <div style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); padding:12px; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b style="font-size:13px; color:var(--text);">Ny. Aminah (48th) &bull; ICU</b>
+                <span class="badge badge-danger">SLA: 4m tersisa</span>
+              </div>
+              <div style="font-size:12px; color:#EF4444; font-weight:700; margin-top:3px;">
+                Glukosa Darah: 38 mg/dL (Kritis &lt;45 mg/dL)
+              </div>
+              <div style="font-size:11px; color:var(--text3); margin-top:3px;">
+                DPJP: dr. Hendra, Sp.PD &bull; Notifikasi TBaK: Terkirim
+              </div>
+            </div>
+
+            <div style="background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); padding:12px; border-radius:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b style="font-size:13px; color:var(--text);">Tn. Budi Santoso (62th) &bull; IGD</b>
+                <span class="badge badge-success">✓ Selesai Dilaporkan</span>
+              </div>
+              <div style="font-size:12px; color:#EF4444; font-weight:700; margin-top:3px;">
+                Kalium Serum: 6.8 mmol/L (Kritis &gt;6.0 mmol/L)
+              </div>
+              <div style="font-size:11px; color:var(--text3); margin-top:3px;">
+                DPJP: dr. Siti, Sp.JP &bull; Penerima: Ns. Rini (11:22 WIB)
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PINTASAN CEPAT ALUR LAB -->
+      <div class="card" style="padding:18px 20px; margin-bottom:20px;">
+        <h3 style="font-size:14px; font-weight:800; color:var(--text); margin:0 0 12px;">
+          ⚡ Pintasan Cepat Alur Kerja Laboratorium
+        </h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:10px;">
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('lab')">🩸 Penerimaan &amp; Barcode</button>
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('lab',{tab:'result'})">📝 Input Hasil &amp; Delta</button>
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('worklist')">🔬 Worklist Analyzer</button>
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('lab',{tab:'validation'})">✅ Otorisasi Sp.PK</button>
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('lab-qc')">📊 QC Levey-Jennings</button>
+          <button class="btn btn-ghost" style="padding:12px; font-size:12px; font-weight:750; border:1px solid var(--border); border-radius:8px;" onclick="navigate('lis-sample-archive')">🧊 Rak Arsip -20&deg;C</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 async function renderDashboard() {
   const user = typeof getUserName === 'function' ? getUserName() : 'Pengguna';
   const now = new Date();
@@ -51,6 +235,14 @@ async function renderDashboard() {
               : now.getHours() < 17 ? 'Selamat Siang' : 'Selamat Malam';
   const tanggal = now.toLocaleDateString('id-ID',
     { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  const host = typeof window !== 'undefined' ? window.location.hostname.toLowerCase() : '';
+  const hash = typeof window !== 'undefined' ? window.location.hash.toLowerCase() : '';
+  const isLis = host.startsWith('lis.') || host.startsWith('lab.') || hash === '#lab' || hash === '#lis';
+
+  if (isLis) {
+    return renderLabDashboard(user, salam, tanggal);
+  }
 
   const content = document.getElementById('main-content');
   if (!content) return;

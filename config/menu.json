@@ -85,10 +85,7 @@
       "subdomain": "lis.avahealth.sbs",
       "peran": "Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen.",
       "kategori": [
-        "lis",
-        "logistik",
-        "mutu",
-        "konfigurasi"
+        "lis"
       ]
     },
     "wellness": {
@@ -516,36 +513,36 @@
       "ikon": "flask",
       "grup": [
         {
-          "nama": "1. Pra-Analitik & Sampling",
+          "nama": "Penerimaan & Sampling",
           "menu": [
             {
               "id": "lab",
-              "label": "Penerimaan Sampel & Barcode",
+              "label": "Penerimaan & Barcode",
               "status": "ada",
               "ket": "Check-in spesimen dan cetak label tabung L{YYMMDD}"
             },
             {
               "id": "lis-phlebotomy",
-              "label": "Flebotomi & Checklist Sampling",
+              "label": "Flebotomi & Tusukan",
               "status": "ada",
               "ket": "Verifikasi tabung, lokasi tusukan & waktu sampling"
             },
             {
               "id": "lis-kelayakan",
-              "label": "Verifikasi Kelayakan Spesimen (ISO 7.2.6)",
+              "label": "Verifikasi Kelayakan",
               "status": "ada",
               "ket": "Kriteria penolakan spesimen hemolisis/lipemik/bekuan"
             },
             {
               "id": "anamnesa",
-              "label": "Order Lab & Label Sampel",
+              "label": "Order Baru & Label",
               "status": "ada",
               "ket": "Pembentukan order dan label dari admisi faskes"
             }
           ]
         },
         {
-          "nama": "2. Analitik & Interfacing",
+          "nama": "Pemeriksaan & Alat",
           "menu": [
             {
               "id": "worklist",
@@ -555,7 +552,7 @@
             },
             {
               "id": "lab-result",
-              "label": "Input Hasil & Delta Check",
+              "label": "Input Hasil & Delta",
               "status": "ada",
               "ket": "Entry hasil dan deteksi lonjakan riwayat pasien",
               "rute": "lab",
@@ -563,43 +560,24 @@
             },
             {
               "id": "lis-analyzer",
-              "label": "Master Interfacing Alat (ASTM :9999)",
+              "label": "Koneksi Alat (:9999)",
               "status": "ada",
               "ket": "Konfigurasi analyzer ASTM E1381/E1394 & channel mapping"
             },
             {
               "id": "lis-lot-verification",
-              "label": "Verifikasi Lot-to-Lot Reagen Baru",
+              "label": "Uji Lot Reagen",
               "status": "ada",
               "ket": "Uji paralel 5-10 sampel & deteksi pergeseran bias"
             }
           ]
         },
         {
-          "nama": "3. Mutu & Kendali Kualitas (QC)",
-          "menu": [
-            {
-              "id": "lab-qc",
-              "label": "QC Westgard & Levey-Jennings",
-              "status": "ada",
-              "ket": "Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'qc'})"
-            },
-            {
-              "id": "lis-pme",
-              "label": "Uji Profisiensi & PME Eksternal",
-              "status": "ada",
-              "ket": "Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score"
-            }
-          ]
-        },
-        {
-          "nama": "4. Pasca-Analitik & Validasi",
+          "nama": "Validasi & Hasil",
           "menu": [
             {
               "id": "lab-validation",
-              "label": "Validasi dr. Sp.PK & Nilai Kritis",
+              "label": "Otorisasi Sp.PK",
               "status": "ada",
               "ket": "Otorisasi klinis dokter spesialis patologi klinik",
               "rute": "lab",
@@ -607,13 +585,13 @@
             },
             {
               "id": "lis-critical-value",
-              "label": "Logbook Notifikasi Nilai Kritis (<15m)",
+              "label": "Alert Nilai Kritis",
               "status": "ada",
               "ket": "Pencatatan lapor telepon dokter & bukti read-back"
             },
             {
               "id": "lab-approval",
-              "label": "Approval & Rilis PDF TTE QR",
+              "label": "Approval & TTE QR",
               "status": "ada",
               "ket": "Tanda tangan kriptografis QR & rilis ke portal pasien",
               "rute": "lab",
@@ -621,24 +599,49 @@
             },
             {
               "id": "lab-tat",
-              "label": "Turnaround Time (TAT) & Bottleneck",
+              "label": "Turnaround Time (TAT)",
               "status": "ada",
               "ket": "Durasi tiap tahap pra-analitik, analitik, rilis"
             }
           ]
         },
         {
-          "nama": "5. Manajemen Arsip & Spesimen",
+          "nama": "Kontrol Mutu (QC)",
+          "menu": [
+            {
+              "id": "lab-qc",
+              "label": "QC Harian (Levey-Jennings)",
+              "status": "ada",
+              "ket": "Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma",
+              "rute": "lab",
+              "aksi": "navigate('lab',{tab:'qc'})"
+            },
+            {
+              "id": "lis-pme",
+              "label": "Uji Profisiensi (PME)",
+              "status": "ada",
+              "ket": "Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score"
+            },
+            {
+              "id": "refrange",
+              "label": "Verifikasi Acuan",
+              "status": "ada",
+              "ket": "Rentang per usia, jenis kelamin, satuan"
+            }
+          ]
+        },
+        {
+          "nama": "Bank Sampel",
           "menu": [
             {
               "id": "lis-sample-archive",
-              "label": "Lokasi Rak Spesimen & Freezer (-20°C)",
+              "label": "Rak Arsip (-20°C)",
               "status": "ada",
               "ket": "Grid rak 10x10, add-on test retrieval & auto-dispose"
             },
             {
               "id": "lab-report",
-              "label": "Arsip Hasil & Tren Pasien",
+              "label": "Riwayat Hasil & Tren",
               "status": "ada",
               "ket": "Riwayat hasil kumulatif dan grafik tren analit",
               "rute": "lab",
@@ -647,8 +650,20 @@
           ]
         },
         {
-          "nama": "6. Master Data Tes (530+ Parameter)",
+          "nama": "Logistik & Rujukan",
           "menu": [
+            {
+              "id": "inventory",
+              "label": "Stok Reagen & Suhu",
+              "status": "ada",
+              "ket": "Saldo stok per gudang dan unit"
+            },
+            {
+              "id": "referral",
+              "label": "Lab Rujukan Luar",
+              "status": "ada",
+              "ket": "Kirim spesimen keluar dan rekonsiliasi biaya"
+            },
             {
               "id": "product",
               "label": "Katalog Tes & Tarif",
@@ -656,90 +671,10 @@
               "ket": "530+ parameter terstandar LOINC/UCUM"
             },
             {
-              "id": "package",
-              "label": "Paket & Panel Pemeriksaan",
-              "status": "ada",
-              "ket": "Susunan panel dan paket MCU"
-            },
-            {
-              "id": "refrange",
-              "label": "Nilai Rujukan Relasional",
-              "status": "ada",
-              "ket": "Rentang per usia, jenis kelamin, satuan"
-            },
-            {
               "id": "catalog-export",
-              "label": "Ekspor Katalog LOINC/UCUM",
+              "label": "Ekspor Katalog LOINC",
               "status": "ada",
               "ket": "Katalog terstandarisasi siap-LIS"
-            },
-            {
-              "id": "labreport",
-              "label": "Format Hasil PDF Lab",
-              "status": "ada",
-              "rute": "labreport",
-              "aksi": "navigate('settings',{tab:'pdf'})",
-              "admin": true,
-              "ket": "Kop surat, tanda tangan, dan tata letak lembar hasil"
-            },
-            {
-              "id": "test-reviewer",
-              "label": "Peninjau Deskripsi Tes",
-              "status": "ada",
-              "admin": true,
-              "ket": "Penyuntingan massal deskripsi 530+ tes ke bahasa awam"
-            }
-          ]
-        },
-        {
-          "nama": "7. Reagen & BHP (FEFO)",
-          "menu": [
-            {
-              "id": "inventory",
-              "label": "Stok Reagen & BHP",
-              "status": "ada",
-              "ket": "Saldo stok per gudang dan unit"
-            },
-            {
-              "id": "inventory-recipe",
-              "label": "Resep BHP per Pemeriksaan",
-              "status": "ada",
-              "ket": "Pemotongan stok otomatis per tes",
-              "rute": "inventory",
-              "aksi": "navigate('inventory',{tab:'recipe'})"
-            },
-            {
-              "id": "inventory-po",
-              "label": "Pesanan Pembelian Reagen",
-              "status": "ada",
-              "ket": "PO ke supplier dan penerimaan barang",
-              "rute": "inventory",
-              "aksi": "navigate('inventory',{tab:'po'})"
-            }
-          ]
-        },
-        {
-          "nama": "8. Rujukan Lab Rekanan",
-          "menu": [
-            {
-              "id": "referral",
-              "label": "Rujukan Lab Rekanan",
-              "status": "ada",
-              "ket": "Kirim spesimen keluar dan rekonsiliasi biaya"
-            },
-            {
-              "id": "perujuk",
-              "label": "Dokter & Klinik Perujuk",
-              "status": "ada",
-              "ket": "Tarif komisi rujukan dan pencairan",
-              "admin": true
-            },
-            {
-              "id": "portal-akses",
-              "label": "Akses Portal Perujuk",
-              "status": "ada",
-              "ket": "Tautan bertoken untuk pihak luar",
-              "admin": true
             }
           ]
         }
