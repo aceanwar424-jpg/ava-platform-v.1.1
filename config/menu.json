@@ -45,7 +45,9 @@
         "konsumen",
         "konfigurasi",
         "marketing",
-        "avahealth"
+        "avahealth",
+        "radiologi",
+        "support-medical"
       ]
     },
     "tech": {
@@ -67,6 +69,8 @@
       "peran": "Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium.",
       "kategori": [
         "his",
+        "radiologi",
+        "support-medical",
         "avahealth",
         "korporat",
         "marketing",
@@ -349,6 +353,12 @@
               "label": "Jadwal Dokter & Perjanjian",
               "status": "ada",
               "ket": "Reservasi konsultasi & pengingat"
+            },
+            {
+              "id": "queue-config",
+              "label": "Konfigurasi Antrean",
+              "status": "belum",
+              "ket": "Definisi loket/poli, prefiks nomor, kuota slot, dan prioritas (lansia, ibu hamil, cito)"
             }
           ]
         },
@@ -378,30 +388,30 @@
               "label": "Arsip Rekam Medis",
               "status": "ada",
               "ket": "Riwayat kunjungan dan berkas pasien"
+            },
+            {
+              "id": "his-orders",
+              "label": "Order Terintegrasi",
+              "status": "belum",
+              "ket": "Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS"
+            },
+            {
+              "id": "his-procedures",
+              "label": "Tindakan & Prosedur",
+              "status": "belum",
+              "ket": "Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya"
+            },
+            {
+              "id": "his-immunization",
+              "label": "Vaksinasi & Imunisasi",
+              "status": "belum",
+              "ket": "Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT"
             }
           ]
         },
         {
-          "nama": "Penunjang Non-Lab",
+          "nama": "Farmasi",
           "menu": [
-            {
-              "id": "radiology",
-              "label": "Radiologi & RIS",
-              "status": "ada",
-              "ket": "Order, worklist, dan hasil bacaan radiologi"
-            },
-            {
-              "id": "pacs-viewer",
-              "label": "PACS & DICOM Viewer",
-              "status": "parsial",
-              "ket": "Viewer siap; sumber citra DICOM belum tersambung"
-            },
-            {
-              "id": "supportive",
-              "label": "Penunjang Diagnostik (EKG, Audiometri, Spirometri)",
-              "status": "ada",
-              "ket": "Pemeriksaan penunjang non-lab: EKG 12 lead, treadmill, audiometri, faal paru"
-            },
             {
               "id": "farmasi",
               "label": "Farmasi & E-Prescription",
@@ -477,6 +487,18 @@
               "label": "Laporan RL Kemenkes",
               "status": "ada",
               "ket": "Rekapitulasi RL terisi dari data operasional"
+            },
+            {
+              "id": "his-mpi",
+              "label": "Master Rekam Medis (MPI)",
+              "status": "belum",
+              "ket": "Penggabungan pasien duplikat, riwayat merge, dan penomoran rekam medis. Layanannya sudah ada di js/core/mpiService.js — layarnya belum"
+            },
+            {
+              "id": "his-mr-governance",
+              "label": "Kelengkapan &amp; Retensi Rekam Medis",
+              "status": "belum",
+              "ket": "Audit kelengkapan RM, jadwal retensi/pemusnahan, dan permintaan salinan oleh pasien atau asuransi"
             }
           ]
         }
@@ -1370,6 +1392,108 @@
               "label": "Portal Multi-Peran",
               "status": "ada",
               "ket": "Tampilan admin, pelanggan, dokter, dan vendor"
+            }
+          ]
+        }
+      ]
+    },
+    "radiologi": {
+      "label": "Radiologi & Pencitraan",
+      "pendek": "Radiologi",
+      "ikon": "scan",
+      "catatan": "Berdiri sendiri, bukan lagi satu grup di bawah Klinik. Alur radiologi punya rantai kerjanya sendiri: order, modalitas, akuisisi citra, bacaan radiolog, lalu rilis ekspertise.",
+      "grup": [
+        {
+          "nama": "Alur Pemeriksaan",
+          "menu": [
+            {
+              "id": "radiology",
+              "label": "Order & Worklist Radiologi",
+              "status": "ada",
+              "ket": "Permintaan foto dari poli, antrean kerja per modalitas, dan status pengerjaan"
+            },
+            {
+              "id": "pacs-viewer",
+              "label": "PACS & DICOM Viewer",
+              "status": "parsial",
+              "ket": "Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung"
+            },
+            {
+              "id": "rad-unggah",
+              "label": "Unggah Citra & Studi",
+              "status": "belum",
+              "ket": "Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan"
+            },
+            {
+              "id": "rad-ekspertise",
+              "label": "Bacaan & Ekspertise Radiolog",
+              "status": "belum",
+              "ket": "Lembar bacaan dokter Sp.Rad, tanda tangan elektronik, dan rilis hasil ke pengirim order"
+            }
+          ]
+        },
+        {
+          "nama": "Master & Alat",
+          "menu": [
+            {
+              "id": "rad-modalitas",
+              "label": "Modalitas & Jadwal Alat",
+              "status": "belum",
+              "ket": "Daftar alat (rontgen, USG, CT), DICOM Modality Worklist, dan jadwal pemakaian"
+            },
+            {
+              "id": "rad-katalog",
+              "label": "Katalog Pemeriksaan Radiologi",
+              "status": "belum",
+              "ket": "Jenis pemeriksaan, persiapan pasien, dosis radiasi, dan tarifnya"
+            },
+            {
+              "id": "assets",
+              "label": "Kalibrasi & Perawatan Alat",
+              "status": "ada",
+              "ket": "Jadwal kalibrasi alat radiologi dan riwayat perawatannya"
+            }
+          ]
+        }
+      ]
+    },
+    "support-medical": {
+      "label": "Support Medical — Penunjang Non-Radiologi",
+      "pendek": "Support Medical",
+      "ikon": "heart",
+      "catatan": "Pemeriksaan penunjang di luar laboratorium dan radiologi.",
+      "grup": [
+        {
+          "nama": "Jantung, Paru & Indera",
+          "menu": [
+            {
+              "id": "supportive",
+              "label": "EKG, Treadmill, Audiometri & Spirometri",
+              "status": "ada",
+              "ket": "Satu layar input untuk keempat pemeriksaan, lengkap dengan interpretasi terstruktur"
+            },
+            {
+              "id": "sm-usg",
+              "label": "USG Non-Radiologi",
+              "status": "belum",
+              "ket": "USG yang dikerjakan dokter poli sendiri (obgyn, abdomen) di luar alur radiologi"
+            }
+          ]
+        },
+        {
+          "nama": "Rehabilitasi & Tindakan",
+          "menu": [
+            {
+              "id": "sm-fisioterapi",
+              "label": "Fisioterapi & Rehabilitasi Medik",
+              "status": "belum",
+              "ket": "Program terapi, jadwal sesi, dan catatan perkembangan pasien"
+            },
+            {
+              "id": "sm-endoskopi",
+              "label": "Endoskopi",
+              "status": "belum",
+              "ket": "Jadwal, persiapan pasien, dan laporan temuan"
             }
           ]
         }
