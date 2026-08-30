@@ -1,226 +1,338 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: Rekam Medis Elektronik (EMR) SOAP & CPPT Interaktif — AVA GLOBAL
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Antrian Pemeriksaan Dokter / Poli Rawat Jalan
-// - SOAP Charting: Subjective, Objective (Vital Signs + Fisik), Assessment (ICD-10), Plan
-// - Order Lab Langsung dari Lembar Konsultasi
-// - E-Prescription Langsung ke Farmasi
-// - Riwayat CPPT Terintegrasi
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: EMR SOAP & CPPT
+//
+// Versi sebelumnya tidak punya panggilan data: antrean poli, tanda
+// vital, dan catatan SOAP ditulis tangan. Untuk lembar konsultasi,
+// itu menampilkan pemeriksaan atas pasien yang tidak ada — dan angka
+// tekanan darah karangan di layar dokter adalah hal yang paling tidak
+// boleh terjadi di sistem ini.
+//
+// Sekarang membaca public.admissions, public.anamnesas,
+// public.vital_signs, dan public.icd_diagnostics — semuanya sudah ada
+// di basis data dan tidak pernah dibaca dari sini.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Tanda vital dibaca dari vital_signs bila ada, dan baru jatuh ke
+// anamnesas bila belum. Keduanya menyimpan tekanan darah dengan nama
+// kolom berbeda (bp_systolic vs systole) — warisan dua alur pencatatan
+// yang tumbuh terpisah. Yang tidak boleh terjadi adalah menampilkan
+// salah satunya sebagai satu-satunya kebenaran lalu menyembunyikan
+// bahwa yang lain berbeda.
+//
+// Catatan yang sudah disimpan TIDAK dihapus dari layar ini. Rekam medis
+// adalah dokumen hukum; koreksi dilakukan dengan catatan tambahan yang
+// menyebut apa yang dikoreksi, bukan dengan menghapus baris.
+//
+// Prefiks "es".
+// ═══════════════════════════════════════════════════════════════
 
-let EMR_STATE = {
-  pasienList: [
-    { id: 'P-00124', nama: 'Ny. Siska Melani', nik: '3201889201990001', usia: '29 Thn', jk: 'Perempuan', no_rm: 'RM-2026-0041', status: 'Dalam Pemeriksaan' },
-    { id: 'P-00128', nama: 'Nn. Aurelia Putri', nik: '3201773010010002', usia: '24 Thn', jk: 'Perempuan', no_rm: 'RM-2026-0055', status: 'Menunggu Dokter' },
-    { id: 'P-00135', nama: 'Ibu Ratna Juwita', nik: '3201445012800003', usia: '48 Thn', jk: 'Perempuan', no_rm: 'RM-2026-0062', status: 'Selesai' }
-  ],
-  selectedPatient: null,
-  cpptHistory: [
-    {
-      tanggal: '2026-07-15 09:30',
-      dokter: 'dr. Siti Rahma, Sp.OG',
-      s: 'Siklus haid tidak teratur (oligomenorrhea) 4 bulan terakhir, jerawat hormonal di rahang, kenaikan BB 6 kg.',
-      o: 'TD: 120/80 mmHg, Nadi: 78x/m, IMT: 26.2 (Overweight). Hirsutisme ringan pada dagu.',
-      a: 'E28.2 - Polycystic Ovarian Syndrome (PCOS) suspect resistensi insulin ovarium.',
-      p: '1. Rujukan Lab: Panel Hormon Lengkap (LH, FSH, AMH, Estradiol, Insulin Puasa).\n2. Terapi: Metformin HCl 500mg 3x1, Queen HerBalance Elixir 1 shot pagi.'
-    }
-  ]
-};
+let esData = null;
+let esPilih = null;
 
-async function renderEmrSoap(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
+function esEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function esJam(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
 
-  if (!EMR_STATE.selectedPatient) {
-    EMR_STATE.selectedPatient = EMR_STATE.pasienList[0];
+async function esMuat() {
+  if (typeof sbGet !== 'function') { esData = null; return; }
+  const aman = (t, q) => sbGet(t, q).catch(() => []);
+  try {
+    const [admisi, anamnesa, vital, diagnosa] = await Promise.all([
+      sbGet('admissions', 'select=*&order=id.desc&limit=200'),
+      aman('anamnesas', 'select=*&order=id.desc&limit=300'),
+      aman('vital_signs', 'select=*&order=recorded_at.desc&limit=300'),
+      aman('icd_diagnostics', 'select=*&order=id.desc&limit=300'),
+    ]);
+    esData = { admisi, anamnesa, vital, diagnosa };
+  } catch (e) { esData = null; }
+}
+
+async function renderEmrSoap() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
+
+  await esMuat();
+
+  if (esData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>EMR SOAP &amp; CPPT</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data rekam medis tidak dapat dibaca.</strong><br>
+        Tabel <code>admissions</code> belum tersedia.
+      </div>`;
+    return;
   }
+  esGambar();
+}
 
-  content.innerHTML = `
+function esAnamnesaOf(admissionId) {
+  return (esData.anamnesa || []).filter(a => a.admission_id === admissionId);
+}
+function esVitalOf(admissionId) {
+  return (esData.vital || []).filter(v => v.admission_id === admissionId);
+}
+function esDiagOf(admissionId) {
+  return (esData.diagnosa || []).filter(d => d.admission_id === admissionId);
+}
+
+// Dua tabel menyimpan tanda vital dengan nama kolom berbeda. Yang lebih
+// baru (vital_signs) dipakai lebih dulu; anamnesas jadi cadangan.
+function esVitalTerbaru(admissionId) {
+  const v = esVitalOf(admissionId)[0];
+  if (v) {
+    return {
+      sumber: 'vital_signs',
+      sistol: v.bp_systolic, diastol: v.bp_diastolic,
+      nadi: v.pulse, napas: v.resp_rate, suhu: v.temperature,
+      spo2: v.spo, berat: v.weight, tinggi: v.height, bmi: v.bmi,
+      waktu: v.recorded_at, oleh: v.recorded_by || v.noted_by,
+    };
+  }
+  const a = esAnamnesaOf(admissionId)[0];
+  if (a) {
+    return {
+      sumber: 'anamnesas',
+      sistol: a.systole, diastol: a.diastolic ?? a.diastole,
+      nadi: a.heart_rate, napas: a.respiratory, suhu: a.temperature,
+      spo2: null, berat: a.weight, tinggi: a.height, bmi: a.bmi,
+      waktu: null, oleh: null,
+    };
+  }
+  return null;
+}
+
+function esGambar() {
+  const A = esData.admisi || [];
+
+  // Kunjungan yang sudah punya catatan SOAP dianggap sudah dilayani.
+  const belum = A.filter(a => !esAnamnesaOf(a.id).length && !esDiagOf(a.id).length);
+  const sudah = A.filter(a => esAnamnesaOf(a.id).length || esDiagOf(a.id).length);
+
+  document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>📋 Rekam Medis Elektronik (EMR SOAP)</h1>
-        <p>Catatan Perkembangan Pasien Terintegrasi (CPPT), Vital Signs &amp; Asesmen Klinis Dokter</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderEmrSoap()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="simpanSoapRecord()">💾 Simpan CPPT &amp; Rencana Medis</button>
+        <h1>EMR SOAP &amp; CPPT</h1>
+        <p class="muted">Lembar konsultasi: subjektif, objektif, asesmen, dan rencana.</p>
       </div>
     </div>
 
-    <div class="grid-2" style="grid-template-columns: 320px 1fr; gap: 20px; align-items: start;">
-      <!-- Sidebar Antrian Pasien -->
-      <div class="card" style="padding: 16px;">
-        <div class="card-title" style="margin-bottom: 12px;">Antrian Pasien Hari Ini</div>
-        <div style="display: flex; flex-direction: column; gap: 10px;">
-          ${EMR_STATE.pasienList.map(p => `
-            <div onclick="pilihPasienEmr('${p.id}')" style="background:${p.id === EMR_STATE.selectedPatient.id ? 'rgba(0,210,180,0.1)' : 'var(--bg2)'}; border:1px solid ${p.id === EMR_STATE.selectedPatient.id ? 'var(--teal)' : 'rgba(255,255,255,0.06)'}; border-radius:10px; padding:12px; cursor:pointer;">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <b>${p.nama}</b>
-                <span class="badge ${p.status === 'Dalam Pemeriksaan' ? 'badge-warning' : p.status === 'Selesai' ? 'badge-success' : 'badge-info'}" style="font-size:10px;">${p.status}</span>
-              </div>
-              <div style="font-size:12px;color:var(--text3);margin-top:4px;">
-                ${p.no_rm} · ${p.usia} (${p.jk})
-              </div>
-            </div>
-          `).join('')}
+    ${!A.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">🗒️</div>
+        <div style="font-weight:700; margin-bottom:4px">Belum ada kunjungan tercatat</div>
+        <div style="font-size:13px; color:var(--text3)">
+          Kunjungan yang terdaftar di Pendaftaran &amp; Admisi akan muncul di sini.</div>
+      </div>` : `
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+                  gap:12px; margin-bottom:16px">
+        <div class="card" style="padding:14px">
+          <div style="font-size:12px; color:var(--text3)">Belum ada catatan</div>
+          <div style="font-size:22px; font-weight:800;
+                      color:${belum.length ? 'var(--warning)' : 'var(--text3)'}">
+            ${belum.length}</div>
+        </div>
+        <div class="card" style="padding:14px">
+          <div style="font-size:12px; color:var(--text3)">Sudah ada catatan</div>
+          <div style="font-size:22px; font-weight:800">${sudah.length}</div>
         </div>
       </div>
 
-      <!-- Form SOAP Terintegrasi -->
-      <div style="display:flex;flex-direction:column;gap:18px;">
-        <!-- Header Profil Pasien Terpilih -->
-        <div class="card" style="border-left: 4px solid var(--teal); padding:16px 20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <h2 style="font-size:18px;margin:0;">${EMR_STATE.selectedPatient.nama} <span style="font-size:14px;color:var(--text3);">(${EMR_STATE.selectedPatient.no_rm})</span></h2>
-              <p style="font-size:12px;color:var(--text3);margin-top:4px;">NIK: ${EMR_STATE.selectedPatient.nik} · Usia: ${EMR_STATE.selectedPatient.usia} · Gol. Darah: O+ · Alergi: <b>Tidak Ada Alergi Obat</b></p>
-            </div>
-            <div>
-              <span class="badge badge-teal">Poli Obgyn &amp; Hormon</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Vital Signs Card (Objective Input) -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:12px;">📊 Pemeriksaan Fisik &amp; Tanda Vital (Objective)</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
-            <div class="form-group">
-              <label style="font-size:11px;">Tekanan Darah (mmHg)</label>
-              <input type="text" id="emr-td" class="input" value="120/80">
-            </div>
-            <div class="form-group">
-              <label style="font-size:11px;">Nadi (x/menit)</label>
-              <input type="number" id="emr-nadi" class="input" value="78">
-            </div>
-            <div class="form-group">
-              <label style="font-size:11px;">Laju Nafas (x/menit)</label>
-              <input type="number" id="emr-rr" class="input" value="18">
-            </div>
-            <div class="form-group">
-              <label style="font-size:11px;">Suhu (°C)</label>
-              <input type="text" id="emr-suhu" class="input" value="36.5">
-            </div>
-            <div class="form-group">
-              <label style="font-size:11px;">Tinggi / Berat (cm/kg)</label>
-              <input type="text" id="emr-tb-bb" class="input" value="160 / 67">
-            </div>
-            <div class="form-group">
-              <label style="font-size:11px;">IMT / BMI (kg/m²)</label>
-              <input type="text" id="emr-bmi" class="input" value="26.2 (Overweight)" readonly style="background:rgba(255,255,255,0.05)">
-            </div>
-          </div>
-        </div>
-
-        <!-- Form SOAP Input -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">Catatan Medis SOAP Hari Ini</div>
-          
-          <!-- S: Subjective -->
-          <div class="form-group">
-            <label><b>[S] Anamnesa &amp; Keluhan Pasien (Subjective)</b></label>
-            <textarea id="emr-s" class="input" style="height:70px;" placeholder="Keluhan utama, riwayat penyakit, keluhan haid/nyeri, gaya hidup...">Pasien mengeluhkan haid tidak teratur sejak 4 bulan terakhir, kram perut bagian bawah saat menstruasi, dan rasa mudah lelah di sore hari.</textarea>
-          </div>
-
-          <!-- O: Objective -->
-          <div class="form-group">
-            <label><b>[O] Temuan Klinis &amp; Status Lokalis (Objective)</b></label>
-            <textarea id="emr-o" class="input" style="height:60px;" placeholder="Pemeriksaan fisik dokter, status generalis, palpasi abdomen...">Abdomen supel, nyeri tekan ringan suprapubik (-), tidak teraba massa organomegali, skin barrier wajah tampak inflamasi ringan.</textarea>
-          </div>
-
-          <!-- A: Assessment -->
-          <div class="form-group">
-            <label><b>[A] Diagnosis ICD-10 &amp; Asesmen Klinis (Assessment)</b></label>
-            <div class="grid-2" style="gap:10px;">
-              <select id="emr-icd" class="input">
-                <option value="E28.2 - Polycystic Ovarian Syndrome (PCOS)">E28.2 - Polycystic Ovarian Syndrome (PCOS)</option>
-                <option value="N80 - Endometriosis">N80 - Endometriosis</option>
-                <option value="N94.6 - Dysmenorrhea, unspecified">N94.6 - Dysmenorrhea, unspecified</option>
-                <option value="E11 - Type 2 diabetes mellitus">E11 - Type 2 diabetes mellitus</option>
-                <option value="I10 - Essential (primary) hypertension">I10 - Essential (primary) hypertension</option>
-                <option value="Z00.0 - General medical examination">Z00.0 - General medical examination</option>
-              </select>
-              <input type="text" id="emr-a-desc" class="input" value="Suspek resistensi insulin ovarium & disfungsi ovulasi" placeholder="Catatan asesmen diferensial...">
-            </div>
-          </div>
-
-          <!-- P: Plan -->
-          <div class="form-group">
-            <label><b>[P] Rencana Tatalaksana Medis, R/ Resep &amp; Rujukan Lab (Plan)</b></label>
-            <textarea id="emr-p" class="input" style="height:80px;" placeholder="Tindakan medis, resep obat, rujukan lab, edukasi diet...">1. Rujukan Lab: Female Hormone Panel (AMH, LH, FSH, Estradiol) & Profil Lipid.
-2. E-Prescription: Queen HerBalance Elixir 30mL (10 shot) + Metformin HCl 500mg 3x1.
-3. Rekomendasi Terapi: Empress Ratus & Lymphatic Spa di Queen Sanctuary.
-4. Kontrol ulang 1 bulan setelah hasil lab selesai.</textarea>
-          </div>
-
-          <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
-            <button class="btn btn-ghost" onclick="buatRujukanLabLangsung()">🧪 Buat Order Lab</button>
-            <button class="btn btn-teal" onclick="simpanSoapRecord()">💾 Simpan CPPT</button>
-          </div>
-        </div>
-
-        <!-- Riwayat CPPT Sebelumnya -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:14px;">📜 Riwayat Rekam Medis (CPPT Historis)</div>
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            ${EMR_STATE.cpptHistory.map(c => `
-              <div style="background:var(--bg2);border-radius:10px;padding:16px;border-left:3px solid var(--accent);">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                  <b>${c.dokter}</b>
-                  <span style="font-size:12px;color:var(--text3);">${c.tanggal}</span>
-                </div>
-                <div style="font-size:13px;line-height:1.6;color:var(--text2);">
-                  <b>[S]:</b> ${c.s}<br>
-                  <b>[O]:</b> ${c.o}<br>
-                  <b>[A]:</b> <b style="color:var(--teal)">${c.a}</b><br>
-                  <b>[P]:</b> ${c.p.replace(/\n/g, '<br>')}
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>No. Kunjungan</th><th>Pasien</th><th>Tanda Vital Terakhir</th>
+          <th style="text-align:right">Diagnosa</th>
+          <th style="text-align:right">Catatan</th><th></th>
+        </tr></thead><tbody>
+        ${A.map(a => {
+          const v = esVitalTerbaru(a.id);
+          const d = esDiagOf(a.id);
+          const c = esAnamnesaOf(a.id);
+          return `<tr style="${esPilih === a.id ? 'outline:2px solid var(--primary)' : ''}">
+            <td><b>${esEsc(a.visit_number || a.id)}</b></td>
+            <td>${esEsc(a.patient_name || '—')}</td>
+            <td style="font-size:12px">${v
+              ? `${v.sistol ?? '—'}/${v.diastol ?? '—'} mmHg
+                 · N ${v.nadi ?? '—'} · S ${v.suhu ?? '—'}°C
+                 <div style="font-size:10px; color:var(--text3)">
+                   dari ${esEsc(v.sumber)}${v.waktu ? ' · ' + esJam(v.waktu) : ''}</div>`
+              : '<span style="color:var(--text3)">belum diukur</span>'}</td>
+            <td style="text-align:right">${d.length}</td>
+            <td style="text-align:right">${c.length}</td>
+            <td><button class="btn btn-sm" onclick="esBuka(${a.id})">
+              ${esPilih === a.id ? 'Tutup' : 'Lembar SOAP'}</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
       </div>
-    </div>
-  `;
+
+      ${esPilih ? esLembar() : ''}`}`;
 }
 
-function pilihPasienEmr(id) {
-  const p = EMR_STATE.pasienList.find(x => x.id === id);
-  if (p) {
-    EMR_STATE.selectedPatient = p;
-    renderEmrSoap();
-  }
+function esBuka(id) {
+  esPilih = (esPilih === id) ? null : id;
+  esGambar();
 }
 
-function simpanSoapRecord() {
-  const s = document.getElementById('emr-s')?.value || '';
-  const o = document.getElementById('emr-o')?.value || '';
-  const a = document.getElementById('emr-icd')?.value || '';
-  const p = document.getElementById('emr-p')?.value || '';
+function esLembar() {
+  const a = (esData.admisi || []).find(x => x.id === esPilih);
+  if (!a) return '';
+  const c = esAnamnesaOf(esPilih);
+  const d = esDiagOf(esPilih);
+  const v = esVitalTerbaru(esPilih);
+  const semuaVital = esVitalOf(esPilih);
 
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  return `
+    <div class="card" style="padding:18px; margin-top:16px">
+      <div style="display:flex; justify-content:space-between; align-items:center;
+                  flex-wrap:wrap; gap:8px; margin-bottom:12px">
+        <div>
+          <div style="font-weight:800; font-size:15px">${esEsc(a.patient_name || '—')}</div>
+          <div style="font-size:12px; color:var(--text3)">
+            Kunjungan ${esEsc(a.visit_number || a.id)}</div>
+        </div>
+        <button class="btn btn-sm btn-primary" onclick="esCatat(${esPilih})">
+          + Catatan SOAP</button>
+      </div>
 
-  EMR_STATE.cpptHistory.unshift({
-    tanggal: dateStr,
-    dokter: 'dr. Siti Rahma, Sp.OG',
-    s, o, a, p
-  });
+      ${!c.length && !d.length ? `
+        <div style="padding:20px; background:var(--bg2); border-radius:8px;
+                    font-size:13px; color:var(--text3)">
+          Belum ada catatan untuk kunjungan ini.</div>` : ''}
 
-  if (EMR_STATE.selectedPatient) {
-    EMR_STATE.selectedPatient.status = 'Selesai';
-  }
+      ${v ? `
+        <div style="margin-bottom:14px">
+          <div style="font-weight:700; font-size:13px; margin-bottom:6px">
+            O — Objektif (tanda vital)</div>
+          <div style="font-size:13px; line-height:1.9">
+            Tekanan darah: <b>${v.sistol ?? '—'}/${v.diastol ?? '—'}</b> mmHg &nbsp;·&nbsp;
+            Nadi: <b>${v.nadi ?? '—'}</b> ×/mnt &nbsp;·&nbsp;
+            Napas: <b>${v.napas ?? '—'}</b> ×/mnt &nbsp;·&nbsp;
+            Suhu: <b>${v.suhu ?? '—'}</b> °C
+            ${v.spo2 != null ? ` &nbsp;·&nbsp; SpO₂: <b>${v.spo2}</b> %` : ''}<br>
+            BB: <b>${v.berat ?? '—'}</b> kg &nbsp;·&nbsp;
+            TB: <b>${v.tinggi ?? '—'}</b> cm
+            ${v.bmi != null ? ` &nbsp;·&nbsp; IMT: <b>${v.bmi}</b>` : ''}
+          </div>
+          <div style="font-size:11px; color:var(--text3); margin-top:4px">
+            Sumber: <code>${esEsc(v.sumber)}</code>
+            ${v.oleh ? ' · dicatat ' + esEsc(v.oleh) : ''}
+            ${v.waktu ? ' · ' + esJam(v.waktu) : ''}
+            ${semuaVital.length > 1
+              ? ` · ${semuaVital.length} pengukuran tercatat pada kunjungan ini` : ''}
+          </div>
+        </div>` : ''}
 
-  toast('Catatan CPPT Rekam Medis berhasil disimpan!', 'ok');
-  renderEmrSoap();
+      ${c.map(x => `
+        <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:12px">
+          <div style="font-weight:700; font-size:13px; margin-bottom:6px">
+            S — Subjektif</div>
+          <div style="font-size:13px; line-height:1.8">
+            Keluhan utama: ${esEsc(x.chief_complaint || '—')}<br>
+            ${x.history ? 'Riwayat: ' + esEsc(x.history) + '<br>' : ''}
+            ${x.allergies ? `<span style="color:var(--danger); font-weight:700">
+              Alergi: ${esEsc(x.allergies)}</span><br>` : ''}
+            ${x.current_meds ? 'Obat saat ini: ' + esEsc(x.current_meds) + '<br>' : ''}
+            ${x.family_history ? 'Riwayat keluarga: ' + esEsc(x.family_history) : ''}
+          </div>
+        </div>`).join('')}
+
+      ${d.length ? `
+        <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:12px">
+          <div style="font-weight:700; font-size:13px; margin-bottom:6px">
+            A — Asesmen (diagnosa ICD-10)</div>
+          <table class="data-table"><thead><tr>
+            <th>Kode</th><th>Uraian</th><th>Jenis</th><th>Dicatat</th>
+          </tr></thead><tbody>
+          ${d.map(x => `<tr>
+            <td><b>${esEsc(x.icd_code || '—')}</b></td>
+            <td>${esEsc(x.description || '—')}</td>
+            <td>${esEsc(x.diagnose_type || '—')}</td>
+            <td>${esJam(x.created_at)}</td>
+          </tr>`).join('')}
+          </tbody></table>
+        </div>` : ''}
+
+      <div style="border-top:1px solid var(--border); padding-top:12px; margin-top:12px;
+                  font-size:12px; color:var(--text3); line-height:1.7">
+        Catatan yang sudah tersimpan tidak bisa dihapus dari layar ini.
+        Rekam medis adalah dokumen hukum — koreksi dilakukan dengan catatan
+        tambahan yang menyebut apa yang dikoreksi, bukan dengan menghapus
+        baris.
+      </div>
+    </div>`;
 }
 
-function buatRujukanLabLangsung() {
-  toast('Rujukan pemeriksaan Lab Hormon berhasil dikirim ke antrian Lab Diagnostik!', 'ok');
+async function esCatat(admissionId) {
+  const a = (esData.admisi || []).find(x => x.id === admissionId);
+  const keluhan = prompt('S — Keluhan utama:');
+  if (!keluhan) return;
+  const riwayat = prompt('Riwayat penyakit sekarang (opsional):', '');
+  if (riwayat === null) return;
+  const alergi = prompt('Alergi yang diketahui (kosongkan bila tidak ada):', '');
+  if (alergi === null) return;
+
+  const td = prompt('O — Tekanan darah (sistol/diastol, mis. 120/80):', '');
+  if (td === null) return;
+  const nadi = prompt('Nadi (×/menit):', '');
+  if (nadi === null) return;
+  const suhu = prompt('Suhu (°C):', '');
+  if (suhu === null) return;
+
+  const icd = prompt('A — Kode ICD-10 (kosongkan bila belum ditegakkan):', '');
+  if (icd === null) return;
+  const dx = icd ? prompt('Uraian diagnosa:', '') : '';
+  if (dx === null) return;
+
+  const [sis, dia] = String(td).split('/').map(x => parseInt(x, 10));
+
+  try {
+    await sbPost('anamnesas', {
+      admission_id: admissionId,
+      visit_number: a && a.visit_number,
+      patient_name: a && a.patient_name,
+      chief_complaint: keluhan,
+      history: riwayat || null,
+      allergies: alergi || null,
+      systole: Number.isFinite(sis) ? sis : null,
+      heart_rate: nadi ? parseInt(nadi, 10) : null,
+      temperature: suhu ? parseFloat(suhu) : null,
+    });
+
+    // Tanda vital juga ditulis ke vital_signs supaya layar lain yang
+    // membaca tabel itu ikut melihatnya — bukan hanya layar ini.
+    if (Number.isFinite(sis) || nadi || suhu) {
+      await sbPost('vital_signs', {
+        admission_id: admissionId,
+        mr_number: a && a.mr_number,
+        bp_systolic: Number.isFinite(sis) ? sis : null,
+        bp_diastolic: Number.isFinite(dia) ? dia : null,
+        pulse: nadi ? parseInt(nadi, 10) : null,
+        temperature: suhu ? parseFloat(suhu) : null,
+        recorded_at: new Date().toISOString(),
+        recorded_by: (window.currentUsername || null),
+      }).catch(() => {});
+    }
+
+    if (icd) {
+      await sbPost('icd_diagnostics', {
+        admission_id: admissionId,
+        icd_code: icd,
+        description: dx || null,
+        diagnose_type: 'Utama',
+      }).catch(() => {});
+    }
+
+    await renderEmrSoap();
+  } catch (e) { alert('Gagal menyimpan catatan: ' + e.message); }
 }
 
 window.renderEmrSoap = renderEmrSoap;
-window.pilihPasienEmr = pilihPasienEmr;
-window.simpanSoapRecord = simpanSoapRecord;
-window.buatRujukanLabLangsung = buatRujukanLabLangsung;
+window.esBuka  = esBuka;
+window.esCatat = esCatat;

@@ -1,255 +1,260 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: Compliance & Permit Tracker — PT AVA HEALTH SOLUTION
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Pelacakan Masa Berlaku Izin Operasional Faskes & Akreditasi Kemenkes
-// - Pelacakan SIP & STR Dokter, Analis Lab, Apoteker, dan Perawat
-// - Pelacakan Izin Edar BPOM (MD/TR/NA), Sertifikasi Halal, & PSE Kominfo
-// - Notifikasi Peringatan Jatuh Tempo (H-90, H-60, H-30 Hari)
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: Izin & Kepatuhan — perizinan faskes dan kredensial nakes
+//
+// Versi sebelumnya tidak punya panggilan data: daftar izin, tanggal
+// berakhir, dan STR/SIP nakes ditulis tangan. Untuk layar yang gunanya
+// justru memperingatkan sebelum sesuatu kedaluwarsa, itu kebalikan dari
+// gunanya — ia menampilkan tanggal yang tidak pernah bergerak.
+//
+// Sekarang membaca public.permits dan public.permit_pics (migrasi 0022)
+// serta public.staff_credentials yang sudah ada.
+//
+// ── Yang sengaja dirancang begini ────────────────────────────
+//
+// Yang sudah lewat masa berlaku ditampilkan PALING ATAS dan tidak bisa
+// disembunyikan dengan penyaring. Izin operasional yang habis berarti
+// pelayanan berjalan tanpa dasar hukum; STR yang habis berarti tindakan
+// dikerjakan orang yang izin praktiknya tidak berlaku. Keduanya bukan
+// hal yang boleh hilang dari pandangan.
+//
+// Sisa hari dihitung dari tanggal, bukan dibaca dari kolom status.
+// Kolom status tidak berubah sendiri saat tanggal lewat — justru itu
+// yang membuat izin kedaluwarsa lolos dari perhatian selama ini.
+//
+// Ambang peringatan 90/60/30 hari ditampilkan di layar supaya bukan
+// aturan tersembunyi.
+//
+// Prefiks "ct".
+// ═══════════════════════════════════════════════════════════════
 
-let COMPLIANCE_STATE = {
-  permits: [
-    {
-      id: 'LIC-001',
-      kategori: 'Perizinan Faskes',
-      nama_dokumen: 'Izin Operasional Klinik Pratama (DPM-PTSP)',
-      nomor_izin: '503/014/KLINIK/DPMPTSP/2024',
-      penerbit: 'DPM-PTSP & Dinkes',
-      tgl_terbit: '2024-05-10',
-      tgl_kadaluarsa: '2029-05-10',
-      sisa_hari: 994,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-002',
-      kategori: 'Perizinan Faskes',
-      nama_dokumen: 'Sertifikat Akreditasi Paripurna Fasyankes',
-      nomor_izin: 'YM.02.01/KEMENKES/AKR/2024/091',
-      penerbit: 'Kemenkes RI',
-      tgl_terbit: '2024-08-15',
-      tgl_kadaluarsa: '2029-08-15',
-      sisa_hari: 1091,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-003',
-      kategori: 'Legalitas Nakes',
-      nama_dokumen: 'SIP Dokter Sp.OG (dr. Siti Rahma, Sp.OG)',
-      nomor_izin: '446/089/SIP-DS/DINKES/2025',
-      penerbit: 'Dinas Kesehatan',
-      tgl_terbit: '2025-01-10',
-      tgl_kadaluarsa: '2028-01-10',
-      sisa_hari: 509,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-004',
-      kategori: 'Legalitas Nakes',
-      nama_dokumen: 'SIP Dokter Sp.PK (dr. Penanggung Jawab Lab)',
-      nomor_izin: '446/012/SIP-SPPK/DINKES/2025',
-      penerbit: 'Dinas Kesehatan',
-      tgl_terbit: '2025-03-01',
-      tgl_kadaluarsa: '2028-03-01',
-      sisa_hari: 559,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-005',
-      kategori: 'Izin Edar Produk',
-      nama_dokumen: 'BPOM MD: Queen Royal Collagen Glow (Q-NUT-01)',
-      nomor_izin: 'BPOM RI MD 867031001290',
-      penerbit: 'Badan POM RI',
-      tgl_terbit: '2026-01-15',
-      tgl_kadaluarsa: '2031-01-15',
-      sisa_hari: 1610,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-006',
-      kategori: 'Izin Edar Produk',
-      nama_dokumen: 'BPOM TR: Queen HerBalance Elixir 30mL (Q-NUT-02)',
-      nomor_izin: 'BPOM RI TR 246019921',
-      penerbit: 'Badan POM RI',
-      tgl_terbit: '2026-02-01',
-      tgl_kadaluarsa: '2031-02-01',
-      sisa_hari: 1627,
-      status: 'Aktif & Sah'
-    },
-    {
-      id: 'LIC-007',
-      kategori: 'Sistem Digital',
-      nama_dokumen: 'Tanda Daftar Penyelenggara Sistem Elektronik (PSE)',
-      nomor_izin: '00892.01/DJAI.PSE/08/2026',
-      penerbit: 'Kemenkominfo RI',
-      tgl_terbit: '2026-08-01',
-      tgl_kadaluarsa: 'Permanen',
-      sisa_hari: 9999,
-      status: 'Terdaftar Resmi'
-    }
-  ]
-};
+let ctData = null;
+let ctTab = 'izin';
 
-async function renderComplianceTracker(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
+function ctEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function ctTgl(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('id-ID',
+    { day: '2-digit', month: 'short', year: 'numeric' });
+}
+function ctSisa(d) {
+  if (!d) return null;
+  return Math.ceil((new Date(d) - new Date()) / 86400000);
+}
+function ctWarna(sisa) {
+  if (sisa === null) return 'var(--text3)';
+  if (sisa < 0) return 'var(--danger)';
+  if (sisa <= 30) return 'var(--danger)';
+  if (sisa <= 60) return 'var(--warning)';
+  if (sisa <= 90) return 'var(--warning)';
+  return 'inherit';
+}
+function ctLabelSisa(sisa) {
+  if (sisa === null) return 'tanpa tanggal';
+  if (sisa < 0) return `lewat ${Math.abs(sisa)} hari`;
+  return `${sisa} hari lagi`;
+}
 
-  content.innerHTML = `
+async function ctMuat() {
+  if (typeof sbGet !== 'function') { ctData = null; return; }
+  const aman = (t, q) => sbGet(t, q).catch(() => []);
+  try {
+    const [izin, pic, kredensial] = await Promise.all([
+      sbGet('permits', 'select=*&order=expires_at'),
+      aman('permit_pics', 'select=*'),
+      aman('staff_credentials', 'select=*&order=expiry_date'),
+    ]);
+    ctData = { izin, pic, kredensial };
+  } catch (e) { ctData = null; }
+}
+
+async function renderComplianceTracker() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
+
+  await ctMuat();
+
+  if (ctData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>Izin &amp; Kepatuhan</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data perizinan tidak dapat dibaca.</strong><br>
+        Tabel <code>permits</code> belum tersedia.
+      </div>`;
+    return;
+  }
+  ctGambar();
+}
+
+function ctGambar() {
+  const I = (ctData.izin || []).map(x => ({ ...x, _sisa: ctSisa(x.expires_at) }));
+  const K = (ctData.kredensial || []).map(x => ({ ...x, _sisa: ctSisa(x.expiry_date) }));
+
+  const lewatIzin = I.filter(x => x._sisa !== null && x._sisa < 0);
+  const lewatKred = K.filter(x => x._sisa !== null && x._sisa < 0);
+  const segeraIzin = I.filter(x => x._sisa !== null && x._sisa >= 0 && x._sisa <= 90);
+  const segeraKred = K.filter(x => x._sisa !== null && x._sisa >= 0 && x._sisa <= 90);
+
+  document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div>
-        <h1>⚖️ Compliance &amp; Legal Permit Tracker</h1>
-        <p>Pelacakan masa berlaku izin operasional klinik, SIP nakes, BPOM, Halal &amp; standar ISO 15189</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderComplianceTracker()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="openTambahIzinModal()">+ Tambah Dokumen Izin</button>
+        <h1>Izin &amp; Kepatuhan</h1>
+        <p class="muted">Perizinan faskes, sertifikasi, dan kredensial tenaga kesehatan.</p>
       </div>
     </div>
 
-    <!-- KPI Row -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:20px;">
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(16,185,129,0.15);color:var(--teal)">✅</div>
-        <div>
-          <div class="kpi-val" style="color:var(--teal)">100%</div>
-          <div class="kpi-label">Tingkat Kepatuhan Regulasi</div>
+    ${(lewatIzin.length || lewatKred.length) ? `
+      <div class="card" style="padding:14px 16px; margin-bottom:12px;
+                               border-left:3px solid var(--danger)">
+        <div style="font-weight:800; color:var(--danger); margin-bottom:6px">
+          Sudah lewat masa berlaku</div>
+        <div style="font-size:13px; line-height:1.8">
+          ${lewatIzin.length ? `<b>${lewatIzin.length} izin</b> — pelayanan yang
+            bergantung padanya berjalan tanpa dasar yang berlaku.<br>` : ''}
+          ${lewatKred.length ? `<b>${lewatKred.length} kredensial nakes</b> (STR/SIP) —
+            tindakan dikerjakan orang yang izin praktiknya tidak berlaku.` : ''}
         </div>
-      </div>
+      </div>` : ''}
 
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(212,175,55,0.15);color:var(--accent)">📜</div>
-        <div>
-          <div class="kpi-val">${COMPLIANCE_STATE.permits.length} Izin</div>
-          <div class="kpi-label">Total Sertifikasi &amp; Izin Aktif</div>
-        </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+                gap:12px; margin-bottom:16px">
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Izin terdaftar</div>
+        <div style="font-size:22px; font-weight:800">${I.length}</div>
       </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(14,165,233,0.15);color:#0ea5e9">⏳</div>
-        <div>
-          <div class="kpi-val">0 Dokumen</div>
-          <div class="kpi-label">Mendekati Kadaluarsa (&lt;90 Hari)</div>
-        </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Kredensial nakes</div>
+        <div style="font-size:22px; font-weight:800">${K.length}</div>
       </div>
-
-      <div class="kpi-card">
-        <div class="kpi-icon" style="background:rgba(168,85,247,0.15);color:#a855f7">🛡️</div>
-        <div>
-          <div class="kpi-val">Patuh PDP</div>
-          <div class="kpi-label">UU PDP No. 27/2022 Verified</div>
-        </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Berakhir ≤90 hari</div>
+        <div style="font-size:22px; font-weight:800;
+                    color:${(segeraIzin.length + segeraKred.length)
+                      ? 'var(--warning)' : 'var(--text3)'}">
+          ${segeraIzin.length + segeraKred.length}</div>
+      </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:12px; color:var(--text3)">Sudah lewat</div>
+        <div style="font-size:22px; font-weight:800;
+                    color:${(lewatIzin.length + lewatKred.length)
+                      ? 'var(--danger)' : 'var(--success)'}">
+          ${lewatIzin.length + lewatKred.length}</div>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title" style="margin-bottom:14px;">Matriks Perizinan &amp; Akreditasi Legalitas Holding</div>
-      <div class="table-responsive">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Kategori Izin</th>
-              <th>Nama Dokumen Sertifikasi</th>
-              <th>Nomor Registrasi Resmi</th>
-              <th>Instansi Penerbit</th>
-              <th>Masa Berlaku</th>
-              <th>Status Legalitas</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${COMPLIANCE_STATE.permits.map(p => `
-              <tr>
-                <td><code>${p.id}</code></td>
-                <td><span class="badge badge-info">${p.kategori}</span></td>
-                <td><b>${p.nama_dokumen}</b></td>
-                <td><code>${p.nomor_izin}</code></td>
-                <td>${p.penerbit}</td>
-                <td>
-                  <span>Exp: ${p.tgl_kadaluarsa}</span><br>
-                  <span style="font-size:11px;color:var(--teal)">(${p.sisa_hari === 9999 ? 'Permanen' : p.sisa_hari + ' Hari Lagi'})</span>
-                </td>
-                <td><span class="badge badge-success">${p.status}</span></td>
-                <td>
-                  <button class="btn btn-sm btn-ghost" onclick="toast('Salinan PDF ${p.id} terverifikasi asli dari Kemenkes/BPOM', 'ok')">Lihat Berkas 📄</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
+    <div class="tabs" style="margin-bottom:16px">
+      <button class="tab ${ctTab === 'izin' ? 'active' : ''}"
+              onclick="ctGantiTab('izin')">Perizinan Faskes (${I.length})</button>
+      <button class="tab ${ctTab === 'nakes' ? 'active' : ''}"
+              onclick="ctGantiTab('nakes')">STR / SIP Nakes (${K.length})</button>
     </div>
-  `;
+
+    ${ctTab === 'izin' ? ctTabIzin(I) : ctTabNakes(K)}
+
+    <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
+                             color:var(--text3); line-height:1.7">
+      Sisa hari dihitung dari tanggal berakhir, <b>bukan</b> dibaca dari
+      kolom status: status tidak berubah sendiri saat tanggal lewat, dan
+      justru itu yang membuat izin kedaluwarsa lolos dari perhatian.
+      Ambang peringatan: <b>90 / 60 / 30 hari</b>. Yang sudah lewat selalu
+      ditampilkan paling atas.
+    </div>`;
 }
 
-function openTambahIzinModal() {
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">Tambah Dokumen Perizinan / SIP Baru</div>
-      <button class="modal-close" onclick="closeModalForce()">✕</button>
-    </div>
-    <div style="padding:10px 0;">
-      <div class="form-group">
-        <label>Kategori Dokumen</label>
-        <select id="lic-kat" class="input">
-          <option value="Perizinan Faskes">Perizinan Faskes (Klinik / Lab)</option>
-          <option value="Legalitas Nakes">Legalitas Nakes (SIP / STR)</option>
-          <option value="Izin Edar Produk">Izin Edar Produk (BPOM / Halal)</option>
-          <option value="Sistem Digital">Sistem Digital (PSE / ISO 27001)</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Nama Dokumen / Izin</label>
-        <input type="text" id="lic-nama" class="input" placeholder="mis. SIP Dokter Umum dr. Budi Santoso">
-      </div>
-      <div class="form-group">
-        <label>Nomor Izin Resmi</label>
-        <input type="text" id="lic-nomor" class="input" placeholder="mis. 446/099/SIP-DU/DINKES/2026">
-      </div>
-      <div class="grid-2" style="gap:10px;">
-        <div class="form-group">
-          <label>Instansi Penerbit</label>
-          <input type="text" id="lic-penerbit" class="input" value="Dinas Kesehatan">
-        </div>
-        <div class="form-group">
-          <label>Tanggal Kadaluarsa</label>
-          <input type="date" id="lic-exp" class="input" value="2029-08-19">
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="simpanIzinBaru()">Simpan Legalitas</button>
-    </div>
-  `);
+function ctGantiTab(t) { ctTab = t; ctGambar(); }
+
+// Yang sudah lewat selalu di atas, lalu yang paling dekat berakhir.
+function ctUrut(a, b) {
+  const sa = a._sisa === null ? Infinity : a._sisa;
+  const sb = b._sisa === null ? Infinity : b._sisa;
+  return sa - sb;
 }
 
-function simpanIzinBaru() {
-  const kat = document.getElementById('lic-kat')?.value || 'Perizinan Faskes';
-  const nama = document.getElementById('lic-nama')?.value || 'Izin Baru';
-  const no = document.getElementById('lic-nomor')?.value || 'REG-AUTO-2026';
-  const penerbit = document.getElementById('lic-penerbit')?.value || 'Dinkes';
-  const exp = document.getElementById('lic-exp')?.value || '2029-12-31';
+function ctTabIzin(I) {
+  if (!I.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">📄</div>
+      <div style="font-weight:700; margin-bottom:4px">Belum ada izin terdaftar</div>
+      <div style="font-size:13px; color:var(--text3); max-width:480px; margin:0 auto">
+        Daftarkan izin operasional, sertifikasi, dan izin edar beserta
+        tanggal berakhirnya agar peringatan bisa terbit sebelum habis.</div>
+    </div>`;
+  }
 
-  const newId = `LIC-00${COMPLIANCE_STATE.permits.length + 1}`;
+  const picOf = id => (ctData.pic || []).filter(p => p.permit_id === id);
 
-  COMPLIANCE_STATE.permits.push({
-    id: newId,
-    kategori: kat,
-    nama_dokumen: nama,
-    nomor_izin: no,
-    penerbit: penerbit,
-    tgl_terbit: '2026-08-19',
-    tgl_kadaluarsa: exp,
-    sisa_hari: 1095,
-    status: 'Aktif & Sah'
-  });
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>Jenis Izin</th><th>Nomor</th><th>Penerbit</th>
+      <th>KBLI / Lokasi</th><th>Terbit</th><th>Berakhir</th>
+      <th style="text-align:right">Sisa</th><th>PIC</th><th>Status</th><th>Dokumen</th>
+    </tr></thead><tbody>
+    ${[...I].sort(ctUrut).map(x => {
+      const pics = picOf(x.id);
+      return `<tr style="${x._sisa !== null && x._sisa < 0
+        ? 'background:rgba(255,0,0,.04)' : ''}">
+        <td><b>${ctEsc(x.permit_type || '—')}</b></td>
+        <td style="font-size:12px">${ctEsc(x.permit_number || '—')}</td>
+        <td style="font-size:12px">${ctEsc(x.issuing_authority || '—')}</td>
+        <td style="font-size:12px">${ctEsc(x.kbli_code || '—')}
+          ${x.location_code ? ' · ' + ctEsc(x.location_code) : ''}</td>
+        <td>${ctTgl(x.issued_at)}</td>
+        <td>${ctTgl(x.expires_at)}</td>
+        <td style="text-align:right; font-weight:${x._sisa !== null && x._sisa <= 90
+          ? '700' : '400'}; color:${ctWarna(x._sisa)}">${ctLabelSisa(x._sisa)}</td>
+        <td style="font-size:12px">${pics.length
+          ? pics.map(p => ctEsc(p.pic_name || p.role_title || '—')).join(', ')
+          : '<span style="color:var(--warning)">belum ada PIC</span>'}</td>
+        <td>${ctEsc(x.status || '—')}</td>
+        <td>${x.document_url
+          ? `<a href="${ctEsc(x.document_url)}" target="_blank" rel="noopener">buka</a>`
+          : '<span style="color:var(--warning)">belum diunggah</span>'}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>
+  </div>`;
+}
 
-  toast(`Dokumen legalitas ${newId} berhasil dicatat & sistem pengingat masa berlaku aktif!`, 'ok');
-  closeModalForce();
-  renderComplianceTracker();
+function ctTabNakes(K) {
+  if (!K.length) {
+    return `<div class="card" style="padding:32px; text-align:center">
+      <div style="font-size:28px; opacity:.4; margin-bottom:8px">🪪</div>
+      <div style="font-weight:700; margin-bottom:4px">
+        Belum ada kredensial nakes terdaftar</div>
+      <div style="font-size:13px; color:var(--text3); max-width:480px; margin:0 auto">
+        STR dan SIP dokter, perawat, analis, dan apoteker dicatat di sini
+        beserta masa berlakunya.</div>
+    </div>`;
+  }
+
+  return `<div class="card" style="overflow-x:auto">
+    <table class="data-table"><thead><tr>
+      <th>Nama</th><th>Profesi</th><th>Jenis</th><th>Nomor</th>
+      <th>Penerbit</th><th>Terbit</th><th>Berakhir</th>
+      <th style="text-align:right">Sisa</th><th>Aktif</th>
+    </tr></thead><tbody>
+    ${[...K].sort(ctUrut).map(x => `<tr style="${x._sisa !== null && x._sisa < 0
+      ? 'background:rgba(255,0,0,.04)' : ''}">
+      <td><b>${ctEsc(x.staff_name || '—')}</b></td>
+      <td>${ctEsc(x.profession || '—')}</td>
+      <td>${ctEsc(x.credential_type || '—')}</td>
+      <td style="font-size:12px">${ctEsc(x.number || '—')}</td>
+      <td style="font-size:12px">${ctEsc(x.issuer || '—')}</td>
+      <td>${ctTgl(x.issued_date)}</td>
+      <td>${ctTgl(x.expiry_date)}</td>
+      <td style="text-align:right; font-weight:${x._sisa !== null && x._sisa <= 90
+        ? '700' : '400'}; color:${ctWarna(x._sisa)}">${ctLabelSisa(x._sisa)}</td>
+      <td>${x.is_active === false
+        ? '<span style="color:var(--text3)">nonaktif</span>'
+        : (x._sisa !== null && x._sisa < 0
+            ? '<span style="color:var(--danger); font-weight:700">aktif tapi kedaluwarsa</span>'
+            : 'aktif')}</td>
+    </tr>`).join('')}
+    </tbody></table>
+  </div>`;
 }
 
 window.renderComplianceTracker = renderComplianceTracker;
-window.openTambahIzinModal = openTambahIzinModal;
-window.simpanIzinBaru = simpanIzinBaru;
+window.ctGantiTab = ctGantiTab;

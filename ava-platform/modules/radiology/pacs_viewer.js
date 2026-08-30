@@ -1,134 +1,200 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// MODULE: PACS & DICOM Medical Imaging Viewer Lite — AVA GLOBAL
-// ---------------------------------------------------------------------------
-// Fitur:
-// - Viewer Citra Digital USG Obgyn, Rontgen Thorax, & Mammografi
-// - Tool Pengukuran Caliper Jarak & Pengaturan Kontras / Windowing
-// - Eksport Ekspertise Radiologi Terintegrasi Rekam Medis Pasien
-// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// MODUL: PACS Viewer — daftar citra dan pratinjau
+//
+// Versi sebelumnya tidak punya panggilan data: daftar studi dan citra
+// ditulis tangan. Menu ini berstatus "parsial" — dan memang begitulah
+// keadaannya, tapi bukan karena datanya karangan.
+//
+// Sekarang membaca public.radiology_images dan public.radiology_orders.
+//
+// ── Yang jujur disebutkan di layar ───────────────────────────
+//
+// Ini BUKAN penampil DICOM. Yang ditampilkan adalah berkas pratinjau
+// (preview_path / preview_url) yang sudah dibuat sebelumnya, bukan
+// berkas DICOM asli. Alat ukur jarak dan pengaturan windowing yang
+// dijanjikan versi lama tidak ada di sini, dan menampilkan alat ukur
+// yang tidak terkalibrasi ke piksel-per-milimeter DICOM justru berbahaya:
+// hasil pengukurannya akan dikira benar.
+//
+// Untuk pembacaan diagnostik, berkas DICOM dibuka di penampil ber-standar
+// (path-nya disebutkan di tabel). Layar ini untuk melihat cepat studi apa
+// saja yang ada dan menautkannya ke ekspertise.
+//
+// Prefiks "pv".
+// ═══════════════════════════════════════════════════════════════
 
-let PACS_STATE = {
-  studies: [
-    {
-      id: 'STUDY-2026-041',
-      pasien: 'Ny. Siska Melani (RM-0041)',
-      modality: 'USG',
-      organ: 'Pelvic & Uterus (Transvaginal)',
-      tgl: '2026-08-19 10:45',
-      dokter: 'dr. Siti Rahma, Sp.OG',
-      kesan: 'Tampak gambaran polycystic appearance pada ovarium bilateral (>12 folikel perifer, volume >10cc). Endometrium tebal 8.2mm regular.',
-      status: 'Expertise Selesai'
-    },
-    {
-      id: 'STUDY-2026-042',
-      pasien: 'Bpk. Hendra Gunawan (RM-0048)',
-      modality: 'CR (X-Ray)',
-      organ: 'Thorax AP/PA',
-      tgl: '2026-08-18 14:20',
-      dokter: 'dr. Spesialis Radiologi, Sp.Rad',
-      kesan: 'Cor: CTR < 50%, bentuk normal. Pulmo: corakan bronkovaskular normal, tidak tampak infiltrat/nodul aktif. Sinus costophrenicus lancip.',
-      status: 'Expertise Selesai'
-    }
-  ],
-  selectedStudy: null
-};
+let pvData = null;
+let pvPilih = null;
 
-async function renderPacsViewer(params = {}) {
-  const content = document.getElementById('main-content');
-  if (!content) return;
-
-  if (!PACS_STATE.selectedStudy) {
-    PACS_STATE.selectedStudy = PACS_STATE.studies[0];
-  }
-
-  content.innerHTML = `
-    <div class="page-header">
-      <div>
-        <h1>🖼️ PACS &amp; DICOM Medical Imaging Viewer</h1>
-        <p>Visualisasi citra digital USG kandungan, radiologi digital &amp; expertise dokter spesialis</p>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderPacsViewer()">↻ Refresh</button>
-        <button class="btn btn-teal btn-sm" onclick="toast('Modality Worklist DICOM terhubung ke mesin USG &amp; CR', 'ok')">📡 Worklist DICOM</button>
-      </div>
-    </div>
-
-    <div class="grid-2" style="grid-template-columns: 320px 1fr; gap: 20px; align-items: start;">
-      <!-- Daftar Pemeriksaan Imaging -->
-      <div class="card" style="padding:16px;">
-        <div class="card-title" style="margin-bottom:12px;">Daftar Studi Citra Pasien</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          ${PACS_STATE.studies.map(s => `
-            <div onclick="pilihStudyPacs('${s.id}')" style="background:${s.id === PACS_STATE.selectedStudy.id ? 'rgba(0,210,180,0.1)' : 'var(--bg2)'};border:1px solid ${s.id === PACS_STATE.selectedStudy.id ? 'var(--teal)' : 'rgba(255,255,255,0.06)'};border-radius:10px;padding:12px;cursor:pointer;">
-              <div style="display:flex;justify-content:space-between;align-items:center;">
-                <b>${s.pasien}</b>
-                <span class="badge badge-teal" style="font-size:10px;">${s.modality}</span>
-              </div>
-              <div style="font-size:12px;color:var(--text3);margin-top:4px;">
-                ${s.organ}<br>
-                <span style="font-size:11px;">${s.tgl}</span>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-
-      <!-- PACS Viewer Workspace -->
-      <div style="display:flex;flex-direction:column;gap:18px;">
-        <div class="card" style="background:#000;border:1px solid #334155;border-radius:14px;padding:20px;text-align:center;min-height:360px;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-          <!-- Simulated Medical Scan Canvas -->
-          <div style="width:100%;max-width:480px;height:260px;background:radial-gradient(circle at center, #1e293b 0%, #050811 85%);border:1px solid #475569;border-radius:8px;position:relative;display:flex;justify-content:center;align-items:center;box-shadow:inset 0 0 40px rgba(0,0,0,0.9);">
-            <!-- Mock Overlay Info -->
-            <div style="position:absolute;top:10px;left:12px;text-align:left;font-family:monospace;font-size:11px;color:var(--teal);">
-              AVA HEALTH IMAGING<br>
-              ${PACS_STATE.selectedStudy.pasien}<br>
-              ${PACS_STATE.selectedStudy.modality} - ${PACS_STATE.selectedStudy.organ}
-            </div>
-            <div style="position:absolute;top:10px;right:12px;text-align:right;font-family:monospace;font-size:11px;color:var(--accent);">
-              FPS: 30<br>
-              GAIN: 64dB<br>
-              DEPTH: 14cm
-            </div>
-            <!-- Center Icon -->
-            <div style="font-size:64px;opacity:0.8;">🩻</div>
-            <div style="position:absolute;bottom:10px;left:12px;font-family:monospace;font-size:11px;color:#94a3b8;">
-              W: 256 L: 128 | CALIPER: 24.5 mm
-            </div>
-          </div>
-
-          <!-- Viewer Toolbar -->
-          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;justify-content:center;">
-            <button class="btn btn-sm btn-ghost" onclick="toast('Zoom & Pan diaktifkan', 'info')">🔍 Zoom / Pan</button>
-            <button class="btn btn-sm btn-ghost" onclick="toast('Contrast Windowing disesuaikan', 'info')">☀️ Kontras / Window</button>
-            <button class="btn btn-sm btn-ghost" onclick="toast('Caliper pengukur diameter ovarium aktif: 24.5mm', 'ok')">📏 Caliper Ukur Jarak</button>
-            <button class="btn btn-sm btn-ghost" onclick="toast('Citra di-invert (hitam/putih)', 'info')">🔄 Invert LUT</button>
-          </div>
-        </div>
-
-        <!-- Expertise Radiologi / Obgyn Card -->
-        <div class="card">
-          <div class="card-title" style="margin-bottom:10px;">🩺 Lembar Kesan Klinis &amp; Expertise Dokter</div>
-          <p style="font-size:12px;color:var(--text3);margin-bottom:10px;">Dokter Pemeriksa: <b>${PACS_STATE.selectedStudy.dokter}</b></p>
-          <div style="background:var(--bg2);padding:14px;border-radius:8px;font-size:13.5px;line-height:1.6;color:var(--text2);border-left:3px solid var(--teal);">
-            ${PACS_STATE.selectedStudy.kesan}
-          </div>
-          <div style="display:flex;justify-content:flex-end;margin-top:14px;gap:10px;">
-            <button class="btn btn-ghost" onclick="toast('Hasil citra terlampir otomatis ke EMR SOAP pasien', 'ok')">📎 Tautkan ke Rekam Medis</button>
-            <button class="btn btn-teal" onclick="toast('Hasil USG & expertise dicetak sebagai PDF standar Kemenkes', 'ok')">🖨️ Cetak Lembar Hasil</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+function pvEsc(s) {
+  return String(s ?? '').replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function pvJam(ts) {
+  if (!ts) return '—';
+  return new Date(ts).toLocaleString('id-ID',
+    { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+function pvUkuran(b) {
+  const n = Number(b || 0);
+  if (!n) return '—';
+  if (n > 1048576) return (n / 1048576).toFixed(1) + ' MB';
+  if (n > 1024) return Math.round(n / 1024) + ' KB';
+  return n + ' B';
 }
 
-function pilihStudyPacs(id) {
-  const s = PACS_STATE.studies.find(x => x.id === id);
-  if (s) {
-    PACS_STATE.selectedStudy = s;
-    renderPacsViewer();
+async function pvMuat() {
+  if (typeof sbGet !== 'function') { pvData = null; return; }
+  const aman = (t, q) => sbGet(t, q).catch(() => []);
+  try {
+    const [citra, order] = await Promise.all([
+      sbGet('radiology_images', 'select=*&order=id.desc&limit=300'),
+      aman('radiology_orders', 'select=*&order=performed_at.desc&limit=300'),
+    ]);
+    pvData = { citra, order };
+  } catch (e) { pvData = null; }
+}
+
+async function renderPacsViewer() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
+
+  await pvMuat();
+
+  if (pvData === null) {
+    main.innerHTML = `
+      <div class="page-header"><div><h1>PACS Viewer</h1></div></div>
+      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
+        <strong>Data citra tidak dapat dibaca.</strong><br>
+        Tabel <code>radiology_images</code> belum tersedia.
+      </div>`;
+    return;
   }
+  pvGambar();
+}
+
+function pvOrder(orderId) {
+  return (pvData.order || []).find(o => o.id === orderId) || {};
+}
+
+function pvGambar() {
+  const C = pvData.citra || [];
+
+  // Dikelompokkan per studi (accession), bukan per berkas: satu
+  // pemeriksaan bisa punya belasan citra dan menampilkannya sebagai
+  // daftar datar membuat studi yang sama terlihat seperti belasan
+  // pemeriksaan berbeda.
+  const studi = new Map();
+  for (const c of C) {
+    const k = c.accession_no || ('order-' + c.order_id);
+    if (!studi.has(k)) studi.set(k, []);
+    studi.get(k).push(c);
+  }
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>PACS Viewer</h1>
+        <p class="muted">Daftar studi dan pratinjau citra radiologi.</p>
+      </div>
+    </div>
+
+    <div class="card" style="padding:12px 16px; margin-bottom:12px; font-size:13px;
+                             color:var(--text3); line-height:1.7">
+      Layar ini menampilkan <b>berkas pratinjau</b>, bukan berkas DICOM asli.
+      Tidak ada alat ukur jarak dan pengaturan windowing di sini: alat ukur
+      yang tidak terkalibrasi ke piksel-per-milimeter DICOM akan memberi
+      angka yang dikira benar. Untuk pembacaan diagnostik, buka berkas
+      DICOM-nya di penampil ber-standar.
+    </div>
+
+    ${!C.length ? `
+      <div class="card" style="padding:32px; text-align:center">
+        <div style="font-size:28px; opacity:.4; margin-bottom:8px">🖼️</div>
+        <div style="font-weight:700; margin-bottom:4px">Belum ada citra tersimpan</div>
+        <div style="font-size:13px; color:var(--text3)">
+          Citra yang diunggah dari modalitas akan muncul di sini.</div>
+      </div>` : `
+      <div class="card" style="overflow-x:auto">
+        <table class="data-table"><thead><tr>
+          <th>Accession</th><th>Pasien</th><th>Pemeriksaan</th><th>Modalitas</th>
+          <th style="text-align:right">Jumlah Citra</th>
+          <th style="text-align:right">Total Ukuran</th>
+          <th>Diperiksa</th><th></th>
+        </tr></thead><tbody>
+        ${[...studi.entries()].map(([acc, daftar]) => {
+          const o = pvOrder(daftar[0].order_id);
+          const total = daftar.reduce((a, c) => a + Number(c.file_size || 0), 0);
+          return `<tr style="${pvPilih === acc ? 'outline:2px solid var(--primary)' : ''}">
+            <td><b>${pvEsc(acc)}</b></td>
+            <td>${pvEsc(o.patient_name || '—')}</td>
+            <td>${pvEsc(o.procedure_name || '—')}</td>
+            <td>${pvEsc(o.modality_code || '—')}</td>
+            <td style="text-align:right">${daftar.length}</td>
+            <td style="text-align:right">${pvUkuran(total)}</td>
+            <td style="white-space:nowrap">${pvJam(o.performed_at)}</td>
+            <td><button class="btn btn-sm" onclick="pvBuka('${pvEsc(acc)}')">
+              ${pvPilih === acc ? 'Tutup' : 'Lihat'}</button></td>
+          </tr>`;
+        }).join('')}
+        </tbody></table>
+      </div>
+
+      ${pvPilih ? pvPanel(studi.get(pvPilih) || []) : ''}`}`;
+}
+
+function pvBuka(acc) {
+  pvPilih = (pvPilih === acc) ? null : acc;
+  pvGambar();
+}
+
+function pvPanel(daftar) {
+  if (!daftar.length) return '';
+  const o = pvOrder(daftar[0].order_id);
+
+  return `
+    <div class="card" style="padding:18px; margin-top:16px">
+      <div style="font-weight:800; font-size:15px; margin-bottom:2px">
+        ${pvEsc(o.patient_name || '—')}</div>
+      <div style="font-size:12px; color:var(--text3); margin-bottom:14px">
+        ${pvEsc(o.procedure_name || '')} · ${pvEsc(pvPilih)}
+        ${o.referring_doctor ? ' · pengirim ' + pvEsc(o.referring_doctor) : ''}</div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+                  gap:12px">
+        ${daftar.map(c => `
+          <div style="border:1px solid var(--border); border-radius:8px; overflow:hidden">
+            ${c.preview_url || c.preview_path
+              ? `<img src="${pvEsc(c.preview_url || c.preview_path)}"
+                      alt="${pvEsc(c.view_label || 'citra')}"
+                      style="width:100%; display:block; background:#000"
+                      onerror="this.style.display='none';
+                               this.nextElementSibling.style.display='block'">
+                 <div style="display:none; padding:24px; text-align:center;
+                             font-size:12px; color:var(--text3)">
+                   Pratinjau tidak dapat dimuat</div>`
+              : `<div style="padding:24px; text-align:center; font-size:12px;
+                            color:var(--text3)">Tidak ada pratinjau</div>`}
+            <div style="padding:8px 10px; font-size:11px; line-height:1.6">
+              <b>${pvEsc(c.view_label || 'Citra')}</b>
+              ${c.series_no != null ? ` · seri ${c.series_no}` : ''}
+              ${c.instance_no != null ? ` · #${c.instance_no}` : ''}<br>
+              ${c.width && c.height ? `${c.width}×${c.height} · ` : ''}
+              ${pvUkuran(c.file_size)}<br>
+              ${c.dicom_path
+                ? `<span style="color:var(--text3)">DICOM: ${pvEsc(c.dicom_path)}</span>`
+                : '<span style="color:var(--warning)">berkas DICOM tidak tercatat</span>'}
+              ${c.uploaded_by ? `<br>diunggah ${pvEsc(c.uploaded_by)}` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+
+      <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border)">
+        <button class="btn btn-sm btn-primary" onclick="navigate('rad-ekspertise')">
+          Buka Ekspertise Radiologi</button>
+      </div>
+    </div>`;
 }
 
 window.renderPacsViewer = renderPacsViewer;
-window.pilihStudyPacs = pilihStudyPacs;
+window.pvBuka = pvBuka;
