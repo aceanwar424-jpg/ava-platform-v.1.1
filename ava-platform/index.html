@@ -18,23 +18,31 @@
 <script defer src="js/core/moduleManager.js"></script>
 </head>
 <body>
-<!-- ═══ SIDEBAR — Category Rail + Flyout Panel (Virtu Digilab style) ═══ -->
+<!-- ═══ SIDEBAR VERTIKAL PENUH AVA GLOBAL ═══ -->
 <aside class="sidebar-rail" id="sidebar-rail">
-  <div class="rail-logo" onclick="navigate('dashboard');closeFlyout()" title="AVA GLOBAL ECOSYSTEM">
-    <img src="css/logo-ava-global.png" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1.5px solid #d4af37;box-shadow:0 0 8px rgba(212,175,55,0.4);" alt="AVA Logo">
+  <div class="sidebar-brand-box" onclick="navigate('dashboard')" title="Kembali ke Dashboard Utama">
+    <img src="css/logo-ava-global.png" class="sidebar-brand-logo" alt="AVA Logo">
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-title">AVA GLOBAL</div>
+      <div class="sidebar-brand-sub">✨ Health &amp; Wellness</div>
+    </div>
   </div>
 
-  <!-- Rel navigasi DIGAMBAR dari config/menu.json (lewat js/core/peta-menu.js).
-       Sebelumnya keempat belas tombol ini ditulis tangan di sini, terpisah dari
-       dokumen pemetaannya — dan keduanya sudah menyimpang. Isinya kini
-       mengikuti ruang kerja tempat halaman ini disajikan. -->
+  <div class="sidebar-unit-wrapper">
+    <select id="portfolio-workspace-switcher" class="sidebar-unit-select" onchange="switchPortfolioWorkspace(this.value)"></select>
+  </div>
+
   <nav class="rail-nav" id="rail-nav"></nav>
 
-  <div class="rail-footer">
-    <span class="conn-dot" id="conn-dot" title="Status koneksi"></span>
+  <div class="sidebar-footer">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span class="conn-dot ok" id="conn-dot" title="Status Sistem: Online"></span>
+      <span style="font-size:11px; font-weight:700; color:#94a3b8;">AVA ENGINE v5.1</span>
+    </div>
+    <span style="font-size:10px; font-weight:800; color:#D4AF37; background:rgba(212,175,55,0.15); border:1px solid rgba(212,175,55,0.3); padding:2px 6px; border-radius:4px;">ISO 15189</span>
   </div>
 
-  <!-- User info — hidden compat refs, moved to topbar dropdown -->
+  <!-- User info — hidden compat refs -->
   <div id="sidebar-user" style="display:none">
     <div id="user-avatar"></div>
     <div><span id="user-name-sidebar"></span><span id="user-role-sidebar"></span></div>
@@ -42,33 +50,18 @@
   <div id="conn-label" style="display:none"></div>
 </aside>
 
-<!-- ═══ FLYOUT PANEL — Submenu per Category ═══ -->
-<div class="flyout-overlay" id="flyout-overlay" onclick="closeFlyout()"></div>
-<div class="flyout-panel" id="flyout-panel">
-  <div class="flyout-header">
-    <div class="flyout-title" id="flyout-title">Menu</div>
-    <button class="flyout-close" onclick="closeFlyout()">✕</button>
-  </div>
-  <div class="flyout-body" id="flyout-body"></div>
-</div>
-
-
-<!-- ═══ TOPBAR ═══ -->
+<!-- ═══ TOPBAR — BERSIH, MINIMAL & ELEGAN ═══ -->
 <div class="topbar" id="topbar">
-  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <button class="hamburger" onclick="toggleSidebar()" style="display:inline-flex; font-size:18px;">☰</button>
   <div class="topbar-breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-    <span style="color:var(--text3);font-weight:700;font-size:12px;">AVA GLOBAL</span>
-    <!-- Pilihan ruang diisi dari config/menu.json saat halaman siap.
-         Daftar tangan sebelumnya masih menyebut enam pilar lama dan
-         tidak pernah ikut berubah saat pembagian ruangnya berubah. -->
-    <select id="portfolio-workspace-switcher" class="input" style="padding:3px 8px; font-size:12px; font-weight:700; background:rgba(212,175,55,0.12); color:#b45309; border:1px solid #d4af37; border-radius:6px; cursor:pointer;" onchange="switchPortfolioWorkspace(this.value)"></select>
+    <span style="color:var(--text3);font-weight:700;font-size:12px;">SISTEM</span>
     <span>/</span>
-    <span class="topbar-title" id="topbar-title" style="font-size:13px;font-weight:700;color:var(--text)">Dashboard</span>
+    <span class="topbar-title" id="topbar-title" style="font-size:13.5px;font-weight:800;color:var(--text)">Dashboard</span>
   </div>
   <div class="topbar-right">
-    <div id="topbar-date" style="font-size:12px;color:var(--text3);font-weight:500;padding-right:4px"></div>
+    <div id="topbar-date" style="font-size:12px;color:var(--text3);font-weight:600;padding-right:6px"></div>
     <button class="topbar-btn" id="btn-tema" title="Ganti tema terang/gelap" onclick="olToggleTema()">🌙</button>
-    <button class="topbar-btn" title="Notifikasi" onclick="">
+    <button class="topbar-btn" title="Notifikasi Sistem" onclick="alert('Tidak ada notifikasi kritis baru.')">
       🔔
       <span class="topbar-notif-dot"></span>
     </button>
@@ -685,12 +678,12 @@ function switchPortfolioWorkspace(val) {
     : (window.kategoriRuang ? window.kategoriRuang(ruang)[0] : 'utama');
 
   // Halaman awal: entri pertama yang benar-benar sudah ada di kategori itu.
-  // Membuka halaman berstatus "belum" hanya menampilkan layar kosong.
   const kat = FLYOUT_MENUS[kategoriPertama];
   const pertama = kat && kat.items.find(function (i) { return !i.soon; });
 
-  if (typeof openCategory === 'function') openCategory(kategoriPertama);
-  else if (pertama && typeof navigate === 'function') navigate(pertama.page);
+  if (pertama && typeof navigate === 'function') {
+    navigate(pertama.page);
+  }
 }
 window.switchPortfolioWorkspace = switchPortfolioWorkspace;
 
@@ -806,6 +799,7 @@ window.susunMenu = susunMenu;
 // disembunyikan. Rel yang tidak pernah ada di DOM tidak bisa muncul kembali
 // karena satu pemanggilan yang keliru, yang persis pernah terjadi lewat
 // listener hashchange.
+// Menggambar menu vertikal lengkap di sidebar kiri untuk ruang kerja aktif.
 function gambarRail(ruang) {
   if (!menuTersusun) susunMenu();
   const nav = document.getElementById('rail-nav');
@@ -815,97 +809,86 @@ function gambarRail(ruang) {
     ? window.kategoriRuang(ruang)
     : Object.keys(FLYOUT_MENUS);
 
-  nav.innerHTML = boleh
-    .filter(function (k) { return FLYOUT_MENUS[k]; })
-    .map(function (k, i) {
-      const m = FLYOUT_MENUS[k];
-      const aksi = (k === 'agentic') ? "navigate('agentic')" : "openCategory('" + k + "')";
-      return '<button class="rail-item' + (i === 0 ? ' active' : '') + '" data-cat="' + k + '"' +
-             ' onclick="' + aksi + '" data-tooltip="' + m.label.replace(/"/g, '&quot;') + '">' +
-             '<span class="rail-icon" data-icon="' + k + '"></span>' +
-             '<span class="rail-label">' + m.pendek + '</span></button>';
-    }).join('');
+  let html = '';
+  const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
+  const isSuperAdmin = role === 'super_admin';
+  const allowedPages = window.roleConfig?.pages || null;
 
-  if (typeof paintRailIcons === 'function') paintRailIcons();
+  boleh.forEach(function (k) {
+    const kat = FLYOUT_MENUS[k];
+    if (!kat || !kat.items || !kat.items.length) return;
+
+    // Filter item yang boleh dilihat user
+    const items = kat.items.filter(function (it) {
+      if (it.adminOnly && !['super_admin','manager','direktur'].includes(role)) return false;
+      if (!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon) return false;
+      return true;
+    });
+
+    if (!items.length) return;
+
+    // Kelompokkan item berdasarkan properti group
+    const groups = {};
+    items.forEach(function (it) {
+      const g = it.group || kat.label || 'Menu';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(it);
+    });
+
+    Object.entries(groups).forEach(function ([gName, gItems]) {
+      html += '<div class="sidebar-group-header"><span>' + gName + '</span></div>';
+      gItems.forEach(function (it) {
+        const ico = typeof icon === 'function' ? icon(it.icon || 'list', 15) : '•';
+        const isSoon = it.soon || it.status === 'belum';
+        const aksi = isSoon
+          ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')"
+          : it.action;
+
+        html += '<button class="sidebar-menu-btn' + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
+                ' onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">' +
+                '<span class="sidebar-menu-ico">' + ico + '</span>' +
+                '<span class="sidebar-menu-label">' + it.label + '</span>' +
+                (isSoon ? '<span class="sidebar-soon-tag">soon</span>' : '') +
+                '</button>';
+      });
+    });
+  });
+
+  nav.innerHTML = html;
+
+  // Sorot halaman aktif yang sedang dibuka
+  if (window.currentPage) {
+    syncFlyoutToPage(window.currentPage);
+  }
 }
 window.gambarRail = gambarRail;
 
-let activeFlyoutCat = null;
-
-function openFlyout(cat) {
-  const menu = FLYOUT_MENUS[cat];
-  if (!menu) return;
-  activeFlyoutCat = cat;
-
-  // Update rail active state
-  document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
-
-  // Get current allowed pages (role-based)
-  const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
-  const allowedPages = window.roleConfig?.pages || null;
-  const isSuperAdmin = role === 'super_admin';
-
-  document.getElementById('flyout-title').textContent = menu.label;
-  document.getElementById('flyout-body').innerHTML = menu.items.map(item => {
-    if (item.adminOnly && !['super_admin','manager','direktur'].includes(role)) return '';
-    if (!isSuperAdmin && allowedPages && !allowedPages.includes(item.page) && !item.soon) return '';
-    const currentPage = window.currentPage || '';
-    const isActive = currentPage === item.page;
-    if (item.soon) {
-      return `<div class="flyout-item flyout-item-soon">
-        <span class="flyout-item-icon">${icon(item.icon,17)}</span>
-        <span class="flyout-item-label">${item.label}</span>
-        <span class="flyout-soon-badge">soon</span>
-      </div>`;
-    }
-    return `<button class="flyout-item ${isActive?'active':''}" data-page="${item.page}"
-      onclick="${item.action};setActiveFlyoutItem('${item.page}')">
-      <span class="flyout-item-icon">${icon(item.icon,17)}</span>
-      <span class="flyout-item-label">${item.label}</span>
-      ${item.badge?`<span class="flyout-item-badge" id="${item.badge}-flyout" style="display:none">0</span>`:''}
-    </button>`;
-  }).join('');
-
-  document.getElementById('flyout-panel').classList.add('open');
-  document.getElementById('flyout-overlay').classList.add('open');
-}
-
-function closeFlyout() {
-  document.getElementById('flyout-panel')?.classList.remove('open');
-  document.getElementById('flyout-overlay')?.classList.remove('open');
-}
-
 function setActiveFlyoutItem(page) {
   window.currentPage = page;
-  document.querySelectorAll('.flyout-item').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.flyout-item[data-page="${page}"]`)?.classList.add('active');
-  // Tandai pintasan atas yang sedang dibuka
-  document.querySelectorAll('#subnav .subnav-item').forEach(b => b.classList.remove('active'));
-  document.querySelector(`#subnav .subnav-item[data-page="${page}"]`)?.classList.add('active');
-  document.querySelector('#subnav .subnav-home')?.classList.remove('active');
-  // Selalu tutup flyout setelah pilih menu — overlay full-screen memblokir klik konten
-  closeFlyout();
+  document.querySelectorAll('.sidebar-menu-btn').forEach(function (b) {
+    b.classList.remove('active');
+  });
+  const activeBtn = document.querySelector('.sidebar-menu-btn[data-page="' + page + '"]');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    const label = activeBtn.querySelector('.sidebar-menu-label')?.textContent;
+    const titleEl = document.getElementById('topbar-title');
+    if (titleEl && label) titleEl.textContent = label;
+  }
 }
 
-// Auto-open category based on current page (called from navigate())
+// Menyelaraskan menu aktif di sidebar saat berpindah halaman via navigate()
 function syncFlyoutToPage(page) {
-  let found = false;
-  for (const [cat, menu] of Object.entries(FLYOUT_MENUS)) {
-    if (menu.items.some(i => i.page === page)) {
-      document.querySelectorAll('.rail-item').forEach(b => b.classList.remove('active'));
-      document.querySelector(`.rail-item[data-cat="${cat}"]`)?.classList.add('active');
-      activeFlyoutCat = cat;
-      window.currentPage = page;
-      renderSubnav(cat, page);   // pintasan atas tetap tampil di dalam kategori
-      found = true;
-      break;
-    }
-  }
-  // Halaman di luar kategori manapun — sembunyikan pintasan
-  if (!found) {
-    const el = document.getElementById('subnav');
-    if (el) { el.classList.remove('show'); el.innerHTML = ''; }
+  window.currentPage = page;
+  document.querySelectorAll('.sidebar-menu-btn').forEach(function (b) {
+    b.classList.remove('active');
+  });
+  const activeBtn = document.querySelector('.sidebar-menu-btn[data-page="' + page + '"]');
+  if (activeBtn) {
+    activeBtn.classList.add('active');
+    const label = activeBtn.querySelector('.sidebar-menu-label')?.textContent;
+    const titleEl = document.getElementById('topbar-title');
+    if (titleEl && label) titleEl.textContent = label;
   }
 }
 
@@ -938,29 +921,13 @@ function visibleCategoryItems(cat) {
   });
 }
 
-// Pintasan horizontal di bawah topbar
+// Pintasan horizontal dinonaktifkan — menu sekarang terpusat di sidebar kiri
 function renderSubnav(cat, activePage) {
   const el = document.getElementById('subnav');
-  if (!el) return;
-  const menu = FLYOUT_MENUS[cat];
-  const items = visibleCategoryItems(cat);
-  if (!menu || !items.length) { el.classList.remove('show'); el.innerHTML = ''; return; }
-
-  const shortLabel = menu.label.includes(':') ? menu.label.split(':')[0].replace(/Pilar \d+ — /g, '').trim() : menu.label;
-  el.innerHTML = `
-    <button class="subnav-home ${!activePage?'active':''}" onclick="openCategory('${cat}')" title="Indeks Menu ${menu.label}">
-      <span class="subnav-home-ico">${icon(menu.icon,14)}</span>
-      <span>${shortLabel}</span>
-    </button>
-    <span class="subnav-sep"></span>
-    <div class="subnav-items">
-      ${items.map(it => it.soon
-        ? `<span class="subnav-item disabled" title="Segera hadir">${it.label}<span class="subnav-soon">soon</span></span>`
-        : `<button class="subnav-item ${activePage===it.page?'active':''}" data-page="${it.page}"
-             onclick="${it.action};setActiveFlyoutItem('${it.page}')">${it.label}</button>`
-      ).join('')}
-    </div>`;
-  el.classList.add('show');
+  if (el) {
+    el.classList.remove('show');
+    el.innerHTML = '';
+  }
 }
 
 // Kategori yang menampilkan ringkasan angka (KPI) di halaman indeksnya.
