@@ -25,7 +25,8 @@ const testSuites = [
   { name: '13. Wellness, Sanctuary & Pabrik', file: 'test_wellness_pabrik.js' },
   { name: '14. LIS, AVA Tech & Order Terintegrasi', file: 'test_lis_tech_order.js' },
   { name: '15. Klaim Penjamin (BPJS/Asuransi/TPA)', file: 'test_klaim_penjamin.js' },
-  { name: '16. HIS — Tindakan, Imunisasi & Kelengkapan RM', file: 'test_his_tindakan_imunisasi.js' }
+  { name: '16. HIS — Tindakan, Imunisasi & Kelengkapan RM', file: 'test_his_tindakan_imunisasi.js' },
+  { name: '17. Alur Tagihan & Penerusan Order', file: 'test_alur_tagihan_order.js' }
 ];
 
 console.log('╔═══════════════════════════════════════════════════════════════╗');

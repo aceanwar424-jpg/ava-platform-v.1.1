@@ -407,7 +407,10 @@ async function imBeri() {
   if (lokasi === null) return;
 
   try {
-    const r = await sbRpc('imunisasi_beri', {
+    // Memakai pembungkus yang menagih: pemberiannya tetap dikerjakan
+    // fungsi asli dengan seluruh penjagaan rantai dingin dan
+    // intervalnya, lalu biayanya diposting bila berhasil.
+    const r = await sbRpc('imunisasi_beri_dan_tagih', {
       p_data: {
         batch_id: String(b.id), patient_name: pasien,
         mr_number: mr || null, penyuntik, lokasi_suntik: lokasi || null,

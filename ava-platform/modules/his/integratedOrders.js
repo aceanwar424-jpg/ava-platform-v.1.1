@@ -330,9 +330,16 @@ function ioRincian(orderId) {
                 ${ioEsc(i.kode)}</div>` : ''}</td>
             <td style="text-align:right">${ioRp(i.harga)}</td>
             <td>${ioEsc(i.status)}</td>
-            <td>${i.status === 'Diminta' || i.status === 'Diproses'
-              ? `<button class="btn btn-sm" onclick="ioSelesaiItem(${i.id})">
-                   Tandai Selesai</button>` : ''}</td>
+            <td style="white-space:nowrap">
+              ${i.status === 'Diminta' && !i.ref_id
+                ? `<button class="btn btn-sm btn-primary" onclick="ioTeruskan(${i.id})">
+                     Teruskan ke ${ioEsc(i.layanan)}</button>` : ''}
+              ${i.ref_id
+                ? `<div style="font-size:11px; color:var(--text3)">
+                     ${ioEsc(i.ref_tabel)} #${i.ref_id}</div>` : ''}
+              ${(i.status === 'Diproses' || (i.status === 'Diminta' && i.ref_id))
+                ? `<button class="btn btn-sm" onclick="ioSelesaiItem(${i.id})">
+                     Tandai Selesai</button>` : ''}</td>
           </tr>`).join('')}
           </tbody></table>
         </div>
@@ -386,6 +393,27 @@ function createIntegratedOrder(data = {}) {
   return { success: true, order };
 }
 
+// Meneruskan item ke layanan yang mengerjakannya. Inilah yang membuat
+// order berarti: sebelum ini order berhenti di tabelnya sendiri dan
+// laboratorium tidak pernah tahu ada permintaan.
+//
+// Nomor yang terbit (barcode sampel / accession radiologi) ditampilkan
+// supaya petugas bisa langsung mencocokkannya dengan tabung atau berkas
+// yang ada di tangannya.
+async function ioTeruskan(itemId) {
+  try {
+    const r = await sbRpc('order_terintegrasi_teruskan', {
+      p_item_id: itemId, p_oleh: (window.currentUsername || 'petugas'),
+    });
+    if (r && r.error) { alert(r.error); return; }
+    alert(`Diteruskan ke ${r.layanan}.
+
+Nomor: ${r.nomor}`);
+    ioTutup();
+    await renderIntegratedOrders();
+  } catch (e) { alert('Gagal meneruskan order: ' + e.message); }
+}
+
 window.renderIntegratedOrders = renderIntegratedOrders;
 window.ioGantiTab    = ioGantiTab;
 window.ioSetCari     = ioSetCari;
@@ -394,4 +422,5 @@ window.ioKirim       = ioKirim;
 window.ioRincian     = ioRincian;
 window.ioTutup       = ioTutup;
 window.ioSelesaiItem = ioSelesaiItem;
+window.ioTeruskan    = ioTeruskan;
 window.createIntegratedOrder = createIntegratedOrder;
