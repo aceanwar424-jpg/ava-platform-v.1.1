@@ -229,7 +229,7 @@ async function navigate(page, params={}) {
     case 'tasks':       safeRun('renderTaskManagement');          break;
     case 'wiki':        safeRun('renderWiki');                   break;
     case 'agentic':     safeRun('renderAgentic', params.tab);     break;
-    case 'satusehat':   safeRun('renderSatusehat');              break;
+    case 'satusehat':   safeRun('renderSatuSehat');              break;
     case 'ar-aging':    safeRun('renderArAging');                break;
     case 'lab-tat':     safeRun('renderLabTat');                 break;
     case 'penawaran':   safeRun('renderPenawaran');              break;

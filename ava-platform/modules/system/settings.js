@@ -466,7 +466,7 @@ async function renderMasterData() {
         <div style="font-size:12px;color:var(--gray);margin-bottom:10px">
           Google Maps API key, Supabase connection, dan integrasi eksternal.
         </div>
-        <button class="btn btn-teal btn-sm" onclick="switchSetTab('general',document.querySelector('#set-tabs .tab-btn'))">Ke Pengaturan Umum</button>
+        <button class="btn btn-teal btn-sm" onclick="switchSettingsTab('general')">Ke Pengaturan Umum</button>
       </div>
 
     </div>`;

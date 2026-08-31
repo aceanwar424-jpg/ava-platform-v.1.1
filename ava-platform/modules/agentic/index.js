@@ -4489,7 +4489,7 @@ async function agSyncLiveState() {
       const liveTasks = await sbGet('agentic_tasks_v', 'select=*&order=updated_at.desc&limit=50');
       if (Array.isArray(liveTasks) && liveTasks.length > 0) window.agTasks = liveTasks;
       
-      const liveDocs = await sbGet('agentic_docs_registry_v', 'select=*&order=updated_at.desc&limit=100');
+      const liveDocs = await sbGet('agentic_registry_v', 'select=*&order=updated_at.desc&limit=100');
       if (Array.isArray(liveDocs) && liveDocs.length > 0) window.agRegistry = liveDocs;
     }
   } catch(e) {

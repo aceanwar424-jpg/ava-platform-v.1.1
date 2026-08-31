@@ -428,7 +428,7 @@ function gambarPilar(d) {
     const adaAngka = p.nilai !== null && p.nilai !== undefined;
     return `
       <div class="card" style="padding:15px 16px;border-left:4px solid ${w};cursor:pointer;
-        transition:transform .18s" onclick="switchPortfolioWorkspace('${p.ws}')"
+        transition:transform .18s" onclick="applyWorkspaceScope('${p.ws}')"
         onmouseover="this.style.transform='translateY(-2px)'"
         onmouseout="this.style.transform='none'">
         <div style="display:flex;justify-content:space-between;align-items:flex-start">

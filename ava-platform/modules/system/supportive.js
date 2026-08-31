@@ -406,6 +406,51 @@ async function saveSuppResult(id) {
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 
+// Validasi dan persetujuan hasil penunjang.
+//
+// Tombolnya sudah ada di daftar sejak lama, tapi fungsi ini tidak pernah
+// ditulis — menekannya tidak melakukan apa pun dan tidak memberi tahu
+// bahwa tidak terjadi apa-apa. Petugas mengira hasilnya sudah divalidasi.
+//
+// Urutannya ditegakkan: Draft → Validated → Approved. Melompat langsung
+// ke Approved berarti melewati pemeriksaan analis, dan hasil yang keluar
+// tanpa diperiksa siapa pun adalah hasil yang tidak bisa
+// dipertanggungjawabkan.
+async function updateResultStatus(id, status) {
+  const r = (suppAll || []).find(x => x.id === id);
+  if (!r) return;
+
+  const urutan = { 'Draft': 0, 'Validated': 1, 'Approved': 2 };
+  const sekarang = urutan[r.status] ?? 0;
+  const tujuan = urutan[status];
+
+  if (tujuan === undefined) { toast('Status tidak dikenal', 'err'); return; }
+  if (tujuan !== sekarang + 1) {
+    toast(`Hasil berstatus "${r.status}" tidak bisa langsung ke "${status}".`, 'warn');
+    return;
+  }
+
+  const siapa = (window.currentUsername || '').trim();
+  if (!siapa) { toast('Akun tidak dikenali — masuk ulang.', 'err'); return; }
+
+  const label = status === 'Validated' ? 'memvalidasi' : 'menyetujui';
+  if (!confirm(`Anda ${label} hasil ${r.product_name || ''} atas nama `
+    + `${r.patient_name || 'pasien ini'}.\n\nNama Anda akan tercatat pada hasil.`)) return;
+
+  const kini = new Date().toISOString();
+  const payload = status === 'Validated'
+    ? { status, validated_by: siapa, validated_at: kini }
+    : { status, approved_by: siapa, released_at: kini };
+
+  try {
+    await sbPatch('lab_results', id, payload);
+    toast(status === 'Validated' ? '✅ Hasil divalidasi' : '✅ Hasil disetujui', 'ok');
+    await loadSupportive();
+  } catch (e) {
+    toast('❌ ' + e.message, 'err');
+  }
+}
+
 function printSuppResult(id) {
   const r = suppAll.find(s=>s.id===id); if (!r) return;
   const data = tryParseJSON(r.notes)||{};
