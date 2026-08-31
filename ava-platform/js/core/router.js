@@ -117,6 +117,9 @@ const PAGE_TITLES = {
   'his-procedures':'Tindakan & Prosedur', 'sm-usg':'USG Non-Radiologi',
   'sm-endoskopi':'Endoskopi', 'sm-fisioterapi':'Fisioterapi & Rehabilitasi Medik',
   'his-immunization':'Vaksinasi & Imunisasi',
+  'igd-triase':'Triase IGD', 'skrining-risiko':'Skrining Risiko Pasien',
+  'mar':'Catatan Pemberian Obat', 'keselamatan-ikp':'Insiden Keselamatan Pasien',
+  'mutu-indikator':'Indikator Mutu',
   'his-mr-governance':'Kelengkapan & Retensi Rekam Medis',
   'rad-modalitas':'Modalitas & Jadwal Alat',
   'rad-katalog':'Katalog Pemeriksaan Radiologi',
@@ -387,6 +390,13 @@ async function navigate(page, params={}) {
 
     case 'his-immunization': safeRun('renderImunisasi');                 break;
     case 'his-mr-governance': safeRun('renderRmGovernance');             break;
+
+    // Keselamatan pasien
+    case 'igd-triase':      safeRun('renderTriase', { tab: 'triase' });   break;
+    case 'skrining-risiko': safeRun('renderTriase', { tab: 'skrining' }); break;
+    case 'mar':             safeRun('renderTriase', { tab: 'mar' });      break;
+    case 'keselamatan-ikp': safeRun('renderIkp', { tab: 'insiden' });     break;
+    case 'mutu-indikator':  safeRun('renderIkp', { tab: 'mutu' });        break;
 
     case 'rad-modalitas':  safeRun('renderRadMaster', { tab: 'modalitas' }); break;
     case 'rad-katalog':    safeRun('renderRadMaster', { tab: 'katalog' });   break;

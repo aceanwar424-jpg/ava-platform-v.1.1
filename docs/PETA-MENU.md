@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 162 — 🟢 154 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 167 — 🟢 159 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -126,6 +126,14 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
 | 🟢 | Tindakan & Prosedur | `his-procedures` | Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya |
 | 🟢 | Vaksinasi & Imunisasi | `his-immunization` | Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT |
+
+**Gawat Darurat & Keselamatan Pasien**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Triase IGD | `igd-triase` | Level kegawatan, target waktu tunggu, EWS, dan triase ulang |
+| 🟢 | Skrining Risiko | `skrining-risiko` | Jatuh, nyeri, dan gizi — wajib saat admisi |
+| 🟢 | Catatan Pemberian Obat | `mar` | Siapa memberikan obat apa, jam berapa; dosis terlewat ikut tercatat |
 
 **Farmasi**
 
@@ -365,6 +373,8 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
+| 🟢 | Insiden Keselamatan Pasien | `keselamatan-ikp` | Pelaporan boleh anonim; grading dihitung, RCA ditegakkan |
+| 🟢 | Indikator Mutu | `mutu-indikator` | Capaian per periode; yang di bawah target wajib punya rencana perbaikan |
 | 🟢 | Compliance & Legal Tracker | `compliance-tracker` | Izin operasional, SIP, BPOM, Halal |
 | 🟢 | Pelaporan & Audit Regulator | `regulatory` | Laporan wajib ke regulator |
 | 🟢 | Jejak Audit | `audit` | Log perubahan data sensitif |

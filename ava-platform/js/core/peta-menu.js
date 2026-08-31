@@ -396,6 +396,29 @@ window.PETA_MENU = {
           ]
         },
         {
+          "nama": "Gawat Darurat & Keselamatan Pasien",
+          "menu": [
+            {
+              "id": "igd-triase",
+              "label": "Triase IGD",
+              "status": "ada",
+              "ket": "Level kegawatan, target waktu tunggu, EWS, dan triase ulang"
+            },
+            {
+              "id": "skrining-risiko",
+              "label": "Skrining Risiko",
+              "status": "ada",
+              "ket": "Jatuh, nyeri, dan gizi — wajib saat admisi"
+            },
+            {
+              "id": "mar",
+              "label": "Catatan Pemberian Obat",
+              "status": "ada",
+              "ket": "Siapa memberikan obat apa, jam berapa; dosis terlewat ikut tercatat"
+            }
+          ]
+        },
+        {
           "nama": "Farmasi",
           "menu": [
             {
@@ -1068,6 +1091,18 @@ window.PETA_MENU = {
         {
           "nama": "Kepatuhan",
           "menu": [
+            {
+              "id": "keselamatan-ikp",
+              "label": "Insiden Keselamatan Pasien",
+              "status": "ada",
+              "ket": "Pelaporan boleh anonim; grading dihitung, RCA ditegakkan"
+            },
+            {
+              "id": "mutu-indikator",
+              "label": "Indikator Mutu",
+              "status": "ada",
+              "ket": "Capaian per periode; yang di bawah target wajib punya rencana perbaikan"
+            },
             {
               "id": "compliance-tracker",
               "label": "Compliance & Legal Tracker",
