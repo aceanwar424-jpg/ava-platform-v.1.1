@@ -114,6 +114,13 @@ const PAGE_TITLES = {
   'sanctuary-booking':'Queen Sanctuary & Spa',
   'holding-finance':'Konsolidasi Finansial Holding',
   'ecommerce-oms':'E-Commerce OMS & Apotek',
+  'his-procedures':'Tindakan & Prosedur', 'sm-usg':'USG Non-Radiologi',
+  'sm-endoskopi':'Endoskopi', 'sm-fisioterapi':'Fisioterapi & Rehabilitasi Medik',
+  'his-immunization':'Vaksinasi & Imunisasi',
+  'his-mr-governance':'Kelengkapan & Retensi Rekam Medis',
+  'rad-modalitas':'Modalitas & Jadwal Alat',
+  'rad-katalog':'Katalog Pemeriksaan Radiologi',
+  'rad-unggah':'Unggah Citra & Studi',
   'pabrik':'Pabrik — Produksi & Maklon',
   'wellness-rnd':'Formulasi & R&D Produk',
   'wellness-maklon':'Kemitraan Maklon',
@@ -366,6 +373,21 @@ async function navigate(page, params={}) {
     case 'his-orders':  safeRun('renderIntegratedOrders');           break;
     case 'rad-ekspertise': safeRun('renderRadiologyExpertise');      break;
     case 'his-mpi':     safeRun('renderMpiManagement');              break;
+
+    // Tindakan: satu modul, empat menu. Yang membedakan hanya penyaring
+    // kategorinya — alur persetujuannya sama, dan itu bagian yang paling
+    // tidak boleh berbeda antar layar.
+    case 'his-procedures': safeRun('renderTindakan', { kategori: null });        break;
+    case 'sm-usg':         safeRun('renderTindakan', { kategori: 'USG' });       break;
+    case 'sm-endoskopi':   safeRun('renderTindakan', { kategori: 'Endoskopi' }); break;
+    case 'sm-fisioterapi': safeRun('renderTindakan', { kategori: 'Fisioterapi' }); break;
+
+    case 'his-immunization': safeRun('renderImunisasi');                 break;
+    case 'his-mr-governance': safeRun('renderRmGovernance');             break;
+
+    case 'rad-modalitas':  safeRun('renderRadMaster', { tab: 'modalitas' }); break;
+    case 'rad-katalog':    safeRun('renderRadMaster', { tab: 'katalog' });   break;
+    case 'rad-unggah':     safeRun('renderRadMaster', { tab: 'unggah' });    break;
     case 'tech-aktivasi': safeRun('renderTechLicenseActivation');    break;
     case 'tech-telemetri': safeRun('renderTechTelemetry');           break;
     case 'tech-harga':  safeRun('renderTechPricingPlans');           break;

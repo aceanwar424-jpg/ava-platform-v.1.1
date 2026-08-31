@@ -384,13 +384,13 @@ window.PETA_MENU = {
             {
               "id": "his-procedures",
               "label": "Tindakan & Prosedur",
-              "status": "belum",
+              "status": "ada",
               "ket": "Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya"
             },
             {
               "id": "his-immunization",
               "label": "Vaksinasi & Imunisasi",
-              "status": "belum",
+              "status": "ada",
               "ket": "Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT"
             }
           ]
@@ -483,7 +483,7 @@ window.PETA_MENU = {
             {
               "id": "his-mr-governance",
               "label": "Kelengkapan &amp; Retensi Rekam Medis",
-              "status": "belum",
+              "status": "ada",
               "ket": "Audit kelengkapan RM, jadwal retensi/pemusnahan, dan permintaan salinan oleh pasien atau asuransi"
             }
           ]
@@ -1391,13 +1391,13 @@ window.PETA_MENU = {
             {
               "id": "pacs-viewer",
               "label": "PACS & DICOM Viewer",
-              "status": "parsial",
+              "status": "ada",
               "ket": "Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung"
             },
             {
               "id": "rad-unggah",
               "label": "Unggah Citra & Studi",
-              "status": "belum",
+              "status": "ada",
               "ket": "Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan"
             },
             {
@@ -1414,13 +1414,13 @@ window.PETA_MENU = {
             {
               "id": "rad-modalitas",
               "label": "Modalitas & Jadwal Alat",
-              "status": "belum",
+              "status": "ada",
               "ket": "Daftar alat (rontgen, USG, CT), DICOM Modality Worklist, dan jadwal pemakaian"
             },
             {
               "id": "rad-katalog",
               "label": "Katalog Pemeriksaan Radiologi",
-              "status": "belum",
+              "status": "ada",
               "ket": "Jenis pemeriksaan, persiapan pasien, dosis radiasi, dan tarifnya"
             },
             {
@@ -1451,7 +1451,7 @@ window.PETA_MENU = {
             {
               "id": "sm-usg",
               "label": "USG Non-Radiologi",
-              "status": "belum",
+              "status": "ada",
               "ket": "USG yang dikerjakan dokter poli sendiri (obgyn, abdomen) di luar alur radiologi"
             }
           ]
@@ -1462,13 +1462,13 @@ window.PETA_MENU = {
             {
               "id": "sm-fisioterapi",
               "label": "Fisioterapi & Rehabilitasi Medik",
-              "status": "belum",
+              "status": "ada",
               "ket": "Program terapi, jadwal sesi, dan catatan perkembangan pasien"
             },
             {
               "id": "sm-endoskopi",
               "label": "Endoskopi",
-              "status": "belum",
+              "status": "ada",
               "ket": "Jadwal, persiapan pasien, dan laporan temuan"
             }
           ]

@@ -86,7 +86,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
@@ -412,7 +415,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -426,7 +432,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -440,7 +449,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -454,7 +466,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -468,7 +483,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -534,7 +552,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -548,7 +569,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "lab": [
   "modules/lab/qcEngine.js",
@@ -681,7 +705,8 @@ window.MODUL_HALAMAN = {
   "modules/radiology/pacs.js",
   "modules/radiology/pacs_viewer.js",
   "modules/radiology/ris.js",
-  "modules/radiology/radiologyExpertise.js"
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
  ],
  "supportive": [
   "modules/system/config/config_family.js",
@@ -725,7 +750,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -739,7 +767,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "farmasi": [
   "modules/pharmacy/pharmacy.js"
@@ -756,7 +787,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -854,7 +888,8 @@ window.MODUL_HALAMAN = {
   "modules/radiology/pacs.js",
   "modules/radiology/pacs_viewer.js",
   "modules/radiology/ris.js",
-  "modules/radiology/radiologyExpertise.js"
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
  ],
  "catalog-export": [
   "modules/logistics/assets.js",
@@ -882,7 +917,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "queue-console": [
   "modules/his/admission.js",
@@ -896,7 +934,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "queue-config": [
   "modules/his/admission.js",
@@ -910,7 +951,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -924,7 +968,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -938,7 +985,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "cashier": [
   "modules/finance/accounting.js",
@@ -1031,7 +1081,10 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -1261,14 +1314,18 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
  ],
  "rad-ekspertise": [
   "modules/radiology/dicomViewer.js",
   "modules/radiology/pacs.js",
   "modules/radiology/pacs_viewer.js",
   "modules/radiology/ris.js",
-  "modules/radiology/radiologyExpertise.js"
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
  ],
  "his-mpi": [
   "modules/his/admission.js",
@@ -1282,7 +1339,136 @@ window.MODUL_HALAMAN = {
   "modules/his/queue_config.js",
   "modules/his/queue_console.js",
   "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js"
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "his-procedures": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "sm-usg": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "sm-endoskopi": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "sm-fisioterapi": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "his-immunization": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "his-mr-governance": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js"
+ ],
+ "rad-modalitas": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
+ ],
+ "rad-katalog": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
+ ],
+ "rad-unggah": [
+  "modules/radiology/dicomViewer.js",
+  "modules/radiology/pacs.js",
+  "modules/radiology/pacs_viewer.js",
+  "modules/radiology/ris.js",
+  "modules/radiology/radiologyExpertise.js",
+  "modules/radiology/rad_master.js"
  ],
  "tech-aktivasi": [
   "modules/business_units/ava_health.js",
@@ -1461,5 +1647,9 @@ window.MODUL_SEMUA = [
  "modules/his/mpiManagement.js",
  "modules/radiology/radiologyExpertise.js",
  "modules/lab/settings.js",
- "modules/lab/admission.js"
+ "modules/lab/admission.js",
+ "modules/his/imunisasi.js",
+ "modules/his/rm_governance.js",
+ "modules/his/tindakan.js",
+ "modules/radiology/rad_master.js"
 ];

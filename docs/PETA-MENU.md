@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 162 — 🟢 142 ada · 🟡 4 sebagian · ⚪ 16 belum dibuat
+**Total menu terpetakan:** 162 — 🟢 152 ada · 🟡 3 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -124,8 +124,8 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Rawat Inap & Bed Management | `inpatient` | Mutasi tempat tidur & resume pulang |
 | 🟢 | Arsip Rekam Medis | `medrecord` | Riwayat kunjungan dan berkas pasien |
 | 🟢 | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
-| ⚪ | Tindakan & Prosedur | `his-procedures` | Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya |
-| ⚪ | Vaksinasi & Imunisasi | `his-immunization` | Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT |
+| 🟢 | Tindakan & Prosedur | `his-procedures` | Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya |
+| 🟢 | Vaksinasi & Imunisasi | `his-immunization` | Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT |
 
 **Farmasi**
 
@@ -153,7 +153,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Izin & Kepatuhan Faskes | `compliance-tracker` | Masa berlaku izin operasional dan SIP nakes |
 | 🟢 | Laporan RL Kemenkes | `rl-reports` | Rekapitulasi RL terisi dari data operasional |
 | 🟢 | Master Rekam Medis (MPI) | `his-mpi` | Penggabungan pasien duplikat, riwayat merge, dan penomoran rekam medis |
-| ⚪ | Kelengkapan &amp; Retensi Rekam Medis | `his-mr-governance` | Audit kelengkapan RM, jadwal retensi/pemusnahan, dan permintaan salinan oleh pasien atau asuransi |
+| 🟢 | Kelengkapan &amp; Retensi Rekam Medis | `his-mr-governance` | Audit kelengkapan RM, jadwal retensi/pemusnahan, dan permintaan salinan oleh pasien atau asuransi |
 
 ---
 
@@ -496,16 +496,16 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Order & Worklist Radiologi | `radiology` | Permintaan foto dari poli, antrean kerja per modalitas, dan status pengerjaan |
-| 🟡 | PACS & DICOM Viewer | `pacs-viewer` | Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung |
-| ⚪ | Unggah Citra & Studi | `rad-unggah` | Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan |
+| 🟢 | PACS & DICOM Viewer | `pacs-viewer` | Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung |
+| 🟢 | Unggah Citra & Studi | `rad-unggah` | Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan |
 | 🟢 | Bacaan & Ekspertise Radiolog | `rad-ekspertise` | Lembar bacaan dokter Sp.Rad, tanda tangan elektronik, dan rilis hasil ke pengirim order |
 
 **Master & Alat**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| ⚪ | Modalitas & Jadwal Alat | `rad-modalitas` | Daftar alat (rontgen, USG, CT), DICOM Modality Worklist, dan jadwal pemakaian |
-| ⚪ | Katalog Pemeriksaan Radiologi | `rad-katalog` | Jenis pemeriksaan, persiapan pasien, dosis radiasi, dan tarifnya |
+| 🟢 | Modalitas & Jadwal Alat | `rad-modalitas` | Daftar alat (rontgen, USG, CT), DICOM Modality Worklist, dan jadwal pemakaian |
+| 🟢 | Katalog Pemeriksaan Radiologi | `rad-katalog` | Jenis pemeriksaan, persiapan pasien, dosis radiasi, dan tarifnya |
 | 🟢 | Kalibrasi & Perawatan Alat | `assets` | Jadwal kalibrasi alat radiologi dan riwayat perawatannya |
 
 ---
@@ -521,14 +521,14 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | EKG, Treadmill, Audiometri & Spirometri | `supportive` | Satu layar input untuk keempat pemeriksaan, lengkap dengan interpretasi terstruktur |
-| ⚪ | USG Non-Radiologi | `sm-usg` | USG yang dikerjakan dokter poli sendiri (obgyn, abdomen) di luar alur radiologi |
+| 🟢 | USG Non-Radiologi | `sm-usg` | USG yang dikerjakan dokter poli sendiri (obgyn, abdomen) di luar alur radiologi |
 
 **Rehabilitasi & Tindakan**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| ⚪ | Fisioterapi & Rehabilitasi Medik | `sm-fisioterapi` | Program terapi, jadwal sesi, dan catatan perkembangan pasien |
-| ⚪ | Endoskopi | `sm-endoskopi` | Jadwal, persiapan pasien, dan laporan temuan |
+| 🟢 | Fisioterapi & Rehabilitasi Medik | `sm-fisioterapi` | Program terapi, jadwal sesi, dan catatan perkembangan pasien |
+| 🟢 | Endoskopi | `sm-endoskopi` | Jadwal, persiapan pasien, dan laporan temuan |
 
 ---
 
