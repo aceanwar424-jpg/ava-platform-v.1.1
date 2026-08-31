@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 167 — 🟢 159 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 168 — 🟢 160 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -169,16 +169,16 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 `lis`
 
-**Penerimaan & Sampling**
+**1. Pra-Analitik & Sampling**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Penerimaan & Barcode | `lab` | Check-in spesimen dan cetak label tabung L{YYMMDD} |
+| 🟢 | Order Baru & Pendaftaran | `lis-admission` | Pendaftaran pasien walk-in dan order pemeriksaan laboratorium |
 | 🟢 | Flebotomi & Tusukan | `lis-phlebotomy` | Verifikasi tabung, lokasi tusukan & waktu sampling |
 | 🟢 | Verifikasi Kelayakan | `lis-kelayakan` | Kriteria penolakan spesimen hemolisis/lipemik/bekuan |
-| 🟢 | Order Baru & Label | `anamnesa` | Pembentukan order dan label dari admisi faskes |
 
-**Pemeriksaan & Alat**
+**2. Analitik & Interfacing**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
@@ -187,7 +187,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Koneksi Alat (:9999) | `lis-analyzer` | Konfigurasi analyzer ASTM E1381/E1394 & channel mapping |
 | 🟢 | Uji Lot Reagen | `lis-lot-verification` | Uji paralel 5-10 sampel & deteksi pergeseran bias |
 
-**Validasi & Hasil**
+**3. Pasca-Analitik & Validasi**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
@@ -196,30 +196,31 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Approval & TTE QR | `lab` › lab-approval | Tanda tangan kriptografis QR & rilis ke portal pasien |
 | 🟢 | Turnaround Time (TAT) | `lab-tat` | Durasi tiap tahap pra-analitik, analitik, rilis |
 
-**Kontrol Mutu (QC)**
+**4. Mutu & Kendali Kualitas (QC)**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | QC Harian (Levey-Jennings) | `lab` › lab-qc | Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma |
 | 🟢 | Uji Profisiensi (PME) | `lis-pme` | Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score |
-| 🟢 | Verifikasi Acuan | `refrange` | Rentang per usia, jenis kelamin, satuan |
 
-**Bank Sampel**
+**5. Bank Sampel & Arsip**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Rak Arsip (-20°C) | `lis-sample-archive` | Grid rak 10x10, add-on test retrieval & auto-dispose |
 | 🟢 | Riwayat Hasil & Tren | `lab` › lab-report | Riwayat hasil kumulatif dan grafik tren analit |
 
-**Logistik & Rujukan**
+**6. Master Data & Pengaturan Lab**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Stok Reagen & Suhu | `inventory` | Saldo stok per gudang dan unit |
-| 🟢 | Lab Rujukan Luar | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya |
-| 🟢 | Katalog Tes & Tarif | `product` | 530+ parameter terstandar LOINC/UCUM |
-| 🟢 | Ekspor Katalog LOINC | `catalog-export` | Katalog terstandarisasi siap-LIS |
-| 🟢 | Pengaturan LIS & Connector | `lis-settings` | Profil lab, dr. Sp.PK, ambang kritis, dan unduh paket connector :9999 |
+| 🟢 | Nilai Rujukan (Reference Range) | `refrange` | Matriks rentang rujukan per kelompok umur, jenis kelamin, dan metode |
+| 🟢 | Master Tes & Kode LOINC/UCUM | `product` | 530+ parameter tes laboratorium terstandar LOINC/UCUM |
+| 🟢 | Paket & Panel Pemeriksaan | `package` | Konfigurasi paket hematologi, kimia, serologi, dan MCU |
+| 🟢 | Stok Reagen & BHP Lab | `inventory` | Saldo stok reagen, kit kontrol, kalibrator, dan pemantauan suhu |
+| 🟢 | Lab Rujukan Luar | `referral` | Kirim spesimen keluar dan rekonsiliasi biaya rujukan |
+| 🟢 | Ekspor Katalog LOINC Siap-LIS | `catalog-export` | Dataset katalog terstandarisasi siap lisensi & ekspor CSV/TSV |
+| 🟢 | Pengaturan LIS & Connector | `lis-settings` | Profil lab, dr. Sp.PK, ambang batas kritis, dan unduh paket connector :9999 |
 
 ---
 

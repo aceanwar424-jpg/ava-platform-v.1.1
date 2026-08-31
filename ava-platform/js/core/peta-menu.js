@@ -519,13 +519,19 @@ window.PETA_MENU = {
       "ikon": "flask",
       "grup": [
         {
-          "nama": "Penerimaan & Sampling",
+          "nama": "1. Pra-Analitik & Sampling",
           "menu": [
             {
               "id": "lab",
               "label": "Penerimaan & Barcode",
               "status": "ada",
               "ket": "Check-in spesimen dan cetak label tabung L{YYMMDD}"
+            },
+            {
+              "id": "lis-admission",
+              "label": "Order Baru & Pendaftaran",
+              "status": "ada",
+              "ket": "Pendaftaran pasien walk-in dan order pemeriksaan laboratorium"
             },
             {
               "id": "lis-phlebotomy",
@@ -538,17 +544,11 @@ window.PETA_MENU = {
               "label": "Verifikasi Kelayakan",
               "status": "ada",
               "ket": "Kriteria penolakan spesimen hemolisis/lipemik/bekuan"
-            },
-            {
-              "id": "anamnesa",
-              "label": "Order Baru & Label",
-              "status": "ada",
-              "ket": "Pembentukan order dan label dari admisi faskes"
             }
           ]
         },
         {
-          "nama": "Pemeriksaan & Alat",
+          "nama": "2. Analitik & Interfacing",
           "menu": [
             {
               "id": "worklist",
@@ -579,7 +579,7 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Validasi & Hasil",
+          "nama": "3. Pasca-Analitik & Validasi",
           "menu": [
             {
               "id": "lab-validation",
@@ -612,7 +612,7 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Kontrol Mutu (QC)",
+          "nama": "4. Mutu & Kendali Kualitas (QC)",
           "menu": [
             {
               "id": "lab-qc",
@@ -627,17 +627,11 @@ window.PETA_MENU = {
               "label": "Uji Profisiensi (PME)",
               "status": "ada",
               "ket": "Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score"
-            },
-            {
-              "id": "refrange",
-              "label": "Verifikasi Acuan",
-              "status": "ada",
-              "ket": "Rentang per usia, jenis kelamin, satuan"
             }
           ]
         },
         {
-          "nama": "Bank Sampel",
+          "nama": "5. Bank Sampel & Arsip",
           "menu": [
             {
               "id": "lis-sample-archive",
@@ -656,37 +650,49 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Logistik & Rujukan",
+          "nama": "6. Master Data & Pengaturan Lab",
           "menu": [
             {
-              "id": "inventory",
-              "label": "Stok Reagen & Suhu",
+              "id": "refrange",
+              "label": "Nilai Rujukan (Reference Range)",
               "status": "ada",
-              "ket": "Saldo stok per gudang dan unit"
+              "ket": "Matriks rentang rujukan per kelompok umur, jenis kelamin, dan metode"
+            },
+            {
+              "id": "product",
+              "label": "Master Tes & Kode LOINC/UCUM",
+              "status": "ada",
+              "ket": "530+ parameter tes laboratorium terstandar LOINC/UCUM"
+            },
+            {
+              "id": "package",
+              "label": "Paket & Panel Pemeriksaan",
+              "status": "ada",
+              "ket": "Konfigurasi paket hematologi, kimia, serologi, dan MCU"
+            },
+            {
+              "id": "inventory",
+              "label": "Stok Reagen & BHP Lab",
+              "status": "ada",
+              "ket": "Saldo stok reagen, kit kontrol, kalibrator, dan pemantauan suhu"
             },
             {
               "id": "referral",
               "label": "Lab Rujukan Luar",
               "status": "ada",
-              "ket": "Kirim spesimen keluar dan rekonsiliasi biaya"
-            },
-            {
-              "id": "product",
-              "label": "Katalog Tes & Tarif",
-              "status": "ada",
-              "ket": "530+ parameter terstandar LOINC/UCUM"
+              "ket": "Kirim spesimen keluar dan rekonsiliasi biaya rujukan"
             },
             {
               "id": "catalog-export",
-              "label": "Ekspor Katalog LOINC",
+              "label": "Ekspor Katalog LOINC Siap-LIS",
               "status": "ada",
-              "ket": "Katalog terstandarisasi siap-LIS"
+              "ket": "Dataset katalog terstandarisasi siap lisensi & ekspor CSV/TSV"
             },
             {
               "id": "lis-settings",
               "label": "Pengaturan LIS & Connector",
               "status": "ada",
-              "ket": "Profil lab, dr. Sp.PK, ambang kritis, dan unduh paket connector :9999"
+              "ket": "Profil lab, dr. Sp.PK, ambang batas kritis, dan unduh paket connector :9999"
             }
           ]
         }

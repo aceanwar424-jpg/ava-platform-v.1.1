@@ -375,24 +375,6 @@ window.MODUL_HALAMAN = {
   "modules/lab/settings.js",
   "modules/lab/admission.js"
  ],
- "anamnesa": [
-  "modules/his/admission.js",
-  "modules/his/anamnesa.js",
-  "modules/his/clinicflow.js",
-  "modules/his/emr_soap.js",
-  "modules/his/homecare.js",
-  "modules/his/inpatient.js",
-  "modules/his/mcu.js",
-  "modules/his/medrecord.js",
-  "modules/his/queue_config.js",
-  "modules/his/queue_console.js",
-  "modules/his/integratedOrders.js",
-  "modules/his/mpiManagement.js",
-  "modules/his/imunisasi.js",
-  "modules/his/rm_governance.js",
-  "modules/his/tindakan.js",
-  "modules/his/triase.js"
- ],
  "lis-admission": [
   "modules/lab/qcEngine.js",
   "modules/lab/index.js",
@@ -1582,6 +1564,24 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js"
+ ],
+ "anamnesa": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js"
  ],
  "import": [
   "modules/system/config/config_family.js",

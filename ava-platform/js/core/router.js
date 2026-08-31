@@ -133,9 +133,17 @@ const PAGE_TITLES = {
   'pacs-viewer':'PACS & DICOM Imaging Viewer',
   'catalog-export':'Master Catalog & LIS Exporter',
   'lis-settings':'Pengaturan LIS & Connector (:9999)',
-  'anamnesa':'Order Pemeriksaan Lab (Walk-in)',
-  'lis-admission':'Order Pemeriksaan Lab (Walk-in)',
-  'order-lab':'Order Pemeriksaan Lab (Walk-in)',
+  anamnesa:'Anamnesa & Tanda Vital (HIS)',
+  'lis-admission':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
+  'order-lab':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
+  'lis-regis':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
+  'lis-phlebotomy':'Flebotomi & Lokasi Tusukan (LIS)',
+  'lis-kelayakan':'Verifikasi Kelayakan Spesimen (LIS)',
+  'lis-analyzer':'Koneksi Alat Analyzer (:9999)',
+  'lis-lot-verification':'Uji Lot Reagen (Lot-to-Lot)',
+  'lis-critical-value':'Logbook Nilai Kritis (Critical Values)',
+  'lis-pme':'Uji Profisiensi (PME / Z-Score)',
+  'lis-sample-archive':'Rak Arsip Bank Sampel (-20°C)',
   'executive-dashboard':'👑 CEO Master Orchestration Cockpit',
   cockpit:'👑 CEO Master Orchestration Cockpit',
   his:'Sistem Informasi Manajemen Rumah Sakit & Faskes (HIS)',
@@ -241,7 +249,6 @@ async function navigate(page, params={}) {
     case 'portal-akses':safeRun('renderPortalAkses');            break;
     case 'perujuk':     safeRun('renderPerujuk');                break;
     case 'lis-settings':safeRun('renderLisSettings');            break;
-    case 'anamnesa':
     case 'lis-admission':
     case 'lis-regis':
     case 'order-lab':   safeRun('renderLisAdmission');           break;
