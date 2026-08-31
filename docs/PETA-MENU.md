@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 162 — 🟢 152 ada · 🟡 3 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 162 — 🟢 154 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -87,7 +87,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Ekspor Katalog LOINC/UCUM | `catalog-export` | Aset utama yang dilisensikan ke klien |
-| 🟡 | Jembatan SATUSEHAT | `satusehat` | Bridging HL7 FHIR Kemenkes; pemeriksa status belum ada |
+| 🟢 | Jembatan SATUSEHAT | `satusehat` | Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4 |
 | 🟡 | Konektor Analyzer | `tech-analyzer` | ASTM E1381/E1394 di porta 9999; layar pengaturannya belum ada |
 | 🟢 | Monitor Kuota AI Gateway | `agentic` › agentic-apimonitor | Pemakaian kunci API & rotasi terpusat |
 
@@ -149,7 +149,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Klaim BPJS & INA-CBG | `bpjs-claim` | Grouper tarif & bridging VClaim |
-| 🟡 | Integrasi SATUSEHAT | `satusehat` | Pengiriman Encounter & Condition ke Kemenkes |
+| 🟢 | Integrasi SATUSEHAT | `satusehat` | Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4 |
 | 🟢 | Izin & Kepatuhan Faskes | `compliance-tracker` | Masa berlaku izin operasional dan SIP nakes |
 | 🟢 | Laporan RL Kemenkes | `rl-reports` | Rekapitulasi RL terisi dari data operasional |
 | 🟢 | Master Rekam Medis (MPI) | `his-mpi` | Penggabungan pasien duplikat, riwayat merge, dan penomoran rekam medis |

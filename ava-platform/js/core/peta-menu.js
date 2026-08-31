@@ -264,8 +264,8 @@ window.PETA_MENU = {
             {
               "id": "satusehat",
               "label": "Jembatan SATUSEHAT",
-              "status": "parsial",
-              "ket": "Bridging HL7 FHIR Kemenkes; pemeriksa status belum ada"
+              "status": "ada",
+              "ket": "Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4"
             },
             {
               "id": "tech-analyzer",
@@ -459,8 +459,8 @@ window.PETA_MENU = {
             {
               "id": "satusehat",
               "label": "Integrasi SATUSEHAT",
-              "status": "parsial",
-              "ket": "Pengiriman Encounter & Condition ke Kemenkes"
+              "status": "ada",
+              "ket": "Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4"
             },
             {
               "id": "compliance-tracker",

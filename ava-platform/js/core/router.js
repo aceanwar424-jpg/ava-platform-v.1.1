@@ -187,21 +187,21 @@ async function navigate(page, params={}) {
     try {
       if (typeof window[fnName] !== 'function' && typeof muatSemuaModul === 'function') {
         await muatSemuaModul();
-        if (currentPage !== page) return;
+        if (currentPage !== resolvedPage) return;
       }
       if (typeof window[fnName] === 'function') {
         window[fnName](...args);
       } else {
         console.warn(`[Router] Module function ${fnName} not found.`);
-        renderRouterError(page, `Modul '${page}' (${fnName}) belum dimuat.`);
+        renderRouterError(resolvedPage, `Modul '${resolvedPage}' (${fnName}) belum dimuat.`);
       }
     } catch (err) {
       console.error(`[Router] Error executing ${fnName}:`, err);
-      renderRouterError(page, err.message || String(err));
+      renderRouterError(resolvedPage, err.message || String(err));
     }
   }
 
-  switch(page) {
+  switch(resolvedPage) {
     case 'dashboard':   safeRun('renderDashboard');              break;
     case 'partners':    safeRun('renderPartners', params);         break;
     case 'maps':        safeRun('renderMaps');                   break;
@@ -240,6 +240,7 @@ async function navigate(page, params={}) {
     case 'lis-settings':safeRun('renderLisSettings');            break;
     case 'anamnesa':
     case 'lis-admission':
+    case 'lis-regis':
     case 'order-lab':   safeRun('renderLisAdmission');           break;
     case 'lisensi':     safeRun('renderLisensi');                break;
     case 'executive_dashboard':
@@ -282,7 +283,9 @@ async function navigate(page, params={}) {
       safeRun('renderExecutiveDashboard');
       break;
     case 'pendaftaran':
+    case 'regis':
     case 'registrasi':
+    case 'registration':
     case 'admission':   safeRun('renderAdmission');              break;
     case 'laboratorium':
     case 'lab':         safeRun('renderLab', params.tab || 'checkin'); break;

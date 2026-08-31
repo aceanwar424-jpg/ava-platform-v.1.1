@@ -144,6 +144,11 @@ function convertToFhirObservation(resultData) {
     subject: {
       reference: `Patient/${resultData.satusehat_patient_id || resultData.patient_id}`
     },
+    // Observation tanpa tautan Encounter tetap sah menurut FHIR, tapi
+    // penerimanya kehilangan konteks: hasil ini keluar dari kunjungan
+    // yang mana. Ditautkan bila ID-nya sudah ada.
+    ...(resultData.satusehat_encounter_id
+        ? { encounter: { reference: `Encounter/${resultData.satusehat_encounter_id}` } } : {}),
     effectiveDateTime: resultData.tanggal_hasil || resultData.created_at || new Date().toISOString(),
     valueQuantity: {
       value: nilai,

@@ -37,7 +37,24 @@ const urutan = urutanModul();
 
 const router = fs.readFileSync('js/core/router.js', 'utf8');
 const pageFn = {};
-for (const m of router.matchAll(/case '([a-z0-9-]+)':\s*safeRun\('([a-zA-Z0-9_]+)'/g)) pageFn[m[1]] = m[2];
+let currentCases = [];
+for (const line of router.split('\n')) {
+  const caseMatch = line.match(/case\s+'([a-zA-Z0-9_-]+)':/);
+  if (caseMatch) {
+    currentCases.push(caseMatch[1]);
+  }
+  const runMatch = line.match(/safeRun\('([a-zA-Z0-9_]+)'/);
+  if (runMatch) {
+    const fnName = runMatch[1];
+    for (const c of currentCases) {
+      pageFn[c] = fnName;
+    }
+    currentCases = [];
+  }
+  if (line.includes('break;') || line.includes('return;')) {
+    currentCases = [];
+  }
+}
 
 const defs = {};
 for (const f of urutan) {
