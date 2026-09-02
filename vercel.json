@@ -190,7 +190,7 @@
           "value": "care.avahealth.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -200,7 +200,7 @@
           "value": "care.avahelath.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -210,7 +210,7 @@
           "value": "nutri.avahealth.sbs"
         }
       ],
-      "dest": "/nutri.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -220,7 +220,7 @@
           "value": "nutri.avahelath.sbs"
         }
       ],
-      "dest": "/nutri.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -230,7 +230,7 @@
           "value": "sanctuary.avahealth.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -240,7 +240,7 @@
           "value": "sanctuary.avahelath.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/$",
@@ -633,7 +633,7 @@
           "value": "care.avahealth.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",
@@ -643,7 +643,7 @@
           "value": "care.avahelath.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",
@@ -653,7 +653,7 @@
           "value": "nutri.avahealth.sbs"
         }
       ],
-      "dest": "/nutri.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",
@@ -663,7 +663,7 @@
           "value": "nutri.avahelath.sbs"
         }
       ],
-      "dest": "/nutri.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",
@@ -673,7 +673,7 @@
           "value": "sanctuary.avahealth.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",
@@ -683,7 +683,7 @@
           "value": "sanctuary.avahelath.sbs"
         }
       ],
-      "dest": "/portal.html"
+      "dest": "/index.html"
     },
     {
       "src": "^/(.*)$",

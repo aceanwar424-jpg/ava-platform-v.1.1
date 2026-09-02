@@ -83,58 +83,49 @@ window.PETA_SUBDOMAIN = {
     "awal": "dashboard"
   },
   "care.avahealth.sbs": {
-    "nama": "AVA Care (Personal Care)",
-    "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "care"
+    "nama": "AVA Care (Personal Care & Home Care)",
+    "workspace": "his",
+    "awal": "homecare"
   },
   "care.avahelath.sbs": {
-    "nama": "AVA Care (Personal Care)",
-    "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "care"
+    "nama": "AVA Care (Personal Care & Home Care)",
+    "workspace": "his",
+    "awal": "homecare"
   },
   "care.localhost": {
-    "nama": "AVA Care (Personal Care)",
-    "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "care"
+    "nama": "AVA Care (Personal Care & Home Care)",
+    "workspace": "his",
+    "awal": "homecare"
   },
   "nutri.avahealth.sbs": {
     "nama": "AVA Nutrition (Nutraseutikal & Pabrik)",
     "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "nutri"
+    "awal": "pabrik"
   },
   "nutri.avahelath.sbs": {
     "nama": "AVA Nutrition (Nutraseutikal & Pabrik)",
     "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "nutri"
+    "awal": "pabrik"
   },
   "nutri.localhost": {
     "nama": "AVA Nutrition (Nutraseutikal & Pabrik)",
     "workspace": "wellness",
-    "awal": "ecommerce-oms",
-    "sorot": "nutri"
+    "awal": "pabrik"
   },
   "sanctuary.avahealth.sbs": {
-    "nama": "AVA Sanctuary (Medical Spa)",
+    "nama": "AVA Sanctuary (Medical Spa & Estetika)",
     "workspace": "wellness",
-    "awal": "sanctuary-booking",
-    "sorot": "sanctuary"
+    "awal": "sanctuary-booking"
   },
   "sanctuary.avahelath.sbs": {
-    "nama": "AVA Sanctuary (Medical Spa)",
+    "nama": "AVA Sanctuary (Medical Spa & Estetika)",
     "workspace": "wellness",
-    "awal": "sanctuary-booking",
-    "sorot": "sanctuary"
+    "awal": "sanctuary-booking"
   },
   "sanctuary.localhost": {
-    "nama": "AVA Sanctuary (Medical Spa)",
+    "nama": "AVA Sanctuary (Medical Spa & Estetika)",
     "workspace": "wellness",
-    "awal": "sanctuary-booking",
-    "sorot": "sanctuary"
+    "awal": "sanctuary-booking"
   },
   "tech.avahealth.sbs": {
     "nama": "AVA Tech (Pembangun & Penjual Sistem)",

@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 169 — 🟢 161 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 177 — 🟢 161 ada · 🟡 9 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -438,6 +438,19 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Pengguna & Hak Akses | `settings` › users | RBAC per peran dan per halaman |
 | 🟢 | Impor & Ekspor Data | `import` | Unggah data awal via XLSX/CSV |
 | 🟢 | Registri Keluarga | `family` | Relasi antar pasien satu keluarga |
+
+**Master Konfigurasi HIS**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Fasilitas, Cabang & Unit | `config` › cfg-facility | Cabang, lokasi, unit, ruang, kelas layanan, dan alat |
+| 🟡 | Praktisi, Jadwal & Fee | `config` › cfg-practitioner | Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan |
+| 🟡 | Pasien, Penjamin & Keluarga | `config` › cfg-patient | Identitas pasien, asuransi, alergi, kondisi, dan relasi |
+| 🟡 | Korporat & Kontrak | `config` › cfg-corporate | Perusahaan, kontrak, jabatan, dan penjamin layanan |
+| 🟡 | Parameter MCU | `config` › cfg-mcu | Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus |
+| 🟡 | Bank, EDC & Pembayaran | `config` › cfg-payment | Metode bayar, bank, EDC, dan mapping akun |
+| 🟡 | Flow, Display & Perangkat Antrean | `config` › cfg-queue | Flow layanan, outlet, ruang, display, kiosk, dan device |
+| 🟡 | Master Obat & Aturan Pakai | `config` › cfg-medicine | Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi |
 
 ---
 

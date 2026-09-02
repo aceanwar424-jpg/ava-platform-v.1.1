@@ -1259,6 +1259,75 @@ window.PETA_MENU = {
               "ket": "Relasi antar pasien satu keluarga"
             }
           ]
+        },
+        {
+          "nama": "Master Konfigurasi HIS",
+          "menu": [
+            {
+              "id": "cfg-facility",
+              "label": "Fasilitas, Cabang & Unit",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Cabang, lokasi, unit, ruang, kelas layanan, dan alat"
+            },
+            {
+              "id": "cfg-practitioner",
+              "label": "Praktisi, Jadwal & Fee",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan"
+            },
+            {
+              "id": "cfg-patient",
+              "label": "Pasien, Penjamin & Keluarga",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Identitas pasien, asuransi, alergi, kondisi, dan relasi"
+            },
+            {
+              "id": "cfg-corporate",
+              "label": "Korporat & Kontrak",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Perusahaan, kontrak, jabatan, dan penjamin layanan"
+            },
+            {
+              "id": "cfg-mcu",
+              "label": "Parameter MCU",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus"
+            },
+            {
+              "id": "cfg-payment",
+              "label": "Bank, EDC & Pembayaran",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Metode bayar, bank, EDC, dan mapping akun"
+            },
+            {
+              "id": "cfg-queue",
+              "label": "Flow, Display & Perangkat Antrean",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Flow layanan, outlet, ruang, display, kiosk, dan device"
+            },
+            {
+              "id": "cfg-medicine",
+              "label": "Master Obat & Aturan Pakai",
+              "status": "parsial",
+              "rute": "config",
+              "aksi": "navigate('config')",
+              "ket": "Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi"
+            }
+          ]
         }
       ],
       "pendek": "Pengaturan"

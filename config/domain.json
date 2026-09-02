@@ -136,22 +136,24 @@
     },
     {
       "kunci": "care",
-      "nama": "AVA Care (Personal Care)",
+      "nama": "AVA Care (Personal Care & Home Care)",
       "host": [
         "care.avahealth.sbs",
         "care.avahelath.sbs"
       ],
       "lokal": "care",
-      "masuk": "/portal.html",
+      "masuk": "/index.html",
       "basis": "",
-      "keterangan": "Showcase produk D2C intimate care organik & konsultasi personal.",
+      "keterangan": "Aplikasi operasional AVA Care: order home care, mobile nakes dispatcher, flebotomi & EMR.",
       "berkas": [
-        "portal.html"
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
       ],
       "bersama": [],
-      "workspace": "wellness",
-      "awal": "ecommerce-oms",
-      "sorot": "care"
+      "workspace": "his",
+      "awal": "homecare"
     },
     {
       "kunci": "nutri",
@@ -161,35 +163,39 @@
         "nutri.avahelath.sbs"
       ],
       "lokal": "nutri",
-      "masuk": "/nutri.html",
+      "masuk": "/index.html",
       "basis": "",
-      "keterangan": "Katalog nutraseutikal, formulasi R&D & kemitraan maklon B2B.",
+      "keterangan": "Aplikasi operasional pabrik nutraseutikal: formulasi R&D, work order manufaktur, batch QA & OMS D2C.",
       "berkas": [
-        "nutri.html"
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
       ],
       "bersama": [],
       "workspace": "wellness",
-      "awal": "ecommerce-oms",
-      "sorot": "nutri"
+      "awal": "pabrik"
     },
     {
       "kunci": "sanctuary",
-      "nama": "AVA Sanctuary (Medical Spa)",
+      "nama": "AVA Sanctuary (Medical Spa & Estetika)",
       "host": [
         "sanctuary.avahealth.sbs",
         "sanctuary.avahelath.sbs"
       ],
       "lokal": "sanctuary",
-      "masuk": "/portal.html",
+      "masuk": "/index.html",
       "basis": "",
-      "keterangan": "Reservasi Empress Ratus, Pelvic Reformer & VIP membership.",
+      "keterangan": "Aplikasi operasional klinik estetika & spa: reservasi treatment, okupansi suite, dan saldo member VIP.",
       "berkas": [
-        "portal.html"
+        "index.html",
+        "js/",
+        "modules/",
+        "css/"
       ],
       "bersama": [],
       "workspace": "wellness",
-      "awal": "sanctuary-booking",
-      "sorot": "sanctuary"
+      "awal": "sanctuary-booking"
     },
     {
       "kunci": "tech",
