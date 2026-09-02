@@ -16,6 +16,7 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - [x] Perbaiki wiring atau kegagalan UI yang ditemukan dalam ruang HIS.
 - [x] Jalankan audit menu serta suite HIS yang relevan.
 - [x] Catat bukti hasil dan batas verifikasi.
+- [x] Perbaiki kepadatan dan ketahanan layout sidebar HIS.
 
 ## Implikasi IP & Kepatuhan
 

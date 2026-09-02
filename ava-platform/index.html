@@ -9,7 +9,7 @@
      query pertama. Hanya petunjuk browser — tidak mengubah perilaku apa pun. -->
 <link rel="preconnect" href="https://rmyqzyfvlmjxtatpctks.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://rmyqzyfvlmjxtatpctks.supabase.co">
-<link rel="stylesheet" href="css/style.css?v=20260719s">
+<link rel="stylesheet" href="css/style.css?v=20260902-sidebar">
 <link rel="stylesheet" href="css/dashboard.css?v=20260719s">
 <script defer src="js/core/rbacService.js"></script>
 <script defer src="js/core/mpiService.js"></script>
@@ -904,11 +904,15 @@ function gambarRail(ruang) {
       groupCounter++;
       const groupId = 'acc-grp-' + groupCounter;
       const hasActiveChild = gItems.some(function (it) { return it.page === currentPage; });
-      const isOpen = hasActiveChild || groupCounter === 1;
+      // Jangan membuka grup pertama hanya karena ia berada di urutan awal.
+      // Setelah halaman aktif tersinkron, hanya grup yang benar-benar
+      // memuat halaman tersebut yang terbuka; rail jadi ringkas dan tidak
+      // menampilkan panel kosong saat hak akses pengguna terbatas.
+      const isOpen = hasActiveChild;
       const gIco = GROUP_ICONS[gName] || (typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁');
 
       html += '<div class="sidebar-accordion-group' + (isOpen ? ' open' : '') + '" id="' + groupId + '">';
-      html += '  <button class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
+      html += '  <button type="button" class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
       html += '    <div class="sidebar-main-left">';
       html += '      <span class="sidebar-main-ico">' + gIco + '</span>';
       html += '      <span class="sidebar-main-label">' + gName + '</span>';
@@ -924,7 +928,7 @@ function gambarRail(ruang) {
           ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')"
           : it.action;
 
-        html += '    <button class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
+        html += '    <button type="button" class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
                 ' onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">';
         html += '      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + it.label + '</span>';
         if (isSoon) {

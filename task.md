@@ -6,3 +6,4 @@
 - [x] Audit menu tidak menemukan renderer, tabel/view, RPC, handler, atau manifest yang hilang untuk ruang HIS.
 - [x] Suite uji HIS lulus.
 - [x] Bukti dicatat di `walkthrough.md`.
+- [x] Sidebar HIS tidak menyisakan ruang kosong antar accordion dan submenu tidak dapat terkompresi.

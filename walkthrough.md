@@ -19,6 +19,11 @@ migrasi database, perubahan data klinis, atau pemanggilan integrasi eksternal.
   menonaktifkan RLS seluruh tabel. Kontrol isolasi data tetap berada di database;
   panel hanya menyisakan diagnostik skema dan bantuan konfirmasi akun yang harus
   dijalankan melalui prosedur administrasi tercatat.
+- Sidebar HIS diperkuat agar grup accordion dan submenu selalu seukuran
+  kontennya, rail selalu menumpuk dari atas, dan submenu memiliki tinggi
+  minimum. Grup tidak lagi dibuka secara otomatis hanya karena berada di
+  urutan pertama; grup aktif saja yang terbuka setelah navigasi tersinkron.
+  Versi URL stylesheet diperbarui agar browser mengambil aturan sidebar baru.
 
 ## Bukti verifikasi
 
@@ -35,6 +40,9 @@ migrasi database, perubahan data klinis, atau pemanggilan integrasi eksternal.
   CLINIC / Hospital & Clinical System**; tombol baru membuka **Pusat Pengaturan
   & Konfigurasi**, bukan pengaturan LIS, dan panel administrasi hanya
   menampilkan bantuan konfirmasi akun serta diagnostik skema.
+- Verifikasi sidebar HIS setelah perbaikan: grup **Pelayanan Klinis** yang
+  aktif menampilkan seluruh submenu; grup lain tertutup rapat dan rail dapat
+  digulir tanpa ruang kosong besar.
 
 ## Batas verifikasi
 
