@@ -275,28 +275,6 @@ function removeLisSelectedTest(productId) {
   renderLisAdmissionTestCatalog();
 }
 
-function updateLisSelectedSummary() {
-  const tagsEl = document.getElementById('adm-selected-tests-tags');
-  const countBadge = document.getElementById('adm-selected-count-badge');
-  const priceEl = document.getElementById('adm-total-price');
-  const tubeEl = document.getElementById('adm-tube-reqs');
-
-  if (!tagsEl) return;
-
-  if (!_lisOrderSelectedTests.length) {
-    tagsEl.innerHTML = `<span style="color:var(--text3); font-size:12.5px;">Belum ada pemeriksaan yang dipilih. Silakan centang tes di atas.</span>`;
-    if (countBadge) countBadge.textContent = '0 Tes Terpilih';
-    if (priceEl) priceEl.textContent = 'Rp 0';
-    if (tubeEl) tubeEl.innerHTML = '<b>Kebutuhan Tabung:</b> <span>-</span>';
-    return;
-  }
-
-  if (countBadge) countBadge.textContent = `${_lisOrderSelectedTests.length} Tes Terpilih`;
-
-  let totalPrice = 0;
-  const tubeTypes = new Set();
-
-  tagsEl.innerHTML = _lisOrderSelectedTests.map(t => {
 function getRequiredTubesForTests(tests = []) {
   const tubes = {};
   tests.forEach(t => {

@@ -13,7 +13,7 @@ async function initAuth(){
   const token = getStoredToken();
   if (token === 'master_ava_token_superadmin_all_access') {
     window.currentUser = {
-      id: 'master-superadmin-ava',
+      id: '00000000-0000-0000-0000-000000000001',
       email: 'admin@avahealth.sbs',
       role: 'super_admin',
       user_metadata: { full_name: 'Master Super Admin', role: 'super_admin' },

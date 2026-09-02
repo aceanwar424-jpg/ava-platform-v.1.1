@@ -30,6 +30,8 @@ release/
 # Basis data operasional PGlite. Isinya data klinik yang sesungguhnya.
 pglite-data/
 .pglite-dev/
+# Data sintetis yang dibuat runner kiosk ↔ display; bukan aset produk.
+data/queue-simulation/
 
 # ── Cadangan & karantina ──────────────────────────────────────────
 *.tar.gz

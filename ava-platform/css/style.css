@@ -297,6 +297,7 @@ body {
   height: 3px;
   background: linear-gradient(90deg, #D4AF37, #10B981, #0891B2);
 }
+.sidebar-scrim { display: none; }
 
 .sidebar-brand-box {
   padding: 16px 16px 14px;
@@ -1509,14 +1510,43 @@ select { cursor: pointer; }
    MOBILE
 ══════════════════════════════════════ */
 @media (max-width: 768px) {
-  .sidebar-rail { width: 56px; }
-  .topbar { left: 56px !important; }
-  .main-content { margin-left: 56px !important; padding: 16px; }
-  .rail-item { width: 40px; height: 40px; font-size: 17px; }
-  .rail-item::after { display: none; }
-  .flyout-panel { left: 56px; width: 80vw; max-width: 260px; }
+  /* Accordion memerlukan lebar label penuh. Pada layar kecil ia menjadi
+     drawer, bukan rail 56px warisan menu ikon lama. */
+  .sidebar-rail {
+    width: min(88vw, 320px);
+    transform: translateX(-102%);
+    transition: transform .22s ease;
+    will-change: transform;
+  }
+  .sidebar-rail.open { transform: translateX(0); }
+  .sidebar-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(2, 12, 27, .48);
+    transition: opacity .22s ease;
+  }
+  .sidebar-scrim.open { opacity: 1; pointer-events: auto; }
+  .topbar { left: 0 !important; padding: 0 12px; gap: 8px; }
+  .topbar-title { max-width: 42vw; }
+  .topbar-breadcrumb { display: none; }
+  .topbar-user { padding: 4px 7px; gap: 6px; }
+  .topbar-user-role { display: none; }
+  .main-content { margin-left: 0 !important; padding: 16px; }
+  .flyout-panel { left: 0; width: 80vw; max-width: 300px; }
   .page-header { flex-direction: column; }
+  .page-header h1 { font-size: 19px; }
   .btn-row { width: 100%; }
+}
+
+/* Fokus keyboard konsisten di seluruh panel operasional. */
+button:focus-visible, a:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, .65);
+  outline-offset: 2px;
 }
 
 /* ══════════════════════════════════════

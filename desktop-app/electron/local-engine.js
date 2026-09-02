@@ -71,6 +71,24 @@ function collectSchemaFiles(repoDir) {
   return files;
 }
 
+async function siapkanAuthUid(pg) {
+  await pg.exec(`CREATE SCHEMA IF NOT EXISTS auth;`);
+  try {
+    await pg.exec(`CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
+      AS $$
+        SELECT CASE
+          WHEN NULLIF(current_setting('request.jwt.claim.sub', true), '') IS NULL THEN NULL
+          WHEN current_setting('request.jwt.claim.sub', true) ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+            THEN current_setting('request.jwt.claim.sub', true)::uuid
+          -- Akun bootstrap lama memakai ID tekstual (mis. master-superadmin-ava).
+          -- Turunkan UUID stabil agar fungsi yang mengikuti kontrak Supabase
+          -- tetap bekerja, tanpa mengubah identitas yang tersimpan.
+          ELSE ('00000000-0000-0000-0000-' || substr(md5(current_setting('request.jwt.claim.sub', true)), 1, 12))::uuid
+        END
+      $$ LANGUAGE sql STABLE;`);
+  } catch (_) {}
+}
+
 async function loadSchema(pg, repoDir, log = () => {}) {
   await pg.exec(`CREATE SCHEMA IF NOT EXISTS auth; CREATE SCHEMA IF NOT EXISTS storage;`);
   for (const r of ['anon', 'authenticated', 'service_role']) { try { await pg.exec(`CREATE ROLE ${r};`); } catch (_) {} }
@@ -88,11 +106,7 @@ async function loadSchema(pg, repoDir, log = () => {}) {
   // Nilainya diisi per permintaan lewat SET LOCAL di dalam transaksi —
   // lihat jalankanDenganIdentitas(). STABLE, bukan IMMUTABLE: nilainya
   // berubah antar transaksi.
-  try {
-    await pg.exec(`CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid
-      AS $$ SELECT NULLIF(current_setting('request.jwt.claim.sub', true), '')::uuid $$
-      LANGUAGE sql STABLE;`);
-  } catch (_) {}
+  await siapkanAuthUid(pg);
   try { await pg.exec(`CREATE FUNCTION auth.role() RETURNS text AS $$ SELECT 'authenticated'::text $$ LANGUAGE sql;`); } catch (_) {}
 
   await siapkanTabelAva(pg, log);
@@ -1066,6 +1080,7 @@ const AUTH_ACCESS_TTL  = 12 * 60 * 60;        // 12 jam
 const AUTH_REFRESH_TTL = 30 * 24 * 60 * 60;   // 30 hari
 const AUTH_MAX_GAGAL   = 5;                   // percobaan sebelum dikunci
 const AUTH_KUNCI_MENIT = 15;
+const BOOTSTRAP_ADMIN_ID = '00000000-0000-0000-0000-000000000001';
 
 function authSecret(dataDir) {
   // Rahasia per-instalasi. Disimpan di folder data, bukan di kode.
@@ -1197,7 +1212,7 @@ async function bootstrapAdmin(pg, dataDir, log) {
     try {
       const ada = await pg.query(`SELECT id FROM public.local_auth_users WHERE lower(email)='admin@avahealth.sbs'`);
       if (!ada.rows[0]) {
-        const id = 'master-superadmin-ava';
+        const id = BOOTSTRAP_ADMIN_ID;
         const salt = 'avasalt12345678';
         await pg.query(`INSERT INTO public.local_auth_users (id, email, password_hash, password_salt) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING`,
           [id, 'admin@avahealth.sbs', hashPassword('12345678', salt), salt]);
@@ -1208,7 +1223,7 @@ async function bootstrapAdmin(pg, dataDir, log) {
     return;
   }
 
-  const id = 'master-superadmin-ava';
+  const id = BOOTSTRAP_ADMIN_ID;
   const email = 'admin@avahealth.sbs';
   const password = '12345678';
   const salt = 'avasalt12345678';
@@ -1252,6 +1267,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
   DIR_DATA_ENGINE = dataDir || '';            // jangkar pencarian .env (lihat muatKunciLLM)
   const { PGlite } = await import('@electric-sql/pglite');   // ESM dari CJS
   const pg = dataDir ? await PGlite.create({ dataDir }) : await new PGlite();
+  await siapkanAuthUid(pg); // juga memperbaiki instalasi lokal yang sudah ada
 
   const needInit = (await pg.query(`SELECT count(*)::int c FROM pg_tables WHERE schemaname='public'`)).rows[0].c < 5;
   if (needInit) {
@@ -1281,6 +1297,63 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
   await siapkanTabelAuth(pg);          // jaring pengaman (lihat 0001_auth_lokal.sql)
   await siapkanTabelAva(pg, log);      // jaring pengaman (lihat 0002_ava_health.sql)
   await bootstrapAdmin(pg, dataDir, log);
+
+  // Kiosk fisik tidak mempunyai sesi staf, tetapi hanya boleh menerbitkan
+  // nomor tanpa nama pasien untuk daftar layanan tertutup. Endpoint ini
+  // sengaja terpisah dari /rest/v1: publik tidak pernah mendapat hak baca
+  // atau tulis langsung ke queue_tickets.
+  const KIOSK_LAYANAN = new Set(['Umum', 'Laboratorium', 'MCU', 'Sanctuary', 'Spesialis', 'Farmasi']);
+  const kioskJejak = new Map();
+  const bolehTerbitKiosk = (ip, layanan) => {
+    const kunci = `${ip}|${layanan}`;
+    const kini = Date.now();
+    const lalu = kioskJejak.get(kunci) || 0;
+    if (kini - lalu < 2500) return false; // cegah sentuhan ganda / spam kasar
+    kioskJejak.set(kunci, kini);
+    return true;
+  };
+
+  async function antreanPublik(jalur, metode, bodyText, ip) {
+    if (jalur === 'display' && metode === 'GET') {
+      const aktif = await pg.query(`
+        SELECT queue_number, service_type, counter, status, called_at, updated_at
+        FROM public.queue_tickets
+        WHERE queue_date=current_date AND status IN ('Dipanggil','Dilayani')
+        ORDER BY COALESCE(called_at, updated_at) DESC, id DESC LIMIT 8`);
+      const menunggu = await pg.query(`
+        SELECT service_type, count(*)::int AS total
+        FROM public.queue_tickets
+        WHERE queue_date=current_date AND status='Menunggu'
+        GROUP BY service_type ORDER BY service_type`);
+      return { calls: aktif.rows, waiting: menunggu.rows };
+    }
+
+    if (jalur !== 'issue' || metode !== 'POST') throw new Error('Jalur antrean tidak dikenal');
+    let badan = {};
+    try { badan = JSON.parse(bodyText || '{}'); } catch (_) {}
+    const layanan = String(badan.service || '').trim();
+    if (!KIOSK_LAYANAN.has(layanan)) throw new Error('Layanan kiosk tidak diizinkan');
+    if (!bolehTerbitKiosk(ip, layanan)) throw new Error('Tunggu sebentar sebelum mengambil nomor lagi');
+
+    return pg.transaction(async (tx) => {
+      // Nomor dihitung dan ditulis dalam satu transaksi. Ini setara tujuan
+      // advisory lock di fungsi cloud, tanpa menjadikan endpoint publik
+      // sebagai pintu tulis tabel umum.
+      const urut = await tx.query(`
+        SELECT coalesce(max(seq),0)+1 AS seq FROM public.queue_tickets
+        WHERE queue_date=current_date AND service_type=$1`, [layanan]);
+      const seq = Number(urut.rows[0]?.seq || 1);
+      const prefix = (layanan.replace(/[^A-Za-z]/g, '').slice(0, 1).toUpperCase() || 'A');
+      const nomor = `${prefix}${String(seq).padStart(3, '0')}`;
+      await tx.query(`INSERT INTO public.queue_tickets
+        (queue_date, queue_number, seq, service_type, patient_name, status,
+         issued_via, kiosk_id, updated_at)
+        VALUES (current_date,$1,$2,$3,NULL,'Menunggu','kiosk','kiosk.localhost',now())`, [nomor, seq, layanan]);
+      const depan = await tx.query(`SELECT count(*)::int AS total FROM public.queue_tickets
+        WHERE queue_date=current_date AND service_type=$1 AND status='Menunggu' AND seq<$2`, [layanan, seq]);
+      return { ok: true, queue_number: nomor, seq, ahead: Number(depan.rows[0]?.total || 0) };
+    });
+  }
 
   const server = http.createServer((req, res) => {
     (async () => {
@@ -1321,7 +1394,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
             const hToken = tokenDariHeader(req);
             if (hToken === 'master_ava_token_superadmin_all_access' || (hToken && hToken.startsWith('master_ava_'))) {
               return jsonRes(res, 200, {
-                id: 'master-superadmin-ava', email: 'admin@avahealth.sbs', role: 'authenticated',
+                id: BOOTSTRAP_ADMIN_ID, email: 'admin@avahealth.sbs', role: 'authenticated',
                 app_metadata: { role: 'super_admin' },
                 user_metadata: { full_name: 'Master Super Admin AVA GLOBAL ECOSYSTEM', role: 'super_admin' },
               });
@@ -1400,7 +1473,7 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
             if (String(email).trim().toLowerCase() === 'admin@avahealth.sbs' && password === '12345678') {
               return jsonRes(res, 200, await buatSesi({
-                id: 'master-superadmin-ava',
+                id: BOOTSTRAP_ADMIN_ID,
                 email: 'admin@avahealth.sbs',
                 is_active: true
               }));
@@ -1482,6 +1555,21 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
           if (p.endsWith('/status')) return jsonRes(res, 200, ringkasanKunciLLM());
           const { status, payload } = await tanganiLlmGateway(bodyText, log);
           return jsonRes(res, status, payload);
+        }
+
+        // ── Antrean publik kiosk/display (mode desktop / simulasi lokal) ──
+        // Diletakkan sebelum gerbang /rest/v1 yang wajib login. Hanya dua
+        // operasi yang dibuka: terbitkan tiket anonim dan baca papan tanpa
+        // nama pasien. Tidak ada PATCH/DELETE, dan layanan divalidasi di atas.
+        if (p.startsWith('/functions/v1/queue-public/')) {
+          const jalur = p.replace('/functions/v1/queue-public/', '');
+          try {
+            const hasil = await antreanPublik(jalur, req.method, bodyText, req.socket.remoteAddress || 'x');
+            return jsonRes(res, 200, hasil);
+          } catch (e) {
+            const pesan = String(e && e.message || e);
+            return jsonRes(res, /tunggu sebentar/i.test(pesan) ? 429 : 400, { error: pesan });
+          }
         }
 
         // ── PORTAL KORPORAT: PENGELOLAAN ROSTER KARYAWAN ────────────────────

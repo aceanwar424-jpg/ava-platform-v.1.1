@@ -8,8 +8,9 @@
 // Deteksi berbasis hostname; TIDAK mengubah perilaku deployment cloud.
 const SUPABASE_CLOUD_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
 const _isLocalEngine = (typeof location !== 'undefined') &&
-  (location.hostname === '127.0.0.1' || location.hostname === 'localhost');
-const LOCAL_ENGINE_URL = (typeof location !== 'undefined') ? `http://${location.hostname}:54329` : '';
+  (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ||
+   location.hostname.endsWith('.localhost'));
+const LOCAL_ENGINE_URL = _isLocalEngine ? 'http://127.0.0.1:54329' : '';
 const SUPABASE_URL = _isLocalEngine ? LOCAL_ENGINE_URL : SUPABASE_CLOUD_URL;
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
 

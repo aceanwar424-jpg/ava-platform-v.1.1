@@ -52,6 +52,7 @@
   </div>
   <div id="conn-label" style="display:none"></div>
 </aside>
+<div class="sidebar-scrim" id="sidebar-scrim" aria-hidden="true" onclick="setSidebarOpen(false)"></div>
 
 <!-- ═══ TOPBAR — BERSIH, MINIMAL & ELEGAN ═══ -->
 <div class="topbar" id="topbar">
@@ -206,10 +207,20 @@
 <script defer src="modules/system/settings_users.js?v=20260719s"></script>
 
 <script>
-// ── Sidebar rail — always 64px, flyout handles submenu ──
+// ── Sidebar drawer — satu pintu untuk desktop/mobile ───────────────────────
+function setSidebarOpen(isOpen) {
+  const rail = document.getElementById('sidebar-rail');
+  const scrim = document.getElementById('sidebar-scrim');
+  if (!rail) return;
+  rail.classList.toggle('open', !!isOpen);
+  scrim?.classList.toggle('open', !!isOpen);
+  scrim?.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+}
+window.setSidebarOpen = setSidebarOpen;
+
 function toggleSidebar() {
-  // Mobile: toggle rail visibility (kept for compat with hamburger button)
-  document.getElementById('sidebar-rail')?.classList.toggle('open');
+  const rail = document.getElementById('sidebar-rail');
+  setSidebarOpen(!rail?.classList.contains('open'));
 }
 
 // ── Date display ─────────────────────────
@@ -1049,7 +1060,7 @@ function openCategory(cat) {
   const titleEl = document.getElementById('topbar-title');
   if (titleEl) titleEl.textContent = menu.label;
 
-  if (window.innerWidth < 768) document.getElementById('sidebar-rail')?.classList.remove('open');
+  if (window.innerWidth < 768) setSidebarOpen(false);
 
   const items = visibleCategoryItems(cat);
   renderSubnav(cat, null);

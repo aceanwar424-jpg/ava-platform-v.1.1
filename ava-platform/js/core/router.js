@@ -163,7 +163,8 @@ async function navigate(page, params={}) {
   if (titleEl) titleEl.textContent = PAGE_TITLES[resolvedPage] || resolvedPage;
 
   if (window.innerWidth < 768) {
-    document.getElementById('sidebar-rail')?.classList.remove('open');
+    if (typeof window.setSidebarOpen === 'function') window.setSidebarOpen(false);
+    else document.getElementById('sidebar-rail')?.classList.remove('open');
     if (typeof closeFlyout === 'function') closeFlyout();
   }
 
@@ -300,6 +301,13 @@ async function navigate(page, params={}) {
     case 'laboratorium':
     case 'lab':         safeRun('renderLab', params.tab || 'checkin'); break;
     case 'worklist':    safeRun('renderLab', 'worklist'); break;
+    // Menu LIS granular memakai shell yang sama dengan tab operasionalnya.
+    // Tanpa mapping ini, menu terlihat aktif tetapi jatuh ke halaman kosong.
+    case 'lab-result':     safeRun('renderLab', 'result');     break;
+    case 'lab-validation': safeRun('renderLab', 'validation'); break;
+    case 'lab-approval':   safeRun('renderLab', 'approval');   break;
+    case 'lab-qc':         safeRun('renderLab', 'qc');         break;
+    case 'lab-report':     safeRun('renderLab', 'report');     break;
     case 'validasi':    safeRun('renderLab', 'validation'); break;
     case 'product':     safeRun('renderConfigProduct');          break;
     case 'config':      safeRun('renderSettings', 'masterdata');   break;
@@ -434,7 +442,12 @@ function renderRouterError(page, msg) {
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar-rail')?.classList.toggle('open');
+  if (typeof window.setSidebarOpen === 'function') {
+    const rail = document.getElementById('sidebar-rail');
+    window.setSidebarOpen(!rail?.classList.contains('open'));
+  } else {
+    document.getElementById('sidebar-rail')?.classList.toggle('open');
+  }
 }
 
 window.navigate = navigate;

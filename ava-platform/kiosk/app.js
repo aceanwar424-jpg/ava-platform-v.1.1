@@ -22,20 +22,10 @@ function updateClock() {
   dateEl.textContent = now.toLocaleDateString('id-ID', options);
 }
 
-// Queue Counter (Local Storage state just for mockup demo)
-function getNextQueueNumber(type) {
-  const key = `kiosk_queue_${type.toLowerCase()}`;
-  let current = parseInt(localStorage.getItem(key)) || 0;
-  current += 1;
-  localStorage.setItem(key, current);
-  return current;
-}
-
 // Print queue action
-function ambilAntrian(layanan) {
+async function ambilAntrian(layanan) {
   const overlay = document.getElementById('print-modal');
   const preview = document.getElementById('ticket-preview');
-  
   if (!overlay || !preview) return;
 
   // Generate Prefix and Ticket number
@@ -48,9 +38,27 @@ function ambilAntrian(layanan) {
     'Farmasi': { prefix: 'F', desc: 'Farmasi & Pelunasan Kasir', wait: 4 }
   };
 
-  const cfg = SERVICE_CONFIG[layanan] || { prefix: 'A', desc: 'Layanan Umum', wait: 2 };
-  const num = getNextQueueNumber(layanan);
-  const formattedNum = `${cfg.prefix}-${String(num).padStart(3, '0')}`;
+  const cfg = SERVICE_CONFIG[layanan] || { prefix: 'A', desc: 'Layanan Umum' };
+  const tombol = Array.from(document.querySelectorAll('.kiosk-card'));
+  const status = document.getElementById('queue-status');
+  tombol.forEach(x => { x.disabled = true; });
+  if (status) status.textContent = 'Menerbitkan nomor antrean…';
+
+  let tiket;
+  try {
+    if (!window.AVA_QUEUE_PUBLIC) throw new Error('Modul antrean belum termuat');
+    tiket = await window.AVA_QUEUE_PUBLIC.issue(layanan);
+  } catch (e) {
+    const pesan = `Nomor belum diterbitkan: ${e.message || 'layanan antrean tidak tersedia'}`;
+    if (status) status.textContent = pesan;
+    alert(pesan);
+    return;
+  } finally {
+    tombol.forEach(x => { x.disabled = false; });
+  }
+
+  const formattedNum = tiket.queue_number;
+  const ahead = Number.isFinite(Number(tiket.ahead)) ? Number(tiket.ahead) : 0;
   
   const now = new Date();
   const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
@@ -61,7 +69,7 @@ function ambilAntrian(layanan) {
     <div class="ticket-header" style="font-weight:800; color:#0A2342; font-size:15px; letter-spacing:0.5px;">PT AVA HEALTH SOLUTION</div>
     <div class="ticket-type" style="font-size:12px; font-weight:700; color:#0E7C86; margin:8px 0;">${cfg.desc.toUpperCase()}</div>
     <div class="ticket-number" style="font-size:52px; font-weight:900; color:#0A2342; line-height:1; margin:14px 0; letter-spacing:-1px;">${formattedNum}</div>
-    <div style="font-size: 13px; color: #475569; margin-bottom: 6px;">Sisa antrian di depan Anda: <strong>${cfg.wait} orang</strong></div>
+    <div style="font-size: 13px; color: #475569; margin-bottom: 6px;">Sisa antrian di depan Anda: <strong>${ahead} orang</strong></div>
     <div style="font-size: 12px; color: #64748B; margin-bottom: 10px;">Silakan perhatikan layar monitor antrian di ruang tunggu</div>
     <div class="ticket-date" style="font-size:11px; color:#94A3B8; border-top:1.5px dashed #CBD5E1; padding-top:8px;">${dateStr} &bull; ${timeStr} WIB</div>
   `;
@@ -83,7 +91,7 @@ function ambilAntrian(layanan) {
         faskesName: 'PT AVA HEALTH SOLUTION',
         queueNumber: formattedNum,
         serviceName: cfg.desc.toUpperCase(),
-        waitCount: cfg.wait
+        waitCount: ahead
       });
       ESCPOS_PRINTER.printDirect(rawTicket, 'kiosk_queue');
     } catch(e){}
@@ -91,6 +99,10 @@ function ambilAntrian(layanan) {
 
   // Open Modal
   overlay.classList.add('open');
+  if (status) {
+    const mode = window.AVA_QUEUE_PUBLIC?.mode === 'simulasi-lokal' ? 'Mode simulasi lokal aktif' : 'Terhubung ke antrean layanan';
+    status.textContent = `${mode} · Nomor ${formattedNum} berhasil diterbitkan.`;
+  }
 
   // Auto close modal after 5 seconds
   setTimeout(() => {
@@ -109,4 +121,10 @@ function closeModal() {
 document.addEventListener('DOMContentLoaded', () => {
   updateClock();
   setInterval(updateClock, 1000);
+  const status = document.getElementById('queue-status');
+  if (status) {
+    status.textContent = window.AVA_QUEUE_PUBLIC?.mode === 'simulasi-lokal'
+      ? 'Mode simulasi lokal · tiket akan muncul pada antrian.localhost.'
+      : 'Kiosk terhubung ke antrean layanan.';
+  }
 });

@@ -186,9 +186,9 @@
   <main>
     <div class="main-call-box">
       <div class="call-badge">SEDANG DILAYANI / DIPANGGIL</div>
-      <div class="active-number" id="call-number">A-014</div>
-      <div class="target-destination" id="call-dest">POLIKLINIK OBGYN & HORMON</div>
-      <div class="call-meta" id="call-meta">Ruang Konsultasi 01 — dr. Siti Rahma, Sp.OG</div>
+      <div class="active-number" id="call-number">—</div>
+      <div class="target-destination" id="call-dest">MENUNGGU PANGGILAN</div>
+      <div class="call-meta" id="call-meta">Kiosk dan konsol loket memakai antrean yang sama</div>
     </div>
 
     <div class="grid-counters">
@@ -197,8 +197,8 @@
           <span class="counter-title">Poli Umum & Spesialis</span>
           <span style="color:var(--teal)">Loket 1</span>
         </div>
-        <div class="counter-num" id="cnt-1">A-014</div>
-        <div class="counter-footer">Pasien: Ny. Siska M.</div>
+        <div class="counter-num" id="cnt-1">—</div>
+        <div class="counter-footer" id="wait-1">Menunggu data antrean</div>
       </div>
 
       <div class="counter-card">
@@ -206,8 +206,8 @@
           <span class="counter-title">Laboratorium Diagnostik</span>
           <span style="color:var(--teal)">Loket 2</span>
         </div>
-        <div class="counter-num" id="cnt-2">B-008</div>
-        <div class="counter-footer">Sampling & Darah Lengkap</div>
+        <div class="counter-num" id="cnt-2">—</div>
+        <div class="counter-footer" id="wait-2">Menunggu data antrean</div>
       </div>
 
       <div class="counter-card">
@@ -215,27 +215,20 @@
           <span class="counter-title">Instalasi Farmasi</span>
           <span style="color:var(--teal)">Loket 3</span>
         </div>
-        <div class="counter-num" id="cnt-3">C-021</div>
-        <div class="counter-footer">Penyerahan Obat & Edukasi</div>
+        <div class="counter-num" id="cnt-3">—</div>
+        <div class="counter-footer" id="wait-3">Menunggu data antrean</div>
       </div>
 
       <div class="counter-card">
         <div class="counter-header">
-          <span class="counter-title">Kasir & Pembayaran</span>
-          <span style="color:var(--teal)">Loket 4</span>
+          <span class="counter-title">Medical Check Up</span>
+          <span style="color:var(--teal)">Layanan MCU</span>
         </div>
-        <div class="counter-num" id="cnt-4">K-035</div>
-        <div class="counter-footer">Billing & Validasi Asuransi</div>
+        <div class="counter-num" id="cnt-4">—</div>
+        <div class="counter-footer" id="wait-4">Menunggu data antrean</div>
       </div>
     </div>
   </main>
-
-  <div class="test-controls">
-    <span style="font-size:12px;color:#aaa;align-self:center">Simulasi Panggilan:</span>
-    <button class="btn-test" onclick="panggilAntrian('A-015', 'Poliklinik Obgyn', 'Ruang 01')">Panggil Poli</button>
-    <button class="btn-test" onclick="panggilAntrian('B-009', 'Laboratorium Diagnostik', 'Sampling Room')">Panggil Lab</button>
-    <button class="btn-test" onclick="panggilAntrian('C-022', 'Instalasi Farmasi', 'Loket 3')">Panggil Farmasi</button>
-  </div>
 
   <footer>
     <div class="marquee-label">INFO SEHAT</div>
@@ -244,6 +237,7 @@
     </div>
   </footer>
 
+  <script src="../kiosk/queue-api.js?v=20260902"></script>
   <script>
     function updateClock() {
       const now = new Date();
@@ -264,14 +258,47 @@
       }
     }
 
-    function panggilAntrian(nomor, tujuan, ruang) {
+    let panggilanTerakhir = '';
+    const LAYANAN = ['Umum', 'Laboratorium', 'Farmasi', 'MCU'];
+
+    function panggilAntrian(nomor, tujuan, ruang, bersuara = true) {
       document.getElementById('call-number').textContent = nomor;
       document.getElementById('call-dest').textContent = tujuan.toUpperCase();
       document.getElementById('call-meta').textContent = `${ruang} — Silakan Menuju Loket`;
       
       const audioText = `Nomor antrian, ${nomor.replace('-', ' ')}, silakan menuju ke ${tujuan}`;
-      panggilSuara(audioText);
+      if (bersuara) panggilSuara(audioText);
     }
+
+    function gambarPapan(data) {
+      const calls = Array.isArray(data.calls) ? data.calls : [];
+      const waiting = new Map((data.waiting || []).map(x => [x.service_type, Number(x.total || 0)]));
+      const utama = calls[0];
+      if (utama) {
+        const kunci = `${utama.queue_number}|${utama.called_at || utama.updated_at || ''}`;
+        panggilAntrian(utama.queue_number, utama.service_type, utama.counter || 'Loket layanan', kunci !== panggilanTerakhir);
+        panggilanTerakhir = kunci;
+      }
+      LAYANAN.forEach((layanan, i) => {
+        const call = calls.find(x => x.service_type === layanan);
+        const slot = i + 1;
+        document.getElementById(`cnt-${slot}`).textContent = call?.queue_number || '—';
+        document.getElementById(`wait-${slot}`).textContent = `${waiting.get(layanan) || 0} menunggu`;
+      });
+    }
+
+    async function segarkanPapan() {
+      try {
+        if (!window.AVA_QUEUE_PUBLIC) throw new Error('Modul antrean belum termuat');
+        gambarPapan(await window.AVA_QUEUE_PUBLIC.display());
+        document.getElementById('call-meta').textContent = 'Kiosk dan konsol loket memakai antrean yang sama';
+      } catch (e) {
+        document.getElementById('call-meta').textContent = 'Koneksi antrean belum tersedia — ' + (e.message || 'coba lagi');
+      }
+    }
+
+    segarkanPapan();
+    setInterval(segarkanPapan, 4000);
   </script>
 </body>
 </html>
