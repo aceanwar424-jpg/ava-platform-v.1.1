@@ -6,13 +6,13 @@ const app = path.join(root, 'ava-platform');
 const errors = [];
 const read = file => fs.readFileSync(path.join(app, file), 'utf8');
 let vercel;
-try { vercel = JSON.parse(read('vercel.json')); }
+try { vercel = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8')); }
 catch (error) { errors.push(`vercel.json tidak valid: ${error.message}`); }
 for (const host of ['kiosk.avahealth.sbs', 'apps.avahealth.sbs', 'antrian.avahealth.sbs']) {
-  const hit = (vercel?.redirects || []).some(rule => (rule.has || []).some(x => x.type === 'host' && x.value === host));
-  if (!hit) errors.push(`Redirect host ${host} belum didefinisikan.`);
+  const hit = (vercel?.routes || []).some(rule => (rule.has || []).some(x => x.type === 'host' && x.value === host));
+  if (!hit) errors.push(`Route host ${host} belum didefinisikan pada konfigurasi root.`);
 }
-if (!fs.existsSync(path.join(app, 'api', 'runtime-config.js'))) errors.push('Endpoint runtime-config.js tidak ditemukan.');
+if (!fs.existsSync(path.join(root, 'api', 'runtime-config.js'))) errors.push('Endpoint runtime-config.js tidak ditemukan di root Vercel.');
 for (const file of ['index.html', 'kiosk/index.html', 'monitor/antrian.html']) {
   if (!read(file).includes('/api/runtime-config.js')) errors.push(`${file} belum memuat runtime config.`);
 }

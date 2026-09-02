@@ -56,7 +56,9 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 3. [x] Tambahkan pemeriksaan statis readiness deploy agar host dan runtime config tidak kembali terlewat.
 4. [x] Siapkan migrasi antrean tenant-aware: tenant pada konfigurasi, loket, tiket, log, tampilan publik, dan RPC.
 5. [x] Terapkan di kode proteksi endpoint publik yang tahan multi-instance: device registry, rate limit tersimpan, dan origin allowlist.
+5a. [x] Siapkan preflight read-only dan runbook rollback untuk penerapan staging migrasi 0048.
 6. [ ] Konsolidasikan SQL arsip menjadi migrasi formal berurutan, lengkap dengan preflight serta rollback operasional.
+6a. [x] Tambahkan katalog dan audit otomatis agar referensi SQL arsip tidak hilang atau tidak terdokumentasi.
 7. [~] Perluas Configuration Hub untuk master fasilitas, tenaga kesehatan, antrean, korporat, dan integrasi; master pembayaran/MCU masih perlu layar data khusus.
 8. [ ] Tambahkan test regresi RBAC dan alur kiosk → loket → display menggunakan database sementara.
 9. [ ] Aktifkan integrasi eksternal hanya melalui staging dan UAT pemilik proses per vendor.

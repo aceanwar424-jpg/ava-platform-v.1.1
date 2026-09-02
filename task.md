@@ -29,6 +29,8 @@
 - [x] Pemeriksaan statis readiness deploy ditambahkan.
 - [x] Migrasi antrean multi-tenant dan proteksi perangkat publik disiapkan; belum diterapkan ke database mana pun.
 - [x] Pemeriksaan kontrak statis antrean multi-tenant ditambahkan.
+- [x] Preflight read-only dan runbook staging/rollback migrasi 0048 disiapkan.
+- [x] Audit otomatis referensi migrasi legacy dan katalog jalur rilis ditambahkan.
 - [x] Configuration Hub diperluas dengan jalur HIS yang sudah tersedia.
 - [ ] Menunggu checkpoint database untuk penerapan staging dan konsolidasi skema.
 - [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.

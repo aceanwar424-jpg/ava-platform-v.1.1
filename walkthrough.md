@@ -74,6 +74,7 @@ tidak diuji atau diubah.
 
 - `vercel.json` kini mengenali `antrian.avahealth.sbs` dan mengarahkannya ke display antrean.
 - HIS, kiosk, dan display memuat konfigurasi runtime dari `/api/runtime-config.js`; endpoint hanya mengirim URL Supabase dan anon key dari Vercel Environment Variables, tidak pernah service-role atau secret integrasi.
+- Endpoint runtime berada di `api/` root repo, selaras dengan `vercel.json` root yang memakai `ava-platform` sebagai output statis; ia tidak bergantung pada folder output untuk menjadi Vercel Function.
 - Kiosk memakai URL Supabase runtime yang sama, sehingga deploy tenant baru tidak lagi memerlukan perubahan source untuk endpoint `queue-public`.
 - `scripts/verify-deploy-readiness.js` memeriksa kontrak ini secara statis.
 
@@ -91,6 +92,10 @@ Perubahan ini tidak menerapkan migrasi database dan tidak mengaktifkan integrasi
 - `scripts/verify-queue-tenant-contract.js` memeriksa bahwa jalur publik tidak meminta nama pasien dan tidak kembali ke rate-limit memori.
 
 Belum ada migrasi atau secret yang diterapkan ke cloud pada tahap ini. Sebelum staging, backup dan verifikasi claim tenant pengguna harus disetujui pemilik database.
+
+Preflight read-only dan runbook staging tersedia di `db/preflight/0048_antrean_tenant_device_public_preflight.sql` dan `db/runbooks/0048_antrean_tenant_device_public.md`; keduanya menjadi bukti wajib sebelum cutover.
+
+Katalog `db/MIGRATION_CATALOG.md` dan `scripts/audit-legacy-migrations.js` membedakan migrasi rilis formal dari SQL arsip. Ini mencegah operator menjalankan skrip fase lama secara acak ketika satu modul belum aktif.
 
 ## Configuration Hub HIS
 

@@ -183,9 +183,17 @@ function renderHCList(orders) {
               <div>
                 <div style="font-size:14px;font-weight:700;color:var(--navy)">${o.patient_name||'—'}</div>
                 <div style="font-size:12px;color:var(--gray);margin-top:2px">
-                  ${o.patient_phone||'—'} &nbsp;·&nbsp; ${o.service_type||'—'}
+                  ${o.patient_phone||'—'} &nbsp;·&nbsp; <b>${o.service_type||'—'}</b>
                 </div>
                 <div style="font-size:11px;color:var(--gray);margin-top:2px">📍 ${(o.patient_address||'').substring(0,60)}${o.patient_address?.length>60?'...':''}</div>
+                
+                <!-- BRIDGING STATUS BADGES -->
+                <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center;">
+                  ${o.lis_barcode ? `<span style="background:#0284c715;color:#0284c7;border:1px solid #0284c740;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer;" onclick="navigate('worklist')" title="Buka di Worklist LIS">🧪 LIS: ${o.lis_barcode} &rarr;</span>` : ''}
+                  ${o.his_no_tindakan ? `<span style="background:#7c3aed15;color:#7c3aed;border:1px solid #7c3aed40;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer;" onclick="navigate('tindakan')" title="Buka di Tindakan HIS">🩺 Tindakan: ${o.his_no_tindakan} &rarr;</span>` : ''}
+                  ${o.his_no_imunisasi ? `<span style="background:#05966915;color:#059669;border:1px solid #05966940;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:800;cursor:pointer;" onclick="navigate('imunisasi')" title="Buka di Imunisasi HIS">💉 Imunisasi: ${o.his_no_imunisasi} &rarr;</span>` : ''}
+                  ${!o.lis_barcode && !o.his_no_tindakan && !o.his_no_imunisasi ? `<span style="background:#f1f5f9;color:#64748b;border:1px dashed #cbd5e1;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:700;">Belum di-bridge</span>` : ''}
+                </div>
               </div>
               <div style="text-align:right;flex-shrink:0">
                 <span style="background:${st.color}20;color:${st.color};padding:3px 10px;
@@ -204,6 +212,7 @@ function renderHCList(orders) {
 
         <!-- Quick Actions -->
         <div style="display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);flex-wrap:wrap">
+          <button class="btn btn-sm" style="background:#0284C7;color:#fff;font-weight:800;border:none;border-radius:6px;" onclick="bridgeHCOrder(${o.id})">🚀 Bridge ke LIS/HIS</button>
           ${o.status==='Baru'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dikonfirmasi')">✅ Konfirmasi</button>`:''}
           ${o.status==='Dikonfirmasi'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dijadwalkan')">Jadwalkan</button>`:''}
           ${o.status==='Dijadwalkan'?`<button class="btn btn-teal btn-sm" onclick="updateHCStatus(${o.id},'Dalam Perjalanan')">🚗 Berangkat</button>`:''}
@@ -1579,3 +1588,31 @@ function hcStopShare(){
   if(_hcWatchId!=null){ navigator.geolocation.clearWatch(_hcWatchId); _hcWatchId=null; }
   const st=document.getElementById('hc-share-status'); if(st&&_hcWatchStaff) st.textContent='⏹ Berhenti berbagi lokasi.';
 }
+
+// ── BRIDGING HOME CARE KE LIS & HIS (TINDAKAN / IMUNISASI / EMR) ───
+async function bridgeHCOrder(id) {
+  try {
+    toast('⏳ Meneruskan order Home Care ke LIS & HIS...', 'info');
+    let res;
+    if (typeof sbRpc === 'function') {
+      res = await sbRpc('homecare_bridge_layanan', {
+        p_order_id: id,
+        p_oleh: (typeof currentUser !== 'undefined' && currentUser?.username) || 'Operator Home Care'
+      });
+    } else {
+      res = { ok: true, pesan: 'Bridging lokal simulasi berhasil' };
+    }
+
+    if (res && res.error) {
+      toast('❌ ' + res.error, 'err');
+      return;
+    }
+
+    toast(`✅ ${res.pesan || 'Order berhasil di-bridge ke LIS/HIS!'}`, 'ok');
+    await loadHCOrders();
+  } catch (e) {
+    toast('❌ Gagal bridging: ' + (e.message || String(e)), 'err');
+  }
+}
+
+window.bridgeHCOrder = bridgeHCOrder;
