@@ -9,7 +9,7 @@
      query pertama. Hanya petunjuk browser — tidak mengubah perilaku apa pun. -->
 <link rel="preconnect" href="https://rmyqzyfvlmjxtatpctks.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://rmyqzyfvlmjxtatpctks.supabase.co">
-<link rel="stylesheet" href="css/style.css?v=20260902-sidebar-compact">
+<link rel="stylesheet" href="css/style.css?v=20260902-module-picker">
 <link rel="stylesheet" href="css/dashboard.css?v=20260719s">
 <script defer src="js/core/rbacService.js"></script>
 <script defer src="js/core/mpiService.js"></script>
@@ -31,6 +31,14 @@
   </div>
 
   <nav class="rail-nav" id="rail-nav"></nav>
+
+  <div class="sidebar-module-bar">
+    <button class="sidebar-module-btn" type="button" onclick="openModulePicker()"
+      aria-haspopup="dialog" aria-controls="module-picker" title="Semua modul (Ctrl+K)">
+      <span aria-hidden="true">⌘</span><span class="sidebar-module-label">Semua Modul</span>
+      <kbd class="sidebar-module-key">Ctrl K</kbd>
+    </button>
+  </div>
 
   <div class="sidebar-settings-bar">
     <button class="sidebar-settings-btn" id="workspace-settings-btn" onclick="navigate('lis-settings')">
@@ -56,13 +64,38 @@
 </aside>
 <div class="sidebar-scrim" id="sidebar-scrim" aria-hidden="true" onclick="setSidebarOpen(false)"></div>
 
+<!-- Pemilih modul: jalan pintas pencarian, bukan sumber menu kedua. Isi dan
+     hak aksesnya dibangkitkan dari definisi menu yang sama dengan sidebar. -->
+<div class="module-picker-overlay" id="module-picker-overlay" aria-hidden="true" onclick="closeModulePicker(event)">
+  <section class="module-picker" id="module-picker" role="dialog" aria-modal="true" aria-labelledby="module-picker-title">
+    <header class="module-picker-head">
+      <div>
+        <p class="module-picker-eyebrow">NAVIGASI CEPAT</p>
+        <h2 id="module-picker-title">Semua Modul</h2>
+      </div>
+      <button class="module-picker-close" type="button" onclick="closeModulePicker()" aria-label="Tutup pemilih modul">×</button>
+    </header>
+    <label class="module-picker-search" for="module-picker-input">
+      <span aria-hidden="true">⌕</span>
+      <input id="module-picker-input" type="search" autocomplete="off" placeholder="Cari layanan, menu, atau proses…" oninput="filterModulePicker(this.value)">
+      <kbd>Esc</kbd>
+    </label>
+    <div class="module-picker-results" id="module-picker-results" aria-live="polite"></div>
+    <footer class="module-picker-foot"><span>↑↓ untuk menelusuri</span><span>Enter untuk membuka</span></footer>
+  </section>
+</div>
+
 <!-- ═══ TOPBAR — BERSIH, MINIMAL & ELEGAN ═══ -->
 <div class="topbar" id="topbar">
   <button class="hamburger" onclick="toggleSidebar()" style="display:inline-flex; font-size:18px;">☰</button>
   <div class="topbar-breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-    <span style="color:var(--text3);font-weight:700;font-size:12px;">SISTEM</span>
-    <span>/</span>
+    <span class="breadcrumb-root">SISTEM</span>
+    <span class="breadcrumb-separator" aria-hidden="true">/</span>
+    <span class="breadcrumb-domain" id="breadcrumb-domain">Beranda</span>
+    <span class="breadcrumb-service-wrap" id="breadcrumb-service-wrap"><span class="breadcrumb-separator" aria-hidden="true">/</span><span id="breadcrumb-service"></span></span>
+    <span class="breadcrumb-page-wrap" id="breadcrumb-page-wrap"><span class="breadcrumb-separator" aria-hidden="true">/</span>
     <span class="topbar-title" id="topbar-title" style="font-size:13.5px;font-weight:800;color:var(--text)">Dashboard</span>
+    </span>
   </div>
   <div class="topbar-right">
     <div id="topbar-date" style="font-size:12px;color:var(--text3);font-weight:600;padding-right:6px"></div>
@@ -1001,9 +1034,123 @@ function gambarRail(ruang) {
   });
 
   nav.innerHTML = html;
+  // Satu-satunya inventaris yang dipakai pemilih modul. Item dibentuk sesudah
+  // penyaringan role, sehingga pencarian tidak pernah membocorkan menu yang
+  // tidak boleh diakses pengguna ini.
+  window.modulePickerItems = railGroups.flatMap(group => group.services.flatMap(service =>
+    service.items.map(item => ({
+      ...item,
+      domain: group.name,
+      service: service.name || '',
+      groupIcon: group.icon
+    }))
+  ));
   if (window.currentPage) syncFlyoutToPage(window.currentPage);
 }
 window.gambarRail = gambarRail;
+
+function updateBreadcrumb(page) {
+  const domainEl = document.getElementById('breadcrumb-domain');
+  const serviceEl = document.getElementById('breadcrumb-service');
+  const serviceWrap = document.getElementById('breadcrumb-service-wrap');
+  const pageWrap = document.getElementById('breadcrumb-page-wrap');
+  const item = (window.modulePickerItems || []).find(x => x.page === page);
+  if (!item) {
+    if (domainEl) domainEl.textContent = page === 'dashboard' ? 'Beranda' : 'Sistem';
+    if (serviceWrap) serviceWrap.hidden = true;
+    if (pageWrap) pageWrap.hidden = page === 'dashboard';
+    return;
+  }
+  if (domainEl) domainEl.textContent = item.domain;
+  if (serviceEl) serviceEl.textContent = item.service;
+  if (serviceWrap) serviceWrap.hidden = !item.service;
+  if (pageWrap) pageWrap.hidden = false;
+}
+window.updateBreadcrumb = updateBreadcrumb;
+
+function modulePickerMatches(query) {
+  const needle = String(query || '').trim().toLocaleLowerCase('id-ID');
+  const source = window.modulePickerItems || [];
+  if (!needle) return source;
+  return source.filter(item => [item.label, item.desc, item.domain, item.service]
+    .filter(Boolean).join(' ').toLocaleLowerCase('id-ID').includes(needle));
+}
+
+function renderModulePicker(query = '') {
+  const target = document.getElementById('module-picker-results');
+  if (!target) return;
+  const matches = modulePickerMatches(query);
+  if (!matches.length) {
+    target.innerHTML = '<div class="module-picker-empty"><span>⌕</span><strong>Menu tidak ditemukan</strong><p>Coba gunakan nama layanan atau proses yang lebih umum.</p></div>';
+    return;
+  }
+  target.innerHTML = matches.map((item, index) => {
+    const unavailable = item.soon || item.status === 'belum';
+    return '<button type="button" class="module-picker-item' + (unavailable ? ' disabled' : '') + '" data-picker-index="' + index + '"' +
+      (unavailable ? ' disabled' : ' onclick="modulePickerNavigate(\'' + item.page + '\')"') + '>' +
+      '<span class="module-picker-item-icon">' + item.groupIcon + '</span>' +
+      '<span class="module-picker-item-body"><strong>' + item.label + '</strong><small>' + item.domain + (item.service ? ' <b>›</b> ' + item.service : '') + '</small></span>' +
+      (unavailable ? '<span class="module-picker-item-state">segera</span>' : '<span class="module-picker-item-go" aria-hidden="true">›</span>') +
+      '</button>';
+  }).join('');
+}
+window.filterModulePicker = function filterModulePicker(query) { renderModulePicker(query); };
+
+function openModulePicker() {
+  const overlay = document.getElementById('module-picker-overlay');
+  const input = document.getElementById('module-picker-input');
+  if (!overlay || !input) return;
+  renderModulePicker('');
+  input.value = '';
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  setTimeout(() => input.focus(), 0);
+}
+window.openModulePicker = openModulePicker;
+
+function closeModulePicker(event) {
+  if (event && event.target !== event.currentTarget) return;
+  const overlay = document.getElementById('module-picker-overlay');
+  overlay?.classList.remove('open');
+  overlay?.setAttribute('aria-hidden', 'true');
+}
+window.closeModulePicker = closeModulePicker;
+
+function modulePickerNavigate(page) {
+  const item = (window.modulePickerItems || []).find(x => x.page === page);
+  if (!item || item.soon || item.status === 'belum') return;
+  closeModulePicker();
+  // Aksi berasal dari manifest lokal yang sama dengan sidebar, bukan input
+  // pengguna; ini menjaga perilaku rute lama tanpa menduplikasi router.
+  Function(item.action)();
+  setActiveFlyoutItem(page);
+}
+window.modulePickerNavigate = modulePickerNavigate;
+
+document.addEventListener('keydown', (event) => {
+  const overlay = document.getElementById('module-picker-overlay');
+  if (overlay?.classList.contains('open') && ['ArrowDown', 'ArrowUp'].includes(event.key)) {
+    const buttons = [...document.querySelectorAll('.module-picker-item:not(.disabled)')];
+    if (buttons.length) {
+      event.preventDefault();
+      const current = buttons.indexOf(document.activeElement);
+      const next = event.key === 'ArrowDown'
+        ? buttons[(current + 1 + buttons.length) % buttons.length]
+        : buttons[(current - 1 + buttons.length) % buttons.length];
+      next.focus();
+    }
+    return;
+  }
+  if (event.key === 'Escape' && overlay?.classList.contains('open')) {
+    event.preventDefault();
+    closeModulePicker();
+    return;
+  }
+  if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+    event.preventDefault();
+    openModulePicker();
+  }
+});
 
 function toggleSidebarAccordion(groupId) {
   const grp = document.getElementById(groupId);
@@ -1043,6 +1190,7 @@ function setActiveFlyoutItem(page) {
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
   }
+  updateBreadcrumb(page);
 }
 
 // Menyelaraskan menu aktif di sidebar saat berpindah halaman via navigate()
@@ -1062,6 +1210,7 @@ function syncFlyoutToPage(page) {
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
   }
+  updateBreadcrumb(page);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -1123,6 +1272,12 @@ function openCategory(cat) {
 
   const titleEl = document.getElementById('topbar-title');
   if (titleEl) titleEl.textContent = menu.label;
+  const domainEl = document.getElementById('breadcrumb-domain');
+  const serviceWrap = document.getElementById('breadcrumb-service-wrap');
+  const pageWrap = document.getElementById('breadcrumb-page-wrap');
+  if (domainEl) domainEl.textContent = menu.label;
+  if (serviceWrap) serviceWrap.hidden = true;
+  if (pageWrap) pageWrap.hidden = true;
 
   if (window.innerWidth < 768) setSidebarOpen(false);
 

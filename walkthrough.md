@@ -155,3 +155,46 @@ token itu dibersihkan dan pengguna harus masuk lewat Supabase Auth dengan JWT
 valid; sebelumnya token demo tersebut diteruskan ke API dan menghasilkan
 kesalahan `Expected 3 parts in JWT`. Form konfigurasi loket juga menyediakan
 seluruh nama layanan kiosk agar pemetaan loket tidak salah ketik.
+
+## Audit Referensi Navigasi HIS (read-only)
+
+- Audit dilakukan pada 2 September 2026 terhadap menu yang tersedia untuk
+  akun referensi, tanpa membuka formulir transaksi, membuat data, atau
+  menampilkan data pasien.
+- Pola navigasinya adalah rail ikon permanen → pemilih semua modul dengan
+  pencarian → hub modul berbentuk kartu → dropdown aksi. Kelompok tingkat atas
+  yang ditemukan: Configuration, Home, Admission, Services, Outpatient,
+  Finance, Medical Record, Package Service, Remuneration, dan Workforce.
+- Kedalaman yang diverifikasi mencakup Admission (termasuk delapan jenis
+  antrean), layanan penunjang klinis, Outpatient, Finance, dan Configuration.
+  Temuan ini dipakai sebagai referensi pola informasi saja; tidak ada aset,
+  data, atau identitas merek pihak ketiga yang disalin ke HIS AVA.
+
+## Penyempurnaan Discovery Menu HIS
+
+- Rail HIS tetap ringkas dan berkelompok, tetapi sekarang memiliki tombol
+  **Semua Modul** serta shortcut `Ctrl+K`. Panel yang muncul mendukung pencarian
+  nama modul, layanan, domain, maupun deskripsi dan menampilkan jalur lengkap
+  domain → layanan → modul.
+- Inventaris panel dibangun dari menu sidebar setelah filter RBAC diterapkan.
+  Karena itu panel tidak memperlihatkan menu yang tidak diizinkan untuk peran
+  aktif, tidak membuat daftar rute kedua, dan tidak membuka akses data baru.
+- Breadcrumb topbar kini menampilkan konteks domain → layanan → halaman aktif.
+  Tombol arah atas/bawah, Enter, dan Escape didukung di pemilih modul.
+- Verifikasi: sintaks semua skrip inline `index.html` valid; audit menu hidup
+  memeriksa 158 menu dan melaporkan tidak ada renderer, tabel/view, RPC,
+  handler, atau manifest yang hilang; `git diff --check` untuk berkas yang
+  diubah pada pekerjaan ini bersih.
+
+## Audit Referensi Konfigurasi Master (read-only)
+
+- Audit 2 September 2026 memakai akun master yang diberikan pengguna dan hanya
+  membuka hub/dropdown serta satu contoh layar daftar konfigurasi; tidak ada
+  data dibuat, diubah, maupun dihapus.
+- Konfigurasi mempunyai 17 hub: System, SAP, Outpatient, Branch, Patient,
+  Doctor, Corporate, MCU, Finance, Promotion, Health Facility, Branch Queue,
+  Virtu Apps, Workforce, Medicine, Telemedicine, dan Satu Sehat.
+- Pola UI yang tervalidasi pada daftar Queue Counter adalah tab kerja MDI,
+  judul daftar, toolbar Add/Refresh/filter, grid berkolom, dan pagination.
+  Struktur ini menjadi referensi pola CRUD saja; data dan identitas merek
+  pihak ketiga tidak dipindahkan ke HIS AVA.
