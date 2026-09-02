@@ -918,6 +918,7 @@ function gambarRail(ruang) {
 
   const GROUP_ICONS = {
     'Alur Pasien': '🏥', 'Pelayanan Klinis': '🩺',
+    'Fasilitas & Antrean': '🎟️', 'Master Klinis': '🗂️',
     'Administrasi & Kepatuhan': '⚖️', 'Operasional Klinik': '📊',
     'Bisnis & Korporat': '🤝', 'Keuangan & Penagihan': '💳',
     'Administrasi Sistem': '⚙️', 'Pra-Analitik & Sampling': '🩸',
@@ -937,7 +938,28 @@ function gambarRail(ruang) {
 
   // HIS memakai tiga tingkat yang lebih ringkas: domain kerja → layanan → modul.
   // Peta rute asli tidak diubah; ini murni pengelompokan presentasi sidebar.
-  const hisPlacement = (kategori, grup, labelKategori) => {
+  const hisPlacement = (kategori, grup, labelKategori, item = {}) => {
+    // Konfigurasi tidak boleh hanya menjadi satu ember “Pengaturan Sistem”.
+    // Pemetaan ini mengubah penempatan visual berdasarkan fungsi kerja, bukan
+    // hak akses/rute; action asli dari manifest tetap dipakai apa adanya.
+    const masterPlacement = {
+      settings: ['Administrasi Sistem', 'Sistem & Hak Akses'],
+      users: ['Administrasi Sistem', 'Sistem & Hak Akses'],
+      import: ['Administrasi Sistem', 'Data Awal & Migrasi'],
+      family: ['Master Klinis', 'Pasien & Keluarga'],
+      admission: ['Alur Pasien', 'Registrasi & Admisi'],
+      queue: ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
+      'queue-console': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
+      'queue-kiosk': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
+      'queue-config': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
+      appointments: ['Fasilitas & Antrean', 'Jadwal & Kapasitas'],
+      'hc-schedule': ['Fasilitas & Antrean', 'Jadwal & Kapasitas'],
+      'hc-staff': ['Fasilitas & Antrean', 'Tenaga & Penugasan'],
+      satusehat: ['Administrasi & Kepatuhan', 'Integrasi & SATUSEHAT'],
+      'bpjs-claim': ['Administrasi & Kepatuhan', 'Integrasi & Klaim'],
+      'rl-reports': ['Administrasi & Kepatuhan', 'Integrasi & Klaim']
+    };
+    if (masterPlacement[item.page]) return masterPlacement[item.page];
     const peta = {
       his: {
         'Alur Pasien': ['Alur Pasien', 'Pendaftaran, Jadwal & Antrean'],
@@ -991,10 +1013,15 @@ function gambarRail(ruang) {
       (bySourceGroup[sumber] ||= []).push(it);
     });
     Object.entries(bySourceGroup).forEach(([sumber, items]) => {
-      const [domain, layanan] = ruang === 'his'
-        ? hisPlacement(k, sumber, kat.label)
-        : [sumber, null];
-      addService(domain, layanan, items, typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁');
+      const iconKategori = typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁';
+      if (ruang === 'his') {
+        items.forEach((it) => {
+          const [domain, layanan] = hisPlacement(k, sumber, kat.label, it);
+          addService(domain, layanan, [it], iconKategori);
+        });
+        return;
+      }
+      addService(sumber, null, items, iconKategori);
     });
   });
 
@@ -1017,7 +1044,7 @@ function gambarRail(ruang) {
       if (showService) {
         html += '<div class="sidebar-service-group' + (serviceActive ? ' open' : '') + '" id="' + serviceId + '">';
         html += '<button type="button" class="sidebar-service-btn' + (serviceActive ? ' active-service' : '') + '" onclick="toggleSidebarService(\'' + serviceId + '\')">';
-        html += '<span>' + service.name + '</span><span class="sidebar-service-chevron">›</span></button><div class="sidebar-service-items">';
+        html += '<span class="sidebar-service-name">' + service.name + '</span><span class="sidebar-service-count" title="' + service.items.length + ' modul">' + service.items.length + '</span><span class="sidebar-service-chevron">›</span></button><div class="sidebar-service-items">';
       }
       service.items.forEach((it) => {
         const isSoon = it.soon || it.status === 'belum';

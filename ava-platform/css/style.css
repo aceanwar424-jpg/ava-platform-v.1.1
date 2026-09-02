@@ -507,6 +507,9 @@ body.sidebar-expanded .sidebar-expand-control { transform: rotate(180deg); }
 }
 .sidebar-service-btn:hover { background: rgba(255,255,255,.06); color: #fff; }
 .sidebar-service-btn.active-service { color: #FBBF24; }
+.sidebar-service-name { min-width:0; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sidebar-service-count { min-width:16px; padding:1px 5px; border-radius:999px; background:rgba(148,163,184,.13); color:#94A3B8; font:800 8.5px/1.4 system-ui,sans-serif; text-align:center; }
+.sidebar-service-btn.active-service .sidebar-service-count { background:rgba(251,191,36,.16); color:#FCD34D; }
 .sidebar-service-chevron { color: #94A3B8; font-size: 14px; transition: transform .18s ease; }
 .sidebar-service-group.open .sidebar-service-chevron { transform: rotate(90deg); color:#FBBF24; }
 .sidebar-service-items {

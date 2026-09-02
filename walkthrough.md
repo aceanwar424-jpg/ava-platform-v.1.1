@@ -198,3 +198,19 @@ seluruh nama layanan kiosk agar pemetaan loket tidak salah ketik.
   judul daftar, toolbar Add/Refresh/filter, grid berkolom, dan pagination.
   Struktur ini menjadi referensi pola CRUD saja; data dan identitas merek
   pihak ketiga tidak dipindahkan ke HIS AVA.
+
+## Penyempurnaan Struktur Konfigurasi HIS
+
+- Sidebar HIS sekarang menempatkan konfigurasi sebagai domain kerja: **Sistem
+  & Hak Akses**, **Data Awal & Migrasi**, dan **Master Klinis → Pasien &
+  Keluarga**. Ini menggantikan satu ember pengaturan yang sebelumnya berisi
+  semua fungsi sistem.
+- **Fasilitas & Antrean** menjadi domain tersendiri, berisi layanan **Antrean,
+  Loket & Kiosk**, **Jadwal & Kapasitas**, serta **Tenaga & Penugasan**.
+  Modul queue, console, kiosk, konfigurasi antrean, jadwal, dispatch, dan
+  master nakes mempertahankan route/action asalnya.
+- Badge jumlah modul pada setiap layanan memberi konteks kedalaman navigasi
+  tanpa memperlebar rail. Pemetaan hanya dilakukan setelah filter RBAC,
+  sehingga tidak menambahkan atau mengungkap akses baru.
+- Verifikasi pascaperubahan: sintaks inline dan CSS valid; audit 158 menu
+  lulus tanpa renderer, tabel/view, RPC, handler, atau manifest hilang.

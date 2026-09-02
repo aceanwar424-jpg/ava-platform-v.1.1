@@ -32,6 +32,9 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - [x] Tambahkan pemilih seluruh modul HIS yang dapat dicari dari rail ringkas.
 - [x] Tampilkan breadcrumb domain → layanan → modul secara konsisten saat navigasi.
 - [x] Verifikasi akses RBAC, rute lama, responsivitas, dan kualitas skrip setelah penyempurnaan navigasi.
+- [x] Pecah presentasi konfigurasi HIS menjadi domain master yang selaras dengan pola audit master.
+- [x] Tambahkan konteks jumlah modul pada layanan sidebar tanpa mengubah definisi hak akses.
+- [x] Jalankan audit regresi menu setelah pemetaan presentasi HIS diperbarui.
 
 ## Implikasi IP & Kepatuhan
 

@@ -1,10 +1,9 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// MODULE: ORDER ENTRY & ADMISI LABORATORIUM (SYSMEX HCLAB SMART-CLIENT WORKSTATION)
-// Sesuai Spesifikasi Sysmex HCLAB (Hal. 3):
-// - Top Horizontal Demographic & Order Header Table Grid
-// - 5-Column Side-by-Side Multi-Discipline Rapid Matrix (Hematology, Chemistry,
-//   Immunology, Urine & Micro, Packages & Selected Summary)
-// - Rule-Based Smart Tube Auto-Splitting (CLSI GP41-A6) & Thermal Barcode Output
+// MODULE: ORDER ENTRY & ADMISI LABORATORIUM (SYSMEX HCLAB PRO MAX WORKSTATION)
+// Desain Responsif Ergonomis Tinggi:
+// - Zero Horizontal Overflow pada semua resolusi layar (Desktop & Laptop)
+// - Responsive Multi-Discipline Matrix (Hematology, Chemistry, Immunology, Urine/Micro)
+// - Smart Multi-Tube Auto-Splitting (CLSI GP41-A6) & Direct Thermal Barcode Output
 // ═══════════════════════════════════════════════════════════════════════════
 
 let _lisOrderSelectedTests = [];
@@ -88,7 +87,7 @@ const QUICK_PANELS = [
   },
   {
     id: 'PANEL_PREMARITAL',
-    name: 'Panel Skrining Pra-Nikah (Premarital)',
+    name: 'Panel Skrining Pra-Nikah',
     code: 'PREMARITAL',
     color: '#14B8A6',
     tube: '🟣 EDTA + 🟡 Serum + ⚪ Urin',
@@ -99,13 +98,13 @@ const QUICK_PANELS = [
 
 // Presets Catatan Klinis / Sampling
 const CLINICAL_PRESETS = [
-  'Puasa 10-12 jam terpenuhi',
-  'Suspek DBD (Demam Hari ke-3)',
-  'Evaluasi Pasien Diabetes Melitus',
-  'Evaluasi Fungsi Ginjal / Hemodialisa',
-  'Skrining Pra-Operasi (Pre-Op)',
-  'Medical Check-Up (MCU) Tahunan',
-  'Trimester 1 Kehamilan (ANC)'
+  'Puasa 10-12 jam',
+  'Suspek DBD (Demam H-3)',
+  'Kontrol Diabetes Melitus',
+  'Evaluasi Fungsi Ginjal',
+  'Skrining Pra-Operasi',
+  'Medical Check-up (MCU)',
+  'Trimester 1 ANC'
 ];
 
 async function renderLisAdmission() {
@@ -125,202 +124,206 @@ async function renderLisAdmission() {
   const autoMR = `RM-${dateStr}-${randSeq}`;
 
   main.innerHTML = `
-    <div style="padding:10px 14px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width:1600px; margin:0 auto; font-size:12px; color:#1e293b;">
+    <div style="padding:12px 16px; font-family:'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; max-width:1600px; margin:0 auto; font-size:12px; color:var(--text, #1e293b); box-sizing:border-box; overflow-x:hidden;">
       
-      <!-- TOP SYSMEX HCLAB WORKSTATION TITLE & TOOLBAR -->
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#0B2240; color:#fff; padding:6px 12px; border-radius:6px 6px 0 0; margin-bottom:2px;">
+      <!-- TOP COMMAND BAR -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:linear-gradient(90deg, #0B2240 0%, #17375E 100%); color:#fff; padding:8px 14px; border-radius:8px; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <button class="btn btn-xs" onclick="navigate('lab')" style="background:#1e3a5f; color:#fff; border:1px solid #3b82f6; font-weight:700; border-radius:4px; padding:2px 8px;">
-            &larr; Exit Order Entry
+          <button class="btn btn-xs" onclick="navigate('lab')" style="background:rgba(255,255,255,0.15); color:#fff; border:1px solid rgba(255,255,255,0.3); font-weight:700; border-radius:4px; padding:3px 10px;">
+            ← Keluar
           </button>
-          <span style="font-weight:800; font-size:13px; letter-spacing:0.02em; display:flex; align-items:center; gap:6px;">
-            <span style="color:#38bdf8;">SYSMEX HCLAB</span> &bull; Order Entry Workstation (Smart Client)
-          </span>
-          <span style="background:#10B981; color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:3px;">ONLINE</span>
+          <div>
+            <div style="font-weight:800; font-size:13.5px; letter-spacing:0.02em; display:flex; align-items:center; gap:8px;">
+              <span>SYSMEX HCLAB</span>
+              <span style="font-size:10.5px; font-weight:700; color:#38bdf8; background:rgba(56,189,248,0.15); padding:1px 6px; border-radius:3px;">Order Entry Pro Max</span>
+            </div>
+          </div>
         </div>
 
-        <div style="display:flex; gap:6px; align-items:center;">
-          <button type="button" class="btn btn-xs" onclick="resetLisAdmissionForm()" style="background:#1e3a5f; color:#cbd5e1; border:1px solid #475569; font-weight:700; padding:3px 10px;">
-            📄 New / Clear
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button type="button" class="btn btn-xs" onclick="resetLisAdmissionForm()" style="background:rgba(255,255,255,0.12); color:#cbd5e1; border:1px solid rgba(255,255,255,0.25); font-weight:700; padding:4px 10px;">
+            📄 Form Baru
           </button>
-          <button type="button" class="btn btn-xs" onclick="submitFullPageLisOrder('${autoVisit}')" style="background:#10B981; color:#fff; border:1px solid #059669; font-weight:800; padding:3px 14px; box-shadow:0 2px 6px rgba(16,185,129,0.3);">
-            💾 Save &amp; Print Barcode (Ctrl+Enter)
+          <button type="button" class="btn btn-xs" onclick="submitFullPageLisOrder('${autoVisit}')" style="background:#10B981; color:#fff; border:1px solid #059669; font-weight:800; padding:4px 14px; box-shadow:0 2px 8px rgba(16,185,129,0.35);">
+            💾 Simpan &amp; Barcode (Ctrl+Enter)
           </button>
         </div>
       </div>
 
-      <!-- HORIZONTAL DEMOGRAPHIC & ORDER HEADER PANEL (SYSMEX HCLAB TABLE LAYOUT) -->
-      <div id="lis-adm-header-panel" style="background:#e2e8f0; border:1px solid #cbd5e1; padding:8px 12px; margin-bottom:8px; border-radius:0 0 6px 6px;">
-        <div style="display:grid; grid-template-columns:140px 140px 220px 100px 110px 80px 120px 1fr 140px; gap:8px; align-items:end;">
+      <!-- HORIZONTAL COMPACT DEMOGRAPHIC PANEL (RESPONSIVE GRID) -->
+      <div id="lis-adm-header-panel" style="background:var(--bg2, #f1f5f9); border:1px solid var(--border, #cbd5e1); padding:10px 12px; margin-bottom:10px; border-radius:8px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(135px, 1fr)); gap:8px; align-items:end;">
           
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Lab No / Accession</label>
-            <input type="text" id="adm-barcode" value="${autoBarcode}" readonly style="width:100%; padding:4px 6px; font-size:11.5px; font-weight:800; font-family:monospace; background:#f8fafc; border:1px solid #94a3b8; border-radius:3px; color:#0f766e;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Lab No / Accession</label>
+            <input type="text" id="adm-barcode" value="${autoBarcode}" readonly style="width:100%; padding:5px 7px; font-size:11.5px; font-weight:800; font-family:monospace; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; color:#0f766e; box-sizing:border-box;">
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">PID / No. RM *</label>
-            <input type="text" id="adm-mr-no" value="${autoMR}" style="width:100%; padding:4px 6px; font-size:11.5px; font-family:monospace; font-weight:700; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">No. RM / PID *</label>
+            <input type="text" id="adm-mr-no" value="${autoMR}" style="width:100%; padding:5px 7px; font-size:11.5px; font-family:monospace; font-weight:700; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
+          </div>
+
+          <div style="grid-column: span 2;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Nama Pasien *</label>
+            <input type="text" id="adm-patient-name" placeholder="Ketik nama lengkap..." required style="width:100%; padding:5px 7px; font-size:12px; font-weight:700; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Patient Name *</label>
-            <input type="text" id="adm-patient-name" placeholder="Nama lengkap pasien..." required style="width:100%; padding:4px 6px; font-size:12px; font-weight:700; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">NIK / KTP</label>
+            <input type="text" id="adm-nik" placeholder="16 digit NIK" maxlength="16" style="width:100%; padding:5px 7px; font-size:11.5px; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">NIK / KTP</label>
-            <input type="text" id="adm-nik" placeholder="16 digit NIK" maxlength="16" style="width:100%; padding:4px 6px; font-size:11.5px; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Usia *</label>
+            <input type="text" id="adm-age" value="30 Th" placeholder="30 Th" style="width:100%; padding:5px 7px; font-size:11.5px; font-weight:700; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Age / DOB *</label>
-            <input type="text" id="adm-age" value="30 Yrs" placeholder="30 Yrs" style="width:100%; padding:4px 6px; font-size:11.5px; font-weight:700; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
-          </div>
-
-          <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Sex *</label>
-            <select id="adm-gender" style="width:100%; padding:4px 6px; font-size:11.5px; font-weight:700; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
-              <option value="L">MALE</option>
-              <option value="P">FEMALE</option>
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Gender *</label>
+            <select id="adm-gender" style="width:100%; padding:5px 7px; font-size:11.5px; font-weight:700; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
+              <option value="L">Laki-laki (L)</option>
+              <option value="P">Perempuan (P)</option>
             </select>
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Priority</label>
-            <select id="adm-priority" onchange="setLisOrderPriority(this.value)" style="width:100%; padding:4px 6px; font-size:11.5px; font-weight:800; background:#fff; border:1px solid #94a3b8; border-radius:3px; color:#0284c7;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Prioritas</label>
+            <select id="adm-priority" onchange="setLisOrderPriority(this.value)" style="width:100%; padding:5px 7px; font-size:11.5px; font-weight:800; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; color:#0284c7; box-sizing:border-box;">
               <option value="ROUTINE">ROUTINE</option>
               <option value="STAT">⚡ STAT / CITO</option>
             </select>
           </div>
 
           <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Ward / Doctor / Clinical Notes</label>
-            <div style="display:flex; gap:4px;">
-              <input type="text" id="adm-doctor" value="APS" placeholder="Dokter / Poli" style="width:140px; padding:4px 6px; font-size:11.5px; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
-              <input type="text" id="adm-notes" placeholder="Catatan puasa, suspek..." style="flex:1; padding:4px 6px; font-size:11.5px; background:#fff; border:1px solid #94a3b8; border-radius:3px;">
-            </div>
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Dokter / Faskes</label>
+            <input type="text" id="adm-doctor" value="APS" placeholder="Dokter / Poli" style="width:100%; padding:5px 7px; font-size:11.5px; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
           </div>
 
-          <div>
-            <label style="font-size:10px; font-weight:800; color:#475569; text-transform:uppercase;">Order Date &amp; Time</label>
-            <div style="font-family:monospace; font-size:11px; font-weight:700; color:#334155; padding:5px 6px; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:3px; text-align:center;">
-              ${today.toLocaleDateString('id-ID')} ${today.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}
-            </div>
+          <div style="grid-column: span 2;">
+            <label style="font-size:10px; font-weight:800; color:var(--text3, #64748b); text-transform:uppercase;">Catatan Klinis / Sampling</label>
+            <input type="text" id="adm-notes" placeholder="Kondisi puasa, riwayat diagnosa..." style="width:100%; padding:5px 7px; font-size:11.5px; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
           </div>
 
         </div>
 
         <!-- FAST CLINICAL PRESETS CHIPS -->
-        <div style="display:flex; align-items:center; gap:6px; margin-top:6px; overflow-x:auto;">
-          <span style="font-size:10px; font-weight:800; color:#64748b;">PRESETS:</span>
+        <div style="display:flex; align-items:center; gap:5px; margin-top:8px; overflow-x:auto; padding-bottom:2px;">
+          <span style="font-size:10px; font-weight:800; color:var(--text3, #64748b); white-space:nowrap;">PRESET KLINIS:</span>
           ${CLINICAL_PRESETS.map(p => `
             <button type="button" class="btn btn-xs" onclick="appendLisClinicalNote('${p}')"
-              style="font-size:10px; padding:1px 6px; background:#fff; border:1px solid #cbd5e1; border-radius:3px; color:#334155; cursor:pointer;">
+              style="font-size:10.5px; padding:2px 7px; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:4px; color:var(--text2, #475569); cursor:pointer; white-space:nowrap;">
               + ${p}
             </button>
           `).join('')}
         </div>
       </div>
 
-      <!-- SEARCH & QUICK PANELS RIBBON -->
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#f1f5f9; border:1px solid #cbd5e1; padding:6px 10px; border-radius:4px; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-        <div style="display:flex; align-items:center; gap:8px; overflow-x:auto;">
-          <span style="font-size:11px; font-weight:800; color:#0b2240; white-space:nowrap;">⚡ QUICK PANELS:</span>
+      <!-- QUICK PANELS & SEARCH FILTER RIBBON -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg2, #f8fafc); border:1px solid var(--border, #cbd5e1); padding:6px 10px; border-radius:6px; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px; overflow-x:auto; max-width:calc(100% - 280px);">
+          <span style="font-size:11px; font-weight:800; color:var(--text, #0b2240); white-space:nowrap;">⚡ PANEL CEPAT:</span>
           ${QUICK_PANELS.map(pk => `
             <button type="button" onclick="selectLisQuickPanel('${pk.id}')"
-              style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:3px; border:1px solid ${pk.color}; background:#fff; color:#0b2240; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px;"
-              onmouseover="this.style.background='${pk.color}15'" onmouseout="this.style.background='#fff'">
-              <span style="color:${pk.color}; font-weight:800;">★</span>
+              style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; border:1px solid ${pk.color}; background:var(--bg, #fff); color:var(--text, #0b2240); cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px;"
+              onmouseover="this.style.background='${pk.color}15'" onmouseout="this.style.background='var(--bg, #fff)'">
+              <span style="color:${pk.color}; font-weight:900;">★</span>
               <span>${pk.name}</span>
             </button>
           `).join('')}
         </div>
 
-        <div style="position:relative; width:260px;">
-          <input type="text" id="adm-test-search" placeholder="🔍 Quick Filter across all disciplines..." value="${_lisSearchQuery}"
+        <div style="position:relative; width:260px; min-width:200px;">
+          <input type="text" id="adm-test-search" placeholder="🔍 Filter parameter LOINC..." value="${_lisSearchQuery}"
             oninput="_lisSearchQuery=this.value; renderLis5ColumnMatrix();"
-            style="width:100%; padding:4px 8px; font-size:11.5px; border:1px solid #94a3b8; border-radius:3px;">
-          ${ _lisSearchQuery ? `<button onclick="_lisSearchQuery=''; document.getElementById('adm-test-search').value=''; renderLis5ColumnMatrix();" style="position:absolute; right:6px; top:4px; background:none; border:none; cursor:pointer; color:#64748b;">&times;</button>` : '' }
+            style="width:100%; padding:5px 8px; font-size:11.5px; border:1px solid var(--border, #cbd5e1); border-radius:4px; box-sizing:border-box;">
+          ${ _lisSearchQuery ? `<button onclick="_lisSearchQuery=''; document.getElementById('adm-test-search').value=''; renderLis5ColumnMatrix();" style="position:absolute; right:6px; top:5px; background:none; border:none; cursor:pointer; color:var(--text3);">&times;</button>` : '' }
         </div>
       </div>
 
-      <!-- 5-COLUMN SIDE-BY-SIDE MULTI-DISCIPLINE SCREEN PANEL (SYSMEX HCLAB PAGE 3 MATRIX) -->
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr) 340px; gap:8px; align-items:stretch; min-height:480px;">
+      <!-- MAIN MULTI-COLUMN WORKSTATION (4 DISCIPLINE COLS + 1 SUMMARY PANEL) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)) 340px; gap:10px; align-items:start;">
         
-        <!-- COLUMN 1: HEMATOLOGY -->
-        <div style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; flex-direction:column; overflow:hidden;">
-          <div style="background:#7c3aed; color:#fff; font-weight:800; font-size:11.5px; padding:5px 8px; letter-spacing:0.03em; display:flex; justify-content:space-between;">
-            <span>🩸 HEMATOLOGY</span>
-            <span id="count-hem" style="font-size:10px; opacity:0.85;"></span>
-          </div>
-          <div id="col-hem-list" style="padding:4px; overflow-y:auto; flex:1; max-height:440px; display:flex; flex-direction:column; gap:2px; background:#faf5ff;">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- COLUMN 2: CHEMISTRY -->
-        <div style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; flex-direction:column; overflow:hidden;">
-          <div style="background:#0284c7; color:#fff; font-weight:800; font-size:11.5px; padding:5px 8px; letter-spacing:0.03em; display:flex; justify-content:space-between;">
-            <span>🧪 CHEMISTRY</span>
-            <span id="count-kim" style="font-size:10px; opacity:0.85;"></span>
-          </div>
-          <div id="col-kim-list" style="padding:4px; overflow-y:auto; flex:1; max-height:440px; display:flex; flex-direction:column; gap:2px; background:#f0f9ff;">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- COLUMN 3: IMMUNOLOGY & SEROLOGY -->
-        <div style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; flex-direction:column; overflow:hidden;">
-          <div style="background:#059669; color:#fff; font-weight:800; font-size:11.5px; padding:5px 8px; letter-spacing:0.03em; display:flex; justify-content:space-between;">
-            <span>🛡️ IMMUNOLOGY</span>
-            <span id="count-imu" style="font-size:10px; opacity:0.85;"></span>
-          </div>
-          <div id="col-imu-list" style="padding:4px; overflow-y:auto; flex:1; max-height:440px; display:flex; flex-direction:column; gap:2px; background:#ecfdf5;">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- COLUMN 4: URINE & MICROBIOLOGY -->
-        <div style="background:#fff; border:1px solid #cbd5e1; border-radius:4px; display:flex; flex-direction:column; overflow:hidden;">
-          <div style="background:#d97706; color:#fff; font-weight:800; font-size:11.5px; padding:5px 8px; letter-spacing:0.03em; display:flex; justify-content:space-between;">
-            <span>⚪ URINE &amp; MICRO</span>
-            <span id="count-uri" style="font-size:10px; opacity:0.85;"></span>
-          </div>
-          <div id="col-uri-list" style="padding:4px; overflow-y:auto; flex:1; max-height:440px; display:flex; flex-direction:column; gap:2px; background:#fffbeb;">
-            <!-- Rendered dynamically -->
-          </div>
-        </div>
-
-        <!-- COLUMN 5: SELECTED ORDER & SMART TUBE AUTO-SPLITTING -->
-        <div style="background:#fff; border:1px solid #0b2240; border-radius:4px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 2px 8px rgba(11,34,64,0.08);">
-          <div style="background:#0b2240; color:#fff; font-weight:800; font-size:11.5px; padding:5px 8px; letter-spacing:0.03em; display:flex; justify-content:space-between; align-items:center;">
-            <span>📋 SELECTED ORDER (<span id="adm-selected-count">0</span>)</span>
-            <button type="button" onclick="_lisOrderSelectedTests=[]; renderLis5ColumnMatrix();" style="background:none; border:none; color:#f87171; font-size:10px; font-weight:700; cursor:pointer;">Clear All</button>
-          </div>
-
-          <!-- SELECTED TEST LIST (TABLE FORMAT ALA HCLAB) -->
-          <div id="adm-selected-table-container" style="flex:1; overflow-y:auto; max-height:260px; padding:4px; background:#fff;">
-            <!-- Rendered dynamically -->
-          </div>
-
-          <!-- BOTTOM TUBE REQUIREMENTS & TOTAL TARIFF -->
-          <div style="border-top:1px solid #cbd5e1; background:#f8fafc; padding:8px 10px;">
-            <div style="font-size:10.5px; font-weight:800; color:#334155; margin-bottom:4px;">
-              🧪 TUBE SPECIMENS &amp; ORDER OF DRAW:
+        <!-- DISCIPLINE COLUMNS WRAPPER (4 COLS) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(210px, 1fr)); gap:10px; min-width:0;">
+          
+          <!-- COLUMN 1: HEMATOLOGY -->
+          <div style="background:var(--card-bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:6px; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="background:#7c3aed; color:#fff; font-weight:800; font-size:11.5px; padding:6px 9px; letter-spacing:0.02em; display:flex; justify-content:space-between; align-items:center;">
+              <span>🩸 HEMATOLOGI</span>
+              <span id="count-hem" style="font-size:10px; opacity:0.9;"></span>
             </div>
-            <div id="adm-tube-reqs" style="display:flex; flex-direction:column; gap:3px; margin-bottom:8px; min-height:42px;">
-              <span style="color:#94a3b8; font-size:11px;">Belum ada spesimen tabung terpilih.</span>
+            <div id="col-hem-list" style="padding:5px; overflow-y:auto; max-height:460px; display:flex; flex-direction:column; gap:3px; background:rgba(124,58,237,0.03);">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- COLUMN 2: CHEMISTRY -->
+          <div style="background:var(--card-bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:6px; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="background:#0284c7; color:#fff; font-weight:800; font-size:11.5px; padding:6px 9px; letter-spacing:0.02em; display:flex; justify-content:space-between; align-items:center;">
+              <span>🧪 KIMIA KLINIK</span>
+              <span id="count-kim" style="font-size:10px; opacity:0.9;"></span>
+            </div>
+            <div id="col-kim-list" style="padding:5px; overflow-y:auto; max-height:460px; display:flex; flex-direction:column; gap:3px; background:rgba(2,132,199,0.03);">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- COLUMN 3: IMMUNOLOGY -->
+          <div style="background:var(--card-bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:6px; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="background:#059669; color:#fff; font-weight:800; font-size:11.5px; padding:6px 9px; letter-spacing:0.02em; display:flex; justify-content:space-between; align-items:center;">
+              <span>🛡️ IMUNOSEROLOGI</span>
+              <span id="count-imu" style="font-size:10px; opacity:0.9;"></span>
+            </div>
+            <div id="col-imu-list" style="padding:5px; overflow-y:auto; max-height:460px; display:flex; flex-direction:column; gap:3px; background:rgba(5,150,105,0.03);">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- COLUMN 4: URINE & MICRO -->
+          <div style="background:var(--card-bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:6px; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="background:#d97706; color:#fff; font-weight:800; font-size:11.5px; padding:6px 9px; letter-spacing:0.02em; display:flex; justify-content:space-between; align-items:center;">
+              <span>⚪ URIN &amp; MIKRO</span>
+              <span id="count-uri" style="font-size:10px; opacity:0.9;"></span>
+            </div>
+            <div id="col-uri-list" style="padding:5px; overflow-y:auto; max-height:460px; display:flex; flex-direction:column; gap:3px; background:rgba(217,119,6,0.03);">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SUMMARY PANEL (COLUMN 5) -->
+        <div style="background:var(--card-bg, #fff); border:1px solid var(--border, #cbd5e1); border-radius:6px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 4px 14px rgba(0,0,0,0.06); position:sticky; top:12px;">
+          
+          <div style="background:#0B2240; color:#fff; font-weight:800; font-size:11.5px; padding:6px 10px; letter-spacing:0.02em; display:flex; justify-content:space-between; align-items:center;">
+            <span>📋 RINGKASAN ORDER (<span id="adm-selected-count">0</span>)</span>
+            <button type="button" onclick="_lisOrderSelectedTests=[]; renderLis5ColumnMatrix();" style="background:none; border:none; color:#f87171; font-size:10.5px; font-weight:700; cursor:pointer;">Reset</button>
+          </div>
+
+          <!-- SELECTED TESTS LIST TABLE -->
+          <div id="adm-selected-table-container" style="max-height:220px; overflow-y:auto; padding:4px; background:var(--bg, #fff);">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- BOTTOM SMART TUBE AUTO-SPLITTING & TOTAL -->
+          <div style="border-top:1px solid var(--border, #cbd5e1); background:var(--bg2, #f8fafc); padding:10px 12px;">
+            <div style="font-size:10.5px; font-weight:800; color:var(--text, #334155); margin-bottom:5px;">
+              🧪 SPESIMEN &amp; URUTAN PENGAMBILAN (CLSI GP41-A6):
+            </div>
+            
+            <div id="adm-tube-reqs" style="display:flex; flex-direction:column; gap:4px; margin-bottom:10px; min-height:42px;">
+              <span style="color:var(--text3, #94a3b8); font-size:11px;">Belum ada tes yang dipilih.</span>
             </div>
 
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed #cbd5e1; padding-top:6px; margin-bottom:8px;">
-              <span style="font-size:11px; font-weight:700; color:#475569;">Total Biaya:</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px dashed var(--border, #cbd5e1); padding-top:8px; margin-bottom:10px;">
+              <span style="font-size:11px; font-weight:700; color:var(--text3, #475569);">Estimasi Total Tarif:</span>
               <span id="adm-total-price" style="font-size:16px; font-weight:900; color:#10B981;">Rp 0</span>
             </div>
 
             <button type="button" class="btn btn-teal" onclick="submitFullPageLisOrder('${autoVisit}')"
-              style="width:100%; font-weight:800; padding:8px; font-size:12.5px; border-radius:4px; background:#10B981; color:#fff; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(16,185,129,0.3);">
-              💾 SUBMIT ORDER &amp; PRINT BARCODE
+              style="width:100%; font-weight:800; padding:9px; font-size:12.5px; border-radius:5px; background:#10B981; color:#fff; border:none; cursor:pointer; box-shadow:0 3px 10px rgba(16,185,129,0.35);">
+              💾 SIMPAN ORDER &amp; CETAK BARCODE
             </button>
           </div>
 
@@ -349,8 +352,8 @@ function setLisOrderPriority(p) {
     panel.style.background = '#fee2e2';
     panel.style.border = '2px solid #ef4444';
   } else {
-    panel.style.background = '#e2e8f0';
-    panel.style.border = '1px solid #cbd5e1';
+    panel.style.background = 'var(--bg2, #f1f5f9)';
+    panel.style.border = '1px solid var(--border, #cbd5e1)';
   }
 }
 
@@ -375,24 +378,23 @@ function selectLisQuickPanel(panelId) {
     }
   });
 
-  if (typeof toast === 'function') toast(`⚡ ${panel.name} selected`, 'ok');
+  if (typeof toast === 'function') toast(`⚡ ${panel.name} ditambahkan`, 'ok');
   renderLis5ColumnMatrix();
 }
 
 function renderLis5ColumnMatrix() {
   const q = (_lisSearchQuery || '').toLowerCase();
 
-  // Filter products for each discipline
   const hemProds = _lisAllProducts.filter(p => {
     const k = (p.kategori || '').toLowerCase();
-    const matchCat = k.includes('hematologi') || p.nama_tes.includes('Hb') || p.nama_tes.includes('Darah');
+    const matchCat = k.includes('hematologi') || p.nama_tes.includes('Hb') || p.nama_tes.includes('Darah') || p.nama_tes.includes('LED') || p.nama_tes.includes('Trombosit');
     const matchQ = !q || p.nama_tes.toLowerCase().includes(q) || (p.loinc_code && p.loinc_code.toLowerCase().includes(q));
     return matchCat && matchQ;
   });
 
   const kimProds = _lisAllProducts.filter(p => {
     const k = (p.kategori || '').toLowerCase();
-    const matchCat = k.includes('kimia') || p.nama_tes.includes('Glukosa') || p.nama_tes.includes('Kolesterol') || p.nama_tes.includes('SGOT') || p.nama_tes.includes('Ureum') || p.nama_tes.includes('Kreatinin');
+    const matchCat = k.includes('kimia') || p.nama_tes.includes('Glukosa') || p.nama_tes.includes('Kolesterol') || p.nama_tes.includes('SGOT') || p.nama_tes.includes('SGPT') || p.nama_tes.includes('Ureum') || p.nama_tes.includes('Kreatinin');
     const matchQ = !q || p.nama_tes.toLowerCase().includes(q) || (p.loinc_code && p.loinc_code.toLowerCase().includes(q));
     return matchCat && matchQ;
   });
@@ -426,10 +428,10 @@ function renderColumnItems(containerId, countId, prods) {
   const countEl = document.getElementById(countId);
   if (!container) return;
 
-  if (countEl) countEl.textContent = `${prods.length} items`;
+  if (countEl) countEl.textContent = `${prods.length}`;
 
   if (!prods.length) {
-    container.innerHTML = `<div style="padding:16px; text-align:center; color:#94a3b8; font-size:11px;">Tidak ada parameter cocok</div>`;
+    container.innerHTML = `<div style="padding:16px; text-align:center; color:var(--text3, #94a3b8); font-size:11px;">Tidak ada parameter cocok</div>`;
     return;
   }
 
@@ -439,16 +441,16 @@ function renderColumnItems(containerId, countId, prods) {
     
     return `
       <div onclick="toggleLisTestSelection(${p.id}, ${!isChecked})"
-        style="display:flex; justify-content:space-between; align-items:center; padding:4px 6px; border-radius:3px; background:${isChecked ? '#d1fae5' : '#fff'}; border:1px solid ${isChecked ? '#10b981' : '#e2e8f0'}; cursor:pointer; font-size:11px; user-select:none; transition:background 0.1s;"
-        onmouseover="if(!${isChecked}) this.style.background='#f8fafc'" onmouseout="if(!${isChecked}) this.style.background='#fff'">
-        <div style="display:flex; align-items:center; gap:6px; overflow:hidden;">
+        style="display:flex; justify-content:space-between; align-items:center; padding:5px 7px; border-radius:4px; background:${isChecked ? '#d1fae5' : 'var(--bg, #fff)'}; border:1px solid ${isChecked ? '#10b981' : 'var(--border, #e2e8f0)'}; cursor:pointer; font-size:11px; user-select:none; transition:all 0.1s;"
+        onmouseover="if(!${isChecked}) this.style.background='var(--bg2, #f8fafc)'" onmouseout="if(!${isChecked}) this.style.background='var(--bg, #fff)'">
+        <div style="display:flex; align-items:center; gap:6px; overflow:hidden; flex:1;">
           <input type="checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation();" onchange="toggleLisTestSelection(${p.id}, this.checked)"
-            style="accent-color:#10B981; width:13px; height:13px; cursor:pointer;">
-          <span style="font-weight:${isChecked ? '800' : '600'}; color:${isChecked ? '#065f46' : '#1e293b'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            style="accent-color:#10B981; width:13px; height:13px; cursor:pointer; flex-shrink:0;">
+          <span style="font-weight:${isChecked ? '800' : '600'}; color:${isChecked ? '#065f46' : 'var(--text, #1e293b)'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
             ${p.nama_tes}
           </span>
         </div>
-        <span style="font-size:10.5px; font-weight:700; color:#059669; white-space:nowrap; margin-left:4px;">
+        <span style="font-size:10px; font-weight:750; color:#059669; white-space:nowrap; margin-left:4px; flex-shrink:0;">
           Rp ${Number(price).toLocaleString('id-ID')}
         </span>
       </div>
@@ -468,13 +470,13 @@ function renderSelectedTable() {
 
   if (!_lisOrderSelectedTests.length) {
     container.innerHTML = `
-      <div style="padding:24px; text-align:center; color:#94a3b8; font-size:11.5px;">
-        <div style="font-size:24px; margin-bottom:4px;">📋</div>
-        Klik parameter pada kolom untuk menambahkan ke order
+      <div style="padding:20px; text-align:center; color:var(--text3, #94a3b8); font-size:11px;">
+        <div style="font-size:20px; margin-bottom:4px;">📋</div>
+        Pilih parameter pada matriks disiplin di samping
       </div>
     `;
     if (priceEl) priceEl.textContent = 'Rp 0';
-    if (tubeEl) tubeEl.innerHTML = `<span style="color:#94a3b8; font-size:11px;">Belum ada spesimen tabung terpilih.</span>`;
+    if (tubeEl) tubeEl.innerHTML = `<span style="color:var(--text3, #94a3b8); font-size:11px;">Belum ada spesimen tabung terpilih.</span>`;
     return;
   }
 
@@ -488,10 +490,10 @@ function renderSelectedTable() {
   container.innerHTML = `
     <table style="width:100%; border-collapse:collapse; font-size:11px;">
       <thead>
-        <tr style="background:#f1f5f9; color:#475569; font-weight:800; text-align:left; border-bottom:1px solid #cbd5e1;">
-          <th style="padding:4px 6px;">Code</th>
-          <th style="padding:4px 6px;">Test Name</th>
-          <th style="padding:4px 6px; text-align:right;">Tariff</th>
+        <tr style="background:var(--bg2, #f1f5f9); color:var(--text2, #475569); font-weight:800; text-align:left; border-bottom:1px solid var(--border, #cbd5e1);">
+          <th style="padding:4px 6px;">Kode</th>
+          <th style="padding:4px 6px;">Pemeriksaan</th>
+          <th style="padding:4px 6px; text-align:right;">Tarif</th>
           <th style="padding:4px 4px; text-align:center; width:20px;"></th>
         </tr>
       </thead>
@@ -499,9 +501,9 @@ function renderSelectedTable() {
         ${_lisOrderSelectedTests.map(t => {
           const price = t.harga_dasar || t.tarif || 0;
           return `
-            <tr style="border-bottom:1px solid #f1f5f9;">
+            <tr style="border-bottom:1px solid var(--border, #f1f5f9);">
               <td style="padding:4px 6px; font-family:monospace; font-weight:700; color:#0284c7;">${t.kode_internal || 'LAB'}</td>
-              <td style="padding:4px 6px; font-weight:600; color:#1e293b;">${t.nama_tes}</td>
+              <td style="padding:4px 6px; font-weight:600; color:var(--text, #1e293b);">${t.nama_tes}</td>
               <td style="padding:4px 6px; text-align:right; font-weight:700; color:#059669;">Rp ${Number(price).toLocaleString('id-ID')}</td>
               <td style="padding:4px 4px; text-align:center;">
                 <button type="button" onclick="removeLisSelectedTest(${t.id})" style="background:none; border:none; color:#ef4444; font-weight:900; cursor:pointer; font-size:12px;">&times;</button>
@@ -517,8 +519,8 @@ function renderSelectedTable() {
   const requiredTubes = getRequiredTubesForTests(_lisOrderSelectedTests);
   if (tubeEl) {
     tubeEl.innerHTML = requiredTubes.map((tb, idx) => `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #cbd5e1; border-left:3px solid ${tb.color}; padding:3px 6px; border-radius:3px; font-size:10.5px;">
-        <span style="font-weight:700; color:#1e293b;">${idx + 1}. ${tb.name}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg, #fff); border:1px solid var(--border, #cbd5e1); border-left:3px solid ${tb.color}; padding:3px 6px; border-radius:3px; font-size:10.5px;">
+        <span style="font-weight:700; color:var(--text, #1e293b);">${idx + 1}. ${tb.name}</span>
         <span style="font-family:monospace; font-weight:800; color:${tb.color};">(${tb.tests.length} tes)</span>
       </div>
     `).join('');
@@ -550,7 +552,7 @@ function resetLisAdmissionForm() {
   _lisSearchQuery = '';
   _lisCurrentPriority = 'ROUTINE';
   renderLisAdmission();
-  if (typeof toast === 'function') toast('Form order cleared', 'info');
+  if (typeof toast === 'function') toast('Form order dibersihkan', 'info');
 }
 
 function getRequiredTubesForTests(tests = []) {
@@ -618,12 +620,12 @@ async function submitFullPageLisOrder(visitNumber) {
   const notes = document.getElementById('adm-notes')?.value?.trim() || null;
 
   if (!patient_name) {
-    if (typeof toast === 'function') toast('Patient Name is required', 'err');
+    if (typeof toast === 'function') toast('Nama Pasien wajib diisi', 'err');
     return;
   }
 
   if (!_lisOrderSelectedTests.length) {
-    if (typeof toast === 'function') toast('Select at least 1 laboratory test', 'err');
+    if (typeof toast === 'function') toast('Pilih minimal 1 parameter pemeriksaan laboratorium', 'err');
     return;
   }
 
@@ -692,7 +694,7 @@ async function submitFullPageLisOrder(visitNumber) {
       });
     }
 
-    if (typeof toast === 'function') toast(`✅ Lab Order Saved (${requiredTubes.length} Physical Tubes Generated)`, 'ok');
+    if (typeof toast === 'function') toast(`✅ Order Lab Tersimpan (${requiredTubes.length} Tabung Spesimen)`, 'ok');
 
     // 3. Print barcode tabung multi-label
     if (typeof printLabBarcodes === 'function') {

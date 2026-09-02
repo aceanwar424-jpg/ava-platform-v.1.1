@@ -22,3 +22,6 @@
 - [x] Pemilih modul dan pencarian menu HIS tersedia dari rail ringkas.
 - [x] Breadcrumb kontekstual memperlihatkan domain, layanan, dan halaman aktif.
 - [x] Regresi navigasi serta sintaks skrip diverifikasi.
+- [x] Konfigurasi HIS dikelompokkan menjadi akses, data awal, pasien, fasilitas, antrean, jadwal, dan integrasi.
+- [x] Jumlah modul terlihat pada level layanan sidebar.
+- [x] Audit menu HIS diulang setelah penyempurnaan.
