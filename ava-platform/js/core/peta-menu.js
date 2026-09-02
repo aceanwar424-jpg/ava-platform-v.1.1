@@ -1268,7 +1268,7 @@ window.PETA_MENU = {
               "label": "Fasilitas, Cabang & Unit",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'facility'})",
               "ket": "Cabang, lokasi, unit, ruang, kelas layanan, dan alat"
             },
             {
@@ -1276,7 +1276,7 @@ window.PETA_MENU = {
               "label": "Praktisi, Jadwal & Fee",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'practitioner'})",
               "ket": "Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan"
             },
             {
@@ -1284,7 +1284,7 @@ window.PETA_MENU = {
               "label": "Pasien, Penjamin & Keluarga",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'patient'})",
               "ket": "Identitas pasien, asuransi, alergi, kondisi, dan relasi"
             },
             {
@@ -1292,7 +1292,7 @@ window.PETA_MENU = {
               "label": "Korporat & Kontrak",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'corporate'})",
               "ket": "Perusahaan, kontrak, jabatan, dan penjamin layanan"
             },
             {
@@ -1300,7 +1300,7 @@ window.PETA_MENU = {
               "label": "Parameter MCU",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'mcu'})",
               "ket": "Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus"
             },
             {
@@ -1308,7 +1308,7 @@ window.PETA_MENU = {
               "label": "Bank, EDC & Pembayaran",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'payment'})",
               "ket": "Metode bayar, bank, EDC, dan mapping akun"
             },
             {
@@ -1316,7 +1316,7 @@ window.PETA_MENU = {
               "label": "Flow, Display & Perangkat Antrean",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'queue'})",
               "ket": "Flow layanan, outlet, ruang, display, kiosk, dan device"
             },
             {
@@ -1324,7 +1324,7 @@ window.PETA_MENU = {
               "label": "Master Obat & Aturan Pakai",
               "status": "parsial",
               "rute": "config",
-              "aksi": "navigate('config')",
+              "aksi": "navigate('config',{focus:'medicine'})",
               "ket": "Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi"
             }
           ]

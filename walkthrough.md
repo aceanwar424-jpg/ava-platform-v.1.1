@@ -246,3 +246,18 @@ seluruh nama layanan kiosk agar pemetaan loket tidak salah ketik.
   sehingga tidak menambahkan atau mengungkap akses baru.
 - Verifikasi pascaperubahan: sintaks inline dan CSS valid; audit 158 menu
   lulus tanpa renderer, tabel/view, RPC, handler, atau manifest hilang.
+
+## Configuration Hub — Domain Master HIS
+
+- Menu **Pengaturan Sistem → Master Konfigurasi HIS** kini memuat delapan
+  pintu masuk: Fasilitas & Unit, Praktisi & Fee, Pasien & Penjamin, Korporat
+  & Kontrak, Parameter MCU, Pembayaran, Antrean, serta Master Obat.
+- Tiap pintu masuk meneruskan fokus ke hub Configuration. Modul yang sudah
+  tersedia (misalnya antrean, jadwal, pendaftaran, kasir, farmasi, dan MCU)
+  memiliki tombol buka; master yang belum punya formulir penyimpanan diberi
+  penanda **Kerangka master**, bukan tautan yang berakhir pada layar kosong.
+- Peta menu dibangkitkan ulang dari `config/menu.json`: 177 menu total
+  (161 tersedia, 9 parsial, 7 belum). Audit menu aktif memeriksa 159 item dan
+  tidak menemukan renderer, tabel/view, RPC, handler, atau manifest hilang.
+- Batas: perubahan ini tidak membuat atau memigrasikan tabel master,
+  tidak menulis data klinis, dan tidak mengaktifkan integrasi vendor.

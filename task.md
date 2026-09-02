@@ -32,5 +32,6 @@
 - [x] Preflight read-only dan runbook staging/rollback migrasi 0048 disiapkan.
 - [x] Audit otomatis referensi migrasi legacy dan katalog jalur rilis ditambahkan.
 - [x] Configuration Hub diperluas dengan jalur HIS yang sudah tersedia.
+- [x] Delapan domain Configuration HIS dapat dibuka langsung dari sidebar dan membedakan modul tersedia dari kerangka master.
 - [ ] Menunggu checkpoint database untuk penerapan staging dan konsolidasi skema.
 - [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.

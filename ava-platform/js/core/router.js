@@ -339,7 +339,9 @@ async function navigate(page, params={}) {
     case 'lab-report':     safeRun('renderLab', 'report');     break;
     case 'validasi':    safeRun('renderLab', 'validation'); break;
     case 'product':     safeRun('renderConfigProduct');          break;
-    case 'config':      safeRun('renderSettings', 'masterdata');   break;
+    // Hub konfigurasi menerima fokus dari menu, sehingga master data tidak
+    // lagi semuanya jatuh ke satu halaman yang sama.
+    case 'config':      safeRun('renderConfigHub', params.focus || 'overview'); break;
     case 'refrange':    safeRun('renderConfigRefRange');          break;
     case 'labreport':   safeRun('renderSettings', 'pdf');          break;
     case 'corporate':   safeRun('renderConfigCorporate');        break;
