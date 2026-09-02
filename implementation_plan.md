@@ -46,3 +46,29 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - Perubahan sidebar hanya mengubah presentasi antarmuka dan preferensi lokal browser; tidak mengubah skema data, hak akses, maupun data klinis.
 - Penggabungan menu HIS mempertahankan seluruh route dan penapisan RBAC yang telah ada; yang berubah hanya hierarki tampilan navigasi.
 - Pemilih modul hanya memakai definisi menu yang sudah lolos RBAC di browser; ia tidak membaca atau menulis data klinis maupun menambah hak akses.
+
+## Fase Kesiapan Produksi — 3 September 2026
+
+### Urutan implementasi
+
+1. [x] Konfigurasi runtime Vercel untuk URL dan anon key Supabase tanpa mengekspos service-role atau secret klinis.
+2. [x] Jadikan `antrian.avahealth.sbs` route resmi menuju display antrean dalam konfigurasi deploy yang sama.
+3. [x] Tambahkan pemeriksaan statis readiness deploy agar host dan runtime config tidak kembali terlewat.
+4. [x] Siapkan migrasi antrean tenant-aware: tenant pada konfigurasi, loket, tiket, log, tampilan publik, dan RPC.
+5. [x] Terapkan di kode proteksi endpoint publik yang tahan multi-instance: device registry, rate limit tersimpan, dan origin allowlist.
+6. [ ] Konsolidasikan SQL arsip menjadi migrasi formal berurutan, lengkap dengan preflight serta rollback operasional.
+7. [~] Perluas Configuration Hub untuk master fasilitas, tenaga kesehatan, antrean, korporat, dan integrasi; master pembayaran/MCU masih perlu layar data khusus.
+8. [ ] Tambahkan test regresi RBAC dan alur kiosk → loket → display menggunakan database sementara.
+9. [ ] Aktifkan integrasi eksternal hanya melalui staging dan UAT pemilik proses per vendor.
+
+### Checkpoint wajib sebelum langkah 4, 6, dan 9
+
+- Persetujuan pemilik database untuk perubahan skema dan rencana backup/rollback.
+- Konfirmasi tenant produksi yang menjadi target serta pemilik data migrasi.
+- Kredensial dan kontrak sandbox resmi untuk SATUSEHAT, BPJS, payment gateway, PACS, atau analyzer.
+
+### Implikasi IP & Kepatuhan
+
+- Endpoint runtime hanya dapat memuat konfigurasi aman untuk browser: URL dan anon key.
+- Tenant-aware queue serta setiap migrasi skema tidak diterapkan ke cloud sebelum checkpoint karena mengubah data operasional.
+- Secret integrasi hanya hidup pada fungsi server dan tidak boleh dimasukkan ke source atau Vercel public config.

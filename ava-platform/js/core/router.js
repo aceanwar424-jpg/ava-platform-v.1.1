@@ -144,6 +144,7 @@ const PAGE_TITLES = {
   'lis-critical-value':'Logbook Nilai Kritis',
   'lis-pme':'Uji Profisiensi (PME)',
   'lis-sample-archive':'Rak Penyimpanan Spesimen (-20°C)',
+  'lis-helpdesk':'Help Desk & Panduan Alur LIS',
   'saas-console':'Cockpit AVA Tech',
   tenants:'Tenant & Klien Faskes',
   'tech-aktivasi':'Penerbitan & Aktivasi Lisensi',
@@ -277,6 +278,7 @@ async function navigate(page, params={}) {
     case 'portal-akses':safeRun('renderPortalAkses');            break;
     case 'perujuk':     safeRun('renderPerujuk');                break;
     case 'lis-settings':safeRun('renderLisSettings');            break;
+    case 'lis-helpdesk':safeRun('renderLisHelpDesk');            break;
     case 'lis-admission':
     case 'lis-regis':
     case 'order-lab':   safeRun('renderLisAdmission');           break;

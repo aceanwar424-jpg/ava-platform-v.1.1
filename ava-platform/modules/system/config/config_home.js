@@ -8,16 +8,31 @@ const CONFIG_GROUPS = [
     { label:'Package & Panel', page:'package' },
     { label:'Master Alat (Analyzer)', action:"navigate('lab',{tab:'qc'})" },
   ]},
-  { icon:'🏢', title:'Master Data', desc:'Korporat & keluarga', items:[
+  { icon:'🏢', title:'Pasien, Korporat & Paket', desc:'Entitas layanan dan relasinya', items:[
     { label:'Corporate', page:'corporate' },
     { label:'Family Registry', page:'family' },
+    { label:'Paket Layanan', page:'package' },
+  ]},
+  { icon:'🎟️', title:'Fasilitas & Antrean', desc:'Loket, kiosk, jadwal dan kapasitas', items:[
+    { label:'Konfigurasi Antrean & Loket', page:'queue-config' },
+    { label:'Jadwal & Perjanjian', page:'appointments' },
+    { label:'Jadwal Home Care', page:'hc-schedule' },
+  ]},
+  { icon:'🩺', title:'Tenaga & Penugasan', desc:'Nakes dan jadwal operasional', items:[
+    { label:'Master Nakes Home Care', page:'hc-staff' },
+    { label:'Jadwal Kerja Tim', page:'work-schedule' },
+  ]},
+  { icon:'🔗', title:'Kepatuhan & Integrasi', desc:'Aktifkan melalui staging dan UAT', items:[
+    { label:'SATUSEHAT — Setup & Status', page:'satusehat' },
+    { label:'Klaim Penjamin & BPJS', page:'bpjs-claim' },
+    { label:'Tracker Kepatuhan', page:'compliance-tracker' },
   ]},
   { icon:'🖨️', title:'Output & Setting', desc:'Hasil PDF, pengaturan, user', items:[
     { label:'Setting Hasil PDF', page:'labreport' },
     { label:'Pengaturan Umum', page:'settings' },
     { label:'User Management', page:'users' },
   ]},
-  { icon:'', title:'Data Tools', desc:'Impor massal', items:[
+  { icon:'🗃️', title:'Data Tools', desc:'Impor, audit, dan penataan data awal', items:[
     { label:'Bulk Upload (Import Excel/CSV)', page:'import' },
   ]},
 ];

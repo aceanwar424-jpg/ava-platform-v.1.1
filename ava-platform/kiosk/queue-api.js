@@ -6,9 +6,11 @@
 (function (global) {
   const host = String(location.hostname || '').toLowerCase();
   const lokal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost');
+  const runtime = window.AVA_RUNTIME_CONFIG || {};
+  const cloudBase = String(runtime.supabaseUrl || 'https://rmyqzyfvlmjxtatpctks.supabase.co').replace(/\/$/, '');
   const basis = lokal
     ? 'http://127.0.0.1:54329/functions/v1/queue-public'
-    : 'https://rmyqzyfvlmjxtatpctks.supabase.co/functions/v1/queue-public';
+    : `${cloudBase}/functions/v1/queue-public`;
 
   async function panggil(jalur, opsi = {}) {
     let res;

@@ -25,3 +25,10 @@
 - [x] Konfigurasi HIS dikelompokkan menjadi akses, data awal, pasien, fasilitas, antrean, jadwal, dan integrasi.
 - [x] Jumlah modul terlihat pada level layanan sidebar.
 - [x] Audit menu HIS diulang setelah penyempurnaan.
+- [x] Konfigurasi runtime deploy dan redirect antrian ditambahkan tanpa menyentuh data klinis.
+- [x] Pemeriksaan statis readiness deploy ditambahkan.
+- [x] Migrasi antrean multi-tenant dan proteksi perangkat publik disiapkan; belum diterapkan ke database mana pun.
+- [x] Pemeriksaan kontrak statis antrean multi-tenant ditambahkan.
+- [x] Configuration Hub diperluas dengan jalur HIS yang sudah tersedia.
+- [ ] Menunggu checkpoint database untuk penerapan staging dan konsolidasi skema.
+- [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.

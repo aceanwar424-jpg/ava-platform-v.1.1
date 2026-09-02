@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 168 — 🟢 160 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 169 — 🟢 161 ada · 🟡 1 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -221,6 +221,12 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Rujukan Laboratorium | `referral` | Outsource spesimen ke lab rujukan & rekonsiliasi |
 | 🟢 | Ekspor Standar LOINC | `catalog-export` | Generator dataset LIS-ready dalam format CSV/TSV |
 | 🟢 | Konfigurasi LIS & Gateway | `lis-settings` | Profil instansi, DPJP Sp.PK, critical limits & installer service :9999 |
+
+**Pusat Bantuan & Panduan SOP**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Help Desk & Panduan Alur LIS | `lis-helpdesk` | Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium |
 
 ---
 

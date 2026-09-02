@@ -6,13 +6,16 @@
 //    pakai shim PostgREST lokal (PGlite) di :54329, sepenuhnya offline.
 //  • Selain itu (mis. Vercel produksi) → Supabase cloud seperti biasa.
 // Deteksi berbasis hostname; TIDAK mengubah perilaku deployment cloud.
-const SUPABASE_CLOUD_URL = 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const _avaRuntimeConfig = (typeof window !== 'undefined' && window.AVA_RUNTIME_CONFIG) || {};
+// Fallback mempertahankan deployment lama; Vercel dapat menimpa URL ini per tenant.
+const SUPABASE_CLOUD_URL = _avaRuntimeConfig.supabaseUrl || 'https://rmyqzyfvlmjxtatpctks.supabase.co';
 const _isLocalEngine = (typeof location !== 'undefined') &&
   (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ||
    location.hostname.endsWith('.localhost'));
 const LOCAL_ENGINE_URL = _isLocalEngine ? 'http://127.0.0.1:54329' : '';
 const SUPABASE_URL = _isLocalEngine ? LOCAL_ENGINE_URL : SUPABASE_CLOUD_URL;
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
+const SUPABASE_RUNTIME_KEY = _avaRuntimeConfig.supabaseAnonKey || SUPABASE_KEY;
 
 // ── Sesi (Fase 1.0) ───────────────────────────────────────────
 // Token pengguna dibaca langsung dari localStorage supaya berkas ini tidak
@@ -35,8 +38,8 @@ function sbRefreshToken() { try { return localStorage.getItem('ol_refresh') || '
 // sehingga ~18 pemanggil yang sudah ada ikut mengirim JWT pengguna tanpa diubah.
 // Selama belum login, jatuh kembali ke anon key agar layar login tetap berfungsi.
 const SB_HEADERS = {
-  'apikey': SUPABASE_KEY,
-  get 'Authorization'() { return `Bearer ${sbAccessToken() || SUPABASE_KEY}`; },
+  'apikey': SUPABASE_RUNTIME_KEY,
+  get 'Authorization'() { return `Bearer ${sbAccessToken() || SUPABASE_RUNTIME_KEY}`; },
   'Content-Type': 'application/json',
   'Prefer': 'return=representation'
 };
@@ -53,7 +56,7 @@ async function sbRefreshSession() {
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_RUNTIME_KEY },
         body: JSON.stringify({ refresh_token: rt }),
       });
       const data = await res.json();

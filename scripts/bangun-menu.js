@@ -58,7 +58,7 @@ const rute = new Set(
 const POLA_DATA = /\b(sbGet|sbRpc|sbPost|sbPatch|sbDelete|fetch)\s*\(/;
 
 const TANPA_DATA_WAJAR = {
-  // 'id-menu': 'alasan kenapa layar ini memang tidak membaca data',
+  'lis-helpdesk': 'Modul panduan interaktif SOP, flowchart laboratorium, dan kamus menu 360 derajat',
 };
 
 // Halaman → nama fungsi render, dibaca dari router.js:

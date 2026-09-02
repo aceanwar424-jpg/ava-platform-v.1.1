@@ -38,6 +38,17 @@
       "has": [
         {
           "type": "host",
+          "value": "antrian.avahealth.sbs"
+        }
+      ],
+      "destination": "/monitor/antrian.html",
+      "permanent": false
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
           "value": "apps.avahelath.sbs"
         }
       ],
@@ -64,6 +75,10 @@
         {
           "type": "host",
           "value": "apps.avahelath.sbs"
+        },
+        {
+          "type": "host",
+          "value": "antrian.avahealth.sbs"
         }
       ],
       "destination": "/index.html"

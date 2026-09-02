@@ -291,7 +291,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "penawaran": [
   "modules/crm/crm_pipeline.js",
@@ -403,7 +404,34 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
+ ],
+ "lis-helpdesk": [
+  "modules/lab/qcEngine.js",
+  "modules/lab/index.js",
+  "modules/lab/checkin.js",
+  "modules/lab/worklist.js",
+  "modules/lab/results.js",
+  "modules/lab/validation.js",
+  "modules/lab/impression.js",
+  "modules/lab/report.js",
+  "modules/lab/qc.js",
+  "modules/lab/autoverify.js",
+  "modules/lab/integration.js",
+  "modules/lab/parser_config.js",
+  "modules/lab/tat.js",
+  "modules/lab/referral.js",
+  "modules/lab/analyzerInterfacing.js",
+  "modules/lab/criticalValue.js",
+  "modules/lab/lotVerification.js",
+  "modules/lab/phlebotomy.js",
+  "modules/lab/pmeProficiency.js",
+  "modules/lab/sampleArchiving.js",
+  "modules/lab/specimenVerification.js",
+  "modules/lab/settings.js",
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-admission": [
   "modules/lab/qcEngine.js",
@@ -428,7 +456,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-regis": [
   "modules/lab/qcEngine.js",
@@ -453,7 +482,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "order-lab": [
   "modules/lab/qcEngine.js",
@@ -478,7 +508,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lisensi": [
   "modules/system/config/config_family.js",
@@ -900,7 +931,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab": [
   "modules/lab/qcEngine.js",
@@ -925,7 +957,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "worklist": [
   "modules/lab/qcEngine.js",
@@ -950,7 +983,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab-result": [
   "modules/lab/qcEngine.js",
@@ -975,7 +1009,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab-validation": [
   "modules/lab/qcEngine.js",
@@ -1000,7 +1035,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab-approval": [
   "modules/lab/qcEngine.js",
@@ -1025,7 +1061,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab-qc": [
   "modules/lab/qcEngine.js",
@@ -1050,7 +1087,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lab-report": [
   "modules/lab/qcEngine.js",
@@ -1075,7 +1113,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "validasi": [
   "modules/lab/qcEngine.js",
@@ -1100,7 +1139,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "product": [
   "modules/system/config/config_family.js",
@@ -1696,7 +1736,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "payroll": [
   "modules/hrd/attendance.js",
@@ -1835,7 +1876,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "phlebotomy": [
   "modules/lab/qcEngine.js",
@@ -1860,7 +1902,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-kelayakan": [
   "modules/lab/qcEngine.js",
@@ -1885,7 +1928,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "specimen-verification": [
   "modules/lab/qcEngine.js",
@@ -1910,7 +1954,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-analyzer": [
   "modules/lab/qcEngine.js",
@@ -1935,7 +1980,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "analyzer-interfacing": [
   "modules/lab/qcEngine.js",
@@ -1960,7 +2006,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-lot-verification": [
   "modules/lab/qcEngine.js",
@@ -1985,7 +2032,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lot-verification": [
   "modules/lab/qcEngine.js",
@@ -2010,7 +2058,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-pme": [
   "modules/lab/qcEngine.js",
@@ -2035,7 +2084,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "pme": [
   "modules/lab/qcEngine.js",
@@ -2060,7 +2110,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "proficiency-testing": [
   "modules/lab/qcEngine.js",
@@ -2085,7 +2136,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-critical-value": [
   "modules/lab/qcEngine.js",
@@ -2110,7 +2162,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "critical-value": [
   "modules/lab/qcEngine.js",
@@ -2135,7 +2188,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "lis-sample-archive": [
   "modules/lab/qcEngine.js",
@@ -2160,7 +2214,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "sample-archiving": [
   "modules/lab/qcEngine.js",
@@ -2185,7 +2240,8 @@ window.MODUL_HALAMAN = {
   "modules/lab/sampleArchiving.js",
   "modules/lab/specimenVerification.js",
   "modules/lab/settings.js",
-  "modules/lab/admission.js"
+  "modules/lab/admission.js",
+  "modules/lab/helpdesk.js"
  ],
  "his-orders": [
   "modules/his/admission.js",
@@ -2623,5 +2679,6 @@ window.MODUL_SEMUA = [
  "modules/radiology/rad_master.js",
  "modules/compliance/catalog_exporter.js",
  "modules/compliance/ikp.js",
- "modules/his/triase.js"
+ "modules/his/triase.js",
+ "modules/lab/helpdesk.js"
 ];

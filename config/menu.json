@@ -702,6 +702,17 @@
               "ket": "Profil instansi, DPJP Sp.PK, critical limits & installer service :9999"
             }
           ]
+        },
+        {
+          "nama": "Pusat Bantuan & Panduan SOP",
+          "menu": [
+            {
+              "id": "lis-helpdesk",
+              "label": "Help Desk & Panduan Alur LIS",
+              "status": "ada",
+              "ket": "Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium"
+            }
+          ]
         }
       ],
       "pendek": "Lab LIS"

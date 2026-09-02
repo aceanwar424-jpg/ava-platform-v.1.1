@@ -70,6 +70,33 @@ Pengujian memakai lingkungan lokal dan data kosong. Koneksi produksi,
 SATUSEHAT, perangkat analyzer, serta penerapan migrasi pada database produksi
 tidak diuji atau diubah.
 
+## Kesiapan Deploy Awal — 3 September 2026
+
+- `vercel.json` kini mengenali `antrian.avahealth.sbs` dan mengarahkannya ke display antrean.
+- HIS, kiosk, dan display memuat konfigurasi runtime dari `/api/runtime-config.js`; endpoint hanya mengirim URL Supabase dan anon key dari Vercel Environment Variables, tidak pernah service-role atau secret integrasi.
+- Kiosk memakai URL Supabase runtime yang sama, sehingga deploy tenant baru tidak lagi memerlukan perubahan source untuk endpoint `queue-public`.
+- `scripts/verify-deploy-readiness.js` memeriksa kontrak ini secara statis.
+
+Perubahan ini tidak menerapkan migrasi database dan tidak mengaktifkan integrasi vendor. Migrasi tenant-aware, konsolidasi SQL arsip, dan aktivasi SATUSEHAT/BPJS/payment/PACS tetap menunggu checkpoint pemilik proses.
+
+## Antrean Multi-tenant & Kiosk Publik — Artefak Staging
+
+- Migrasi `0048_antrean_tenant_device_public.sql` menambahkan tenant pada tiket, konfigurasi, loket, dan log antrean. Data lama dipetakan ke tenant lokal, sedangkan cloud memakai claim `tenant_id` pada JWT.
+- Kode loket dan layanan kini dirancang unik per tenant, bukan global.
+- Perangkat kiosk terdaftar di `queue_public_devices`; fungsi publik membaca tenant dari perangkat di server, bukan dari nilai yang dikirim browser.
+- Penerbitan tiket memakai bucket rate-limit persisten per tenant/perangkat/layanan/menit dan nomor harian dikunci per tenant serta layanan.
+- Seluruh RPC konsol panggilan yang memakai `SECURITY DEFINER` kini didefinisikan ulang dengan filter tenant eksplisit untuk panggil, ulang, lewati, kembalikan, dan pindah loket.
+- View internal `queue_papan` tidak lagi dapat dibaca role anonim karena memuat nama pasien. Display publik mengambil hanya nomor, layanan, status, dan loket.
+- Edge Function `queue-public` sekarang menuntut origin yang diizinkan dan `QUEUE_PUBLIC_DEVICE_ID` sebagai Supabase secret.
+- `scripts/verify-queue-tenant-contract.js` memeriksa bahwa jalur publik tidak meminta nama pasien dan tidak kembali ke rate-limit memori.
+
+Belum ada migrasi atau secret yang diterapkan ke cloud pada tahap ini. Sebelum staging, backup dan verifikasi claim tenant pengguna harus disetujui pemilik database.
+
+## Configuration Hub HIS
+
+- Master Data Hub tidak lagi hanya menonjolkan konfigurasi laboratorium. Ia kini memberi jalur langsung ke pasien/korporat/paket, loket/kiosk/jadwal, tenaga home care, dan kepatuhan/SATUSEHAT.
+- Setiap kartu hanya mengarah ke renderer yang sudah ada; tidak ada layar placeholder atau akses baru yang ditambahkan.
+
 Selain itu, menu yang berstatus roadmap (7 `belum` dan 1 `parsial`) perlu
 keputusan produk sebelum dibuka penuh. Pemeriksaan kepatuhan ISO pada engine
 masih berupa pemeriksaan konten otomatis; ia bukan pengganti penilaian auditor
