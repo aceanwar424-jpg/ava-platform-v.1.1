@@ -8,10 +8,20 @@
 // NOT become a window property, which previously caused getUserRole()/getUserName()
 // to read a permanently-null local variable instead of the real session data.
 if (typeof window.currentUser === 'undefined') window.currentUser = null;
+const authLocalDemo = () => {
+  const h = String(location.hostname || '').toLowerCase();
+  return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.localhost');
+};
 
 async function initAuth(){
   const token = getStoredToken();
-  if (token === 'master_ava_token_superadmin_all_access') {
+  if (token.startsWith('master_ava_') && !authLocalDemo()) {
+    clearStoredToken();
+    window.currentUser = null;
+    showLoginScreen();
+    return;
+  }
+  if (token === 'master_ava_token_superadmin_all_access' && authLocalDemo()) {
     window.currentUser = {
       id: '00000000-0000-0000-0000-000000000001',
       email: 'admin@avahealth.sbs',
@@ -249,7 +259,7 @@ async function doLogin(){
 
   // Multi-Role Demo Direct Authentication
   const lowEmail = email.toLowerCase();
-  if (AVA_DEMO_USERS[lowEmail] && (pass === '12345678' || pass.length >= 6)) {
+  if (authLocalDemo() && AVA_DEMO_USERS[lowEmail] && (pass === '12345678' || pass.length >= 6)) {
     const demoUser = AVA_DEMO_USERS[lowEmail];
     const sessionUser = {
       id: demoUser.id,
@@ -280,7 +290,7 @@ async function doLogin(){
       await loadUserProfile();
       showApp();
     } else {
-      if (AVA_DEMO_USERS[lowEmail]) {
+      if (authLocalDemo() && AVA_DEMO_USERS[lowEmail]) {
         const demoUser = AVA_DEMO_USERS[lowEmail];
         setStoredToken('master_ava_token_' + demoUser.role);
         window.currentUser = { id: demoUser.id, email: demoUser.email, role: demoUser.role, profile: demoUser };
@@ -291,7 +301,7 @@ async function doLogin(){
       btn.textContent='Masuk ke Sistem'; btn.disabled=false;
     }
   } catch(e){
-    if (AVA_DEMO_USERS[lowEmail]) {
+    if (authLocalDemo() && AVA_DEMO_USERS[lowEmail]) {
       const demoUser = AVA_DEMO_USERS[lowEmail];
       setStoredToken('master_ava_token_' + demoUser.role);
       window.currentUser = { id: demoUser.id, email: demoUser.email, role: demoUser.role, profile: demoUser };

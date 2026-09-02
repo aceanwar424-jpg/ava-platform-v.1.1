@@ -114,6 +114,9 @@ Untuk mengaktifkan dua domain produksi, terapkan migrasi HIS
 `kiosk`) dan membuat RPC khusus yang hanya bisa dipanggil service-role.
 Migrasi ini juga membuat `queue_config` bila instalasi lama hanya memiliki
 `queue_tickets`, sehingga tidak bergantung pada urutan pemasangan fitur loket.
+Ia juga menyemai loket HIS standar yang dipetakan tepat ke layanan kiosk;
+operator dapat mengubah nama/ruang lewat Konfigurasi Antrean tanpa nomor
+tiket yang sudah terbit berubah.
 Tidak ada deploy atau perubahan data cloud yang dilakukan pada pekerjaan ini.
 
 Konfigurasi `supabase/config.toml` menetapkan `verify_jwt = false` hanya untuk
@@ -121,3 +124,9 @@ Konfigurasi `supabase/config.toml` menetapkan `verify_jwt = false` hanya untuk
 Function sendiri hanya menerima enam layanan yang diizinkan, menerapkan
 pembatasan sentuhan, dan memakai service-role di server; browser tetap tidak
 memegang kredensial ataupun hak tulis tabel.
+
+Sesi demo `master_ava_*` kini hanya diizinkan pada host lokal. Di produksi
+token itu dibersihkan dan pengguna harus masuk lewat Supabase Auth dengan JWT
+valid; sebelumnya token demo tersebut diteruskan ke API dan menghasilkan
+kesalahan `Expected 3 parts in JWT`. Form konfigurasi loket juga menyediakan
+seluruh nama layanan kiosk agar pemetaan loket tidak salah ketik.

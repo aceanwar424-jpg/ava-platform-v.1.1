@@ -344,8 +344,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
   const token = localStorage.getItem('ol_token');
+  const demoLokal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost');
   if (token) {
-    if (token === 'master_ava_token_superadmin_all_access' || token.startsWith('master_ava_')) {
+    if (demoLokal && (token === 'master_ava_token_superadmin_all_access' || token.startsWith('master_ava_'))) {
       const masterUser = {
         id: 'master-superadmin-ava',
         email: 'admin@avahealth.sbs',

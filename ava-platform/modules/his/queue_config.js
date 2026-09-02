@@ -143,7 +143,8 @@ function qcfgFormLoket(id) {
   const layanan = [...new Set([
     ...(qcfgConfig || []).map(c => c.layanan),
     ...qcfgLoket.map(x => x.layanan),
-    'Dokter', 'Lab', 'Radiologi', 'Farmasi', 'Kasir',
+    'Umum', 'Laboratorium', 'MCU', 'Sanctuary', 'Spesialis', 'Farmasi',
+    'Dokter', 'Lab', 'Radiologi', 'Kasir',
   ].filter(Boolean))];
 
   openModal(`

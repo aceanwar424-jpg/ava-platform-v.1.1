@@ -50,6 +50,33 @@ VALUES
   ('Farmasi',      'F')
 ON CONFLICT (layanan) DO NOTHING;
 
+-- Loket awal menghubungkan layanan kiosk dengan konsol panggilan HIS.
+-- ON CONFLICT menjaga konfigurasi loket yang sudah disunting operator.
+CREATE TABLE IF NOT EXISTS public.queue_counters (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  kode        text UNIQUE NOT NULL,
+  nama        text NOT NULL,
+  layanan     text NOT NULL,
+  prefiks     text,
+  ruang       text,
+  urutan      integer NOT NULL DEFAULT 100,
+  is_active   boolean NOT NULL DEFAULT true,
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+
+INSERT INTO public.queue_counters (kode, nama, layanan, prefiks, ruang, urutan, is_active)
+VALUES
+  ('LOKET-UMUM',      'Loket 1 — Poli Umum',       'Umum',         'U', 'Lobi Utama',        10, true),
+  ('LOKET-LAB',       'Loket 2 — Laboratorium',    'Laboratorium', 'L', 'Ruang Sampling',     20, true),
+  ('LOKET-MCU',       'Loket MCU',                 'MCU',          'M', 'Ruang MCU',          30, true),
+  ('LOKET-SANCTUARY', 'Loket Sanctuary',           'Sanctuary',    'S', 'Sanctuary',          40, true),
+  ('LOKET-SPESIALIS', 'Loket Dokter Spesialis',    'Spesialis',    'P', 'Poliklinik',         50, true),
+  ('LOKET-FARMASI',   'Loket 3 — Farmasi',         'Farmasi',      'F', 'Instalasi Farmasi',  60, true)
+ON CONFLICT (kode) DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_queue_counters_layanan
+  ON public.queue_counters (layanan, is_active);
+
 -- Hanya Edge Function dengan JWT service_role yang dapat menjalankan fungsi
 -- ini. Tidak ada grant untuk anon/authenticated: petugas memakai
 -- issue_queue_ticket yang terautentikasi seperti biasa.

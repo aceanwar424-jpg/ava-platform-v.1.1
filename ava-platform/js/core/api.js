@@ -17,7 +17,17 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 // ── Sesi (Fase 1.0) ───────────────────────────────────────────
 // Token pengguna dibaca langsung dari localStorage supaya berkas ini tidak
 // bergantung pada auth.js yang dimuat belakangan.
-function sbAccessToken()  { try { return localStorage.getItem('ol_token')   || ''; } catch(e) { return ''; } }
+function sbIsJwt(token) {
+  // Token demo lama seperti "master_ava_token_*" bukan JWT dan ditolak
+  // Supabase sebelum query diproses. Jangan pernah meneruskannya ke cloud.
+  return typeof token === 'string' && token.split('.').length === 3;
+}
+function sbAccessToken()  {
+  try {
+    const token = localStorage.getItem('ol_token') || '';
+    return sbIsJwt(token) ? token : '';
+  } catch(e) { return ''; }
+}
 function sbRefreshToken() { try { return localStorage.getItem('ol_refresh') || ''; } catch(e) { return ''; } }
 
 // PENTING: 'Authorization' sengaja berupa getter, bukan nilai tetap.
