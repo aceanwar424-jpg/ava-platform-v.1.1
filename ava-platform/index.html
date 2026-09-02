@@ -878,111 +878,130 @@ function gambarRail(ruang) {
   const boleh = (typeof window.kategoriRuang === 'function')
     ? window.kategoriRuang(ruang)
     : Object.keys(FLYOUT_MENUS);
-
-  let html = '';
   const role = typeof getUserRole === 'function' ? getUserRole() : 'sales';
   const isSuperAdmin = role === 'super_admin';
   const allowedPages = window.roleConfig?.pages || null;
   const currentPage = window.currentPage || '';
 
   const GROUP_ICONS = {
-    'Pra-Analitik & Sampling': '🩸',
-    'Analitik & Interfacing': '🔬',
-    'Pasca-Analitik & Otorisasi': '✅',
-    'Quality Control (QC)': '📊',
-    'Bio-Bank & Arsip': '🧊',
-    'Master Data & Konfigurasi': '⚙️',
-    '1. Pra-Analitik & Sampling': '🩸',
-    '2. Analitik & Interfacing': '🔬',
-    '3. Pasca-Analitik & Validasi': '✅',
-    '4. Mutu & Kendali Kualitas (QC)': '📊',
-    '5. Bank Sampel & Arsip': '🧊',
-    '6. Master Data & Pengaturan Lab': '⚙️',
-    '6. Master Data & Tes': '📋',
-    '7. Reagen & BHP Lab': '🧪',
-    '8. Rujukan Lab Luar': '🤝',
-    'Alur Pelayanan': '🩺',
-    'Rawat Inap & Rekam Medis': '🏥',
-    'Farmasi': '💊',
-    'Home Care': '🚑',
-    'Kepatuhan & Klaim': '⚖️',
-    'Alur Pemeriksaan': '🩻',
-    'Master & Alat': '⚙️',
-    'Pengembangan Sistem': '💻',
-    'Klien & Lisensi': '🔐',
-    'Komersial Sistem': '💰',
-    'Interoperabilitas': '🌐'
+    'Alur Pasien': '🏥', 'Pelayanan Klinis': '🩺',
+    'Administrasi & Kepatuhan': '⚖️', 'Operasional Klinik': '📊',
+    'Bisnis & Korporat': '🤝', 'Keuangan & Penagihan': '💳',
+    'Administrasi Sistem': '⚙️', 'Pra-Analitik & Sampling': '🩸',
+    'Analitik & Interfacing': '🔬', 'Pasca-Analitik & Otorisasi': '✅',
+    'Quality Control (QC)': '📊', 'Bio-Bank & Arsip': '🧊',
+    'Master Data & Konfigurasi': '⚙️', '1. Pra-Analitik & Sampling': '🩸',
+    '2. Analitik & Interfacing': '🔬', '3. Pasca-Analitik & Validasi': '✅',
+    '4. Mutu & Kendali Kualitas (QC)': '📊', '5. Bank Sampel & Arsip': '🧊',
+    '6. Master Data & Pengaturan Lab': '⚙️', '6. Master Data & Tes': '📋',
+    '7. Reagen & BHP Lab': '🧪', '8. Rujukan Lab Luar': '🤝',
+    'Alur Pelayanan': '🩺', 'Rawat Inap & Rekam Medis': '🏥',
+    'Farmasi': '💊', 'Home Care': '🚑', 'Kepatuhan & Klaim': '⚖️',
+    'Alur Pemeriksaan': '🩻', 'Master & Alat': '⚙️',
+    'Pengembangan Sistem': '💻', 'Klien & Lisensi': '🔐',
+    'Komersial Sistem': '💰', 'Interoperabilitas': '🌐'
   };
 
-  let groupCounter = 0;
+  // HIS memakai tiga tingkat yang lebih ringkas: domain kerja → layanan → modul.
+  // Peta rute asli tidak diubah; ini murni pengelompokan presentasi sidebar.
+  const hisPlacement = (kategori, grup, labelKategori) => {
+    const peta = {
+      his: {
+        'Alur Pasien': ['Alur Pasien', 'Pendaftaran, Jadwal & Antrean'],
+        'Pelayanan Klinis': ['Pelayanan Klinis', 'Konsultasi, EMR & Rawat Inap'],
+        'Gawat Darurat & Keselamatan Pasien': ['Pelayanan Klinis', 'IGD & Keselamatan Pasien'],
+        'Farmasi': ['Pelayanan Klinis', 'Farmasi & Resep'],
+        'Home Care': ['Pelayanan Klinis', 'Home Care'],
+        'Kepatuhan & Klaim': ['Administrasi & Kepatuhan', 'Klaim, Integrasi & Rekam Medis']
+      },
+      radiologi: { '*': ['Pelayanan Klinis', 'Radiologi & Pencitraan'] },
+      'support-medical': { '*': ['Pelayanan Klinis', grup] },
+      avahealth: { '*': ['Operasional Klinik', labelKategori] },
+      korporat: { '*': ['Bisnis & Korporat', labelKategori] },
+      marketing: { '*': ['Bisnis & Korporat', labelKategori] },
+      keuangan: { '*': ['Keuangan & Penagihan', grup] },
+      mutu: { '*': ['Administrasi & Kepatuhan', grup] },
+      sdm: { '*': ['Administrasi Sistem', 'SDM & ' + grup] },
+      konfigurasi: { '*': ['Administrasi Sistem', 'Pengaturan Sistem'] }
+    };
+    const hasil = peta[kategori]?.[grup] || peta[kategori]?.['*'];
+    return hasil || [grup, null];
+  };
 
-  boleh.forEach(function (k) {
+  const railGroups = [];
+  const railByName = new Map();
+  const addService = (namaGroup, namaLayanan, items, iconKategori) => {
+    let group = railByName.get(namaGroup);
+    if (!group) {
+      group = { name: namaGroup, icon: GROUP_ICONS[namaGroup] || iconKategori || '📁', services: [] };
+      railByName.set(namaGroup, group);
+      railGroups.push(group);
+    }
+    let service = group.services.find(x => x.name === namaLayanan);
+    if (!service) {
+      service = { name: namaLayanan, items: [] };
+      group.services.push(service);
+    }
+    service.items.push(...items);
+  };
+
+  boleh.forEach((k) => {
     const kat = FLYOUT_MENUS[k];
-    if (!kat || !kat.items || !kat.items.length) return;
-
-    // Filter item yang boleh dilihat user
-    const items = kat.items.filter(function (it) {
-      if (it.adminOnly && !['super_admin','manager','direktur'].includes(role)) return false;
-      if (!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon) return false;
-      return true;
+    if (!kat?.items?.length) return;
+    const visible = kat.items.filter((it) => {
+      if (it.adminOnly && !['super_admin', 'manager', 'direktur'].includes(role)) return false;
+      return !(!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon);
     });
-
-    if (!items.length) return;
-
-    // Kelompokkan item berdasarkan properti group
-    const groups = {};
-    items.forEach(function (it) {
-      const g = it.group || kat.label || 'Menu Utama';
-      if (!groups[g]) groups[g] = [];
-      groups[g].push(it);
+    const bySourceGroup = {};
+    visible.forEach((it) => {
+      const sumber = it.group || kat.label || 'Menu Utama';
+      (bySourceGroup[sumber] ||= []).push(it);
     });
-
-    Object.entries(groups).forEach(function ([gName, gItems]) {
-      groupCounter++;
-      const groupId = 'acc-grp-' + groupCounter;
-      const hasActiveChild = gItems.some(function (it) { return it.page === currentPage; });
-      // Jangan membuka grup pertama hanya karena ia berada di urutan awal.
-      // Setelah halaman aktif tersinkron, hanya grup yang benar-benar
-      // memuat halaman tersebut yang terbuka; rail jadi ringkas dan tidak
-      // menampilkan panel kosong saat hak akses pengguna terbatas.
-      const isOpen = hasActiveChild;
-      const gIco = GROUP_ICONS[gName] || (typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁');
-
-      html += '<div class="sidebar-accordion-group' + (isOpen ? ' open' : '') + '" id="' + groupId + '">';
-      html += '  <button type="button" class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
-      html += '    <div class="sidebar-main-left">';
-      html += '      <span class="sidebar-main-ico">' + gIco + '</span>';
-      html += '      <span class="sidebar-main-label">' + gName + '</span>';
-      html += '    </div>';
-      html += '    <span class="sidebar-chevron">▾</span>';
-      html += '  </button>';
-
-      html += '  <div class="sidebar-sub-menu-list">';
-      gItems.forEach(function (it) {
-        const isSoon = it.soon || it.status === 'belum';
-        const isActive = it.page === currentPage;
-        const aksi = isSoon
-          ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')"
-          : it.action;
-
-        html += '    <button type="button" class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '"' +
-                ' onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">';
-        html += '      <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + it.label + '</span>';
-        if (isSoon) {
-          html += '      <span class="sidebar-soon-tag">soon</span>';
-        }
-        html += '    </button>';
-      });
-      html += '  </div>';
-      html += '</div>';
+    Object.entries(bySourceGroup).forEach(([sumber, items]) => {
+      const [domain, layanan] = ruang === 'his'
+        ? hisPlacement(k, sumber, kat.label)
+        : [sumber, null];
+      addService(domain, layanan, items, typeof icon === 'function' ? icon(kat.icon || 'list', 15) : '📁');
     });
   });
 
-  nav.innerHTML = html;
+  let html = '';
+  let groupCounter = 0;
+  railGroups.forEach((group) => {
+    groupCounter++;
+    const groupId = 'acc-grp-' + groupCounter;
+    const allItems = group.services.flatMap(x => x.items);
+    const hasActiveChild = allItems.some(it => it.page === currentPage);
+    html += '<div class="sidebar-accordion-group' + (hasActiveChild ? ' open' : '') + '" id="' + groupId + '">';
+    html += '  <button type="button" class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" title="' + group.name + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
+    html += '    <div class="sidebar-main-left"><span class="sidebar-main-ico">' + group.icon + '</span><span class="sidebar-main-label">' + group.name + '</span></div>';
+    html += '    <span class="sidebar-chevron">▾</span></button><div class="sidebar-sub-menu-list">';
 
-  if (window.currentPage) {
-    syncFlyoutToPage(window.currentPage);
-  }
+    group.services.forEach((service, serviceIndex) => {
+      const serviceId = groupId + '-svc-' + serviceIndex;
+      const serviceActive = service.items.some(it => it.page === currentPage);
+      const showService = !!service.name;
+      if (showService) {
+        html += '<div class="sidebar-service-group' + (serviceActive ? ' open' : '') + '" id="' + serviceId + '">';
+        html += '<button type="button" class="sidebar-service-btn' + (serviceActive ? ' active-service' : '') + '" onclick="toggleSidebarService(\'' + serviceId + '\')">';
+        html += '<span>' + service.name + '</span><span class="sidebar-service-chevron">›</span></button><div class="sidebar-service-items">';
+      }
+      service.items.forEach((it) => {
+        const isSoon = it.soon || it.status === 'belum';
+        const isActive = it.page === currentPage;
+        const aksi = isSoon ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')" : it.action;
+        html += '<button type="button" class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '" onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">';
+        html += '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.label + '</span>';
+        if (isSoon) html += '<span class="sidebar-soon-tag">soon</span>';
+        html += '</button>';
+      });
+      if (showService) html += '</div></div>';
+    });
+    html += '</div></div>';
+  });
+
+  nav.innerHTML = html;
+  if (window.currentPage) syncFlyoutToPage(window.currentPage);
 }
 window.gambarRail = gambarRail;
 
@@ -1001,6 +1020,13 @@ function toggleSidebarAccordion(groupId) {
 }
 window.toggleSidebarAccordion = toggleSidebarAccordion;
 
+function toggleSidebarService(serviceId) {
+  const service = document.getElementById(serviceId);
+  if (!service) return;
+  service.classList.toggle('open');
+}
+window.toggleSidebarService = toggleSidebarService;
+
 function setActiveFlyoutItem(page) {
   window.currentPage = page;
   document.querySelectorAll('.sidebar-sub-link').forEach(function (b) {
@@ -1011,6 +1037,8 @@ function setActiveFlyoutItem(page) {
     activeBtn.classList.add('active');
     const grp = activeBtn.closest('.sidebar-accordion-group');
     if (grp) grp.classList.add('open');
+    const service = activeBtn.closest('.sidebar-service-group');
+    if (service) service.classList.add('open');
     const label = activeBtn.querySelector('span')?.textContent;
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
@@ -1028,6 +1056,8 @@ function syncFlyoutToPage(page) {
     activeBtn.classList.add('active');
     const grp = activeBtn.closest('.sidebar-accordion-group');
     if (grp) grp.classList.add('open');
+    const service = activeBtn.closest('.sidebar-service-group');
+    if (service) service.classList.add('open');
     const label = activeBtn.querySelector('span')?.textContent;
     const titleEl = document.getElementById('topbar-title');
     if (titleEl && label) titleEl.textContent = label;
