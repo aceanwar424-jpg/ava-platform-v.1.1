@@ -150,12 +150,11 @@ async function renderSettingsTabContent(tab) {
           </div>
 
           <div class="card">
-            <div class="card-title" style="margin-bottom:12px">Quick Fix SQL</div>
-            <p style="font-size:13px;color:var(--text3);margin-bottom:10px">SQL siap pakai untuk fix umum. Copy dan jalankan di Supabase SQL Editor.</p>
+            <div class="card-title" style="margin-bottom:12px">Bantuan Administrasi SQL</div>
+            <p style="font-size:13px;color:var(--text3);margin-bottom:10px">SQL untuk diagnostik skema dan pemulihan konfirmasi akun. Jalankan hanya melalui prosedur administrasi yang tercatat.</p>
             <div style="display:flex;flex-direction:column;gap:6px">
               <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('confirm_email')">Fix Email Confirmation</button>
-              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('disable_rls')">Disable RLS semua tabel</button>
-              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">Check semua tabel</button>
+              <button class="btn btn-outline btn-sm" onclick="copyAdminSQL('check_tables')">Diagnostik skema tabel</button>
             </div>
           </div>
           
@@ -376,22 +375,6 @@ const ADMIN_SQL = {
 UPDATE auth.users 
 SET email_confirmed_at = now() 
 WHERE email_confirmed_at IS NULL;`,
-
-  disable_rls: `-- Disable RLS semua tabel
-ALTER TABLE public.partners DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.partner_deals DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.partner_contacts DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.mous DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.projects DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.marketing_templates DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.outgoing_letters DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.letter_sequences DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.voucher_campaigns DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.vouchers DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.activity_logs DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.settings DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_profiles DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.documents DISABLE ROW LEVEL SECURITY;`,
 
   check_tables: `-- Cek semua tabel dan jumlah kolom
 SELECT 

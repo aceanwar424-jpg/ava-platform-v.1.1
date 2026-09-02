@@ -536,180 +536,170 @@
       "ikon": "flask",
       "grup": [
         {
-          "nama": "1. Pra-Analitik & Sampling",
+          "nama": "Pra-Analitik & Sampling",
           "menu": [
             {
               "id": "lab",
               "label": "Penerimaan & Barcode",
               "status": "ada",
-              "ket": "Check-in spesimen dan cetak label tabung L{YYMMDD}"
+              "ket": "Check-in spesimen dan cetak barcode tabung CLSI"
             },
             {
               "id": "lis-admission",
-              "label": "Order Baru & Pendaftaran",
+              "label": "Order Pemeriksaan",
               "status": "ada",
-              "ket": "Pendaftaran pasien walk-in dan order pemeriksaan laboratorium"
+              "ket": "Pendaftaran order spesimen & auto-split tabung"
             },
             {
               "id": "lis-phlebotomy",
-              "label": "Flebotomi & Tusukan",
+              "label": "Flebotomi & Sampling",
               "status": "ada",
-              "ket": "Verifikasi tabung, lokasi tusukan & waktu sampling"
+              "ket": "Verifikasi tabung, lokasi flebotomi & timestamp sampling"
             },
             {
               "id": "lis-kelayakan",
-              "label": "Verifikasi Kelayakan",
+              "label": "Kriteria Kelayakan Spesimen",
               "status": "ada",
-              "ket": "Kriteria penolakan spesimen hemolisis/lipemik/bekuan"
+              "ket": "Verifikasi penerimaan/penolakan spesimen (hemolisis/lipemik/clot)"
             }
           ]
         },
         {
-          "nama": "2. Analitik & Interfacing",
+          "nama": "Analitik & Interfacing",
           "menu": [
             {
               "id": "worklist",
               "label": "Worklist Analyzer",
               "status": "ada",
-              "ket": "Antrean kerja per alat analyzer"
+              "ket": "Daftar antrean kerja batch analyzer per instrumen"
             },
             {
               "id": "lab-result",
-              "label": "Input Hasil & Delta",
+              "label": "Entry Hasil & Delta Check",
               "status": "ada",
-              "ket": "Entry hasil dan deteksi lonjakan riwayat pasien",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'result'})"
+              "ket": "Input hasil, kalkulator pengenceran & deteksi delta check"
             },
             {
               "id": "lis-analyzer",
-              "label": "Koneksi Alat (:9999)",
+              "label": "Interfacing Alat (:9999)",
               "status": "ada",
-              "ket": "Konfigurasi analyzer ASTM E1381/E1394 & channel mapping"
+              "ket": "Konfigurasi protokol ASTM E1381/E1394 & channel mapping"
             },
             {
               "id": "lis-lot-verification",
-              "label": "Uji Lot Reagen",
+              "label": "Verifikasi Lot Reagen",
               "status": "ada",
-              "ket": "Uji paralel 5-10 sampel & deteksi pergeseran bias"
+              "ket": "Evaluasi bias lot-to-lot & uji paralel kontrol"
             }
           ]
         },
         {
-          "nama": "3. Pasca-Analitik & Validasi",
+          "nama": "Pasca-Analitik & Otorisasi",
           "menu": [
             {
               "id": "lab-validation",
-              "label": "Otorisasi Sp.PK",
+              "label": "Otorisasi Dokter Sp.PK",
               "status": "ada",
-              "ket": "Otorisasi klinis dokter spesialis patologi klinik",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'validation'})"
+              "ket": "Expert clinical impression & otorisasi medis Sp.PK"
             },
             {
               "id": "lis-critical-value",
-              "label": "Alert Nilai Kritis",
+              "label": "Logbook Nilai Kritis",
               "status": "ada",
-              "ket": "Pencatatan lapor telepon dokter & bukti read-back"
+              "ket": "Pencatatan eskalasi nilai kritis SLA < 15 menit & TBaK"
             },
             {
               "id": "lab-approval",
-              "label": "Approval & TTE QR",
+              "label": "Validasi & TTE Digital",
               "status": "ada",
-              "ket": "Tanda tangan kriptografis QR & rilis ke portal pasien",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'approval'})"
+              "ket": "Tanda tangan kriptografis QR & rilis hasil resmi"
             },
             {
               "id": "lab-tat",
-              "label": "Turnaround Time (TAT)",
+              "label": "Monitoring TAT",
               "status": "ada",
-              "ket": "Durasi tiap tahap pra-analitik, analitik, rilis"
+              "ket": "Turnaround time pra-analitik, analitik, dan pasca-analitik"
             }
           ]
         },
         {
-          "nama": "4. Mutu & Kendali Kualitas (QC)",
+          "nama": "Quality Control (QC)",
           "menu": [
             {
               "id": "lab-qc",
-              "label": "QC Harian (Levey-Jennings)",
+              "label": "QC Harian & Westgard",
               "status": "ada",
-              "ket": "Evaluasi otomatis 6 Westgard Multi-rules & Six Sigma",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'qc'})"
+              "ket": "Plot Levey-Jennings, evaluasi 6 multi-rules Westgard & Six Sigma"
             },
             {
               "id": "lis-pme",
               "label": "Uji Profisiensi (PME)",
               "status": "ada",
-              "ket": "Manajemen PME Kemenkes/RIQAS & kalkulasi Z-Score"
+              "ket": "Kalkulasi Z-Score uji profisiensi eksternal ISO 15189"
             }
           ]
         },
         {
-          "nama": "5. Bank Sampel & Arsip",
+          "nama": "Bio-Bank & Arsip",
           "menu": [
             {
               "id": "lis-sample-archive",
-              "label": "Rak Arsip (-20°C)",
+              "label": "Rak Penyimpanan Spesimen",
               "status": "ada",
-              "ket": "Grid rak 10x10, add-on test retrieval & auto-dispose"
+              "ket": "Manajemen slot freezer -20°C & retrieval add-on test"
             },
             {
               "id": "lab-report",
-              "label": "Riwayat Hasil & Tren",
+              "label": "Riwayat Hasil Kumulatif",
               "status": "ada",
-              "ket": "Riwayat hasil kumulatif dan grafik tren analit",
-              "rute": "lab",
-              "aksi": "navigate('lab',{tab:'report'})"
+              "ket": "Tren analit longitudinal & riwayat kumulatif pasien"
             }
           ]
         },
         {
-          "nama": "6. Master Data & Pengaturan Lab",
+          "nama": "Master Data & Konfigurasi",
           "menu": [
             {
               "id": "refrange",
-              "label": "Nilai Rujukan (Reference Range)",
+              "label": "Reference Range Matrix",
               "status": "ada",
-              "ket": "Matriks rentang rujukan per kelompok umur, jenis kelamin, dan metode"
+              "ket": "Nilai rujukan multi-tier per usia, gender, dan metode"
             },
             {
               "id": "product",
-              "label": "Master Tes & Kode LOINC/UCUM",
+              "label": "Katalog Tes & LOINC/UCUM",
               "status": "ada",
-              "ket": "530+ parameter tes laboratorium terstandar LOINC/UCUM"
+              "ket": "Master analit & pemetaan standar LOINC OBX-3 / UCUM OBX-6"
             },
             {
               "id": "package",
-              "label": "Paket & Panel Pemeriksaan",
+              "label": "Panel & Paket Pemeriksaan",
               "status": "ada",
-              "ket": "Konfigurasi paket hematologi, kimia, serologi, dan MCU"
+              "ket": "Konfigurasi profil panel organ, hemostasis, dan MCU"
             },
             {
               "id": "inventory",
-              "label": "Stok Reagen & BHP Lab",
+              "label": "Inventori Reagen & BHP",
               "status": "ada",
-              "ket": "Saldo stok reagen, kit kontrol, kalibrator, dan pemantauan suhu"
+              "ket": "Logistik reagen, lot number, expired date & suhu simpan"
             },
             {
               "id": "referral",
-              "label": "Lab Rujukan Luar",
+              "label": "Rujukan Laboratorium",
               "status": "ada",
-              "ket": "Kirim spesimen keluar dan rekonsiliasi biaya rujukan"
+              "ket": "Outsource spesimen ke lab rujukan & rekonsiliasi"
             },
             {
               "id": "catalog-export",
-              "label": "Ekspor Katalog LOINC Siap-LIS",
+              "label": "Ekspor Standar LOINC",
               "status": "ada",
-              "ket": "Dataset katalog terstandarisasi siap lisensi & ekspor CSV/TSV"
+              "ket": "Generator dataset LIS-ready dalam format CSV/TSV"
             },
             {
               "id": "lis-settings",
-              "label": "Pengaturan LIS & Connector",
+              "label": "Konfigurasi LIS & Gateway",
               "status": "ada",
-              "ket": "Profil lab, dr. Sp.PK, ambang batas kritis, dan unduh paket connector :9999"
+              "ket": "Profil instansi, DPJP Sp.PK, critical limits & installer service :9999"
             }
           ]
         }

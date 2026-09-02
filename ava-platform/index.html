@@ -31,9 +31,9 @@
   <nav class="rail-nav" id="rail-nav"></nav>
 
   <div class="sidebar-settings-bar">
-    <button class="sidebar-settings-btn" onclick="navigate('lis-settings')">
+    <button class="sidebar-settings-btn" id="workspace-settings-btn" onclick="navigate('lis-settings')">
       <span style="font-size:14px; color:#FBBF24;">⚙️</span>
-      <span style="flex:1; text-align:left;">Pengaturan &amp; LIS Connector</span>
+      <span id="workspace-settings-label" style="flex:1; text-align:left;">Pengaturan &amp; LIS Connector</span>
     </button>
   </div>
 
@@ -271,6 +271,32 @@ window.addEventListener('DOMContentLoaded', async () => {
                       || (situsIni && situsIni.workspace)
                       || defaultSubdomainWorkspace;
 
+  // Tombol yang selalu tampak di bawah rail harus mengikuti ruang kerja.
+  // Sebelumnya HIS, Tech, Wellness, dan OPS sama-sama membawa pengguna ke
+  // konfigurasi connector LIS (:9999). Selain membingungkan, itu membuka
+  // konteks operasional yang tidak relevan bagi staf klinis. Konfigurasi
+  // umum tetap melewati router/RBAC; hanya target pintasannya yang berubah.
+  function sesuaikanChromeRuangKerja(ruang) {
+    const opsi = {
+      lis:      { halaman: 'lis-settings', label: 'Pengaturan & LIS Connector', tag: 'ISO 15189:2022' },
+      his:      { halaman: 'settings',     label: 'Pengaturan Sistem HIS',     tag: 'HIS / RME' },
+      tech:     { halaman: 'settings',     label: 'Pengaturan Platform',       tag: 'AVA TECH' },
+      wellness: { halaman: 'settings',     label: 'Pengaturan Wellness',       tag: 'WELLNESS' },
+      ops:      { halaman: 'settings',     label: 'Pengaturan Holding',        tag: 'AVA GLOBAL' }
+    }[ruang] || { halaman: 'settings', label: 'Pengaturan Sistem', tag: 'AVA ENGINE' };
+
+    const tombol = document.getElementById('workspace-settings-btn');
+    const label = document.getElementById('workspace-settings-label');
+    const tag = document.getElementById('sidebar-brand-tag');
+
+    if (label) label.textContent = opsi.label;
+    if (tag) tag.textContent = opsi.tag;
+    if (tombol) {
+      tombol.title = opsi.label;
+      tombol.onclick = () => navigate(opsi.halaman, opsi.halaman === 'settings' ? { tab: 'general' } : {});
+    }
+  }
+
   function determineInitialPage() {
     if (customView) return customView;
     if (hash.startsWith('#')) return hash.substring(1);
@@ -322,6 +348,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       applyRoleMenu();
       
       if (typeof siapkanNavigasi === 'function') siapkanNavigasi(workspaceAktif);
+      sesuaikanChromeRuangKerja(workspaceAktif);
 
       if (typeof injectExecToggle === 'function') setTimeout(injectExecToggle, 500);
       checkConnection();
@@ -355,6 +382,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           // Sebelumnya hanya jalur master token yang memanggilnya, sehingga
           // staf biasa melihat seluruh 14 rel di his, lis, ops, dan console.
           if (typeof siapkanNavigasi === 'function') siapkanNavigasi(workspaceAktif);
+          sesuaikanChromeRuangKerja(workspaceAktif);
           if (typeof injectExecToggle==='function') setTimeout(injectExecToggle,500);
           checkConnection();
           navigate(determineInitialPage());
@@ -821,6 +849,12 @@ function gambarRail(ruang) {
   const currentPage = window.currentPage || '';
 
   const GROUP_ICONS = {
+    'Pra-Analitik & Sampling': '🩸',
+    'Analitik & Interfacing': '🔬',
+    'Pasca-Analitik & Otorisasi': '✅',
+    'Quality Control (QC)': '📊',
+    'Bio-Bank & Arsip': '🧊',
+    'Master Data & Konfigurasi': '⚙️',
     '1. Pra-Analitik & Sampling': '🩸',
     '2. Analitik & Interfacing': '🔬',
     '3. Pasca-Analitik & Validasi': '✅',
