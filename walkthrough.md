@@ -115,3 +115,9 @@ Untuk mengaktifkan dua domain produksi, terapkan migrasi HIS
 Migrasi ini juga membuat `queue_config` bila instalasi lama hanya memiliki
 `queue_tickets`, sehingga tidak bergantung pada urutan pemasangan fitur loket.
 Tidak ada deploy atau perubahan data cloud yang dilakukan pada pekerjaan ini.
+
+Konfigurasi `supabase/config.toml` menetapkan `verify_jwt = false` hanya untuk
+`queue-public`, karena kiosk adalah perangkat publik tanpa sesi pengguna.
+Function sendiri hanya menerima enam layanan yang diizinkan, menerapkan
+pembatasan sentuhan, dan memakai service-role di server; browser tetap tidak
+memegang kredensial ataupun hak tulis tabel.

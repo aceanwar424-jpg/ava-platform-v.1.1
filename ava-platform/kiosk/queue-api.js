@@ -11,12 +11,22 @@
     : 'https://rmyqzyfvlmjxtatpctks.supabase.co/functions/v1/queue-public';
 
   async function panggil(jalur, opsi = {}) {
-    const res = await fetch(`${basis}/${jalur}`, {
-      ...opsi,
-      headers: { 'Content-Type': 'application/json', ...(opsi.headers || {}) },
-    });
+    let res;
+    try {
+      res = await fetch(`${basis}/${jalur}`, {
+        ...opsi,
+        headers: { 'Content-Type': 'application/json', ...(opsi.headers || {}) },
+      });
+    } catch (_) {
+      throw new Error('Layanan antrean belum tersedia. Deploy Edge Function queue-public terlebih dahulu.');
+    }
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error || data.message || 'Layanan antrean tidak dapat dihubungi');
+    if (!res.ok) {
+      const pesan = res.status === 404
+        ? 'Layanan antrean belum tersedia. Deploy Edge Function queue-public terlebih dahulu.'
+        : (data.error || data.message || 'Layanan antrean tidak dapat dihubungi');
+      throw new Error(pesan);
+    }
     return data;
   }
 

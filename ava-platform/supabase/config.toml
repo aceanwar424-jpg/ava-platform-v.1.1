@@ -1,0 +1,5 @@
+# Konfigurasi Supabase untuk endpoint publik yang hanya melayani kiosk dan
+# display antrean. Ia tidak memakai JWT pengguna; validasi layanan, pembatasan
+# sentuhan, dan akses database service-role berada di dalam function.
+[functions.queue-public]
+verify_jwt = false
