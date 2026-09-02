@@ -442,6 +442,10 @@ function renderRouterError(page, msg) {
 }
 
 function toggleSidebar() {
+  if (window.innerWidth >= 769 && typeof window.setSidebarExpanded === 'function') {
+    window.setSidebarExpanded(!document.body.classList.contains('sidebar-expanded'));
+    return;
+  }
   if (typeof window.setSidebarOpen === 'function') {
     const rail = document.getElementById('sidebar-rail');
     window.setSidebarOpen(!rail?.classList.contains('open'));

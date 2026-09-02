@@ -35,7 +35,7 @@
   /* Sidebar */
   --sidebar-w:     220px;
   --sidebar-mini:  52px;
-  --topbar-h:      56px;
+  --topbar-h:      52px;
 
   /* Shadows */
   --shadow-xs:  0 1px 2px rgba(0,0,0,.05);
@@ -272,9 +272,14 @@ body {
    Desain visual mengacu ke Logo & Dokumen AVA Global
 ══════════════════════════════════════ */
 :root {
-  --rail-w: 268px;
-  --sidebar-w: 268px;
-  --flyout-w: 268px;
+  --rail-w: 64px;
+  --sidebar-w: 64px;
+  --flyout-w: 232px;
+}
+
+body.sidebar-expanded {
+  --rail-w: 232px;
+  --sidebar-w: 232px;
 }
 
 .sidebar-rail {
@@ -289,6 +294,7 @@ body {
   z-index: 250;
   box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
   border-right: 1px solid rgba(212, 175, 55, 0.22);
+  transition: width .2s ease;
 }
 .sidebar-rail::before {
   content: '';
@@ -308,6 +314,7 @@ body {
   cursor: pointer;
   background: rgba(255, 255, 255, 0.02);
   transition: background .15s;
+  position: relative;
 }
 .sidebar-brand-box:hover {
   background: rgba(255, 255, 255, 0.05);
@@ -345,6 +352,21 @@ body {
   align-items: center;
   gap: 4px;
 }
+.sidebar-expand-control {
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 7px;
+  background: rgba(255,255,255,.06);
+  color: #CBD5E1;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: all .18s ease;
+}
+.sidebar-expand-control:hover { color:#fff; border-color:rgba(16,185,129,.7); background:rgba(16,185,129,.15); }
+body.sidebar-expanded .sidebar-expand-control { transform: rotate(180deg); }
 
 .rail-nav {
   flex: 1;
@@ -552,6 +574,88 @@ body {
 .conn-dot.ok, .conn-dot.online { background: #10B981; box-shadow: 0 0 8px #10B981; }
 .conn-dot.error { background: #EF4444; }
 
+/* ── Rail ringkas desktop ───────────────────────────────────────
+   Pada kondisi awal pengguna hanya melihat ikon kelompok. Label dan daftar
+   submenu muncul setelah rail diperluas lewat tombol atas atau ikon kelompok. */
+@media (min-width: 769px) {
+  .topbar, .main-content { transition: margin-left .2s ease, left .2s ease; }
+
+  body:not(.sidebar-expanded) .sidebar-brand-box {
+    min-height: 60px;
+    padding: 10px 8px;
+    justify-content: center;
+  }
+  body:not(.sidebar-expanded) .sidebar-brand-logo {
+    width: 34px;
+    height: 34px;
+    border-width: 1.5px;
+  }
+  body:not(.sidebar-expanded) .sidebar-brand-text,
+  body:not(.sidebar-expanded) .sidebar-main-label,
+  body:not(.sidebar-expanded) .sidebar-chevron,
+  body:not(.sidebar-expanded) .sidebar-sub-menu-list,
+  body:not(.sidebar-expanded) #workspace-settings-label,
+  body:not(.sidebar-expanded) .sidebar-footer { display: none !important; }
+
+  body:not(.sidebar-expanded) .sidebar-expand-control {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 17px;
+    height: 17px;
+    border-radius: 5px;
+    font-size: 15px;
+    opacity: .8;
+  }
+  body:not(.sidebar-expanded) .rail-nav {
+    padding: 8px 7px 16px;
+    overflow-x: hidden;
+  }
+  body:not(.sidebar-expanded) .sidebar-accordion-group {
+    margin-bottom: 5px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+  }
+  body:not(.sidebar-expanded) .sidebar-accordion-group.open {
+    background: rgba(16,185,129,.12);
+    border-color: rgba(16,185,129,.25);
+  }
+  body:not(.sidebar-expanded) .sidebar-main-btn {
+    min-height: 39px;
+    padding: 8px;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  body:not(.sidebar-expanded) .sidebar-main-left { justify-content: center; }
+  body:not(.sidebar-expanded) .sidebar-main-ico {
+    width: 22px;
+    font-size: 16px;
+  }
+  body:not(.sidebar-expanded) .sidebar-settings-bar {
+    padding: 7px;
+    background: transparent;
+    border-top: 1px solid rgba(255,255,255,.07);
+  }
+  body:not(.sidebar-expanded) .sidebar-settings-btn {
+    min-height: 38px;
+    padding: 7px;
+    justify-content: center;
+    border-color: rgba(212,175,55,.2);
+  }
+
+  body.sidebar-expanded .sidebar-brand-box { padding: 12px 13px; gap: 10px; }
+  body.sidebar-expanded .sidebar-brand-logo { width: 36px; height: 36px; }
+  body.sidebar-expanded .sidebar-brand-title { font-size: 12px; }
+  body.sidebar-expanded .sidebar-brand-sub { font-size: 10px; }
+  body.sidebar-expanded .rail-nav { padding: 8px 8px 16px; }
+  body.sidebar-expanded .sidebar-main-btn { padding: 8px 10px; font-size: 11.5px; }
+  body.sidebar-expanded .sidebar-main-ico { font-size: 13px; width: 18px; }
+  body.sidebar-expanded .sidebar-sub-link { min-height: 29px; padding: 6px 8px; font-size: 11px; }
+  body.sidebar-expanded .sidebar-settings-bar { padding: 7px 8px; }
+  body.sidebar-expanded .sidebar-settings-btn { padding: 7px 9px; font-size: 11px; }
+  body.sidebar-expanded .sidebar-footer { padding: 8px 12px; }
+}
+
 /* Nonaktifkan subnav horizontal atas agar area atas bersih dan lapang */
 .subnav {
   display: none !important;
@@ -707,7 +811,7 @@ body {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 16px;
   gap: 12px;
   z-index: 100;
   box-shadow: var(--shadow-xs);
@@ -817,7 +921,7 @@ body {
 .main-content {
   margin-left: var(--rail-w);
   margin-top: var(--topbar-h);
-  padding: 24px;
+  padding: 18px;
   min-height: calc(100vh - var(--topbar-h));
 }
 .main-content.mini, .main-content.expanded { margin-left: var(--rail-w); }

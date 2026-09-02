@@ -120,6 +120,7 @@ async function renderQueueConsole() {
   }
 
   if (!qkLoket) qkLoket = qkDaftarLoket[0].kode;
+  qkSinkronkanPanggilanAktif();
   qkGambar();
   qkMulaiSegar();
 }
@@ -132,6 +133,8 @@ function qkMulaiSegar() {
   qkTimer = setInterval(async () => {
     if (!document.getElementById('qk-akar')) { qkHentiSegar(); return; }
     await qkMuat();
+    qkSinkronkanPanggilanAktif();
+    qkGambarPanel();
     qkGambarDaftar();
   }, 10000);
 }
@@ -139,6 +142,27 @@ function qkHentiSegar() { if (qkTimer) { clearInterval(qkTimer); qkTimer = null;
 
 function qkLoketAktif() {
   return qkDaftarLoket.find(l => l.kode === qkLoket) || qkDaftarLoket[0];
+}
+
+// Panggilan aktif tersimpan di basis data, bukan hanya di state browser.
+// Ini membuat nomor yang telah dipanggil tetap terlihat setelah HIS di-refresh
+// atau konsol dibuka ulang dari komputer lain.
+function qkSinkronkanPanggilanAktif() {
+  const L = qkLoketAktif();
+  if (!L || !Array.isArray(qkPapan)) return;
+  const aktif = qkPapan
+    .filter(t => t.status === 'Dipanggil'
+      && (Number(t.counter_id) === Number(L.id) || (!t.counter_id && t.counter === L.nama)))
+    .sort((a, b) => String(b.called_at || '').localeCompare(String(a.called_at || '')))[0];
+
+  qkSekarang = aktif ? {
+    ...aktif,
+    nomor: aktif.queue_number,
+    pasien: aktif.patient_name,
+    panggilan_ke: aktif.jml_panggil,
+    loket: L.nama,
+    ruang: aktif.ruang || L.ruang,
+  } : null;
 }
 
 function qkGambar() {

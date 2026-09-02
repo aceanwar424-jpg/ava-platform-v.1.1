@@ -119,6 +119,18 @@ operator dapat mengubah nama/ruang lewat Konfigurasi Antrean tanpa nomor
 tiket yang sudah terbit berubah.
 Tidak ada deploy atau perubahan data cloud yang dilakukan pada pekerjaan ini.
 
+## Sidebar Ringkas Desktop
+
+- Rail desktop sekarang dimulai pada lebar 64 px dan hanya menampilkan ikon
+  kelompok. Klik ikon kelompok atau kontrol chevron di area brand memperluas
+  rail menjadi 232 px; pengelompokan accordion dan submenu yang sama tetap
+  dipakai.
+- Preferensi lebar rail disimpan per-browser (`ava_sidebar_expanded`), sedangkan
+  layar kecil tetap menggunakan drawer mobile sehingga label tidak tersembunyi
+  pada perangkat sentuh.
+- Tinggi topbar dan padding area kerja dipadatkan untuk meningkatkan area kerja;
+  font submenu saat diperluas diperkecil tetapi tetap di atas 11 px.
+
 Konfigurasi `supabase/config.toml` menetapkan `verify_jwt = false` hanya untuk
 `queue-public`, karena kiosk adalah perangkat publik tanpa sesi pengguna.
 Function sendiri hanya menerima enam layanan yang diizinkan, menerapkan

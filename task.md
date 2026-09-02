@@ -16,3 +16,5 @@
 - [x] Kontrak kiosk dipindahkan ke migrasi HIS resmi dan bukan skrip SQL lepas.
 - [x] Edge Function produksi memakai prosedur kiosk khusus berbasis service-role.
 - [x] Peta domain, build desktop, dan audit regresi diverifikasi ulang.
+- [x] Sidebar desktop ringkas: ikon sebagai keadaan awal, ekspansi eksplisit, dan grouping accordion tetap tersedia.
+- [x] Kepadatan visual topbar dan konten disesuaikan untuk layar operasional.

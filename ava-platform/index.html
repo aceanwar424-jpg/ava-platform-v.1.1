@@ -9,7 +9,7 @@
      query pertama. Hanya petunjuk browser — tidak mengubah perilaku apa pun. -->
 <link rel="preconnect" href="https://rmyqzyfvlmjxtatpctks.supabase.co" crossorigin>
 <link rel="dns-prefetch" href="https://rmyqzyfvlmjxtatpctks.supabase.co">
-<link rel="stylesheet" href="css/style.css?v=20260902-sidebar">
+<link rel="stylesheet" href="css/style.css?v=20260902-sidebar-compact">
 <link rel="stylesheet" href="css/dashboard.css?v=20260719s">
 <script defer src="js/core/rbacService.js"></script>
 <script defer src="js/core/mpiService.js"></script>
@@ -26,6 +26,8 @@
       <div class="sidebar-brand-title" id="sidebar-brand-title">AVA LAB</div>
       <div class="sidebar-brand-sub" id="sidebar-brand-sub">🔬 Diagnostic Laboratory</div>
     </div>
+    <button class="sidebar-expand-control" type="button" aria-label="Perluas sidebar"
+      title="Perluas sidebar" onclick="event.stopPropagation(); toggleSidebar()">›</button>
   </div>
 
   <nav class="rail-nav" id="rail-nav"></nav>
@@ -170,7 +172,7 @@
 <script defer src="js/core/icons.js?v=20260721g"></script>
 <script defer src="js/core/api.js?v=20260719s"></script>
 <script defer src="js/core/utils.js?v=20260723b"></script>
-<script defer src="js/core/router.js?v=20260719s"></script>
+<script defer src="js/core/router.js?v=20260902-sidebar-compact"></script>
 <script defer src="js/core/storage.js?v=20260719s"></script>
 <script defer src="js/core/barcode.js?v=20260725a"></script>
 <!-- Kunci API lokal (tidak masuk repo). Wajib sebelum aiGateway.js.
@@ -218,10 +220,28 @@ function setSidebarOpen(isOpen) {
 }
 window.setSidebarOpen = setSidebarOpen;
 
+function setSidebarExpanded(isExpanded, persist = true) {
+  const rail = document.getElementById('sidebar-rail');
+  const expand = !!isExpanded;
+  document.body.classList.toggle('sidebar-expanded', expand);
+  rail?.classList.toggle('expanded', expand);
+  document.querySelectorAll('.sidebar-expand-control').forEach((btn) => {
+    btn.setAttribute('aria-label', expand ? 'Perkecil sidebar' : 'Perluas sidebar');
+    btn.setAttribute('title', expand ? 'Perkecil sidebar' : 'Perluas sidebar');
+  });
+  if (persist) localStorage.setItem('ava_sidebar_expanded', expand ? '1' : '0');
+}
+window.setSidebarExpanded = setSidebarExpanded;
+
 function toggleSidebar() {
+  if (window.innerWidth >= 769) {
+    setSidebarExpanded(!document.body.classList.contains('sidebar-expanded'));
+    return;
+  }
   const rail = document.getElementById('sidebar-rail');
   setSidebarOpen(!rail?.classList.contains('open'));
 }
+window.toggleSidebar = toggleSidebar;
 
 // ── Date display ─────────────────────────
 function updateDate() {
@@ -234,6 +254,11 @@ function updateDate() {
 
 // ── Boot ─────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
+  // Desktop dimulai hemat ruang (hanya ikon). Pilihan pengguna diingat di
+  // browser ini; drawer pada layar kecil selalu mengikuti mekanisme mobile.
+  if (window.innerWidth >= 769) {
+    setSidebarExpanded(localStorage.getItem('ava_sidebar_expanded') === '1', false);
+  }
   updateDate();
   setInterval(updateDate, 60000);
 
@@ -964,6 +989,14 @@ window.gambarRail = gambarRail;
 function toggleSidebarAccordion(groupId) {
   const grp = document.getElementById(groupId);
   if (!grp) return;
+  // Rail ringkas hanya menampilkan ikon. Klik ikon memperluas rail dan
+  // langsung membuka kelompok yang dipilih, tanpa mengubah struktur grouping.
+  if (window.innerWidth >= 769 && !document.body.classList.contains('sidebar-expanded')) {
+    setSidebarExpanded(true);
+    document.querySelectorAll('.sidebar-accordion-group.open').forEach(x => x.classList.remove('open'));
+    grp.classList.add('open');
+    return;
+  }
   grp.classList.toggle('open');
 }
 window.toggleSidebarAccordion = toggleSidebarAccordion;
