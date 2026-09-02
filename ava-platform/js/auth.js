@@ -104,7 +104,9 @@ window.quickFillDemo = quickFillDemo;
 async function loadUserProfile(){
   if(!window.currentUser) return;
   const email = (window.currentUser.email || '').toLowerCase();
-  if (AVA_DEMO_USERS[email]) {
+  // Akun demo hanya boleh melengkapi sesi demo lokal. Pada domain publik,
+  // role dan profil harus selalu berasal dari Supabase Auth + user_profiles.
+  if (authLocalDemo() && AVA_DEMO_USERS[email]) {
     const demo = AVA_DEMO_USERS[email];
     window.currentUser.role = demo.role;
     window.currentUser.profile = { ...demo };
