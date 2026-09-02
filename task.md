@@ -18,3 +18,4 @@
 - [x] Peta domain, build desktop, dan audit regresi diverifikasi ulang.
 - [x] Sidebar desktop ringkas: ikon sebagai keadaan awal, ekspansi eksplisit, dan grouping accordion tetap tersedia.
 - [x] Kepadatan visual topbar dan konten disesuaikan untuk layar operasional.
+- [x] Menu HIS dirapikan dalam hierarki domain kerja → layanan → modul tanpa menghapus akses menu mana pun.

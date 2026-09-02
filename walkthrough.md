@@ -131,6 +131,19 @@ Tidak ada deploy atau perubahan data cloud yang dilakukan pada pekerjaan ini.
 - Tinggi topbar dan padding area kerja dipadatkan untuk meningkatkan area kerja;
   font submenu saat diperluas diperkecil tetapi tetap di atas 11 px.
 
+## Konsolidasi Menu HIS
+
+- Renderer HIS kini menggabungkan 10 kategori sumber menjadi domain kerja
+  yang lebih pendek. Setiap domain membuka daftar layanan lebih dahulu, lalu
+  modul operasionalnya; peta menu, route, dan RBAC tetap memakai sumber yang
+  sama.
+- Contoh hierarki: **Pelayanan Klinis → Radiologi & Pencitraan → Order,
+  PACS, Unggah Studi, Bacaan**, serta **Pelayanan Klinis → Jantung, Paru &
+  Indera → EKG, Treadmill, Audiometri & Spirometri**.
+- `node scripts/audit-menu-hidup.js` setelah perubahan: 158 menu berstatus
+  tersedia diperiksa; tidak ada renderer, tabel/view, RPC, handler, atau
+  manifest yang hilang.
+
 Konfigurasi `supabase/config.toml` menetapkan `verify_jwt = false` hanya untuk
 `queue-public`, karena kiosk adalah perangkat publik tanpa sesi pengguna.
 Function sendiri hanya menerima enam layanan yang diizinkan, menerapkan
