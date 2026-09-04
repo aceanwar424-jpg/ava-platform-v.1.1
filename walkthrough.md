@@ -261,3 +261,71 @@ seluruh nama layanan kiosk agar pemetaan loket tidak salah ketik.
   tidak menemukan renderer, tabel/view, RPC, handler, atau manifest hilang.
 - Batas: perubahan ini tidak membuat atau memigrasikan tabel master,
   tidak menulis data klinis, dan tidak mengaktifkan integrasi vendor.
+
+## Pemisahan Menu Configuration dan Operasional
+
+- **Pengaturan & Master HIS** kini khusus memuat akses/data awal, master
+  fasilitas, praktisi/pasien, korporat/keuangan, parameter klinis, antrean,
+  perangkat, obat, promo, dan integrasi.
+- Konfigurasi antrean dipindahkan dari **Alur Pasien** ke **Pengaturan**.
+  Konsol panggilan, kiosk, layar antrean, pendaftaran, pemeriksaan MCU,
+  farmasi, kasir, dan booking tetap merupakan halaman operasional.
+- Kerangka baru ditambahkan untuk cabang/plant; unit, ruang, kelas, dan alat;
+  spesialisasi serta fee; penjamin/alergi/ICD; kontrak/jabatan korporat;
+  parameter MCU; bank/EDC/mapping akun; flow/device antrean; formularium;
+  promo; dan telemedicine. Kartu fokus sekarang juga menampilkan blueprint
+  field untuk setiap master.
+- Peta menu dibangkitkan ulang: 197 menu (162 tersedia, 28 parsial, 7 belum).
+  Audit memeriksa 160 menu tersedia dan tidak menemukan layar, renderer,
+  tabel/view, RPC, handler, atau manifest yang hilang.
+
+## Rancangan End-to-End 20 Master
+
+- Rancangan lengkap disimpan di `docs/RANCANGAN_E2E_20_MASTER_HIS.md` sebelum
+  perubahan skema atau CRUD dimulai. Ia mencakup model relasi, field minimum,
+  workflow, status/versioning, RBAC, outbox integrasi, acceptance criteria,
+  dan paket rilis.
+- Hasil desain mengunci batas penting: Configuration tidak menjalankan
+  transaksi; perangkat kiosk tidak mendapat akses DB; transaksi menyimpan
+  snapshot master; dan sistem tenant-aware wajib diterapkan dari awal.
+- Referensi integrasi menggunakan dokumentasi primer SATUSEHAT dan HL7 FHIR;
+  aktivasi tetap dibatasi sandbox lalu UAT, tanpa penggunaan secret atau data
+  pasien nyata pada tahap perancangan.
+
+## Registry Master HIS — Implementasi Source
+
+- Semua 20 menu Configuration yang sebelumnya hanya mengarah ke hub kini
+  langsung menuju `master-records` dengan domain eksplisit. Setiap domain
+  mempunyai daftar, pencarian, filter status, tambah, ubah, soft archive,
+  versi, dan jejak audit.
+- `ava-platform/modules/system/config/master_registry.js` mendefinisikan field
+  domain untuk fasilitas, klinis/SDM, keuangan/promo, antrean, serta integrasi.
+  Form SATUSEHAT/Telemedicine menerima `vault://...` reference saja; tidak ada
+  input API key, token, password, atau data pasien.
+- `0050_his_master_registry.sql` membuat registry tenant-aware, RLS baca per
+  tenant, RPC tulis berperan, audit append-only, code uniqueness, periode
+  efektif, dan pengarsipan. Domain `queue_device` menyinkronkan device aktif
+  ke `queue_public_devices`; tenant lain tidak dapat menimpa device ID publik.
+- Preflight dan prosedur rollout/rollback operasional tersedia di
+  `db/preflight/0050_his_master_registry_preflight.sql` dan
+  `db/runbooks/0050_his_master_registry.md`.
+
+### Bukti verifikasi source
+
+- `node scripts/verify-master-registry-contract.js`: 20 menu/domain, definisi
+  UI, dan seed migrasi konsisten.
+- `node scripts/bangun-menu.js` dan `node scripts/bangun-manifest.js`: lulus;
+  peta saat ini berisi 197 menu (161 tersedia, 29 parsial, 7 belum).
+- `node scripts/audit-menu-hidup.js`: 159 menu berstatus tersedia, tanpa
+  renderer, tabel/view, RPC, handler, atau manifest yang hilang.
+- `node scripts/audit-keamanan-modul.js`: 2.350/2.350 pemeriksaan lulus.
+- `node scripts/uji/test_antrian_panggilan.js`: 11/11 lulus.
+- `node --check` untuk router, Configuration Hub, registry master, dan
+  pemeriksa kontrak; serta `git diff --check`: lulus.
+
+### Batas verifikasi
+
+Migrasi `0050` belum dijalankan ke staging maupun produksi, sehingga belum
+ada data master baru, perangkat publik, ataupun integrasi vendor yang diubah.
+Pengujian database nyata harus mengikuti runbook dengan backup, preflight, dan
+UAT pemilik proses terlebih dahulu.

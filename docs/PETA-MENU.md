@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 177 — 🟢 161 ada · 🟡 9 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 197 — 🟢 161 ada · 🟡 29 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -113,7 +113,6 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Konsol Panggilan Antrean | `queue-console` | Panggil berikutnya, panggil ulang, tandai tidak hadir, dan pindah loket — dengan pemanggilan bersuara |
 | 🟢 | Kiosk Mandiri Pasien | `queue-kiosk` | Ambil nomor sendiri di lobi |
 | 🟢 | Jadwal Dokter & Perjanjian | `appointments` | Reservasi konsultasi & pengingat |
-| 🟢 | Konfigurasi Antrean | `queue-config` | Loket, prefiks nomor, kuota harian, dan urutan prioritas panggilan |
 
 **Pelayanan Klinis**
 
@@ -426,7 +425,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 ---
 
-### Pengaturan Sistem
+### Pengaturan & Master HIS
 
 `konfigurasi`
 
@@ -451,6 +450,47 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟡 | Bank, EDC & Pembayaran | `config` › cfg-payment | Metode bayar, bank, EDC, dan mapping akun |
 | 🟡 | Flow, Display & Perangkat Antrean | `config` › cfg-queue | Flow layanan, outlet, ruang, display, kiosk, dan device |
 | 🟡 | Master Obat & Aturan Pakai | `config` › cfg-medicine | Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi |
+
+**Fasilitas & Sumber Daya**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Master Cabang / Plant | `master-records` › cfg-branch | Kode, identitas, alamat, status dan jam operasional cabang |
+| 🟡 | Unit, Ruang & Kelas Layanan | `master-records` › cfg-unit-room | Struktur unit, ruang, kapasitas, lokasi dan kelas layanan |
+| 🟡 | Peralatan & Modalitas | `master-records` › cfg-equipment | Alat, modalitas, lokasi, status dan jadwal pemeliharaan |
+| 🟡 | Kelas & Kapasitas Layanan | `master-records` › cfg-service-class | Kelas layanan, kapasitas, tarif dasar dan status aktif |
+
+**Master Klinis & SDM**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Spesialisasi Praktisi | `master-records` › cfg-specialty | Kategori dan spesialisasi tenaga medis |
+| 🟡 | Jasa Praktisi & Fee Rujukan | `master-records` › cfg-practitioner-fee | Jasa layanan, fee praktisi, rujukan, dan periode berlaku |
+| 🟡 | Penjamin, Kondisi & Alergi Pasien | `master-records` › cfg-patient-reference | Master penjamin, kondisi klinis, alergi, gelar dan relasi |
+| 🟡 | Referensi Diagnosis & Prosedur | `master-records` › cfg-diagnosis-reference | Referensi ICD-10 dan ICD-9-CM dengan versi dan status aktif |
+| 🟡 | Parameter & Hasil MCU | `master-records` › cfg-mcu-parameter | Exposure, hasil, status akhir, rekomendasi dan parameter fisik |
+| 🟡 | Ambang Audiometri, Spirometri & Visus | `master-records` › cfg-mcu-assessment | Ambang, klasifikasi, metode, nilai dan interpretasi MCU |
+| 🟡 | Kategori, Bentuk & Aturan Obat | `master-records` › cfg-medicine-reference | Kategori, bentuk sediaan, aturan pakai, instruksi dan waktu konsumsi |
+
+**Korporat, Keuangan & Promo**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Kontrak & Benefit Korporat | `master-records` › cfg-corporate-contract | Periode kontrak, paket, plafon, PIC dan fasilitas cakupan |
+| 🟡 | Level & Posisi Jabatan | `master-records` › cfg-job-master | Struktur jabatan untuk benefit, kontrak dan MCU korporat |
+| 🟡 | Bank & Terminal EDC | `master-records` › cfg-bank-edc | Bank, merchant, terminal, settlement dan biaya MDR |
+| 🟡 | Mapping Pembayaran ke Akun | `master-records` › cfg-payment-account | Metode penerimaan, akun pendapatan/biaya dan status aktif |
+| 🟡 | Deal, Voucher & Diskon | `master-records` › cfg-promotion | Periode, target layanan, kuota, syarat dan status promo |
+
+**Antrean & Integrasi**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Konfigurasi Antrean | `queue-config` | Loket, prefiks nomor, kuota harian dan urutan prioritas panggilan |
+| 🟡 | Flow, Display & Outlet Antrean | `master-records` › cfg-queue-flow | Flow per layanan, ruang, display, outlet dan prioritas |
+| 🟡 | Registry Kiosk & Display | `master-records` › cfg-queue-device | Perangkat, lokasi, layanan, origin dan status terakhir aktif |
+| 🟡 | Setup Telemedicine | `master-records` › cfg-telemedicine | Jadwal, provider, webhook dan status koneksi |
+| 🟡 | SATUSEHAT — Setup & Status | `master-records` › cfg-satusehat | Status konfigurasi dan sinkronisasi FHIR; aktivasi melalui staging/UAT |
 
 ---
 

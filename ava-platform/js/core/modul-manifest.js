@@ -45,7 +45,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "mou": [
   "modules/crm/crm_pipeline.js",
@@ -316,7 +317,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "sales-corong": [
   "modules/crm/crm_pipeline.js",
@@ -340,7 +342,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "portal-korporat": [
   "modules/system/config/config_family.js",
@@ -355,7 +358,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "portal-akses": [
   "modules/system/config/config_family.js",
@@ -370,7 +374,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "perujuk": [
   "modules/crm/crm_pipeline.js",
@@ -524,7 +529,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "hc-schedule": [
   "modules/his/admission.js",
@@ -1147,7 +1153,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_home.js",
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js"
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "config": [
   "modules/system/config/config_family.js",
@@ -1155,21 +1162,23 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/db_studio.js",
-  "modules/system/lisensi.js",
-  "modules/system/ops_kendali.js",
-  "modules/system/portal_akses.js",
-  "modules/system/settings.js",
-  "modules/system/supportive.js",
-  "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/config/master_registry.js"
+ ],
+ "master-records": [
+  "modules/system/config/config_family.js",
+  "modules/system/config/config_home.js",
+  "modules/system/config/config_labreport.js",
+  "modules/system/config/config_package.js",
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "refrange": [
   "modules/system/config/config_family.js",
   "modules/system/config/config_home.js",
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js"
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "labreport": [
   "modules/system/config/config_family.js",
@@ -1184,14 +1193,16 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "corporate": [
   "modules/system/config/config_family.js",
   "modules/system/config/config_home.js",
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js"
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "radiology": [
   "modules/radiology/dicomViewer.js",
@@ -1214,7 +1225,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "spirometry": [
   "modules/system/config/config_family.js",
@@ -1229,7 +1241,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "medrecord": [
   "modules/his/admission.js",
@@ -1752,14 +1765,16 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_home.js",
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js"
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "family": [
   "modules/system/config/config_family.js",
   "modules/system/config/config_home.js",
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
-  "modules/system/config/config_product.js"
+  "modules/system/config/config_product.js",
+  "modules/system/config/master_registry.js"
  ],
  "anamnesa": [
   "modules/his/admission.js",
@@ -1792,7 +1807,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "settings": [
   "modules/system/config/config_family.js",
@@ -1807,7 +1823,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ],
  "tech": [
   "modules/business_units/ava_health.js",
@@ -2552,7 +2569,8 @@ window.MODUL_HALAMAN = {
   "modules/system/settings.js",
   "modules/system/supportive.js",
   "modules/system/surat.js",
-  "modules/system/timeline.js"
+  "modules/system/timeline.js",
+  "modules/system/config/master_registry.js"
  ]
 };
 
@@ -2680,5 +2698,6 @@ window.MODUL_SEMUA = [
  "modules/compliance/catalog_exporter.js",
  "modules/compliance/ikp.js",
  "modules/his/triase.js",
- "modules/lab/helpdesk.js"
+ "modules/lab/helpdesk.js",
+ "modules/system/config/master_registry.js"
 ];

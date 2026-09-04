@@ -96,7 +96,7 @@ const PAGE_TITLES = {
   inventory:'Inventory & Logistik', hrd:'HRD & SDM', homecare:'Home Care',
   admission:'Admission / Registrasi', anamnesa:'Anamnesa', lab:'Operasional Lab',
   wiki:'Wiki AVA Ecosystem', agentic:'Agentic AI',
-  config:'Configuration', product:'Master Produk & Tes', refrange:'Reference Range', labreport:'Setting Hasil PDF', corporate:'Corporate Management',
+  config:'Configuration', 'master-records':'Registry Master HIS', product:'Master Produk & Tes', refrange:'Reference Range', labreport:'Setting Hasil PDF', corporate:'Corporate Management',
   radiology:'Radiology', supportive:'Supportive Examination',
   medrecord:'Rekam Medis', cashier:'Kasir',
   queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payables:'Hutang Usaha', assets:'Aset & Kalibrasi', referral:'Rujukan Lab Luar', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes', inpatient:'Rawat Inap', pharmacy:'Farmasi', 'crm-pipeline':'Pipeline & Pendapatan',
@@ -342,6 +342,7 @@ async function navigate(page, params={}) {
     // Hub konfigurasi menerima fokus dari menu, sehingga master data tidak
     // lagi semuanya jatuh ke satu halaman yang sama.
     case 'config':      safeRun('renderConfigHub', params.focus || 'overview'); break;
+    case 'master-records': safeRun('renderMasterRegistry', params.domain); break;
     case 'refrange':    safeRun('renderConfigRefRange');          break;
     case 'labreport':   safeRun('renderSettings', 'pdf');          break;
     case 'corporate':   safeRun('renderConfigCorporate');        break;

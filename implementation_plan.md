@@ -60,6 +60,9 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 6. [ ] Konsolidasikan SQL arsip menjadi migrasi formal berurutan, lengkap dengan preflight serta rollback operasional.
 6a. [x] Tambahkan katalog dan audit otomatis agar referensi SQL arsip tidak hilang atau tidak terdokumentasi.
 7. [x] Perluas Configuration Hub menjadi delapan domain HIS: fasilitas, praktisi, pasien, korporat, MCU, pembayaran, antrean, dan obat. Setiap domain mengarahkan modul yang siap dan menandai master yang masih berupa kerangka.
+7a. [x] Pisahkan kembali menu konfigurasi/master dari menu operasional; tambahkan kerangka navigasi untuk cabang/unit, praktisi, pasien, korporat, MCU, pembayaran, antrean, obat, promo, dan telemedicine.
+7b. [x] Rancang alur end-to-end, kontrak master, RBAC, integrasi, dan urutan rilis untuk 20 master baru sebelum membuat skema atau CRUD.
+7c. [x] Paket Foundation P0 disiapkan sebagai source-only: registry multi-tenant, audit, preflight, runbook, dan UI 20 domain; belum diterapkan ke database mana pun.
 8. [ ] Tambahkan test regresi RBAC dan alur kiosk → loket → display menggunakan database sementara.
 9. [ ] Aktifkan integrasi eksternal hanya melalui staging dan UAT pemilik proses per vendor.
 
@@ -75,3 +78,25 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - Tenant-aware queue serta setiap migrasi skema tidak diterapkan ke cloud sebelum checkpoint karena mengubah data operasional.
 - Secret integrasi hanya hidup pada fungsi server dan tidak boleh dimasukkan ke source atau Vercel public config.
 - Struktur Configuration Hub adalah navigasi dan kerangka UI; tidak membuat tabel, mengubah data master, atau menyatakan master yang belum memiliki formulir sebagai fitur siap produksi.
+- Menu baru tetap berstatus parsial sampai ada skema, validasi, RBAC, dan formulir penyimpanan yang disetujui. Tidak ada perubahan data master atau data pasien dalam tahap ini.
+- Rancangan 20 master memisahkan konfigurasi dari transaksi dan memakai fixture sintetis; pelaksanaannya tidak mengizinkan secret integrasi di browser atau data klinis lintas tenant.
+
+## Registry Master HIS — Implementasi Source 4 September 2026
+
+### Urutan implementasi
+
+1. [x] Tambahkan satu registry per-tenant untuk 20 domain master, kode unik, periode berlaku, status, dan versioning.
+2. [x] Tambahkan RPC tulis terbatas peran, jejak append-only, alasan perubahan, dan soft archive.
+3. [x] Hubungkan `queue_device` ke `queue_public_devices` tanpa memberi browser hak tulis perangkat publik.
+4. [x] Tambahkan daftar, cari/filter, tambah, ubah, arsip, dan lihat audit untuk seluruh 20 domain dari menu serta hub Configuration.
+5. [x] Buat preflight staging, runbook, katalog migrasi, dan pemeriksa kontrak statis 20 menu/domain.
+6. [x] Bangkitkan ulang peta menu/manifest dan jalankan audit menu, keamanan modul, antrean, serta sintaks.
+7. [ ] Terapkan `0050_his_master_registry.sql` ke staging sesudah backup dan persetujuan pemilik database.
+8. [ ] UAT pemilik proses per domain, lalu aktivasi integrasi vendor hanya pada sandbox resmi.
+
+### Implikasi IP & Kepatuhan
+
+- Registry bersifat generik dan parameterized per tenant; tidak menyemai data pasien, kontrak, harga, atau credential pihak mana pun.
+- Hanya referensi `vault://...` yang diterima UI untuk Telemedicine/SATUSEHAT. Secret, token, serta password tidak disimpan di browser maupun payload master.
+- Perubahan master ber-governance membutuhkan alasan dan snapshot audit. Arsip tidak menghapus riwayat.
+- Migrasi source tidak sama dengan perubahan database. Rilis staging/produksi tetap memerlukan backup, preflight, dan UAT sesuai `db/runbooks/0050_his_master_registry.md`.

@@ -2,7 +2,9 @@
 
 ## Jalur resmi
 
-Migrasi yang boleh diterapkan untuk instalasi baru dan rilis bertahap berada di `db/migrations/` dan dijalankan berurutan berdasarkan nomor. Rilis antrean publik saat ini berakhir pada `0048_antrean_tenant_device_public.sql`.
+Migrasi yang boleh diterapkan untuk instalasi baru dan rilis bertahap berada di `db/migrations/` dan dijalankan berurutan berdasarkan nomor. Jalur saat ini mencakup `0048_antrean_tenant_device_public.sql`, `0049_homecare_bridging_his_lis.sql`, lalu `0050_his_master_registry.sql`.
+
+`0050_his_master_registry.sql` wajib didahului preflight dan runbook yang ada di `db/preflight/0050_his_master_registry_preflight.sql` serta `db/runbooks/0050_his_master_registry.md`. Migrasi ini belum merupakan perintah untuk mengaktifkan SATUSEHAT/Telemedicine atau melakukan deploy produksi.
 
 ## SQL arsip
 

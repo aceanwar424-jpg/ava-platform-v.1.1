@@ -1353,6 +1353,31 @@ select { cursor: pointer; }
 
 .modal-box.wide { max-width: 800px; }
 .modal-box.narrow { max-width: 420px; }
+.modal-box.modal-lg { max-width: 920px; }
+.modal-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:18px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--border);
+}
+.modal-head h2 { margin:0; font-size:17px; color:var(--navy); }
+.modal-head p { margin:4px 0 0; font-size:11px; color:var(--text3); line-height:1.45; }
+.modal-x { border:0; background:transparent; color:var(--text3); font-size:24px; line-height:1; cursor:pointer; }
+.modal-x:hover { color:var(--danger); }
+.master-registry-grid label { display:flex; flex-direction:column; gap:5px; font-size:11px; font-weight:700; color:var(--navy); }
+.master-registry-grid input,
+.master-registry-grid select,
+.master-registry-grid textarea { width:100%; box-sizing:border-box; font:inherit; font-weight:500; }
+.master-registry-grid small { color:var(--text3); font-size:10px; line-height:1.35; font-weight:400; }
+@media (max-width: 640px) {
+  .modal-overlay { padding:10px; }
+  .modal-box.modal-lg { padding:18px; }
+  .master-registry-grid { grid-template-columns:1fr !important; }
+  .master-registry-grid [style*="grid-column"] { grid-column:auto !important; }
+}
 
 @keyframes modalIn {
   from { opacity: 0; transform: translateY(-16px) scale(.96); }

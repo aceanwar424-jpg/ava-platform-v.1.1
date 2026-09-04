@@ -356,12 +356,6 @@
               "label": "Jadwal Dokter & Perjanjian",
               "status": "ada",
               "ket": "Reservasi konsultasi & pengingat"
-            },
-            {
-              "id": "queue-config",
-              "label": "Konfigurasi Antrean",
-              "status": "ada",
-              "ket": "Loket, prefiks nomor, kuota harian, dan urutan prioritas panggilan"
             }
           ]
         },
@@ -1240,7 +1234,7 @@
       "pendek": "Portal"
     },
     "konfigurasi": {
-      "label": "Pengaturan Sistem",
+      "label": "Pengaturan & Master HIS",
       "ikon": "settings",
       "grup": [
         {
@@ -1343,6 +1337,192 @@
               "rute": "config",
               "aksi": "navigate('config',{focus:'medicine'})",
               "ket": "Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi"
+            }
+          ]
+        },
+        {
+          "nama": "Fasilitas & Sumber Daya",
+          "menu": [
+            {
+              "id": "cfg-branch",
+              "label": "Master Cabang / Plant",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'branch'})",
+              "ket": "Kode, identitas, alamat, status dan jam operasional cabang"
+            },
+            {
+              "id": "cfg-unit-room",
+              "label": "Unit, Ruang & Kelas Layanan",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'unit_room'})",
+              "ket": "Struktur unit, ruang, kapasitas, lokasi dan kelas layanan"
+            },
+            {
+              "id": "cfg-equipment",
+              "label": "Peralatan & Modalitas",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'equipment'})",
+              "ket": "Alat, modalitas, lokasi, status dan jadwal pemeliharaan"
+            },
+            {
+              "id": "cfg-service-class",
+              "label": "Kelas & Kapasitas Layanan",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'service_capacity'})",
+              "ket": "Kelas layanan, kapasitas, tarif dasar dan status aktif"
+            }
+          ]
+        },
+        {
+          "nama": "Master Klinis & SDM",
+          "menu": [
+            {
+              "id": "cfg-specialty",
+              "label": "Spesialisasi Praktisi",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'specialty'})",
+              "ket": "Kategori dan spesialisasi tenaga medis"
+            },
+            {
+              "id": "cfg-practitioner-fee",
+              "label": "Jasa Praktisi & Fee Rujukan",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'practitioner_fee'})",
+              "ket": "Jasa layanan, fee praktisi, rujukan, dan periode berlaku"
+            },
+            {
+              "id": "cfg-patient-reference",
+              "label": "Penjamin, Kondisi & Alergi Pasien",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'patient_reference'})",
+              "ket": "Master penjamin, kondisi klinis, alergi, gelar dan relasi"
+            },
+            {
+              "id": "cfg-diagnosis-reference",
+              "label": "Referensi Diagnosis & Prosedur",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'diagnosis_reference'})",
+              "ket": "Referensi ICD-10 dan ICD-9-CM dengan versi dan status aktif"
+            },
+            {
+              "id": "cfg-mcu-parameter",
+              "label": "Parameter & Hasil MCU",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'mcu_parameter'})",
+              "ket": "Exposure, hasil, status akhir, rekomendasi dan parameter fisik"
+            },
+            {
+              "id": "cfg-mcu-assessment",
+              "label": "Ambang Audiometri, Spirometri & Visus",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'mcu_threshold'})",
+              "ket": "Ambang, klasifikasi, metode, nilai dan interpretasi MCU"
+            },
+            {
+              "id": "cfg-medicine-reference",
+              "label": "Kategori, Bentuk & Aturan Obat",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'medicine_reference'})",
+              "ket": "Kategori, bentuk sediaan, aturan pakai, instruksi dan waktu konsumsi"
+            }
+          ]
+        },
+        {
+          "nama": "Korporat, Keuangan & Promo",
+          "menu": [
+            {
+              "id": "cfg-corporate-contract",
+              "label": "Kontrak & Benefit Korporat",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'corporate_contract'})",
+              "ket": "Periode kontrak, paket, plafon, PIC dan fasilitas cakupan"
+            },
+            {
+              "id": "cfg-job-master",
+              "label": "Level & Posisi Jabatan",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'job_master'})",
+              "ket": "Struktur jabatan untuk benefit, kontrak dan MCU korporat"
+            },
+            {
+              "id": "cfg-bank-edc",
+              "label": "Bank & Terminal EDC",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'bank_edc'})",
+              "ket": "Bank, merchant, terminal, settlement dan biaya MDR"
+            },
+            {
+              "id": "cfg-payment-account",
+              "label": "Mapping Pembayaran ke Akun",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'payment_mapping'})",
+              "ket": "Metode penerimaan, akun pendapatan/biaya dan status aktif"
+            },
+            {
+              "id": "cfg-promotion",
+              "label": "Deal, Voucher & Diskon",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'promotion'})",
+              "ket": "Periode, target layanan, kuota, syarat dan status promo"
+            }
+          ]
+        },
+        {
+          "nama": "Antrean & Integrasi",
+          "menu": [
+            {
+              "id": "queue-config",
+              "label": "Konfigurasi Antrean",
+              "status": "ada",
+              "ket": "Loket, prefiks nomor, kuota harian dan urutan prioritas panggilan"
+            },
+            {
+              "id": "cfg-queue-flow",
+              "label": "Flow, Display & Outlet Antrean",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'queue_flow'})",
+              "ket": "Flow per layanan, ruang, display, outlet dan prioritas"
+            },
+            {
+              "id": "cfg-queue-device",
+              "label": "Registry Kiosk & Display",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'queue_device'})",
+              "ket": "Perangkat, lokasi, layanan, origin dan status terakhir aktif"
+            },
+            {
+              "id": "cfg-telemedicine",
+              "label": "Setup Telemedicine",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'telemedicine'})",
+              "ket": "Jadwal, provider, webhook dan status koneksi"
+            },
+            {
+              "id": "cfg-satusehat",
+              "label": "SATUSEHAT — Setup & Status",
+              "status": "parsial",
+              "rute": "master-records",
+              "aksi": "navigate('master-records',{domain:'satusehat_setup'})",
+              "ket": "Status konfigurasi dan sinkronisasi FHIR; aktivasi melalui staging/UAT"
             }
           ]
         }

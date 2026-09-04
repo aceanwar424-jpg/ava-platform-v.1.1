@@ -33,5 +33,12 @@
 - [x] Audit otomatis referensi migrasi legacy dan katalog jalur rilis ditambahkan.
 - [x] Configuration Hub diperluas dengan jalur HIS yang sudah tersedia.
 - [x] Delapan domain Configuration HIS dapat dibuka langsung dari sidebar dan membedakan modul tersedia dari kerangka master.
-- [ ] Menunggu checkpoint database untuk penerapan staging dan konsolidasi skema.
+- [x] Menu konfigurasi dan menu operasional dipisahkan; 20 master baru ditambahkan sebagai kerangka berstatus parsial dengan field blueprint yang terlihat.
+- [x] Rancangan end-to-end 20 master diselesaikan sebelum eksekusi skema/CRUD.
+- [x] Registry source untuk 20 master dibuat: daftar, filter, tambah, ubah, arsip, audit, dan field domain spesifik.
+- [x] Migrasi `0050` menegakkan tenant isolation, role write gate, versioning, audit append-only, dan sinkronisasi perangkat antrean.
+- [x] Preflight, runbook, katalog migrasi, serta pemeriksa kontrak 20 menu/domain tersedia.
+- [x] Peta menu dan manifest dibangkitkan ulang; audit menu, audit keamanan, dan uji antrean lulus.
+- [ ] Persetujuan rilis staging untuk menerapkan `0050` setelah backup/preflight.
+- [ ] UAT pemilik proses serta koneksi sandbox vendor setelah registry tersedia di staging.
 - [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.
