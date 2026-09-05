@@ -27,185 +27,206 @@
 </head>
 <body>
   <div class="app-container">
-     <!-- ════════════════════════ VIRTU-STYLE PREMIUM LOGIN SCREEN ════════════════════════ -->
-    <div id="login-screen" class="screen active" style="display:flex; flex-direction:row; width:100vw; height:100vh; overflow:hidden; background:linear-gradient(135deg, #061429 0%, #0b2246 50%, #030c1b 100%); color:#ffffff; font-family:'Outfit', sans-serif;">
+    <!-- ════════════════════════ VIRTU-STYLE PREMIUM LOGIN SCREEN ════════════════════════ -->
+    <div id="login-screen" class="screen active" style="display:flex; flex-direction:row; width:100vw; height:100vh; overflow:hidden; background:linear-gradient(135deg, #051021 0%, #0a1c38 50%, #030812 100%); color:#ffffff; font-family:'Outfit', sans-serif;">
       
       <!-- Left Panel: Virtu Brand Glow, Features & Super Admin Quick Demo Account Chips -->
-      <div class="login-left-panel" style="flex:1.2; display:flex; flex-direction:column; padding:40px 50px; background:rgba(6, 20, 41, 0.6); backdrop-filter:blur(16px); border-right:1px solid rgba(255,255,255,0.08); justify-content:space-between; overflow-y:auto; position:relative;">
+      <div class="login-left-panel" style="flex:1.25; display:flex; flex-direction:column; padding:44px 56px; background:rgba(5, 16, 33, 0.65); backdrop-filter:blur(24px); border-right:1px solid rgba(255,255,255,0.08); justify-content:space-between; overflow-y:auto; position:relative;">
         
-        <!-- Background Glowing Ornaments -->
-        <div style="position:absolute; top:-100px; left:-100px; width:350px; height:350px; background:radial-gradient(circle, rgba(20,184,166,0.18) 0%, rgba(15,41,99,0) 70%); filter:blur(60px); pointer-events:none;"></div>
-        <div style="position:absolute; bottom:-100px; right:-100px; width:400px; height:400px; background:radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(15,41,99,0) 70%); filter:blur(70px); pointer-events:none;"></div>
+        <!-- Background Glowing Ambient Lights -->
+        <div style="position:absolute; top:-120px; left:-120px; width:420px; height:420px; background:radial-gradient(circle, rgba(56,189,248,0.18) 0%, rgba(15,41,99,0) 70%); filter:blur(70px); pointer-events:none;"></div>
+        <div style="position:absolute; bottom:-120px; right:-120px; width:450px; height:450px; background:radial-gradient(circle, rgba(212,175,55,0.18) 0%, rgba(15,41,99,0) 70%); filter:blur(80px); pointer-events:none;"></div>
 
         <div>
-          <!-- Header Brand Logo (AVA GLOBAL ECOSYSTEM Virtu style) -->
-          <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
-            <img src="css/logo-ava-global.png" style="width:52px; height:52px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; box-shadow:0 0 20px rgba(212,175,55,0.5);" alt="AVA Logo">
+          <!-- Header Brand Logo (AVA HEALTH Elegant White Style as on main site avahealth.sbs) -->
+          <div style="display:flex; align-items:center; gap:16px; margin-bottom:28px;">
+            <div style="position:relative; width:52px; height:52px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, rgba(255,255,255,0.12), rgba(212,175,55,0.25)); border:2px solid #d4af37; border-radius:50%; box-shadow:0 0 20px rgba(212,175,55,0.45); flex-shrink:0;">
+              <img src="../css/logo-ava-global.png" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" alt="AVA Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-weight:800; font-size:18px; color:#ffffff; background:linear-gradient(135deg, #0f2963, #14b8a6); border-radius:50%;">AH</div>
+            </div>
             <div>
-              <h3 style="font-size:20px; font-weight:800; color:#ffffff; margin:0; line-height:1; letter-spacing:-0.5px;">AVA GLOBAL ECOSYSTEM</h3>
-              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
-                <span style="font-size:9.5px; background:linear-gradient(135deg, #14b8a6, #0f766e); color:#ffffff; font-weight:800; padding:2px 8px; border-radius:12px; letter-spacing:0.5px; text-transform:uppercase;">ISO 15189 CERTIFIED</span>
-                <span style="font-size:10px; color:#cbd5e1; font-weight:600;">Clinical &amp; Multi-Role Portal</span>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <h3 style="font-size:22px; font-weight:800; color:#ffffff; margin:0; line-height:1; letter-spacing:-0.5px; font-family:'Outfit', sans-serif;">
+                  AVA<span style="font-weight:300; color:#38bdf8;"> HEALTH</span>
+                </h3>
+                <span style="font-size:9.5px; background:linear-gradient(135deg, #d4af37, #b45309); color:#ffffff; font-weight:800; padding:2px 8px; border-radius:12px; letter-spacing:0.5px; text-transform:uppercase;">GLOBAL ECOSYSTEM</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; margin-top:5px;">
+                <span style="font-size:10px; color:#cbd5e1; font-weight:600; letter-spacing:0.5px;">PT AVA Health Solution</span>
+                <span style="color:rgba(255,255,255,0.3);">&bull;</span>
+                <span style="font-size:9.5px; background:rgba(20,184,166,0.2); color:#2dd4bf; border:1px solid rgba(20,184,166,0.4); font-weight:700; padding:1px 6px; border-radius:4px; text-transform:uppercase;">ISO 15189 CERTIFIED</span>
               </div>
             </div>
           </div>
 
-          <!-- Hero Headline & Description -->
-          <div style="max-width:620px; margin-bottom:28px;">
-            <h1 style="font-size:26px; font-weight:800; color:#ffffff; line-height:1.25; margin:0 0 12px 0; background:linear-gradient(135deg, #ffffff 60%, #a5f3fc 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
-              Platform Layanan Kesehatan Terintegrasi &amp; Diagnostik Presisi
+          <!-- Hero Headline & Description (Executive High-Class Editorial Content) -->
+          <div style="max-width:640px; margin-bottom:30px;">
+            <h1 style="font-size:28px; font-weight:800; color:#ffffff; line-height:1.25; margin:0 0 14px 0; background:linear-gradient(135deg, #ffffff 60%, #93c5fd 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-0.03em;">
+              Precision Medicine &amp; Executive Diagnostic Ecosystem
             </h1>
-            <p style="font-size:13px; color:#94a3b8; line-height:1.6; font-weight:400; margin:0;">
-              Menghubungkan layanan laboratorium LIS, rujukan dokter/faskes, pemeriksaan MCU corporate, perawatan homecare nakes, dan sanctuary wellness dalam satu ekosistem digital.
+            <p style="font-size:13.5px; color:#94a3b8; line-height:1.65; font-weight:400; margin:0;">
+              Integrasi diagnostik laboratorium LIS presisi, pemetaan biomonitoring seluler, layanan rujukan medis faskes, serta manajemen kesehatan korporat berbasis <i>multi-lab engine</i> berstandar internasional.
             </p>
           </div>
 
-          <!-- Quick Demo Accounts Switcher (Virtu DigiLab Feature) -->
-          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:18px 20px; max-width:620px; margin-bottom:24px; backdrop-filter:blur(8px);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <span style="font-size:11px; font-weight:800; color:#14b8a6; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:6px;">
-                ⚡ Super Admin Quick Demo Sign-In (1-Click)
+          <!-- Quick Demo Accounts Switcher (Virtu DigiLab Executive Standard) -->
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:20px 22px; max-width:640px; margin-bottom:28px; backdrop-filter:blur(12px); box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+              <span style="font-size:11px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:6px;">
+                ⚡ Super Admin &amp; Role Quick Access (1-Click Sign-In)
               </span>
-              <span style="font-size:10px; color:#94a3b8;">Klik akun untuk masuk instant</span>
+              <span style="font-size:10px; color:#94a3b8; font-weight:500;">Pilih akun untuk pengujian instant</span>
             </div>
             
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:10px;">
               <!-- Super Admin Card -->
-              <div onclick="quickFillDemoUser('admin@avahealth.sbs', 'patient')" style="background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(15,41,99,0.4)); border:1px solid rgba(212,175,55,0.4); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#d4af37'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(212,175,55,0.4)'; this.style.transform='translateY(0)';">
-                <div style="font-size:11px; font-weight:800; color:#fef08a; display:flex; align-items:center; gap:4px;">👑 Super Admin (Ace Anwar)</div>
-                <div style="font-size:9.5px; color:#cbd5e1; margin-top:2px;">Akses Semua Role &amp; Full System</div>
+              <div onclick="quickFillDemoUser('admin@avahealth.sbs', 'patient')" style="background:linear-gradient(135deg, rgba(212,175,55,0.22), rgba(15,41,99,0.5)); border:1px solid rgba(212,175,55,0.5); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#fef08a'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(212,175,55,0.5)'; this.style.transform='translateY(0)';">
+                <div style="font-size:11.5px; font-weight:800; color:#fef08a; display:flex; align-items:center; gap:5px;">👑 Super Admin (Ace Anwar)</div>
+                <div style="font-size:9.5px; color:#cbd5e1; margin-top:3px; line-height:1.3;">Head of Operations &bull; Full Access</div>
               </div>
 
-              <!-- Corporate Maker Card -->
-              <div onclick="quickFillDemoUser('corp@avahealth.sbs', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#38bdf8'; this.style.background='rgba(56,189,248,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
-                <div style="font-size:11px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:4px;">🏢 Corporate Maker (HRD)</div>
-                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">CV Gaya Bunga Prima (8000010448)</div>
+              <!-- Corporate HRD Maker Card -->
+              <div onclick="quickFillDemoUser('corp@avahealth.sbs', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#38bdf8'; this.style.background='rgba(56,189,248,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11.5px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:5px;">🏢 Corporate Maker (HRD)</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:3px; line-height:1.3;">CV Gaya Bunga Prima (8000010448)</div>
               </div>
 
               <!-- Corporate Approver Card -->
-              <div onclick="quickFillDemoUser('88.003681', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#f59e0b'; this.style.background='rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
-                <div style="font-size:11px; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:4px;">🏢 Corporate Approver</div>
-                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Approval Batch MCU &amp; Finance</div>
+              <div onclick="quickFillDemoUser('88.003681', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#fbbf24'; this.style.background='rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11.5px; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:5px;">🏢 Corporate Approver (CFO)</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:3px; line-height:1.3;">Approval Batch MCU &amp; Finance</div>
               </div>
 
               <!-- Referral Doctor Card -->
-              <div onclick="quickFillDemoUser('referral@avahealth.sbs', 'referral')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#34d399'; this.style.background='rgba(52,211,153,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
-                <div style="font-size:11px; font-weight:800; color:#34d399; display:flex; align-items:center; gap:4px;">🏥 Dokter / Faskes Referral</div>
-                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Klinik Pratama &amp; E-Rujukan</div>
+              <div onclick="quickFillDemoUser('referral@avahealth.sbs', 'referral')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#34d399'; this.style.background='rgba(52,211,153,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11.5px; font-weight:800; color:#34d399; display:flex; align-items:center; gap:5px;">🏥 Dokter / Faskes Referral</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:3px; line-height:1.3;">Klinik Pratama &amp; E-Rujukan LIS</div>
               </div>
 
               <!-- Pasien B2C Card -->
-              <div onclick="quickFillDemoUser('88.000841', 'patient')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#a78bfa'; this.style.background='rgba(167,139,250,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
-                <div style="font-size:11px; font-weight:800; color:#c084fc; display:flex; align-items:center; gap:4px;">👤 Pasien Terverifikasi (B2C)</div>
-                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">EHR, Order Lab &amp; Homecare</div>
+              <div onclick="quickFillDemoUser('88.000841', 'patient')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#c084fc'; this.style.background='rgba(192,132,252,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11.5px; font-weight:800; color:#c084fc; display:flex; align-items:center; gap:5px;">👤 Pasien Terverifikasi (B2C)</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:3px; line-height:1.3;">EHR Rekam Medis &amp; Order Lab</div>
               </div>
 
               <!-- Nakes Staff Card -->
-              <div onclick="quickFillDemoUser('nakes@avahealth.sbs', 'staff')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#f472b6'; this.style.background='rgba(244,114,182,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
-                <div style="font-size:11px; font-weight:800; color:#f472b6; display:flex; align-items:center; gap:4px;">🩺 Staff Nakes Flebotomi</div>
-                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Sampling &amp; ISO 15189 Audit</div>
+              <div onclick="quickFillDemoUser('nakes@avahealth.sbs', 'staff')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:11px; padding:11px 13px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#f472b6'; this.style.background='rgba(244,114,182,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11.5px; font-weight:800; color:#f472b6; display:flex; align-items:center; gap:5px;">🩺 Staff Nakes Flebotomi</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:3px; line-height:1.3;">Sampling &amp; ISO 15189 Audit</div>
               </div>
             </div>
           </div>
 
-          <!-- Feature Grid Icons -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; max-width:620px;">
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:16px; background:rgba(20,184,166,0.15); padding:6px; border-radius:8px; color:#14b8a6;">🩺</span>
-              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Telehealth &amp; E-Rujukan LIS</span>
+          <!-- Feature Grid Icons (Executive High Class) -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; max-width:640px;">
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:18px; background:rgba(56,189,248,0.15); padding:6px; border-radius:8px; color:#38bdf8;">🔬</span>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#ffffff;">Diagnostik LIS &amp; MCU Presisi</div>
+                <div style="font-size:10px; color:#94a3b8;">Hasil terintegrasi LOINC &amp; UCUM</div>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:16px; background:rgba(56,189,248,0.15); padding:6px; border-radius:8px; color:#38bdf8;">🔬</span>
-              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Pemeriksaan Lab &amp; MCU Batch</span>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:18px; background:rgba(52,211,153,0.15); padding:6px; border-radius:8px; color:#34d399;">🩺</span>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#ffffff;">Rujukan Faskes &amp; E-Consult</div>
+                <div style="font-size:10px; color:#94a3b8;">Jaringan rujukan antar-dokter</div>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:16px; background:rgba(245,158,11,0.15); padding:6px; border-radius:8px; color:#f59e0b;">🏠</span>
-              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Kunjungan Flebotomi Homecare</span>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:18px; background:rgba(245,158,11,0.15); padding:6px; border-radius:8px; color:#f59e0b;">🏠</span>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#ffffff;">Flebotomi Home Care ISO 15189</div>
+                <div style="font-size:10px; color:#94a3b8;">Pengambilan spesimen ber-cold chain</div>
+              </div>
             </div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:16px; background:rgba(212,175,55,0.15); padding:6px; border-radius:8px; color:#d4af37;">👑</span>
-              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Queen Sanctuary &amp; VIP Spa</span>
+            <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);">
+              <span style="font-size:18px; background:rgba(212,175,55,0.15); padding:6px; border-radius:8px; color:#d4af37;">👑</span>
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#ffffff;">Queen Sanctuary &amp; Bio-Restorasi</div>
+                <div style="font-size:10px; color:#94a3b8;">Layanan VIP Spa &amp; Nutrisi Presisi</div>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- Footer Info -->
-        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:14px; margin-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:#64748b;">
-          <span>&copy; 2026 AVA GLOBAL DIAGNOSTICS &bull; Multi-Lab Engine</span>
-          <span>Versi Portal v2.4 (Virtu-Compliant)</span>
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:16px; margin-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:#64748b;">
+          <span>&copy; 2026 PT AVA HEALTH SOLUTION &bull; Multi-Tenant Diagnostic System</span>
+          <span style="color:#94a3b8; font-weight:600;">Versi Portal v2.4 (Virtu-Compliant)</span>
         </div>
 
       </div>
 
       <!-- Right Panel: Virtu Glass Login Form Card -->
-      <div class="login-right-panel" style="width:460px; display:flex; align-items:center; justify-content:center; padding:40px 30px; background:rgba(3, 12, 27, 0.85); backdrop-filter:blur(20px); border-left:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
-        <div class="login-box" style="width:100%; background:rgba(15, 23, 42, 0.75); border:1px solid rgba(255, 255, 255, 0.15); border-radius:18px; padding:32px; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+      <div class="login-right-panel" style="width:470px; display:flex; align-items:center; justify-content:center; padding:40px 32px; background:rgba(3, 10, 22, 0.88); backdrop-filter:blur(24px); border-left:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
+        <div class="login-box" style="width:100%; background:rgba(12, 23, 44, 0.85); border:1px solid rgba(255, 255, 255, 0.16); border-radius:20px; padding:34px; box-shadow:0 30px 60px -12px rgba(0, 0, 0, 0.65);">
           
-          <div style="text-align: center; margin-bottom: 22px;">
-            <img src="css/logo-ava-global.png" style="width:50px; height:50px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; margin-bottom:10px; box-shadow:0 0 15px rgba(212,175,55,0.4);" alt="Logo">
-            <h4 id="login-form-title" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">Masuk Portal Layanan</h4>
-            <p id="login-form-subtitle" style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;">Silakan pilih tipe akses dan masukkan kredensial Anda</p>
+          <div style="text-align: center; margin-bottom: 24px;">
+            <!-- Login Box White & Gold Logo Header -->
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; border-radius:50%; background:linear-gradient(135deg, rgba(255,255,255,0.15), rgba(212,175,55,0.3)); border:2px solid #d4af37; box-shadow:0 0 20px rgba(212,175,55,0.45); margin-bottom:12px;">
+              <img src="../css/logo-ava-global.png" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-weight:800; font-size:20px; color:#ffffff; background:linear-gradient(135deg, #0f2963, #14b8a6); border-radius:50%;">AH</div>
+            </div>
+            <h4 id="login-form-title" style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">Masuk Portal Layanan</h4>
+            <p id="login-form-subtitle" style="font-size: 11.5px; color: #94a3b8; margin-top: 5px;">Pilih tipe hak akses dan masukkan kredensial Anda</p>
           </div>
 
           <form id="login-form" onsubmit="handleLogin(event)">
             <!-- 5 Role Segmented Tabs -->
-            <div class="role-selector" style="margin-bottom: 18px;">
-              <span class="role-label" style="font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:8px;">Pilih Tipe Akses Login:</span>
+            <div class="role-selector" style="margin-bottom: 20px;">
+              <span class="role-label" style="font-size:10.5px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:10px;">Pilih Peran Akses Login:</span>
               
-              <div class="role-options" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <div class="role-options" style="display:grid; grid-template-columns:1fr 1fr; gap:7px;">
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
-                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">👤 Pasien B2C</span>
+                  <span style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#cbd5e1; transition:all 0.2s;">👤 Pasien B2C</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="member" onchange="updateLoginFormUI('member')">
-                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">👑 Member VIP</span>
+                  <span style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#cbd5e1; transition:all 0.2s;">👑 Member VIP</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
-                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🏢 Corporate B2B</span>
+                  <span style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#cbd5e1; transition:all 0.2s;">🏢 Corporate B2B</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="staff" onchange="updateLoginFormUI('staff')">
-                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🩺 Staff Nakes</span>
+                  <span style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#cbd5e1; transition:all 0.2s;">🩺 Staff Nakes</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer; grid-column: span 2;">
                   <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
-                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🔗 Dokter / Faskes Referral</span>
+                  <span style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.06); color:#cbd5e1; transition:all 0.2s;">🔗 Dokter / Faskes Referral</span>
                 </label>
               </div>
             </div>
 
             <!-- Inputs -->
-            <div class="input-group" style="margin-bottom: 14px;">
+            <div class="input-group" style="margin-bottom: 15px;">
               <label for="username" id="username-label" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email / User ID</label>
-              <input type="text" id="username" placeholder="admin@avahealth.sbs atau 88.000841" value="admin@avahealth.sbs" required style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+              <input type="text" id="username" placeholder="admin@avahealth.sbs atau 88.000841" value="admin@avahealth.sbs" required style="width:100%; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.22); border-radius:9px; padding:12px 14px; color:#ffffff; font-size:13px; outline:none; transition:all 0.2s;" onfocus="this.style.borderColor='#38bdf8'; this.style.boxShadow='0 0 10px rgba(56,189,248,0.3)';" onblur="this.style.borderColor='rgba(255,255,255,0.22)'; this.style.boxShadow='none';">
             </div>
 
-            <div class="input-group" id="corp-code-group" style="margin-bottom: 14px; display: none;">
+            <div class="input-group" id="corp-code-group" style="margin-bottom: 15px; display: none;">
               <label for="login-corp-code" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">ID Perusahaan (Corporate Code)</label>
-              <input type="text" id="login-corp-code" placeholder="Contoh: 8000010448" value="8000010448" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+              <input type="text" id="login-corp-code" placeholder="Contoh: 8000010448" value="8000010448" style="width:100%; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.22); border-radius:9px; padding:12px 14px; color:#ffffff; font-size:13px; outline:none; transition:all 0.2s;" onfocus="this.style.borderColor='#38bdf8'; this.style.boxShadow='0 0 10px rgba(56,189,248,0.3)';" onblur="this.style.borderColor='rgba(255,255,255,0.22)'; this.style.boxShadow='none';">
             </div>
 
-            <div class="input-group" style="margin-bottom: 18px;">
+            <div class="input-group" style="margin-bottom: 20px;">
               <label for="password" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
-              <input type="password" id="password" placeholder="••••••••" value="12345678" required style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+              <input type="password" id="password" placeholder="••••••••" value="12345678" required style="width:100%; background:rgba(15,23,42,0.85); border:1px solid rgba(255,255,255,0.22); border-radius:9px; padding:12px 14px; color:#ffffff; font-size:13px; outline:none; transition:all 0.2s;" onfocus="this.style.borderColor='#38bdf8'; this.style.boxShadow='0 0 10px rgba(56,189,248,0.3)';" onblur="this.style.borderColor='rgba(255,255,255,0.22)'; this.style.boxShadow='none';">
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:13.5px; font-weight:800; background:linear-gradient(135deg, #14b8a6, #0f2963); border:none; border-radius:10px; color:#ffffff; cursor:pointer; box-shadow:0 10px 20px -5px rgba(20,184,166,0.4); transition:all 0.2s ease;">MASUK PORTAL LAYANAN &rarr;</button>
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:13px; font-size:14px; font-weight:800; background:linear-gradient(135deg, #38bdf8, #0f2963); border:none; border-radius:11px; color:#ffffff; cursor:pointer; box-shadow:0 12px 25px -5px rgba(56,189,248,0.4); transition:all 0.2s ease;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 15px 30px -5px rgba(56,189,248,0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 12px 25px -5px rgba(56,189,248,0.4)';">MASUK PORTAL LAYANAN &rarr;</button>
           </form>
 
-          <div class="screen-footer" style="margin-top: 20px; text-align: center;">
-            <p id="login-footer-desc" style="font-size: 11.5px; color: #94a3b8; margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:#14b8a6; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
+          <div class="screen-footer" style="margin-top: 22px; text-align: center;">
+            <p id="login-footer-desc" style="font-size: 11.5px; color: #94a3b8; margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:#38bdf8; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
           </div>
 
         </div>
       </div>
 
-    </div>enRegisterModal()" style="color:#0f2963; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
-          </div>
-        </div>
-      </div>
     </div>
 
     <!-- ════════════════════════ DASHBOARD SCREEN ════════════════════════ -->
@@ -213,10 +234,16 @@
       
       <!-- Responsive Left Sidebar -->
       <aside class="app-sidebar" id="app-sidebar">
-        <!-- Sidebar Brand/Logo -->
-        <div class="sidebar-brand">
-          <div class="logo-mark">AH</div>
-          <span>AvaHealth</span>
+        <!-- Sidebar Brand/Logo (AVA HEALTH White & Gold Style) -->
+        <div class="sidebar-brand" style="display:flex; align-items:center; gap:12px; padding:18px 20px; border-bottom:1px solid rgba(255,255,255,0.08);">
+          <div style="width:38px; height:38px; border-radius:50%; border:2px solid #d4af37; overflow:hidden; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, #0f2963, #14b8a6); flex-shrink:0; box-shadow:0 0 12px rgba(212,175,55,0.45);">
+            <img src="../css/logo-ava-global.png" style="width:100%; height:100%; object-fit:cover;" alt="Logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <span style="display:none; font-weight:800; font-size:14px; color:#ffffff;">AH</span>
+          </div>
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-size:17px; font-weight:800; color:#ffffff; line-height:1; font-family:'Outfit', sans-serif;">AVA<span style="font-weight:300; color:#38bdf8;"> HEALTH</span></span>
+            <small style="font-size:8.5px; color:#d4af37; font-weight:700; letter-spacing:0.8px; margin-top:3px; text-transform:uppercase;">GLOBAL ECOSYSTEM</small>
+          </div>
         </div>
 
         <!-- User Profile Card -->

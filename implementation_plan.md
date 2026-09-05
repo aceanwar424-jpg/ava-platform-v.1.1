@@ -155,6 +155,27 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
   verifikasi. Pop-up pemilih pendukung tetap berada di ruang aplikasi dan
   tunduk pada RBAC yang telah ada.
 
+## Ergonomi Form Admission — 5 September 2026
+
+### Urutan implementasi
+
+1. [x] Ubah navigasi tahap form dari tab horizontal menjadi mini rail vertikal
+   di sisi kiri pada desktop; setiap tahap tetap memiliki teks, urutan, dan
+   target klik yang jelas.
+2. [x] Padatkan lebar/padding field serta baris metadata agar dua kolom tetap
+   proporsional, mudah dipindai, dan tidak mengurangi tinggi area input.
+3. [x] Pertahankan tab horizontal yang dapat digulir pada ponsel agar rail
+   tidak mengambil ruang kerja sempit.
+4. [x] Verifikasi form OPD, variasi tab, kembali ke daftar, serta sintaks dan
+   audit sumber tanpa menyimpan transaksi.
+
+### Implikasi IP & Kepatuhan
+
+- Perubahan murni pada komposisi tampilan dan ergonomi; tidak mengubah field,
+  validasi, data pasien, hak akses, kontrak API, maupun skema transaksi.
+- Identitas dan informasi layanan yang muncul saat verifikasi tetap sintetis
+  atau keadaan kosong. Tidak ada penyimpanan, ekspor, atau integrasi eksternal.
+
 ## Perombakan web publik AVA Health — 2026-09-05
 Rencana: (1) audit portal dan routing (≤1 jam), (2) bangun profil publik responsif, detail brand, katalog, sejarah, sertifikasi, kontak (≤1 jam), (3) validasi tautan/aset/routing dan preview (≤1 jam).
 Arah visual: editorial kesehatan, putih dan navy, aksen emerald, tipografi besar, enam brand sebagai portofolio bisnis. Pertahankan stack statis dan deployment Vercel yang ada.

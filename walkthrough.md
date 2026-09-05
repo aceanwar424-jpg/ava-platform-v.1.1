@@ -404,3 +404,20 @@ Bukti verifikasi: verify-public-profile PASS; verify-public-editorial PASS untuk
   `bangun-menu.js --periksa`, `audit-menu-hidup.js` (159 menu tanpa temuan),
   `audit-keamanan-modul.js` (2.350/2.350), serta `git diff --check` pada
   berkas terkait.
+
+## Ergonomi Form Admission — 5 September 2026
+
+- Navigasi tahap Pasien, Pembayaran, Unit & Layanan, serta Kasir kini berupa
+  mini rail vertikal di kiri form desktop. Setiap tombol membawa ikon, nama,
+  urutan tahap, serta keadaan aktif yang jelas tanpa mengambil lebar kolom
+  form.
+- Isi form dibuat lebih padat secara proporsional: padding input, jarak antar
+  grup, metadata kunjungan, dan area teks disesuaikan hanya dalam workspace
+  Admission. Bidang input serta tombol tahap tetap memiliki target klik yang
+  nyaman.
+- Pada lebar tablet/ponsel, rail berubah menjadi tab horizontal yang dapat
+  digulir agar area input tidak terpotong.
+- Preview lokal tanpa penyimpanan data membuktikan `+ Registrasi` membuka
+  rail vertikal dan perpindahan ke tahap Pembayaran bekerja. Syntax Admission,
+  pemeriksaan menu, audit 159 menu, audit keamanan 2.350/2.350, dan
+  `git diff --check` lulus.

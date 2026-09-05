@@ -825,18 +825,22 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
   const today = new Date().toISOString().split('T')[0];
   const visitNum = id ? a.visit_number : `VISIT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Date.now().toString().slice(-3)}`;
   const mrNum = id ? (a.mr_number || '') : `MR-${Date.now().toString().slice(-8)}`;
+  const admissionStepIcons = { patient: 'user', payment: 'note', services: 'tube', cashier: 'print' };
 
   const admissionFormMarkup = `
     <div class="admission-form-notice">
       <strong>${modeDef.label}.</strong> ${modeDef.notice}
     </div>
-    <div class="admission-form-tabs">
-      ${modeDef.tabs.map(([k, label]) => `
+    <div class="admission-form-layout">
+      <aside class="admission-form-tabs" aria-label="Tahap registrasi">
+      ${modeDef.tabs.map(([k, label], index) => `
         <button onclick="switchAdmTab('${k}')" id="af-tab-${k}"
-          class="${k === 'patient' ? 'active' : ''}">
-          ${label}
+          class="${k === 'patient' ? 'active' : ''}" data-step="${index + 1}">
+          <span class="admission-tab-icon" aria-hidden="true">${svgIcon(admissionStepIcons[k] || 'note', 15)}</span>
+          <span class="admission-tab-copy"><b>${label}</b><small>Tahap ${index + 1}</small></span>
         </button>`).join('')}
-    </div>
+      </aside>
+      <div class="admission-form-content">
 
     <!-- ═══ TAB: PATIENT ═══ -->
     <div id="af-tab-content-patient">
@@ -1027,6 +1031,8 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
       <!-- hidden fields dipakai saat simpan -->
       <input type="hidden" id="af-total-price"><input type="hidden" id="af-discount"><input type="hidden" id="af-total-net">
       <input type="hidden" id="af-pay-total"><input type="hidden" id="af-cash-total">
+    </div>
+      </div>
     </div>
 
     <div class="admission-form-footer">

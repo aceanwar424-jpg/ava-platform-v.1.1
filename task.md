@@ -60,6 +60,13 @@
 - [x] Popup hanya dipakai untuk pemilih data dan konfirmasi kecil.
 - [x] Sintaks, menu, keamanan, dan preview lokal diverifikasi tanpa transaksi data.
 
+## Ergonomi Form Admission — 5 September 2026
+
+- [x] Mini rail tahapan ditempatkan di kiri form desktop.
+- [x] Field, kolom, dan ruang antarbaris diproporsikan ulang untuk kerja cepat.
+- [x] Mobile memakai tab horizontal yang tetap mudah disentuh.
+- [x] Alur form dan pemeriksaan regresi diverifikasi tanpa menyimpan data.
+
 ## Web publik AVA Health — 2026-09-05
 - [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
 - [ ] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
