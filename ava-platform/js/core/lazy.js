@@ -20,7 +20,7 @@
 // buruk daripada perilaku lama.
 // ═══════════════════════════════════════════════════════════════
 
-const MODUL_VER = '20260815a';
+const MODUL_VER = '20260905-his-shell';
 const _modulDimuat = new Map();   // src → Promise
 
 function muatSkrip(src) {

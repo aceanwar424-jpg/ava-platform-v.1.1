@@ -338,9 +338,10 @@ function renderSidebarMenu() {
     care:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
   };
 
-  if (currentRole === 'patient') {
+    if (currentRole === 'patient') {
     const subLayanan = `
       <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">${I.dashboard}<span>Dashboard Utama</span></a>
+      <a class="sidebar-link" onclick="showView('ava-biotwin-view', 'AVA Bio-Twin Index')">${I.result}<span>🧬 AVA Bio-Twin Index</span></a>
       <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab &amp; MCU')">${I.lab}<span>Pesan Test Lab</span></a>
       <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Visit')">${I.home}<span>Book Homecare Nakes</span></a>
       <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
@@ -349,12 +350,14 @@ function renderSidebarMenu() {
     `;
 
     const subRekamMedis = `
+      <a class="sidebar-link" onclick="showView('ava-biointerpreter-view', 'AI Bio-Interpreter Lab')">${I.medrec}<span>🤖 AI Bio-Interpreter Lab</span></a>
       <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis Digital (EHR)')">${I.medrec}<span>Rekam Medis (EHR LOINC)</span></a>
       <a class="sidebar-link" onclick="showView('ava-devices-view', 'Perangkat &amp; Wearables')">${I.device}<span>Biosensor &amp; Wearable Pulse</span></a>
       <a class="sidebar-link" onclick="switchTimelinePhase('fase2'); showView('patient-view', 'CRISPR Bio-Age Reversal')">${I.result}<span>CRISPR Bio-Age Reversal</span></a>
     `;
 
     const subTracking = `
+      <a class="sidebar-link" onclick="showView('ava-homecare-tracking-view', 'Lacak Cold-Chain Flebotomi')">${I.home}<span>🚚 Lacak Live Cold-Chain</span></a>
       <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Lacak Pesanan D2C')">${I.package}<span>Lacak Pesanan D2C Refill</span></a>
       <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Kunjungan Nakes')">${I.home}<span>Lacak Kunjungan Home Care</span></a>
     `;
@@ -380,6 +383,7 @@ function renderSidebarMenu() {
   } else if (currentRole === 'member') {
     const subPrivilege = `
       <a class="sidebar-link active" onclick="showView('member-sanctuary-view', 'Queen Sanctuary')">${I.book}<span>VIP Sanctuary &amp; Spa</span></a>
+      <a class="sidebar-link" onclick="showView('ava-biotwin-view', 'AVA Bio-Twin Index')">${I.result}<span>🧬 AVA Bio-Twin Index</span></a>
       <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Auto-Refill Nutrisi')">${I.package}<span>Auto-Refill Suplemen</span></a>
       <a class="sidebar-link" onclick="showView('ava-consult-view', 'Konsultasi Dokter VIP')">${I.consult}<span>Telekonsultasi VIP</span></a>
       <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Home Care')">${I.home}<span>Lacak Home Care</span></a>
@@ -387,6 +391,7 @@ function renderSidebarMenu() {
 
     const subEHR = `
       <a class="sidebar-link" onclick="showView('patient-view', 'Status Kesehatan')">${I.dashboard}<span>Status Kesehatan</span></a>
+      <a class="sidebar-link" onclick="showView('ava-biointerpreter-view', 'AI Bio-Interpreter Lab')">${I.medrec}<span>🤖 AI Bio-Interpreter Lab</span></a>
       <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">${I.medrec}<span>Rekam Medis (EHR)</span></a>
       <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Keluarga')">${I.care}<span>Caregiver &amp; Keluarga</span></a>
       <a class="sidebar-link" onclick="showView('profile-view', 'Profil Member')">${I.profile}<span>Profil Member VIP</span></a>
@@ -404,6 +409,7 @@ function renderSidebarMenu() {
 
     const subCorpMcu = `
       <a class="sidebar-link active" onclick="showView('corporate-view', 'Home MCU')">${I.home}<span>Dasbor Kesehatan Korporat</span></a>
+      <a class="sidebar-link" onclick="showView('ava-corp-burnout-view', 'Corporate Health Index')">${I.result}<span>🏢 Burnout &amp; Health Index</span></a>
       <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Data Karyawan</span></a>
       ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Order MCU Massal (Maker)</span></a>` : ''}
       ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Approval MCU Batch (Approver)</span></a>` : ''}
@@ -422,6 +428,8 @@ function renderSidebarMenu() {
   } else if (currentRole === 'staff') {
     const subNakes = `
       <a class="sidebar-link active" onclick="showView('staff-homecare-view', 'Tugas Home Care')">${I.home}<span>Jadwal Visit Hari Ini</span></a>
+      <a class="sidebar-link" onclick="showView('ava-iso-audit-view', 'Audit Mutu ISO 15189')">${I.result}<span>📜 Continuous ISO 15189 Audit</span></a>
+      <a class="sidebar-link" onclick="showView('ava-laas-api-view', 'LaaS API Portal')">${I.device}<span>🌐 LaaS Open API Portal</span></a>
       <a class="sidebar-link" onclick="openPhlebotomyModal()">${I.result}<span>Audit Sampling ISO 15189</span></a>
       <a class="sidebar-link" onclick="showView('homecare-results-view', 'Riwayat Kunjungan')">${I.history}<span>Riwayat Sampling Flebotomi</span></a>
       <a class="sidebar-link" onclick="showView('nearme-view', 'Faskes &amp; Lab Pusat')">${I.mapPin}<span>Peta Faskes &amp; Rute</span></a>
@@ -435,6 +443,7 @@ function renderSidebarMenu() {
   } else if (currentRole === 'referral') {
     const subRefRujukan = `
       <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">${I.dashboard}<span>Dasbor &amp; Riwayat Rujukan</span></a>
+      <a class="sidebar-link" onclick="showView('ava-ambient-scribe-view', 'Ambient AI Clinical Scribe')">${I.consult}<span>🎙️ Ambient AI Scribe Dokter</span></a>
       <a class="sidebar-link" onclick="openReferralForm()">${I.filePlus}<span>Buat Rujukan Baru (FPP)</span></a>
       <a class="sidebar-link" onclick="showView('referral-view', 'Chat Patologi')">${I.consult}<span>Peer-to-Peer Chat Patologi</span></a>
     `;
@@ -4163,6 +4172,41 @@ window.unifiedSuperCart = unifiedSuperCart;
 window.addToUnifiedCart = addToUnifiedCart;
 window.calculateUnifiedCartTotal = calculateUnifiedCartTotal;
 window.processUnifiedCheckout = processUnifiedCheckout;
+function toggleAmbientScribeRecording() {
+  const btn = document.getElementById('scribe-rec-btn');
+  const box = document.getElementById('scribe-status-box');
+  if (!btn || !box) return;
+
+  if (btn.textContent.includes('Mulai')) {
+    btn.textContent = '⏹️ Hentikan Scribe';
+    btn.style.background = '#ef4444';
+    box.innerHTML = `
+      <div style="color:#0f766e; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#ef4444; animation:pulse 1s infinite;"></span>
+        Merekam Dialog Medis Real-Time...
+      </div>
+      <p style="background:#ffffff; border:1px solid #cbd5e1; padding:12px; border-radius:8px; line-height:1.5;">
+        <strong>Dokter:</strong> "Pasien mengeluh sering lemas di sore hari dan pusing ringan."<br>
+        <strong>AI Transcribe (Live):</strong> Anamnesis tercatat. Direkomendasikan e-Order Tes Darah Lengkap, Profil Lipid (LOINC 2093-3), dan Glukosa Puasa (LOINC 2345-7).
+      </p>
+    `;
+  } else {
+    btn.textContent = '🎙️ Mulai Rekam Konsultasi';
+    btn.style.background = 'var(--teal)';
+    alert('Transkripsi medis diselesaikan! Draf SOAP EHR & e-Order Lab rujukan berhasil dibuat.');
+  }
+}
+
+function generateLaasApiKey() {
+  const keyEl = document.getElementById('laas-api-key-text');
+  if (!keyEl) return;
+  const newKey = 'ava_live_laas_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 8);
+  keyEl.textContent = 'API_KEY: ' + newKey;
+  alert('API Key LaaS Baru Berhasil Di-generate! Gunakan header Authorization: Bearer ' + newKey);
+}
+
+window.toggleAmbientScribeRecording = toggleAmbientScribeRecording;
+window.generateLaasApiKey = generateLaasApiKey;
 window.trackUnifiedOrder = trackUnifiedOrder;
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -4175,4 +4219,5 @@ if (typeof module !== 'undefined' && module.exports) {
     unifiedOrderHistory
   };
 }
+
 

@@ -47,5 +47,6 @@ const html = `<!doctype html>
 <section class="contact" id="kontak"><div class="wrap contact-grid"><div><p class="eyebrow">06 / HUBUNGI KAMI</p><h2>Mari mulai<br>percakapan.</h2><p>Untuk informasi layanan, katalog produk,<br>atau peluang kerja sama.</p></div><div class="contact-links"><a href="https://wa.me/6282120071009" target="_blank" rel="noopener noreferrer"><span><small>WHATSAPP</small>+62 821-2007-1009</span><span aria-hidden="true">↗</span></a><a href="mailto:admin@avahealth.sbs"><span><small>EMAIL</small>admin@avahealth.sbs</span><span aria-hidden="true">↗</span></a><p>Hubungi tim kami untuk konfirmasi lokasi layanan dan jadwal kunjungan.</p></div></div></section>
 </main><footer class="wrap footer"><div><a class="footer-brand" href="#beranda">AVA HEALTH</a><p>PT AVA Health Solution</p></div><div><a href="#tentang">Tentang AVA</a><a href="#brand">Brand kami</a><a href="#kontak">Hubungi kami</a></div><p>© 2026 PT AVA Health Solution</p></footer></body></html>`;
 const extended = require('./extend-public-profile').extend(html, root, brands);
-fs.writeFileSync(path.join(root,'ava-platform/portal.html'), require('./public-business-positioning').reposition(extended,root)+'\n');
+const positioned = require('./public-business-positioning').reposition(extended,root);
+fs.writeFileSync(path.join(root,'ava-platform/portal.html'), require('./public-multipage').multipage(positioned,root)+'\n');
 console.log('Built AVA public company profile.');
