@@ -3623,6 +3623,9 @@ async function handleLogin(event) {
     currentUserProfile = { id: 'mock', full_name: finalUsername };
   }
   
+  // Set active session flag
+  sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
+
   localStorage.setItem('AVA_CURRENT_USER_ROLE', finalRole);
   await applyRoleUIState(finalRole);
   
@@ -3640,6 +3643,28 @@ async function handleLogin(event) {
 // ═══════════════════════════════════════════════════════════════
 // INSTANT ROLE SWITCHER (SUPER ADMIN & MULTI-ROLE SUPPORT)
 // ═══════════════════════════════════════════════════════════════
+
+function quickFillDemoUser(email, role, corpCode = '') {
+  const uInput = document.getElementById('username');
+  const pInput = document.getElementById('password');
+  const cInput = document.getElementById('login-corp-code');
+
+  if (uInput) uInput.value = email;
+  if (pInput) pInput.value = '12345678';
+  if (cInput && corpCode) cInput.value = corpCode;
+
+  const radio = document.querySelector(`input[name="login-role"][value="${role}"]`);
+  if (radio) {
+    radio.checked = true;
+    updateLoginFormUI(role);
+  }
+
+  const form = document.getElementById('login-form');
+  if (form) {
+    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+  }
+}
+if (typeof window !== 'undefined') window.quickFillDemoUser = quickFillDemoUser;
 
 async function switchActiveRole(newRole) {
   if (!newRole) return;
@@ -3721,6 +3746,7 @@ function handleLogout() {
   document.getElementById('password').value = '';
   currentUsername = '';
   bookingCart = [];
+  sessionStorage.removeItem('AVA_IS_LOGGED_IN');
   if (queueSimulatorInterval) {
     clearInterval(queueSimulatorInterval);
     queueSimulatorInterval = null;
@@ -3904,6 +3930,7 @@ if (typeof document !== 'undefined') {
     if (qToken) {
       localStorage.setItem('ol_token', qToken);
       if (qRefresh) localStorage.setItem('ol_refresh', qRefresh);
+      sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
     }
 
     // Subdomain ikut menentukan peran yang dituju.
@@ -3913,10 +3940,11 @@ if (typeof document !== 'undefined') {
     const hash = window.location.hash || (peranSubdomain === 'corporate' ? '#korporat' : '');
     const storedRole = localStorage.getItem('AVA_CURRENT_USER_ROLE') || peranSubdomain;
     const storedToken = localStorage.getItem('ol_token');
+    const isLoggedIn = sessionStorage.getItem('AVA_IS_LOGGED_IN') === 'true';
 
     if (typeof renderSidebarMenu === 'function') renderSidebarMenu();
 
-    if (storedToken) {
+    if (storedToken && isLoggedIn) {
       if (hash === '#member' || storedRole === 'member') {
         currentRole = 'member';
         showScreen('dashboard-screen');

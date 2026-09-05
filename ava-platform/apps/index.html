@@ -27,147 +27,182 @@
 </head>
 <body>
   <div class="app-container">
-    
-    <!-- ════════════════════════ LOGIN SCREEN ════════════════════════ -->
-    <div id="login-screen" class="screen active" style="display:flex; flex-direction:row; width:100vw; height:100vh; overflow:hidden; background:#f8fafc;">
-      <!-- Left Panel: Brand info, Value Proposition, Feature Grid, Articles & Doctor Team -->
-      <div class="login-left-panel" style="flex:1; display:flex; flex-direction:column; padding:40px 60px 0 60px; background:#f8fafc; border-right:1px solid #e2e8f0; justify-content:space-between; overflow-y:auto; position:relative;">
+     <!-- ════════════════════════ VIRTU-STYLE PREMIUM LOGIN SCREEN ════════════════════════ -->
+    <div id="login-screen" class="screen active" style="display:flex; flex-direction:row; width:100vw; height:100vh; overflow:hidden; background:linear-gradient(135deg, #061429 0%, #0b2246 50%, #030c1b 100%); color:#ffffff; font-family:'Outfit', sans-serif;">
+      
+      <!-- Left Panel: Virtu Brand Glow, Features & Super Admin Quick Demo Account Chips -->
+      <div class="login-left-panel" style="flex:1.2; display:flex; flex-direction:column; padding:40px 50px; background:rgba(6, 20, 41, 0.6); backdrop-filter:blur(16px); border-right:1px solid rgba(255,255,255,0.08); justify-content:space-between; overflow-y:auto; position:relative;">
         
-        <!-- Header Brand Logo (AVA GLOBAL ECOSYSTEM style) -->
-        <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
-          <img src="css/logo-ava-global.png" style="width:44px; height:44px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; box-shadow:0 0 10px rgba(212,175,55,0.4);" alt="AVA Logo">
-          <div>
-            <h3 style="font-size:18px; font-weight:800; color:#0f2963; margin:0; line-height:1; letter-spacing:-0.5px;">AVA GLOBAL ECOSYSTEM</h3>
-            <span style="font-size:10px; color:#14b8a6; font-weight:700; letter-spacing:0.5px;">Health · Wellness · Nutrition · Lab</span>
-          </div>
-        </div>
+        <!-- Background Glowing Ornaments -->
+        <div style="position:absolute; top:-100px; left:-100px; width:350px; height:350px; background:radial-gradient(circle, rgba(20,184,166,0.18) 0%, rgba(15,41,99,0) 70%); filter:blur(60px); pointer-events:none;"></div>
+        <div style="position:absolute; bottom:-100px; right:-100px; width:400px; height:400px; background:radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(15,41,99,0) 70%); filter:blur(70px); pointer-events:none;"></div>
 
-        <!-- Headline & Description from Company Profile -->
-        <div style="max-width:580px;">
-          <p style="font-size:13.5px; color:#0f2963; line-height:1.6; font-weight:600; margin:0;">
-            AVA GLOBAL ECOSYSTEM menghadirkan solusi kesehatan, nutrisi, wellness spa, dan diagnostik terintegrasi. Kami menghubungkan layanan preventif, pemeriksaan lab, konsultasi dokter, D2C suplemen wanita, dan home care dalam satu portal terpadu.
-          </p>
-        </div>
-
-        <!-- Features list in two-column grid matching sample layout -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; margin-top:24px; max-width:580px;">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">🩺</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Clinical &amp; Telehealth</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">📦</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Lacak Pesanan D2C &amp; Refill</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">🔬</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Laboratorium LIS &amp; MCU</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">🏠</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Lacak Kunjungan Home Care</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">👑</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Queen Sanctuary &amp; Spa</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">🏢</span>
-            <span style="font-size:12.5px; font-weight:700; color:#0f2963;">Corporate Health Management</span>
-          </div>
-        </div>
-
-        <!-- Corporate Health & Clinical Articles Section -->
-        <div style="border-top:1px solid #e2e8f0; padding-top:16px; margin-top:24px; max-width:580px; z-index:2;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:11px; font-weight:700; color:#ef7a4a; text-transform:uppercase; letter-spacing:0.05em; display:block;">📰 HEALTH TIPS &amp; CLINICAL ARTICLES</span>
-            <a href="https://www.halodoc.com" target="_blank" style="font-size:10px; color:#0f2963; text-decoration:none; font-weight:700;">Selengkapnya &rarr;</a>
-          </div>
-          
-          <div style="display:flex; flex-direction:column; gap:8px;">
-            <!-- Real Article 1 (MCU Importance) -->
-            <a href="https://www.halodoc.com/artikel/ketahui-pentingnya-melakukan-medical-check-up-rutin" target="_blank" class="news-item" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; display:flex; gap:12px; align-items:center; text-decoration:none; transition:all 0.2s ease; cursor:pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.01);" onmouseover="this.style.borderColor='#0f2963'; this.style.background='#f0f6fc';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';">
-              <span style="font-size:16px;">📋</span>
-              <div style="flex:1;">
-                <h6 style="font-size:11px; font-weight:700; color:#0f2963; margin:0; line-height:1.3;">Pentingnya Medical Check-Up Berkala bagi Karyawan</h6>
-                <p style="font-size:9.5px; color:#64748b; margin:2px 0 0 0; line-height:1.4;">Deteksi dini risiko kesehatan untuk mendukung produktivitas dan kebugaran tim kerja.</p>
+        <div>
+          <!-- Header Brand Logo (AVA GLOBAL ECOSYSTEM Virtu style) -->
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+            <img src="css/logo-ava-global.png" style="width:52px; height:52px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; box-shadow:0 0 20px rgba(212,175,55,0.5);" alt="AVA Logo">
+            <div>
+              <h3 style="font-size:20px; font-weight:800; color:#ffffff; margin:0; line-height:1; letter-spacing:-0.5px;">AVA GLOBAL ECOSYSTEM</h3>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                <span style="font-size:9.5px; background:linear-gradient(135deg, #14b8a6, #0f766e); color:#ffffff; font-weight:800; padding:2px 8px; border-radius:12px; letter-spacing:0.5px; text-transform:uppercase;">ISO 15189 CERTIFIED</span>
+                <span style="font-size:10px; color:#cbd5e1; font-weight:600;">Clinical &amp; Multi-Role Portal</span>
               </div>
-            </a>
+            </div>
+          </div>
 
-            <!-- Real Article 2 (Healthy Lifestyle at Work) -->
-            <a href="https://www.halodoc.com/artikel/lakukan-6-tips-sehat-ini-saat-bekerja-di-kantor" target="_blank" class="news-item" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; display:flex; gap:12px; align-items:center; text-decoration:none; transition:all 0.2s ease; cursor:pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.01);" onmouseover="this.style.borderColor='#0f2963'; this.style.background='#f0f6fc';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.background='#ffffff';">
-              <span style="font-size:16px;">🏃</span>
-              <div style="flex:1;">
-                <h6 style="font-size:11px; font-weight:700; color:#0f2963; margin:0; line-height:1.3;">Keseimbangan Hormon &amp; Vitalitas dengan Formula Alami</h6>
-                <p style="font-size:9.5px; color:#64748b; margin:2px 0 0 0; line-height:1.4;">Pendekatan nutraseutikal presisi untuk energi harian, kulit awet muda &amp; kesehatan reproduksi.</p>
+          <!-- Hero Headline & Description -->
+          <div style="max-width:620px; margin-bottom:28px;">
+            <h1 style="font-size:26px; font-weight:800; color:#ffffff; line-height:1.25; margin:0 0 12px 0; background:linear-gradient(135deg, #ffffff 60%, #a5f3fc 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">
+              Platform Layanan Kesehatan Terintegrasi &amp; Diagnostik Presisi
+            </h1>
+            <p style="font-size:13px; color:#94a3b8; line-height:1.6; font-weight:400; margin:0;">
+              Menghubungkan layanan laboratorium LIS, rujukan dokter/faskes, pemeriksaan MCU corporate, perawatan homecare nakes, dan sanctuary wellness dalam satu ekosistem digital.
+            </p>
+          </div>
+
+          <!-- Quick Demo Accounts Switcher (Virtu DigiLab Feature) -->
+          <div style="background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:18px 20px; max-width:620px; margin-bottom:24px; backdrop-filter:blur(8px);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <span style="font-size:11px; font-weight:800; color:#14b8a6; text-transform:uppercase; letter-spacing:0.08em; display:flex; align-items:center; gap:6px;">
+                ⚡ Super Admin Quick Demo Sign-In (1-Click)
+              </span>
+              <span style="font-size:10px; color:#94a3b8;">Klik akun untuk masuk instant</span>
+            </div>
+            
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:10px;">
+              <!-- Super Admin Card -->
+              <div onclick="quickFillDemoUser('admin@avahealth.sbs', 'patient')" style="background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(15,41,99,0.4)); border:1px solid rgba(212,175,55,0.4); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#d4af37'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(212,175,55,0.4)'; this.style.transform='translateY(0)';">
+                <div style="font-size:11px; font-weight:800; color:#fef08a; display:flex; align-items:center; gap:4px;">👑 Super Admin (Ace Anwar)</div>
+                <div style="font-size:9.5px; color:#cbd5e1; margin-top:2px;">Akses Semua Role &amp; Full System</div>
               </div>
-            </a>
+
+              <!-- Corporate Maker Card -->
+              <div onclick="quickFillDemoUser('corp@avahealth.sbs', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#38bdf8'; this.style.background='rgba(56,189,248,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11px; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:4px;">🏢 Corporate Maker (HRD)</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">CV Gaya Bunga Prima (8000010448)</div>
+              </div>
+
+              <!-- Corporate Approver Card -->
+              <div onclick="quickFillDemoUser('88.003681', 'corporate', '8000010448')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#f59e0b'; this.style.background='rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11px; font-weight:800; color:#fbbf24; display:flex; align-items:center; gap:4px;">🏢 Corporate Approver</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Approval Batch MCU &amp; Finance</div>
+              </div>
+
+              <!-- Referral Doctor Card -->
+              <div onclick="quickFillDemoUser('referral@avahealth.sbs', 'referral')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#34d399'; this.style.background='rgba(52,211,153,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11px; font-weight:800; color:#34d399; display:flex; align-items:center; gap:4px;">🏥 Dokter / Faskes Referral</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Klinik Pratama &amp; E-Rujukan</div>
+              </div>
+
+              <!-- Pasien B2C Card -->
+              <div onclick="quickFillDemoUser('88.000841', 'patient')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#a78bfa'; this.style.background='rgba(167,139,250,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11px; font-weight:800; color:#c084fc; display:flex; align-items:center; gap:4px;">👤 Pasien Terverifikasi (B2C)</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">EHR, Order Lab &amp; Homecare</div>
+              </div>
+
+              <!-- Nakes Staff Card -->
+              <div onclick="quickFillDemoUser('nakes@avahealth.sbs', 'staff')" style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.12); border-radius:10px; padding:10px 12px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#f472b6'; this.style.background='rgba(244,114,182,0.15)';" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'; this.style.background='rgba(255,255,255,0.05)';">
+                <div style="font-size:11px; font-weight:800; color:#f472b6; display:flex; align-items:center; gap:4px;">🩺 Staff Nakes Flebotomi</div>
+                <div style="font-size:9.5px; color:#94a3b8; margin-top:2px;">Sampling &amp; ISO 15189 Audit</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Feature Grid Icons -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 20px; max-width:620px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; background:rgba(20,184,166,0.15); padding:6px; border-radius:8px; color:#14b8a6;">🩺</span>
+              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Telehealth &amp; E-Rujukan LIS</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; background:rgba(56,189,248,0.15); padding:6px; border-radius:8px; color:#38bdf8;">🔬</span>
+              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Pemeriksaan Lab &amp; MCU Batch</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; background:rgba(245,158,11,0.15); padding:6px; border-radius:8px; color:#f59e0b;">🏠</span>
+              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Kunjungan Flebotomi Homecare</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:16px; background:rgba(212,175,55,0.15); padding:6px; border-radius:8px; color:#d4af37;">👑</span>
+              <span style="font-size:12px; font-weight:600; color:#cbd5e1;">Queen Sanctuary &amp; VIP Spa</span>
+            </div>
           </div>
         </div>
 
-        <!-- Doctors Illustration with premium clinical integration -->
-        <div style="margin-top:auto; position:relative; display:flex; justify-content:center; align-items:center; width:100%; z-index:1; padding-bottom:10px;">
-          <div style="position:absolute; width:280px; height:280px; background:radial-gradient(circle, rgba(20,184,166,0.12) 0%, rgba(15,41,99,0) 70%); filter:blur(40px); bottom:-40px; pointer-events:none; z-index:0;"></div>
-          <img src="doctors.jpg" style="max-width:400px; width:90%; height:auto; object-fit:contain; display:block; border-radius:24px; box-shadow: 0 20px 40px rgba(15,41,99,0.08); border: 1px solid rgba(20,184,166,0.15); filter: hue-rotate(15deg) brightness(0.95) saturate(1.1) contrast(1.05); -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%); mask-image: linear-gradient(to bottom, black 75%, transparent 100%); position:relative; z-index:1;" alt="AVA Medical Team">
+        <!-- Footer Info -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:14px; margin-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:10.5px; color:#64748b;">
+          <span>&copy; 2026 AVA GLOBAL DIAGNOSTICS &bull; Multi-Lab Engine</span>
+          <span>Versi Portal v2.4 (Virtu-Compliant)</span>
         </div>
 
       </div>
 
-      <!-- Right Panel: Login Card with 4 Roles -->
-      <div class="login-right-panel" style="width:440px; display:flex; align-items:center; justify-content:center; padding:30px; background:#f1f5f9; border-left:1px solid #e2e8f0; flex-shrink:0;">
-        <div class="login-box" style="width:100%; background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:30px; box-shadow: 0 10px 25px rgba(15,23,42,0.04);">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <img src="css/logo-ava-global.png" style="width:48px; height:48px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; margin-bottom:8px; box-shadow:0 0 10px rgba(212,175,55,0.3);" alt="Logo">
-            <h4 id="login-form-title" style="font-size: 18px; font-weight: 700; color: #0f2963; margin: 0; letter-spacing: -0.02em;">AVA GLOBAL Portal</h4>
-            <p id="login-form-subtitle" style="font-size: 11.5px; color: #64748b; margin-top: 4px;">Akses Layanan Pasien, Member, Korporat &amp; Nakes</p>
+      <!-- Right Panel: Virtu Glass Login Form Card -->
+      <div class="login-right-panel" style="width:460px; display:flex; align-items:center; justify-content:center; padding:40px 30px; background:rgba(3, 12, 27, 0.85); backdrop-filter:blur(20px); border-left:1px solid rgba(255,255,255,0.08); flex-shrink:0;">
+        <div class="login-box" style="width:100%; background:rgba(15, 23, 42, 0.75); border:1px solid rgba(255, 255, 255, 0.15); border-radius:18px; padding:32px; box-shadow:0 25px 50px -12px rgba(0, 0, 0, 0.5);">
+          
+          <div style="text-align: center; margin-bottom: 22px;">
+            <img src="css/logo-ava-global.png" style="width:50px; height:50px; border-radius:50%; border:2px solid #d4af37; object-fit:cover; margin-bottom:10px; box-shadow:0 0 15px rgba(212,175,55,0.4);" alt="Logo">
+            <h4 id="login-form-title" style="font-size: 19px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">Masuk Portal Layanan</h4>
+            <p id="login-form-subtitle" style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;">Silakan pilih tipe akses dan masukkan kredensial Anda</p>
           </div>
 
           <form id="login-form" onsubmit="handleLogin(event)">
-            <div class="input-group" style="margin-bottom: 12px;">
-              <label for="username" id="username-label" style="font-size:10.5px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email</label>
-              <input type="text" id="username" placeholder="Contoh: admin@avahealth.sbs atau RM-001" value="admin@avahealth.sbs" required style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; color:#0f172a; font-size:12.5px;">
-            </div>
-            <div class="input-group" id="corp-code-group" style="margin-bottom: 12px; display: none;">
-              <label for="login-corp-code" style="font-size:10.5px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kode Corporate</label>
-              <input type="text" id="login-corp-code" placeholder="Contoh: CORP-89808" style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; color:#0f172a; font-size:12.5px;">
-            </div>
-            <div class="input-group" style="margin-bottom: 14px;">
-              <label for="password" style="font-size:10.5px; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
-              <input type="password" id="password" placeholder="••••••••" value="12345678" required style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; color:#0f172a; font-size:12.5px;">
-            </div>
-
-            <!-- 4 Role Selector Grid -->
-            <div class="role-selector" style="margin-bottom: 16px;">
-              <span class="role-label" style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Masuk Sebagai:</span>
+            <!-- 5 Role Segmented Tabs -->
+            <div class="role-selector" style="margin-bottom: 18px;">
+              <span class="role-label" style="font-size:10px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; display:block; margin-bottom:8px;">Pilih Tipe Akses Login:</span>
+              
               <div class="role-options" style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="patient" checked onchange="updateLoginFormUI('patient')">
-                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">👤 Pasien / Cust</span>
+                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">👤 Pasien B2C</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="member" onchange="updateLoginFormUI('member')">
-                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">👑 Member VIP</span>
+                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">👑 Member VIP</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="corporate" onchange="updateLoginFormUI('corporate')">
-                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">🏢 Corporate</span>
+                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🏢 Corporate B2B</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="staff" onchange="updateLoginFormUI('staff')">
-                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">🩺 Staff Nakes</span>
+                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🩺 Staff Nakes</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer; grid-column: span 2;">
                   <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
-                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">🔗 Dokter / Faskes Referral</span>
+                  <span style="display:block; text-align:center; padding:8px 4px; font-size:11px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.05); color:#cbd5e1; transition:all 0.2s;">🔗 Dokter / Faskes Referral</span>
                 </label>
               </div>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; padding:11px; font-size:13px; font-weight:700; margin-top:4px; background:linear-gradient(135deg, #0f2963, #14b8a6); border:none; border-radius:8px; color:white; cursor:pointer;">Masuk Portal Layanan</button>
+            <!-- Inputs -->
+            <div class="input-group" style="margin-bottom: 14px;">
+              <label for="username" id="username-label" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">No. Rekam Medis / Email / User ID</label>
+              <input type="text" id="username" placeholder="admin@avahealth.sbs atau 88.000841" value="admin@avahealth.sbs" required style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+            </div>
+
+            <div class="input-group" id="corp-code-group" style="margin-bottom: 14px; display: none;">
+              <label for="login-corp-code" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">ID Perusahaan (Corporate Code)</label>
+              <input type="text" id="login-corp-code" placeholder="Contoh: 8000010448" value="8000010448" style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+            </div>
+
+            <div class="input-group" style="margin-bottom: 18px;">
+              <label for="password" style="font-size:10.5px; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Kata Sandi</label>
+              <input type="password" id="password" placeholder="••••••••" value="12345678" required style="width:100%; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:11px 14px; color:#ffffff; font-size:13px; outline:none;">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; padding:12px; font-size:13.5px; font-weight:800; background:linear-gradient(135deg, #14b8a6, #0f2963); border:none; border-radius:10px; color:#ffffff; cursor:pointer; box-shadow:0 10px 20px -5px rgba(20,184,166,0.4); transition:all 0.2s ease;">MASUK PORTAL LAYANAN &rarr;</button>
           </form>
 
-          <div class="screen-footer" style="margin-top: 18px; text-align: center;">
-            <p id="login-footer-desc" style="font-size: 11px; color: #64748b; margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:#0f2963; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
+          <div class="screen-footer" style="margin-top: 20px; text-align: center;">
+            <p id="login-footer-desc" style="font-size: 11.5px; color: #94a3b8; margin: 0;">Belum memiliki akun? <a href="#" onclick="openRegisterModal()" style="color:#14b8a6; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
+          </div>
+
+        </div>
+      </div>
+
+    </div>enRegisterModal()" style="color:#0f2963; font-weight:700; text-decoration:none;">Daftar Akun Baru</a></p>
           </div>
         </div>
       </div>
