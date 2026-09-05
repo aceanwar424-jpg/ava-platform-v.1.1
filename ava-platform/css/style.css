@@ -2723,3 +2723,57 @@ body.admission-workspace-page .main-content {
   .admission-form-context { order: 4; }
   .admission-report-grid { grid-template-columns: 1fr; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   HIS OPERATIONAL SHELL — komponen bersama seluruh menu HIS
+══════════════════════════════════════════════════════════════ */
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .main-content {
+  padding: 14px 16px 18px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  min-height: 48px; margin-bottom: 10px; padding: 0 2px 10px; background: transparent; border: 0; border-bottom: 1px solid var(--border); border-radius: 0;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header h1 {
+  margin: 0; color: var(--navy); font-size: 18px; line-height: 1.2; letter-spacing: -.015em;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header p {
+  margin: 3px 0 0; color: var(--text3); font-size: 11.5px; line-height: 1.35;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header .btn-row,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header > div:last-child {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header .btn,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .btn-row .btn {
+  min-height: 34px; padding-right: 10px; padding-left: 10px; font-size: 11.5px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .tabs {
+  display: flex; align-items: center; gap: 5px; margin: 0 0 10px !important; padding: 5px; overflow-x: auto; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .tabs .tab-btn {
+  flex: 0 0 auto; min-height: 32px; padding: 6px 10px; color: var(--text3); background: transparent; border: 1px solid transparent; border-radius: 5px; font-size: 11px; font-weight: 700;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .tabs .tab-btn:hover { color: var(--teal); background: var(--teal-light); }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .tabs .tab-btn.active { color: var(--teal); background: var(--white); border-color: var(--teal); }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .card,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .table-wrap {
+  border-color: var(--border);
+  border-radius: 9px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-row { gap: 10px; }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-group { margin-bottom: 10px; }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-group > label { margin-bottom: 4px; font-size: 11.5px; }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-group input,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-group select,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .form-group textarea {
+  padding: 8px 10px; font-size: 12px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .table-wrap table th { padding-top: 8px; padding-bottom: 8px; font-size: 10px; }
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .table-wrap table td { padding-top: 8px; padding-bottom: 8px; font-size: 11.5px; }
+@media (max-width: 768px) {
+  body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .main-content { padding: 12px; }
+  body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header { align-items: flex-start; flex-direction: column; }
+  body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header .btn-row,
+  body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header > div:last-child { width: 100%; }
+}

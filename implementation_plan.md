@@ -176,6 +176,33 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - Identitas dan informasi layanan yang muncul saat verifikasi tetap sintetis
   atau keadaan kosong. Tidak ada penyimpanan, ekspor, atau integrasi eksternal.
 
+## Konsolidasi Navigasi HIS & Shell Operasional — 5 September 2026
+
+### Urutan implementasi
+
+1. [ ] Audit ulang read-only struktur menu referensi sampai level kelompok dan
+   sub-menu operasional, tanpa membuka data transaksi atau melakukan perubahan.
+2. [ ] Lengkapi konteks Admission dengan empat kelompok kerja: Admission,
+   Back Office, Queue, dan Queue Outpatient; koreksi lokasi presentasi menu
+   yang masih terpencar tanpa menghapus rute atau mengubah RBAC.
+3. [ ] Terapkan shell navigasi ringkas yang seragam pada domain HIS: rail
+   ikon, panel konteks dua tingkat, dan header operasional tanpa breadcrumb
+   atau indikator API yang tidak relevan bagi petugas.
+4. [ ] Rapikan elemen form berulang melalui CSS terlingkup dan hapus label
+   tahap yang tidak diperlukan, dengan fallback responsif pada tablet/ponsel.
+5. [ ] Jalankan audit menu, keamanan, sintaks, serta preview klik lintas
+   kelompok; catat menu yang hanya bisa diverifikasi sampai level renderer.
+
+### Implikasi IP & Kepatuhan
+
+- Audit referensi dilakukan read-only pada struktur navigasi dan layar kosong;
+  data pasien, daftar transaksi, konfigurasi, dan ekspor tidak disentuh.
+- Pemetaan ulang hanya mengubah presentasi menu. Rute, RBAC, tabel, API, dan
+  kontrak transaksi tetap memakai implementasi yang ada.
+- Tidak ada data pasien nyata ditambahkan pada dokumentasi, fixture, maupun
+  pengujian. Perubahan skema atau integrasi tetap memerlukan checkpoint
+  pemilik database.
+
 ## Perombakan web publik AVA Health — 2026-09-05
 Rencana: (1) audit portal dan routing (≤1 jam), (2) bangun profil publik responsif, detail brand, katalog, sejarah, sertifikasi, kontak (≤1 jam), (3) validasi tautan/aset/routing dan preview (≤1 jam).
 Arah visual: editorial kesehatan, putih dan navy, aksen emerald, tipografi besar, enam brand sebagai portofolio bisnis. Pertahankan stack statis dan deployment Vercel yang ada.
@@ -186,3 +213,8 @@ OWNED_BY: ava untuk konten situs perusahaan yang sudah tersedia; tidak dipindahk
 Rencana: 1) teliti sumber kesehatan primer dan rumus kalkulator (≤1 jam); 2) perluas enam profil brand, visi/misi, model bisnis, alur manufaktur sebagai skenario operasional (≤1 jam); 3) bangun jurnal kesehatan bersumber dan kalkulator lokal BMI/kalori serta penyempurnaan premium (≤1 jam); 4) verifikasi kalkulasi, konten, tautan, ekspor dan preview (≤1 jam).
 ### Implikasi IP & Kepatuhan
 OWNED_BY: ava. Pengguna mengotorisasi rancangan dengan asumsi semua lini sudah berjalan. Asumsi manufaktur/farmasi diberi penanda konsep, tidak menjadi klaim izin atau operasi faktual. Tidak menambah klaim CPOB/izin edar terverifikasi. Artikel orisinal berbasis sumber primer yang diperiksa tanggal 2026-09-05; tidak mengaku telah ditinjau dokter. Kalkulator khusus dewasa, bukan diagnosis atau resep diet; input hanya di memori browser. Tidak mengubah master data, vendor atau sistem produksi.
+
+## Konten komersial setelah discovery — 2026-09-05
+Rencana: susun positioning AVA Tech dan hierarki AVA/Queen (≤1 jam); terapkan beranda, tiga solusi faskes, demo/pilot, model biaya, investor dan ekspansi produk (≤1 jam); verifikasi seluruh halaman, konsistensi status, tautan dan preview (≤1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Sumber fakta adalah jawaban pemilik dalam percakapan: seluruh lini dalam pengembangan; HIS/LIS/Apps siap demo; laporan terbukti di demo tanpa jenis laporan spesifik terkonfirmasi; tersedia demo/uji coba terbatas. Hindari angka traction, sertifikat, nama anak PT, bukti produksi atau laporan contoh yang belum diberikan. Queen adalah brand usaha sendiri, AVA korporat dan AVA Tech B2B. Produk herbal prioritas ekspansi, pabrik bukan klaim kapasitas aktual. Biaya setup/modular ditambah lisensi bulanan tanpa harga rekaan. Tidak mengubah data master, aplikasi operasional atau integrasi eksternal; tautan email hanya menyiapkan permintaan pengguna, bukan mengirim pesan.

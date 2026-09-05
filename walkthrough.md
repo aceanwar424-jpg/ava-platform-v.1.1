@@ -421,3 +421,7 @@ Bukti verifikasi: verify-public-profile PASS; verify-public-editorial PASS untuk
   rail vertikal dan perpindahan ke tahap Pembayaran bekerja. Syntax Admission,
   pemeriksaan menu, audit 159 menu, audit keamanan 2.350/2.350, dan
   `git diff --check` lulus.
+
+## Konten komersial setelah discovery — selesai 2026-09-05
+OWNED_BY: ava. Beranda kini memprioritaskan AVA Tech, demo HIS/LIS/Apps dan uji coba terbatas. Ditambahkan tiga halaman solusi (laboratorium mandiri, klinik pratama, klinik utama), halaman investasi, biaya setup/modular + lisensi bulanan, lingkup pengembangan khusus, dan kriteria evaluasi pilot. Consumer portfolio memakai Queen; perusahaan tetap AVA Health Solution. Narasi manufaktur sebelumnya diganti fokus produk herbal/nutrisi/personal care dan opsi maklon; pabrik sendiri hanya arah jangka panjang. Tidak ada bukti laporan spesifik, traction, fasilitas, atau harga yang direka.
+Bukti: verify-public-profile PASS; verify-public-editorial PASS untuk 19 halaman, tautan/aset/anchor, rebuild deterministik, hierarki teknologi sebelum brand, status demo/pilot, identitas korporat, penghapusan narasi pabrik nonsteril lama, dan regresi kalkulator. Generator routing --periksa PASS. HTTP 200 untuk portal, tiga solusi, dan investasi pada :5186. Dokumen editorial: docs/WEB-CONTENT-AVA-BUSINESS.md. Tidak mengubah aplikasi operasional atau mempublikasikan produksi; visual browser tidak diuji pada tahap penulisan konten ini.

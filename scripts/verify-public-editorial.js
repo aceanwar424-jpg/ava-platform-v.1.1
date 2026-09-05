@@ -17,9 +17,16 @@ for(const bad of [{height:0},{weight:-1},{weight:NaN},{age:19},{age:79},{age:20.
 assert.equal(calculate({...input,factor:1.8}).maintenance,3114);
 console.log('PASS: independent calorie examples, BMI boundary classifications, activity factor, excluded and invalid inputs.');
 const files = ['portal.html',...fs.readdirSync(path.join(platform,'public')).filter(f=>f.endsWith('.html')).map(f=>'public/'+f)];
-assert.equal(files.length,15);
+assert.equal(files.length,19);
 const read = file => fs.readFileSync(path.join(platform,file),'utf8');
 const lookup = new Map(files.map(file=>[file,read(file)]));
+const home = lookup.get('portal.html');
+assert(home.indexOf('id="solusi"') < home.indexOf('id="brand"'), 'Technology solutions must precede the consumer portfolio');
+for (const id of ['demo','penawaran','investor']) assert(home.includes(`id="${id}"`));
+assert(home.includes('Lisensi bulanan') && home.includes('Biaya awal'));
+for (const file of ['solusi-laboratorium.html','solusi-klinik-pratama.html','solusi-klinik-utama.html','investasi.html']) assert(lookup.get('public/'+file).includes('uji coba terbatas'));
+for (const [file, content] of lookup) assert(!content.includes('Queen Health Solution'), `Corporate name must remain AVA: ${file}`);
+assert(!lookup.get('public/manufaktur.html').includes('sediaan nonsteril'), 'Obsolete factory-led positioning must not be published');
 for (const [file,html] of lookup) {
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
   assert.equal(ids.length,new Set(ids).size,`Duplicate IDs in ${file}`);
@@ -36,7 +43,7 @@ for (const [file,html] of lookup) {
 }
 for(const [brand,p] of Object.entries(profiles)) {
   assert.equal(p.mission.length,3); assert(p.flow.length>=5);
-  assert(lookup.get('public/brand-'+brand+'.html').includes('KONSEP PORTOFOLIO'));
+  assert(lookup.get('public/brand-'+brand+'.html').includes('PENGEMBANGAN'));
 }
 for(const article of articles) {
   const html = lookup.get('public/jurnal-'+article.slug+'.html');
@@ -46,4 +53,4 @@ for(const article of articles) {
 }
 const digest = () => crypto.createHash('sha256').update(files.map(read).join('')).digest('hex');
 const before = digest(); execFileSync(process.execPath,['scripts/build-public-profile.js'],{cwd:root}); assert.equal(digest(),before);
-console.log('PASS: 15 pages, all local targets/anchors, one H1, 6 profiles, 7 sourced articles, deterministic rebuild.');
+console.log('PASS: 19 pages, all local targets/anchors, one H1, 6 profiles, 7 sourced articles, deterministic rebuild.');

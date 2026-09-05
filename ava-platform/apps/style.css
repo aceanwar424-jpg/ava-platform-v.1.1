@@ -1781,12 +1781,23 @@ th {
   display: block;
 }
 
+/* Hide scrollbar for sidebar (Aesthetic Polish) */
+.app-sidebar, .sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.app-sidebar::-webkit-scrollbar, .sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .sidebar-nav {
   flex: 1;
   padding: 14px 12px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   overflow-y: auto;
 }
 
@@ -1797,6 +1808,46 @@ th {
   text-transform: uppercase;
   color: rgba(203, 213, 225, 0.5);
   padding: 12px 14px 6px;
+}
+
+/* Accordion Collapsible Category Styles */
+.sidebar-cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  transition: all 0.2s ease;
+}
+
+.sidebar-cat-header:hover {
+  background: rgba(56, 189, 248, 0.12);
+  color: #ffffff;
+}
+
+.sidebar-cat-chevron {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s ease;
+}
+
+.sidebar-submenu-group {
+  padding-left: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 6px;
+  border-left: 2px solid rgba(56, 189, 248, 0.25);
 }
 
 .sidebar-link {

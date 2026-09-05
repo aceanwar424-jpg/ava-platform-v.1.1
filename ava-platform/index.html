@@ -978,17 +978,23 @@ function gambarRail(ruang) {
       users: ['Administrasi Sistem', 'Sistem & Hak Akses'],
       import: ['Administrasi Sistem', 'Data Awal & Migrasi'],
       family: ['Master Klinis', 'Pasien & Keluarga'],
-      admission: ['Alur Pasien', 'Registrasi & Admisi'],
-      'admission-service': ['Alur Pasien', 'Registrasi & Admisi'],
-      'admission-medical-kit': ['Alur Pasien', 'Registrasi & Admisi'],
-      'admission-package': ['Alur Pasien', 'Registrasi & Admisi'],
-      'admission-subscription': ['Alur Pasien', 'Registrasi & Admisi'],
-      'admission-package-usage': ['Alur Pasien', 'Registrasi & Admisi'],
-      queue: ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
-      'queue-console': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
-      'queue-kiosk': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
-      'queue-config': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
-      appointments: ['Fasilitas & Antrean', 'Jadwal & Kapasitas'],
+      admission: ['Alur Pasien', 'Admission'],
+      'admission-service': ['Alur Pasien', 'Admission'],
+      'admission-medical-kit': ['Alur Pasien', 'Admission'],
+      'admission-package': ['Alur Pasien', 'Admission'],
+      'admission-subscription': ['Alur Pasien', 'Admission'],
+      'admission-package-usage': ['Alur Pasien', 'Admission'],
+      // Booking tetap merupakan proses pasien, tetapi dipisahkan dari enam
+      // jenis registrasi agar operator tidak mengira ia adalah tipe registrasi.
+      appointments: ['Alur Pasien', 'Jadwal & Perjanjian'],
+      'admission-report': ['Alur Pasien', 'Back Office'],
+      queue: ['Alur Pasien', 'Queue'],
+      'queue-console': ['Alur Pasien', 'Queue'],
+      'queue-kiosk': ['Alur Pasien', 'Queue'],
+      'queue-outpatient': ['Alur Pasien', 'Queue Outpatient'],
+      // Definisi flow/loket/perangkat adalah konfigurasi, bukan pekerjaan
+      // harian loket. Operasionalnya tetap ada di kelompok Queue di atas.
+      'queue-config': ['Administrasi Sistem', 'Konfigurasi Antrean'],
       'hc-schedule': ['Fasilitas & Antrean', 'Jadwal & Kapasitas'],
       'hc-staff': ['Fasilitas & Antrean', 'Tenaga & Penugasan'],
       satusehat: ['Administrasi & Kepatuhan', 'Integrasi & SATUSEHAT'],
@@ -1240,7 +1246,10 @@ function renderNavigationContext(groupId, preferredServiceIndex) {
       const unavailable = item.soon || item.status === 'belum';
       const partial = item.status === 'parsial';
       const active = item.page === window.currentPage;
-      const state = unavailable ? '<span class="navigation-module-state">Segera</span>' : partial ? '<span class="navigation-module-state partial">Bertahap</span>' : '<span class="navigation-module-go" aria-hidden="true">›</span>';
+      // Status progres tidak ditampilkan sebagai label tahap pada navigasi.
+      // Arahkan pengguna ke modul yang memang sudah bisa dibuka; penanda
+      // "Segera" dipertahankan hanya untuk modul yang benar-benar belum ada.
+      const state = unavailable ? '<span class="navigation-module-state">Segera</span>' : '<span class="navigation-module-go" aria-hidden="true">›</span>';
       return '<button type="button" class="navigation-module-item' + (active ? ' active' : '') + (partial ? ' partial' : '') + (unavailable ? ' disabled' : '') + '"' +
         (unavailable ? ' disabled aria-disabled="true"' : ' onclick="navigateFromContext(\'' + groupId + '\',' + serviceIndex + ',' + index + ')"') + '>' +
         '<span class="navigation-module-item-copy"><strong>' + navEscapeHtml(item.label) + '</strong><small>' + navEscapeHtml(item.desc || 'Buka proses operasional') + '</small></span>' + state + '</button>';

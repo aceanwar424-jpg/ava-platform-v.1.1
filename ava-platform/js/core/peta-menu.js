@@ -357,10 +357,26 @@ window.PETA_MENU = {
               "ket": "Penebusan hak paket aktif dengan masa berlaku dan sisa penggunaan"
             },
             {
+              "id": "admission-report",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'outpatient',view:'report'})",
+              "label": "Laporan Registrasi",
+              "status": "ada",
+              "ket": "Ringkasan registrasi, status kunjungan, dan penerimaan pada periode terpilih"
+            },
+            {
               "id": "queue",
               "label": "Antrian Poli",
               "status": "ada",
               "ket": "Pemanggilan bersuara & layar ruang tunggu"
+            },
+            {
+              "id": "queue-outpatient",
+              "rute": "queue",
+              "aksi": "navigate('queue',{scope:'outpatient'})",
+              "label": "Antrean Poli Umum & Spesialis",
+              "status": "ada",
+              "ket": "Daftar dan pemanggilan antrean rawat jalan dokter umum maupun spesialis"
             },
             {
               "id": "queue-console",

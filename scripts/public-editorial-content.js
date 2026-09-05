@@ -44,4 +44,13 @@ const articles = [
  ['Pahami konteks mutu produksi','CPOB berkaitan dengan cara pembuatan obat yang baik. Informasi sertifikasi fasilitas tidak boleh dianggap sebagai bukti izin edar untuk semua produk yang dikaitkan dengannya. Mintalah informasi yang sesuai dengan fasilitas dan produk bersangkutan.'],
  ['Siapkan pertanyaan kepada penjual','Sebagai langkah praktis, tanyakan produsen, izin edar, aturan penyimpanan, dan kanal pengaduan. Simpan kemasan serta bukti pembelian bila muncul pertanyaan. Bila penggunaan produk berkaitan dengan kondisi medis atau obat yang sedang dikonsumsi, diskusikan dengan tenaga kesehatan sebelum memutuskan.']],sources:[['BPOM — Cerdas Gunakan Obat, Ingat Cek KLIK','https://kmei.pom.go.id/wp-content/uploads/2025/03/KIE-Tips-Cerdas-Mimilih-Obat-Aman-2.pdf'],['BPOM — KLIK CPOB, FAQ','https://klikcpob.pom.go.id/faq-2/']]}
 ];
+// Commercial positioning clarified by the owner: products first, production via partners.
+profiles.tech.model = 'Biaya awal meliputi setup, implementasi, dan modul yang dipilih, dilanjutkan lisensi bulanan. Integrasi serta pengembangan menu dan alur khusus ditentukan melalui asesmen kebutuhan, kelayakan, dan lingkup kerja yang disepakati.';
+profiles.tech.flow = ['Asesmen kebutuhan','Demo alur & menu','Uji coba terbatas','Evaluasi bersama','Pembahasan implementasi'];
+profiles.care.model = 'Pengembangan produk Queen untuk usaha sendiri dan peluang penggunaan dalam program bersama. Produksi melalui mitra maklon menjadi opsi sesuai kesiapan produk. Informasi komersial dan formulasi dibahas sesuai lingkup serta kesepakatan kerahasiaan.';
+profiles.care.offers = ['Pengembangan personal care','Produk untuk program bersama','Kemitraan pengembangan produk'];
+profiles.care.org = ['Pengembangan portofolio','Koordinasi mitra produksi','Mutu & informasi produk','Program & komersial'];
+profiles.nutrition.model = 'Pengembangan portofolio herbal, nutrisi, dan produk terkait di bawah Queen. Peluang bisnis mencakup produk untuk konsumen serta penggunaan dalam program kesehatan bersama. Maklon merupakan opsi produksi; fasilitas sendiri menjadi kemungkinan jangka panjang.';
+profiles.nutrition.offers = ['Pengembangan produk herbal','Portofolio nutrisi','Produk untuk program bersama'];
+profiles.nutrition.connection = 'Terhubung dengan arah program kesehatan dan aplikasi wellness dalam ekosistem AVA. Kategori, informasi penggunaan, serta kesiapan setiap produk ditetapkan secara tersendiri.';
 module.exports = { profiles, articles };

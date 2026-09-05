@@ -18,18 +18,20 @@ let qTickets = [], qService = '';
 // ══════════════════════════════════════════════════════════════
 // ANTRIAN
 // ══════════════════════════════════════════════════════════════
-async function renderQueuePage() {
+async function renderQueuePage(params = {}) {
+  const outpatientScope = params?.scope === 'outpatient';
+  qService = outpatientScope ? 'Dokter' : '';
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
-      <div><h1>Antrian</h1><p>Nomor antrian harian per layanan, panggil, dan lewati</p></div>
+      <div><h1>${outpatientScope ? 'Antrean Rawat Jalan' : 'Antrean'}</h1><p>${outpatientScope ? 'Antrean poli umum dan spesialis yang menunggu dokter' : 'Nomor antrian harian per layanan, panggil, dan lewati'}</p></div>
       <div class="btn-row">
         <button class="btn btn-ghost btn-sm" onclick="openQueueDisplay()">🖥️ Layar Ruang Tunggu</button>
         <button class="btn btn-teal" onclick="openQueueForm()">+ Ambil Nomor</button>
       </div>
     </div>
     <div class="tabs" id="q-tabs" style="margin-bottom:14px">
-      <button class="tab-btn active" onclick="filterQueue('',this)">Semua</button>
-      ${QUEUE_SERVICES.map(s=>`<button class="tab-btn" onclick="filterQueue('${s}',this)">${s}</button>`).join('')}
+      <button class="tab-btn ${outpatientScope ? '' : 'active'}" onclick="filterQueue('',this)">Semua</button>
+      ${QUEUE_SERVICES.map(s=>`<button class="tab-btn ${outpatientScope && s === 'Dokter' ? 'active' : ''}" onclick="filterQueue('${s}',this)">${s}</button>`).join('')}
     </div>
     <div id="q-kpi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px"></div>
     <div id="q-content"><div class="loading-row"><div class="spinner"></div></div></div>`;

@@ -282,6 +282,34 @@ function toggleSidebar() {
   if (sidebar) sidebar.classList.toggle('open');
 }
 
+// Toggle sidebar category accordion
+function toggleSidebarCategory(catId) {
+  const grp = document.getElementById(`subgroup-${catId}`);
+  const chev = document.getElementById(`chevron-${catId}`);
+  if (!grp) return;
+  const isHidden = (grp.style.display === 'none');
+  grp.style.display = isHidden ? 'flex' : 'none';
+  if (chev) chev.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+if (typeof window !== 'undefined') window.toggleSidebarCategory = toggleSidebarCategory;
+
+// Helper to render accordion category item
+function renderCategoryAccordion(catId, catTitle, catIcon, subLinksHtml, defaultOpen = false) {
+  const chevronSvg = `<svg id="chevron-${catId}" class="sidebar-cat-chevron" style="width:14px; height:14px; transition:transform 0.25s ease; ${defaultOpen ? 'transform:rotate(180deg);' : ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`;
+  
+  return `
+    <div class="sidebar-cat-group">
+      <div class="sidebar-cat-header" onclick="toggleSidebarCategory('${catId}')">
+        <span style="display:flex; align-items:center; gap:8px;">${catIcon} ${catTitle}</span>
+        ${chevronSvg}
+      </div>
+      <div id="subgroup-${catId}" class="sidebar-submenu-group" style="display:${defaultOpen ? 'flex' : 'none'}; flex-direction:column; gap:2px;">
+        ${subLinksHtml}
+      </div>
+    </div>
+  `;
+}
+
 // Render dynamic menus inside sidebar based on logged-in role
 function renderSidebarMenu() {
   const navContainer = document.getElementById('sidebar-nav');
@@ -296,20 +324,14 @@ function renderSidebarMenu() {
     result: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg>',
     stmt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>',
     deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-    
-    // Patient specific
     dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
     medrec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
     lab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.7 22h14.6c.6 0 1-.4 1-1v-2.5c0-.3-.1-.5-.3-.7L14 11.5v-7h1V3.5H9v1h1v7L4.3 17.8c-.2.2-.3.4-.3.7V21c0 .6.4 1 1 1z"/></svg>',
     package: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
     mapPin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
     profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    
-    // Referral specific
     filePlus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>',
     wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M16 8h4v8h-4z"/></svg>',
-
-    // AVA Health
     consult: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>',
     market:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
     device:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="6" width="14" height="12" rx="3"/><path d="M8 6V3h8v3M8 18v3h8v-3"/></svg>',
@@ -317,68 +339,114 @@ function renderSidebarMenu() {
   };
 
   if (currentRole === 'patient') {
-    navContainer.innerHTML = `
-      <div class="sidebar-section">Layanan &amp; Transaksi</div>
-      <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Lacak Pesanan & Refill')">${I.package}<span>Lacak Pesanan D2C</span></a>
-      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Home Care')">${I.home}<span>Lacak Home Care</span></a>
-      <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab')">${I.lab}<span>Pesan Lab</span></a>
-      <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Care')">${I.home}<span>Book Home Visit</span></a>
-      <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
-      <a class="sidebar-link" onclick="showView('ava-consult-view', 'Telekonsultasi Dokter')">${I.consult}<span>Telekonsultasi</span></a>
-      <a class="sidebar-link" onclick="showView('ava-marketplace-view', 'Sewa &amp; Beli Alkes')">${I.market}<span>Sewa &amp; Beli Alkes</span></a>
-      <a class="sidebar-link" onclick="showView('toko-view', 'Toko AVA')">${I.package}<span>Toko AVA</span></a>
-
-      <div class="sidebar-section">Kesehatan Saya</div>
+    const subLayanan = `
       <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">${I.dashboard}<span>Dashboard Utama</span></a>
-      <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">${I.medrec}<span>Rekam Medis (EHR)</span></a>
-      <a class="sidebar-link" onclick="showView('ava-devices-view', 'Perangkat &amp; Wearables')">${I.device}<span>Perangkat &amp; Wearables</span></a>
-      <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Keluarga')">${I.care}<span>Caregiver &amp; Keluarga</span></a>
-
-      <div class="sidebar-section">Lainnya</div>
-      <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">${I.mapPin}<span>Cabang Terdekat</span></a>
-      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">${I.profile}<span>My Profile</span></a>
+      <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab &amp; MCU')">${I.lab}<span>Pesan Test Lab</span></a>
+      <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Visit')">${I.home}<span>Book Homecare Nakes</span></a>
+      <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
+      <a class="sidebar-link" onclick="showView('ava-consult-view', 'Telekonsultasi Dokter')">${I.consult}<span>Telekonsultasi Dokter</span></a>
+      <a class="sidebar-link" onclick="showView('ava-marketplace-view', 'Sewa &amp; Beli Alkes')">${I.market}<span>Toko AVA &amp; Alkes</span></a>
     `;
+
+    const subRekamMedis = `
+      <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis Digital (EHR)')">${I.medrec}<span>Rekam Medis (EHR LOINC)</span></a>
+      <a class="sidebar-link" onclick="showView('ava-devices-view', 'Perangkat &amp; Wearables')">${I.device}<span>Biosensor &amp; Wearable Pulse</span></a>
+      <a class="sidebar-link" onclick="switchTimelinePhase('fase2'); showView('patient-view', 'CRISPR Bio-Age Reversal')">${I.result}<span>CRISPR Bio-Age Reversal</span></a>
+    `;
+
+    const subTracking = `
+      <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Lacak Pesanan D2C')">${I.package}<span>Lacak Pesanan D2C Refill</span></a>
+      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Kunjungan Nakes')">${I.home}<span>Lacak Kunjungan Home Care</span></a>
+    `;
+
+    const subSanctuary = `
+      <a class="sidebar-link" onclick="showView('member-sanctuary-view', 'Queen Sanctuary Spa')">${I.book}<span>Queen Sanctuary &amp; VIP Spa</span></a>
+    `;
+
+    const subAkun = `
+      <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Pendampingan Keluarga')">${I.care}<span>Caregiver &amp; Keluarga</span></a>
+      <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">${I.mapPin}<span>Cabang &amp; Faskes Terdekat</span></a>
+      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">${I.profile}<span>Profil &amp; Card Member</span></a>
+    `;
+
+    navContainer.innerHTML = [
+      renderCategoryAccordion('p-layanan', 'Portal Pasien (Layanan Utama)', '🩺', subLayanan, true),
+      renderCategoryAccordion('p-rekam', 'Hasil Lab &amp; Rekam Medis', '📊', subRekamMedis, true),
+      renderCategoryAccordion('p-tracking', 'Queen Care &amp; Nutri Refill', '📦', subTracking, false),
+      renderCategoryAccordion('p-sanctuary', 'Sanctuary Spa &amp; Wellness', '👑', subSanctuary, false),
+      renderCategoryAccordion('p-akun', 'Caregiver &amp; Akun Pasien', '👤', subAkun, false)
+    ].join('');
+
   } else if (currentRole === 'member') {
-    navContainer.innerHTML = `
-      <div class="sidebar-section">VIP Privilege</div>
+    const subPrivilege = `
       <a class="sidebar-link active" onclick="showView('member-sanctuary-view', 'Queen Sanctuary')">${I.book}<span>VIP Sanctuary &amp; Spa</span></a>
       <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Auto-Refill Nutrisi')">${I.package}<span>Auto-Refill Suplemen</span></a>
-      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Home Care')">${I.home}<span>Lacak Home Care</span></a>
       <a class="sidebar-link" onclick="showView('ava-consult-view', 'Konsultasi Dokter VIP')">${I.consult}<span>Telekonsultasi VIP</span></a>
+      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Home Care')">${I.home}<span>Lacak Home Care</span></a>
+    `;
 
-      <div class="sidebar-section">Kesehatan &amp; Rekam Medis</div>
+    const subEHR = `
       <a class="sidebar-link" onclick="showView('patient-view', 'Status Kesehatan')">${I.dashboard}<span>Status Kesehatan</span></a>
       <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis (EHR)')">${I.medrec}<span>Rekam Medis (EHR)</span></a>
+      <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Keluarga')">${I.care}<span>Caregiver &amp; Keluarga</span></a>
       <a class="sidebar-link" onclick="showView('profile-view', 'Profil Member')">${I.profile}<span>Profil Member VIP</span></a>
     `;
+
+    navContainer.innerHTML = [
+      renderCategoryAccordion('m-privilege', 'VIP Sanctuary Privilege', '👑', subPrivilege, true),
+      renderCategoryAccordion('m-ehr', 'Rekam Medis &amp; Caregiver', '📊', subEHR, true)
+    ].join('');
+
   } else if (currentRole === 'corporate') {
     const isSA = (currentUserEmail === 'admin@avahealth.sbs');
     const canRequest = isSA || !currentCorpRole || currentCorpRole === 'requestor';
     const canApprove = isSA || !currentCorpRole || currentCorpRole === 'approver';
-    navContainer.innerHTML = `
-      <div class="sidebar-section">Korporat</div>
-      <a class="sidebar-link active" onclick="showView('corporate-view', 'Home')">${I.home}<span>Home MCU</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Karyawan</span></a>
-      ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Order MCU Massal</span></a>` : ''}
-      ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Approval MCU</span></a>` : ''}
+
+    const subCorpMcu = `
+      <a class="sidebar-link active" onclick="showView('corporate-view', 'Home MCU')">${I.home}<span>Dasbor Kesehatan Korporat</span></a>
+      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Data Karyawan</span></a>
+      ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Order MCU Massal (Maker)</span></a>` : ''}
+      ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Approval MCU Batch (Approver)</span></a>` : ''}
       <a class="sidebar-link" onclick="showView('examination-history-view', 'Examination History')">${I.history}<span>Riwayat MCU Karyawan</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit &amp; Tagihan</span></a>
     `;
+
+    const subCorpBilling = `
+      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit, Tagihan &amp; Cashback</span></a>
+    `;
+
+    navContainer.innerHTML = [
+      renderCategoryAccordion('c-mcu', 'Manajemen Karyawan &amp; MCU', '🏢', subCorpMcu, true),
+      renderCategoryAccordion('c-billing', 'Keuangan &amp; Billing Corporate', '🧾', subCorpBilling, true)
+    ].join('');
+
   } else if (currentRole === 'staff') {
-    navContainer.innerHTML = `
-      <div class="sidebar-section">Penugasan Nakes Lapangan</div>
+    const subNakes = `
       <a class="sidebar-link active" onclick="showView('staff-homecare-view', 'Tugas Home Care')">${I.home}<span>Jadwal Visit Hari Ini</span></a>
-      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Riwayat Kunjungan')">${I.history}<span>Riwayat Sampling</span></a>
-      <a class="sidebar-link" onclick="showView('nearme-view', 'Faskes & Lab Pusat')">${I.mapPin}<span>Lokasi Lab &amp; Faskes</span></a>
-      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Nakes')">${I.profile}<span>Profil Petugas</span></a>
+      <a class="sidebar-link" onclick="openPhlebotomyModal()">${I.result}<span>Audit Sampling ISO 15189</span></a>
+      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Riwayat Kunjungan')">${I.history}<span>Riwayat Sampling Flebotomi</span></a>
+      <a class="sidebar-link" onclick="showView('nearme-view', 'Faskes &amp; Lab Pusat')">${I.mapPin}<span>Peta Faskes &amp; Rute</span></a>
+      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Nakes')">${I.profile}<span>Profil Petugas Nakes</span></a>
     `;
+
+    navContainer.innerHTML = [
+      renderCategoryAccordion('s-nakes', 'Operasional Flebotomi Lapangan', '🩺', subNakes, true)
+    ].join('');
+
   } else if (currentRole === 'referral') {
-    navContainer.innerHTML = `
-      <div class="sidebar-section">Kemitraan</div>
-      <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">${I.dashboard}<span>Riwayat Rujukan</span></a>
-      <a class="sidebar-link" onclick="openReferralForm()">${I.filePlus}<span>Buat Rujukan Baru</span></a>
-      <a class="sidebar-link" onclick="openWithdrawFeeModal()">${I.wallet}<span>Tarik Komisi</span></a>
+    const subRefRujukan = `
+      <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">${I.dashboard}<span>Dasbor &amp; Riwayat Rujukan</span></a>
+      <a class="sidebar-link" onclick="openReferralForm()">${I.filePlus}<span>Buat Rujukan Baru (FPP)</span></a>
+      <a class="sidebar-link" onclick="showView('referral-view', 'Chat Patologi')">${I.consult}<span>Peer-to-Peer Chat Patologi</span></a>
     `;
+
+    const subRefWallet = `
+      <a class="sidebar-link" onclick="openWithdrawFeeModal()">${I.wallet}<span>Tarik Komisi &amp; Saldo Wallet</span></a>
+    `;
+
+    navContainer.innerHTML = [
+      renderCategoryAccordion('r-rujukan', 'Manajemen Rujukan (E-Rujukan)', '🏥', subRefRujukan, true),
+      renderCategoryAccordion('r-wallet', 'Wallet &amp; Komisi Mitra', '💰', subRefWallet, true)
+    ].join('');
   }
 }
 

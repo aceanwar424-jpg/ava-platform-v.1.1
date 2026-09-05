@@ -10,6 +10,13 @@ const brands = [
   ['nutrition', 'Nutrition', 'Nutrisi & nutraseutikal', 'Melengkapi perhatian pada kesehatan sehari-hari.', 'AVA Nutrition merupakan lini pengembangan nutrisi dan nutraseutikal. Informasi komposisi, izin edar, dan ketersediaan diberikan sesuai produk yang telah diverifikasi.', 'Nutrisi|Nutraseutikal|Pengembangan formulasi', 'Dikembangkan sebagai bagian dari perluasan portofolio AVA ke bidang nutrisi.'],
   ['sanctuary', 'Sanctuary', 'Wellness & perawatan', 'Ruang untuk jeda dan merawat diri.', 'AVA Sanctuary merupakan lini wellness dan spa dalam ekosistem AVA. Pilihan program dan ketersediaan layanan dapat dikonfirmasi melalui tim kami.', 'Wellness|Spa & relaksasi|Program perawatan', 'Melengkapi arah pengembangan AVA dengan pengalaman wellness dan perawatan diri.'],
 ];
+// Current stage confirmed in discovery: demos exist; other portfolio areas are developing.
+for (const b of brands) {
+  if (b[0] === 'tech') b[4] = 'AVA Tech mengembangkan HIS, LIS, dan Apps untuk fasilitas kesehatan. Ketiganya tersedia untuk demo; uji coba terbatas dilaksanakan berdasarkan lingkup yang disepakati.';
+  else if (b[0] === 'health') b[4] = 'Queen Health merupakan arah pengembangan layanan dan program kesehatan dalam ekosistem AVA, termasuk peluang kolaborasi dengan fasilitas mitra.';
+  else if (b[0] === 'lab') b[4] = 'Queen Lab merupakan arah pengembangan layanan diagnostik dalam ekosistem AVA. Kebutuhan proses laboratorium juga menjadi salah satu dasar pengembangan LIS AVA Tech.';
+  else if (b[0] === 'sanctuary') b[4] = 'Queen Sanctuary merupakan arah pengembangan wellness dan pengalaman perawatan diri, dengan ruang kolaborasi program serta aplikasi wellness.';
+}
 const products = [
  ['layanan','Pemeriksaan laboratorium','AVA Lab','Informasi pemeriksaan individu dan paket diagnostik sesuai kebutuhan.'],
  ['layanan','Medical check-up','AVA Health · AVA Lab','Pilihan pemeriksaan kesehatan untuk individu dan program perusahaan.'],
@@ -39,5 +46,6 @@ const html = `<!doctype html>
 <section class="section wrap certification" id="sertifikasi"><div><p class="eyebrow">05 / SERTIFIKASI & LEGALITAS</p><h2>Kepercayaan membutuhkan<br>informasi yang jelas.</h2><p>Status sertifikasi, akreditasi, dan izin perlu dilihat sesuai entitas, lokasi, atau produk yang bersangkutan.</p><a class="button secondary" href="mailto:admin@avahealth.sbs?subject=Permintaan%20informasi%20sertifikasi%20AVA">Minta informasi dokumen <span aria-hidden="true">↗</span></a></div><div class="cert-list"><article><h3>Legalitas perusahaan & layanan</h3><p>Informasi badan usaha dan perizinan layanan dapat diminta melalui kontak resmi.</p></article><article><h3>Akreditasi & sertifikasi mutu</h3><p>Dokumen sertifikat terverifikasi belum ditampilkan di situs ini. Penyebutan standar mutu bukan pernyataan telah terakreditasi.</p></article><article><h3>Perizinan produk</h3><p>Konfirmasikan nomor izin edar, produsen, dan informasi label untuk produk yang Anda pilih.</p></article></div></section>
 <section class="contact" id="kontak"><div class="wrap contact-grid"><div><p class="eyebrow">06 / HUBUNGI KAMI</p><h2>Mari mulai<br>percakapan.</h2><p>Untuk informasi layanan, katalog produk,<br>atau peluang kerja sama.</p></div><div class="contact-links"><a href="https://wa.me/6282120071009" target="_blank" rel="noopener noreferrer"><span><small>WHATSAPP</small>+62 821-2007-1009</span><span aria-hidden="true">↗</span></a><a href="mailto:admin@avahealth.sbs"><span><small>EMAIL</small>admin@avahealth.sbs</span><span aria-hidden="true">↗</span></a><p>Hubungi tim kami untuk konfirmasi lokasi layanan dan jadwal kunjungan.</p></div></div></section>
 </main><footer class="wrap footer"><div><a class="footer-brand" href="#beranda">AVA HEALTH</a><p>PT AVA Health Solution</p></div><div><a href="#tentang">Tentang AVA</a><a href="#brand">Brand kami</a><a href="#kontak">Hubungi kami</a></div><p>© 2026 PT AVA Health Solution</p></footer></body></html>`;
-fs.writeFileSync(path.join(root,'ava-platform/portal.html'), require('./extend-public-profile').extend(html, root, brands)+'\n');
+const extended = require('./extend-public-profile').extend(html, root, brands);
+fs.writeFileSync(path.join(root,'ava-platform/portal.html'), require('./public-business-positioning').reposition(extended,root)+'\n');
 console.log('Built AVA public company profile.');

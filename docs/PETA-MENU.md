@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 202 — 🟢 161 ada · 🟡 34 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 204 — 🟢 163 ada · 🟡 34 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -114,7 +114,9 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟡 | Registrasi Paket Layanan | `admission` › admission-package | Paket/MCU: kategori, paket, produk paket, add-on, dan total net |
 | 🟡 | Langganan Paket | `admission` › admission-subscription | Hak penggunaan berulang: item, bonus, masa berlaku, pembayaran, dan kasir |
 | 🟡 | Pemakaian Langganan Paket | `admission` › admission-package-usage | Penebusan hak paket aktif dengan masa berlaku dan sisa penggunaan |
+| 🟢 | Laporan Registrasi | `admission` › admission-report | Ringkasan registrasi, status kunjungan, dan penerimaan pada periode terpilih |
 | 🟢 | Antrian Poli | `queue` | Pemanggilan bersuara & layar ruang tunggu |
+| 🟢 | Antrean Poli Umum & Spesialis | `queue` › queue-outpatient | Daftar dan pemanggilan antrean rawat jalan dokter umum maupun spesialis |
 | 🟢 | Konsol Panggilan Antrean | `queue-console` | Panggil berikutnya, panggil ulang, tandai tidak hadir, dan pindah loket — dengan pemanggilan bersuara |
 | 🟢 | Kiosk Mandiri Pasien | `queue-kiosk` | Ambil nomor sendiri di lobi |
 | 🟢 | Jadwal Dokter & Perjanjian | `appointments` | Reservasi konsultasi & pengingat |

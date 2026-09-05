@@ -133,6 +133,19 @@ async function renderAdmission(params = {}) {
   const mode = getAdmissionMode(params?.mode);
   const modeDef = ADM_REGISTRATION_MODES[mode];
   window.activeAdmissionMode = mode;
+  if (params?.view === 'report') {
+    const main = document.getElementById('main-content');
+    if (main) main.innerHTML = '<div class="loading-row" style="min-height:40vh"><div class="spinner"></div></div>';
+    const reportDate = new Date().toISOString().split('T')[0];
+    try {
+      const data = await sbGet('admissions', `select=*&visit_date=eq.${reportDate}&order=created_at.desc`);
+      admAll = Array.isArray(data) ? data : [];
+    } catch (e) {
+      admAll = [];
+      if (typeof toast === 'function') toast('Ringkasan laporan belum dapat dimuat: ' + e.message, 'warn');
+    }
+    return renderAdmissionReport({ mode, reportDate });
+  }
   const dateText = new Date().toLocaleDateString('id-ID', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
@@ -832,12 +845,12 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
       <strong>${modeDef.label}.</strong> ${modeDef.notice}
     </div>
     <div class="admission-form-layout">
-      <aside class="admission-form-tabs" aria-label="Tahap registrasi">
+      <aside class="admission-form-tabs" aria-label="Bagian registrasi">
       ${modeDef.tabs.map(([k, label], index) => `
         <button onclick="switchAdmTab('${k}')" id="af-tab-${k}"
           class="${k === 'patient' ? 'active' : ''}" data-step="${index + 1}">
           <span class="admission-tab-icon" aria-hidden="true">${svgIcon(admissionStepIcons[k] || 'note', 15)}</span>
-          <span class="admission-tab-copy"><b>${label}</b><small>Tahap ${index + 1}</small></span>
+          <span class="admission-tab-copy"><b>${label}</b></span>
         </button>`).join('')}
       </aside>
       <div class="admission-form-content">
@@ -1049,7 +1062,7 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
           <button class="btn btn-ghost btn-sm" type="button" onclick="closeAdmissionWorkspace()">← Daftar Registrasi</button>
           <span>Admission</span>
         </div>
-        <div class="admission-form-heading"><h1>${id ? 'Ubah ' + modeDef.label : modeDef.label}</h1><p>${id ? 'Perbarui data registrasi dan tagihan sebelum disimpan.' : 'Lengkapi data secara bertahap sebelum registrasi disimpan.'}</p></div>
+        <div class="admission-form-heading"><h1>${id ? 'Ubah ' + modeDef.label : modeDef.label}</h1><p>${id ? 'Perbarui data registrasi dan tagihan sebelum disimpan.' : 'Lengkapi data berikut sebelum registrasi disimpan.'}</p></div>
         <div class="admission-form-context"><span>${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span><button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmissionReport()">Laporan</button></div>
       </header>
       <section class="admission-form-surface">${admissionFormMarkup}</section>
@@ -1603,8 +1616,8 @@ async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
   }
 }
 
-async function renderAdmissionReport() {
-  const mode = getAdmissionMode(window.activeAdmissionMode || 'outpatient');
+async function renderAdmissionReport(options = {}) {
+  const mode = getAdmissionMode(options.mode || window.activeAdmissionMode || 'outpatient');
   const reportItems = [
     { label: 'Total registrasi', value: admAll.length },
     { label: 'Selesai', value: admAll.filter(a => a.status === 'Done').length },
@@ -1620,7 +1633,7 @@ async function renderAdmissionReport() {
       <header class="admission-form-workspace-head">
         <div class="admission-form-back"><button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmission({mode:'${mode}'})">← Daftar Registrasi</button><span>Admission</span></div>
         <div class="admission-form-heading"><h1>Laporan Admission</h1><p>Ringkasan register pada periode yang sedang dipilih.</p></div>
-        <div class="admission-form-context"><span>${document.getElementById('adm-date')?.value || new Date().toISOString().slice(0, 10)}</span></div>
+        <div class="admission-form-context"><span>${options.reportDate || document.getElementById('adm-date')?.value || new Date().toISOString().slice(0, 10)}</span></div>
       </header>
       <section class="admission-report-surface">
         <div class="admission-report-grid">${reportItems.map(item => `<article><strong>${item.value}</strong><span>${item.label}</span></article>`).join('')}</div>

@@ -298,25 +298,11 @@
           </defs>
         </svg>
         
-        <!-- Breadcrumb / Header Row (Desktop) -->
-        <header class="app-content-header">
-          <div class="header-left-row">
+        <!-- Header Row (Clean Title without Breadcrumb Prefix & No Top Tabs) -->
+        <header class="app-content-header" style="display:flex; align-items:center; justify-content:space-between; padding:16px 24px; background:#ffffff; border-bottom:1px solid #e2e8f0; position:sticky; top:0; z-index:100;">
+          <div class="header-left-row" style="display:flex; align-items:center; gap:12px;">
             <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
-            <div class="breadcrumb">
-              <span class="bc-parent">AvaHealth</span>
-              <span class="bc-sep">/</span>
-              <span id="breadcrumb-active-view">Dashboard</span>
-            </div>
-          </div>
-          
-          <!-- Service Quick Switcher -->
-          <div class="timeline-tabs-container" id="timeline-tabs-nav">
-            <div class="timeline-tabs">
-              <button class="t-tab active" id="btn-fase1" onclick="switchTimelinePhase('fase1')">Portal Pasien<br><small>Layanan Utama</small></button>
-              <button class="t-tab" id="btn-fase2" onclick="switchTimelinePhase('fase2')">Hasil Lab &amp; MCU<br><small>Rekam Medis</small></button>
-              <button class="t-tab" id="btn-fase3" onclick="switchTimelinePhase('fase3')">Queen Care &amp; Nutri<br><small>D2C Refill</small></button>
-              <button class="t-tab" id="btn-fase4" onclick="switchTimelinePhase('fase4')">Sanctuary Spa<br><small>VIP Wellness</small></button>
-            </div>
+            <h4 id="breadcrumb-active-view" style="font-size:16.5px; font-weight:800; color:#0f2963; margin:0; font-family:'Outfit', sans-serif;">Dashboard Utama</h4>
           </div>
         </header>
 

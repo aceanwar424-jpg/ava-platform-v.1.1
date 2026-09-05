@@ -183,6 +183,9 @@ async function navigate(page, params={}) {
   // Resolusi 3-segmen rute ke target handler (Strangler Fig)
   const resolvedPage = ROUTE_ALIASES_3SEG[page] || page;
   const isAdmissionWorkspace = ['admission', 'pendaftaran', 'regis', 'registrasi', 'registration'].includes(resolvedPage);
+  const host = window.location.hostname.toLowerCase();
+  const isHisWorkspace = host.startsWith('his.') || new URLSearchParams(window.location.search).get('app') === 'his';
+  document.body.classList.toggle('his-workspace-page', isHisWorkspace);
   document.body.classList.toggle('admission-workspace-page', isAdmissionWorkspace);
 
   if (typeof syncFlyoutToPage === 'function') syncFlyoutToPage(resolvedPage);
@@ -388,7 +391,7 @@ async function navigate(page, params={}) {
     case 'catalog_export':
     case 'catalog-export':    safeRun('renderCatalogExport', params);    break;
     case 'crm-pipeline':safeRun('renderCrmPipeline');            break;
-    case 'queue':       safeRun('renderQueuePage');                  break;
+    case 'queue':       safeRun('renderQueuePage', params);          break;
     case 'queue-console': safeRun('renderQueueConsole');          break;
     case 'queue-config':  safeRun('renderQueueConfig');           break;
     case 'queue-kiosk': safeRun('renderQueueKiosk');                 break;

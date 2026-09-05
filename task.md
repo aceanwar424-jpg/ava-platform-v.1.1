@@ -67,6 +67,14 @@
 - [x] Mobile memakai tab horizontal yang tetap mudah disentuh.
 - [x] Alur form dan pemeriksaan regresi diverifikasi tanpa menyimpan data.
 
+## Konsolidasi Navigasi HIS & Shell Operasional — 5 September 2026
+
+- [ ] Audit read-only kelompok menu referensi.
+- [ ] Admission memuat Admission, Back Office, Queue, dan Queue Outpatient.
+- [ ] Shell navigasi/header operasional diterapkan konsisten pada HIS.
+- [ ] Label tahap yang tidak diperlukan dihapus dan form responsif dipertahankan.
+- [ ] Menu, renderer, keamanan, dan preview lintas kelompok diverifikasi.
+
 ## Web publik AVA Health — 2026-09-05
 - [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
 - [ ] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
@@ -95,3 +103,17 @@
 - [x] BMI & estimasi energi, validasi, reset, input lokal.
 - [x] Verifikasi kalkulasi, 15 halaman, tautan, aset, dan HTTP preview.
 - [ ] Peninjauan klinis/editorial dan verifikasi fakta korporat sebelum publikasi.
+
+## Konten komersial hasil discovery
+- [ ] AVA Tech dominan dan Queen sebagai brand usaha sendiri.
+- [ ] Tiga halaman solusi, penawaran modular, demo dan pilot.
+- [ ] Investor, kemitraan dan produk herbal dengan status akurat.
+- [ ] Validasi dan preview.
+
+### Selesai — konten komersial hasil discovery
+- [x] AVA Tech dominan dan Queen sebagai brand usaha sendiri.
+- [x] Tiga halaman solusi, model biaya, demo dan pilot.
+- [x] Investor, kemitraan dan produk herbal sesuai status pengembangan.
+- [x] Dokumen konten untuk peninjauan.
+- [x] Validasi 19 halaman dan HTTP preview.
+- [ ] Publikasi produksi (belum dilakukan).
