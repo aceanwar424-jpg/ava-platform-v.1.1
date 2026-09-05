@@ -127,6 +127,34 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
   pemilik database karena melibatkan model transaksi, pricing snapshot,
   penjaminan, paket, dan audit trail.
 
+## Penyempurnaan Workspace Admission — 5 September 2026
+
+### Urutan implementasi
+
+1. [ ] Padatkan halaman daftar registrasi: hilangkan breadcrumb/topbar khusus
+   halaman, kartu KPI besar, serta header ganda; satukan tanggal, notifikasi,
+   dan identitas pengguna pada satu header kerja.
+2. [ ] Letakkan pencarian, tanggal, jenis, laporan, tindakan registrasi, dan
+   filter status dalam toolbar ringkas di atas tabel yang mengisi sisa layar.
+3. [ ] Pindahkan formulir registrasi/edit dari modal lebar ke workspace penuh
+   yang tetap memakai state, validasi, serta proses simpan yang ada.
+4. [ ] Pertahankan modal hanya untuk pencarian/pemilihan data pendukung dan
+   konfirmasi singkat; jangan mengubah kontrak API atau skema transaksi.
+5. [ ] Verifikasi sintaks, peta menu, audit menu/keamanan, dan preview lokal
+   tanpa menulis data pasien.
+
+### Implikasi IP & Kepatuhan
+
+- Perubahan ini hanya mengatur presentasi dan alur kerja browser; tidak
+  menambah field, mengubah skema database, kontrak API, atau data klinis.
+- Form tetap menggunakan state dan validasi yang ada. Setiap variasi transaksi
+  (OPD, layanan, kit, paket, langganan, pemakaian) masih berstatus bertahap
+  sampai UAT proses dan checkpoint pemilik database menyetujui kontrak
+  transaksinya.
+- Tidak ada data pasien nyata dalam fixture, screenshot, atau dokumentasi
+  verifikasi. Pop-up pemilih pendukung tetap berada di ruang aplikasi dan
+  tunduk pada RBAC yang telah ada.
+
 ## Perombakan web publik AVA Health — 2026-09-05
 Rencana: (1) audit portal dan routing (≤1 jam), (2) bangun profil publik responsif, detail brand, katalog, sejarah, sertifikasi, kontak (≤1 jam), (3) validasi tautan/aset/routing dan preview (≤1 jam).
 Arah visual: editorial kesehatan, putih dan navy, aksen emerald, tipografi besar, enam brand sebagai portofolio bisnis. Pertahankan stack statis dan deployment Vercel yang ada.

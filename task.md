@@ -52,6 +52,14 @@
 - [x] Pertahankan RBAC, action/route, breadcrumb, pencarian seluruh modul, Escape, dan responsivitas.
 - [ ] Menunggu checkpoint skema/UAT sebelum enam variasi registrasi menjadi transaksi produksi terpisah.
 
+## Workspace Admission — 5 September 2026
+
+- [ ] Daftar registrasi menggunakan header kerja ringkas dan area tabel utama.
+- [ ] Toolbar menggabungkan pencarian, filter periode/jenis/status, laporan, dan registrasi.
+- [ ] Form tambah/ubah Admission dibuka sebagai halaman kerja, bukan modal.
+- [ ] Popup hanya dipakai untuk pemilih data dan konfirmasi kecil.
+- [ ] Sintaks, menu, keamanan, dan preview lokal diverifikasi tanpa transaksi data.
+
 ## Web publik AVA Health — 2026-09-05
 - [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
 - [ ] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
