@@ -258,26 +258,10 @@ const AIGateway = {
 
   // ── VISUAL MONITOR UI MODAL & TOPBAR BADGE ──────────────────────────
   updateTopbarBadge() {
-    let badge = document.getElementById('topbar-ai-monitor');
-    const activeCount = this.state.keyPool.filter(k => k.status === 'ACTIVE').length;
-    const totalCount = this.state.keyPool.length;
-
-    if (!badge) {
-      const topbarRight = document.querySelector('.topbar-right');
-      if (topbarRight) {
-        badge = document.createElement('button');
-        badge.id = 'topbar-ai-monitor';
-        badge.onclick = () => AIGateway.renderMonitorUI();
-        badge.style.cssText = 'background:rgba(16,185,129,0.12); border:1px solid rgba(52,211,153,0.3); color:#059669; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; flex-shrink:0;';
-        topbarRight.prepend(badge);
-      }
-    }
-
-    if (badge) {
-      badge.innerHTML = `⚡ <span>API Keys: <b>${activeCount}/${totalCount}</b> Aktif</span>`;
-      badge.style.borderColor = activeCount > 0 ? 'rgba(52,211,153,0.4)' : 'rgba(239,68,68,0.5)';
-      badge.style.color = activeCount > 0 ? '#34D399' : '#FCA5A5';
-    }
+    // Status kunci adalah telemetri internal, bukan informasi operasional
+    // pengguna. Hapus badge lama bila ada; monitor tetap tersedia melalui
+    // area pengaturan untuk administrator yang berwenang.
+    document.getElementById('topbar-ai-monitor')?.remove();
   },
 
   renderMonitorUI() {

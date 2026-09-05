@@ -2728,7 +2728,36 @@ body.admission-workspace-page .main-content {
    HIS OPERATIONAL SHELL — komponen bersama seluruh menu HIS
 ══════════════════════════════════════════════════════════════ */
 body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .main-content {
-  padding: 14px 16px 18px;
+  margin-top: 44px;
+  min-height: calc(100vh - 44px);
+  padding: 10px 16px 18px;
+}
+/* Semua layar HIS selain kiosk memakai strip sesi yang ringkas. Breadcrumb
+   teknis (Sistem / domain / layanan) serta telemetri API tidak mengganggu
+   ruang kerja; judul halaman sendiri menjadi orientasi utama. */
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .topbar {
+  height: 44px;
+  justify-content: flex-end;
+  padding: 0 14px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .topbar-breadcrumb,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .topbar .hamburger,
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) #topbar-ai-monitor {
+  display: none !important;
+}
+body.his-workspace-page:not(.kiosk-mode) .subnav {
+  display: none !important;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .topbar-right {
+  gap: 6px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .topbar-btn {
+  width: 32px;
+  height: 32px;
+}
+body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) #topbar-date {
+  padding-right: 3px;
+  font-size: 11.5px !important;
 }
 body.his-workspace-page:not(.kiosk-mode):not(.admission-workspace-page) .page-header {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
