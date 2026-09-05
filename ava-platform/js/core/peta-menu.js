@@ -312,9 +312,49 @@ window.PETA_MENU = {
           "menu": [
             {
               "id": "admission",
-              "label": "Pendaftaran & Admisi",
+              "label": "Registrasi Rawat Jalan (OPD)",
               "status": "ada",
-              "ket": "Registrasi pasien, general consent, gelang identitas"
+              "ket": "Kunjungan poli: pasien, penjamin, jadwal/unit/dokter, layanan minimum, dan kasir"
+            },
+            {
+              "id": "admission-service",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'service'})",
+              "label": "Registrasi Layanan",
+              "status": "parsial",
+              "ket": "Tindakan/layanan langsung dengan prioritas, line item, diskon, dan status dengan/tanpa kit"
+            },
+            {
+              "id": "admission-medical-kit",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'medical-kit'})",
+              "label": "Registrasi Medical Kit",
+              "status": "parsial",
+              "ket": "Layanan berbasis kit/perangkat dengan tanggal layanan dan siklus status operasional sendiri"
+            },
+            {
+              "id": "admission-package",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'package'})",
+              "label": "Registrasi Paket Layanan",
+              "status": "parsial",
+              "ket": "Paket/MCU: kategori, paket, produk paket, add-on, dan total net"
+            },
+            {
+              "id": "admission-subscription",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'subscription'})",
+              "label": "Langganan Paket",
+              "status": "parsial",
+              "ket": "Hak penggunaan berulang: item, bonus, masa berlaku, pembayaran, dan kasir"
+            },
+            {
+              "id": "admission-package-usage",
+              "rute": "admission",
+              "aksi": "navigate('admission',{mode:'package-usage'})",
+              "label": "Pemakaian Langganan Paket",
+              "status": "parsial",
+              "ket": "Penebusan hak paket aktif dengan masa berlaku dan sisa penggunaan"
             },
             {
               "id": "queue",

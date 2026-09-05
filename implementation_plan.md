@@ -100,3 +100,40 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 - Hanya referensi `vault://...` yang diterima UI untuk Telemedicine/SATUSEHAT. Secret, token, serta password tidak disimpan di browser maupun payload master.
 - Perubahan master ber-governance membutuhkan alasan dan snapshot audit. Arsip tidak menghapus riwayat.
 - Migrasi source tidak sama dengan perubahan database. Rilis staging/produksi tetap memerlukan backup, preflight, dan UAT sesuai `db/runbooks/0050_his_master_registry.md`.
+
+## Audit Admission & Navigasi Konteks — 5 September 2026
+
+### Urutan implementasi
+
+1. [x] Audit read-only hub Admission, enam variasi registrasi, form kosong,
+   Back Office, Queue, dan Queue Outpatient.
+2. [x] Dokumentasikan perbedaan tujuan, tahapan, dan field kritis agar
+   registrasi layanan, kit, paket, langganan, serta penggunaan langganan tidak
+   kembali disatukan secara keliru.
+3. [x] Ganti accordion rail bertingkat dengan panel konteks dua kolom:
+   domain → sub-menu → modul.
+4. [x] Pertahankan penyaringan RBAC, route/action asal, shortcut pencarian
+   modul, breadcrumb, Escape, serta perilaku mobile.
+5. [ ] Rancang kontrak transaksi dan UAT pemilik proses untuk enam variasi
+   registrasi sebelum perubahan skema atau transaksi produksi.
+
+### Implikasi IP & Kepatuhan
+
+- Audit referensi hanya memetakan pola proses generik melalui layar kosong dan
+  tidak memindahkan data, identitas, atau aset visual pihak ketiga.
+- Perubahan navigasi bersifat presentasi lokal: tidak mengubah database,
+  data klinis, hak akses, maupun integrasi eksternal.
+- Pemisahan registrasi menjadi transaksi produksi memerlukan checkpoint
+  pemilik database karena melibatkan model transaksi, pricing snapshot,
+  penjaminan, paket, dan audit trail.
+
+## Perombakan web publik AVA Health — 2026-09-05
+Rencana: (1) audit portal dan routing (≤1 jam), (2) bangun profil publik responsif, detail brand, katalog, sejarah, sertifikasi, kontak (≤1 jam), (3) validasi tautan/aset/routing dan preview (≤1 jam).
+Arah visual: editorial kesehatan, putih dan navy, aksen emerald, tipografi besar, enam brand sebagai portofolio bisnis. Pertahankan stack statis dan deployment Vercel yang ada.
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava untuk konten situs perusahaan yang sudah tersedia; tidak dipindahkan menjadi produk generik. Tidak mengubah master katalog, DB, provider LLM, atau aplikasi operasional. Hapus autentikasi dari halaman publik; hanya tautkan apps.avahealth.sbs. Tidak menerbitkan klaim sertifikasi, manfaat klinis, tanggal sejarah, atau produk tersedia tanpa bukti. Kontak bersumber portal lama. Metadata sumber dan kebutuhan verifikasi dicatat dalam audit. Publikasi produksi terpisah dari penyuntingan lokal.
+
+## Pengayaan profil publik premium — 2026-09-05
+Rencana: 1) teliti sumber kesehatan primer dan rumus kalkulator (≤1 jam); 2) perluas enam profil brand, visi/misi, model bisnis, alur manufaktur sebagai skenario operasional (≤1 jam); 3) bangun jurnal kesehatan bersumber dan kalkulator lokal BMI/kalori serta penyempurnaan premium (≤1 jam); 4) verifikasi kalkulasi, konten, tautan, ekspor dan preview (≤1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Pengguna mengotorisasi rancangan dengan asumsi semua lini sudah berjalan. Asumsi manufaktur/farmasi diberi penanda konsep, tidak menjadi klaim izin atau operasi faktual. Tidak menambah klaim CPOB/izin edar terverifikasi. Artikel orisinal berbasis sumber primer yang diperiksa tanggal 2026-09-05; tidak mengaku telah ditinjau dokter. Kalkulator khusus dewasa, bukan diagnosis atau resep diet; input hanya di memori browser. Tidak mengubah master data, vendor atau sistem produksi.

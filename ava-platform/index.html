@@ -66,6 +66,24 @@
 </aside>
 <div class="sidebar-scrim" id="sidebar-scrim" aria-hidden="true" onclick="setSidebarOpen(false)"></div>
 
+<!-- Panel konteks navigasi. Rail hanya menyimpan domain utama; layanan dan
+     modul ditampilkan berdampingan di panel ini agar kedalaman menu tidak
+     memanjangkan sidebar. Isinya dibangun dari menu yang sudah disaring RBAC. -->
+<div class="navigation-context-scrim" id="navigation-context-scrim" aria-hidden="true" onclick="closeNavigationContext()"></div>
+<aside class="navigation-context" id="navigation-context" aria-hidden="true" aria-label="Navigasi konteks">
+  <header class="navigation-context-head">
+    <div class="navigation-context-heading">
+      <span class="navigation-context-icon" id="navigation-context-icon" aria-hidden="true">🏥</span>
+      <div><p>NAVIGASI HIS</p><h2 id="navigation-context-title">Menu</h2></div>
+    </div>
+    <button class="navigation-context-close" type="button" onclick="closeNavigationContext()" aria-label="Tutup menu">×</button>
+  </header>
+  <div class="navigation-context-body">
+    <section class="navigation-context-services" aria-label="Kelompok layanan" id="navigation-context-services"></section>
+    <section class="navigation-context-modules" aria-live="polite" aria-label="Menu layanan" id="navigation-context-modules"></section>
+  </div>
+</aside>
+
 <!-- Pemilih modul: jalan pintas pencarian, bukan sumber menu kedua. Isi dan
      hak aksesnya dibangkitkan dari definisi menu yang sama dengan sidebar. -->
 <div class="module-picker-overlay" id="module-picker-overlay" aria-hidden="true" onclick="closeModulePicker(event)">
@@ -207,7 +225,7 @@
 <script defer src="js/core/icons.js?v=20260721g"></script>
 <script defer src="js/core/api.js?v=20260719s"></script>
 <script defer src="js/core/utils.js?v=20260723b"></script>
-<script defer src="js/core/router.js?v=20260902-sidebar-compact"></script>
+<script defer src="js/core/router.js?v=20260905-navigation-context"></script>
 <script defer src="js/core/storage.js?v=20260719s"></script>
 <script defer src="js/core/barcode.js?v=20260725a"></script>
 <!-- Kunci API lokal (tidak masuk repo). Wajib sebelum aiGateway.js.
@@ -257,20 +275,31 @@ window.setSidebarOpen = setSidebarOpen;
 
 function setSidebarExpanded(isExpanded, persist = true) {
   const rail = document.getElementById('sidebar-rail');
-  const expand = !!isExpanded;
-  document.body.classList.toggle('sidebar-expanded', expand);
-  rail?.classList.toggle('expanded', expand);
+  // Desktop HIS memakai rail ikon permanen. Label/layer menu hidup di panel
+  // konteks, sehingga "expand" lama tidak lagi mengubah lebar layout.
+  const expand = false;
+  document.body.classList.remove('sidebar-expanded');
+  rail?.classList.remove('expanded');
   document.querySelectorAll('.sidebar-expand-control').forEach((btn) => {
-    btn.setAttribute('aria-label', expand ? 'Perkecil sidebar' : 'Perluas sidebar');
-    btn.setAttribute('title', expand ? 'Perkecil sidebar' : 'Perluas sidebar');
+    btn.setAttribute('aria-label', 'Buka atau tutup menu');
+    btn.setAttribute('title', 'Buka atau tutup menu');
   });
-  if (persist) localStorage.setItem('ava_sidebar_expanded', expand ? '1' : '0');
+  if (persist) localStorage.removeItem('ava_sidebar_expanded');
 }
 window.setSidebarExpanded = setSidebarExpanded;
 
 function toggleSidebar() {
   if (window.innerWidth >= 769) {
-    setSidebarExpanded(!document.body.classList.contains('sidebar-expanded'));
+    const panel = document.getElementById('navigation-context');
+    if (panel?.classList.contains('open')) {
+      closeNavigationContext();
+      return;
+    }
+    const activeId = window.activeNavigationContext?.groupId ||
+      (window.navigationMenuGroups || []).find((group) =>
+        group.services.some((service) => service.items.some((item) => item.page === window.currentPage)))?.id ||
+      window.navigationMenuGroups?.[0]?.id;
+    if (activeId) openNavigationContext(activeId);
     return;
   }
   const rail = document.getElementById('sidebar-rail');
@@ -950,6 +979,11 @@ function gambarRail(ruang) {
       import: ['Administrasi Sistem', 'Data Awal & Migrasi'],
       family: ['Master Klinis', 'Pasien & Keluarga'],
       admission: ['Alur Pasien', 'Registrasi & Admisi'],
+      'admission-service': ['Alur Pasien', 'Registrasi & Admisi'],
+      'admission-medical-kit': ['Alur Pasien', 'Registrasi & Admisi'],
+      'admission-package': ['Alur Pasien', 'Registrasi & Admisi'],
+      'admission-subscription': ['Alur Pasien', 'Registrasi & Admisi'],
+      'admission-package-usage': ['Alur Pasien', 'Registrasi & Admisi'],
       queue: ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
       'queue-console': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
       'queue-kiosk': ['Fasilitas & Antrean', 'Antrean, Loket & Kiosk'],
@@ -1027,46 +1061,24 @@ function gambarRail(ruang) {
     });
   });
 
-  let html = '';
-  let groupCounter = 0;
-  railGroups.forEach((group) => {
-    groupCounter++;
-    const groupId = 'acc-grp-' + groupCounter;
-    const allItems = group.services.flatMap(x => x.items);
-    const hasActiveChild = allItems.some(it => it.page === currentPage);
-    html += '<div class="sidebar-accordion-group' + (hasActiveChild ? ' open' : '') + '" id="' + groupId + '">';
-    html += '  <button type="button" class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" title="' + group.name + '" onclick="toggleSidebarAccordion(\'' + groupId + '\')">';
-    html += '    <div class="sidebar-main-left"><span class="sidebar-main-ico">' + group.icon + '</span><span class="sidebar-main-label">' + group.name + '</span></div>';
-    html += '    <span class="sidebar-chevron">▾</span></button><div class="sidebar-sub-menu-list">';
-
-    group.services.forEach((service, serviceIndex) => {
-      const serviceId = groupId + '-svc-' + serviceIndex;
-      const serviceActive = service.items.some(it => it.page === currentPage);
-      const showService = !!service.name;
-      if (showService) {
-        html += '<div class="sidebar-service-group' + (serviceActive ? ' open' : '') + '" id="' + serviceId + '">';
-        html += '<button type="button" class="sidebar-service-btn' + (serviceActive ? ' active-service' : '') + '" onclick="toggleSidebarService(\'' + serviceId + '\')">';
-        html += '<span class="sidebar-service-name">' + service.name + '</span><span class="sidebar-service-count" title="' + service.items.length + ' modul">' + service.items.length + '</span><span class="sidebar-service-chevron">›</span></button><div class="sidebar-service-items">';
-      }
-      service.items.forEach((it) => {
-        const isSoon = it.soon || it.status === 'belum';
-        const isActive = it.page === currentPage;
-        const aksi = isSoon ? "alert('Modul " + it.label.replace(/'/g, "\\'") + " sedang dalam tahap finalisasi.')" : it.action;
-        html += '<button type="button" class="sidebar-sub-link' + (isActive ? ' active' : '') + (isSoon ? ' disabled' : '') + '" data-page="' + it.page + '" onclick="' + aksi + '; setActiveFlyoutItem(\'' + it.page + '\')">';
-        html += '<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + it.label + '</span>';
-        if (isSoon) html += '<span class="sidebar-soon-tag">soon</span>';
-        html += '</button>';
-      });
-      if (showService) html += '</div></div>';
-    });
-    html += '</div></div>';
-  });
-
-  nav.innerHTML = html;
+  // Rail hanya menampilkan domain. Rincian layanan dan modul dibuka pada
+  // panel konteks dua kolom di sebelah kanan rail, bukan ditumpuk vertikal.
+  // Ini menjaga struktur domain → layanan → modul tanpa mengubah route/RBAC.
+  window.navigationMenuGroups = railGroups.map((group, index) => ({ ...group, id: 'nav-group-' + index }));
+  const escapeNavHtml = (value) => String(value || '').replace(/[&<>'"]/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[char]));
+  nav.innerHTML = window.navigationMenuGroups.map((group) => {
+    const hasActiveChild = group.services.flatMap(x => x.items).some(it => it.page === currentPage);
+    return '<div class="sidebar-accordion-group' + (hasActiveChild ? ' active-context' : '') + '" id="' + group.id + '">' +
+      '<button type="button" class="sidebar-main-btn' + (hasActiveChild ? ' active-group' : '') + '" title="' + escapeNavHtml(group.name) + '" aria-expanded="false" onclick="openNavigationContext(\'' + group.id + '\')">' +
+      '<span class="sidebar-main-left"><span class="sidebar-main-ico">' + group.icon + '</span><span class="sidebar-main-label">' + escapeNavHtml(group.name) + '</span></span>' +
+      '<span class="sidebar-chevron" aria-hidden="true">›</span></button></div>';
+  }).join('');
   // Satu-satunya inventaris yang dipakai pemilih modul. Item dibentuk sesudah
   // penyaringan role, sehingga pencarian tidak pernah membocorkan menu yang
   // tidak boleh diakses pengguna ini.
-  window.modulePickerItems = railGroups.flatMap(group => group.services.flatMap(service =>
+  window.modulePickerItems = window.navigationMenuGroups.flatMap(group => group.services.flatMap(service =>
     service.items.map(item => ({
       ...item,
       domain: group.name,
@@ -1175,72 +1187,142 @@ document.addEventListener('keydown', (event) => {
     closeModulePicker();
     return;
   }
+  if (event.key === 'Escape' && document.getElementById('navigation-context')?.classList.contains('open')) {
+    event.preventDefault();
+    closeNavigationContext();
+    return;
+  }
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
     event.preventDefault();
     openModulePicker();
   }
 });
 
-function toggleSidebarAccordion(groupId) {
-  const grp = document.getElementById(groupId);
-  if (!grp) return;
-  // Rail ringkas hanya menampilkan ikon. Klik ikon memperluas rail dan
-  // langsung membuka kelompok yang dipilih, tanpa mengubah struktur grouping.
-  if (window.innerWidth >= 769 && !document.body.classList.contains('sidebar-expanded')) {
-    setSidebarExpanded(true);
-    document.querySelectorAll('.sidebar-accordion-group.open').forEach(x => x.classList.remove('open'));
-    grp.classList.add('open');
-    return;
-  }
-  grp.classList.toggle('open');
+function navEscapeHtml(value) {
+  return String(value || '').replace(/[&<>'"]/g, (char) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[char]));
 }
-window.toggleSidebarAccordion = toggleSidebarAccordion;
 
-function toggleSidebarService(serviceId) {
-  const service = document.getElementById(serviceId);
-  if (!service) return;
-  service.classList.toggle('open');
+function findNavigationGroup(groupId) {
+  return (window.navigationMenuGroups || []).find((group) => group.id === groupId) || null;
 }
+
+function activeNavigationServiceIndex(group) {
+  const page = window.currentPage || '';
+  const found = group.services.findIndex((service) => service.items.some((item) => item.page === page));
+  return found >= 0 ? found : 0;
+}
+
+function renderNavigationContext(groupId, preferredServiceIndex) {
+  const group = findNavigationGroup(groupId);
+  const servicesEl = document.getElementById('navigation-context-services');
+  const modulesEl = document.getElementById('navigation-context-modules');
+  if (!group || !servicesEl || !modulesEl) return;
+
+  const serviceIndex = Number.isInteger(preferredServiceIndex)
+    ? Math.max(0, Math.min(preferredServiceIndex, group.services.length - 1))
+    : activeNavigationServiceIndex(group);
+  const service = group.services[serviceIndex] || { name: 'Menu', items: [] };
+  window.activeNavigationContext = { groupId, serviceIndex };
+
+  document.getElementById('navigation-context-icon').textContent = group.icon;
+  document.getElementById('navigation-context-title').textContent = group.name;
+  servicesEl.innerHTML = '<p class="navigation-context-label">SUB-MENU</p>' + group.services.map((entry, index) => {
+    const isActive = index === serviceIndex;
+    return '<button type="button" class="navigation-service-card' + (isActive ? ' active' : '') + '" aria-pressed="' + isActive + '" onclick="selectNavigationService(\'' + groupId + '\',' + index + ')">' +
+      '<span class="navigation-service-card-title">' + navEscapeHtml(entry.name || 'Menu') + '</span>' +
+      '<span class="navigation-service-card-meta"><span>' + entry.items.length + ' menu</span><span aria-hidden="true">›</span></span></button>';
+  }).join('');
+
+  modulesEl.innerHTML = '<div class="navigation-context-module-head"><div><p>MENU ' + navEscapeHtml(service.name || 'UTAMA') + '</p><h3>' + navEscapeHtml(service.name || 'Menu') + '</h3></div><span>' + service.items.length + ' item</span></div>' +
+    '<div class="navigation-module-list">' + service.items.map((item, index) => {
+      const unavailable = item.soon || item.status === 'belum';
+      const partial = item.status === 'parsial';
+      const active = item.page === window.currentPage;
+      const state = unavailable ? '<span class="navigation-module-state">Segera</span>' : partial ? '<span class="navigation-module-state partial">Bertahap</span>' : '<span class="navigation-module-go" aria-hidden="true">›</span>';
+      return '<button type="button" class="navigation-module-item' + (active ? ' active' : '') + (partial ? ' partial' : '') + (unavailable ? ' disabled' : '') + '"' +
+        (unavailable ? ' disabled aria-disabled="true"' : ' onclick="navigateFromContext(\'' + groupId + '\',' + serviceIndex + ',' + index + ')"') + '>' +
+        '<span class="navigation-module-item-copy"><strong>' + navEscapeHtml(item.label) + '</strong><small>' + navEscapeHtml(item.desc || 'Buka proses operasional') + '</small></span>' + state + '</button>';
+    }).join('') + '</div>';
+}
+
+function openNavigationContext(groupId) {
+  const group = findNavigationGroup(groupId);
+  if (!group) return;
+  const panel = document.getElementById('navigation-context');
+  const scrim = document.getElementById('navigation-context-scrim');
+  const prior = window.activeNavigationContext;
+  const serviceIndex = prior?.groupId === groupId ? prior.serviceIndex : activeNavigationServiceIndex(group);
+  renderNavigationContext(groupId, serviceIndex);
+  panel?.classList.add('open');
+  scrim?.classList.add('open');
+  panel?.setAttribute('aria-hidden', 'false');
+  scrim?.setAttribute('aria-hidden', 'false');
+  document.querySelectorAll('.sidebar-main-btn').forEach((button) => button.setAttribute('aria-expanded', 'false'));
+  document.querySelector('#' + groupId + ' .sidebar-main-btn')?.setAttribute('aria-expanded', 'true');
+  document.querySelectorAll('.sidebar-accordion-group').forEach((el) => el.classList.remove('context-open'));
+  document.getElementById(groupId)?.classList.add('context-open');
+  requestAnimationFrame(() => document.querySelector('.navigation-service-card.active')?.focus());
+}
+window.openNavigationContext = openNavigationContext;
+
+function closeNavigationContext() {
+  const panel = document.getElementById('navigation-context');
+  const scrim = document.getElementById('navigation-context-scrim');
+  panel?.classList.remove('open');
+  scrim?.classList.remove('open');
+  panel?.setAttribute('aria-hidden', 'true');
+  scrim?.setAttribute('aria-hidden', 'true');
+  document.querySelectorAll('.sidebar-main-btn').forEach((button) => button.setAttribute('aria-expanded', 'false'));
+  document.querySelectorAll('.sidebar-accordion-group').forEach((el) => el.classList.remove('context-open'));
+}
+window.closeNavigationContext = closeNavigationContext;
+
+function selectNavigationService(groupId, serviceIndex) {
+  renderNavigationContext(groupId, serviceIndex);
+  requestAnimationFrame(() => document.querySelector('.navigation-service-card.active')?.focus());
+}
+window.selectNavigationService = selectNavigationService;
+
+function navigateFromContext(groupId, serviceIndex, itemIndex) {
+  const item = findNavigationGroup(groupId)?.services?.[serviceIndex]?.items?.[itemIndex];
+  if (!item || item.soon || item.status === 'belum') return;
+  closeNavigationContext();
+  // Aksi hanya berasal dari konfigurasi menu yang dibangkitkan lokal dan telah
+  // difilter RBAC saat rail dibuat. Tidak ada aksi dari input pengguna.
+  Function(item.action)();
+  setActiveFlyoutItem(item.page);
+}
+window.navigateFromContext = navigateFromContext;
+
+// Nama lama dipertahankan agar pemanggil eksternal/legacy tidak rusak; kini
+// ia membuka panel konteks dan tidak lagi memperlebar rail menjadi menu panjang.
+function toggleSidebarAccordion(groupId) { openNavigationContext(groupId); }
+window.toggleSidebarAccordion = toggleSidebarAccordion;
+function toggleSidebarService() { /* Tingkat layanan dipilih di panel konteks. */ }
 window.toggleSidebarService = toggleSidebarService;
 
 function setActiveFlyoutItem(page) {
   window.currentPage = page;
-  document.querySelectorAll('.sidebar-sub-link').forEach(function (b) {
-    b.classList.remove('active');
-  });
-  const activeBtn = document.querySelector('.sidebar-sub-link[data-page="' + page + '"]');
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-    const grp = activeBtn.closest('.sidebar-accordion-group');
-    if (grp) grp.classList.add('open');
-    const service = activeBtn.closest('.sidebar-service-group');
-    if (service) service.classList.add('open');
-    const label = activeBtn.querySelector('span')?.textContent;
-    const titleEl = document.getElementById('topbar-title');
-    if (titleEl && label) titleEl.textContent = label;
+  let activeGroup = null;
+  (window.navigationMenuGroups || []).some((group) => group.services.some((service) => service.items.some((item) => {
+    if (item.page !== page) return false;
+    activeGroup = group;
+    return true;
+  })));
+  document.querySelectorAll('.sidebar-accordion-group').forEach((groupEl) => groupEl.classList.remove('active-context'));
+  if (activeGroup) document.getElementById(activeGroup.id)?.classList.add('active-context');
+  document.querySelectorAll('.sidebar-main-btn').forEach((button) => button.classList.remove('active-group'));
+  document.querySelector('#' + activeGroup?.id + ' .sidebar-main-btn')?.classList.add('active-group');
+  if (document.getElementById('navigation-context')?.classList.contains('open') && activeGroup) {
+    renderNavigationContext(activeGroup.id, activeNavigationServiceIndex(activeGroup));
   }
   updateBreadcrumb(page);
 }
 
-// Menyelaraskan menu aktif di sidebar saat berpindah halaman via navigate()
-function syncFlyoutToPage(page) {
-  window.currentPage = page;
-  document.querySelectorAll('.sidebar-sub-link').forEach(function (b) {
-    b.classList.remove('active');
-  });
-  const activeBtn = document.querySelector('.sidebar-sub-link[data-page="' + page + '"]');
-  if (activeBtn) {
-    activeBtn.classList.add('active');
-    const grp = activeBtn.closest('.sidebar-accordion-group');
-    if (grp) grp.classList.add('open');
-    const service = activeBtn.closest('.sidebar-service-group');
-    if (service) service.classList.add('open');
-    const label = activeBtn.querySelector('span')?.textContent;
-    const titleEl = document.getElementById('topbar-title');
-    if (titleEl && label) titleEl.textContent = label;
-  }
-  updateBreadcrumb(page);
-}
+// Menyelaraskan penanda aktif saat berpindah halaman via navigate().
+function syncFlyoutToPage(page) { setActiveFlyoutItem(page); }
 
 // ══════════════════════════════════════════════════════════════
 // KATEGORI: halaman indeks + pintasan atas (pengganti flyout)

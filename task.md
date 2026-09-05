@@ -42,3 +42,30 @@
 - [ ] Persetujuan rilis staging untuk menerapkan `0050` setelah backup/preflight.
 - [ ] UAT pemilik proses serta koneksi sandbox vendor setelah registry tersedia di staging.
 - [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.
+
+- [x] Audit referensi Admission read-only hingga variasi registrasi, Back Office, Queue, dan Queue Outpatient.
+- [x] Dokumentasikan batas proses rawat jalan, layanan, medical kit, paket, langganan, dan pemakaian langganan.
+- [x] Ubah rail menu bertingkat menjadi panel konteks domain → sub-menu → modul.
+- [x] Pertahankan RBAC, action/route, breadcrumb, pencarian seluruh modul, Escape, dan responsivitas.
+- [ ] Menunggu checkpoint skema/UAT sebelum enam variasi registrasi menjadi transaksi produksi terpisah.
+
+## Web publik AVA Health — 2026-09-05
+- [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
+- [ ] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
+- [ ] Satukan login ke apps.avahealth.sbs.
+- [ ] Verifikasi struktur, navigasi, aset, dan routing; catat bukti.
+
+## Web publik AVA Health — hasil 2026-09-05
+- [x] Profil perusahaan, enam detail brand, delapan kategori produk/layanan, filter, perjalanan bisnis, sertifikasi, dan kontak.
+- [x] Satu tautan login menuju https://apps.avahealth.sbs/; autentikasi di portal publik dihapus.
+- [x] Pemeriksaan anchor, ID unik, aset/manifest ekspor, batas publik-operasional dan syntax lulus.
+- [x] Routing Vercel/subdomain tetap sesuai generator; halaman dan empat aset HTTP 200.
+- [ ] Verifikasi pemilik untuk tanggal sejarah, dokumen sertifikasi, katalog resmi, lokasi, dan kontak.
+- [ ] Publikasi produksi (belum dilakukan).
+
+## Pengayaan web publik premium
+- [ ] Enam profil brand: visi, misi, model bisnis, rantai layanan.
+- [ ] Skenario manufaktur obat/nutrisi/personal care dan kemitraan.
+- [ ] Jurnal kesehatan lengkap dengan sumber dan tanggal pemeriksaan referensi.
+- [ ] Kalkulator BMI dan estimasi energi dengan validasi dan batas penggunaan.
+- [ ] Verifikasi dan preview.

@@ -329,3 +329,51 @@ Migrasi `0050` belum dijalankan ke staging maupun produksi, sehingga belum
 ada data master baru, perangkat publik, ataupun integrasi vendor yang diubah.
 Pengujian database nyata harus mengikuti runbook dengan backup, preflight, dan
 UAT pemilik proses terlebih dahulu.
+
+## Audit Admission & Navigasi Konteks — 5 September 2026
+
+### Bukti audit referensi (read-only)
+
+- Hub Admission terbukti memakai empat kelompok kerja: Admission, Back Office,
+  Queue, dan Queue Outpatient.
+- Kelompok Admission memiliki enam alur berbeda: rawat jalan, layanan, medical
+  kit, paket layanan, langganan paket, serta pemakaian langganan.
+- Form kosong memperlihatkan pemisahan tahap dan field: rawat jalan membawa
+  unit/dokter/jadwal; layanan memiliki line item dan prioritas; medical kit
+  memiliki tanggal layanan/status; paket memakai kategori/paket/add-on;
+  langganan menyimpan kuantitas/bonus/kedaluwarsa; pemakaian memilih hak paket
+  aktif.
+- Tidak ada transaksi, data pasien, konfigurasi, ekspor, atau perubahan lain
+  yang dilakukan selama audit.
+
+### Perubahan source
+
+- ava-platform/index.html kini membangkitkan rail sebagai daftar domain
+  ringkas dan membuka panel konteks dua kolom untuk sub-menu serta modul.
+- ava-platform/css/style.css membuat rail desktop tetap 64px, menambahkan
+  panel konteks yang responsif, dan mencegah cache class sidebar lama
+  memperlebar rail kembali.
+- Enam pintu registrasi ditampilkan dalam layanan Registrasi & Admisi. Variasi
+  non-OPD berstatus Bertahap agar perbedaan kontrak transaksi tidak
+  disalahartikan sebagai fitur produksi yang sudah lengkap.
+- Action/rute berasal dari definisi menu yang sama setelah penyaringan RBAC;
+  pencarian Semua Modul dan breadcrumb tetap memakai inventaris tersebut.
+- Audit proses dan batas implementasi tersimpan di
+  docs/AUDIT_REFERENSI_ADMISSION_2026-09-05.md.
+
+### Verifikasi
+
+- Preview lokal HIS: klik ikon Alur Pasien membuka panel dua kolom dan
+  menampilkan enam item Registrasi & Admisi; klik Fasilitas & Antrean
+  menampilkan tiga sub-menu layanan serta empat modul antrean pada kolom
+  kanan.
+- Rute Registrasi Medical Kit membuka header, konteks, dan form mode khusus
+  tanpa menulis data saat diuji; formulir kemudian ditutup dengan Batal.
+- Pemeriksaan terakhir: sintaks skrip inline index dan admission/router valid;
+  peta menu sesuai source (202 menu: 161 ada, 34 parsial, 7 belum); audit
+  menu hidup lulus; audit keamanan 2.350/2.350 lulus; kontrak registry
+  20 domain lulus.
+
+## Perombakan situs publik AVA Health — 2026-09-05
+OWNED_BY: ava. Portal publik dibangun ulang sebagai company profile; autentikasi multi-role, sesi mock, dan tautan operasional tidak lagi ada pada halaman utama. Login tunggal menuju apps.avahealth.sbs. Enam brand menggunakan detail native, katalog delapan kategori dapat difilter, seluruh konten tetap tersedia tanpa JavaScript. Menu responsif mendukung Escape dan fokus keyboard.
+Bukti: node scripts/verify-public-profile.js PASS (anchor, ID unik, aset/ekspor, brand, katalog, batas autentikasi). Syntax kedua berkas JS lulus. node scripts/bangun-vercel.js --periksa PASS. HTTP 200 untuk /portal.html, /css/public-profile.css, /js/public-profile.js, /apps/doctors.jpg, /css/logo-ava-global.png pada preview lokal :5186. Pratinjau dibuka di Codex. Tidak dilakukan pengujian visual browser atau deploy produksi. Audit sumber dan konten yang perlu verifikasi: docs/audit/07-PUBLIC-COMPANY-PROFILE.md. Perubahan aplikasi operasional yang sudah ada tidak disunting oleh pekerjaan ini.

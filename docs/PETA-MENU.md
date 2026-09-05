@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 197 — 🟢 161 ada · 🟡 29 sebagian · ⚪ 7 belum dibuat
+**Total menu terpetakan:** 202 — 🟢 161 ada · 🟡 34 sebagian · ⚪ 7 belum dibuat
 
 ---
 
@@ -108,7 +108,12 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Pendaftaran & Admisi | `admission` | Registrasi pasien, general consent, gelang identitas |
+| 🟢 | Registrasi Rawat Jalan (OPD) | `admission` | Kunjungan poli: pasien, penjamin, jadwal/unit/dokter, layanan minimum, dan kasir |
+| 🟡 | Registrasi Layanan | `admission` › admission-service | Tindakan/layanan langsung dengan prioritas, line item, diskon, dan status dengan/tanpa kit |
+| 🟡 | Registrasi Medical Kit | `admission` › admission-medical-kit | Layanan berbasis kit/perangkat dengan tanggal layanan dan siklus status operasional sendiri |
+| 🟡 | Registrasi Paket Layanan | `admission` › admission-package | Paket/MCU: kategori, paket, produk paket, add-on, dan total net |
+| 🟡 | Langganan Paket | `admission` › admission-subscription | Hak penggunaan berulang: item, bonus, masa berlaku, pembayaran, dan kasir |
+| 🟡 | Pemakaian Langganan Paket | `admission` › admission-package-usage | Penebusan hak paket aktif dengan masa berlaku dan sisa penggunaan |
 | 🟢 | Antrian Poli | `queue` | Pemanggilan bersuara & layar ruang tunggu |
 | 🟢 | Konsol Panggilan Antrean | `queue-console` | Panggil berikutnya, panggil ulang, tandai tidak hadir, dan pindah loket — dengan pemanggilan bersuara |
 | 🟢 | Kiosk Mandiri Pasien | `queue-kiosk` | Ambil nomor sendiri di lobi |

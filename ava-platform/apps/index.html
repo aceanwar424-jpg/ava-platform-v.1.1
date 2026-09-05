@@ -156,6 +156,10 @@
                   <input type="radio" name="login-role" value="staff" onchange="updateLoginFormUI('staff')">
                   <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">🩺 Staff Nakes</span>
                 </label>
+                <label class="role-btn" style="cursor:pointer; grid-column: span 2;">
+                  <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
+                  <span style="display:block; text-align:center; padding:7px 4px; font-size:10.5px; font-weight:600; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#64748b; transition:all 0.2s;">🔗 Dokter / Faskes Referral</span>
+                </label>
               </div>
             </div>
 
@@ -2387,6 +2391,56 @@
         </div>
 
         <button class="btn btn-close" onclick="closeXrayViewer()" style="width:100%; background:#1f2937; color:white; border-color:#374151;">Tutup Gambar</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════ MODAL: PRA-ANALITIK FLEBOTOMI NAKES (ISO 15189) ════════════════════════ -->
+    <div id="phlebotomy-sampling-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width: 480px; padding: 24px; background:#ffffff; border-radius:14px;">
+        <h3 style="margin-bottom:4px; color:#0f2963; font-size:16px; font-weight:800;">Konfirmasi Flebotomi &amp; Sampling Spesimen</h3>
+        <p style="color: var(--text-muted); font-size:11.5px; margin-bottom: 16px;">Dokumentasi Pra-Analitik Sesuai ISO 15189:2022 (Traceability Spesimen)</p>
+        
+        <form onsubmit="shProsesKonfirmasiSampling(event)">
+          <input type="hidden" id="sh-modal-order-id">
+          <div class="input-group" style="margin-bottom:10px;">
+            <label for="sh-sample-barcode" style="font-size:11px; font-weight:600; color:#64748b;">No. Barcode Tabung Spesimen (Sample ID)</label>
+            <input type="text" id="sh-sample-barcode" placeholder="Contoh: SMP-20260905-001" required style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:9px 12px; font-size:12px;">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="sh-tube-type" style="font-size:11px; font-weight:600; color:#64748b;">Jenis Tabung / Wadah</label>
+              <select id="sh-tube-type" style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font-size:12px;">
+                <option value="EDTA (Ungu)">EDTA (Ungu)</option>
+                <option value="Serum / Clot Activator (Merah/Kuning)">Serum / Clot Activator (Merah/Kuning)</option>
+                <option value="Sodium Citrate (Biru)">Sodium Citrate (Biru)</option>
+                <option value="Heparin (Hijau)">Heparin (Hijau)</option>
+                <option value="Pot Urine Steril">Pot Urine Steril</option>
+              </select>
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="sh-sampling-time" style="font-size:11px; font-weight:600; color:#64748b;">Jam Flebotomi Aktual</label>
+              <input type="time" id="sh-sampling-time" required style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font-size:12px;">
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="sh-coldchain-temp" style="font-size:11px; font-weight:600; color:#64748b;">Suhu Box Transport (°C)</label>
+              <input type="text" id="sh-coldchain-temp" value="4°C (2-8°C Valid)" required style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font-size:12px;">
+            </div>
+            <div class="input-group" style="margin-bottom:0;">
+              <label for="sh-sample-condition" style="font-size:11px; font-weight:600; color:#64748b;">Kondisi Spesimen</label>
+              <select id="sh-sample-condition" style="width:100%; background:#f8fafc; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font-size:12px;">
+                <option value="Baik / Layak Analisis">Baik / Layak Analisis</option>
+                <option value="Perlu Perhatian Khusus">Perlu Perhatian Khusus</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:16px;">
+            <button type="button" class="btn btn-close" onclick="closePhlebotomyModal()" style="padding:9px 16px; font-size:12px;">Batal</button>
+            <button type="submit" class="btn btn-teal" style="width:100%; padding:9px 16px; font-size:12px; font-weight:700;">Simpan Data &amp; Selesaikan Sampling</button>
+          </div>
+        </form>
       </div>
     </div>
 

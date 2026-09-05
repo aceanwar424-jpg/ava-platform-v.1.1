@@ -326,7 +326,7 @@ async function navigate(page, params={}) {
     case 'regis':
     case 'registrasi':
     case 'registration':
-    case 'admission':   safeRun('renderAdmission');              break;
+    case 'admission':   safeRun('renderAdmission', params);      break;
     case 'laboratorium':
     case 'lab':         safeRun('renderLab', params.tab || 'checkin'); break;
     case 'worklist':    safeRun('renderLab', 'worklist'); break;

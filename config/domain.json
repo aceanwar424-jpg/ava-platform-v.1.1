@@ -37,10 +37,15 @@
       "lokal": "web",
       "masuk": "/portal.html",
       "basis": "",
-      "keterangan": "Website Company Profile holding, 6 pilar, artikel, dan universal login gateway.",
+      "keterangan": "Website publik perusahaan: profil, enam brand, produk dan layanan, perjalanan, sertifikasi, kontak; login hanya menuju apps.avahealth.sbs.",
       "berkas": [
         "portal.html",
-        "apps_portal.html"
+        "css/public-profile.css",
+        "js/public-profile.js",
+        "js/health-calculators.js",
+        "public/",
+        "css/logo-ava-global.png",
+        "apps/doctors.jpg"
       ],
       "bersama": [],
       "sorot": "semua"

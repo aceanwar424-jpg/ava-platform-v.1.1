@@ -14,6 +14,53 @@ const ADM_STATUS = {
   'Cancelled': { color: '#EF4444', icon: '❌' },
 };
 
+// Varian registrasi tidak diperlakukan sebagai nama lain untuk satu form.
+// Mereka berbagi pasien dan billing dasar, tetapi konteks operasional serta
+// urutan kerja berbeda. Metadata ini dipakai untuk mengarahkan UI tanpa
+// mengubah kontrak tabel transaksi yang sudah berjalan.
+const ADM_REGISTRATION_MODES = {
+  outpatient: {
+    label: 'Registrasi Rawat Jalan (OPD)',
+    subtitle: 'Pasien · penjamin · jadwal/unit/dokter · layanan · kasir',
+    notice: 'Untuk kunjungan poli. Pilih konteks jadwal, unit, dan dokter sebelum layanan ditagihkan.',
+    tabs: [['patient', 'Pasien'], ['payment', 'Pembayaran'], ['services', 'Unit & Layanan'], ['cashier', 'Kasir']],
+  },
+  service: {
+    label: 'Registrasi Layanan',
+    subtitle: 'Pasien · pembayaran · layanan langsung · kasir',
+    notice: 'Untuk tindakan atau layanan langsung; line item menyimpan prioritas, harga, dan diskon.',
+    tabs: [['patient', 'Pasien'], ['payment', 'Pembayaran'], ['services', 'Layanan'], ['cashier', 'Kasir']],
+  },
+  'medical-kit': {
+    label: 'Registrasi Medical Kit',
+    subtitle: 'Pasien · pembayaran · tanggal layanan/kit · kasir',
+    notice: 'Gunakan untuk layanan yang tergantung pada kit atau perangkat. Tanggal layanan dan status proses harus dikendalikan terpisah.',
+    tabs: [['patient', 'Pasien'], ['payment', 'Pembayaran'], ['services', 'Medical Kit'], ['cashier', 'Kasir']],
+  },
+  package: {
+    label: 'Registrasi Paket Layanan',
+    subtitle: 'Pasien · pembayaran · paket dan add-on · kasir',
+    notice: 'Paket dan add-on dipilih sebagai bundel. Rincian komponen tetap terlihat agar nilai transaksi dapat ditelusuri.',
+    tabs: [['patient', 'Pasien'], ['payment', 'Pembayaran'], ['services', 'Paket & Add-on'], ['cashier', 'Kasir']],
+  },
+  subscription: {
+    label: 'Langganan Paket',
+    subtitle: 'Pasien · pembayaran · hak paket/masa berlaku · kasir',
+    notice: 'Langganan membentuk hak penggunaan berulang; item, bonus, masa berlaku, dan saldo penggunaan harus terpisah dari registrasi biasa.',
+    tabs: [['patient', 'Pasien'], ['payment', 'Pembayaran'], ['services', 'Langganan'], ['cashier', 'Kasir']],
+  },
+  'package-usage': {
+    label: 'Pemakaian Langganan Paket',
+    subtitle: 'Pasien · paket aktif · sisa pemakaian',
+    notice: 'Pemakaian menebus hak paket yang telah aktif. Verifikasi masa berlaku dan sisa penggunaan sebelum menyimpan.',
+    tabs: [['patient', 'Pasien'], ['services', 'Pemakaian']],
+  },
+};
+
+function getAdmissionMode(mode) {
+  return ADM_REGISTRATION_MODES[mode] ? mode : 'outpatient';
+}
+
 // ── Ikon SVG line profesional (Feather-style) ─────────────────────
 const SVG_ICONS = {
   user: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/>',
@@ -81,23 +128,30 @@ function injectProShell() {
   document.head.appendChild(s);
 }
 
-async function renderAdmission() {
+async function renderAdmission(params = {}) {
   injectProShell();
+  const mode = getAdmissionMode(params?.mode);
+  const modeDef = ADM_REGISTRATION_MODES[mode];
+  window.activeAdmissionMode = mode;
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
     <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
       <div style="display:flex;align-items:center;gap:12px">
         <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('admission')" title="Kembali ke daftar menu Admission">← Menu Admission</button>
         <div>
-          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">Admission / Registrasi Pasien</h1>
-          <span class="lis-sub" style="font-size:11px;color:#9db4d0">Walk-in · Booking · Rujukan · Project MCU</span>
+          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">${modeDef.label}</h1>
+          <span class="lis-sub" style="font-size:11px;color:#9db4d0">${modeDef.subtitle}</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <span id="adm-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
         <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderAdmissionReport()">Laporan</button>
-        <button class="btn btn-teal btn-sm" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
+        <button class="btn btn-teal btn-sm" onclick="openAdmissionForm(null,'${mode}')">+ Buat Registrasi</button>
       </div>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:8px;margin:0 0 12px;padding:9px 12px;border:1px solid rgba(14,165,233,.28);border-left:3px solid #0EA5E9;border-radius:8px;background:#F0F9FF;color:#33546D;font-size:11.5px;line-height:1.45">
+      <span aria-hidden="true">ⓘ</span><span><strong>${modeDef.label}.</strong> ${modeDef.notice}</span>
     </div>
 
     <div id="adm-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
@@ -246,7 +300,7 @@ function renderAdmList(data) {
   if (!data.length) {
     el.innerHTML = `<div class="empty-state">
       <h3>${admAll.length ? 'Tidak ada hasil' : 'Belum ada kunjungan hari ini'}</h3>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="openAdmissionForm()">+ Registrasi Pasien</button>
+      <button class="btn btn-teal" style="margin-top:12px" onclick="openAdmissionForm(null, window.activeAdmissionMode || 'outpatient')">+ Buat Registrasi</button>
     </div>`; return;
   }
 
@@ -707,7 +761,9 @@ function refreshVoucherUI() {
 }
 
 // ── Main tabbed Admission Form ───────────────────────────────
-async function openAdmissionForm(id = null) {
+async function openAdmissionForm(id = null, requestedMode = window.activeAdmissionMode || 'outpatient') {
+  const mode = getAdmissionMode(requestedMode);
+  const modeDef = ADM_REGISTRATION_MODES[mode];
   let a = {};
   if (id) { const d = await sbGet('admissions', `select=*&id=eq.${id}`); a = d[0] || {}; }
 
@@ -726,7 +782,7 @@ async function openAdmissionForm(id = null) {
 
   // Load existing patient IDs and service lines if editing
   admFormState = {
-    patientIds: [], serviceLines: [], admissionId: id, activeTab: 'patient',
+    patientIds: [], serviceLines: [], admissionId: id, activeTab: 'patient', mode,
     // Diskon berjenjang
     scheme: a.discount_scheme || 'umum',       // umum | family | corporate
     schemeRefId: a.scheme_ref_id || a.corporate_id || a.family_id || null,
@@ -771,12 +827,15 @@ async function openAdmissionForm(id = null) {
 
   openModal(`
     <div class="modal-header">
-      <div class="modal-title">${id ? 'Edit Registrasi' : 'Service Registration Form'}</div>
+      <div class="modal-title">${id ? 'Edit ' + modeDef.label : modeDef.label}</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
 
+    <div style="margin:0 0 10px;padding:8px 10px;border-radius:7px;background:#F0F9FF;color:#33546D;font-size:11px;line-height:1.4">
+      <strong>${modeDef.label}.</strong> ${modeDef.notice}
+    </div>
     <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px">
-      ${[['patient', 'Patient'], ['payment', 'Payment'], ['services', 'Services'], ['cashier', 'Cashier']].map(([k, label]) => `
+      ${modeDef.tabs.map(([k, label]) => `
         <button onclick="switchAdmTab('${k}')" id="af-tab-${k}"
           style="padding:9px 18px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:700;
           color:${k === 'patient' ? 'var(--teal)' : 'var(--text3)'};border-bottom:2.5px solid ${k === 'patient' ? 'var(--teal)' : 'transparent'}">
