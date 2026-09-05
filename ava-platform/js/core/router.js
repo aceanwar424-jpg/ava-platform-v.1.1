@@ -182,6 +182,8 @@ let currentPage = '';
 async function navigate(page, params={}) {
   // Resolusi 3-segmen rute ke target handler (Strangler Fig)
   const resolvedPage = ROUTE_ALIASES_3SEG[page] || page;
+  const isAdmissionWorkspace = ['admission', 'pendaftaran', 'regis', 'registrasi', 'registration'].includes(resolvedPage);
+  document.body.classList.toggle('admission-workspace-page', isAdmissionWorkspace);
 
   if (typeof syncFlyoutToPage === 'function') syncFlyoutToPage(resolvedPage);
 

@@ -133,48 +133,54 @@ async function renderAdmission(params = {}) {
   const mode = getAdmissionMode(params?.mode);
   const modeDef = ADM_REGISTRATION_MODES[mode];
   window.activeAdmissionMode = mode;
+  const dateText = new Date().toLocaleDateString('id-ID', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  });
+  const userName = document.getElementById('topbar-user-name')?.textContent?.trim() ||
+    (typeof getUserName === 'function' ? getUserName() : 'Pengguna');
+  const userRole = document.getElementById('topbar-user-role')?.textContent?.trim() || 'Pengguna HIS';
+  const userInitials = document.getElementById('topbar-avatar')?.textContent?.trim() ||
+    userName.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase();
+
   document.getElementById('main-content').innerHTML = `
-    <div class="pro-shell">
-    <div class="lis-header" style="display:flex;justify-content:space-between;align-items:center;background:linear-gradient(90deg,#0A2342,#0d2d54);color:var(--on-accent);border-radius:8px;padding:8px 14px;margin-bottom:10px">
-      <div style="display:flex;align-items:center;gap:12px">
-        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="openCategory('admission')" title="Kembali ke daftar menu Admission">← Menu Admission</button>
-        <div>
-          <h1 style="margin:0;font-size:15px;color:var(--on-accent);font-weight:800">${modeDef.label}</h1>
-          <span class="lis-sub" style="font-size:11px;color:#9db4d0">${modeDef.subtitle}</span>
+    <div class="admission-workspace">
+      <header class="admission-workspace-head">
+        <div class="admission-workspace-title">
+          <h1>${modeDef.label}</h1>
+          <p>${modeDef.subtitle}</p>
         </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span id="adm-date-badge" class="lis-date" style="font-size:11px;color:#cfe0f2"></span>
-        <button class="btn btn-ghost btn-sm" style="color:var(--on-accent);border-color:rgba(255,255,255,0.2)" onclick="renderAdmissionReport()">Laporan</button>
-        <button class="btn btn-teal btn-sm" onclick="openAdmissionForm(null,'${mode}')">+ Buat Registrasi</button>
-      </div>
-    </div>
+        <div class="admission-session" aria-label="Informasi sesi">
+          <span class="admission-session-date">${dateText}</span>
+          <button class="admission-session-button" type="button" title="Ganti tema" aria-label="Ganti tema" onclick="olToggleTema()">☾</button>
+          <button class="admission-session-button" type="button" title="Notifikasi sistem" aria-label="Notifikasi sistem" onclick="alert('Tidak ada notifikasi kritis baru.')">🔔<span aria-hidden="true"></span></button>
+          <button class="admission-session-user" type="button" onclick="openEditProfile()" title="Buka profil pengguna">
+            <b>${userInitials}</b><span><strong>${userName}</strong><small>${userRole}</small></span>
+          </button>
+        </div>
+      </header>
 
-    <div style="display:flex;align-items:flex-start;gap:8px;margin:0 0 12px;padding:9px 12px;border:1px solid rgba(14,165,233,.28);border-left:3px solid #0EA5E9;border-radius:8px;background:#F0F9FF;color:#33546D;font-size:11.5px;line-height:1.45">
-      <span aria-hidden="true">ⓘ</span><span><strong>${modeDef.label}.</strong> ${modeDef.notice}</span>
-    </div>
+      <section class="admission-registry" aria-labelledby="admission-registry-title">
+        <header class="admission-registry-head">
+          <div><h2 id="admission-registry-title">Daftar Registrasi</h2><p><b id="adm-kpi">0</b> registrasi pada periode terpilih</p></div>
+          <span class="admission-mode-note">${modeDef.notice}</span>
+        </header>
 
-    <div id="adm-kpi" class="pro-kpi"><div class="loading-row" style="grid-column:1/-1"><div class="spinner"></div></div></div>
+        <div class="admission-toolbar" aria-label="Pencarian dan tindakan registrasi">
+          <label class="admission-search"><span aria-hidden="true">⌕</span><input id="adm-q" type="search" placeholder="Cari nomor registrasi, MR, atau nama pasien" oninput="admFilter.search=this.value;applyAdmFilter()"></label>
+          <label class="admission-field"><span aria-hidden="true">◷</span><input type="date" id="adm-date" aria-label="Tanggal registrasi" onchange="loadAdmissions()" value="${new Date().toISOString().split('T')[0]}"></label>
+          <label class="admission-field"><select id="adm-type" aria-label="Jenis registrasi" onchange="admFilter.type=this.value;applyAdmFilter()"><option value="">Semua jenis</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option></select></label>
+          <button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmissionReport()">Laporan</button>
+          <button class="btn btn-teal btn-sm" type="button" onclick="openAdmissionForm(null,'${mode}')">+ Registrasi</button>
+        </div>
 
-    <div class="pro-toolbar" id="adm-status-tabs">
-      <button class="pro-chip active" onclick="setAdmFilter('','',this)">Semua</button>
-      ${Object.entries(ADM_STATUS).map(([s, v]) => `<button class="pro-chip" onclick="setAdmFilter('status','${s}',this)">${s}</button>`).join('')}
-    </div>
+        <div class="admission-filter-row" id="adm-status-tabs" aria-label="Filter status">
+          <button class="admission-filter active" type="button" onclick="setAdmFilter('','',this)">Semua <b>0</b></button>
+          ${Object.entries(ADM_STATUS).map(([status]) => `<button class="admission-filter" type="button" onclick="setAdmFilter('status','${status}',this)">${status} <b>0</b></button>`).join('')}
+        </div>
 
-    <div class="pro-toolbar">
-      <input class="table-search" id="adm-q" placeholder="Cari nama pasien, no. kunjungan..."
-        oninput="admFilter.search=this.value;applyAdmFilter()" style="flex:1;min-width:220px">
-      <select class="table-filter" id="adm-type" onchange="admFilter.type=this.value;applyAdmFilter()">
-        <option value="">Semua Tipe</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option>
-      </select>
-      <input type="date" class="table-filter" id="adm-date" onchange="loadAdmissions()" value="${new Date().toISOString().split('T')[0]}">
-    </div>
-
-    <div id="adm-list"><div class="loading-row"><div class="spinner"></div></div></div>
+        <div id="adm-list" class="admission-list"><div class="loading-row"><div class="spinner"></div></div></div>
+      </section>
     </div>`;
-
-  const badge = document.getElementById('adm-date-badge');
-  if (badge) badge.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   await loadAdmissions();
 }
@@ -256,27 +262,20 @@ async function backfillBookingServices() {
 }
 
 function renderAdmKPI() {
-  const el = document.getElementById('adm-kpi'); if (!el) return;
-  const done = admAll.filter(a => a.status === 'Done').length;
-  const active = admAll.filter(a => !['Done', 'Cancelled'].includes(a.status)).length;
-  const revenue = admAll.filter(a => a.payment_status === 'Paid').reduce((s, a) => s + (a.net_amount || 0), 0);
-  el.innerHTML = [
-    { icon: '', val: admAll.length, label: 'Total Hari Ini', color: '#0A2342' },
-    { icon: '🔵', val: active, label: 'Sedang Dilayani', color: '#0EA5E9' },
-    { icon: '✅', val: done, label: 'Selesai', color: '#22C55E' },
-    { icon: '❌', val: admAll.filter(a => a.status === 'Cancelled').length, label: 'Batal', color: '#EF4444' },
-    { icon: '', val: formatCurrency(revenue), label: 'Revenue Hari Ini', color: '#8B5CF6' },
-    { icon: '', val: admAll.filter(a => a.visit_type === 'Project MCU').length, label: 'MCU Project', color: '#F59E0B' },
-  ].map(k => `
-    <div style="background:var(--white);border-radius:10px;padding:10px 12px;border:1px solid var(--border);border-left:4px solid ${k.color}">
-      <div style="font-size:18px">${k.icon}</div>
-      <div style="font-size:16px;font-weight:800;color:${k.color}">${k.val}</div>
-      <div style="font-size:10px;color:var(--gray)">${k.label}</div>
-    </div>`).join('');
+  const total = document.getElementById('adm-kpi');
+  if (total) total.textContent = String(admAll.length);
+  const counts = { '': admAll.length };
+  Object.keys(ADM_STATUS).forEach(status => { counts[status] = admAll.filter(a => a.status === status).length; });
+  document.querySelectorAll('#adm-status-tabs .admission-filter').forEach(button => {
+    const text = button.textContent.trim().replace(/\s+\d+$/, '');
+    const value = text === 'Semua' ? '' : text;
+    const count = button.querySelector('b');
+    if (count) count.textContent = String(counts[value] || 0);
+  });
 }
 
 function setAdmFilter(key, val, btn) {
-  document.querySelectorAll('#adm-status-tabs .pro-chip').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#adm-status-tabs .admission-filter').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   admFilter.status = key === 'status' ? val : '';
   applyAdmFilter();
@@ -297,31 +296,33 @@ function applyAdmFilter() {
 
 function renderAdmList(data) {
   const el = document.getElementById('adm-list');
+  if (!el) return;
   if (!data.length) {
-    el.innerHTML = `<div class="empty-state">
-      <h3>${admAll.length ? 'Tidak ada hasil' : 'Belum ada kunjungan hari ini'}</h3>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="openAdmissionForm(null, window.activeAdmissionMode || 'outpatient')">+ Buat Registrasi</button>
-    </div>`; return;
+    el.innerHTML = `<table class="admission-table"><thead><tr>
+      <th>No. registrasi</th><th>Pasien</th><th>Layanan / paket</th><th>Status</th><th>Tagihan</th><th>Aksi</th>
+    </tr></thead><tbody><tr><td class="admission-empty" colspan="6">
+      <span aria-hidden="true">▤</span><strong>${admAll.length ? 'Tidak ada registrasi yang sesuai filter' : 'Belum ada registrasi pada periode ini'}</strong>
+      <p>Ubah pencarian atau filter dari toolbar di atas.</p>
+    </td></tr></tbody></table>`;
+    return;
   }
 
-  el.innerHTML = `<div style="overflow-x:auto"><table class="pro-grid"><thead><tr>
-    <th>MR / Kunjungan</th><th>Pasien</th><th>Layanan</th><th>Tipe</th><th>Status</th><th style="text-align:right">Tagihan</th><th>Aksi</th>
+  const mode = getAdmissionMode(window.activeAdmissionMode || 'outpatient');
+  el.innerHTML = `<div class="admission-table-scroll"><table class="admission-table"><thead><tr>
+    <th>No. registrasi</th><th>Pasien</th><th>Layanan / paket</th><th>Status</th><th>Tagihan</th><th>Aksi</th>
   </tr></thead><tbody>
   ${data.map(a => {
     const st = ADM_STATUS[a.status] || ADM_STATUS['Registered'];
     return `<tr>
-      <td style="font-family:monospace;font-size:11px">${a.mr_number || '—'}<div style="color:var(--gray)">${a.visit_number || ''}</div></td>
-      <td><div style="font-weight:700;color:var(--navy)">${a.patient_name || '—'}</div>
-        <div style="font-size:10.5px;color:var(--gray)">${a.patient_gender || ''} ${a.patient_age ? '· ' + a.patient_age + ' th' : ''} ${a.patient_phone ? '· ' + a.patient_phone : ''}</div></td>
-      <td style="font-size:12px">${a.package_name || 'Layanan Individual'}</td>
-      <td style="font-size:11px;color:var(--gray)">${a.visit_type || 'Walk-in'}</td>
-      <td><span style="background:${st.color}15;color:${st.color};border:1px solid ${st.color}35;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;white-space:nowrap">${a.status}</span></td>
-      <td style="text-align:right"><div style="font-weight:700;color:var(--navy)">${formatCurrency(a.net_amount || 0)}</div>
-        <div style="font-size:10px;color:${a.payment_status === 'Paid' ? '#22C55E' : '#F59E0B'}">${a.payment_status || 'Unpaid'}</div></td>
-      <td><div class="act-row" style="flex-wrap:nowrap">
+      <td class="admission-registration"><b>${a.visit_number || '—'}</b><span>${a.mr_number || 'MR belum tersedia'} · ${a.visit_type || 'Walk-in'}</span></td>
+      <td><div class="admission-patient"><b>${a.patient_name || '—'}</b><span>${a.patient_gender || ''}${a.patient_age ? ' · ' + a.patient_age + ' th' : ''}${a.patient_phone ? ' · ' + a.patient_phone : ''}</span></div></td>
+      <td><div class="admission-service">${a.package_name || 'Layanan individual'}<span>${a.services ? 'Layanan telah dipilih' : 'Belum ada layanan'}</span></div></td>
+      <td><span class="admission-status" style="--admission-status:${st.color}">${a.status || 'Registered'}</span></td>
+      <td class="admission-billing"><b>${formatCurrency(a.net_amount || 0)}</b><span class="${a.payment_status === 'Paid' ? 'is-paid' : ''}">${a.payment_status || 'Unpaid'}</span></td>
+      <td><div class="act-row admission-actions">
         ${['Registered', 'Anamnesa'].includes(a.status) ? `<button class="btn btn-teal btn-xs" title="Buka Anamnesa" onclick="navigate('anamnesa')" style="padding:2px 6px">${svgIcon('stethoscope', 13, '#fff')} Anamnesa</button>` : ''}
         ${a.package_id ? `<button class="act-btn" title="Cetak Ulang Barcode" onclick="reprintSampleLabels(${a.id})" style="padding:2px">${svgIcon('print', 13, 'var(--teal)')}</button>` : ''}
-        <button class="act-btn edit" onclick="openAdmissionForm(${a.id})" style="padding:2px">${svgIcon('edit', 13, 'var(--navy)')}</button>
+        <button class="act-btn edit" title="Buka registrasi" onclick="openAdmissionForm(${a.id},'${mode}')" style="padding:2px">${svgIcon('edit', 13, 'var(--navy)')}</button>
         ${a.payment_status !== 'Paid' ? `<button class="act-btn" style="color:var(--success-strong);font-size:11px" onclick="markAdmPaid(${a.id})">Bayar</button>` : ''}
       </div></td>
     </tr>`;
@@ -825,20 +826,14 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
   const visitNum = id ? a.visit_number : `VISIT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Date.now().toString().slice(-3)}`;
   const mrNum = id ? (a.mr_number || '') : `MR-${Date.now().toString().slice(-8)}`;
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${id ? 'Edit ' + modeDef.label : modeDef.label}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
-
-    <div style="margin:0 0 10px;padding:8px 10px;border-radius:7px;background:#F0F9FF;color:#33546D;font-size:11px;line-height:1.4">
+  const admissionFormMarkup = `
+    <div class="admission-form-notice">
       <strong>${modeDef.label}.</strong> ${modeDef.notice}
     </div>
-    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px">
+    <div class="admission-form-tabs">
       ${modeDef.tabs.map(([k, label]) => `
         <button onclick="switchAdmTab('${k}')" id="af-tab-${k}"
-          style="padding:9px 18px;border:none;background:none;cursor:pointer;font-size:12.5px;font-weight:700;
-          color:${k === 'patient' ? 'var(--teal)' : 'var(--text3)'};border-bottom:2.5px solid ${k === 'patient' ? 'var(--teal)' : 'transparent'}">
+          class="${k === 'patient' ? 'active' : ''}">
           ${label}
         </button>`).join('')}
     </div>
@@ -1034,10 +1029,25 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
       <input type="hidden" id="af-pay-total"><input type="hidden" id="af-cash-total">
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+    <div class="admission-form-footer">
+      <button class="btn btn-ghost" onclick="closeAdmissionWorkspace()">Batal</button>
       <button class="btn btn-teal" onclick="saveAdmission(${id || 'null'})">${id ? 'Update' : 'Save & Print'}</button>
-    </div>`, 'wide');
+    </div>`;
+
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  main.innerHTML = `
+    <div class="admission-form-workspace">
+      <header class="admission-form-workspace-head">
+        <div class="admission-form-back">
+          <button class="btn btn-ghost btn-sm" type="button" onclick="closeAdmissionWorkspace()">← Daftar Registrasi</button>
+          <span>Admission</span>
+        </div>
+        <div class="admission-form-heading"><h1>${id ? 'Ubah ' + modeDef.label : modeDef.label}</h1><p>${id ? 'Perbarui data registrasi dan tagihan sebelum disimpan.' : 'Lengkapi data secara bertahap sebelum registrasi disimpan.'}</p></div>
+        <div class="admission-form-context"><span>${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span><button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmissionReport()">Laporan</button></div>
+      </header>
+      <section class="admission-form-surface">${admissionFormMarkup}</section>
+    </div>`;
 
   renderPatientIdTable();
   renderServiceLines();
@@ -1077,16 +1087,19 @@ async function isiPilihanPerujuk(terpilih) {
   }
 }
 
+async function closeAdmissionWorkspace() {
+  const mode = getAdmissionMode(admFormState?.mode || window.activeAdmissionMode || 'outpatient');
+  if (typeof navigate === 'function') return navigate('admission', { mode });
+  return renderAdmission({ mode });
+}
+
 function switchAdmTab(tab) {
   admFormState.activeTab = tab;
   ['patient', 'payment', 'services', 'cashier'].forEach(t => {
     const content = document.getElementById(`af-tab-content-${t}`);
     const btn = document.getElementById(`af-tab-${t}`);
     if (content) content.style.display = t === tab ? '' : 'none';
-    if (btn) {
-      btn.style.color = t === tab ? 'var(--teal)' : 'var(--text3)';
-      btn.style.borderBottom = t === tab ? '2.5px solid var(--teal)' : '2.5px solid transparent';
-    }
+    if (btn) btn.classList.toggle('active', t === tab);
   });
 }
 
@@ -1488,8 +1501,7 @@ async function saveAdmission(id) {
       issueQueueForAdmissionByProducts(admissionId, name, productIds).catch(() => { });
     }
 
-    closeModalForce();
-    await loadAdmissions();
+    await closeAdmissionWorkspace();
 
     // Label KLINIK (identitas pasien) dicetak otomatis saat registrasi baru
     // disimpan — untuk map berkas klinik & identifikasi. Ini BUKAN label lab.
@@ -1586,25 +1598,29 @@ async function generateSampleLabelsFromProducts(admissionId, adm, productIds) {
 }
 
 async function renderAdmissionReport() {
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">Laporan Admission</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      ${[
-      { l: 'Total Kunjungan', v: admAll.length },
-      { l: 'Selesai', v: admAll.filter(a => a.status === 'Done').length },
-      { l: 'Walk-in', v: admAll.filter(a => a.visit_type === 'Walk-in').length },
-      { l: 'Project MCU', v: admAll.filter(a => a.visit_type === 'Project MCU').length },
-      { l: 'Revenue', v: formatCurrency(admAll.filter(a => a.payment_status === 'Paid').reduce((s, a) => s + (a.net_amount || 0), 0)) },
-      { l: 'Unpaid', v: formatCurrency(admAll.filter(a => a.payment_status === 'Unpaid').reduce((s, a) => s + (a.net_amount || 0), 0)) },
-    ].map(k => `<div style="background:var(--lgray);border-radius:8px;padding:12px">
-        <div style="font-size:16px;font-weight:800;color:var(--navy)">${k.v}</div>
-        <div style="font-size:11px;color:var(--gray)">${k.l}</div>
-      </div>`).join('')}
-    </div>
-    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModalForce()">Tutup</button></div>`);
+  const mode = getAdmissionMode(window.activeAdmissionMode || 'outpatient');
+  const reportItems = [
+    { label: 'Total registrasi', value: admAll.length },
+    { label: 'Selesai', value: admAll.filter(a => a.status === 'Done').length },
+    { label: 'Walk-in', value: admAll.filter(a => a.visit_type === 'Walk-in').length },
+    { label: 'Project MCU', value: admAll.filter(a => a.visit_type === 'Project MCU').length },
+    { label: 'Penerimaan tercatat', value: formatCurrency(admAll.filter(a => a.payment_status === 'Paid').reduce((sum, a) => sum + (a.net_amount || 0), 0)) },
+    { label: 'Belum dibayar', value: formatCurrency(admAll.filter(a => a.payment_status === 'Unpaid').reduce((sum, a) => sum + (a.net_amount || 0), 0)) },
+  ];
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  main.innerHTML = `
+    <div class="admission-report-workspace">
+      <header class="admission-form-workspace-head">
+        <div class="admission-form-back"><button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmission({mode:'${mode}'})">← Daftar Registrasi</button><span>Admission</span></div>
+        <div class="admission-form-heading"><h1>Laporan Admission</h1><p>Ringkasan register pada periode yang sedang dipilih.</p></div>
+        <div class="admission-form-context"><span>${document.getElementById('adm-date')?.value || new Date().toISOString().slice(0, 10)}</span></div>
+      </header>
+      <section class="admission-report-surface">
+        <div class="admission-report-grid">${reportItems.map(item => `<article><strong>${item.value}</strong><span>${item.label}</span></article>`).join('')}</div>
+        <div class="admission-report-note">Laporan ini bersifat ringkasan tampilan. Ekspor dan rekonsiliasi keuangan tetap perlu mengikuti otorisasi serta periode tutup buku.</div>
+      </section>
+    </div>`;
 }
 
 // ══════════════════════════════════════════════════════════════

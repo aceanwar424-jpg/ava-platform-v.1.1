@@ -383,3 +383,24 @@ OWNED_BY: ava. Ditambahkan 6 halaman profil brand (visi, 3 misi, pelanggan, port
 Tujuh artikel orisinal tersedia sebagai halaman HTML utuh dengan empat bagian, sumber primer, tanggal pemeriksaan referensi, dan status belum ditinjau klinis. Tema: persiapan lab, interpretasi hasil digital, makan seimbang, aktivitas fisik, skincare, tidur, dan keamanan produk. Pembaruan editorial tidak dijanjikan otomatis.
 Kalkulator lokal memakai kategori BMI CDC usia ≥20 tahun dan Mifflin–St Jeor, usia dibatasi 20–78, faktor aktivitas ditampilkan sebagai asumsi simulasi. Tidak memberi defisit energi/resep diet; tidak menyimpan/mengirim input. Hasil lama disembunyikan saat input berubah/reset; submit dinonaktifkan sampai JS aktif. Menu tetap tersedia tanpa JavaScript.
 Bukti verifikasi: verify-public-profile PASS; verify-public-editorial PASS untuk 15 halaman, 6 profil, 7 artikel, seluruh tautan/aset/anchor, satu H1, rebuild deterministik, contoh energi laki-laki 1730/2076 dan perempuan 1564 kkal, ambang BMI 18.5/25/30, serta penolakan input tidak valid. Pemeriksaan routing generator PASS. HTTP 200 untuk portal, profil Health/Care, manufaktur, artikel nutrisi, dan JS kalkulator. Tidak dilakukan browser visual QA atau publikasi produksi.
+
+## Workspace Admission — 5 September 2026
+
+- Halaman daftar sekarang memakai header kerja satu baris berisi judul,
+  konteks singkat, tanggal, tema, notifikasi, dan identitas pengguna. Topbar
+  global/breadcrumb/API key tidak ditampilkan pada rute Admission; toolbar
+  daftar berada langsung di atas tabel.
+- Pencarian, periode, jenis kunjungan, filter status, laporan, dan tindakan
+  registrasi dipadatkan dalam satu alur. Area tabel mengisi ruang kerja yang
+  tersisa dan memiliki keadaan kosong yang informatif.
+- Tambah dan ubah registrasi kini membuka workspace penuh dengan tombol
+  kembali, tab tahapan, dan footer tindakan. Laporan Admission juga menjadi
+  halaman ringkasan penuh. Modal tetap dipakai oleh pemilih paket/pasien dan
+  tindakan pendukung yang memang berukuran kecil.
+- Preview lokal `his.localhost` diverifikasi tanpa menyimpan data: rute
+  Admission → `+ Registrasi` menampilkan formulir penuh → kembali ke daftar;
+  `Laporan` menampilkan halaman ringkasan penuh → kembali ke daftar.
+- Pemeriksaan source lulus: `node --check` untuk Admission dan router,
+  `bangun-menu.js --periksa`, `audit-menu-hidup.js` (159 menu tanpa temuan),
+  `audit-keamanan-modul.js` (2.350/2.350), serta `git diff --check` pada
+  berkas terkait.

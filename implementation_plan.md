@@ -131,16 +131,16 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
 
 ### Urutan implementasi
 
-1. [ ] Padatkan halaman daftar registrasi: hilangkan breadcrumb/topbar khusus
+1. [x] Padatkan halaman daftar registrasi: hilangkan breadcrumb/topbar khusus
    halaman, kartu KPI besar, serta header ganda; satukan tanggal, notifikasi,
    dan identitas pengguna pada satu header kerja.
-2. [ ] Letakkan pencarian, tanggal, jenis, laporan, tindakan registrasi, dan
+2. [x] Letakkan pencarian, tanggal, jenis, laporan, tindakan registrasi, dan
    filter status dalam toolbar ringkas di atas tabel yang mengisi sisa layar.
-3. [ ] Pindahkan formulir registrasi/edit dari modal lebar ke workspace penuh
+3. [x] Pindahkan formulir registrasi/edit dari modal lebar ke workspace penuh
    yang tetap memakai state, validasi, serta proses simpan yang ada.
-4. [ ] Pertahankan modal hanya untuk pencarian/pemilihan data pendukung dan
+4. [x] Pertahankan modal hanya untuk pencarian/pemilihan data pendukung dan
    konfirmasi singkat; jangan mengubah kontrak API atau skema transaksi.
-5. [ ] Verifikasi sintaks, peta menu, audit menu/keamanan, dan preview lokal
+5. [x] Verifikasi sintaks, peta menu, audit menu/keamanan, dan preview lokal
    tanpa menulis data pasien.
 
 ### Implikasi IP & Kepatuhan

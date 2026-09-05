@@ -54,11 +54,11 @@
 
 ## Workspace Admission — 5 September 2026
 
-- [ ] Daftar registrasi menggunakan header kerja ringkas dan area tabel utama.
-- [ ] Toolbar menggabungkan pencarian, filter periode/jenis/status, laporan, dan registrasi.
-- [ ] Form tambah/ubah Admission dibuka sebagai halaman kerja, bukan modal.
-- [ ] Popup hanya dipakai untuk pemilih data dan konfirmasi kecil.
-- [ ] Sintaks, menu, keamanan, dan preview lokal diverifikasi tanpa transaksi data.
+- [x] Daftar registrasi menggunakan header kerja ringkas dan area tabel utama.
+- [x] Toolbar menggabungkan pencarian, filter periode/jenis/status, laporan, dan registrasi.
+- [x] Form tambah/ubah Admission dibuka sebagai halaman kerja, bukan modal.
+- [x] Popup hanya dipakai untuk pemilih data dan konfirmasi kecil.
+- [x] Sintaks, menu, keamanan, dan preview lokal diverifikasi tanpa transaksi data.
 
 ## Web publik AVA Health — 2026-09-05
 - [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
