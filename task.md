@@ -39,9 +39,12 @@
 - [x] Migrasi `0050` menegakkan tenant isolation, role write gate, versioning, audit append-only, dan sinkronisasi perangkat antrean.
 - [x] Preflight, runbook, katalog migrasi, serta pemeriksa kontrak 20 menu/domain tersedia.
 - [x] Peta menu dan manifest dibangkitkan ulang; audit menu, audit keamanan, dan uji antrean lulus.
-- [ ] Persetujuan rilis staging untuk menerapkan `0050` setelah backup/preflight.
-- [ ] UAT pemilik proses serta koneksi sandbox vendor setelah registry tersedia di staging.
-- [ ] Menunggu checkpoint integrasi untuk aktivasi vendor eksternal.
+- [ ] Tambahkan `<select id="role-switcher-select">` pada `.sidebar-user-card` di `index.html`.
+- [ ] Buat fungsi `switchActiveRole(newRole)` di `app.js` untuk alih role real-time tanpa logout.
+- [ ] Tambahkan toggle sub-role Korporat (Maker vs Approver) pada `corporate-view`.
+- [ ] Perbarui `renderSidebarMenu()` dan styling di `style.css` agar dropdown role switcher responsif.
+- [ ] Verifikasi sintaks dan uji alih role lintas 5 mode (Pasien, Member, Corporate, Nakes, Referral).
+- [ ] Dokumentasikan bukti pengujian pada `walkthrough.md`.
 
 - [x] Audit referensi Admission read-only hingga variasi registrasi, Back Office, Queue, dan Queue Outpatient.
 - [x] Dokumentasikan batas proses rawat jalan, layanan, medical kit, paket, langganan, dan pemakaian langganan.
@@ -69,3 +72,11 @@
 - [ ] Jurnal kesehatan lengkap dengan sumber dan tanggal pemeriksaan referensi.
 - [ ] Kalkulator BMI dan estimasi energi dengan validasi dan batas penggunaan.
 - [ ] Verifikasi dan preview.
+
+### Selesai — pengayaan premium
+- [x] Enam profil brand: visi, misi, model bisnis, rantai layanan.
+- [x] Model manufaktur obat/nutrisi/personal care dan kemitraan.
+- [x] Tujuh artikel utuh, sumber primer, tanggal pemeriksaan referensi.
+- [x] BMI & estimasi energi, validasi, reset, input lokal.
+- [x] Verifikasi kalkulasi, 15 halaman, tautan, aset, dan HTTP preview.
+- [ ] Peninjauan klinis/editorial dan verifikasi fakta korporat sebelum publikasi.

@@ -187,9 +187,17 @@
         <!-- User Profile Card -->
         <div class="sidebar-user-card">
           <div class="sidebar-user-avatar" id="user-avatar">P</div>
-          <div class="sidebar-user-details">
+          <div class="sidebar-user-details" style="flex:1; min-width:0;">
             <h5 id="user-welcome">Ace Darojatun Anwar</h5>
-            <span id="user-role-badge">Pasien Terverifikasi</span>
+            <div style="margin-top:3px; display:flex; align-items:center; gap:4px;">
+              <select id="role-switcher-select" onchange="switchActiveRole(this.value)" style="background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.25); border-radius:6px; padding:4px 6px; font-size:10.5px; font-weight:700; cursor:pointer; width:100%; outline:none; font-family:inherit;">
+                <option value="patient" style="color:#0f172a; background:#ffffff;">👤 Mode Pasien B2C</option>
+                <option value="member" style="color:#0f172a; background:#ffffff;">👑 Mode Member VIP</option>
+                <option value="corporate" style="color:#0f172a; background:#ffffff;">🏢 Mode Corporate B2B</option>
+                <option value="staff" style="color:#0f172a; background:#ffffff;">🩺 Mode Staff Nakes</option>
+                <option value="referral" style="color:#0f172a; background:#ffffff;">🔗 Mode Faskes Referral</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -1381,8 +1389,12 @@
               <h2 style="color: white; margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px;">Selamat Datang di Portal Korporat AVA</h2>
               <p style="color: #cbd5e1; margin: 6px 0 0 0; font-size: 13px;">Kelola pemeriksaan kesehatan (MCU), daftar karyawan, dan invoice perusahaan Anda dengan mudah.</p>
             </div>
-            <div style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; border: 1px solid rgba(255,255,255,0.15);">
-              🔑 HR Portal &bull; Active Contract
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:11px; font-weight:700; color:#cbd5e1;">Akses Sub-Role:</span>
+              <select id="corp-subrole-select" onchange="switchCorpSubRole(this.value)" style="background:rgba(255,255,255,0.15); color:#ffffff; border:1px solid rgba(255,255,255,0.3); border-radius:8px; padding:6px 10px; font-size:11.5px; font-weight:700; cursor:pointer; outline:none; font-family:inherit;">
+                <option value="requestor" style="color:#0f172a; background:#ffffff;">📝 Maker (Order MCU Batch)</option>
+                <option value="approver" style="color:#0f172a; background:#ffffff;">✅ Approver (Approval MCU)</option>
+              </select>
             </div>
           </div>
 

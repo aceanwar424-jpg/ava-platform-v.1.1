@@ -18,6 +18,7 @@
   if (!root.document) return;
   const form = root.document.querySelector('#health-calculator');
   if (!form) return;
+  form.querySelector('button[type="submit"]').disabled = false;
   const result = root.document.querySelector('#calculator-result');
   const message = root.document.querySelector('#calculator-message');
   const clear = () => { result.hidden = true; message.textContent = ''; };

@@ -3623,69 +3623,8 @@ async function handleLogin(event) {
     currentUserProfile = { id: 'mock', full_name: finalUsername };
   }
   
-  const avatarEl = document.getElementById('user-avatar');
-  const welcomeEl = document.getElementById('user-welcome');
-  const roleBadgeEl = document.getElementById('user-role-badge');
-  
-  const isSuperAdmin = (usernameInput === 'admin@avahealth.sbs');
-  const adminRealName = 'Ace Darojatun Anwar';
-
-  renderSidebarMenu();
-
-  if (currentRole === 'corporate') {
-    avatarEl.textContent = 'C';
-    avatarEl.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)';
-    welcomeEl.textContent = isSuperAdmin ? `${adminRealName}` : (finalUsername || 'PT. Sukses Mandiri');
-    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Korporasi' : 'Mitra Korporasi';
-    
-    const cbEl = document.getElementById('c-cashback-balance');
-    if (cbEl) cbEl.textContent = `Rp ${corporateCashback.toLocaleString('id-ID')}`;
-
-    loadCorporateData();   // muat corporate_id, roster, cashback nyata
-    renderInvoices();
-  }
-  else if (currentRole === 'referral') {
-    avatarEl.textContent = 'R';
-    avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)';
-    welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (finalUsername || 'Klinik Medika Pratama');
-    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Referral' : 'Faskes / Dokter Perujuk';
-    
-    const feeEl = document.getElementById('r-fee-balance');
-    if (feeEl) feeEl.textContent = `Rp ${referralWallet.toLocaleString('id-ID')}`;
-
-    renderReferralList();
-  } 
-  else if (currentRole === 'member') {
-    const finalName = isSuperAdmin ? adminRealName : (finalUsername || 'Member');
-    avatarEl.textContent = '👑';
-    avatarEl.style.background = 'linear-gradient(135deg, #d4af37, #b45309)';
-    welcomeEl.textContent = finalName;
-    roleBadgeEl.textContent = 'VIP Gold Sanctuary Member';
-    await loadDataFromSupabase();
-  }
-  else if (currentRole === 'staff') {
-    const finalName = isSuperAdmin ? `Ns. ${adminRealName}` : (finalUsername || 'Petugas');
-    avatarEl.textContent = '🩺';
-    avatarEl.style.background = 'linear-gradient(135deg, #10b981, #0f766e)';
-    welcomeEl.textContent = finalName;
-    roleBadgeEl.textContent = 'Petugas Home Care & Flebotomi';
-    await loadDataFromSupabase();
-  }
-  else {
-    // Default: Patient
-    const finalName = isSuperAdmin ? adminRealName : (finalUsername || 'Budi Santoso');
-    avatarEl.textContent = 'P';
-    avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)';
-    welcomeEl.textContent = finalName;
-    roleBadgeEl.textContent = isSuperAdmin ? 'Super Admin Pasien' : 'Pasien Terverifikasi';
-    
-    const memberNameEl = document.getElementById('p-member-name');
-    if (memberNameEl) memberNameEl.textContent = finalName;
-
-    // Load real database data from Supabase (async)
-    await loadDataFromSupabase();
-    await loadPatientEHR(currentUsername);
-  }
+  localStorage.setItem('AVA_CURRENT_USER_ROLE', finalRole);
+  await applyRoleUIState(finalRole);
   
   // Hide timeline tabs for corporate and referral, only show for patient
   const timelineNav = document.getElementById('timeline-tabs-nav');
@@ -3696,6 +3635,84 @@ async function handleLogin(event) {
   // Always reset timeline phase to Fase 1 on login
   switchTimelinePhase('fase1');
   showScreen('dashboard-screen');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INSTANT ROLE SWITCHER (SUPER ADMIN & MULTI-ROLE SUPPORT)
+// ═══════════════════════════════════════════════════════════════
+
+async function switchActiveRole(newRole) {
+  if (!newRole) return;
+  currentRole = newRole;
+  localStorage.setItem('AVA_CURRENT_USER_ROLE', newRole);
+  await applyRoleUIState(newRole);
+}
+
+function switchCorpSubRole(newSubRole) {
+  currentCorpRole = newSubRole;
+  const selectEl = document.getElementById('corp-subrole-select');
+  if (selectEl) selectEl.value = newSubRole;
+  renderSidebarMenu();
+  alert(`Mode Sub-Role Korporat beralih ke: ${newSubRole === 'requestor' ? '📝 Maker (Order MCU Batch)' : '✅ Approver (Approval MCU)'}`);
+}
+
+async function applyRoleUIState(role) {
+  currentRole = role;
+  const avatarEl = document.getElementById('user-avatar');
+  const welcomeEl = document.getElementById('user-welcome');
+  const selectEl = document.getElementById('role-switcher-select');
+  if (selectEl) selectEl.value = role;
+
+  const isSuperAdmin = (currentUserEmail === 'admin@avahealth.sbs') || (currentUsername === 'Ace Darojatun Anwar') || (currentUsername === 'Master Super Admin');
+  const adminRealName = 'Ace Darojatun Anwar';
+
+  renderSidebarMenu();
+
+  if (role === 'corporate') {
+    if (avatarEl) { avatarEl.textContent = 'C'; avatarEl.style.background = 'linear-gradient(135deg, #f59e0b, #ea580c)'; }
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'PT. Sukses Mandiri');
+    
+    const cbEl = document.getElementById('c-cashback-balance');
+    if (cbEl) cbEl.textContent = `Rp ${corporateCashback.toLocaleString('id-ID')}`;
+
+    await loadCorporateData();
+    renderInvoices();
+    showView('corporate-view', 'Portal Klien Korporat');
+  }
+  else if (role === 'referral') {
+    if (avatarEl) { avatarEl.textContent = 'R'; avatarEl.style.background = 'linear-gradient(135deg, #14b8a6, #0d9488)'; }
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? `Dr. ${adminRealName}` : (currentUsername || 'Klinik Medika Pratama');
+    
+    const feeEl = document.getElementById('r-fee-balance');
+    if (feeEl) feeEl.textContent = `Rp ${referralWallet.toLocaleString('id-ID')}`;
+
+    renderReferralList();
+    showView('referral-view', 'Dokter & Faskes Referral');
+  }
+  else if (role === 'member') {
+    if (avatarEl) { avatarEl.textContent = '👑'; avatarEl.style.background = 'linear-gradient(135deg, #d4af37, #b45309)'; }
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Member VIP');
+    await loadDataFromSupabase();
+    showView('member-sanctuary-view', 'Queen Sanctuary & VIP Member');
+  }
+  else if (role === 'staff') {
+    if (avatarEl) { avatarEl.textContent = '🩺'; avatarEl.style.background = 'linear-gradient(135deg, #10b981, #0f766e)'; }
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? `Ns. ${adminRealName}` : (currentUsername || 'Petugas Home Care');
+    await loadDataFromSupabase();
+    showView('staff-homecare-view', 'Tugas Home Care Nakes');
+  }
+  else {
+    // Default: Patient
+    if (avatarEl) { avatarEl.textContent = 'P'; avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)'; }
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
+    
+    const memberNameEl = document.getElementById('p-member-name');
+    if (memberNameEl) memberNameEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
+
+    await loadDataFromSupabase();
+    await loadPatientEHR(currentUsername || 'Ace Darojatun Anwar');
+    showView('patient-view', 'Dashboard Utama Pasien');
+  }
 }
 
 // Logout

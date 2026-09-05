@@ -1,5 +1,6 @@
 /* OWNED_BY: ava. Public navigation only; no authentication or patient data. */
 (() => {
+  document.documentElement.classList.add('js-ready');
   const toggle = document.querySelector('.menu-toggle');
   const nav = document.querySelector('#navigation');
   const close = () => { toggle.setAttribute('aria-expanded', 'false'); nav.classList.remove('open'); };
