@@ -1,6 +1,6 @@
 {
   "name": "ava-connector",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Jembatan alat lab (ASTM/HL7 TCP) ↔ AVA Supabase. Jalankan di PC LAN lab.",
   "main": "ava-connector.js",
   "scripts": {

@@ -259,7 +259,7 @@ async function saveQCRun(){
 function westgardEvaluate(runs) {
   if(!runs.length) return {label:'BELUM ADA DATA',color:'#64748b',rule:null,detail:'Belum ada data QC'};
   const current=runs[0];
-  const sameSeries=runs.filter(r=>r.qc_level===current.qc_level && r.lot_id===current.lot_id && r.target===current.target && r.sd===current.sd);
+  const sameSeries=runs.filter(r=>r.qc_level===current.qc_level && r.lot_id===current.lot_id && r.lot_number===current.lot_number && r.target===current.target && r.sd===current.sd);
   const z=r=>r.z_score!=null?Number(r.z_score):
     (r.measured!=null && r.target!=null && Number(r.sd)>0?(Number(r.measured)-Number(r.target))/Number(r.sd):NaN);
   const sameRun=current.run_id?runs.filter(r=>r.run_id===current.run_id).map(z):[];

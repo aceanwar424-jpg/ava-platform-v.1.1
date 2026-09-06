@@ -1,5 +1,14 @@
 # AVA Connector — Integrasi Alat Lab (ASTM / HL7)
 
+## Rilis 1.1.0 — 7 September 2026
+
+Paket ZIP dari LIS berisi connector operasional, durable-inbox dan evaluator QC yang sama dengan UI. Pertahankan struktur folder `connector/` dan `modules/lab/` ketika menyalin paket. Tidak ada kunci API dalam paket.
+
+Antrean lengkap disimpan pada `AVA_CONNECTOR_SPOOL` atau folder pengguna `.ava-connector/inbox`, sebelum acknowledgment MLLP. Frame ASTM diperiksa checksum/nomor urut dan dijurnal sebelum ACK. Pesan gagal delapan kali masuk `.dead` agar tidak menahan pesan berikutnya; sesi belum lengkap tersimpan sebagai `.partial` beserta identitas alat. Petugas integrasi perlu merekonsiliasi berkas tersebut terhadap alat sebelum pengiriman ulang. Jangan mengunggah spool ke repositori atau situs publik.
+
+Pengiriman bersifat **at least once**: kegagalan setelah server menyimpan namun sebelum respons diterima masih memerlukan idempotensi endpoint dan rekonsiliasi. Deduplikasi lokal hanya mencakup pesan yang sedang antre. Belum ada klaim exactly-once. Lindungi disk workstation dengan kontrol akses dan enkripsi yang berlaku di fasilitas. Uji perangkat nyata, putus sambungan, restart serta penerimaan QC wajib dilakukan di staging sebelum penggunaan rutin.
+
+
 Jembatan antara **alat lab** (yang bicara TCP mentah di jaringan lokal) dan
 **AVA/Supabase** (cloud, HTTPS). Alat lab tak bisa mengirim langsung ke cloud —
 connector inilah perantaranya.
@@ -18,7 +27,7 @@ Alat Lab ──TCP(ASTM/HL7)──► AVA Connector (PC di lab) ──HTTPS─�
 
 ## Setup (sekali)
 1. Salin folder `connector/` ini ke PC lab.
-2. Salin `config.example.json` → `config.json`, isi `supabase_key` (anon key dari AVA).
+2. Salin `config.example.json` → `config.json`, isi URL proyek dan kredensial connector yang telah dikonfigurasi administrator untuk endpoint tujuan. Jangan memasukkan kunci ke repositori atau arsip distribusi. Verifikasi hak endpoint pada staging; kunci kosong tidak dapat digunakan.
 3. Jalankan:
    ```
    cd connector

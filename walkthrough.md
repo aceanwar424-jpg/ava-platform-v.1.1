@@ -559,3 +559,13 @@ Batas: tidak menerapkan migrasi ke produksi. Pemetaan tenant admisi historis per
 - `node scripts/verify-lis-his-sync.cjs`: PASS PostgreSQL (tenant/RBAC/katalog/retry/panel/konflik/billing) dan PASS frontend (payload klinis/retry/ack barcode/tanpa harga).
 - Audit ini menambah dokumentasi dan fixture lokal. Tidak mengubah kode klinis, master data, DB produksi atau mengaktifkan migrasi. SQL arsip, helper tanpa pemanggil dan simulator ditandai terpisah dari jalur runtime utama.
 - Belum diverifikasi: seluruh UI dengan login/peran di staging, viewport lintas perangkat, RLS/RPC produksi yang terpasang, perangkat analyzer nyata dan distribusi hasil nyata.
+
+## Implementasi kandidat rilis LIS — 2026-09-07
+
+- Catatan perubahan, saran akhir dan urutan aktivasi: `docs/LIS-RELEASE-1.1.0-RC1.md`.
+- `verify-lis-integrity.cjs` lulus setelah migrasi 0052 dijalankan dua kali pada PGlite sintetis; pemeriksaan RLS sebagai authenticated tidak melihat tenant lain.
+- `verify-lis-connector.cjs` lulus; `verify-lis-his-sync.cjs` lulus; sintaks 24 modul LIS lulus; pemeriksaan statis deployment lulus.
+- Browser fixture memakai modul aktual tanpa API produksi: kondisi nol, error dan data sintetis diverifikasi; filter 7 hari bertahan. Lebar desktop 1275 dan iframe 733 masing-masing memiliki scrollWidth=clientWidth. Screenshot layout diperiksa melalui CUA.
+- Fixture dipindahkan ke `scripts/fixtures/lis-release-check.html` sesudah pengujian, sehingga bukan halaman publik rilis. Untuk mengulang, salin sementara ke root static ava-platform dan hapus salinan setelah uji.
+- ZIP connector dibangun dari kode operasional + evaluator QC + contoh konfigurasi kosong; tidak menyertakan config.json/kunci/spool. Dibangkitkan dengan `scripts/build-lis-connector.cjs`.
+- Remote repo/cabang main teridentifikasi. Belum tersedia project link Vercel atau kredensial migrasi Supabase; informasi diminta dari pengguna. Tidak menjalankan DB produksi atau mengklaim deployment selesai.

@@ -665,19 +665,19 @@ window.PETA_MENU = {
             },
             {
               "id": "lab-validation",
-              "label": "Tinjauan Dokter Sp.PK",
+              "label": "Verifikasi Teknis",
               "status": "ada",
-              "ket": "Expert clinical impression & otorisasi medis Sp.PK"
+              "ket": "Peninjauan hasil oleh analis sebelum otorisasi dokter"
             },
             {
               "id": "lab-approval",
-              "label": "Validasi & Rilis Hasil",
+              "label": "Otorisasi & Rilis",
               "status": "ada",
-              "ket": "Tanda tangan kriptografis QR & rilis hasil resmi"
+              "ket": "Otorisasi dokter dan rilis hasil dengan jejak transaksi"
             },
             {
               "id": "lab-tat",
-              "label": "Waktu Layanan (TAT)",
+              "label": "Kinerja & TAT",
               "status": "ada",
               "ket": "Turnaround time pra-analitik, analitik, dan pasca-analitik"
             }
@@ -694,9 +694,9 @@ window.PETA_MENU = {
             },
             {
               "id": "lis-lot-verification",
-              "label": "Verifikasi Lot Reagen",
+              "label": "Lot Kontrol",
               "status": "ada",
-              "ket": "Evaluasi bias lot-to-lot & uji paralel kontrol"
+              "ket": "Pencatatan dan evaluasi lot bahan kontrol QC"
             },
             {
               "id": "lis-pme",

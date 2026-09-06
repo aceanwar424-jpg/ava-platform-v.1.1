@@ -33,7 +33,7 @@ async function main(){
  CREATE TABLE user_profiles(id uuid,tenant_id uuid,role text);
  CREATE FUNCTION lis_his_actor() RETURNS uuid LANGUAGE sql AS $$SELECT tenant_id FROM user_profiles WHERE id=auth.uid()$$;
  CREATE TABLE admissions(id bigint PRIMARY KEY,tenant_id uuid,mr_number text,patient_id bigint);
- CREATE TABLE lab_results(id bigint PRIMARY KEY,admission_id bigint,sample_id bigint,product_id bigint,product_item_id bigint,patient_name text,product_name text,result_value text,result_numeric numeric,unit text,status text,is_critical boolean,critical_low numeric,critical_high numeric,critical_ack_at timestamptz,critical_ack_by text,critical_ack_note text,critical_notified_at timestamptz,critical_notified_by text,validated_by text,validated_at timestamptz,approved_by text,approved_at timestamptz,released_by text,released_at timestamptz,created_at timestamptz DEFAULT now(),updated_at timestamptz);
+ CREATE TABLE lab_results(id bigint PRIMARY KEY,admission_id bigint,sample_id bigint,product_id bigint,product_item_id bigint,patient_name text,product_name text,result_value text,notes text,result_numeric numeric,unit text,status text,is_critical boolean,critical_low numeric,critical_high numeric,critical_ack_at timestamptz,critical_ack_by text,critical_ack_note text,critical_notified_at timestamptz,critical_notified_by text,validated_by text,validated_at timestamptz,approved_by text,approved_at timestamptz,released_by text,released_at timestamptz,created_at timestamptz DEFAULT now(),updated_at timestamptz);
  CREATE TABLE critical_value_notifications(id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,result_id bigint,sample_id bigint,admission_id bigint,patient_name text,test_name text,result_value text,unit text,notified_by text,notified_to text,notified_role text,method text,notified_at timestamptz,readback boolean,response text,attempt_status text,notes text,updated_at timestamptz);
  INSERT INTO user_profiles VALUES('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa','11111111-1111-4111-8111-111111111111','lab_analyst');
  SELECT set_config('test.uid','aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',false);
@@ -62,10 +62,16 @@ async function main(){
  await assert.rejects(()=>db.query("SELECT mark_autoverified(1,'test')"),/ditahan/);
  await db.exec("INSERT INTO lab_results(id,admission_id,product_id,result_value,status,is_critical) VALUES(5,1,5,'99','Draft',true)");
  await assert.rejects(()=>transition('validate',[{id:5,updated_at:null}]),/kritis/);
+ await db.exec("UPDATE lab_results SET is_critical=false,critical_high=80 WHERE id=5");
+ await assert.rejects(()=>transition('validate',[{id:5,updated_at:null}]),/kritis/);
  await assert.rejects(()=>db.query('SELECT lis_record_critical(5,$1::jsonb)',[JSON.stringify({notified_to:'SYNTHETIC',attempt_status:'Berhasil',readback:false})]),/Read-back/);
  await db.query('SELECT lis_record_critical(5,$1::jsonb)',[JSON.stringify({notified_to:'SYNTHETIC',attempt_status:'Berhasil',readback:true})]);
  assert((await db.query('SELECT critical_ack_at FROM lab_results WHERE id=5')).rows[0].critical_ack_at);
  assert.equal((await db.query('SELECT count(*)::int AS n FROM lis_result_events')).rows[0].n,3);
+ await db.exec('GRANT SELECT ON lab_results,admissions,user_profiles,critical_value_notifications TO authenticated; GRANT USAGE ON SCHEMA auth TO authenticated; SET ROLE authenticated;');
+ const visible=(await db.query('SELECT id FROM lab_results ORDER BY id')).rows.map(r=>r.id);
+ assert.deepEqual(visible,[1,2,4,5]);
+ await db.exec('RESET ROLE;');
  await db.close();
  console.log('PASS LIS integrity: truthful TAT, panel/tube mapping, QC consistency, failed-release handling, history identity, simulator rejection, transactional tenant/role/version/critical/final-result guards and migration repeatability.');
 }

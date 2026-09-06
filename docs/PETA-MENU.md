@@ -211,16 +211,16 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Pelaporan Nilai Kritis | `lis-critical-value` | Pencatatan eskalasi nilai kritis SLA < 15 menit & TBaK |
-| 🟢 | Tinjauan Dokter Sp.PK | `lab-validation` | Expert clinical impression & otorisasi medis Sp.PK |
-| 🟢 | Validasi & Rilis Hasil | `lab-approval` | Tanda tangan kriptografis QR & rilis hasil resmi |
-| 🟢 | Waktu Layanan (TAT) | `lab-tat` | Turnaround time pra-analitik, analitik, dan pasca-analitik |
+| 🟢 | Verifikasi Teknis | `lab-validation` | Peninjauan hasil oleh analis sebelum otorisasi dokter |
+| 🟢 | Otorisasi & Rilis | `lab-approval` | Otorisasi dokter dan rilis hasil dengan jejak transaksi |
+| 🟢 | Kinerja & TAT | `lab-tat` | Turnaround time pra-analitik, analitik, dan pasca-analitik |
 
 **Mutu Laboratorium**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Kendali Mutu Harian (QC) | `lab-qc` | Plot Levey-Jennings, evaluasi 6 multi-rules Westgard & Six Sigma |
-| 🟢 | Verifikasi Lot Reagen | `lis-lot-verification` | Evaluasi bias lot-to-lot & uji paralel kontrol |
+| 🟢 | Lot Kontrol | `lis-lot-verification` | Pencatatan dan evaluasi lot bahan kontrol QC |
 | 🟢 | Uji Profisiensi (PME) | `lis-pme` | Kalkulasi Z-Score uji profisiensi eksternal ISO 15189 |
 
 **Riwayat & Arsip**

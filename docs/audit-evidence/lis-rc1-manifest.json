@@ -1,0 +1,159 @@
+{
+  "version": "1.1.0-rc.1",
+  "date": "2026-09-07",
+  "status": "local-tested-production-not-activated",
+  "hashFormat": "SHA256; UTF-8 text normalized to LF; ZIP bytes unchanged",
+  "tests": [
+    "verify-lis-integrity.cjs",
+    "verify-lis-his-sync.cjs",
+    "verify-lis-connector.cjs",
+    "verify-deploy-readiness.js"
+  ],
+  "activationPrerequisites": [
+    "confirmed deployment project",
+    "staging migrations and historical tenant mapping",
+    "clinical role/SOP and instrument acceptance"
+  ],
+  "files": [
+    {
+      "file": "ava-platform/connector/ava-connector.js",
+      "sha256": "f589606174727c252dfc9bfa37683b04476027b89a17f672476b0ac8df7991be"
+    },
+    {
+      "file": "ava-platform/connector/config.example.json",
+      "sha256": "9670a36f3d889c6720d727e88159188295fc11a48d9ca90382c83b1d317e76b5"
+    },
+    {
+      "file": "ava-platform/connector/durable-inbox.js",
+      "sha256": "67e0e6e4adf9248a1fae12958aa0fc49b345441c1f0f125f92b25c310ad416b3"
+    },
+    {
+      "file": "ava-platform/connector/package.json",
+      "sha256": "4fe5d3f062136424b1ec280143cdd9b8a5ec2095ccc80109a621c4f63f56471b"
+    },
+    {
+      "file": "ava-platform/downloads/ava-lis-connector-1.1.0.zip",
+      "sha256": "80413dcb76e8250c58d3db4d9b1520ea80d0492846c3a896868bac28b3231bf4"
+    },
+    {
+      "file": "ava-platform/index.html",
+      "sha256": "417180b2ee0f5ec62b238e5bc8c287377c87302412b84dd2cfb340a292c345ea"
+    },
+    {
+      "file": "ava-platform/js/core/lazy.js",
+      "sha256": "943392a5d6bc59203f708085c80c1fdd734e83efc71b01a70703aa08b74ddbf3"
+    },
+    {
+      "file": "ava-platform/js/core/peta-menu.js",
+      "sha256": "9984f4fed3efda02129ac973fae1b8719eeccd5b6bda5d6ea3ab8c9bb95bf614"
+    },
+    {
+      "file": "ava-platform/modules/lab/admission.js",
+      "sha256": "3337089ad3ee6dfaa871359f758339aa46edf22d17dbc6350d60710cf96ecd05"
+    },
+    {
+      "file": "ava-platform/modules/lab/analyzerInterfacing.js",
+      "sha256": "a0447d91d9306e647b840f0452f516400d059b1230be2d9f3b1cb874bc689a18"
+    },
+    {
+      "file": "ava-platform/modules/lab/autoverify.js",
+      "sha256": "862ab625d3e0f6f8a39c0dd2867bcbd5fe54d9098abd318ff8f3515e29757951"
+    },
+    {
+      "file": "ava-platform/modules/lab/checkin.js",
+      "sha256": "1b33a9d8f853c6881dc72331fb208e027e18a912488fd989b7b62de7096482fc"
+    },
+    {
+      "file": "ava-platform/modules/lab/criticalValue.js",
+      "sha256": "e6a7fd7490b72e019f66557ab960df1ea735c4ae5d91724b0ecf19917a1cec97"
+    },
+    {
+      "file": "ava-platform/modules/lab/helpdesk.js",
+      "sha256": "15d8021fee7086172ba16bc5b9910245d257aaee14edcea105d5d2fd003e0162"
+    },
+    {
+      "file": "ava-platform/modules/lab/impression.js",
+      "sha256": "25bf2d773fe5baf921a4835723949bbea81a58384dc1d1e42e7fa79e9f16361a"
+    },
+    {
+      "file": "ava-platform/modules/lab/index.js",
+      "sha256": "4924d7380c4988046080eca3e2cf52246d5fb4aadf159bb7f1649647e1d051fd"
+    },
+    {
+      "file": "ava-platform/modules/lab/integration.js",
+      "sha256": "df037e340d81ef44722d14ca8047f2d65e04c89739dc3077d9b0d80ed88fff41"
+    },
+    {
+      "file": "ava-platform/modules/lab/lotVerification.js",
+      "sha256": "441b106ea9e83dd53e8b4d64c5aa0684031bf7425d924438ffe4b1c1fa48d2a4"
+    },
+    {
+      "file": "ava-platform/modules/lab/parser_config.js",
+      "sha256": "673eca50601933d0065a98648ace8de0bb30c929c37667abeae014363fdf3296"
+    },
+    {
+      "file": "ava-platform/modules/lab/phlebotomy.js",
+      "sha256": "bd979fca41f5487977258336cd9c4fbc6d4567598a7d9fca702488ae939d34a7"
+    },
+    {
+      "file": "ava-platform/modules/lab/pmeProficiency.js",
+      "sha256": "ddf828e1cfbca16c59be87bd41385d9780dbec92025df049601f09eb8daba5f4"
+    },
+    {
+      "file": "ava-platform/modules/lab/qc.js",
+      "sha256": "6719d2c2fe3ae5c44947b70a710db9acbc4141dfbf24e0f33832493c86e1a3b7"
+    },
+    {
+      "file": "ava-platform/modules/lab/qcEngine.js",
+      "sha256": "8184c922ef7963f28c7d1c41827bb493365027700440d10e9f2f8442a891bf8d"
+    },
+    {
+      "file": "ava-platform/modules/lab/referral.js",
+      "sha256": "4c61442cd0b25191fe7609439f49d47b1889c7228ecbad3ce34d733c44c0447c"
+    },
+    {
+      "file": "ava-platform/modules/lab/report.js",
+      "sha256": "8e4d6b139f8d505c7fbdc968feb2272885cdfa321a82a223d940f93a5d13db33"
+    },
+    {
+      "file": "ava-platform/modules/lab/results.js",
+      "sha256": "536e016b6b0f72b09fd8d858a0e8ece3902c4d0e22cdf1e6d03d9dce04299b13"
+    },
+    {
+      "file": "ava-platform/modules/lab/sampleArchiving.js",
+      "sha256": "d8f6565b9139889f7e6e5e6d348f418a320d5c5a88d367f7ff28b026536baeb1"
+    },
+    {
+      "file": "ava-platform/modules/lab/settings.js",
+      "sha256": "c668a122e7a5c36b5a73c32ee2875bb7435bac8cb2d9c7e18351dc9f7dbd3987"
+    },
+    {
+      "file": "ava-platform/modules/lab/specimenVerification.js",
+      "sha256": "95d178da403573fe87a5aa8fd602695d2e50e6d012b3b1c4d839ee1d74a067fa"
+    },
+    {
+      "file": "ava-platform/modules/lab/tat.js",
+      "sha256": "fc624d2ac74a31ffa19230c8e0e7c8b7085ff814ae5f95b26b5d9a2bfddf9bda"
+    },
+    {
+      "file": "ava-platform/modules/lab/validation.js",
+      "sha256": "3b6229f081023a8d59989b58aa6d34be23453302001d793072cd3385e93c1129"
+    },
+    {
+      "file": "ava-platform/modules/lab/worklist.js",
+      "sha256": "77ed2f5f428e6b1abf66c16dda70ea6a26c323bd19b23120e30401e10cbcb6c6"
+    },
+    {
+      "file": "config/menu.json",
+      "sha256": "3d698d476c0816852eb8ee687f41b2ea54cf8a77bc763ec0960a932eaacf4714"
+    },
+    {
+      "file": "db/migrations/0051_lis_his_service_sync.sql",
+      "sha256": "7016febf5045095a04eb613044dd176e19f6c9ce27573ba0c0599fa726cc0dda"
+    },
+    {
+      "file": "db/migrations/0052_lis_result_integrity.sql",
+      "sha256": "54ec4dac06cb27f2f0bea4e1bafe3931dea7e70d56df956f791cdf086aa6ee54"
+    }
+  ]
+}

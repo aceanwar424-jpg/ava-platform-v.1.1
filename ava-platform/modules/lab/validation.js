@@ -228,7 +228,7 @@ async function selectValidationPatient(admId, mode='validate'){
             ${held?`<span style="font-size:9px;font-weight:700;color:var(--warn-deep);background:var(--warn-soft);padding:1px 6px;border-radius:10px;margin-left:6px">${kosong?'menunggu hasil':'kritis belum dilapor'} · tertahan</span>`:''}</td>
           <td style="padding:5px 8px;font-weight:800;color:${col};cursor:pointer" onclick="selectValResult(${r.id},'${mode}')">${r.result_value||'—'}</td>
           <td style="padding:5px 4px;text-align:center">${crit?'<span style="color:var(--danger-strong);font-weight:800;font-size:10px">KRITIS </span>':''}${flag?`<span style="color:${flag==='H'?'#EF4444':'#0EA5E9'};font-weight:800">${flag}</span>`:''}</td>
-          <td style="padding:5px 8px;color:var(--gray)">${r.unit||''}</td>
+          <td style="padding:5px 8px;color:var(--gray)">${labEscape(r.unit||'')}</td>
           <td style="padding:5px 8px;color:var(--gray);font-size:11px">${r.normal_min!=null?`${r.normal_min}–${r.normal_max}`:r.interpretation||'—'}</td>
         </tr>`;
       }).join('') : `<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--gray)">Tidak ada hasil untuk pasien ini</td></tr>`}
@@ -306,7 +306,7 @@ function selectValResult(rid, mode='validate'){
     <div style="font-size:12.5px;font-weight:800;color:var(--navy)">${r.item_name||r.product_name||''}</div>
     <div style="font-size:10.5px;color:var(--gray);margin-bottom:8px">${r.product_name||''}${r.loinc_code?' · LOINC '+r.loinc_code:''}${r.host_code?' · Host '+r.host_code:''}</div>
     <div style="background:#EAF5F3;border-radius:8px;padding:8px;margin-bottom:8px;font-size:11px">
-      <div><strong>Hasil:</strong> ${r.result_value||'—'} ${r.unit||''}</div>
+      <div><strong>Hasil:</strong> ${r.result_value||'—'} ${labEscape(r.unit||'')}</div>
       <div><strong>Interpretasi:</strong> <span style="color:${labColor(r.color_code)};font-weight:700">${r.interpretation||'—'}</span></div>
       ${r.normal_min!=null?`<div><strong>Rujukan:</strong> ${r.normal_min}–${r.normal_max}</div>`:''}
       ${isCriticalResult(r)?`<div><strong style="color:var(--danger-strong)">NILAI KRITIS</strong></div>`:''}
@@ -345,7 +345,7 @@ async function lisTransitionBatch(action, admissionId=null) {
     for(const r of rows){const list=groups.get(r.admission_id)||[];list.push(r);groups.set(r.admission_id,list);}
     for(const [id,group] of groups){
       try {
-        const result=await sbRpc('lis_transition_results',{p_action:action,p_rows:group.map(r=>({id:r.id,updated_at:r.updated_at??null}))});
+        const result=await sbRpc('lis_transition_results',{p_action:action,p_rows:group.map(r=>({id:r.id,updated_at:r.updated_at??null,notes:_valNotes[r.id]??r.notes??null}))});
         if(!result?.ok || result.count!==group.length) throw new Error('Konfirmasi transaksi tidak sesuai');
         ok+=result.count;
       } catch(e) { failed+=group.length; toast('Kunjungan '+id+': '+e.message,'err'); }
@@ -367,7 +367,7 @@ function printPatientResults(admId, mode){
   const rows=labResults.filter(r=>r.admission_id==admId && r.result_value && statusSet.includes(r.status));
   if(!rows.length){ toast('Tidak ada hasil untuk dicetak','warn'); return; }
   const p=rows[0]||{};
-  if(typeof printLabReport==='function') printLabReport(p.patient_name, p.visit_number, rows);
+  if(typeof printLabReport==='function') printLabReport(p.patient_name, p.visit_number, mode==='approve'?undefined:rows);
   else toast('Fungsi cetak tidak tersedia','err');
 }
 

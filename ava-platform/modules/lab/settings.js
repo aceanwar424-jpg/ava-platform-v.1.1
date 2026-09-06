@@ -21,16 +21,7 @@ const LIS_DEFAULT_SETTINGS = {
   satusehat_active: true
 };
 
-const DEFAULT_CRITICAL_PARAMETERS = [
-  { id: 1, code: 'GLU', name: 'Glukosa Darah Sewaktu/Puasa', low: 45, high: 450, unit: 'mg/dL', alert: 'Hipoglikemia Akut / Koma KAD', action: 'Lapor DPJP via TBaK <15m' },
-  { id: 2, code: 'K', name: 'Kalium Serum (K+)', low: 2.8, high: 6.2, unit: 'mmol/L', alert: 'Aritmia Jantung Fatal', action: 'Lapor DPJP via TBaK <15m' },
-  { id: 3, code: 'NA', name: 'Natrium Serum (Na+)', low: 120, high: 160, unit: 'mmol/L', alert: 'Edema Serebral / Dehidrasi Berat', action: 'Lapor DPJP <15m' },
-  { id: 4, code: 'HGB', name: 'Hemoglobin (Hb)', low: 7.0, high: 20.0, unit: 'g/dL', alert: 'Anemia Gravis / Polisitemia', action: 'Konfirmasi Transfusi Darah' },
-  { id: 5, code: 'PLT', name: 'Trombosit (Platelet)', low: 20000, high: 1000000, unit: '/uL', alert: 'Risiko Perdarahan Spontan / DIC', action: 'Lapor DPJP <15m' },
-  { id: 6, code: 'WBC', name: 'Leukosit', low: 2000, high: 30000, unit: '/uL', alert: 'Leukopenia Berat / Leukemoid', action: 'Lapor DPJP <15m' },
-  { id: 7, code: 'CA', name: 'Kalsium Ion / Total', low: 6.5, high: 13.0, unit: 'mg/dL', alert: 'Tetani / Krisis Hiperkalsemia', action: 'Lapor DPJP <15m' },
-  { id: 8, code: 'TROP', name: 'Troponin I Kuantitatif', low: null, high: 0.04, unit: 'ng/mL', alert: 'Sindrom Koroner Akut (STEMI)', action: 'Hubungi Dokter Jaga IGD/ICU Segera' }
-];
+const DEFAULT_CRITICAL_PARAMETERS = []; // Acuan klinis berasal dari master server.
 
 function getLisSettings() {
   try {
@@ -41,24 +32,14 @@ function getLisSettings() {
   }
 }
 
-function getCriticalParameters() {
-  try {
-    const saved = localStorage.getItem('AVA_LIS_CRITICAL_PARAMS');
-    return saved ? JSON.parse(saved) : DEFAULT_CRITICAL_PARAMETERS;
-  } catch (e) {
-    return DEFAULT_CRITICAL_PARAMETERS;
-  }
-}
-
-function saveCriticalParameters(params) {
-  localStorage.setItem('AVA_LIS_CRITICAL_PARAMS', JSON.stringify(params));
-}
+function getCriticalParameters(){return [];}
+function saveCriticalParameters(){toast('Kelola acuan klinis pada menu Nilai Rujukan.','warn');}
 
 function saveLisSettings(data) {
   const current = getLisSettings();
   const updated = { ...current, ...data };
   localStorage.setItem('AVA_LIS_SETTINGS', JSON.stringify(updated));
-  if (typeof toast === 'function') toast('✓ Pengaturan Laboratorium berhasil disimpan', 'ok');
+  if (typeof toast === 'function') toast('Preferensi workstation tersimpan pada browser ini', 'ok');
   renderLisSettings();
 }
 
@@ -80,7 +61,7 @@ async function renderLisSettings() {
             Pengaturan Laboratorium &amp; LIS Master Config
           </h1>
           <p style="font-size:13px; color:var(--text3); margin:0;">
-            Konfigurasi profil faskes, dr. Sp.PK, ambang nilai kritis per analit, katalog tes, dan connector alat server :9999.
+            Preferensi tampilan pada browser ini. Nilai rujukan dan batas kritis dikelola melalui master server; identitas otorisator mengikuti akun petugas.
           </p>
         </div>
 
@@ -103,7 +84,7 @@ async function renderLisSettings() {
           🔌 Alat &amp; Connector (:9999)
         </button>
         <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'catalog' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'catalog' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('catalog')">
-          🧪 Master Katalog Tes (530+)
+          🧪 Katalog Pemeriksaan
         </button>
         <button class="btn btn-ghost" style="border-radius:8px 8px 0 0; font-weight:750; font-size:13px; padding:10px 18px; border-bottom:3px solid ${_lisActiveSettingsTab === 'pdf' ? '#10B981' : 'transparent'}; color:${_lisActiveSettingsTab === 'pdf' ? 'var(--text)' : 'var(--text3)'};" onclick="switchLisSettingsTab('pdf')">
           📄 Format Lembar Hasil PDF
@@ -119,6 +100,7 @@ async function renderLisSettings() {
 }
 
 function switchLisSettingsTab(tab) {
+  if(tab==='critical'){navigate('refrange');return;}
   _lisActiveSettingsTab = tab;
   renderLisSettings();
 }
@@ -193,7 +175,7 @@ function renderLisSettingsTabContent(tab, cfg) {
             <div class="form-group">
               <label style="font-size:12px; font-weight:750; color:var(--text2);">SLA Maksimal Pelaporan Nilai Kritis ke DPJP (Menit)</label>
               <input type="number" id="cfg-critical-sla" value="${cfg.critical_alert_sla}" style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px;">
-              <span style="font-size:11px; color:var(--text3);">Standar ISO 15189 / KARS: maksimal &le; 15 menit dengan metode TBaK (Tulis, Baca, Konfirmasi).</span>
+              <span style="font-size:11px; color:var(--text3);">Target waktu ditetapkan dalam SOP lab yang disahkan.</span>
             </div>
 
             <div class="form-group">
@@ -514,113 +496,11 @@ async function testConnectorSocket() {
   }
 }
 
-function downloadConnectorZip() {
-  const serverCode = `// ══════════════════════════════════════════════════════════════════
-// AVA LAB ANALYZER CONNECTOR DAEMON (Port :9999)
-// Protokol ASTM E1381 / E1394 & HL7 v2
-// ══════════════════════════════════════════════════════════════════
-
-const http = require('http');
-const net = require('net');
-
-const HTTP_PORT = 9999;
-const TCP_PORT = 9998;
-
-console.log('👑 [AVA Lab Connector] Starting Service on Port ' + HTTP_PORT + '...');
-
-const server = http.createServer((req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-    res.writeHead(200);
-    return res.end();
-  }
-
-  if (req.url === '/api/status') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    return res.end(JSON.stringify({
-      status: 'ONLINE',
-      port: HTTP_PORT,
-      astm_socket: TCP_PORT,
-      drivers_active: 3,
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString()
-    }));
-  }
-
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end('<h1>AVA Lab Analyzer Connector</h1><p>Status: ACTIVE (Port :9999)</p>');
-});
-
-server.listen(HTTP_PORT, '0.0.0.0', () => {
-  console.log('✓ HTTP Server Ready at http://127.0.0.1:' + HTTP_PORT);
-});
-
-const tcpServer = net.createServer((socket) => {
-  console.log('🔌 Mesin Analyzer Terhubung dari:', socket.remoteAddress);
-  socket.on('data', (data) => {
-    console.log('[ASTM RAW]', data.toString('utf-8'));
-    socket.write(Buffer.from([0x06]));
-  });
-});
-
-tcpServer.listen(TCP_PORT, '0.0.0.0', () => {
-  console.log('✓ ASTM TCP Socket Ready on Port ' + TCP_PORT);
-});
-`;
-
-  const batCode = `@echo off
-title AVA Lab Analyzer Connector (:9999)
-color 0A
-echo ========================================================
-echo   👑 AVA LAB ANALYZER CONNECTOR DAEMON v2.5
-echo   ASTM E1381 / E1394 & HL7 Bi-directional Server
-echo ========================================================
-echo.
-node -v >nul 2>&1
-if %errorlevel% neq 0 (
-  echo [ERROR] Node.js belum terpasang di komputer ini.
-  echo Silakan unduh dan pasang Node.js dari https://nodejs.org
-  pause
-  exit /b
-)
-
-echo [OK] Menjalankan AVA Lab Connector pada Port 9999...
-node connector-server.js
-pause
-`;
-
-  const readmeCode = `# AVA LAB ANALYZER CONNECTOR DAEMON
-
-Layanan penghubung bi-directional antara mesin otomatis lab (Sysmex, Mindray, Cobas) dengan AVA LIS Cloud.
-
-## Cara Menggunakan:
-1. Pastikan Node.js sudah terpasang di komputer (https://nodejs.org).
-2. Klik ganda pada start-connector.bat.
-3. Buka LIS di browser: https://lis.avahealth.sbs
-4. Indikator "ASTM :9999 LIVE" akan otomatis menyala hijau.
-`;
-
-  const createDownload = (filename, content, mime = 'text/plain') => {
-    const blob = new Blob([content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  createDownload('start-connector.bat', batCode, 'application/x-bat');
-  setTimeout(() => createDownload('connector-server.js', serverCode, 'application/javascript'), 300);
-  setTimeout(() => createDownload('README.txt', readmeCode, 'text/plain'), 600);
-
-  if (typeof toast === 'function') toast('✓ Berkas paket Connector berhasil diunduh (start-connector.bat, connector-server.js, README)', 'ok');
+function downloadConnectorZip(){
+  const a=document.createElement('a');a.href='/downloads/ava-lis-connector-1.1.0.zip';a.download='ava-lis-connector-1.1.0.zip';
+  document.body.appendChild(a);a.click();a.remove();
 }
+
 
 window.renderLisSettings = renderLisSettings;
 window.getLisSettings = getLisSettings;

@@ -23,6 +23,9 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
+const {DurableInbox}=require('./durable-inbox');
+const {evaluateWestgardZ}=require('../modules/lab/qcEngine');
 
 // Alamat IPv4 LAN PC ini (untuk diisi di master Alat AVA GLOBAL ECOSYSTEM, mode server).
 function localIPs() {
@@ -39,11 +42,11 @@ function localIPs() {
 // ── Konfigurasi koneksi Supabase ──────────────────────────────────────
 let CFG = {};
 try { CFG = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')); } catch (_) {}
-const SUPABASE_URL = process.env.SUPABASE_URL || CFG.supabase_url || 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const SUPABASE_URL = process.env.SUPABASE_URL || CFG.supabase_url || '';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || CFG.supabase_key || '';
 const REFRESH_MS   = (CFG.refresh_seconds || 60) * 1000;
 const STATUS_PORT  = CFG.status_port || 9999;
-if (!SUPABASE_KEY) { console.error('❌ SUPABASE_KEY belum diset (env atau config.json). Berhenti.'); process.exit(1); }
+if (require.main === module && (!SUPABASE_KEY || !SUPABASE_URL)) { console.error('SUPABASE_URL dan SUPABASE_KEY wajib dikonfigurasi pada workstation.'); process.exit(1); }
 
 const HDR = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 async function rpc(fn, args) {
@@ -75,6 +78,8 @@ function pushRawStream(deviceName, direction, protocol, raw) {
 const ENQ = 0x05, ACK = 0x06, NAK = 0x15, STX = 0x02, ETX = 0x03, ETB = 0x17, EOT = 0x04, CR = 0x0D, LF = 0x0A;
 const VT = 0x0B, FS = 0x1C; // HL7 MLLP
 
+let inbox;
+function getInbox(){return inbox ||= new DurableInbox(process.env.AVA_CONNECTOR_SPOOL || CFG.spool_dir || path.join(os.homedir(),'.ava-connector','inbox'));}
 const INGEST_QUEUE = [];
 let isProcessingQueue = false;
 
@@ -85,7 +90,8 @@ async function processQueue() {
   while (INGEST_QUEUE.length > 0) {
     const item = INGEST_QUEUE[0];
     try {
-      const res = await rpc('analyzer_ingest', {
+      const qc=item.protocol==='ASTM'?pisahkanQcAstm(item.raw):[];
+      const res = qc.length ? await kirimQc(item.analyzer,qc) : await rpc('analyzer_ingest', {
         p: {
           analyzer_code: item.analyzer.code,
           analyzer_id: item.analyzer.id,
@@ -103,7 +109,8 @@ async function processQueue() {
         d.lastError = null;
         d.lastErrorAt = null;
       }
-      INGEST_QUEUE.shift(); // remove from queue on success
+      getInbox().complete(item.id);
+      INGEST_QUEUE.shift(); // durable delivery acknowledged
     } catch (e) {
       item.attempts = (item.attempts || 0) + 1;
       log(`  ⚠ [QUEUE] ingest gagal (${item.analyzer.name}) (ke-${item.attempts}): ${e.message}`);
@@ -112,6 +119,8 @@ async function processQueue() {
         d.lastError = `ingest gagal (ke-${item.attempts}): ${e.message}`;
         d.lastErrorAt = new Date();
       }
+      if(item.attempts>=8){getInbox().quarantine(item);INGEST_QUEUE.shift();log('Message quarantined for reconciliation: '+item.id);continue;}
+      getInbox().retry(item);
       // Wait with backoff before retry (max 10s)
       const delay = Math.min(1000 * Math.pow(2, item.attempts - 1), 10000);
       await new Promise(resolve => setTimeout(resolve, delay));
@@ -124,7 +133,8 @@ async function processQueue() {
 function ingest(analyzer, protocol, raw, direction) {
   const dir = direction || 'IN';
   pushRawStream(analyzer.name, dir, protocol, raw);
-  INGEST_QUEUE.push({ analyzer, protocol, raw, direction: dir, attempts: 0 });
+  const id=getInbox().enqueue({analyzer,protocol,raw,direction:dir});
+  if(!INGEST_QUEUE.some(x=>x.id===id)) INGEST_QUEUE.push(getInbox().pending().find(x=>x.id===id));
   processQueue();
 }
 
@@ -133,6 +143,7 @@ function ingest(analyzer, protocol, raw, direction) {
 // ══════════════════════════════════════════════════════════════════════
 function attachHandler(socket, analyzer) {
   let buf = Buffer.alloc(0);
+  let session=crypto.randomUUID(), expectedFrame=1, lastFrame=null;
   let astm = [];          // kumpulan teks frame ASTM dalam satu sesi (STX..EOT)
   const proto = (analyzer.protocol || '').toUpperCase();
 
@@ -158,26 +169,25 @@ function attachHandler(socket, analyzer) {
         const start = buf.indexOf(VT);
         if (start < 0) { buf = Buffer.alloc(0); break; }
         const end = buf.indexOf(FS, start + 1);
-        if (end < 0) break; // tunggu sisa
+        if (end < 0 || buf.length<end+2) break; // tunggu sisa
+        if(buf[end+1]!==CR){socket.destroy(new Error('Invalid MLLP terminator'));return;}
         const msg = buf.slice(start + 1, end).toString('latin1');
         buf = buf.slice(end + 2); // buang FS + CR
-        ingest(analyzer, 'HL7', msg, 'IN');
+        try{ingest(analyzer, 'HL7', msg, 'IN');}catch(e){socket.destroy(e);return;}
         socket.write(hl7Ack(msg));         // MLLP ACK
         if (analyzer.direction === 'twoway') maybeSendOrders(socket, analyzer, msg, 'HL7');
         advanced = true; continue;
       }
 
       // ── ASTM: ENQ / STX-frame / EOT ──
-      if (b0 === ENQ) { socket.write(Buffer.from([ACK])); astm = []; buf = buf.slice(1); advanced = true; continue; }
+      if (b0 === ENQ) { session=crypto.randomUUID();expectedFrame=1;lastFrame=null;socket.write(Buffer.from([ACK])); astm = []; buf = buf.slice(1); advanced = true; continue; }
       if (b0 === EOT) {
         buf = buf.slice(1);
         if (astm.length) {
           const full = astm.join(''); astm = [];
           // Hasil bahan kontrol dialihkan ke lab_qc_runs, tidak dicampur
           // ke jalur hasil pasien.
-          const qc = pisahkanQcAstm(full);
-          if (qc.length) kirimQc(analyzer, qc);
-          else ingest(analyzer, 'ASTM', full, 'IN');
+          try{ingest(analyzer,'ASTM',full,'IN');getInbox().finish(session);}catch(e){socket.destroy(e);return;}
           if (analyzer.direction === 'twoway') maybeSendOrders(socket, analyzer, full, 'ASTM');
         }
         advanced = true; continue;
@@ -187,11 +197,19 @@ function attachHandler(socket, analyzer) {
         let term = -1;
         for (let i = 1; i < buf.length; i++) { if (buf[i] === ETX || buf[i] === ETB) { term = i; break; } }
         if (term < 0) break;               // frame belum lengkap
-        if (buf.length < term + 4) break;  // tunggu checksum + CRLF
-        const text = buf.slice(2, term).toString('latin1'); // buang STX + nomor frame
-        astm.push(text);
-        buf = buf.slice(term + 4);         // buang ETX/ETB + 2 checksum + CR (+LF ditangani loop)
-        if (buf.length && buf[0] === LF) buf = buf.slice(1);
+        if (buf.length < term + 5) break;
+        const frame=buf.subarray(0,term+5);
+        const checksum=frame.subarray(1,term+1).reduce((n,v)=>(n+v)&255,0).toString(16).toUpperCase().padStart(2,'0');
+        const frameNo=Number(String.fromCharCode(frame[1]));
+        const valid=checksum===frame.subarray(term+1,term+3).toString('ascii').toUpperCase() && frame[term+3]===CR && frame[term+4]===LF;
+        buf=buf.subarray(term+5);
+        if(!valid || !Number.isInteger(frameNo) || frameNo<0 || frameNo>7){socket.write(Buffer.from([NAK]));advanced=true;continue;}
+        if(lastFrame && frame.equals(lastFrame)){socket.write(Buffer.from([ACK]));advanced=true;continue;}
+        if(frameNo!==expectedFrame){socket.write(Buffer.from([NAK]));advanced=true;continue;}
+        const text=frame.subarray(2,term).toString('latin1');
+        const next=[...astm,text];
+        try{getInbox().frame(session,next,analyzer);}catch(e){socket.write(Buffer.from([NAK]));socket.destroy(e);return;}
+        astm=next;lastFrame=Buffer.from(frame);expectedFrame=(frameNo+1)%8;
         socket.write(Buffer.from([ACK]));  // ACK per frame
         advanced = true; continue;
       }
@@ -429,40 +447,9 @@ function pisahkanQcAstm(raw) {
 // dan level yang sama.
 //
 // `riwayatZ` = z-score run sebelumnya, urut dari yang TERBARU.
-function nilaiWestgard(z, riwayatZ = []) {
-  const abs = Math.abs(z);
-  const semua = [z, ...riwayatZ];                       // termasuk run ini
-  const sama = (a, b) => (a >= 0) === (b >= 0);         // sisi yang sama terhadap mean
-
-  // 1-3s — kesalahan acak besar. Paling tegas, dicek lebih dulu.
-  if (abs > 3) return { verdict: 'REJECT', rule: '1-3s',
-    catatan: 'Menyimpang >3 SD. Tolak batch, telusuri alat/reagen sebelum melanjutkan.' };
-
-  // R-4s — selisih dua run berturut pada sisi berlawanan melebihi 4 SD.
-  if (riwayatZ.length >= 1 && Math.abs(z - riwayatZ[0]) > 4 && !sama(z, riwayatZ[0]))
-    return { verdict: 'REJECT', rule: 'R-4s',
-      catatan: 'Rentang dua run >4 SD berlawanan arah. Indikasi kesalahan acak.' };
-
-  // 2-2s — dua run berturut >2 SD pada sisi yang sama.
-  if (abs > 2 && riwayatZ.length >= 1 && Math.abs(riwayatZ[0]) > 2 && sama(z, riwayatZ[0]))
-    return { verdict: 'REJECT', rule: '2-2s',
-      catatan: 'Dua run berturut >2 SD searah. Indikasi kesalahan sistematik.' };
-
-  // 4-1s — empat run berturut >1 SD pada sisi yang sama.
-  if (semua.length >= 4 && semua.slice(0, 4).every(v => Math.abs(v) > 1 && sama(v, z)))
-    return { verdict: 'REJECT', rule: '4-1s',
-      catatan: 'Empat run berturut >1 SD searah. Pergeseran sistematik.' };
-
-  // 10x — sepuluh run berturut pada sisi yang sama, sekecil apa pun simpangannya.
-  if (semua.length >= 10 && semua.slice(0, 10).every(v => sama(v, z)))
-    return { verdict: 'REJECT', rule: '10x',
-      catatan: 'Sepuluh run berturut di sisi yang sama. Bias terhadap mean.' };
-
-  // 1-2s — bukan penolakan, melainkan tanda waspada.
-  if (abs > 2) return { verdict: 'WARNING', rule: '1-2s',
-    catatan: 'Satu run >2 SD. Amati run berikutnya sebelum menyimpulkan.' };
-
-  return { verdict: 'PASS', rule: null, catatan: null };
+function nilaiWestgard(z,riwayatZ=[]) {
+  const ev=evaluateWestgardZ([...riwayatZ].reverse().concat(z));
+  return {verdict:ev.status,rule:ev.triggeredRule,catatan:ev.recommendation};
 }
 
 async function ambilLot(analyzer, r) {
@@ -551,6 +538,7 @@ async function kirimQc(analyzer, runs) {
   } catch (e) {
     // Jangan diamkan: QC yang gagal naik berarti bukti mutu hilang.
     log(`  ⚠ QC gagal diunggah (${analyzer.name}): ${e.message}`);
+    throw e;
   }
 }
 
@@ -685,7 +673,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
     <span style="font-size:11.5px;color:var(--text-muted)">Perubahan alat yang sudah aktif butuh restart proses (tutup lalu jalankan lagi).</span>
   </div>
   <div class="grid" id="devs"></div>
-  
+
   <div class="split-row">
     <div class="split-col">
       <div style="font-size:13.5px;font-weight:700;margin-bottom:8px">Log Aktivitas (Live)</div>
@@ -724,16 +712,16 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
       document.getElementById('sub').textContent='Supabase: '+s.supabase+' · Antrean: '+(s.queueSize || 0)+' · uptime '+Math.floor(up/60)+'m '+(up%60)+'s · '+s.devices.length+' alat aktif';
       var ipEl=document.getElementById('ip-banner');
       if(ipEl){ var ips=(s.localIps||[]); ipEl.innerHTML='<b style="color:var(--teal)">IP PC Connector:</b> '+(ips.length?ips.map(function(x){return '<code style="color:#38bdf8;font-size:13.5px">'+esc(x)+'</code>';}).join('&nbsp; , &nbsp;'):'(tidak terdeteksi)')+' &nbsp;·&nbsp; <span style="color:var(--text-muted)">Isi IP ini + port yang sama di master Alat AVA GLOBAL ECOSYSTEM (mode server) agar alat mengirim hasil ke PC ini.</span>'; }
-      
+
       document.getElementById('devs').innerHTML = s.devices.length ? s.devices.map(d=>{
         const seen=d.lastMsgAt?new Date(d.lastMsgAt).toLocaleTimeString('id-ID'):'—';
         const errTime=d.lastErrorAt?new Date(d.lastErrorAt).toLocaleTimeString('id-ID'):'';
-        
+
         let errHtml = '';
         if (d.lastError) {
           errHtml = '<div class="err-badge"><b>⚠️ Error Terakhir:</b><br>' + esc(d.lastError) + (errTime ? ' (' + errTime + ')' : '') + '</div>';
         }
-        
+
         return '<div class="dev">' +
           '<div class="dev-header"><h3><span class="dot '+(d.connected?'on':'off')+'"></span>'+esc(d.name||'?')+'</h3><span style="font-size:11px;color:var(--text-muted)">'+esc(d.protocol||'')+'</span></div>'+
           '<div class="meta">'+
@@ -746,7 +734,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
           (d.lastRaw?'<details style="margin-top:10px"><summary style="cursor:pointer;font-size:11px;color:#14B8A6">Lihat pesan mentah terakhir</summary><pre style="max-height:150px;margin-top:6px;font-size:10.5px;background:#090d16;padding:8px">'+esc(d.lastRaw)+'</pre></details>':'')+
           '</div>';
       }).join('') : '<div class="empty">Belum ada alat terdaftar. Set IP/port & aktifkan integrasi di AVA GLOBAL ECOSYSTEM → master Alat.</div>';
-      
+
       // Highlight logs
       const logText = (s.logs||[]).map(l => {
         const lower = l.toLowerCase();
@@ -761,7 +749,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
         }
         return esc(l);
       }).join('\\n');
-      
+
       const logEl = document.getElementById('log');
       logEl.innerHTML = logText;
       logEl.scrollTop = logEl.scrollHeight; // Auto scroll to bottom
@@ -775,7 +763,7 @@ const STATUS_HTML = `<!doctype html><html lang="id"><head><meta charset="utf-8">
           '<div style="color:#38bdf8;word-break:break-all">'+esc(r.data)+'</div>' +
           '</div>';
       }).join('');
-      
+
       const rawEl = document.getElementById('raw-stream');
       rawEl.innerHTML = rawText || '<div style="color:var(--text-muted)">Menunggu aliran data alat lab...</div>';
       rawEl.scrollTop = rawEl.scrollHeight; // Auto scroll to bottom
@@ -914,6 +902,8 @@ if (require.main === module) {
   (async () => {
     log('══ AVA Lab Connector ══');
     log(`Supabase: ${SUPABASE_URL}`);
+    INGEST_QUEUE.push(...getInbox().pending());
+    processQueue();
     startStatusServer();
     await loadAndBind();
     setInterval(loadAndBind, REFRESH_MS); // pungut alat baru tiap menit (restart utk ubah alat yang sudah bind)

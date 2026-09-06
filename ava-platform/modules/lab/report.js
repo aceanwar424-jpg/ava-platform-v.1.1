@@ -34,7 +34,7 @@ function renderReportTab(){
           <div style="display:flex;align-items:center;gap:11px;min-width:0">
             <span class="rc-chev" style="color:var(--gray);transition:transform .15s;font-size:12px">▶</span>
             <div style="min-width:0">
-              <div style="font-size:14.5px;font-weight:700;color:var(--navy)">${pt.name}
+              <div style="font-size:14.5px;font-weight:700;color:var(--navy)">${labEscape(pt.name)}
                 ${critCount?`<span style="background:var(--danger-soft);color:var(--danger-strong);padding:1px 8px;border-radius:8px;font-size:10px;margin-left:6px">${critCount} kritis</span>`:''}</div>
               <div style="font-size:11px;color:var(--gray)">${pt.visit||'—'} · ${pt.results.length} pemeriksaan · ${pt.released_at?new Date(pt.released_at).toLocaleString('id-ID'):''}</div>
             </div>
@@ -62,7 +62,7 @@ function renderReportTab(){
                       :r.result_numeric!=null&&r.normal_min!=null&&r.result_numeric<r.normal_min?'L':'';
             const crit=isCriticalResult(r);
             return `<tr style="border-bottom:1px solid var(--bg2)">
-              <td style="padding:6px 10px;font-weight:600">${r.item_name||r.product_name||'—'}${r.item_name?`<div style="font-size:9px;color:var(--gray);font-weight:400">${r.product_name}</div>`:''}</td>
+              <td style="padding:6px 10px;font-weight:600">${r.item_name||r.product_name||'—'}${r.item_name?`<div style="font-size:9px;color:var(--gray);font-weight:400">${labEscape(r.product_name)}</div>`:''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${col}">${r.result_value||'—'}${crit?' ':''}</td>
               <td style="padding:6px 10px;font-weight:800;color:${flag==='H'?'#EF4444':flag==='L'?'#0EA5E9':'#94A3B8'}">${flag||'—'}</td>
               <td style="padding:6px 10px;color:var(--gray)">${r.unit||'—'}</td>
@@ -122,7 +122,7 @@ async function showTrend(patientName, productId, productName, itemId=null,admiss
       <div class="modal-title">📈 Tren — ${productName}</div>
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
-    <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${patientName} · ${data.length} hasil${nmin!=null&&nmax!=null?` · normal ${nmin}–${nmax}`:''}</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:8px">${labEscape(patientName)} · ${data.length} hasil${nmin!=null&&nmax!=null?` · normal ${nmin}–${nmax}`:''}</div>
     <div style="overflow-x:auto;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:10px">
       <svg width="${w}" height="${h}" style="min-width:100%">
         ${nmin!=null&&nmax!=null&&nmax<=max&&nmin>=min?`
@@ -247,7 +247,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
   const pRight = cfg.margin_right || '15mm';
 
   w.document.open();
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hasil Lab — ${patientName}</title>
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Hasil Lab — ${labEscape(patientName)}</title>
     <style>
       @page{ 
         size: ${cfg.paper === 'Custom' ? `${cfg.paper_width} ${cfg.paper_height}` : cfg.paper || 'A4'}; 
@@ -374,9 +374,9 @@ async function printLabReport(patientName, visitNumber, sampleRows){
       <div class="pinfo-title">HASIL LABORATORIUM</div>
       <div class="pinfo">
         <div class="pinfo-col">
-          <div class="pinfo-row"><div class="pinfo-label">Nama Pasien</div><div class="pinfo-sep">:</div><div class="pinfo-val">${patientName}</div></div>
+          <div class="pinfo-row"><div class="pinfo-label">Nama Pasien</div><div class="pinfo-sep">:</div><div class="pinfo-val">${labEscape(patientName)}</div></div>
           <div class="pinfo-row"><div class="pinfo-label">Tgl.Lahir Umur Kelamin</div><div class="pinfo-sep">:</div><div class="pinfo-val">${dob ? new Date(dob).toLocaleDateString('id-ID') : '—'} / ${ageText} / ${gender}</div></div>
-          <div class="pinfo-row"><div class="pinfo-label">Dokter Peminta</div><div class="pinfo-sep">:</div><div class="pinfo-val">${requestingDoc}</div></div>
+          <div class="pinfo-row"><div class="pinfo-label">Dokter Peminta</div><div class="pinfo-sep">:</div><div class="pinfo-val">${labEscape(requestingDoc)}</div></div>
           <div class="pinfo-row"><div class="pinfo-label">Diagnosa</div><div class="pinfo-sep">:</div><div class="pinfo-val">${diagnosis}</div></div>
           <div class="pinfo-row"><div class="pinfo-label">Alamat</div><div class="pinfo-sep">:</div><div class="pinfo-val">${address}</div></div>
         </div>
@@ -456,7 +456,7 @@ async function printLabReport(patientName, visitNumber, sampleRows){
         const trackUrl = 'https://apps.avahealth.sbs/track.html?visit=' + first.visit_number;
         const msg =
           `*${orgName}*\n` +
-          `Yth. ${patientName},\n\n` +
+          `Yth. ${labEscape(patientName)},\n\n` +
           `Hasil pemeriksaan laboratorium Anda *sudah siap*.\n\n` +
           `Pemeriksaan: ${testNames}${more}\n` +
           `No. Kunjungan: ${visitNumber || first.visit_number || '-'}\n\n` +
@@ -514,7 +514,7 @@ function _labPrintCatRows(rows, cfg){
   return Object.entries(byProd).map(([prod,prows])=>{
     const isPanel = prows.length>1 || prows.some(r=>r.item_name);
     if(isPanel){
-      return `<tr><td colspan="${span}" style="background:#EEF2FF;font-weight:700;color:var(--ink-05);padding:5px 10px">${prod}</td></tr>`
+      return `<tr><td colspan="${span}" style="background:#EEF2FF;font-weight:700;color:var(--ink-05);padding:5px 10px">${labEscape(prod)}</td></tr>`
         + prows.map(r=>_labPrintRow(r,true,cfg)).join('');
     }
     return prows.map(r=>_labPrintRow(r,false,cfg)).join('');
@@ -545,7 +545,7 @@ async function sendLabResultWA(patientName, visitNumber) {
   const trackUrl = 'https://apps.avahealth.sbs/track.html?visit=' + visitNumber;
   const msg =
     `*${orgName}*\n` +
-    `Yth. ${patientName},\n\n` +
+    `Yth. ${labEscape(patientName)},\n\n` +
     `Hasil pemeriksaan laboratorium Anda *sudah siap*.\n\n` +
     `No. Kunjungan: ${visitNumber || '-'}\n` +
     `Lihat hasil online:\n${trackUrl}\n\n` +

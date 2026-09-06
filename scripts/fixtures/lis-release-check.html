@@ -1,0 +1,17 @@
+<!doctype html><html lang="id"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Uji Sintetis LIS — Release Candidate</title>
+<link rel="stylesheet" href="css/style.css"><style>body{margin:0;padding:24px;background:#f1f5f9;font-family:system-ui;color:#102b46}h1{font-size:24px}#review{margin-top:24px}.test-banner{background:#102b46;color:white;padding:16px;border-radius:12px;margin-bottom:20px}button{cursor:pointer}iframe{border:1px solid #cbd5e1;max-width:100%;height:480px}#status{padding:12px;background:white}</style>
+<div class="test-banner"><h1>AVA LIS · Pemeriksaan Rilis</h1>DATA SINTETIS — tanpa koneksi database, tanpa data pasien nyata.</div>
+<button onclick="fixtureMode='zero';renderLabTat()">Periode kosong</button> <button onclick="fixtureMode='error';renderLabTat()">Simulasi gagal muat</button> <button onclick="fixtureMode='data';renderLabTat()">Data sintetis</button>
+<main id="main-content"></main><div id="status"></div><section id="review"><h2>Verifikasi Teknis · Layout Responsif</h2><div id="lab-validation"></div></section>
+<script src="modules/lab/qcEngine.js"></script><script src="modules/lab/index.js"></script><script src="modules/lab/validation.js"></script><script src="modules/lab/tat.js"></script>
+<script>
+let fixtureMode='zero';
+async function sbRpc(){if(fixtureMode==='error')throw Error('Skenario koneksi terputus');if(fixtureMode==='zero')return {n_total:0,n_tuntas:0,total_median:null,tahap:[]};return {n_total:12,n_tuntas:9,total_median:42,total_p90:61,tahap:[{nama:'Penerimaan',median:10},{nama:'Pemeriksaan',median:25},{nama:'Otorisasi',median:7}],per_jenis:[{jenis:'Serum (sintetis)',jumlah:12,median:42}]};}
+document.getElementById('lab-validation').innerHTML=valPaneHtml('validate');
+document.getElementById('val-worklist').innerHTML='<div style="padding:16px">SYN-001<br><b>Pasien Sintetis</b><br>2 pemeriksaan</div>';
+document.getElementById('val-pbar').textContent='SYN-001 · Pasien Sintetis · Kunjungan UJI-001';
+document.getElementById('val-grid').innerHTML='<table class="table"><tr><th>Analit</th><th>Hasil</th><th>Status</th></tr><tr><td>Analit A</td><td>5</td><td>Draft</td></tr><tr><td>Analit B</td><td>Belum diisi</td><td>Draft</td></tr></table>';
+document.getElementById('val-notes').innerHTML='<label>Catatan verifikasi<textarea style="width:100%"></textarea></label>';
+renderLabTat();
+const params=new URLSearchParams(location.search);if(params.get('narrow')!=='1'){const f=document.createElement('iframe');f.width='740';f.src='lis-release-check.html?narrow=1';f.title='Layout uji 740 piksel';document.body.appendChild(f);}
+</script></html>

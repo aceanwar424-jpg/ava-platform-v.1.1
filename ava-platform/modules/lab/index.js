@@ -200,7 +200,6 @@ function tatBadge(row){
 // keluar dari batas critical_low/high yang tersimpan di hasil.
 function isCriticalResult(r){
   if (r.is_critical === true) return true;
-  if ((r.color_code||'') === 'red' && r.condition_type !== 'normal') return true;
   const v = (r.result_numeric!=null) ? r.result_numeric : parseFloat(r.result_value);
   if (!isNaN(v)) {
     if (r.critical_low  != null && v <= r.critical_low)  return true;
@@ -224,8 +223,8 @@ async function labLoadRR(productId){
 // dengan opsi filter gender & umur. rawVal boleh angka atau teks (Positif/Negatif).
 function matchRefRange(rrs, rawVal, gender, age){
   const cand = (rrs||[]).filter(rr=>{
-    const gOk = !rr.gender || rr.gender==='All' || !gender || rr.gender===gender;
-    const aOk = age==null || ((rr.age_min==null||age>=rr.age_min) && (rr.age_max==null||age<=rr.age_max));
+    const gOk = !rr.gender || rr.gender==='All' || rr.gender===gender;
+    const aOk = (age==null ? (rr.age_min==null && rr.age_max==null) : ((rr.age_min==null||age>=rr.age_min) && (rr.age_max==null||age<=rr.age_max)));
     return gOk && aOk;
   });
   const num = parseFloat(rawVal);
@@ -604,7 +603,7 @@ async function ackCritical(id){
 
     <div id="cv-reached">
       <div class="form-group" style="display:flex;align-items:center;gap:8px">
-        <input type="checkbox" id="cv-readback" style="width:auto" checked>
+        <input type="checkbox" id="cv-readback" style="width:auto">
         <label style="margin:0">Penerima <b>mengulang kembali</b> nilai &amp; nama pasien (read-back)</label>
       </div>
       <div class="form-group"><label>Instruksi / tindakan dari penerima</label>
@@ -672,3 +671,5 @@ async function labHistory(admissionId,productId,itemId=null,excludeId=null){
   if(!Array.isArray(rows)) throw new Error('Riwayat tidak tersedia');
   return rows;
 }
+
+function labEscape(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}

@@ -291,12 +291,12 @@ function wlParamRow(r, editable){
   const noteVal=(_wlNotes[r.id]!=null?_wlNotes[r.id]:(r.notes||''));
   const valCell = editable
     ? `<input type="text" class="wl-val" data-rid="${r.id}" data-item="${itemId||''}" data-prod="${pid}" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="wlInterpret(this)" style="width:104px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px">`
-    : `<span style="font-weight:700">${r.result_value||'—'} ${r.unit||''}</span>`;
+    : `<span style="font-weight:700">${r.result_value||'—'} ${labEscape(r.unit||'')}</span>`;
   const noteCell = editable
     ? `<input list="wl-note-presets" class="wl-note" value="${String(noteVal).replace(/"/g,'&quot;')}" placeholder="catatan…" oninput="_wlNotes[${r.id}]=this.value" style="width:100%;font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:5px">`
     : (noteVal?`<span style="font-size:11px;color:var(--gray)">${noteVal}</span>`:'<span style="color:var(--gray)">—</span>');
   return `<tr>
-    <td style="padding:4px 10px;border-bottom:1px solid #f5f7fa">${name}${r.unit?` <span style="font-size:9.5px;color:var(--gray)">${r.unit}</span>`:''}</td>
+    <td style="padding:4px 10px;border-bottom:1px solid #f5f7fa">${name}${r.unit?` <span style="font-size:9.5px;color:var(--gray)">${labEscape(r.unit)}</span>`:''}</td>
     <td style="padding:4px 8px;border-bottom:1px solid #f5f7fa;color:var(--gray);font-size:11px">${refTxt}</td>
     <td style="padding:4px 8px;border-bottom:1px solid #f5f7fa">${valCell}</td>
     <td style="padding:4px 4px;border-bottom:1px solid #f5f7fa;text-align:center" class="wl-flag"></td>

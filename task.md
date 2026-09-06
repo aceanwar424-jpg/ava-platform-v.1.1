@@ -187,7 +187,9 @@
 - [ ] Tindak lanjut terpisah: perbaikan P0/P1 dan pengujian staging berdasarkan laporan audit.
 # Perbaikan dan rilis LIS — 2026-09-06
 
-- [ ] Dashboard/grafik, agregasi panel dan persistensi hasil.
-- [ ] QC/autoverifikasi, identitas laporan dan helper legacy.
-- [ ] API transisi, connector dan pengujian regresi.
-- [ ] Menu/layout, paket rilis dan verifikasi deployment.
+- [x] Dashboard/grafik, agregasi panel dan persistensi hasil.
+- [x] Evaluator QC/autoverifikasi tertahan, identitas laporan dan helper legacy.
+- [x] API transisi, connector dan pengujian regresi lokal.
+- [x] Menu/layout, ZIP connector operasional, dan catatan kandidat rilis.
+- [ ] Aktivasi staging/produksi: menunggu identitas proyek dan akses migrasi/deployment.
+- [ ] Penerimaan klinis lanjutan: amended report, penjagaan QC server, delivery acknowledgment dan UAT alat nyata; lihat docs/LIS-RELEASE-1.1.0-RC1.md.

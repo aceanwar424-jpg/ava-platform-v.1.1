@@ -10,12 +10,53 @@ CREATE TABLE IF NOT EXISTS public.lis_result_events (
 ALTER TABLE public.lis_result_events ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON public.lis_result_events FROM anon,authenticated;
 
+-- Restrictive policies intersect existing permissions; never broaden access.
+ALTER TABLE public.lab_results ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS lis_result_staff_read ON public.lab_results;
+CREATE POLICY lis_result_staff_read ON public.lab_results FOR SELECT TO authenticated
+USING(EXISTS(SELECT 1 FROM public.user_profiles WHERE id=auth.uid() AND lower(role) IN
+ ('super_admin','superadmin','admin','registration','registrasi','admin_faskes','lab_analyst','lab_supervisor','analis','lab','doctor_sppk','sp_pk')));
+DROP POLICY IF EXISTS lis_result_tenant_boundary ON public.lab_results;
+CREATE POLICY lis_result_tenant_boundary ON public.lab_results AS RESTRICTIVE FOR ALL TO authenticated
+USING (EXISTS(SELECT 1 FROM public.admissions a JOIN public.user_profiles u ON u.tenant_id=a.tenant_id
+  WHERE a.id=lab_results.admission_id AND u.id=auth.uid()))
+WITH CHECK (EXISTS(SELECT 1 FROM public.admissions a JOIN public.user_profiles u ON u.tenant_id=a.tenant_id
+  WHERE a.id=lab_results.admission_id AND u.id=auth.uid()));
+ALTER TABLE public.critical_value_notifications ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS lis_critical_staff_read ON public.critical_value_notifications;
+CREATE POLICY lis_critical_staff_read ON public.critical_value_notifications FOR SELECT TO authenticated
+USING(EXISTS(SELECT 1 FROM public.user_profiles WHERE id=auth.uid() AND lower(role) IN
+ ('super_admin','superadmin','admin','lab_analyst','lab_supervisor','analis','lab','doctor_sppk','sp_pk')));
+REVOKE INSERT,UPDATE,DELETE ON public.critical_value_notifications FROM authenticated;
+DROP POLICY IF EXISTS lis_critical_tenant_boundary ON public.critical_value_notifications;
+CREATE POLICY lis_critical_tenant_boundary ON public.critical_value_notifications AS RESTRICTIVE FOR ALL TO authenticated
+USING (EXISTS(SELECT 1 FROM public.admissions a JOIN public.user_profiles u ON u.tenant_id=a.tenant_id
+  WHERE a.id=critical_value_notifications.admission_id AND u.id=auth.uid()))
+WITH CHECK (EXISTS(SELECT 1 FROM public.admissions a JOIN public.user_profiles u ON u.tenant_id=a.tenant_id
+  WHERE a.id=critical_value_notifications.admission_id AND u.id=auth.uid()));
+
 CREATE OR REPLACE FUNCTION public.lis_guard_result_write()
 RETURNS trigger LANGUAGE plpgsql SET search_path=public AS $$
 BEGIN
+  IF TG_OP='DELETE' THEN
+    IF OLD.status IS DISTINCT FROM 'Draft' OR nullif(btrim(OLD.result_value),'') IS NOT NULL THEN
+      RAISE EXCEPTION 'Hasil klinis tidak boleh dihapus';
+    END IF;
+    RETURN OLD;
+  END IF;
+  IF TG_OP='INSERT' THEN
+    IF NEW.status IS DISTINCT FROM 'Draft' THEN RAISE EXCEPTION 'Hasil baru harus berstatus Draft'; END IF;
+    RETURN NEW;
+  END IF;
   IF current_setting('ava.lis_transition',true) IS DISTINCT FROM 'authorized' THEN
-    IF NEW.status IS DISTINCT FROM OLD.status THEN
+    IF OLD.status='Validated' AND NEW.status='Draft' THEN
+      NEW.validated_by:=NULL; NEW.validated_at:=NULL;
+    ELSIF NEW.status IS DISTINCT FROM OLD.status THEN
       RAISE EXCEPTION 'Gunakan transaksi verifikasi/rilis LIS';
+    END IF;
+    IF OLD.status='Validated' AND NEW.status='Validated' AND
+      (NEW.result_value IS DISTINCT FROM OLD.result_value OR NEW.result_numeric IS DISTINCT FROM OLD.result_numeric) THEN
+      RAISE EXCEPTION 'Perubahan hasil harus kembali ke Draft';
     END IF;
     IF OLD.status IN ('Approved','Released') AND to_jsonb(NEW) IS DISTINCT FROM to_jsonb(OLD) THEN
       RAISE EXCEPTION 'Hasil final terkunci; koreksi membutuhkan alur revisi terotorisasi';
@@ -27,13 +68,13 @@ BEGIN
   RETURN NEW;
 END $$;
 DROP TRIGGER IF EXISTS lis_result_write_guard ON public.lab_results;
-CREATE TRIGGER lis_result_write_guard BEFORE UPDATE ON public.lab_results
+CREATE TRIGGER lis_result_write_guard BEFORE INSERT OR UPDATE OR DELETE ON public.lab_results
 FOR EACH ROW EXECUTE FUNCTION public.lis_guard_result_write();
 
 CREATE OR REPLACE FUNCTION public.lis_transition_results(p_action text,p_rows jsonb)
 RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path=public AS $$
 DECLARE v_tenant uuid:=public.lis_his_actor(); v_role text; r public.lab_results;
-  e jsonb; v_ids bigint[]:='{}'; v_adm bigint; v_snapshot jsonb:='[]'; v_now timestamptz:=now();
+  e jsonb; v_ids bigint[]:='{}'; v_adm bigint; v_snapshot jsonb:='[]'; v_now timestamptz:=now(); v_numeric numeric;
 BEGIN
   SELECT lower(role) INTO v_role FROM public.user_profiles WHERE id=auth.uid();
   IF p_action IS NULL OR p_rows IS NULL OR p_action NOT IN ('validate','release') OR jsonb_typeof(p_rows)<>'array'
@@ -42,6 +83,9 @@ BEGIN
     RAISE EXCEPTION 'Kewenangan klinis diperlukan';
   END IF;
   IF p_action='release' AND v_role NOT IN ('doctor_sppk','sp_pk') THEN RAISE EXCEPTION 'Otorisasi dokter penanggung jawab diperlukan'; END IF;
+  -- Same lock order as service changes: admission first, then result IDs.
+  PERFORM 1 FROM public.admissions WHERE id IN (SELECT admission_id FROM public.lab_results
+    WHERE id IN (SELECT (value->>'id')::bigint FROM jsonb_array_elements(p_rows))) AND tenant_id=v_tenant ORDER BY id FOR UPDATE;
   -- Lock all requested results in stable order, then validate each expected version.
   PERFORM 1 FROM public.lab_results WHERE id IN (SELECT (value->>'id')::bigint FROM jsonb_array_elements(p_rows)) ORDER BY id FOR UPDATE;
   FOR e IN SELECT value FROM jsonb_array_elements(p_rows) LOOP
@@ -54,9 +98,14 @@ BEGIN
     IF (to_jsonb(r)->>'updated_at') IS DISTINCT FROM (e->>'updated_at') THEN RAISE EXCEPTION 'Hasil telah berubah; muat ulang'; END IF;
     IF r.status IS DISTINCT FROM (CASE WHEN p_action='validate' THEN 'Draft' ELSE 'Validated' END) THEN RAISE EXCEPTION 'Status hasil tidak sesuai'; END IF;
     IF nullif(btrim(r.result_value),'') IS NULL THEN RAISE EXCEPTION 'Hasil kosong tidak dapat diteruskan'; END IF;
+    v_numeric:=r.result_numeric;
+    IF btrim(r.result_value) ~ '^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$' THEN
+      IF v_numeric IS NOT NULL AND v_numeric<>btrim(r.result_value)::numeric THEN RAISE EXCEPTION 'Nilai numerik tidak sesuai hasil'; END IF;
+      v_numeric:=btrim(r.result_value)::numeric;
+    END IF;
     IF (coalesce((to_jsonb(r)->>'is_critical')::boolean,false)
-       OR (r.result_numeric IS NOT NULL AND ((r.critical_low IS NOT NULL AND r.result_numeric<=r.critical_low)
-          OR (r.critical_high IS NOT NULL AND r.result_numeric>=r.critical_high))))
+       OR (v_numeric IS NOT NULL AND ((r.critical_low IS NOT NULL AND v_numeric<=r.critical_low)
+          OR (r.critical_high IS NOT NULL AND v_numeric>=r.critical_high))))
        AND r.critical_ack_at IS NULL THEN RAISE EXCEPTION 'Pelaporan nilai kritis belum selesai'; END IF;
     v_ids:=array_append(v_ids,r.id);
   END LOOP;
@@ -68,7 +117,9 @@ BEGIN
   END IF;
   PERFORM set_config('ava.lis_transition','authorized',true);
   IF p_action='validate' THEN
-    UPDATE public.lab_results SET status='Validated',validated_by=auth.uid()::text,validated_at=v_now,updated_at=v_now WHERE id=ANY(v_ids);
+    UPDATE public.lab_results l SET status='Validated',validated_by=auth.uid()::text,validated_at=v_now,updated_at=v_now,
+      notes=CASE WHEN e.value ? 'notes' THEN e.value->>'notes' ELSE l.notes END
+      FROM jsonb_array_elements(p_rows) e WHERE l.id=(e.value->>'id')::bigint;
   ELSE
     UPDATE public.lab_results SET status='Approved',approved_by=auth.uid()::text,approved_at=v_now,
       released_by=auth.uid()::text,released_at=v_now,updated_at=v_now WHERE id=ANY(v_ids);

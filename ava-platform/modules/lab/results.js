@@ -123,7 +123,7 @@ function resRowHtml(r, pid, indent){
     <td style="padding:4px 8px;border-bottom:1px solid var(--bg2)"><input type="text" class="res-val" value="${(r.result_value||'').replace(/"/g,'&quot;')}" oninput="resInterpret(this)" onclick="event.stopPropagation()" style="width:96px;padding:4px 6px;border:1.5px solid var(--border);border-radius:5px"></td>
     <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray)" class="res-prev">—</td>
     <td style="padding:5px 4px;border-bottom:1px solid var(--bg2);text-align:center" class="res-flag"></td>
-    <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray)">${r.unit||''}</td>
+    <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray)">${labEscape(r.unit||'')}</td>
     <td style="padding:5px 8px;border-bottom:1px solid var(--bg2);color:var(--gray);font-size:11px">${refTxt}</td>
   </tr>`;
 }
@@ -200,7 +200,7 @@ async function resPickRow(rid){
     const prev=await labHistory(r.admission_id,r.product_id,r.product_item_id,r.id);
     const p=prev?.[0];
     const box=document.getElementById('res-prevbox');
-    if(box) box.innerHTML= p?`Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong> <span style="color:var(--text4)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
+    if(box) box.innerHTML= p?`Hasil sebelumnya: <strong>${labEscape(p.result_value)} ${labEscape(p.unit||'')}</strong> <span style="color:var(--text4)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>`:'Belum ada riwayat sebelumnya.';
     const prevCell=tr.querySelector('.res-prev'); if(prevCell&&p) prevCell.textContent=p.result_value;
   } catch(e){}
 }
@@ -422,7 +422,7 @@ async function openResultForm(resultId=null, prefill=null){
       <div class="form-group"><label>Nilai Hasil *</label>
         <input type="text" id="rf-value" value="${r.result_value||''}" placeholder="Angka atau teks (Pos/Neg)" oninput="interpretResult(this.value)"></div>
       <div class="form-group"><label>Unit</label>
-        <input type="text" id="rf-unit" value="${r.unit||''}" placeholder="mg/dL"></div>
+        <input type="text" id="rf-unit" value="${labEscape(r.unit||'')}" placeholder="mg/dL"></div>
     </div>
     <div id="rf-interp-box" style="margin-bottom:12px"></div>
     <div id="rf-delta-box" style="margin-bottom:12px"></div>
@@ -431,7 +431,7 @@ async function openResultForm(resultId=null, prefill=null){
       <div class="form-group"><label>Interpretasi</label>
         <input type="text" id="rf-interp" value="${r.interpretation||''}" placeholder="Normal, Tinggi, Prediabetik..."></div>
       <div class="form-group"><label>Catatan Analis</label>
-        <input type="text" id="rf-notes" value="${r.notes||''}" placeholder="Catatan..."></div>
+        <input type="text" id="rf-notes" value="${labEscape(r.notes||'')}" placeholder="Catatan..."></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
@@ -514,7 +514,7 @@ async function showDeltaCheck(patientName, productId, excludeId=null){
     if(!p){ box.innerHTML=''; return; }
     box.innerHTML=`
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink-11)">
-        Hasil sebelumnya: <strong>${p.result_value} ${p.unit||''}</strong>
+        Hasil sebelumnya: <strong>${labEscape(p.result_value)} ${labEscape(p.unit||'')}</strong>
         <span style="color:var(--text3)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
         <span id="rf-delta-arrow"></span>
       </div>`;

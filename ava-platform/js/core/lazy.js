@@ -20,7 +20,7 @@
 // buruk daripada perilaku lama.
 // ═══════════════════════════════════════════════════════════════
 
-const MODUL_VER = '20260906-ops-hubs-lis-his-sync';
+const MODUL_VER = '20260907-lis-integrity-rc1';
 const _modulDimuat = new Map();   // src → Promise
 
 function muatSkrip(src) {
