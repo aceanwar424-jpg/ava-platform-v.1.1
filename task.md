@@ -193,3 +193,11 @@
 - [x] Menu/layout, ZIP connector operasional, dan catatan kandidat rilis.
 - [ ] Aktivasi staging/produksi: menunggu identitas proyek dan akses migrasi/deployment.
 - [ ] Penerimaan klinis lanjutan: amended report, penjagaan QC server, delivery acknowledgment dan UAT alat nyata; lihat docs/LIS-RELEASE-1.1.0-RC1.md.
+
+## Penyelarasan LIS dengan audit layanan referensi — 2026-09-07
+
+- [x] Inventarisasi read-only layanan referensi, termasuk menu/submenu, tab, toolbar, tabel, dan tahapan kerja.
+- [x] Dokumentasikan batas HIS klinis ↔ LIS ↔ viewer hasil lintas-sistem.
+- [x] Rapikan workspace layanan penunjang menjadi halaman penuh tanpa mengubah payload atau skema.
+- [x] Evaluasi dan rapikan pengelompokan menu LIS setelah temuan referensi lengkap.
+- [x] Jalankan pemeriksaan sintaks, menu/manifest, dan uji UI tanpa data produksi.

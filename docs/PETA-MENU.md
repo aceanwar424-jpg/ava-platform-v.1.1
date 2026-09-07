@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 213 — 🟢 213 ada · 🟡 0 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 217 — 🟢 217 ada · 🟡 0 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -197,6 +197,15 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Pengambilan Sampel | `lis-phlebotomy` | Verifikasi tabung, lokasi flebotomi & timestamp sampling |
 | 🟢 | Penerimaan Sampel | `lab` | Check-in spesimen dan cetak barcode tabung CLSI |
 | 🟢 | Kelayakan Sampel | `lis-kelayakan` | Verifikasi penerimaan/penolakan spesimen (hemolisis/lipemik/clot) |
+
+**Konteks Klinis & Penunjang**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Anamnesis & Observasi | `anamnesa` › lis-anamnesa | Konteks klinis pra-pemeriksaan: verifikasi pasien, tanda vital, observasi, catatan, dan ICD sebelum spesimen diproses |
+| 🟢 | Audiometri | `audiometry` › lis-audiometry | Worklist pemeriksaan pendengaran; hasil tetap mengikuti validasi dan rilis klinis yang terpisah |
+| 🟢 | Spirometri | `spirometry` › lis-spirometry | Worklist fungsi paru dengan hasil terstruktur dan alur validasi bertahap |
+| 🟢 | EKG & Pemeriksaan Penunjang | `supportive` › lis-supportive | Pusat worklist EKG, treadmill, audiometri, dan spirometri tanpa mencampurkan proses laboratorium analitik |
 
 **Pemeriksaan**
 

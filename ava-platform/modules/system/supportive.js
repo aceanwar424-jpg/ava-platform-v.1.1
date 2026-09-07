@@ -78,6 +78,9 @@ const SUPPORTIVE_TYPES = {
 
 let suppAll = [];
 let suppFormDefaultType = 'EKG 12 Lead';
+// Workspace pemeriksaan sengaja menyimpan state UI terpisah dari payload. Dengan
+// begitu berpindah bagian form tidak mengubah nilai klinis yang akan disimpan.
+let suppWorkspaceState = null;
 
 async function renderSupportive(params = {}) {
   if (typeof injectProShell==='function') injectProShell();
@@ -235,100 +238,127 @@ async function openSupportiveForm(id=null) {
 
   const user=getUserName?getUserName():'User';
   const currentType = r.product_name || suppFormDefaultType || 'EKG 12 Lead';
+  suppWorkspaceState = { id, activeTab:'context', existingData, returnType:suppActiveType };
+  const main = document.getElementById('main-content');
+  if (!main) return;
+  main.innerHTML = `
+    <div class="pro-shell" style="max-width:1280px;margin:0 auto">
+      <header style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:8px 2px 12px;border-bottom:1px solid var(--border);margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0">
+          <button class="btn btn-ghost btn-sm" type="button" onclick="closeSupportiveWorkspace()">← Daftar pemeriksaan</button>
+          <div style="min-width:0"><h1 style="font-size:16px;margin:0;color:var(--navy)">${id?'Ubah':'Input'} Pemeriksaan Supportive</h1>
+            <div style="font-size:11px;color:var(--gray);margin-top:2px">Data tersimpan sebagai hasil pemeriksaan dan mengikuti alur Draft → Validated → Approved.</div></div>
+        </div>
+        <span style="font-size:11px;color:var(--gray);white-space:nowrap">${new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}</span>
+      </header>
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${id?'Edit':'+ Input'} Pemeriksaan Supportive</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
+      <div style="display:grid;grid-template-columns:174px minmax(0,1fr);gap:12px;align-items:start">
+        <aside style="position:sticky;top:10px;border:1px solid var(--border);border-radius:10px;background:var(--white);padding:7px">
+          <div style="font-size:10px;font-weight:800;color:var(--gray);letter-spacing:.06em;text-transform:uppercase;padding:5px 7px 7px">Input hasil</div>
+          ${[['context','Kunjungan & jenis','1'],['measurement','Pengukuran','2'],['interpretation','Interpretasi','3'],['review','Tinjau & simpan','4']].map(([key,label,no])=>`
+            <button type="button" id="sf-nav-${key}" onclick="switchSupportiveWorkspaceTab('${key}')" style="width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:8px 7px;border:0;border-radius:7px;background:${key==='context'?'var(--teal-soft)':'transparent'};color:${key==='context'?'var(--teal-deep)':'var(--text)'};font-size:11px;font-weight:700;cursor:pointer">
+              <span style="width:18px;height:18px;display:inline-grid;place-items:center;border-radius:50%;background:${key==='context'?'var(--teal)':'var(--bg2)'};color:${key==='context'?'#fff':'var(--gray)'};font-size:10px">${no}</span>${label}
+            </button>`).join('')}
+          <div style="font-size:10px;color:var(--gray);line-height:1.45;padding:10px 7px 3px">Kolom wajib hanya kunjungan. Nilai klinis dapat dilengkapi bertahap sebelum disimpan.</div>
+        </aside>
 
-    <div class="form-row">
-      <div class="form-group" style="grid-column:1/-1">
-        <label>Pasien / Kunjungan *</label>
-        <select id="sf-adm" onchange="document.getElementById('sf-patient').value=this.options[this.selectedIndex].dataset.name||'';document.getElementById('sf-visit').value=this.options[this.selectedIndex].dataset.visit||''">
-          ${admOpts}
-        </select>
-        <input type="hidden" id="sf-patient" value="${r.patient_name||''}">
-        <input type="hidden" id="sf-visit" value="${r.visit_number||''}">
+        <section style="min-width:0;border:1px solid var(--border);border-radius:10px;background:var(--white);overflow:hidden">
+          <div style="padding:14px 16px 10px" id="sf-workspace-body">
+            <section id="sf-section-context">
+              <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">Konteks pemeriksaan</div>
+              <div style="font-size:11px;color:var(--gray);margin-bottom:12px">Pilih kunjungan, jenis pemeriksaan, dan pemeriksa terlebih dahulu.</div>
+              <div class="form-row">
+                <div class="form-group" style="grid-column:1/-1"><label>Pasien / Kunjungan *</label>
+                  <select id="sf-adm" onchange="document.getElementById('sf-patient').value=this.options[this.selectedIndex].dataset.name||'';document.getElementById('sf-visit').value=this.options[this.selectedIndex].dataset.visit||''">${admOpts}</select>
+                  <input type="hidden" id="sf-patient" value="${r.patient_name||''}"><input type="hidden" id="sf-visit" value="${r.visit_number||''}">
+                </div>
+                <div class="form-group"><label>Tipe Pemeriksaan *</label>
+                  <select id="sf-type" onchange="renderSuppFields(this.value, suppWorkspaceState ? suppWorkspaceState.existingData : {})">
+                    ${Object.entries(SUPPORTIVE_TYPES).map(([t,cfg])=>`<option value="${t}" ${currentType===t?'selected':''}>${cfg.icon} ${t}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="form-group"><label>Dokter Pemeriksa</label><input type="text" id="sf-doctor" value="${r.approved_by||''}" placeholder="dr. Nama SpJP"></div>
+                <div class="form-group"><label>Status</label><select id="sf-status" disabled title="Perubahan status dilakukan dari daftar hasil sesuai urutan validasi"><option value="Draft" ${(r.status||'Draft')==='Draft'?'selected':''}>Draft</option><option value="Validated" ${r.status==='Validated'?'selected':''}>Validated</option><option value="Approved" ${r.status==='Approved'?'selected':''}>Approved</option></select><div style="font-size:10px;color:var(--gray);margin-top:4px">Status berubah dari daftar hasil: Draft → Validated → Approved.</div></div>
+              </div>
+            </section>
+            <section id="sf-section-measurement" style="display:none"><div id="sf-measurement-fields"></div></section>
+            <section id="sf-section-interpretation" style="display:none"><div id="sf-interpretation-fields"></div></section>
+            <section id="sf-section-review" style="display:none">
+              <div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:4px">Tinjau sebelum simpan</div>
+              <div style="font-size:11px;color:var(--gray);line-height:1.5;max-width:720px">Pastikan kunjungan dan nilai pemeriksaan sudah tepat. Penyimpanan mempertahankan mekanisme status yang ada; validasi dan persetujuan akhir tetap dilakukan dari daftar hasil.</div>
+              <div id="sf-review-summary" style="margin-top:12px;padding:10px 12px;border-radius:8px;background:var(--bg2);font-size:11px;color:var(--text)"></div>
+            </section>
+          </div>
+          <footer style="display:flex;justify-content:space-between;gap:8px;align-items:center;border-top:1px solid var(--border);padding:9px 16px;background:var(--bg)">
+            <button class="btn btn-ghost btn-sm" type="button" onclick="closeSupportiveWorkspace()">Batal</button>
+            <div style="display:flex;gap:7px"><button class="btn btn-ghost btn-sm" type="button" id="sf-prev" onclick="moveSupportiveWorkspace(-1)" style="display:none">← Kembali</button><button class="btn btn-teal btn-sm" type="button" id="sf-next" onclick="moveSupportiveWorkspace(1)">Lanjut →</button><button class="btn btn-teal btn-sm" type="button" id="sf-save" onclick="saveSuppResult(${id||'null'})" style="display:none">Simpan Hasil</button></div>
+          </footer>
+        </section>
       </div>
-      <div class="form-group">
-        <label>Tipe Pemeriksaan *</label>
-        <select id="sf-type" onchange="renderSuppFields(this.value,'${JSON.stringify(existingData).replace(/'/g,"\\'")}')">
-          ${Object.entries(SUPPORTIVE_TYPES).map(([t,cfg])=>
-            `<option value="${t}" ${currentType===t?'selected':''}>${cfg.icon} ${t}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Dokter Pemeriksa</label>
-        <input type="text" id="sf-doctor" value="${r.approved_by||''}" placeholder="dr. Nama SpJP">
-      </div>
-    </div>
-
-    <!-- Dynamic Fields -->
-    <div id="sf-fields"></div>
-
-    <div class="form-group">
-      <label>Status</label>
-      <select id="sf-status">
-        <option value="Draft" ${(r.status||'Draft')==='Draft'?'selected':''}>Draft</option>
-        <option value="Validated" ${r.status==='Validated'?'selected':''}>Validated</option>
-        <option value="Approved"  ${r.status==='Approved'?'selected':''}>Approved</option>
-      </select>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveSuppResult(${id||'null'})">Simpan</button>
-    </div>`);
-
+    </div>`;
   renderSuppFields(currentType, existingData);
 }
 
-function renderSuppFields(type, existing={}) {
-  const el = document.getElementById('sf-fields'); if (!el) return;
-  const cfg = SUPPORTIVE_TYPES[type]; if (!cfg) return;
+async function closeSupportiveWorkspace() {
+  const type = suppWorkspaceState?.returnType || suppActiveType || '';
+  suppWorkspaceState = null;
+  await renderSupportive(type ? { type } : {});
+}
 
-  // Build form based on type fields
-  const half = Math.ceil(cfg.fields.length/2);
-  el.innerHTML = `
-    <div style="background:${cfg.color}10;border-radius:10px;padding:14px;margin-bottom:14px;border:1.5px solid ${cfg.color}30">
-      <div style="font-size:11px;font-weight:700;color:${cfg.color};text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">
-        ${cfg.icon} ${type}
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        ${cfg.fields.map(f=>{
-          const val = existing[f.id]||'';
-          if (f.type==='textarea') return `
-            <div class="form-group" style="grid-column:1/-1">
-              <label>${f.label}</label>
-              <textarea id="sff-${f.id}" rows="2" placeholder="${f.placeholder||''}">${val}</textarea>
-            </div>`;
-          if (f.type==='select') return `
-            <div class="form-group">
-              <label>${f.label}</label>
-              <select id="sff-${f.id}">
-                ${(f.opts||[]).map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')}
-              </select>
-            </div>`;
-          if (f.type==='file') return `
-            <div class="form-group" style="grid-column:1/-1">
-              <label>${f.label}</label>
-              <div style="display:flex;align-items:center;gap:8px">
-                <input type="file" id="sff-${f.id}" accept=".jpg,.jpeg,.png,.pdf"
-                  onchange="handleSuppFile(this,'${f.id}')">
-                <input type="hidden" id="sff-${f.id}-url" value="${val}">
-                ${val?`<a href="${val}" target="_blank" style="font-size:11px;color:var(--teal)">📎 File tersimpan</a>`:''}
-              </div>
-            </div>`;
-          return `
-            <div class="form-group">
-              <label>${f.label}</label>
-              <input type="${f.type}" id="sff-${f.id}" value="${val}"
-                placeholder="${f.placeholder||''}" step="${f.step||'1'}">
-            </div>`;
-        }).join('')}
-      </div>
-    </div>`;
+function switchSupportiveWorkspaceTab(tab) {
+  if (!suppWorkspaceState) return;
+  const tabs=['context','measurement','interpretation','review'];
+  if (!tabs.includes(tab)) return;
+  suppWorkspaceState.activeTab=tab;
+  document.querySelectorAll('[id^="sf-section-"]').forEach(el=>el.style.display=el.id===`sf-section-${tab}`?'':'none');
+  tabs.forEach((key,index)=>{
+    const btn=document.getElementById(`sf-nav-${key}`); if (!btn) return;
+    const active=key===tab;
+    btn.style.background=active?'var(--teal-soft)':'transparent'; btn.style.color=active?'var(--teal-deep)':'var(--text)';
+    const badge=btn.querySelector('span'); if (badge) { badge.style.background=active?'var(--teal)':'var(--bg2)'; badge.style.color=active?'#fff':'var(--gray)'; }
+  });
+  const index=tabs.indexOf(tab);
+  const prev=document.getElementById('sf-prev'), next=document.getElementById('sf-next'), save=document.getElementById('sf-save');
+  if (prev) prev.style.display=index?'':'none';
+  if (next) next.style.display=index===tabs.length-1?'none':'';
+  if (save) save.style.display=index===tabs.length-1?'':'none';
+  if (tab==='review') renderSupportiveReview();
+}
+
+function moveSupportiveWorkspace(direction) {
+  const tabs=['context','measurement','interpretation','review'];
+  const current=tabs.indexOf(suppWorkspaceState?.activeTab||'context');
+  switchSupportiveWorkspaceTab(tabs[Math.max(0,Math.min(tabs.length-1,current+direction))]);
+}
+
+function renderSupportiveReview() {
+  const el=document.getElementById('sf-review-summary'); if (!el) return;
+  const adm=document.getElementById('sf-adm'), type=document.getElementById('sf-type'), doctor=document.getElementById('sf-doctor'), status=document.getElementById('sf-status');
+  const label=adm?.options?.[adm.selectedIndex]?.text||'Belum memilih kunjungan';
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div><b>Kunjungan</b><br>${label}</div><div><b>Pemeriksaan</b><br>${type?.value||'—'}</div><div><b>Pemeriksa</b><br>${doctor?.value||'Belum diisi'}</div><div><b>Status awal</b><br>${status?.value||'Draft'}</div></div>`;
+}
+
+function renderSuppFields(type, existing={}) {
+  const measurementEl = document.getElementById('sf-measurement-fields');
+  const interpretationEl = document.getElementById('sf-interpretation-fields');
+  if (!measurementEl || !interpretationEl) return;
+  const cfg = SUPPORTIVE_TYPES[type]; if (!cfg) return;
+  if (typeof existing==='string') existing=tryParseJSON(existing)||{};
+  if (suppWorkspaceState) suppWorkspaceState.existingData=existing;
+
+  const fieldMarkup = (f) => {
+    const val = existing[f.id]||'';
+    if (f.type==='textarea') return `<div class="form-group" style="grid-column:1/-1"><label>${f.label}</label><textarea id="sff-${f.id}" rows="3" placeholder="${f.placeholder||''}">${val}</textarea></div>`;
+    if (f.type==='select') return `<div class="form-group"><label>${f.label}</label><select id="sff-${f.id}">${(f.opts||[]).map(o=>`<option${o===val?' selected':''}>${o}</option>`).join('')}</select></div>`;
+    if (f.type==='file') return `<div class="form-group" style="grid-column:1/-1"><label>${f.label}</label><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><input type="file" id="sff-${f.id}" accept=".jpg,.jpeg,.png,.pdf" onchange="handleSuppFile(this,'${f.id}')"><input type="hidden" id="sff-${f.id}-url" value="${val}">${val?`<a href="${val}" target="_blank" style="font-size:11px;color:var(--teal)">📎 File tersimpan</a>`:''}</div></div>`;
+    return `<div class="form-group"><label>${f.label}</label><input type="${f.type}" id="sff-${f.id}" value="${val}" placeholder="${f.placeholder||''}" step="${f.step||'1'}"></div>`;
+  };
+  const interpretationIds=['kesan','rec'];
+  const measurement=cfg.fields.filter(f=>!interpretationIds.includes(f.id));
+  const interpretation=cfg.fields.filter(f=>interpretationIds.includes(f.id));
+
+  measurementEl.innerHTML = `<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">${cfg.icon} Parameter ${type}</div><div style="font-size:11px;color:var(--gray);margin-bottom:12px">Masukkan hasil pengukuran sesuai pemeriksaan yang dilakukan.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${measurement.map(fieldMarkup).join('')}</div>`;
+  interpretationEl.innerHTML = `<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">Interpretasi klinis</div><div style="font-size:11px;color:var(--gray);margin-bottom:12px">Tuliskan kesimpulan dan rekomendasi pemeriksa bila diperlukan.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${interpretation.map(fieldMarkup).join('') || '<div style="font-size:11px;color:var(--gray)">Tidak ada kolom interpretasi khusus.</div>'}</div>`;
 }
 
 function handleSuppFile(input, fieldId) {
@@ -406,7 +436,7 @@ async function saveSuppResult(id) {
   try {
     if (id) { await sbPatch('lab_results',id,payload); toast('✅ Data diupdate','ok'); }
     else    { await sbPost('lab_results',payload);    toast('✅ Data disimpan','ok'); }
-    closeModalForce();
+    await closeSupportiveWorkspace();
     await loadSupportive();
   } catch(e) { toast('❌ '+e.message,'err'); }
 }

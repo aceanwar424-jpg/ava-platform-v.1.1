@@ -632,6 +632,39 @@ window.PETA_MENU = {
           ]
         },
         {
+          "nama": "Konteks Klinis & Penunjang",
+          "menu": [
+            {
+              "id": "lis-anamnesa",
+              "rute": "anamnesa",
+              "label": "Anamnesis & Observasi",
+              "status": "ada",
+              "ket": "Konteks klinis pra-pemeriksaan: verifikasi pasien, tanda vital, observasi, catatan, dan ICD sebelum spesimen diproses"
+            },
+            {
+              "id": "lis-audiometry",
+              "rute": "audiometry",
+              "label": "Audiometri",
+              "status": "ada",
+              "ket": "Worklist pemeriksaan pendengaran; hasil tetap mengikuti validasi dan rilis klinis yang terpisah"
+            },
+            {
+              "id": "lis-spirometry",
+              "rute": "spirometry",
+              "label": "Spirometri",
+              "status": "ada",
+              "ket": "Worklist fungsi paru dengan hasil terstruktur dan alur validasi bertahap"
+            },
+            {
+              "id": "lis-supportive",
+              "rute": "supportive",
+              "label": "EKG & Pemeriksaan Penunjang",
+              "status": "ada",
+              "ket": "Pusat worklist EKG, treadmill, audiometri, dan spirometri tanpa mencampurkan proses laboratorium analitik"
+            }
+          ]
+        },
+        {
           "nama": "Pemeriksaan",
           "menu": [
             {

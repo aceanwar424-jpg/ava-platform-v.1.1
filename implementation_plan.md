@@ -342,3 +342,19 @@ Rencana per irisan ≤1 jam: (1) benahi kebenaran dashboard/grafik/status panel 
 ## Implikasi IP & Kepatuhan
 
 OWNED_BY: ava. Pengguna secara eksplisit meminta implementasi dan release setelah audit. Otorisasi ini mencakup perbaikan aplikasi dan persiapan/deployment rilis pada target proyek yang terbukti; tidak mencakup mengarang SOP klinis, mengubah nilai master, memindahkan data pasien atau mengaktifkan fitur belum tervalidasi. Perubahan operasional diuji dengan data sintetis. Autoverifikasi tetap ditahan jika penjagaan server belum tervalidasi. Tidak menyalin aset brosur. Hindari mengikutsertakan perubahan task lain pada rilis; status deployment dan pengujian alat dilaporkan apa adanya.
+
+## Penyelarasan navigasi LIS dengan audit layanan referensi — 7 September 2026
+
+### Urutan implementasi
+
+1. [x] Audit read-only menu, sub-menu, halaman, tab, toolbar, tabel, dan alur layanan referensi—termasuk anamnesis/specimen, audiometri, spirometri, patologi, radiologi, dan layanan penunjang.
+2. [x] Bedakan secara eksplisit tiga batas kerja: HIS klinis, LIS pra/analitik/pasca-analitik, dan viewer hasil lintas-sistem.
+3. [x] Rapikan menu LIS menjadi kelompok kerja yang ringkas dan berorientasi peran tanpa menduplikasi input klinis dari HIS.
+4. [x] Tambahkan konteks handoff order/hasil untuk layanan non-lab sebagai navigasi baca-saja atau tautan antar-workspace bila rute telah tersedia.
+5. [x] Verifikasi rute, RBAC/menu, sintaks, dan responsivitas menggunakan data kosong/sintetis; jangan membuat transaksi, data pasien, atau koneksi produksi.
+
+### Implikasi IP & Kepatuhan
+
+- Audit referensi hanya membaca UI yang terlihat dan tidak menyalin data pasien, konfigurasi privat, atau aset visual pihak ketiga.
+- LIS tetap menjadi sumber kerja spesimen, pemeriksaan, mutu, validasi, dan rilis hasil lab. Audiometri, spirometri, radiologi, dan anamnesis klinis tetap dimiliki HIS; LIS hanya menerima order atau menyajikan hasil yang memang berada pada kontrak data yang disetujui.
+- Tahap ini tidak mengubah skema, RLS, integrasi analyzer, koneksi LIS/HIS produksi, atau hasil klinis. Perubahan kontrak lintas-sistem memerlukan checkpoint pemilik database dan integrasi.

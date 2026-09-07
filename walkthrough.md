@@ -569,3 +569,11 @@ Batas: tidak menerapkan migrasi ke produksi. Pemetaan tenant admisi historis per
 - Fixture dipindahkan ke `scripts/fixtures/lis-release-check.html` sesudah pengujian, sehingga bukan halaman publik rilis. Untuk mengulang, salin sementara ke root static ava-platform dan hapus salinan setelah uji.
 - ZIP connector dibangun dari kode operasional + evaluator QC + contoh konfigurasi kosong; tidak menyertakan config.json/kunci/spool. Dibangkitkan dengan `scripts/build-lis-connector.cjs`.
 - Remote repo/cabang main teridentifikasi. Belum tersedia project link Vercel atau kredensial migrasi Supabase; informasi diminta dari pengguna. Tidak menjalankan DB produksi atau mengklaim deployment selesai.
+
+## Audit layanan referensi & perapihan workspace penunjang LIS — 2026-09-07
+
+- Audit Chrome dilakukan read-only terhadap delapan domain Services. Tidak ada pencarian/pembukaan data pasien, simpan, cetak, ekspor, sinkronisasi, atau perubahan konfigurasi. Inventaris UI dan workflow tersimpan di [AUDIT_TRUSTMEDIS_SERVICES_2026-09-07.md](docs/AUDIT_TRUSTMEDIS_SERVICES_2026-09-07.md).
+- Menu LIS menambahkan kelompok Konteks Klinis & Penunjang yang memanfaatkan rute yang telah ada: Anamnesis & Observasi, Audiometri, Spirometri, serta EKG & Pemeriksaan Penunjang. Tidak ada rute, API, payload, skema, atau hak akses baru.
+- Form penunjang sekarang merupakan workspace halaman penuh dengan rail ringkas untuk konteks, pengukuran, interpretasi, serta tinjau/simpan. Alur status di form dikunci; transisi tetap dilakukan dari daftar secara berurutan Draft → Validated → Approved.
+- Bukti source: `node --check ava-platform/modules/system/supportive.js`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js`, dan `git diff --check` lulus. Audit menu hidup memeriksa 214 menu aktif tanpa layar, tabel/view, RPC, handler, atau manifest mati.
+- Tidak dilakukan uji visual browser terhadap perubahan workspace ini maupun deploy/migrasi produksi. Integrasi eksternal, object storage lampiran, dan perubahan skema tetap di luar irisan ini.
