@@ -146,8 +146,8 @@ lalu mengisi kolom `target`, `sd`, `z_score`, dan `verdict` di `lab_qc_runs`.
 | `1-2s` | satu run >2 SD | WARNING |
 | `1-3s` | satu run >3 SD | REJECT |
 | `2-2s` | dua run berturut >2 SD searah | REJECT |
-| `R-4s` | rentang dua run >4 SD berlawanan | REJECT |
-| `4-1s` | empat run berturut >1 SD searah | REJECT |
+| `R-4s` | dua level pada run yang sama melewati +2 dan −2 SD | memerlukan konteks run eksplisit; tidak ditebak dari riwayat connector |
+| `4-1s` | empat run berturut >1 SD searah | WARNING pada konfigurasi evaluator saat ini |
 | `10x` | sepuluh run berturut di sisi sama | REJECT |
 
 Aturan yang butuh rentetan membaca 10 run terakhir untuk alat, tes, dan level

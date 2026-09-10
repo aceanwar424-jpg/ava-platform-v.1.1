@@ -227,9 +227,10 @@ function lvGambar() {
                              color:var(--text3); line-height:1.7">
       Aturan Westgard yang diperiksa di sini terbatas pada <b>1-3s</b> dan
       <b>2-2s</b> — hanya itu yang bisa dihitung dari data yang tersimpan.
-      Aturan lain (4-1s, 10x, R-4s lintas level) butuh riwayat lintas level
-      dan lintas hari yang belum lengkap; menampilkannya sebagai "lolos"
-      padahal tidak pernah diperiksa akan memberi rasa aman yang keliru.
+      Aturan lain (4-1s, 10x, dan R-4s antar-level pada run yang sama)
+      memerlukan konteks run/riwayat yang belum lengkap; menampilkannya
+      sebagai "lolos" padahal tidak pernah diperiksa akan memberi rasa aman
+      yang keliru.
     </div>`;
 }
 

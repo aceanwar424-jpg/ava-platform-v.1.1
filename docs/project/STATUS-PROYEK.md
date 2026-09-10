@@ -2,6 +2,27 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Verifikasi restrukturisasi sebelum melanjutkan LIS — 10 September 2026
+
+### Rencana dan checklist
+- [x] Baca aturan baru, struktur dan riwayat Git; baseline main 27a3a85. Pertahankan perubahan Apps yang sedang berjalan.
+- [x] Verifikasi boundary/domain dan lokasi runtime, migrasi, laporan serta skrip LIS.
+- [x] Regresi LIS–HIS dan connector lulus. Uji integritas menemukan fallback R-4s lintas run dari commit restrukturisasi ce5e923.
+- [x] Perbaiki regresi terarah dan selaraskan fixture/dokumentasi terkait (≤1 jam).
+- [x] Ulangi uji terdampak, cek menu/manifest dan paket connector; catat batas kelanjutan rilis (≤1 jam).
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perubahan terbatas pada regresi kode, fixture sintetis dan dokumentasi; tidak mengubah master, nilai rujukan, data pasien atau DB produksi. R-4s menerima konteks satu run secara eksplisit, bukan menebaknya dari riwayat. Referensi primer diperiksa 10 September 2026: https://www.westgard.com/westgard-rules.html. Struktur baru, pengamanan sesi dan pekerjaan Apps dipertahankan. Dokumen historis di bawah tidak menjadi instruksi untuk mengembalikan fallback yang keliru.
+
+### Bukti penutupan verifikasi LIS — 11 September 2026
+- Checkout terbaru main `0405e33`; commit sesudah baseline mengubah kompatibilitas antrean lokal (0048/local-engine), bukan memindahkan runtime LIS. Perubahan Apps, backlog, dan teks lot kontrol dari pekerjaan lain dipertahankan.
+- Struktur: 6 boundary dan 17/17 domain valid; seluruh 125 berkas manifest runtime serta 35 jalur pada manifest historis RC1 masih tersedia. Ini verifikasi keberadaan, bukan kesamaan hash dengan rilis lama.
+- Audit menu statis: 214 menu diperiksa, tanpa renderer, tabel/view, RPC, handler atau entri manifest yang hilang. Tidak menyatakan seluruh fitur sudah lolos UAT.
+- Regresi akibat restrukturisasi direproduksi pada `verify-lis-integrity.cjs`: fallback R-4s mengambil dua nilai riwayat tanpa identitas run. Fallback sudah dihapus; fixture lama kini memberikan pasangan kontrol dalam run yang sama secara eksplisit dan menambahkan kasus negatif lintas run.
+- Sesudah koreksi: verify-lis-integrity, verify-lis-his-sync, verify-lis-connector, syntax LIS dan verify-deploy-readiness lulus. Suite fase 2 lulus 14/14 skenario sintetis; bukan koneksi ke layanan eksternal.
+- ZIP connector dibangun ulang. Pemeriksaan 11 September membuktikan 8 entri, isi sumber sesuai checkout dengan normalisasi LF, dan tidak memuat config.json. SHA256: `9ea3de71ff55efa8d85fd4c7122d47bc51fcb70a6cdd591f71d539e4beb014ff`.
+- Kesimpulan: struktur baru dapat digunakan untuk melanjutkan pengembangan LIS; tidak perlu mengembalikan folder atau dokumen lama. Belum melakukan deploy, migrasi, pembacaan DB operasional, atau perubahan master. Dokumen RC1 tetap catatan historis; paket/manifest rilis berikutnya perlu mencerminkan baseline terkini dan pengujian staging.
+
 ## implementation_plan
 
 # Rencana Implementasi â€” Penyempurnaan HIS & Antrean Publik
@@ -607,7 +628,7 @@ OWNED_BY: ava (pemeliharaan aplikasi yang sudah ada; bukan ekstraksi produk gene
 Tidak mengubah skema, kunci katalog, nilai klinis, provider LLM, atau integrasi eksternal. Tidak menulis data produksi. Data uji sintetis. Klaim sertifikasi di halaman masuk dihapus karena bukti tidak tersedia dalam audit. Otorisasi server/RLS dan simulasi klinis di modul lain tetap perlu audit terpisah sebelum peluncuran produksi.
 
 ### Hasil audit Apps â€” 8 September 2026
-Implementasi lokal dan verifikasi selesai. Detail bukti berada di bagian walkthrough dokumen ini dan docs/archive/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Reload sementara meminta login ulang; SSO query token dihentikan sampai tersedia verifikasi server. Tidak ada deployment atau penulisan produksi.
+Implementasi lokal dan verifikasi selesai. Detail bukti berada di bagian walkthrough dokumen ini dan docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Reload sementara meminta login ulang; SSO query token dihentikan sampai tersedia verifikasi server. Tidak ada deployment atau penulisan produksi.
 
 ## Menu Apps siap uji â€” 8 September 2026
 ### Rencana
@@ -1666,7 +1687,7 @@ Batas: tidak menerapkan migrasi ke produksi. Pemetaan tenant admisi historis per
 - Modal tertutup tidak muncul pada pohon aksesibilitas. Kontras pilihan aktif diperbaiki. Desktop 1280Ã—720, mobile 390Ã—844, dan lebar 320 diperiksa via browser; tidak ada overflow horizontal pada 320px.
 - Dua belas uji regresi sintetis lulus (12/12); sintaks JS/SW dan sinkronisasi domain lulus.
 - Aksi pembayaran/pencairan dan beberapa simulasi klinis diganti pesan belum tersedia. Banner versi uji menandai dashboard yang masih memuat contoh.
-- Laporan terperinci: docs/archive/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Masih perlu audit server/RLS, pemisahan contoh, transaksi cashback, dan EHR berdasarkan ID sebelum produksi.
+- Laporan terperinci: docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Masih perlu audit server/RLS, pemisahan contoh, transaksi cashback, dan EHR berdasarkan ID sebelum produksi.
 - Belum deploy. Checkout juga berisi perubahan HIS/LIS lain; tidak menerbitkan perubahan tersebut sebagai bagian pekerjaan Apps.
 
 ## Audit keamanan domain dan sesi â€” 10 September 2026
@@ -1676,3 +1697,30 @@ Verifikasi: node --test scripts/uji/test_security_domains.cjs scripts/uji/test_a
 Belum deployment: alat browser timeout dua kali ketika membuka tab dashboard Vercel. Belum membaca/mengubah DB produksi, merotasi password atau mencabut semua sesi. Daftar UUID staf belum tersedia. Detail batasan dan langkah penerapan ada di laporan. Perubahan lokal pengguna yang sudah ada dipertahankan.
 
 ---
+
+## Verifikasi restrukturisasi sebelum melanjutkan Apps — 10 September 2026
+
+### Rencana dan checklist
+- [x] Baca AGENTS.md baru dan status Git; baseline bersih pada cde7799.
+- [x] Cocokkan lokasi Apps, AVA Tech, dokumen, fixture, dan entrypoint dengan boundary registry.
+- [x] Jalankan pemeriksaan boundary/domain serta regresi login dan keamanan.
+- [x] Koreksi rujukan laporan Apps yang menunjuk lokasi arsip yang tidak ada.
+- [x] Lanjutkan verifikasi kontrak menu Apps di atas baseline baru; pertahankan pengamanan sesi/cache.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Verifikasi baca-saja, uji sintetis tanpa koneksi DB produksi. Tidak memindahkan runtime, mengubah skema/master, mengembalikan penyimpanan token lama, atau menimpa perubahan keamanan dari pekerjaan lain. Pembaruan berikutnya dibatasi ke kontrak menu/tes dan rujukan dokumentasi Apps.
+
+### Bukti awal
+- verify-application-boundaries: 6 boundary, 17/17 domain, semua entrypoint dan root tersedia.
+- bangun-vercel --periksa: sesuai config/domain.json.
+- test_apps_auth + test_security_domains: 24/24 lulus.
+- Syntax app.js dan navigation.js: lulus.
+- Apps tetap di ava-platform/apps; fixture di scripts/uji; AVA Tech di ava-platform/modules/tech-platform. Rencana/checklist/bukti memakai berkas ini, backlog memakai docs/project/backlog.md.
+- Service worker terbaru membersihkan cache Apps lama dan unregister; tidak dikembalikan ke versi precache sebelumnya.
+
+### Hasil verifikasi lanjutan struktur Apps
+- test_apps_navigation: 6/6 lulus. Setiap halaman terdaftar memiliki tepat satu target HTML; tidak ada view-panel bersarang; menu peran tidak duplikat; maker/approver terpisah; aset lokal dan urutan script valid.
+- verify-deploy-readiness: lulus secara statis; bukan bukti deploy atau UAT produksi.
+- Rujukan laporan Apps dikoreksi ke docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md yang benar-benar tersedia. Laporan audit lama lainnya berada di docs/archive; direktori docs/audit tidak ada pada baseline ini.
+- Total verifikasi terfokus: 24 uji login/keamanan + 6 uji struktur/navigasi lulus. Tidak ada perubahan kode runtime atau pengamanan sesi dalam langkah verifikasi ini.
+- Lanjutan pekerjaan produk: pengujian visual final dan kelengkapan alur menu Apps tetap perlu diselesaikan; verifikasi struktur tidak menyatakan seluruh layanan siap produksi.

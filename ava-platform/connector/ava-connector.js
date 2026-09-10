@@ -443,8 +443,9 @@ function pisahkanQcAstm(raw) {
 // ── Penilaian Westgard ────────────────────────────────────────────────
 // Mencatat angka QC saja belum menjadi bukti mutu; yang dinilai auditor
 // adalah apakah rentetannya melanggar aturan. Aturan yang memerlukan
-// riwayat (2-2s, R-4s, 4-1s, 10x) memakai run sebelumnya pada alat, tes,
+// riwayat (2-2s, 4-1s, 10x) memakai run sebelumnya pada alat, tes,
 // dan level yang sama.
+// R-4s tidak dievaluasi dari riwayat: perlu identitas level dalam run yang sama.
 //
 // `riwayatZ` = z-score run sebelumnya, urut dari yang TERBARU.
 function nilaiWestgard(z,riwayatZ=[]) {

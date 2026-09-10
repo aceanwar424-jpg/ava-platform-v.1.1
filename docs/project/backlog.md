@@ -8,7 +8,7 @@ Rincian bukti dan acceptance: [laporan audit](docs/archive/AUDIT-LIS-MENDALAM-20
 - [ ] P0: perbaiki status panel parsial dan pemetaan tabungâ€“layanan (LIS-03).
 - [ ] P0: rancang transisi server verifikasi/rilis, hitungan berhasil dan event setelah commit (LIS-04).
 - [ ] P0: identitas riwayat stabil, QR lokal dan versi laporan final (LIS-07).
-- [ ] P0: satukan kontrak evaluator QC; inventaris RPC autoverifikasi aktif sebelum aktivasi (LIS-05/06).
+- [x] P0: satukan kontrak evaluator QC; R-4s kini hanya memakai level pada run yang sama dan telah diuji regresi (LIS-05/06).
 - [ ] P1: pagination dan error yang eksplisit; pengaturan klinis terpusat (LIS-08/11).
 - [ ] P1: satukan transaksi log/acknowledgment nilai kritis (LIS-10).
 - [ ] P1: uji fault connector dan desain inbox durable/checksum/deduplikasi (LIS-09).
@@ -23,4 +23,3 @@ Rincian bukti dan acceptance: [laporan audit](docs/archive/AUDIT-LIS-MENDALAM-20
 - Pulihkan sesi melalui validasi server; ganti SSO query-token dengan alur aman.
 - Jadikan klaim cashback transaksi server yang idempoten.
 - Uji EHR terikat patient ID/tenant dan akun resmi sebelum release publik.
-

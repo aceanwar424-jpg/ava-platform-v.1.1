@@ -55,8 +55,10 @@ const qc22s = window.westgardQcEngine.evaluateWestgardRules(111, targetMean, sd,
 assert(qc22s.status === 'REJECT' && qc22s.triggeredRule === '2-2s', 'Deteksi Rule 2-2s (2x berturut >2 SD arah sama): REJECT');
 
 // 1.4 Deteksi Rule R-4s (Random Jump)
-const qcR4s = window.westgardQcEngine.evaluateWestgardRules(111, targetMean, sd, [89]); // dari -2.2 SD lompat ke +2.2 SD (Δ = 4.4 SD)
+const qcR4s = window.westgardQcEngine.evaluateWestgardRules(111, targetMean, sd, [], [89,111]); // dua level pada run yang sama, rentang 4.4 SD
 assert(qcR4s.status === 'REJECT' && qcR4s.triggeredRule === 'R-4s', 'Deteksi Rule R-4s (Rentang lonjakan >4 SD): REJECT');
+const qcAcrossRuns = window.westgardQcEngine.evaluateWestgardRules(111, targetMean, sd, [89]);
+assert(qcAcrossRuns.triggeredRule !== 'R-4s', 'Riwayat berbeda run tidak dianggap sebagai pasangan R-4s');
 
 // 1.5 Deteksi Rule 4-1s (Systematic Trend)
 const qc41s = window.westgardQcEngine.evaluateWestgardRules(106, targetMean, sd, [106, 107, 106]); // 4x di atas +1 SD
