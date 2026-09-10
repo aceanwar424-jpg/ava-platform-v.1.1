@@ -236,7 +236,7 @@ Akar keluhan "sudah ada file .md tapi masih melenceng". Struktur menu hidup di
 **dua tempat yang ditulis tangan**:
 
 - `FLYOUT_MENUS` di dalam `index.html` (~240 baris)
-- `LAPORAN_ARSITEKTUR_MENU_AVA_GLOBAL.md`
+- `docs/architecture/LAPORAN_ARSITEKTUR_MENU_AVA_GLOBAL.md`
 
 Dua daftar tangan untuk hal yang sama pasti menyimpang, dan memang sudah:
 dokumennya menjanjikan pembagian per unit usaha, aplikasinya menampilkan

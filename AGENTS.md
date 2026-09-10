@@ -26,9 +26,9 @@
 
 ## 2. Cara Kerja di Repo Ini (planner hints)
 
-- Selalu **Plan → Execute → Verify**. Tulis rencana ke `implementation_plan.md`, checklist ke `task.md`, bukti ke `walkthrough.md`.
+- Selalu **Plan → Execute → Verify**. Tulis rencana, checklist, dan bukti di `docs/project/STATUS-PROYEK.md`.
 - Pecah tiap Work Item menjadi sub-task **≤ 1 jam**.
-- Setiap `implementation_plan.md` **wajib** memuat section **"Implikasi IP & Kepatuhan"**
+- Setiap perubahan yang direncanakan di `docs/project/STATUS-PROYEK.md` **wajib** memuat section **"Implikasi IP & Kepatuhan"**
   (lihat §4) sebelum mulai koding.
 - **Human checkpoint wajib** (jangan lanjut tanpa persetujuan) sebelum:
   - Mengubah skema data master (kolom katalog, kunci relasional).
@@ -142,7 +142,7 @@ situs/lab klien + bahan otoritas LinkedIn.
 
 ### 4.5 Disiplin Scope
 - **JANGAN** membangun fitur besar sebelum ada 1 klien/uji nyata yang memvalidasi kebutuhan.
-- Utamakan **MVP tipis**; catat ide "nanti" di `backlog.md`, jangan dikerjakan lebih dulu.
+- Utamakan **MVP tipis**; catat ide "nanti" di `docs/project/backlog.md`, jangan dikerjakan lebih dulu.
 
 ### 4.6 Pemeliharaan & Audit
 - Versikan pustaka template & katalog (semantic-ish: `MAJOR.MINOR` + tanggal).
@@ -168,5 +168,5 @@ situs/lab klien + bahan otoritas LinkedIn.
 ## 7. Definition of Done (global)
 - Tidak ada data/ID milik AVA yang ter-hardcode di aset generik.
 - Lolos aturan §4.3 (integritas data) via validator otomatis.
-- Ada `walkthrough.md` berisi bukti (screenshot/log) tiap Work Item.
+- Ada `docs/project/STATUS-PROYEK.md` berisi bukti (screenshot/log) tiap Work Item.
 - Setiap fitur punya section "Implikasi IP & Kepatuhan" yang sudah ditinjau.

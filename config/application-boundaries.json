@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "source_of_truth": "config/domain.json",
+  "migration_policy": {
+    "mode": "compatibility_first",
+    "legacy_paths_remain_until": [
+      "route_manifest_has_no_legacy_references",
+      "dependency_audit_is_zero",
+      "local_and_cloud_parity_is_verified",
+      "rollback_artifact_is_available"
+    ]
+  },
+  "boundaries": {
+    "public-web": {
+      "purpose": "Company profile, public editorial content, and public calculators",
+      "domains": ["web"],
+      "entrypoints": ["portal.html"],
+      "legacy_roots": ["ava-platform/portal.html", "ava-platform/public", "ava-platform/css"],
+      "owner": "public"
+    },
+    "clinical-platform": {
+      "purpose": "HIS, LIS, radiology, pharmacy, finance, workforce, and clinical shared services",
+      "domains": ["his", "lis", "ops", "care"],
+      "entrypoints": ["index.html"],
+      "legacy_roots": [
+        "ava-platform/modules/his",
+        "ava-platform/modules/lab",
+        "ava-platform/modules/radiology",
+        "ava-platform/modules/pharmacy",
+        "ava-platform/modules/finance",
+        "ava-platform/modules/hrd",
+        "ava-platform/modules/logistics",
+        "ava-platform/modules/compliance"
+      ],
+      "owner": "clinical"
+    },
+    "patient-portal": {
+      "purpose": "Patient, corporate, and appointment-facing authenticated portals",
+      "domains": ["app", "corporate"],
+      "entrypoints": ["apps/index.html"],
+      "legacy_roots": ["ava-platform/apps"],
+      "owner": "portal"
+    },
+    "tech-platform": {
+      "purpose": "Customer control plane, licensing, module catalog, telemetry, and platform administration",
+      "domains": ["tech", "console"],
+      "entrypoints": ["index.html"],
+      "legacy_roots": [
+        "ava-platform/modules/tech-platform/tech_saas.js",
+        "ava-platform/modules/tech-platform/tenants.js",
+        "ava-platform/modules/tech-platform/techLicenseActivation.js",
+        "ava-platform/modules/tech-platform/techPricingPlans.js",
+        "ava-platform/modules/tech-platform/techTelemetry.js"
+      ],
+      "owner": "tech"
+    },
+    "wellness-platform": {
+      "purpose": "Wellness, nutrition, sanctuary, home-care, and commerce capabilities",
+      "domains": ["wellness", "nutri", "sanctuary"],
+      "entrypoints": ["index.html"],
+      "legacy_roots": [
+        "ava-platform/modules/business_units/ava_health.js",
+        "ava-platform/modules/business_units/sanctuary_booking.js",
+        "ava-platform/modules/business_units/ecommerce_oms.js"
+      ],
+      "owner": "wellness"
+    },
+    "public-surfaces": {
+      "purpose": "Kiosk, queue display, CRM monitor, nurse portal, and tracking surfaces",
+      "domains": ["kiosk", "nakes", "lacak", "antrian", "crm"],
+      "entrypoints": ["kiosk/index.html", "nakes.html", "track.html", "monitor/antrian.html", "monitor/crm.html"],
+      "legacy_roots": ["ava-platform/kiosk", "ava-platform/monitor"],
+      "owner": "public-operations"
+    }
+  }
+}

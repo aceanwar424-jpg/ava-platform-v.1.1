@@ -23,3 +23,24 @@ Sebelum suatu modul bergantung pada SQL arsip pada staging/produksi:
 - Jangan menjalankan beberapa berkas `supabase_fase*.sql` tanpa urutan dan backup.
 - Jangan menjalankan SQL arsip langsung pada produksi untuk memperbaiki layar kosong.
 - Jangan menganggap audit statis sebagai bukti migrasi telah diterapkan ke cloud.
+
+## Parity lokal → Supabase
+
+DB lokal PGlite adalah sumber kebenaran untuk sinkronisasi data aplikasi desktop.
+Gunakan pemeriksaan read-only terlebih dahulu:
+
+```text
+node scripts/db-parity-local-authoritative.cjs --deep
+```
+
+Laporan hanya berisi metadata tabel, jumlah baris, dan digest; tidak menulis data
+cloud. Untuk menerapkan upsert lokal ke Supabase, operator harus memasok
+`SUPABASE_SERVICE_ROLE_KEY` melalui environment dan menegaskan sumber kebenaran:
+
+```text
+node scripts/db-parity-local-authoritative.cjs --deep --apply --confirm-local-authoritative
+```
+
+Perintah apply tidak menghapus baris cloud yang tidak ada di lokal. Penghapusan
+cloud memerlukan prosedur terpisah, backup, daftar tabel, dan persetujuan pemilik
+database. Tabel tanpa primary key dilewati karena tidak aman untuk di-upsert.

@@ -21,9 +21,9 @@ global.localStorage = {
 require('../../ava-platform/modules/his/integratedOrders.js');
 require('../../ava-platform/modules/radiology/radiologyExpertise.js');
 require('../../ava-platform/modules/his/mpiManagement.js');
-require('../../ava-platform/modules/business_units/techLicenseActivation.js');
-require('../../ava-platform/modules/business_units/techTelemetry.js');
-require('../../ava-platform/modules/business_units/techPricingPlans.js');
+require('../../ava-platform/modules/tech-platform/techLicenseActivation.js');
+require('../../ava-platform/modules/tech-platform/techTelemetry.js');
+require('../../ava-platform/modules/tech-platform/techPricingPlans.js');
 require('../../ava-platform/apps/app.js');
 
 let passedTests = 0;

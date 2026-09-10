@@ -16,7 +16,7 @@ global.localStorage = {
 };
 
 // Muat Modul-modul Terkait
-require('../../ava-platform/modules/business_units/tech_saas.js');
+require('../../ava-platform/modules/tech-platform/tech_saas.js');
 require('../../ava-platform/modules/compliance/catalog_exporter.js');
 require('../../ava-platform/modules/finance/holding_finance.js');
 

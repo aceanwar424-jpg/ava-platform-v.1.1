@@ -99,89 +99,49 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-consult": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-devices": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-calibration": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-marketplace": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-caregiver": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-corporate": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ava-portals": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "finance": [
   "modules/finance/accounting.js",
@@ -1471,34 +1431,19 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "sanctuary_booking": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "sanctuary-booking": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "holding_finance": [
   "modules/finance/accounting.js",
@@ -1522,89 +1467,49 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "d2c": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ecommerce_oms": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "ecommerce-oms": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "pabrik": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "wellness-rnd": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "wellness-maklon": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "wellness-mutu": [
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "bpjs": [
   "modules/compliance/audit.js",
@@ -1957,48 +1862,32 @@ window.MODUL_HALAMAN = {
   "modules/system/config/master_registry.js"
  ],
  "tech": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech_saas": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "license-manager": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "saas-console": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "lis-phlebotomy": [
   "modules/lab/qcEngine.js",
@@ -2771,48 +2660,32 @@ window.MODUL_HALAMAN = {
   "modules/radiology/rad_master.js"
  ],
  "tech-aktivasi": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech-telemetri": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech-harga": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tenants": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "db-studio": [
   "modules/system/config/config_family.js",
@@ -2831,48 +2704,32 @@ window.MODUL_HALAMAN = {
   "modules/system/config/master_registry.js"
  ],
  "tech-roadmap": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech-modul": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech-isu": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "tech-sprint": [
-  "modules/business_units/ava_health.js",
-  "modules/business_units/ecommerce_oms.js",
-  "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js"
  ],
  "apps-hub": [
   "modules/system/config/config_family.js",
@@ -2910,12 +2767,7 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "cfg-facility": [
   "modules/system/config/config_family.js",
@@ -3192,12 +3044,7 @@ window.MODUL_HALAMAN = {
   "modules/business_units/ava_health.js",
   "modules/business_units/ecommerce_oms.js",
   "modules/business_units/sanctuary_booking.js",
-  "modules/business_units/tech_saas.js",
-  "modules/business_units/tenants.js",
-  "modules/business_units/pabrik.js",
-  "modules/business_units/techLicenseActivation.js",
-  "modules/business_units/techPricingPlans.js",
-  "modules/business_units/techTelemetry.js"
+  "modules/business_units/pabrik.js"
  ],
  "cfg-satusehat": [
   "modules/compliance/audit.js",
@@ -3387,8 +3234,6 @@ window.MODUL_SEMUA = [
  "modules/system/supportive.js",
  "modules/system/surat.js",
  "modules/system/timeline.js",
- "modules/business_units/tech_saas.js",
- "modules/business_units/tenants.js",
  "modules/his/queue_config.js",
  "modules/his/queue_console.js",
  "modules/business_units/pabrik.js",
@@ -3399,9 +3244,6 @@ window.MODUL_SEMUA = [
  "modules/lab/pmeProficiency.js",
  "modules/lab/sampleArchiving.js",
  "modules/lab/specimenVerification.js",
- "modules/business_units/techLicenseActivation.js",
- "modules/business_units/techPricingPlans.js",
- "modules/business_units/techTelemetry.js",
  "modules/his/integratedOrders.js",
  "modules/his/mpiManagement.js",
  "modules/radiology/radiologyExpertise.js",
@@ -3417,5 +3259,10 @@ window.MODUL_SEMUA = [
  "modules/lab/helpdesk.js",
  "modules/system/config/master_registry.js",
  "modules/his/lis_result_viewer.js",
- "modules/his/operations_hubs.js"
+ "modules/his/operations_hubs.js",
+ "modules/tech-platform/techLicenseActivation.js",
+ "modules/tech-platform/techPricingPlans.js",
+ "modules/tech-platform/techTelemetry.js",
+ "modules/tech-platform/tech_saas.js",
+ "modules/tech-platform/tenants.js"
 ];

@@ -26,9 +26,12 @@ function evaluateWestgardZ(zScores, sameRunZ=[]) {
   const z=zScores.at(-1),same=(n,t)=>zScores.length>=n &&
     (zScores.slice(-n).every(v=>v>t)||zScores.slice(-n).every(v=>v < -t));
   let rule=null,status='PASS';
+  const run = sameRunZ.length ? sameRunZ : zScores.slice(-2);
   if(Math.abs(z)>3) rule='1-3s';
   else if(same(2,2)) rule='2-2s';
-  else if(sameRunZ.length>=2 && Math.max(...sameRunZ)>2 && Math.min(...sameRunZ)<-2 && Math.max(...sameRunZ)-Math.min(...sameRunZ)>4) rule='R-4s';
+  // Older callers supplied the immediately preceding control in zScores.
+  // Keep that contract while allowing explicit same-run levels for multi-level QC.
+  else if(run.length>=2 && Math.max(...run)>2 && Math.min(...run)<-2 && Math.max(...run)-Math.min(...run)>4) rule='R-4s';
   else if(same(10,0)) rule='10x';
   if(rule) status='REJECT';
   else if(same(4,1)){rule='4-1s';status='WARNING';}

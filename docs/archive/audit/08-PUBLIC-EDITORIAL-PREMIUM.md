@@ -20,4 +20,4 @@ Pengguna meminta menganggap seluruh lini berjalan. Enam profil menggunakan ranca
 BMI untuk dewasa usia ≥20; pembatasan usia maksimum 78 untuk scope alat energi. Rumus energi Mifflin–St Jeor yang disederhanakan. Faktor 1.2/1.4/1.6/1.8 adalah pilihan skenario aplikasi, bukan bagian studi asli. Tidak menghasilkan target defisit kalori. Form tidak melakukan request atau persistence. Penggunaan pada hamil/menyusui, atlet bermassa otot tinggi dan kondisi kebutuhan gizi medis dikecualikan dalam petunjuk alat. Hasil kategori ditentukan sebelum pembulatan angka.
 
 ## Validasi dan status
-Lihat walkthrough.md dan scripts/verify-public-editorial.js. Perubahan hanya aset publik dan build/validasi terkait, tidak menyentuh aplikasi operasional lain. Belum dipublikasikan.
+Lihat bagian walkthrough pada `docs/project/STATUS-PROYEK.md` dan scripts/verify-public-editorial.js. Perubahan hanya aset publik dan build/validasi terkait, tidak menyentuh aplikasi operasional lain. Belum dipublikasikan.

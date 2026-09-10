@@ -4,7 +4,7 @@
 //
 // MENGAPA DIBANGKITKAN, BUKAN DITULIS TANGAN
 // Struktur menu sebelumnya hidup di dua tempat sekaligus: FLYOUT_MENUS di
-// dalam index.html dan LAPORAN_ARSITEKTUR_MENU_AVA_GLOBAL.md. Keduanya
+// dalam index.html dan docs/architecture/LAPORAN_ARSITEKTUR_MENU_AVA_GLOBAL.md. Keduanya
 // ditulis tangan dan sudah menyimpang — dokumennya menjanjikan pembagian
 // per unit usaha, aplikasinya menampilkan semuanya di setiap subdomain.
 //

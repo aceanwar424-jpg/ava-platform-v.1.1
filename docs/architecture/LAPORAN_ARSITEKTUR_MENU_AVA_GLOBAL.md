@@ -1,10 +1,10 @@
-# DOKUMEN LAPORAN EKSEKUTIF ARSITEKTUR SISTEM & PEMETAAN MENU
-## AVA GLOBAL HOLDING (ONE PLATFORM — 6 PILAR BISNIS & SUPPORT SYSTEM)
+﻿# DOKUMEN LAPORAN EKSEKUTIF ARSITEKTUR SISTEM & PEMETAAN MENU
+## AVA GLOBAL HOLDING (ONE PLATFORM â€” 6 PILAR BISNIS & SUPPORT SYSTEM)
 
 > **Catatan revisi 30 Agustus 2026.** Dokumen ini menjelaskan peta menu yang
-> *dituju*. Untuk keadaan yang benar-benar terpasang — termasuk menu yang
-> sempat tidak tersambung dan portal korporat yang dipulihkan — lihat
-> [docs/audit/05-KOREKSI-DAN-PERBAIKAN.md](docs/audit/05-KOREKSI-DAN-PERBAIKAN.md).
+> *dituju*. Untuk keadaan yang benar-benar terpasang â€” termasuk menu yang
+> sempat tidak tersambung dan portal korporat yang dipulihkan â€” lihat
+> [docs/archive/audit/05-KOREKSI-DAN-PERBAIKAN.md](docs/archive/audit/05-KOREKSI-DAN-PERBAIKAN.md).
 
 **Dokumen No:** AVA-DOC-ARCH-2026-V5.1  
 **Tanggal Rilis:** 30 Agustus 2026  
@@ -45,11 +45,11 @@ graph TD
 - **Badan Hukum:** PT AVA Global Holding Nusantara
 - **Fokus Utama:** Pengawasan operasional lintas entitas, konsolidasi finansial, valuasi seri A, dan pusat kendali krisis operasional.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Dashboard Operasional Holding (`dashboard`):**
    - *Fungsi:* Ringkasan KPI live 6 pilar bisnis, jumlah pasien hari ini, revenue harian, status antrian, dan tombol pintasan cepat ke seluruh modul operasional.
 2. **Pusat Kendali Operasional (`ops-kendali`):**
-   - *Fungsi:* Incident command center — memantau sampel lab kritis yang tertahan, stok reagen/BHP menipis, jadwal nakes belum ter-dispatch, dan tagihan invoice jatuh tempo.
+   - *Fungsi:* Incident command center â€” memantau sampel lab kritis yang tertahan, stok reagen/BHP menipis, jadwal nakes belum ter-dispatch, dan tagihan invoice jatuh tempo.
 3. **CEO Master Orchestration Cockpit (`executive-dashboard`):**
    - *Fungsi:* Visualisasi matriks performa bisnis tingkat direksi: P&L konsolidasi, status tenant aktif, lisensi modul, Burn Rate, Runway, dan simulasi BEP holding.
 4. **Konsolidasi Finansial 6 Pilar (`holding-finance`):**
@@ -59,7 +59,7 @@ graph TD
 6. **SUPPORT SYSTEM Hub (`support-hub`):**
    - *Fungsi:* Gateway peluncuran display layar antrian TV poli/lab, anjungan mandiri (Kiosk), dan CRM monitor penjualan.
 
-#### 🔄 End-to-End Workflow Holding HQ:
+#### ðŸ”„ End-to-End Workflow Holding HQ:
 ```mermaid
 sequenceDiagram
     participant AnakPT as 6 Pilar Bisnis (PT)
@@ -79,7 +79,7 @@ sequenceDiagram
 - **Badan Hukum:** PT AVA Diagnostika Indonesia
 - **Fokus Utama:** Sistem Informasi Laboratorium (LIS) patuh ISO 15189:2022, integrasi alat analyzer otomatis, delta check, kendali mutu Westgard, dan rilis hasil terenkripsi.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Penerimaan Sampel & Barcode (`lab-checkin`):**
    - *Fungsi:* Registrasi sampel laboratorium, validasi tabung vakum (EDTA, Serum, Heparin), dan pencetakan barcode label tabung direct thermal.
 2. **Input Hasil & Delta Check (`lab-result`):**
@@ -99,7 +99,7 @@ sequenceDiagram
 9. **Arsip Rekam Medis Lab (`lab-report`):**
    - *Fungsi:* Database pencarian riwayat pemeriksaan laboratorium pasien terdahulu, tren analit darah dari waktu ke waktu, dan pencetakan ulang salinan hasil.
 
-#### 🔄 End-to-End Workflow PT AVA Diagnostika:
+#### ðŸ”„ End-to-End Workflow PT AVA Diagnostika:
 ```mermaid
 graph LR
     A[Pasien / Phlebotomy] -->|Sampel Darah| B(Check-in & Cetak Barcode)
@@ -117,7 +117,7 @@ graph LR
 - **Badan Hukum:** PT AVA Medika Prima
 - **Fokus Utama:** Rekam Medis Elektronik (RME / EMR SOAP), Poliklinik Spesialis, Farmasi Apotek, Visualisasi Radiologi PACS, dan Integrasi SATUSEHAT Kemenkes RI.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Pendaftaran & Admisi Pasien (`admission`):**
    - *Fungsi:* Registrasi identitas pasien baru/lama, sinkronisasi NIK ke Dukcapil, penandatanganan formulir persetujuan umum (*General Consent*), dan pencetakan gelang pasien.
 2. **Antrian Poli & TV Ruang Tunggu (`queue`):**
@@ -139,7 +139,7 @@ graph LR
 10. **Integrasi SATUSEHAT Kemenkes (`satusehat`):**
     - *Fungsi:* Bridging standar HL7 FHIR Kemenkes RI untuk pengiriman data kunjungan (*Encounter*), riwayat keluhan (*Condition*), dan tindakan medis secara otomatis.
 
-#### 🔄 End-to-End Workflow PT AVA Medika Prima:
+#### ðŸ”„ End-to-End Workflow PT AVA Medika Prima:
 ```mermaid
 graph LR
     A[Pasien Datang / Kiosk] --> B(Pendaftaran & Antrian Poli)
@@ -157,7 +157,7 @@ graph LR
 - **Badan Hukum:** PT AVA Care Indonesia
 - **Fokus Utama:** Layanan on-demand kesehatan ke rumah pasien (sampling darah, infus vitamin, perawatan luka, fisioterapi, dan vaksinasi).
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Order Kunjungan Pasien (`homecare`):**
    - *Fungsi:* Penerimaan pemesanan home care dari aplikasi pasien atau WhatsApp admin, pencatatan alamat GPS, paket layanan yang dipilih, dan jadwal kedatangan.
 2. **Kalender & Penjadwalan Nakes (`hc-schedule`):**
@@ -177,7 +177,7 @@ graph LR
 - **Badan Hukum:** PT Queen Nutrition Nusantara
 - **Fokus Utama:** Penjualan suplemen nutrisi, minuman kesehatan wanita, distribusi konsinyasi 1.000 apotek, dan ekosistem e-commerce omni-channel.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Pesanan Multi-Channel D2C (`ecommerce-oms`):**
    - *Fungsi:* Manajemen pesanan masuk tersentralisasi dari Shopee Mall, TikTok Shop, Tokopedia, Lazada, dan situs web resmi AVA Store.
 2. **Konsinyasi 1.000 Apotek Modern (`ecommerce-oms-apotek`):**
@@ -197,7 +197,7 @@ graph LR
 - **Badan Hukum:** PT Queen Sanctuary Wellness
 - **Fokus Utama:** Layanan pemulihan pasca-melahirkan (*Postnatal Care*), terapi dasar panggul (*Pelvic Floor Rehab*), lymphatic drainage, dan perawatan kecantikan wanita holistik.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Jadwal Reservasi Treatment (`sanctuary-booking`):**
    - *Fungsi:* Kalender booking sesi terapi, alokasi terapis bersertifikasi, dan pencegahan bentrok jadwal perawatan.
 2. **Manajemen Member VIP & Saldo Sesi (`sanctuary-members`):**
@@ -215,7 +215,7 @@ graph LR
 - **Badan Hukum:** PT AVA Mitra Korporat
 - **Fokus Utama:** Pelayanan Medical Check-Up (MCU) massal bagi perusahaan, pabrik BUMN/swasta, institusi perbankan, serta kerja sama rujukan asuransi TPA.
 
-#### 📋 Struktur Menu & Sub-Menu:
+#### ðŸ“‹ Struktur Menu & Sub-Menu:
 1. **Corporate Partner Database (`partners`):**
    - *Fungsi:* Direktori perusahaan klien B2B, PIC perusahaan, plafon anggaran karyawan, dan histori proyek MCU tahunan.
 2. **Project MCU & Roster Karyawan (`mcu`):**
@@ -236,66 +236,66 @@ graph LR
 ## 3. MODUL PENDUKUNG MANAJEMEN & TATA KELOLA (SUPPORT & GOVERNANCE)
 
 ### 1. Marketing, CRM & Growth Engine (`marketing`)
-- 🎯 **Leads & Pipeline CRM (`leads`):** Pelacakan calon pasien dan prospek corporate MCU.
-- ✨ **Campaign & Promo Vouchers (`campaigns`):** Manajemen kupon diskon dan promosi musiman.
-- ✍️ **AI Content & SEO Writer (`content-engine`):** Penulisan otomatis artikel kesehatan dan konten edukasi medsos.
-- 📄 **Penerbitan Penawaran Harga (`penawaran`):** Quotation resmi paket layanan medis/wellness.
-- 📜 **MOU & Kontrak Kerjasama (`mou`):** Legalitas perjanjian kerja sama influencer/partner.
-- 📺 **CRM Live Display Monitor (`crm-tv`):** Monitor layar TV target penjualan & omzet sales harian.
-- 📈 **Analitik Pertumbuhan Omzet (`ecommerce-oms-analytics`):** Evaluasi ROI promosi dan konversi leads.
+- ðŸŽ¯ **Leads & Pipeline CRM (`leads`):** Pelacakan calon pasien dan prospek corporate MCU.
+- âœ¨ **Campaign & Promo Vouchers (`campaigns`):** Manajemen kupon diskon dan promosi musiman.
+- âœï¸ **AI Content & SEO Writer (`content-engine`):** Penulisan otomatis artikel kesehatan dan konten edukasi medsos.
+- ðŸ“„ **Penerbitan Penawaran Harga (`penawaran`):** Quotation resmi paket layanan medis/wellness.
+- ðŸ“œ **MOU & Kontrak Kerjasama (`mou`):** Legalitas perjanjian kerja sama influencer/partner.
+- ðŸ“º **CRM Live Display Monitor (`crm-tv`):** Monitor layar TV target penjualan & omzet sales harian.
+- ðŸ“ˆ **Analitik Pertumbuhan Omzet (`ecommerce-oms-analytics`):** Evaluasi ROI promosi dan konversi leads.
 
 ### 2. Administrasi Umum, Dokumen Mutu & Legal (`administration`)
-- 🛡️ **Compliance & Legal Tracker (`compliance-tracker`):** Pengawasan izin operasional, SIP nakes, BPOM, Halal, K3 Lab.
-- 💼 **Master Database Rekanan & Vendor (`partners`):** Arsip data mitra bisnis, supplier reagen, dan vendor holding.
-- 📜 **Arsip Dokumen MOU & Kontrak (`mou`):** Penyimpanan naskah perjanjian kerja sama (PKS/MoU) ber-alarm.
-- 📄 **Penawaran & Surat Keluar Resmi (`penawaran`):** Penomoran surat resmi, surat rujukan, dan korespondensi.
-- 🏥 **Arsip Project & Klien Korporat (`mcu`):** Rekapitulasi arsip proyek MCU massal dan rekap sertifikat sehat.
+- ðŸ›¡ï¸ **Compliance & Legal Tracker (`compliance-tracker`):** Pengawasan izin operasional, SIP nakes, BPOM, Halal, K3 Lab.
+- ðŸ’¼ **Master Database Rekanan & Vendor (`partners`):** Arsip data mitra bisnis, supplier reagen, dan vendor holding.
+- ðŸ“œ **Arsip Dokumen MOU & Kontrak (`mou`):** Penyimpanan naskah perjanjian kerja sama (PKS/MoU) ber-alarm.
+- ðŸ“„ **Penawaran & Surat Keluar Resmi (`penawaran`):** Penomoran surat resmi, surat rujukan, dan korespondensi.
+- ðŸ¥ **Arsip Project & Klien Korporat (`mcu`):** Rekapitulasi arsip proyek MCU massal dan rekap sertifikat sehat.
 
 ### 3. Keuangan, Kasir POS & Akuntansi (`finance`)
-- 🏧 **Kasir POS Multi-Payment (`cashier`):** Kasir tunai, QRIS dinamis, kartu debit/kredit, dan split bill.
-- ⏰ **Shift Kasir & Berita Acara (`cashier-shift`):** Buka/tutup shift kasir dengan rekonsiliasi kas fisik.
-- 💳 **Invoice & Tagihan AR (`finance`):** Faktur tagihan resmi, kwitansi lunas, dan monitoring pelunasan.
-- 📑 **Piutang Usaha & AR Aging (`finance-ar`):** Pelacakan umur piutang perusahaan klien (0-30, 31-60, >90 hari).
-- 🏆 **Komisi Sales & Nakes (`finance-comm`):** Perhitungan komisi tim sales dan honor tindakan home care.
-- 📊 **Laporan Laba Rugi P&L (`finance-report`):** Laporan keuangan pendapatan, HPP, beban operasional, dan net margin.
-- 📖 **Buku Besar & Akuntansi (`accounting`):** Jurnal otomatis debet/kredit terintegrasi bagan akun (COA).
-- 🧾 **Hutang Usaha AP (`payables`):** Pengelolaan jadwal jatuh tempo pembayaran supplier.
-- 🔧 **Aset Tetap & Kalibrasi (`assets`):** Inventaris alat medis, nilai penyusutan depresiasi, dan kalibrasi tahunan.
+- ðŸ§ **Kasir POS Multi-Payment (`cashier`):** Kasir tunai, QRIS dinamis, kartu debit/kredit, dan split bill.
+- â° **Shift Kasir & Berita Acara (`cashier-shift`):** Buka/tutup shift kasir dengan rekonsiliasi kas fisik.
+- ðŸ’³ **Invoice & Tagihan AR (`finance`):** Faktur tagihan resmi, kwitansi lunas, dan monitoring pelunasan.
+- ðŸ“‘ **Piutang Usaha & AR Aging (`finance-ar`):** Pelacakan umur piutang perusahaan klien (0-30, 31-60, >90 hari).
+- ðŸ† **Komisi Sales & Nakes (`finance-comm`):** Perhitungan komisi tim sales dan honor tindakan home care.
+- ðŸ“Š **Laporan Laba Rugi P&L (`finance-report`):** Laporan keuangan pendapatan, HPP, beban operasional, dan net margin.
+- ðŸ“– **Buku Besar & Akuntansi (`accounting`):** Jurnal otomatis debet/kredit terintegrasi bagan akun (COA).
+- ðŸ§¾ **Hutang Usaha AP (`payables`):** Pengelolaan jadwal jatuh tempo pembayaran supplier.
+- ðŸ”§ **Aset Tetap & Kalibrasi (`assets`):** Inventaris alat medis, nilai penyusutan depresiasi, dan kalibrasi tahunan.
 
 ### 4. Inventori, Logistik & Pengadaan MRP (`inventory`)
-- 📦 **Stok Barang & Reagen (`inventory`):** Saldo stok fisik real-time di seluruh gudang dan poli/lab.
-- 📤 **Pengeluaran Barang Internal (`inventory-issue`):** Bon mutasi barang dari gudang ke unit pemakai.
-- 📋 **Stock Opname (`inventory-opname`):** Penyesuaian stok berkala dengan berita acara selisih stok.
-- 📜 **Kartu Stok Elektronik (`inventory-ledger`):** Mutasi keluar/masuk per lot batch barang.
-- 🧪 **Resep BHP per Pemeriksaan Lab (`inventory-recipe`):** *Bill of Materials (BOM)* otomatis memotong reagen/BHP per tes lab.
-- 🛒 **Permintaan Pembelian / PR (`inventory-pr`):** Pengajuan pembelian stok baru oleh kepala unit operasional.
-- 📄 **Pesanan Pembelian / PO (`inventory-po`):** Penerbitan dokumen Purchase Order resmi ke supplier.
-- 🏭 **Master Supplier Rekanan (`inventory-supplier`):** Database vendor penyedia reagen, obat, dan packaging.
-- 📈 **Perencanaan Kebutuhan Material / MRP (`inventory-mrp`):** Perhitungan otomatis kebutuhan pembelian (*Buffer Stock & Reorder Point*).
-- 📊 **Laporan Inventori & Valuasi (`inventory-report`):** Valuasi aset stok menggunakan metode FIFO/Average.
+- ðŸ“¦ **Stok Barang & Reagen (`inventory`):** Saldo stok fisik real-time di seluruh gudang dan poli/lab.
+- ðŸ“¤ **Pengeluaran Barang Internal (`inventory-issue`):** Bon mutasi barang dari gudang ke unit pemakai.
+- ðŸ“‹ **Stock Opname (`inventory-opname`):** Penyesuaian stok berkala dengan berita acara selisih stok.
+- ðŸ“œ **Kartu Stok Elektronik (`inventory-ledger`):** Mutasi keluar/masuk per lot batch barang.
+- ðŸ§ª **Resep BHP per Pemeriksaan Lab (`inventory-recipe`):** *Bill of Materials (BOM)* otomatis memotong reagen/BHP per tes lab.
+- ðŸ›’ **Permintaan Pembelian / PR (`inventory-pr`):** Pengajuan pembelian stok baru oleh kepala unit operasional.
+- ðŸ“„ **Pesanan Pembelian / PO (`inventory-po`):** Penerbitan dokumen Purchase Order resmi ke supplier.
+- ðŸ­ **Master Supplier Rekanan (`inventory-supplier`):** Database vendor penyedia reagen, obat, dan packaging.
+- ðŸ“ˆ **Perencanaan Kebutuhan Material / MRP (`inventory-mrp`):** Perhitungan otomatis kebutuhan pembelian (*Buffer Stock & Reorder Point*).
+- ðŸ“Š **Laporan Inventori & Valuasi (`inventory-report`):** Valuasi aset stok menggunakan metode FIFO/Average.
 
 ### 5. SDM, Presensi & HR Management (`hrd`)
-- 👥 **Database Karyawan (`hrd`):** Data biodata staf medis, analis, perawat, marketing, dan manajemen holding.
-- 🌳 **Struktur Organisasi (`org-structure`):** Visualisasi bagan hierarki departemen holding.
-- 📅 **Jadwal Kerja & Roster Shift (`work-schedule`):** Pengaturan jadwal kerja fleksibel dan shift jaga.
-- 📆 **Kalender Shift Terintegrasi (`shift-calendar`):** Kalender bulanan jadwal staf yang bertugas.
-- ⏰ **Presensi GPS & Kehadiran (`attendance`):** Catatan log presensi mobile dengan validasi GPS dan foto selfie.
-- 🕐 **Manajemen Cuti & Izin (`hrd-cuti`):** Alur persetujuan cuti tahunan, sakit, dan izin dinas.
-- 💵 **Penggajian / Payroll (`hrd-payroll`):** Perhitungan gaji pokok, lembur, BPJS, dan slip gaji digital.
+- ðŸ‘¥ **Database Karyawan (`hrd`):** Data biodata staf medis, analis, perawat, marketing, dan manajemen holding.
+- ðŸŒ³ **Struktur Organisasi (`org-structure`):** Visualisasi bagan hierarki departemen holding.
+- ðŸ“… **Jadwal Kerja & Roster Shift (`work-schedule`):** Pengaturan jadwal kerja fleksibel dan shift jaga.
+- ðŸ“† **Kalender Shift Terintegrasi (`shift-calendar`):** Kalender bulanan jadwal staf yang bertugas.
+- â° **Presensi GPS & Kehadiran (`attendance`):** Catatan log presensi mobile dengan validasi GPS dan foto selfie.
+- ðŸ• **Manajemen Cuti & Izin (`hrd-cuti`):** Alur persetujuan cuti tahunan, sakit, dan izin dinas.
+- ðŸ’µ **Penggajian / Payroll (`hrd-payroll`):** Perhitungan gaji pokok, lembur, BPJS, dan slip gaji digital.
 
 ### 6. AI Agentic Suite & Otomasi Medis (`agentic`)
-- 🤖 **Agentic Orchestrator (`agentic`):** Pusat orkestrasi multi-agent AI otonom untuk tugas analitik dan optimasi sistem.
-- 📑 **ISO 15189 QMS Engine:** Pemroses rekayasa dokumen mutu laboratorium ke standar akreditasi ISO 15189:2022.
-- 🔬 **Batch Test Reengineering:** Penerjemah dan standarisasi deskripsi 530+ tes medis ke bahasa Indonesia awam.
-- 🌐 **AI Medical Translator:** Modul penerjemahan istilah medis dan singkatan laboratorium.
+- ðŸ¤– **Agentic Orchestrator (`agentic`):** Pusat orkestrasi multi-agent AI otonom untuk tugas analitik dan optimasi sistem.
+- ðŸ“‘ **ISO 15189 QMS Engine:** Pemroses rekayasa dokumen mutu laboratorium ke standar akreditasi ISO 15189:2022.
+- ðŸ”¬ **Batch Test Reengineering:** Penerjemah dan standarisasi deskripsi 530+ tes medis ke bahasa Indonesia awam.
+- ðŸŒ **AI Medical Translator:** Modul penerjemahan istilah medis dan singkatan laboratorium.
 
 ### 7. Pengaturan Sistem, Akses & Lisensi (`konfigurasi`)
-- ⚙️ **Pengaturan Profil Klinik / Lab (`settings`):** Nama faskes, alamat, izin operasional, logo resmi, dan format kop surat PDF.
-- 👤 **User Management & Hak Akses RBAC (`users`):** Pengelolaan user, password, dan pembagian hak akses menu per peran.
-- 🔍 **Jejak Audit Trail Sistem (`audit`):** Log pencatatan kronologis aktivitas pengubahan data sensitif sesuai UU PDP & ISO.
-- 🧬 **Master Data Pemeriksaan & Tarif (`product`):** Katalog paket layanan, tarif dasar tindakan, dan formula bagi hasil.
-- 📥 **Import & Export Data Excel (`import`):** Upload data pasien, tarif, dan stok awal via spreadsheet XLSX/CSV.
-- 🔑 **Manajemen Lisensi Multi-Tenant:** Lisensi aktivasi modul per entitas anak perusahaan.
+- âš™ï¸ **Pengaturan Profil Klinik / Lab (`settings`):** Nama faskes, alamat, izin operasional, logo resmi, dan format kop surat PDF.
+- ðŸ‘¤ **User Management & Hak Akses RBAC (`users`):** Pengelolaan user, password, dan pembagian hak akses menu per peran.
+- ðŸ” **Jejak Audit Trail Sistem (`audit`):** Log pencatatan kronologis aktivitas pengubahan data sensitif sesuai UU PDP & ISO.
+- ðŸ§¬ **Master Data Pemeriksaan & Tarif (`product`):** Katalog paket layanan, tarif dasar tindakan, dan formula bagi hasil.
+- ðŸ“¥ **Import & Export Data Excel (`import`):** Upload data pasien, tarif, dan stok awal via spreadsheet XLSX/CSV.
+- ðŸ”‘ **Manajemen Lisensi Multi-Tenant:** Lisensi aktivasi modul per entitas anak perusahaan.
 
 ---
 
@@ -320,3 +320,4 @@ graph LR
 
 ---
 *Dokumen ini diterbitkan secara resmi sebagai pedoman standar operasional dan arsitektur perangkat lunak AVA GLOBAL HOLDING PLATFORM.*
+

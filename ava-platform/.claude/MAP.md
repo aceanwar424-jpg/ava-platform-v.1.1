@@ -24,8 +24,8 @@ Anchor = **nama fungsi**, bukan nomor baris (baris cepat bergeser). Grep nama fu
 | Portal corporate — Book/Approval/History | `apps/app.js` | `renderBookExamination`+`submitExamBooking`, `renderExamApproval`+`saveExamApproval`, `renderExamHistory`, `filterBookExam`, `genBatchCode` |
 | Hasil MCU & Account Statement (ADMIN, tab di Config Corporate) | `modules/config_package.js` | `renderCorpResultsAdmin`+`exportCorpResultsAdmin` (lab_results via admisi corporate), `renderCorpStatementAdmin`+`exportCorpStatementAdmin` (invoices+saldo), `_csvDownload`. Tab via `switchCorpDetailTab('results'/'statement')`. (Dulu di portal — dipindah ke admin.) |
 | Portal — menu/peran/login | `apps/app.js` | `renderSidebarMenu`, `showView`, `handleLogin` |
-| AVA Tech — cockpit & penjualan sistem | `modules/business_units/tech_saas.js` | `renderTechSaas` (rute `saas-console`), `provisionNewTenant`, `trackUsageMetering` — keduanya **async & menulis ke DB** sejak 0029 |
-| AVA Tech — tenant klien faskes | `modules/business_units/tenants.js` | `renderTenants`, `tntForm`, `tntSimpan`. Sumber: view `tenant_ringkasan` (0029) |
+| AVA Tech — cockpit & penjualan sistem | `modules/tech-platform/tech_saas.js` | `renderTechSaas` (rute `saas-console`), `provisionNewTenant`, `trackUsageMetering` — keduanya **async & menulis ke DB** sejak 0029 |
+| AVA Tech — tenant klien faskes | `modules/tech-platform/tenants.js` | `renderTenants`, `tntForm`, `tntSimpan`. Sumber: view `tenant_ringkasan` (0029) |
 | Portal korporat BERTOKEN (tanpa akun) | `portal_korporat.html` | halaman mandiri; data HANYA via `POST /functions/v1/portal` (RPC `portal_korporat`). Kelola roster via `/functions/v1/portal/karyawan/{tambah,impor,assign,nonaktif}` — lihat `db/migrations/0028`. Izin tulis = `portal_akses.boleh_tulis` (bawaan MATI). |
 | Terbitkan/cabut tautan portal (staf) | `modules/system/portal_akses.js` | `pakBuat`, `pakSimpan`, `pakSetTulis`, `pakCabut` |
 | Config corporate (admin) | `modules/config_package.js` | `openCorpForm` (multi-tab), `openCorpEmployees`, `saveCorpEmpInline`, `_caStyleTag` |

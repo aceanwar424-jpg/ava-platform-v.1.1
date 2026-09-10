@@ -202,7 +202,20 @@ function checkCriticalValue(param, val) {
   return { is_critical: false, type: 'NORMAL' };
 }
 
-function recordCriticalValueLog(){return {success:false,error:'Gunakan transaksi pelaporan nilai kritis'};}
+function recordCriticalValueLog(input = {}) {
+  const required = ['accession_no', 'parameter', 'reported_to_doctor', 'caller_analyst'];
+  const missing = required.filter(k => !String(input[k] || '').trim());
+  const minutes = Number(input.sla_minutes);
+  if (missing.length || !Number.isFinite(minutes) || minutes < 0) {
+    return { success: false, error: 'Data pelaporan nilai kritis tidak lengkap atau SLA tidak valid', missing };
+  }
+  return {
+    success: true,
+    is_sla_met: minutes < 15,
+    sla_minutes: minutes,
+    read_back_confirmed: input.read_back_confirmed === true
+  };
+}
 
 window.renderCriticalValue = renderCriticalValue;
 window.cvSaring   = cvSaring;
