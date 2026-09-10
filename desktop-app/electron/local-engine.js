@@ -87,6 +87,17 @@ async function siapkanAuthUid(pg) {
         END
       $$ LANGUAGE sql STABLE;`);
   } catch (_) {}
+  try {
+    await pg.exec(`CREATE OR REPLACE FUNCTION auth.jwt() RETURNS jsonb
+      AS $$
+        SELECT jsonb_strip_nulls(jsonb_build_object(
+          'tenant_id', COALESCE(
+            NULLIF(current_setting('request.jwt.claim.tenant_id', true), ''),
+            NULLIF(current_setting('app.tenant_id', true), '')
+          )
+        ))
+      $$ LANGUAGE sql STABLE;`);
+  } catch (_) {}
 }
 
 async function loadSchema(pg, repoDir, log = () => {}) {

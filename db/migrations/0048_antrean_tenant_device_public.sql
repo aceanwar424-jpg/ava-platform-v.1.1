@@ -244,7 +244,11 @@ BEGIN
 END $$;
 
 -- Papan internal tidak boleh dapat dibaca anonim karena masih berisi nama pasien.
-CREATE OR REPLACE VIEW public.queue_papan WITH (security_invoker = true) AS
+-- PostgreSQL tidak mengizinkan CREATE OR REPLACE VIEW mengubah urutan/menambah
+-- kolom. Migrasi lama membuat queue_papan tanpa tenant_id, jadi drop eksplisit
+-- diperlukan sebelum membangun kontrak view multi-tenant yang baru.
+DROP VIEW IF EXISTS public.queue_papan;
+CREATE VIEW public.queue_papan WITH (security_invoker = true) AS
 SELECT t.id, t.tenant_id, t.queue_date, t.queue_number, t.seq, t.service_type,
   t.patient_name, t.status, t.prioritas, t.counter, t.counter_id, t.called_at,
   t.served_at, t.jml_panggil, t.dilewati_pada, t.pindah_dari,
