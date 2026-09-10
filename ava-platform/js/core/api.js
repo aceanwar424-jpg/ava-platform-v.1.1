@@ -28,7 +28,12 @@ for (const key of ['ol_token', 'ol_refresh', 'ol_master_user', 'AVA_CURRENT_USER
 function sbIsJwt(token) {
   // Token demo lama seperti "master_ava_token_*" bukan JWT dan ditolak
   // Supabase sebelum query diproses. Jangan pernah meneruskannya ke cloud.
-  return typeof token === 'string' && token.split('.').length === 3;
+  // Engine lokal memakai token HMAC dua bagian; token itu hanya valid pada
+  // origin lokal dan tetap diverifikasi ulang oleh server PGlite.
+  return typeof token === 'string' && (
+    token.split('.').length === 3 ||
+    (_isLocalEngine && token.split('.').length === 2)
+  );
 }
 function sbAccessToken()  {
   try {
