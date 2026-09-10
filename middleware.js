@@ -4,6 +4,9 @@ import {PUBLIC_HOST, PRIVATE_HEADERS, settings, readCookie, verifyStaff, loginPa
 
 const hosts = new Set(domains.situs.flatMap(s=>s.host));
 const publicFiles = domains.situs.find(s=>s.kunci === 'web').berkas;
+const publicAsset = /^\/(?:css|js|public|apps|kiosk|monitor|vendor|fonts|images)(?:\/|$)/i;
+const publicAssetFile = /\.(?:css|js|mjs|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|webmanifest)$/i;
+const deniedAsset = /\.(?:map|env|pem|key|sql|db|sqlite|bak|zip)$/i;
 export const config = { matcher: '/:path*' };
 export default async function middleware(request) {
   const url = new URL(request.url);
@@ -38,6 +41,12 @@ export default async function middleware(request) {
     ]);
     if (pathname === '/' || pathname.startsWith('/apps/') || appAssets.has(pathname)) return;
   }
+  // Private shells still need their public frontend assets before staff login.
+  // This never exposes source maps, credentials, database files, or server code.
+  if (['GET','HEAD'].includes(request.method)
+      && publicAsset.test(pathname)
+      && publicAssetFile.test(pathname)
+      && !deniedAsset.test(pathname)) return;
   if (site?.kunci === 'web') {
     return new Response(null,{status:308,headers:{Location:'https://'+PUBLIC_HOST+'/',...PRIVATE_HEADERS}});
   }
@@ -49,5 +58,5 @@ export default async function middleware(request) {
   const cfg = settings();
   if (!cfg) return new Response('Akses staf belum dikonfigurasi. Hubungi administrator.',{status:503,headers:PRIVATE_HEADERS});
   if (await verifyStaff(readCookie(request),cfg)) return;
-  return new Response(loginPage(),{status:401,headers:{...PRIVATE_HEADERS,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"}});
+  return new Response(loginPage(site),{status:401,headers:{...PRIVATE_HEADERS,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"}});
 }

@@ -19,6 +19,17 @@ test('every configured private domain denies anonymous requests and direct file 
     assert.match(r.headers.get('cache-control'),/no-store/);
   }
 });
+test('private login shells can load frontend assets without exposing protected files',async()=>{
+  const gate=await gateway();
+  for(const host of map.situs.find(s=>s.kunci==='his').host) {
+    for(const path of ['/css/style.css','/css/dashboard.css','/js/auth.js','/js/core/router.js','/images/logo.svg','/fonts/inter.woff2']) {
+      assert.equal(await gate(new Request('https://'+host+path)),undefined, host+path);
+    }
+    for(const path of ['/js/config.local.js','/js/core/router.js.map','/sql_arsip/catalog.sql','/connector/config.json']) {
+      assert.equal((await gate(new Request('https://'+host+path))).status,404,path);
+    }
+  }
+});
 test('patient portal serves only its public shell and shared static assets anonymously',async()=>{
   const gate=await gateway();
   for(const host of map.situs.find(s=>s.kunci==='app').host) {

@@ -253,6 +253,28 @@ Membuat ruang `his.avahealth.sbs` dapat dipakai secara konsisten untuk alur HIS 
   verifikasi. Pop-up pemilih pendukung tetap berada di ruang aplikasi dan
   tunduk pada RBAC yang telah ada.
 
+## Audit Login Lintas Domain & Menu — 2026
+
+- [x] Aset CSS, JavaScript, font, dan gambar frontend pada domain privat dapat
+  dimuat sebelum login; source map, konfigurasi, SQL, database, connector, dan
+  file rahasia tetap ditolak.
+- [x] Halaman login staf dibuat responsif, ber-brand, sadar nama domain, tanpa
+  credential demo, auto-login, atau secret.
+- [x] Seluruh 217 menu memiliki rute dan judul halaman; audit menu hidup tidak
+  menemukan renderer, handler, tabel, RPC, atau manifest yang hilang.
+- [x] Peta menu dan dokumentasi menu dibangkitkan ulang dari
+  `config/menu.json`; route ID dan RBAC tidak diubah.
+- [x] Security domain: 12/12 lulus; audit modul: 2.817/2.817 lulus; suite
+  regresi: 17/17 suite lulus.
+
+### Implikasi IP & Kepatuhan
+
+- Perubahan hanya menyentuh presentasi login, kebijakan penyajian aset publik,
+  dan artefak navigasi yang dibangkitkan. Tidak ada perubahan skema, connector,
+  hak akses, atau data pasien.
+- Aset yang dibuka anonim dibatasi ke kebutuhan rendering frontend; akses data
+  dan endpoint aplikasi tetap melalui autentikasi, RBAC, dan RLS.
+
 ## Ergonomi Form Admission â€” 5 September 2026
 
 ### Urutan implementasi
@@ -1654,4 +1676,3 @@ Verifikasi: node --test scripts/uji/test_security_domains.cjs scripts/uji/test_a
 Belum deployment: alat browser timeout dua kali ketika membuka tab dashboard Vercel. Belum membaca/mengubah DB produksi, merotasi password atau mencabut semua sesi. Daftar UUID staf belum tersedia. Detail batasan dan langkah penerapan ada di laporan. Perubahan lokal pengguna yang sudah ada dipertahankan.
 
 ---
-
