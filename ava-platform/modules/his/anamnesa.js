@@ -122,11 +122,12 @@ async function openAnamnesaForm(admissionId) {
   const an = exD?.[0] || {};
   const hasLab = anamHasLabTests(a);
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">Anamnesa — ${a.patient_name}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
+  document.getElementById('main-content').innerHTML = `
+    <section id="anamnesa-workspace" class="pro-shell" style="max-width:1120px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+        <div><div style="font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">Pelayanan klinis / Anamnesis</div><h1 style="font-size:20px;color:var(--text);margin:2px 0 0">Anamnesis — ${a.patient_name}</h1></div>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('anamnesa')">Kembali ke daftar</button>
+      </div>
     <div style="background:var(--mint);border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12px">
       <strong>${a.mr_number||''}</strong> · ${a.visit_number} · ${a.patient_gender||''} ${a.patient_age?a.patient_age+' th':''} · ${anamServicesSummary(a)}
     </div>
@@ -170,18 +171,18 @@ async function openAnamnesaForm(admissionId) {
       <textarea id="an-note" rows="3" placeholder="Catatan anamnesa, keluhan singkat, kondisi pasien...">${an.notes||an.chief_complaint||''}</textarea></div>
     <div class="form-group"><label>Petugas</label><input type="text" id="an-nurse" value="${an.nurse_name||(getUserName?getUserName():'')}"></div>
 
-    <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:var(--ink-11)">
+    <div style="background:var(--teal-light);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12px;color:var(--text)">
       ${hasLab
         ? 'Kunjungan ini <strong>ada tes lab</strong>. Setelah anamnesa disimpan, barcode akan digenerate & dicetak, lalu pasien dilempar ke <strong>Lab</strong>.'
-        : 'ℹ️ Kunjungan ini <strong>tanpa tes lab</strong>. Setelah anamnesa disimpan, status menjadi <strong>Selesai</strong>.'}
+        : 'Kunjungan ini <strong>tanpa tes lab</strong>. Setelah anamnesa disimpan, status menjadi <strong>Selesai</strong>.'}
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="navigate('anamnesa')">Batal</button>
       <button class="btn btn-outline" onclick="saveAnamnesa(${admissionId},false)">Simpan Saja</button>
       <button class="btn btn-teal" onclick="saveAnamnesa(${admissionId},true)">
-        ${hasLab?'✅ Simpan → Print Barcode → Lab':'✅ Simpan → Selesai'}</button>
-    </div>`, 'wide');
+        ${hasLab?'Simpan → cetak barcode → lab':'Simpan → selesai'}</button>
+    </div></section>`;
   calcBMI();
 }
 
@@ -228,11 +229,11 @@ async function saveAnamnesa(admissionId, proceed) {
     else await sbPost('anamnesas', payload);
 
     if (typeof logActivity==='function') logActivity('anamnesa','admissions',admissionId,'Anamnesa disimpan',payload.patient_name);
-    toast('✅ Anamnesa tersimpan','ok');
+    toast('Anamnesis tersimpan','ok');
 
-    if (proceed) { closeModalForce(); await completeAnamnesa(admissionId); }
+    if (proceed) { await completeAnamnesa(admissionId); navigate('anamnesa'); }
     else { await sbPatch('admissions',admissionId,{status:'Anamnesa',updated_at:new Date().toISOString()}).catch(()=>{});
-           closeModalForce(); loadAnamnesaQueue(); }
+           navigate('anamnesa'); }
   } catch(e) { toast('❌ '+e.message,'err'); }
 }
 

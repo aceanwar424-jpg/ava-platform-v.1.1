@@ -577,3 +577,77 @@ Batas: tidak menerapkan migrasi ke produksi. Pemetaan tenant admisi historis per
 - Form penunjang sekarang merupakan workspace halaman penuh dengan rail ringkas untuk konteks, pengukuran, interpretasi, serta tinjau/simpan. Alur status di form dikunci; transisi tetap dilakukan dari daftar secara berurutan Draft → Validated → Approved.
 - Bukti source: `node --check ava-platform/modules/system/supportive.js`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js`, dan `git diff --check` lulus. Audit menu hidup memeriksa 214 menu aktif tanpa layar, tabel/view, RPC, handler, atau manifest mati.
 - Tidak dilakukan uji visual browser terhadap perubahan workspace ini maupun deploy/migrasi produksi. Integrasi eksternal, object storage lampiran, dan perubahan skema tetap di luar irisan ini.
+# Konsistensi workspace LIS dan tema — 2026-09-07
+
+- Input hasil batch dan per-tes kini memakai halaman kerja penuh, dengan tombol kembali yang eksplisit ke daftar hasil. Tidak ada perubahan payload ataupun urutan Draft → Validated → Approved.
+- Form anamnesis dan pemeriksaan penunjang mengikuti pola halaman kerja; dialog tersisa hanya untuk tindakan yang singkat atau konfirmasi.
+- Toolbar dan aksi pemeriksaan penunjang memakai label teks seperti `Input pemeriksaan`, `Ubah`, dan `Cetak`; ikon dekoratif tidak lagi menjadi satu-satunya petunjuk aksi.
+- Tema terang/gelap memakai token semantik pada informasi, status, dan peringatan. Pemeriksaan rasio teks/latar utama: terang `17.06:1` dan `4.55:1`; gelap `15.19:1` dan `7.30:1`; status pada latar lembut gelap minimum `5.42:1`.
+- Bukti teknis: `node --check` untuk results/supportive/anamnesa/utils, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js`, `node scripts/audit-keamanan-modul.js` (2970/2970), dan `git diff --check` lulus.
+
+# Koreksi target HIS — 2026-09-07
+
+- `his.avahealth.sbs` dipetakan ke workspace `his`; `lis.avahealth.sbs` tetap ke workspace `lis`. Keduanya menggunakan artefak statis yang sama, tetapi scope menu dan halaman awal ditentukan host.
+- Registrasi HIS tetap sebagai halaman penuh. Tombol, pencarian, tanggal, tab form, dan placeholder foto diringkas menjadi label teks tanpa ikon dekoratif.
+- Anamnesis HIS telah menjadi halaman penuh pada perubahan ini; form panjang tidak lagi dibatasi tinggi modal.
+
+## Konsolidasi indeks kategori HIS — 2026-09-07
+
+- Indeks kategori sekarang memakai pola domain → kelompok → fungsi: rel kiri memilih domain, direktori kelompok berada di sisi area kerja, dan kartu fungsi di kanan. Pola ini memakai data yang sama dari `config/menu.json`, sehingga tidak ada ID menu, route, atau aturan role baru.
+- Kartu fungsi dipadatkan menjadi teks, deskripsi, dan penanda `Buka`; ikon dekoratif tidak lagi mendominasi halaman. Menu dengan status belum tersedia tetap terlihat dan tidak dapat diklik.
+- Direktori kelompok dapat dinavigasi dengan keyboard dan memiliki target scroll semantik; pada layar kecil ia berubah menjadi strip horizontal sehingga tidak memakan tinggi halaman kerja.
+- Hub Paket & Membership, Remunerasi, serta Workforce juga disederhanakan: kartu tidak lagi mengandalkan emoji sebagai penanda aksi dan judul/bar status memakai teks eksplisit.
+- Verifikasi lokal: `node --check` untuk utilitas dan modul HIS, pemeriksaan skrip inline `index.html`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js` (214 menu aktif, tanpa layar/tabel/RPC/handler/manifest mati), `node scripts/audit-keamanan-modul.js` (2970/2970 lulus), serta `git diff --check` lulus. Tidak ada data, database, atau deployment produksi yang diubah.
+
+## Perapihan pusat konfigurasi HIS — 2026-09-08
+
+- Halaman Pengaturan & Master HIS dan setiap domain konfigurasi sekarang menggunakan teks ringkas, tab domain yang dapat diakses keyboard, kartu field scope yang padat, serta tombol tindakan eksplisit. Ikon dekoratif dihapus dari judul, tab, dan daftar tindakan.
+- Peta master dan operasional dipertahankan: `Kelola master` hanya menuju halaman master yang terpetakan, `Buka operasional` menuju layar kerja yang telah ada, dan item tanpa form tetap diberi label jujur `Belum memiliki form domain khusus`.
+- Verifikasi: `node --check ava-platform/modules/system/config/config_home.js`, `node --check ava-platform/modules/his/operations_hubs.js`, `node --check ava-platform/js/core/utils.js`, pemeriksaan menu, audit menu hidup (214 menu), audit keamanan (2970/2970), serta `git diff --check` seluruhnya lulus. Tidak ada data master, perangkat, antrean, integrasi, atau deployment produksi yang diubah.
+
+## Workspace konfigurasi antrean — 2026-09-08
+
+- Form `Loket Baru/Ubah Loket` dan `Pengaturan Layanan` sekarang memakai halaman kerja penuh. Keduanya memiliki konteks, tombol kembali/batal ke daftar, dan submit form eksplisit—bukan lagi dialog dengan tinggi terbatas.
+- Fungsi penyimpanan, validasi kode/prefiks, pemetaan `queue_counters` dan `queue_config`, serta refresh daftar setelah berhasil disimpan tetap dipertahankan. Penerbitan nomor antrean tetap merupakan aksi pendek tersendiri; tidak dipindahkan secara mekanis ke halaman lain.
+- Bukti: `node --check ava-platform/modules/his/queue_config.js`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js` (214 menu aktif bersih), `node scripts/audit-keamanan-modul.js` (2970/2970), dan `git diff --check` lulus. Tidak ada simpan data, migrasi, atau deployment produksi dalam verifikasi.
+
+## Workspace perjanjian pasien — 2026-09-08
+
+- Form perjanjian dipindahkan ke halaman kerja penuh; tombol kembali dan batal mengembalikan operator ke daftar. Pembuatan berhasil mengembalikan halaman ke daftar yang dimuat ulang.
+- Validasi nama/waktu wajib serta pemeriksaan bentrok sumber daya sebelum simpan dipertahankan. Tidak ada data pasien atau perjanjian yang digunakan saat verifikasi.
+- Bukti: `node --check ava-platform/modules/his/clinicflow.js`, `node --check ava-platform/modules/his/queue_config.js`, pemeriksaan menu, audit menu hidup (214 menu), audit keamanan (2970/2970), dan `git diff --check` lulus.
+
+## Workspace master paket — 2026-09-08
+
+- Form buat/ubah paket menjadi halaman kerja penuh. Setelah simpan berhasil, layar kembali membangun katalog paket penuh sebelum memuat data—bukan mencoba menyegarkan elemen daftar yang sudah tidak ada di halaman form.
+- Validasi kode dan nama, payload paket, serta alur pengelolaan isi pemeriksaan yang terpisah dipertahankan. Tidak ada paket, tarif, HPP, atau master yang ditulis selama verifikasi.
+- Bukti: `node --check ava-platform/modules/system/config/config_package.js`, pemeriksaan menu, audit menu hidup (214 menu aktif), audit keamanan (2970/2970), dan `git diff --check` lulus.
+
+## Penuntasan menu konfigurasi — 2026-09-08
+
+- Pemeriksaan `config/menu.json` menemukan `TOTAL_NON_ACTIVE=0`: seluruh 214 menu pada peta bertanda aktif. Tidak ada item `belum` yang disembunyikan atau diaktifkan secara kosmetik.
+- Label `Kerangka master` pada pusat konfigurasi dikoreksi menjadi `Tersedia` karena setiap label tersebut telah dipetakan ke domain CRUD di `MASTER_REGISTRY`. Domain baru Integrasi & Konektivitas membuka flow antrean, registry kiosk/display, telemedicine, dan setup SATUSEHAT dari satu tempat.
+- Bukti: `node --check ava-platform/modules/system/config/config_home.js`, `node scripts/bangun-menu.js --periksa`, audit menu hidup (214 menu, tanpa layar/tabel/RPC/handler/manifest mati), audit keamanan (2970/2970), dan `git diff --check` lulus. Tidak ada migrasi, data master, secret, integrasi eksternal, atau deployment produksi yang diubah.
+
+## Pemeriksaan kesiapan runtime menu — 2026-09-09
+
+- Validasi statis tambahan memuat registry konfigurasi dan membuktikan bahwa semua item pada 11 domain mempunyai rute halaman atau domain CRUD; tidak ada lagi item pusat konfigurasi yang hanya berupa label.
+- `verify-master-registry-contract.js` lulus untuk 20 menu/domain. `verify-queue-tenant-contract.js` lulus untuk isolasi tenant, registry perangkat, rate limit, dan minimisasi data. `verify-deploy-readiness.js` lulus untuk domain publik dan konfigurasi runtime secara statis.
+- Batas yang tetap berlaku: kelulusan statis tidak menjalankan migrasi ataupun mengaktifkan koneksi pihak ketiga di lingkungan produksi. SQL/migrasi tersedia dan harus diterapkan terlebih dahulu pada staging oleh pemilik database sebelum modul yang bergantung data dapat digunakan pada domain produksi.
+
+## Audit Apps fase awal — selesai lokal, 8 September 2026
+
+- Pintu masuk publik diaudit baca-saja; tidak melakukan login/transaksi produksi.
+- Login disederhanakan dan responsif; demo publik, kredensial bawaan, klaim sertifikasi tanpa bukti, dan pendaftaran sukses tiruan dihapus.
+- Autentikasi fail-closed: profil/peran diverifikasi, akses korporat memakai RPC, token/flag tiruan tidak memulihkan sesi. Logout membersihkan token. Reload sementara memerlukan login ulang.
+- Modal tertutup tidak muncul pada pohon aksesibilitas. Kontras pilihan aktif diperbaiki. Desktop 1280×720, mobile 390×844, dan lebar 320 diperiksa via browser; tidak ada overflow horizontal pada 320px.
+- Dua belas uji regresi sintetis lulus (12/12); sintaks JS/SW dan sinkronisasi domain lulus.
+- Aksi pembayaran/pencairan dan beberapa simulasi klinis diganti pesan belum tersedia. Banner versi uji menandai dashboard yang masih memuat contoh.
+- Laporan terperinci: docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Masih perlu audit server/RLS, pemisahan contoh, transaksi cashback, dan EHR berdasarkan ID sebelum produksi.
+- Belum deploy. Checkout juga berisi perubahan HIS/LIS lain; tidak menerbitkan perubahan tersebut sebagai bagian pekerjaan Apps.
+
+## Audit keamanan domain dan sesi — 10 September 2026
+OWNED_BY: ava. Laporan: docs/AUDIT_SECURITY_2026-09-10.md. Bukti HTTP tanpa login: docs/audit-evidence/security-http-2026-09-10.json (44 hostname + 6 jalur www). Markup password demo ditemukan pada produksi Apps dan Corp; tidak mencoba login dengan kredensial tersebut. HTTP 200 pada path konfigurasi tidak dianggap bukti kebocoran file karena kemungkinan SPA fallback.
+Perbaikan lokal menghapus kredensial/demo/bypass, URL session injection, localStorage token dan role metadata fallback; menambahkan middleware staf HttpOnly cookie/UUID allowlist, CSRF check, domain public allowlist, no-store dan pembersihan service worker. Hanya www publik. Konfigurasi staf wajib tersedia sebelum deploy; konfigurasi kosong menutup domain privat.
+Verifikasi: node --test scripts/uji/test_security_domains.cjs scripts/uji/test_apps_auth.cjs = 22/22 PASS; bangun-vercel --periksa PASS; verify-deploy-readiness PASS; syntax JS dan git diff --check PASS. Pengujian middleware berbasis Web Request sintetis, bukan build Vercel.
+Belum deployment: alat browser timeout dua kali ketika membuka tab dashboard Vercel. Belum membaca/mengubah DB produksi, merotasi password atau mencabut semua sesi. Daftar UUID staf belum tersedia. Detail batasan dan langkah penerapan ada di laporan. Perubahan lokal pengguna yang sudah ada dipertahankan.

@@ -265,9 +265,11 @@ function paintAppointments() {
 
 function openApptForm() {
   const now = new Date(Date.now() - new Date().getTimezoneOffset()*60000);
-  openModal(`
-    <div class="modal-header"><div class="modal-title">Buat Perjanjian</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+  document.getElementById('main-content').innerHTML = `
+    <section class="config-workspace appointment-workspace">
+      <header class="config-workspace-head"><div><p class="cat-eyebrow">Alur pasien · Perjanjian</p><h1>Buat Perjanjian</h1><p>Catat konteks pasien, layanan, jadwal, dan sumber daya sebelum perjanjian diterbitkan.</p></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="renderAppointments()">Kembali ke daftar perjanjian</button></header>
+      <form class="workflow-form-card" onsubmit="saveAppt();return false;">
     <div class="form-row">
       <div class="form-group"><label>Nama Pasien *</label><input type="text" id="af2-name"></div>
       <div class="form-group"><label>No. HP / WA</label><input type="text" id="af2-phone" placeholder="08xxxxxxxxxx"></div>
@@ -285,10 +287,12 @@ function openApptForm() {
     <div class="form-group"><label>Dokter / Alat / Ruang</label><input type="text" id="af2-res" placeholder="Opsional"></div>
     <div class="form-group"><label>Catatan</label><textarea id="af2-notes" rows="2"></textarea></div>
     <div id="af2-clash"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="saveAppt()">Simpan</button>
-    </div>`, 'wide');
+        <div class="workflow-form-actions">
+          <button type="button" class="btn btn-ghost" onclick="renderAppointments()">Batal</button>
+          <button type="submit" class="btn btn-teal">Simpan perjanjian</button>
+        </div>
+      </form>
+    </section>`;
 }
 
 async function saveAppt() {
@@ -320,9 +324,9 @@ async function saveAppt() {
       created_by: getUserName?getUserName():'User',
       updated_at: new Date().toISOString(),
     });
-    toast('✅ Perjanjian dibuat','ok');
-    closeModalForce(); await loadAppointments();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+    toast('Perjanjian dibuat','ok');
+    await renderAppointments();
+  } catch(e) { toast(e.message,'err'); }
 }
 
 async function setAppt(id, status) {

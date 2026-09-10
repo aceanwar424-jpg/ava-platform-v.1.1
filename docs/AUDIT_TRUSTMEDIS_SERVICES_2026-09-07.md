@@ -77,3 +77,37 @@ Keputusan AVA: radiologi tetap RIS/PACS; pola antrean modalitas dipakai sebagai 
 - Tidak ada migrasi data, perubahan RLS, koneksi analyzer, sinkronisasi eksternal, atau pengiriman SATUSEHAT.
 - Lampiran grafik spirometri masih memakai kontrak data yang ada; pemindahan ke object storage memerlukan desain dan checkpoint skema/integrasi.
 - UI referensi diaudit sebagai pola proses, bukan untuk disalin secara visual atau fungsional secara mentah.
+
+## Tambahan audit navigasi dan penyajian — 7 September 2026, 21:00 WIB
+
+Audit lanjutan dilakukan read-only pada sesi master yang sudah dibuka pengguna. Tidak ada data pasien dicari, dipilih, disimpan, dicetak, diekspor, atau diubah.
+
+### Pola menu tingkat atas
+
+Rail ikon membuka satu domain. Domain menampilkan **kartu hub horizontal**. Setiap kartu hub membuka daftar leaf pada sisi/overlay kanan. Pola yang terbaca:
+
+| Domain | Kartu hub | Leaf yang terlihat |
+|---|---|---|
+| Admission | Admission | Outpatient; Services Registration; Medical Kit Registration; Package Service Registration; Package Subscription; Usage Package Subscription |
+| Admission | Back Office | Medical Kit Registration Report |
+| Admission | Queue | Registration; Weight Scale; ECG; Xray; Doctor; Audiometry & Spirometry; Receptionist; Lab Queue |
+| Admission | Queue Outpatient | General Queue; Specialist Queue |
+| Finance | Cashier | Cancel Transaction; Contract Transaction; Cashier; Refund |
+| Finance | Deposit | Deposit Contract; Deposit Transfer |
+| Finance | Log SAP | Preview/Log SAP Transaction; Customer; DP Request; Invoice; Invoice Referral; Service Fee |
+| Finance | Report | Payment; HIS Report Generator; Health Facility; Subscription; Insurance; Refund; Revenue; Contract Expired; Contract; Coverage Payment Company; Voucher |
+
+### Telaah visual Anamnesa & Specimen
+
+- Page header ringkas dan tab MDI/breadcrumb; tombol tutup halaman berada di kanan, bukan mengandalkan modal.
+- Panel **Patient List** memisahkan antrean dari pengisian: Refresh, pencarian `MR Number / Name`, Filter, legenda status, paginator.
+- Kolom antrean: Order Number, Register Number, Registration Date, Invoice Group, MR Number, Name, Gender, Age, Medical Kit, Status.
+- Workbench mengikat data antrean terpilih dengan tombol Next Queue, View Examination, Get Weightscale Data, Verify Patient, dan barcode.
+- Navigasi proses adalah rail vertikal lokal: Patient, Anamnesa, Specimen, Observation, Notes, ICD X Diagnostic. Ini menjadi dasar yang tepat untuk HIS AVA: daftar kerja + detail halaman, bukan modal tinggi yang memotong alur.
+
+### Implikasi desain HIS AVA
+
+1. Pertahankan rail global ringkas, tetapi gunakan hub horizontal untuk kelompok operasional besar dan rail/tab lokal hanya ketika pekerjaan memang memiliki urutan proses.
+2. List registrasi/anamnesis harus memuat toolbar, filter, status teks, paginator, dan tabel sebagai satu surface; form detail muncul sebagai halaman penuh.
+3. Antrian dipisah menurut peran/layanan, bukan satu daftar generik tanpa konteks unit.
+4. Finance harus dipisah jelas antara kasir, deposit, pembatalan/refund, integrasi/log, dan laporan; tidak dicampur dengan registrasi klinis.

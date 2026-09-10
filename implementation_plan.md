@@ -358,3 +358,153 @@ OWNED_BY: ava. Pengguna secara eksplisit meminta implementasi dan release setela
 - Audit referensi hanya membaca UI yang terlihat dan tidak menyalin data pasien, konfigurasi privat, atau aset visual pihak ketiga.
 - LIS tetap menjadi sumber kerja spesimen, pemeriksaan, mutu, validasi, dan rilis hasil lab. Audiometri, spirometri, radiologi, dan anamnesis klinis tetap dimiliki HIS; LIS hanya menerima order atau menyajikan hasil yang memang berada pada kontrak data yang disetujui.
 - Tahap ini tidak mengubah skema, RLS, integrasi analyzer, koneksi LIS/HIS produksi, atau hasil klinis. Perubahan kontrak lintas-sistem memerlukan checkpoint pemilik database dan integrasi.
+
+## Konsistensi halaman kerja LIS dan tema terang/gelap — 7 September 2026
+
+### Urutan implementasi
+
+1. [x] Inventarisasi dialog berdasarkan risiko dan panjang tugas: halaman penuh untuk input kerja klinis; dialog singkat hanya untuk konfirmasi, pencarian cepat, atau tindakan atomik.
+2. [x] Ubah input hasil pemeriksaan (batch dan per-tes) menjadi workspace halaman penuh dengan kembali ke daftar hasil yang jelas; anamnesis serta pemeriksaan penunjang mengikuti pola yang sama.
+3. [x] Kurangi ikon dekoratif pada toolbar, tombol, kartu, dan keluaran cetak; pertahankan hanya ikon yang membantu orientasi global.
+4. [x] Terapkan token warna semantik pada workspace LIS agar teks, status, fokus, dan latar terbaca pada tema terang serta gelap.
+5. [x] Uji sintaks, menu/manifest, pemeriksaan kontras kode, dan tinjauan visual dua tema memakai data kosong/sintetis.
+
+### Implikasi IP & Kepatuhan
+
+- Perubahan ini hanya mengatur presentasi dan navigasi lokal; tidak mengubah skema, payload, status klinis, nilai hasil, data pasien, atau integrasi produksi.
+- Status klinis tetap selalu ditulis sebagai teks selain warna. Tema tidak mengubah arti status, urutan validasi, ataupun otorisasi peran.
+- Tidak memakai ataupun merekam data pasien nyata saat pengujian visual.
+
+## Koreksi sasaran: workspace HIS — 7 September 2026
+
+### Urutan implementasi
+
+1. [x] Pastikan pemetaan `his.avahealth.sbs` menuju workspace HIS, bukan LIS; keduanya berbagi artefak build tetapi lingkup menu dipilih menurut host.
+2. [x] Terapkan pola halaman penuh pada alur HIS yang panjang: registrasi sudah berupa workspace, anamnesis dipindahkan dari modal ke halaman penuh.
+3. [x] Kurangi ikon dekoratif pada toolbar/form Registrasi HIS dan gunakan label tindakan eksplisit.
+4. [x] Wariskan perbaikan tema dan kontras global ke HIS; tidak mengubah skema maupun transaksi.
+
+### Implikasi IP & Kepatuhan
+
+- Ini hanya koreksi target UI HIS. Tidak mengubah nilai klinis, data pasien, antrean, tagihan, otorisasi, skema, atau layanan produksi.
+- Dialog pendek tetap dipakai untuk tindakan atomik seperti konfirmasi, pemilih cepat, atau penerbitan nomor; input klinis/administratif panjang menggunakan halaman penuh.
+
+## Konsolidasi indeks seluruh kategori HIS — 7 September 2026
+
+### Urutan implementasi
+
+1. [x] Audit ulang pola navigasi referensi secara baca-saja: domain di rel kiri, kelompok proses pada area kerja, lalu daun menu di dalam kelompok.
+2. [x] Ubah indeks kategori HIS menjadi direktori ringkas: navigasi kelompok di sisi area kerja dan daftar fungsi di kanan, tanpa menambah rute atau mengubah RBAC.
+3. [x] Ringkas ukuran kartu, jarak, dan ikon dekoratif; pertahankan deskripsi serta status ketersediaan agar fungsi tetap dapat dipindai.
+4. [x] Verifikasi pembentukan menu, semua action, sintaks, aksesibilitas keyboard, tema terang/gelap, dan regresi menu hidup.
+
+### Implikasi IP & Kepatuhan
+
+- Referensi eksternal hanya dipakai untuk memahami pola navigasi dan informasi yang terlihat; tidak menyalin aset visual, data pasien, konfigurasi privat, atau data transaksi.
+- Perubahan terbatas pada layer presentasi/navigasi lokal. Tidak mengubah peta peran, rute, skema, tabel, RPC, data klinis, tagihan, antrean, maupun integrasi produksi.
+- Label status tetap tertulis, bukan hanya dibedakan oleh warna. Menu yang belum tersedia tetap ditandai dan tidak dibuat seolah berfungsi.
+
+## Perapihan pusat konfigurasi HIS — 8 September 2026
+
+### Urutan implementasi
+
+1. [x] Tinjau ulang peta konfigurasi terhadap rute master dan operasional yang tersedia.
+2. [x] Ubah pusat konfigurasi serta halaman domainnya menjadi direktori teks yang padat dan konsisten dengan indeks kategori.
+3. [x] Hilangkan ikon dekoratif dari tombol/tab konfigurasi dan pertahankan status serta field scope sebagai teks eksplisit.
+4. [x] Jalankan pemeriksaan rute, handler, sintaks, dan regresi manifest; tanpa menjalankan perubahan master atau integrasi.
+
+### Implikasi IP & Kepatuhan
+
+- Implementasi hanya merapikan presentasi rute konfigurasi yang telah ada. Tidak membuat atau mengubah data master, konfigurasi perangkat, kredensial, antrean, maupun koneksi eksternal.
+- Item yang belum memiliki form operasional harus tetap diberi status jujur; perubahan skema dan penyambungan DB memerlukan checkpoint pemilik database.
+
+## Workspace konfigurasi antrean — 8 September 2026
+
+### Urutan implementasi
+
+1. [x] Audit modal pada alur HIS untuk membedakan aksi atomik dari formulir konfigurasi yang memerlukan konteks.
+2. [x] Pindahkan formulir loket dan prefiks/kuota layanan dari modal ke halaman kerja penuh dengan kembali eksplisit.
+3. [x] Pertahankan validasi, pemetaan tabel, dan penyegaran daftar setelah simpan; tidak menjalankan tulis data saat pengujian.
+4. [x] Jalankan pemeriksaan sintaks, struktur menu, rute/handler, dan integritas modul.
+
+### Implikasi IP & Kepatuhan
+
+- Perubahan hanya menggeser UI formulir yang sudah ada; payload, validasi, tabel, serta kewenangan penulisan tetap sama.
+- Loket, kuota, perangkat antrean, dan koneksi kiosk/display tidak dibuat atau diubah oleh pekerjaan ini. Aktivasi/penyelarasan lingkungan produksi tetap memerlukan checkpoint integrasi.
+
+## Workspace perjanjian pasien — 8 September 2026
+
+### Urutan implementasi
+
+1. [x] Klasifikasikan form perjanjian sebagai workflow panjang: identitas, layanan, jadwal, sumber daya, catatan, dan validasi bentrok.
+2. [x] Ubah form modal menjadi halaman kerja penuh dengan kembali/batal eksplisit ke daftar perjanjian.
+3. [x] Pertahankan validasi mandatory dan pengecekan sumber daya sebelum simpan; kembali ke daftar hanya setelah respons berhasil.
+4. [x] Jalankan pemeriksaan sintaks serta regresi menu/rute/modul tanpa membuat perjanjian baru.
+
+### Implikasi IP & Kepatuhan
+
+- Tidak ada perjanjian, identitas pasien, nomor telepon, atau pesan pengingat yang dibuat/diubah selama pekerjaan ini.
+- Perubahan UI tidak mengubah aturan validasi, payload, penerima pesan, atau integrasi eksternal. Pengiriman pengingat tetap aksi eksplisit operator.
+
+## Workspace master paket — 8 September 2026
+
+### Urutan implementasi
+
+1. [x] Klasifikasikan form paket sebagai form panjang: kode, nama, segmentasi, dua tarif, HPP, TAT, deskripsi, persiapan, dan status.
+2. [x] Ubah buat/ubah paket dari modal menjadi halaman kerja penuh dengan kembali eksplisit ke katalog paket.
+3. [x] Pertahankan validasi kode/nama, payload, dan penyegaran katalog setelah simpan sukses.
+4. [x] Jalankan pemeriksaan sintaks, menu/rute, keamanan modul, dan pemeriksaan diff tanpa melakukan perubahan master.
+
+### Implikasi IP & Kepatuhan
+
+- Ini perubahan presentasi form. Tidak membuat, mengubah, menghapus, atau menerbitkan paket, tarif, HPP, maupun instruksi persiapan pasien.
+- Penetapan katalog/tarif dan perubahan master tetap tunduk pada otorisasi operasional yang ada; tidak ada skema atau integrasi produksi yang diubah.
+
+## Penuntasan menu konfigurasi yang terlihat belum aktif — 8 September 2026
+
+### Urutan implementasi
+
+1. [x] Periksa seluruh status di `config/menu.json`: seluruh 214 menu aktif, tidak ada menu berstatus `belum`.
+2. [x] Cocokkan label `Kerangka master` dengan registry CRUD yang sudah ada dan sambungkan setiap master yang dipetakan.
+3. [x] Tambahkan domain Integrasi & Konektivitas untuk flow antrean, registry kiosk/display, telemedicine, dan SATUSEHAT.
+4. [x] Verifikasi sintaks, struktur menu, handler/rute, dan audit modul; tidak menjalankan migrasi atau menulis data produksi.
+
+### Implikasi IP & Kepatuhan
+
+- Label kesiapan hanya diubah setelah rute master dan field registry ditemukan di kode. Ini bukan klaim bahwa konfigurasi telah diisi atau integrasi eksternal telah diaktifkan.
+- SATUSEHAT, kiosk/display lintas-domain, dan telemedicine tetap menyimpan hanya referensi secret; aktivasi koneksi dan migrasi lingkungan produksi memerlukan checkpoint pemilik integrasi/database.
+
+## Audit Apps fase awal — 7 September 2026
+
+### Rencana (sub-task masing-masing < 1 jam)
+1. Audit halaman publik dan sumber login, modal, cache, serta sesi.
+2. Rapikan login responsif: bahasa Indonesia, akun kosong, hapus akses demo publik dan klaim sertifikasi tanpa bukti.
+3. Perbaiki autentikasi fail-closed, peran dari profil, dan pemulihan sesi; modal tertutup tidak dapat difokuskan.
+4. Verifikasi sintaks, regresi autentikasi dengan mock sintetis, rute, dan browser desktop/mobile lokal.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava (pemeliharaan aplikasi yang sudah ada; bukan ekstraksi produk generik).
+Tidak mengubah skema, kunci katalog, nilai klinis, provider LLM, atau integrasi eksternal. Tidak menulis data produksi. Data uji sintetis. Klaim sertifikasi di halaman masuk dihapus karena bukti tidak tersedia dalam audit. Otorisasi server/RLS dan simulasi klinis di modul lain tetap perlu audit terpisah sebelum peluncuran produksi.
+
+### Hasil audit Apps — 8 September 2026
+Implementasi lokal dan verifikasi selesai. Detail bukti pada walkthrough.md dan docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md. Reload sementara meminta login ulang; SSO query token dihentikan sampai tersedia verifikasi server. Tidak ada deployment atau penulisan produksi.
+
+## Menu Apps siap uji — 8 September 2026
+### Rencana
+1. Inventarisasi menu, target panel, renderer, dan status fungsi (<1 jam).
+2. Satukan label Indonesia, perbaiki routing/active state dan pemuatan data (<1 jam).
+3. Isi beranda/profil dari akun; pisahkan fitur konsep, tampilkan empty/error state nyata (<1 jam).
+4. Uji semua target menu pada fixture sintetis lokal dan regresi autentikasi (<1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Tidak mengubah skema, data katalog, integrasi, RBAC server, atau data produksi. Tidak mengisi halaman kosong dengan data pasien/hasil/keuangan rekaan. Menu konsep tetap terdokumentasi dan ditandai belum tersedia; tidak dianggap operasional. Fixture hanya di server localhost terpisah dan tidak ikut output deployment.
+
+## Audit keamanan domain dan sesi — 10 September 2026
+### Rencana
+1. Audit statis autentikasi, kredensial, routing dan inventaris domain; pemeriksaan HTTP tanpa login/data pasien (<1 jam).
+2. Hapus kredensial demo/bypass dan penerimaan sesi dari URL; batasi persistensi sesi dan file deploy (<1 jam).
+3. Uji negatif sintetis, dokumentasikan risiko backend/produksi dan tindakan deployment (<1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perbaikan keamanan untuk sistem ini; tidak menyalin aset ke produk generik, mengubah master/katalog, atau membaca data pasien. Tidak menghubungkan DB produksi. Klaim keamanan dibatasi bukti; rotasi akun dan RLS produksi membutuhkan akses administratif yang terverifikasi. Hanya www.avahealth.sbs merupakan website publik; domain operasional memerlukan kontrol akses.
+
+### Klarifikasi dan hasil keamanan — 10 September 2026
+Pengguna menegaskan semua domain selain www harus membutuhkan akun staf. Gerbang server memakai UUID staf yang disetujui administrator; metadata role browser bukan dasar akses. Konfigurasi kosong menolak akses, sehingga daftar staf dan build Vercel harus disiapkan sebelum penerapan. Pengujian lokal selesai; deployment, rotasi akun dan verifikasi backend produksi belum selesai. Tidak ada perubahan DB produksi.

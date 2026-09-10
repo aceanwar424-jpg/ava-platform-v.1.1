@@ -2,6 +2,8 @@
 
 OWNED_BY: ava. Status: kandidat rilis teruji lokal; aktivasi produksi belum dilakukan.
 
+Pembaruan 8 September: commit `705dde4` telah ditemukan pada cabang remote `codex/lis-integrity-1.1.0-rc1`, yang kini berada di `06d0ffe`. Tidak dilakukan push ulang atau reset cabang. Domain LIS merespons HTTP 200 melalui Vercel; aset validasi publik memakai RPC transaksional, tetapi index belum memuat penanda cache RC1. Ini belum membuktikan backend 0052 aktif. Bukti: `docs/audit-evidence/lis-deployment-check-2026-09-08.json`. Pemeriksaan instalasi backend tanpa membaca data pasien disediakan di `db/checks/lis_release_preflight.sql`.
+
 ## Perubahan yang diimplementasikan
 
 - Dashboard TAT memakai data respons server; nol tetap nol, periode kosong tanpa angka rekaan, error terpisah, pilihan tanggal bertahan.

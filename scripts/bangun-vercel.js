@@ -117,6 +117,14 @@ if (galat.length) {
 //   2. handle: filesystem → /css/style.css, /js/core/api.js, dsb. apa adanya
 //   3. "^/(.*)$" per host → jaring untuk jalur yang bukan berkas
 const routes = [];
+// Security headers run before filesystem/host rewrites; middleware enforces staff access.
+routes.push({ src: '^/(.*)$', headers: {
+  'Cache-Control': 'private, no-store, max-age=0',
+  'Referrer-Policy': 'no-referrer',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'Content-Security-Policy': "object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+}, continue: true });
 
 // Lapis 1 — akar tiap host. Harus mendahului filesystem, kalau tidak
 // "/" akan selalu jatuh ke index.html milik aplikasi.

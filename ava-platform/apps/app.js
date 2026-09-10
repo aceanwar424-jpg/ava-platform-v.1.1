@@ -209,46 +209,67 @@ function showScreen(screenId) {
 }
 
 // Sub-view Routing (Sidebar clicks)
-function showView(viewId, viewTitle) {
-  // Hide all view panels
-  document.querySelectorAll('.view-panel').forEach(panel => {
-    panel.classList.remove('active');
-  });
-
-  // Display active panel
-  const target = document.getElementById(viewId);
-  if (target) target.classList.add('active');
-
-  // Render on demand untuk view alur pemeriksaan
-  if (viewId === 'book-examination-view') renderBookExamination();
-  else if (viewId === 'examination-approval-view') renderExamApproval();
-  else if (viewId === 'examination-history-view') renderExamHistory();
-  else if (viewId === 'ava-consult-view') renderAvaConsult();
-  else if (viewId === 'ava-marketplace-view') renderAvaMarketplace();
-  else if (viewId === 'ava-devices-view') renderAvaDevices();
-  else if (viewId === 'ava-caregiver-view') renderAvaCaregiver();
-  else if (viewId === 'toko-view') renderToko();
-  else if (viewId === 'toko-checkout-view') renderTokoCheckout();
-  else if (viewId === 'member-sanctuary-view') renderMemberSanctuary();
-  else if (viewId === 'staff-homecare-view') renderStaffHomecare();
-  else if (viewId === 'homecare-results-view') renderHomecareResults();
-  else if (viewId === 'referral-view') renderReferralList();
-
-  // Update Breadcrumb
-  const breadcrumbActive = document.getElementById('breadcrumb-active-view');
-  if (breadcrumbActive) breadcrumbActive.textContent = viewTitle;
-
-  // Sync Active Sidebar Link
+async function showView(viewId, viewTitle) {
+  const page = APPS_PAGES[viewId];
+  const requested = document.getElementById(viewId);
+  // Do not clear the current page for invalid or stale navigation targets.
+  if (!page || !requested) { alert('Halaman tidak tersedia. Pilih menu lain.'); return; }
+  const title = page[0];
+  let target = requested;
+  if (page[1] === 'planned') {
+    target = document.getElementById('apps-unavailable-view');
+    if (!target) {
+      target = document.createElement('div'); target.id = 'apps-unavailable-view'; target.className = 'view-panel';
+      document.querySelector('.view-panels-wrapper').appendChild(target);
+    }
+    appsStatusPanel(target, title + ' — belum tersedia', 'Layanan ini masih dalam pengembangan. Untuk kebutuhan saat ini, hubungi petugas layanan atau pilih menu lain.');
+  }
+  document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+  target.classList.add('active');
+  target.setAttribute('aria-label', title);
+  const heading = document.getElementById('breadcrumb-active-view');
+  if (heading) heading.textContent = title;
   document.querySelectorAll('.sidebar-link').forEach(link => {
-    // Sebagian tautan memanggil modal, bukan showView, jadi atribut onclick
-    // tidak dijamin ada — baca dengan aman agar navigasi tak pernah crash.
-    const aksi = link.getAttribute('onclick') || '';
-    link.classList.toggle('active', aksi.includes(viewId));
+    const active = link.dataset.view === viewId;
+    link.classList.toggle('active', active);
+    if (active) { link.setAttribute('aria-current', 'page'); const group = link.closest('details'); if (group) group.open = true; }
+    else link.removeAttribute('aria-current');
   });
-
-  // Close sidebar drawer on mobile
-  const sidebar = document.getElementById('app-sidebar');
-  if (sidebar) sidebar.classList.remove('open');
+  document.getElementById('app-sidebar')?.classList.remove('open');
+  if (page[1] === 'planned') return;
+  const renderers = {
+    'book-examination-view': renderBookExamination,
+    'examination-approval-view': renderExamApproval,
+    'examination-history-view': renderExamHistory,
+    'corporate-view': renderCorporateHome,
+    'corporate-employees-view': renderCorporateList,
+    'corporate-billing-view': loadInvoices,
+    'book-test-view': renderLabCatalogue,
+    'ava-consult-view': renderAvaConsult,
+    'ava-marketplace-view': renderAvaMarketplace,
+    'ava-devices-view': renderAvaDevices,
+    'ava-caregiver-view': renderAvaCaregiver,
+    'toko-view': renderToko,
+    'toko-checkout-view': renderTokoCheckout,
+    'member-sanctuary-view': renderMemberSanctuary,
+    'staff-homecare-view': renderStaffHomecare,
+    'homecare-results-view': renderHomecareResults
+  };
+  // Remove only our previous error; preserve form markup and renderer containers for retry.
+  target.querySelector('.apps-route-error')?.remove();
+  try {
+    if (page[1] === 'home') renderAppsHome(target);
+    else if (page[1] === 'profile') renderAppsProfile(target);
+    else if (page[1] === 'branches') await renderAppsBranches(target);
+    else if (renderers[viewId]) await renderers[viewId]();
+    const sectionHeading = target.querySelector(':scope > .section-title');
+    if (sectionHeading) sectionHeading.textContent = title;
+  } catch (error) {
+    const message = document.createElement('section'); message.className = 'apps-state apps-route-error'; message.setAttribute('role', 'alert');
+    const p = document.createElement('p'); p.textContent = 'Data belum dapat dimuat. Periksa koneksi lalu coba lagi.';
+    const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = 'Coba lagi'; retry.addEventListener('click', () => showView(viewId));
+    message.append(p, retry); target.prepend(message);
+  }
 }
 
 // Switch Timeline Phase (Only applicable for Patient view)
@@ -311,160 +332,7 @@ function renderCategoryAccordion(catId, catTitle, catIcon, subLinksHtml, default
 }
 
 // Render dynamic menus inside sidebar based on logged-in role
-function renderSidebarMenu() {
-  const navContainer = document.getElementById('sidebar-nav');
-  if (!navContainer) return;
-
-  const I = {
-    home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
-    users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 12v6M9 15h6"/></svg>',
-    approve: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v1h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V3a1 1 0 0 1 1-1z"/><path d="m9 14 2 2 4-4"/></svg>',
-    history: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>',
-    result: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13l2 2 4-4"/></svg>',
-    stmt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8M8 9h2"/></svg>',
-    deposit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-    dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
-    medrec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>',
-    lab: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.7 22h14.6c.6 0 1-.4 1-1v-2.5c0-.3-.1-.5-.3-.7L14 11.5v-7h1V3.5H9v1h1v7L4.3 17.8c-.2.2-.3.4-.3.7V21c0 .6.4 1 1 1z"/></svg>',
-    package: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
-    mapPin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
-    profile: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
-    filePlus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>',
-    wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18"/><path d="M16 8h4v8h-4z"/></svg>',
-    consult: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>',
-    market:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
-    device:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="6" width="14" height="12" rx="3"/><path d="M8 6V3h8v3M8 18v3h8v-3"/></svg>',
-    care:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1L12 21l7.7-7.6 1.1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
-  };
-
-    if (currentRole === 'patient' || currentRole === 'member') {
-      const subLayanan = `
-        <a class="sidebar-link active" onclick="showView('patient-view', 'Dashboard Utama')">${I.dashboard}<span>Dashboard Utama</span></a>
-        <a class="sidebar-link" onclick="showView('book-test-view', 'Pesan Lab &amp; MCU')">${I.lab}<span>Pesan Test Lab</span></a>
-        <a class="sidebar-link" onclick="showView('book-homecare-view', 'Book Home Visit')">${I.home}<span>Book Homecare Nakes</span></a>
-        <a class="sidebar-link" onclick="showView('buy-package-view', 'Beli Paket MCU')">${I.package}<span>Beli Paket MCU</span></a>
-        <a class="sidebar-link" onclick="showView('ava-consult-view', 'Telekonsultasi Dokter')">${I.consult}<span>Telekonsultasi Dokter</span></a>
-        <a class="sidebar-link" onclick="showView('ava-marketplace-view', 'Sewa &amp; Beli Alkes')">${I.market}<span>Toko AVA &amp; Alkes</span></a>
-      `;
-
-      const subRekamMedis = `
-        <a class="sidebar-link" onclick="showView('ava-biointerpreter-view', 'AI Bio-Interpreter Lab')">${I.medrec}<span>🤖 AI Bio-Interpreter Lab</span></a>
-        <a class="sidebar-link" onclick="showView('medrec-view', 'Rekam Medis Digital (EHR)')">${I.medrec}<span>Rekam Medis (EHR LOINC)</span></a>
-        <a class="sidebar-link" onclick="showView('ava-biotwin-view', 'AVA Bio-Twin Index')">${I.result}<span>🧬 AVA Bio-Twin Index</span></a>
-        <a class="sidebar-link" onclick="showView('ava-devices-view', 'Perangkat &amp; Wearables')">${I.device}<span>Biosensor &amp; Wearable Pulse</span></a>
-        <a class="sidebar-link" onclick="switchTimelinePhase('fase2'); showView('patient-view', 'CRISPR Bio-Age Reversal')">${I.result}<span>CRISPR Bio-Age Reversal</span></a>
-      `;
-
-      const subWellness = `
-        <a class="sidebar-link" onclick="showView('ava-wellness-hub-view', 'Wellness &amp; Bio-Hacking Hub')">${I.dashboard}<span>🌟 Wellness &amp; Bio-Hacking Hub</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-run-challenge-view', 'Step &amp; Run Challenge')">${I.dashboard}<span>🏃 1. Step &amp; Run Club Challenge</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-nutrico-view', 'NutriCo Calorie Planner')">${I.package}<span>🥗 2. NutriCo Calorie &amp; Diet</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-sleep-optimizer-view', 'Sleep &amp; Circadian Optimizer')">${I.result}<span>🌙 3. Sleep &amp; Circadian Optimizer</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-hrv-stress-view', 'HRV Stress Biofeedback')">${I.device}<span>🧘 4. HRV Stress Biofeedback</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-hydration-view', 'Smart Hydration Tracker')">${I.deposit}<span>💧 5. Smart Hydration Tracker</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-hormonal-sync-view', 'Hormonal &amp; Metabolic Syncing')">${I.result}<span>⚖️ 6. Hormonal &amp; Metabolic Sync</span></a>
-        <a class="sidebar-link" onclick="showView('wellness-bioage-quest-view', 'Bio-Age 90-Day Quest')">${I.approve}<span>🚀 7. Bio-Age 90-Day Quest</span></a>
-      `;
-
-      const subTracking = `
-        <a class="sidebar-link" onclick="showView('ava-homecare-tracking-view', 'Lacak Cold-Chain Flebotomi')">${I.home}<span>🚚 Lacak Live Cold-Chain</span></a>
-        <a class="sidebar-link" onclick="showView('orders-tracking-view', 'Lacak Pesanan D2C')">${I.package}<span>Lacak Pesanan D2C Refill</span></a>
-        <a class="sidebar-link" onclick="showView('homecare-results-view', 'Lacak Kunjungan Nakes')">${I.home}<span>Lacak Kunjungan Home Care</span></a>
-      `;
-
-      const subSanctuaryAkun = `
-        <a class="sidebar-link" onclick="showView('member-sanctuary-view', 'Queen Sanctuary Spa')">${I.book}<span>👑 Queen Sanctuary &amp; VIP Spa</span></a>
-        <a class="sidebar-link" onclick="showView('ava-caregiver-view', 'Caregiver &amp; Pendampingan Keluarga')">${I.care}<span>👨‍👩‍👧 Caregiver &amp; Keluarga</span></a>
-        <a class="sidebar-link" onclick="showView('nearme-view', 'Cabang Terdekat')">${I.mapPin}<span>📍 Cabang &amp; Faskes Terdekat</span></a>
-        <a class="sidebar-link" onclick="showView('profile-view', 'Profil Saya')">${I.profile}<span>👤 Profil &amp; Card Member VIP</span></a>
-      `;
-
-      navContainer.innerHTML = [
-        renderCategoryAccordion('p-layanan', 'Portal Pasien (Layanan Utama)', '🩺', subLayanan, true),
-        renderCategoryAccordion('p-rekam', 'Hasil Lab &amp; Rekam Medis (Klinis)', '📊', subRekamMedis, true),
-        renderCategoryAccordion('p-wellness', 'AVA Wellness &amp; Bio-Hacking (7 Modul)', '🌿', subWellness, true),
-        renderCategoryAccordion('p-tracking', 'Logistik, Tracking &amp; Cold-Chain', '🚚', subTracking, false),
-        renderCategoryAccordion('p-sanctuary', 'Queen Sanctuary VIP &amp; Akun', '👑', subSanctuaryAkun, false)
-      ].join('');
-
-  } else if (currentRole === 'corporate') {
-    const isSA = (currentUserEmail === 'admin@avahealth.sbs');
-    const canRequest = isSA || !currentCorpRole || currentCorpRole === 'requestor';
-    const canApprove = isSA || !currentCorpRole || currentCorpRole === 'approver';
-
-    const subCorpMcu = `
-      <a class="sidebar-link active" onclick="showView('corporate-view', 'Home MCU')">${I.home}<span>Dasbor Kesehatan Korporat</span></a>
-      <a class="sidebar-link" onclick="showView('ava-corp-burnout-view', 'Corporate Health Index')">${I.result}<span>🏢 Burnout &amp; Health Index</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-analytics-view', 'Analytics Epidemiologi')">${I.result}<span>📊 Analytics Epidemiologi &amp; E-Hasil</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-onsite-schedule-view', 'Jadwal Mobile MCU')">${I.home}<span>🚌 Live Mobile Lab Bus On-Site</span></a>
-      <a class="sidebar-link" onclick="showView('corporate-employees-view', 'Master Employee')">${I.users}<span>Master Data Karyawan</span></a>
-      ${canRequest ? `<a class="sidebar-link" onclick="showView('book-examination-view', 'Book Examination')">${I.book}<span>Order MCU Massal (Maker)</span></a>` : ''}
-      ${canApprove ? `<a class="sidebar-link" onclick="showView('examination-approval-view', 'Examination Approval')">${I.approve}<span>Approval MCU Batch (Approver)</span></a>` : ''}
-      <a class="sidebar-link" onclick="showView('examination-history-view', 'Examination History')">${I.history}<span>Riwayat MCU Karyawan</span></a>
-    `;
-
-    const subCorpBilling = `
-      <a class="sidebar-link" onclick="showView('corporate-billing-view', 'Deposit &amp; Transaction')">${I.deposit}<span>Deposit, Tagihan &amp; Cashback</span></a>
-    `;
-
-    navContainer.innerHTML = [
-      renderCategoryAccordion('c-mcu', 'Manajemen Karyawan &amp; MCU', '🏢', subCorpMcu, true),
-      renderCategoryAccordion('c-billing', 'Keuangan &amp; Billing Corporate', '🧾', subCorpBilling, true)
-    ].join('');
-
-  } else if (currentRole === 'staff') {
-    const subNakes = `
-      <a class="sidebar-link active" onclick="showView('staff-homecare-view', 'Tugas Home Care')">${I.home}<span>Jadwal Visit Hari Ini</span></a>
-      <a class="sidebar-link" onclick="showView('staff-custody-view', 'Serah Terima Spesimen')">${I.package}<span>📦 Serah Terima Spesimen (Custody Log)</span></a>
-      <a class="sidebar-link" onclick="showView('staff-coldchain-check-view', 'Pre-Departure Check')">${I.device}<span>❄️ Kalibrasi Pre-Departure Cold-Chain</span></a>
-      <a class="sidebar-link" onclick="showView('ava-iso-audit-view', 'Audit Mutu ISO 15189')">${I.result}<span>📜 Continuous ISO 15189 Audit</span></a>
-      <a class="sidebar-link" onclick="showView('ava-laas-api-view', 'LaaS API Portal')">${I.device}<span>🌐 LaaS Open API Portal</span></a>
-      <a class="sidebar-link" onclick="openPhlebotomyModal()">${I.result}<span>Audit Sampling ISO 15189</span></a>
-      <a class="sidebar-link" onclick="showView('homecare-results-view', 'Riwayat Kunjungan')">${I.history}<span>Riwayat Sampling Flebotomi</span></a>
-      <a class="sidebar-link" onclick="showView('nearme-view', 'Faskes &amp; Lab Pusat')">${I.mapPin}<span>Peta Faskes &amp; Rute</span></a>
-      <a class="sidebar-link" onclick="showView('profile-view', 'Profil Nakes')">${I.profile}<span>Profil Petugas Nakes</span></a>
-    `;
-
-    navContainer.innerHTML = [
-      renderCategoryAccordion('s-nakes', 'Operasional Flebotomi Lapangan', '🩺', subNakes, true)
-    ].join('');
-
-  } else if (currentRole === 'referral') {
-    const subRefRujukan = `
-      <a class="sidebar-link active" onclick="showView('referral-view', 'Faskes Referral')">${I.dashboard}<span>Dasbor &amp; Riwayat Rujukan</span></a>
-      <a class="sidebar-link" onclick="showView('referral-catalog-view', 'Katalog Tes &amp; Tarif LIS')">${I.lab}<span>🧪 Katalog Tes &amp; Tarif LIS (530+)</span></a>
-      <a class="sidebar-link" onclick="showView('referral-lab-results-view', 'Hasil Lab E-Rujukan')">${I.result}<span>📋 E-Hasil Lab Pasien Rujukan</span></a>
-      <a class="sidebar-link" onclick="showView('ava-ambient-scribe-view', 'Ambient AI Clinical Scribe')">${I.consult}<span>🎙️ Ambient AI Scribe Dokter</span></a>
-      <a class="sidebar-link" onclick="openReferralForm()">${I.filePlus}<span>Buat Rujukan Baru (FPP)</span></a>
-      <a class="sidebar-link" onclick="showView('referral-view', 'Chat Patologi')">${I.consult}<span>Peer-to-Peer Chat Patologi</span></a>
-    `;
-
-    const subRefWallet = `
-      <a class="sidebar-link" onclick="openWithdrawFeeModal()">${I.wallet}<span>Tarik Komisi &amp; Saldo Wallet</span></a>
-    `;
-
-    navContainer.innerHTML = [
-      renderCategoryAccordion('r-rujukan', 'Manajemen Rujukan (E-Rujukan)', '🏥', subRefRujukan, true),
-      renderCategoryAccordion('r-wallet', 'Wallet &amp; Komisi Mitra', '💰', subRefWallet, true)
-    ].join('');
-
-  } else if (currentRole === 'tech') {
-    const subTechMaster = `
-      <a class="sidebar-link active" onclick="showView('tech-saas-master-console-view', 'AVA Tech Master Console')">${I.dashboard}<span>💻 Master Dashboard &amp; Telemetri</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-site'); showView('tech-saas-master-console-view', 'Monitoring Site Branch')">${I.home}<span>🏢 Monitoring Site Branch (Per Cabang)</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-modules'); showView('tech-saas-master-console-view', 'Set Modul &amp; Lisensi')">${I.package}<span>📦 Set Modul &amp; Lisensi Pemesanan</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-telemetry'); showView('tech-saas-master-console-view', 'Log Activity &amp; Telemetri')">${I.medrec}<span>📊 Log Activity &amp; Live Telemetry</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-bugs'); showView('tech-saas-master-console-view', 'Bug &amp; SLA Tracker')">${I.result}<span>🐞 Bug, Incident &amp; SLA Ticket</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-backup'); showView('tech-saas-master-console-view', 'Backup &amp; Maintenance')">${I.device}<span>💾 Backup &amp; Maintenance Engine</span></a>
-      <a class="sidebar-link" onclick="switchTechTab('domain-security'); showView('tech-saas-master-console-view', 'Security &amp; AI Gateway')">${I.deposit}<span>🔑 Security, API Keys &amp; AI Gateway</span></a>
-    `;
-
-    navContainer.innerHTML = [
-      renderCategoryAccordion('t-master', 'AVA Tech Vendor Operations Center', '💻', subTechMaster, true)
-    ].join('');
-  }
-}
+function renderSidebarMenu() { renderAppsMenu(); }
 
 function updateSidebarNav() {
   renderSidebarMenu();
@@ -506,7 +374,7 @@ function avaKosong(pesan) {
 
 function avaGagal(e) {
   return `<div class="glass-card" style="padding:20px; background:#fff5f5; border-color:#fecaca;">
-    <div style="font-size:13px; color:#b91c1c;">Gagal memuat data: ${e && e.message ? e.message : e}</div>
+    <div style="font-size:13px; color:#b91c1c;">Gagal memuat data: ${appsEscape(e && e.message ? e.message : e)}</div>
   </div>`;
 }
 
@@ -516,10 +384,8 @@ async function renderAvaConsult() {
   box.innerHTML = avaKosong('Memuat...');
   try {
     const rows = await avaAmbil('ava_consultations', 'select=*&order=created_at.desc&limit=25');
-    const dataList = (rows && rows.length > 0) ? rows : [
-      { complaint: 'Pemeriksaan Evaluasi Prediabetes & Profil Lipid', doctor_name: 'Ace Darojatun, Sp.PD', created_at: '2026-07-19T09:00:00Z', triage_level: 'normal', status: 'Selesai' },
-      { complaint: 'Konsultasi Hasil Lab HbA1c & Fungsi Hati GGT', doctor_name: 'Ahmad Subarjo, Sp.PK', created_at: '2026-06-24T14:30:00Z', triage_level: 'normal', status: 'Selesai' }
-    ];
+    const dataList = rows || [];
+    if (!dataList.length) { box.innerHTML = avaKosong('Belum ada riwayat konsultasi.'); return; }
 
     const warna = { urgent: '#dc2626', priority: '#d97706', normal: '#0f766e' };
     box.innerHTML = dataList.map(r => `
@@ -574,17 +440,11 @@ async function renderAvaMarketplace() {
   try {
     rows = await avaAmbil('ava_marketplace_items', 'select=*&order=created_at.desc&limit=40');
   } catch (e) {
-    console.warn('Fallback to local verified marketplace items:', e.message);
+    box.innerHTML = avaGagal(e); return;
   }
 
-  const dataList = (rows && rows.length > 0) ? rows : [
-    { title: 'ECG Portable Holter 24 Jam', badge_status: 'verified', vendor_name: 'AVA Tech Medical', price: 450000, type: 'sewa bulan' },
-    { title: 'Continuous Glucose Monitor (CGM) Kit', badge_status: 'verified', vendor_name: 'AVA Diagnostics', price: 1250000, type: 'beli' },
-    { title: 'Smart Oxygen Concentrator 5L Silent', badge_status: 'verified', vendor_name: 'Medika Jaya', price: 850000, type: 'sewa bulan' },
-    { title: 'Vital Signs Monitor 6 Parameter', badge_status: 'verified', vendor_name: 'AVA Tech Medical', price: 950000, type: 'sewa bulan' },
-    { title: 'Nebulizer Mesh Portable Silent', badge_status: 'verified', vendor_name: 'Queen Healthcare', price: 350000, type: 'beli' },
-    { title: 'Smart Infusion Pump Precision', badge_status: 'verified', vendor_name: 'AVA Diagnostics', price: 650000, type: 'sewa bulan' }
-  ];
+  const dataList = rows || [];
+  if (!dataList.length) { box.innerHTML = avaKosong('Belum ada alat kesehatan yang tersedia.'); return; }
 
   box.innerHTML = `<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:14px;">
     ${dataList.map(r => {
@@ -614,15 +474,11 @@ async function renderAvaDevices() {
   try {
     rows = await avaAmbil('ava_device_readings', 'select=*&order=created_at.desc&limit=40');
   } catch (e) {
-    console.warn('Fallback to local IoT biosensor readings:', e.message);
+    box.innerHTML = avaGagal(e); return;
   }
 
-  const dataList = (rows && rows.length > 0) ? rows : [
-    { device_name: 'Smart Ring Oura Gen3', device_type: 'Heart Rate & Sleep Tracker', reading_value: '65', unit: 'ms HRV', alert_status: 'normal', created_at: new Date().toISOString() },
-    { device_name: 'Continuous Glucose Sensor (CGM)', device_type: 'Sub-dermal Bio-patch', reading_value: '98', unit: 'mg/dL (Normal Puasa)', alert_status: 'normal', created_at: new Date().toISOString() },
-    { device_name: 'Pulse Oximeter Bluetooth', device_type: 'SpO2 Fingertip Sensor', reading_value: '99', unit: '% SpO2 (Saturasi Primer)', alert_status: 'normal', created_at: new Date().toISOString() },
-    { device_name: 'Tensi Smart Bluetooth Omron', device_type: 'Upper Arm Cuff Sensor', reading_value: '118/78', unit: 'mmHg (Normal Systolic)', alert_status: 'normal', created_at: new Date().toISOString() }
-  ];
+  const dataList = rows || [];
+  if (!dataList.length) { box.innerHTML = avaKosong('Belum ada pembacaan perangkat untuk akun Anda.'); return; }
 
   box.innerHTML = dataList.map(r => {
     const siaga = (r.alert_status || 'normal') !== 'normal';
@@ -653,13 +509,11 @@ async function renderAvaCaregiver() {
   try {
     rows = await avaAmbil('ava_caregiver_links', 'select=*&order=created_at.desc&limit=30');
   } catch (e) {
-    console.warn('Fallback to local caregiver list:', e.message);
+    box.innerHTML = avaGagal(e); return;
   }
 
-  const dataList = (rows && rows.length > 0) ? rows : [
-    { caregiver_name: 'Siti Rahma', relation: 'Istri / Pendamping Utama', permission_scope: 'Akses Penuh Rekam Medis & MCU' },
-    { caregiver_name: 'dr. Bambang Wijaya', relation: 'Dokter Keluarga Rujukan', permission_scope: 'Akses Rujukan & Hasil Lab' }
-  ];
+  const dataList = rows || [];
+  if (!dataList.length) { box.innerHTML = avaKosong('Belum ada pendamping yang ditautkan.'); return; }
 
   box.innerHTML = dataList.map(r => `
     <div class="glass-card" style="padding:14px 18px; background:#ffffff; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:16px; border:1px solid var(--border);">
@@ -815,20 +669,7 @@ async function loadPatientEHR(patientName) {
     } catch(e) { console.warn("Gagal mengambil radiology_reports:", e); }
   }
 
-  // ── KEPATUHAN ISO 15189:2022 & UU PDP ──
-  // Tidak menyuntikkan (sbPost) data klinis palsu ke DB produksi live jika EHR kosong.
-  if (labs.length === 0 && pres.length === 0 && radOrders.length === 0 && (patientName.includes('Rina') || patientName.includes('Dewi') || patientName.includes('Budi') || patientName.includes('Ace'))) {
-    console.log("Menggunakan fallback sampel memori khusus demo tampilan (tanpa simpan ke DB live)");
-    labs = [
-      { id: 'm-lab-1', patient_name: patientName, product_name: 'Hemoglobin (Hb)', result_value: '14.5', unit: 'g/dL', normal_min: 13.0, normal_max: 17.5, interpretation: 'Normal', color_code: 'green' },
-      { id: 'm-lab-2', patient_name: patientName, product_name: 'Kolesterol Total', result_value: '245', unit: 'mg/dL', normal_min: 100, normal_max: 200, interpretation: 'Tinggi', color_code: 'red', condition_name: 'Hiperkolesterolemia' },
-      { id: 'm-lab-3', patient_name: patientName, product_name: 'Glukosa Puasa', result_value: '126', unit: 'mg/dL', normal_min: 70, normal_max: 100, interpretation: 'Tinggi', color_code: 'red', condition_name: 'Prediabetes' }
-    ];
-    radOrders = [{ id: 'm-rad-1', procedure_name: 'Chest X-Ray / Thorax PA', referring_doctor: 'Dr. Ace Darojatun', status: 'Selesai' }];
-    radReports = [{ order_id: 'm-rad-1', technique: 'Thorax PA view', findings: 'Cor dan pulmo dalam batas normal. Tidak tampak kardiomegali.', impression: 'Chest X-Ray Normal.', radiologist: 'Dr. Sarah Amalia, Sp.Rad' }];
-    pres = [{ id: 'm-rx-1', rx_number: 'RX-DEMO-01', rx_date: new Date().toISOString().split('T')[0], doctor_name: 'Dr. Ace Darojatun', diagnosis: 'E11.9 DM Tipe 2, E78.5 Hiperlipidemia', notes: 'Kontrol gula darah puasa. Lakukan olahraga aerobik.' }];
-    presItems = [{ rx_id: 'm-rx-1', drug_name: 'Metformin 500 mg', qty: 15, dosage: '2 x Sehari 1 Tablet (Sesudah Makan)' }];
-  }
+  // Empty clinical results remain empty; never synthesize patient records.
 
   // Render profile
   const isSuperAdmin = (patientName === 'Ace Darojatun Anwar' || patientName === 'admin@avahealth.sbs');
@@ -978,7 +819,7 @@ function renderLabCatalogue(filterText = '') {
   const container = document.getElementById('bt-catalogue-grid');
   if (!container) return;
 
-  const itemsList = labTestsFromDB.length > 0 ? labTestsFromDB : LAB_TEST_ITEMS;
+  const itemsList = labTestsFromDB;
   const query = filterText.toLowerCase();
   const filtered = itemsList.filter(item => 
     item.code.toLowerCase().includes(query) || 
@@ -986,7 +827,7 @@ function renderLabCatalogue(filterText = '') {
   );
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">Tidak menemukan hasil pemeriksaan "${filterText}"</div>`;
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">Belum ada pemeriksaan yang sesuai dengan pencarian ${appsEscape(filterText)}.</div>`;
     return;
   }
 
@@ -1398,8 +1239,8 @@ function renderTokoCheckout() {
     const el = document.getElementById(id);
     if (el && nilai && !el.value) el.value = nilai;
   };
-  const prof = window.currentUserProfile || {};
-  isi('tk-nama',   prof.full_name || window.currentUsername);
+  const prof = currentUserProfile || {};
+  isi('tk-nama',   prof.full_name || currentUsername);
   isi('tk-hp',     prof.phone);
   isi('tk-alamat', prof.address);
 }
@@ -1428,7 +1269,7 @@ async function tkKirimPesanan(tombol) {
         kanal: 'web',
         pembeli_nama: nama,
         pembeli_hp: hp,
-        pembeli_email: (window.currentUserEmail || null),
+        pembeli_email: (currentUserEmail || null),
         alamat: alamat,
         kota: (document.getElementById('tk-kota').value || '').trim(),
         provinsi: (document.getElementById('tk-provinsi').value || '').trim(),
@@ -1497,8 +1338,8 @@ async function renderMemberSanctuary() {
 
   let saldo = null, treatment = [], reservasi = [];
   try {
-    const hp = (window.currentUserProfile && window.currentUserProfile.phone) || '';
-    const email = window.currentUserEmail || '';
+    const hp = (currentUserProfile && currentUserProfile.phone) || '';
+    const email = currentUserEmail || '';
 
     // Pencocokan lewat identitas akun. Kalau keduanya kosong, jangan
     // menebak — lebih baik mengatakan belum tertaut.
@@ -1648,7 +1489,7 @@ async function spMintaJadwal(treatmentId, namaTreatment) {
     + `Tanggal: ${tgl}\nJam: ${jam}\n`
     + (spMember
         ? `Member: ${spMember.nama}${spMember.no_member ? ' (' + spMember.no_member + ')' : ''}`
-        : `Nama: ${window.currentUsername || '-'}`);
+        : `Nama: ${currentUsername || '-'}`);
 
   // Dikirim lewat WhatsApp resepsionis, bukan langsung menulis ke
   // spa_reservasi: menulis reservasi tanpa memeriksa ketersediaan terapis
@@ -1687,7 +1528,7 @@ async function renderStaffHomecare() {
   box.innerHTML = '<div style="padding:24px; text-align:center; font-size:13px; '
     + 'color:var(--text-muted)">Memuat tugas hari ini…</div>';
 
-  const nama = window.currentUsername || '';
+  const nama = currentUsername || '';
   const hariIni = new Date().toISOString().slice(0, 10);
 
   let tugas = [];
@@ -1875,8 +1716,8 @@ async function renderHomecareResults() {
   box.innerHTML = '<div style="padding:24px; text-align:center; font-size:13px; '
     + 'color:var(--text-muted)">Memuat kunjungan…</div>';
 
-  const nama = window.currentUsername || '';
-  const hp = (window.currentUserProfile && window.currentUserProfile.phone) || '';
+  const nama = currentUsername || '';
+  const hp = (currentUserProfile && currentUserProfile.phone) || '';
 
   if (!nama && !hp) {
     box.innerHTML = avaKosong('Masuk terlebih dahulu untuk melihat kunjungan Anda.');
@@ -1896,35 +1737,10 @@ async function renderHomecareResults() {
         + '&order=scheduled_date.desc&limit=20');
     }
   } catch (e) {
-    console.warn('Fallback to local homecare orders:', e.message);
+    box.innerHTML = avaGagal(e); return;
   }
 
-  if (!pesanan || !pesanan.length) {
-    pesanan = [
-      {
-        order_number: 'HC-2026-9902',
-        scheduled_date: '2026-09-06',
-        scheduled_time: '14:00',
-        status: 'Dalam Perjalanan',
-        petugas_name: 'Perawat Siti Nakes, S.Kep',
-        package_name: 'Flebotomi Home Care & Sample Transport ISO 15189',
-        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
-        coldchain_temp: '4.2°C (Valid ISO 15189)',
-        notes: 'Sampling Darah Lengkap, Profil Lipid & Glukosa Puasa'
-      },
-      {
-        order_number: 'HC-2026-8814',
-        scheduled_date: '2026-08-15',
-        scheduled_time: '09:00',
-        status: 'Selesai',
-        petugas_name: 'Perawat Dedi Kurniawan, Amd.Kep',
-        package_name: 'MCU Eksekutif Home Care',
-        address: 'Jl. Senopati No. 45, Kebayoran Baru, Jakarta Selatan',
-        coldchain_temp: '3.8°C (Tersimpan di Lab)',
-        notes: 'Hasil lab sudah dikirim ke Rekam Medis Pasien'
-      }
-    ];
-  }
+  if (!pesanan || !pesanan.length) { box.innerHTML = avaKosong('Belum ada riwayat kunjungan untuk akun Anda.'); return; }
 
   const warna = {
     'Baru': '#0369a1', 'Dijadwalkan': '#0369a1', 'Dalam Perjalanan': '#b45309',
@@ -2144,14 +1960,8 @@ function closeRegisterModal() {
 
 function handleRegistrationSubmit(event) {
   event.preventDefault();
-  const name = document.getElementById('reg-name').value.trim();
-  
   closeRegisterModal();
-  alert(`Registrasi Akun Mandiri berhasil! No. Rekam Medis (RM) Anda adalah RM-12948. Silakan gunakan untuk masuk.`);
-  
-  // Fill the login form with the mock RM number
-  const inputEl = document.getElementById('username');
-  if (inputEl) inputEl.value = 'RM-12948';
+  showLoginError('Pendaftaran mandiri belum tersedia. Hubungi petugas untuk aktivasi akun.');
 }
 
 // Open/Close Member & Affiliate Modal
@@ -2400,10 +2210,7 @@ async function buildPackageServices(pkgId) {
 
 // ── Book Examination (Requestor) ──
 async function renderBookExamination() {
-  if (!currentCorporateId) {
-    currentCorporateId = 8000010448;
-    currentCorporateName = 'PT AVA Global Corp';
-  }
+  if (!currentCorporateId) { const box = document.getElementById('book-exam-content'); if (box) box.innerHTML = avaKosong('Akses perusahaan belum terverifikasi. Masuk ulang melalui portal perusahaan.'); return; }
   const box = document.getElementById('book-exam-content');
   if (!box) return;
   
@@ -2414,13 +2221,8 @@ async function renderBookExamination() {
   ]);
 
   // Fallback demo employees if Supabase table is empty
-  const employeeList = (emps && emps.length > 0) ? emps : MOCK_CORPORATES.map((m, i) => ({
-    id: i + 1,
-    full_name: m.name,
-    employee_id: m.id,
-    department: 'Operations',
-    gender: 'M'
-  }));
+  const employeeList = emps || [];
+  if (!employeeList.length) { box.innerHTML = avaKosong('Belum ada karyawan. Tambahkan data karyawan sebelum mengajukan pemeriksaan.'); return; }
 
   // Load packages from corporate active contracts
   let allowedPkgIds = [];
@@ -2447,13 +2249,7 @@ async function renderBookExamination() {
     const idFilter = allowedPkgIds.map(id => `id.eq.${id}`).join(',');
     pkgs = await sbGet('packages', `select=id,nama_paket&is_active=eq.true&or=(${idFilter})&order=nama_paket`).catch(()=>[]);
   }
-  if (!pkgs.length) {
-    pkgs = [
-      { id: 101, nama_paket: 'Paket MCU Eksekutif A' },
-      { id: 102, nama_paket: 'Paket MCU Dasar' },
-      { id: 103, nama_paket: 'Paket MCU Driver & Flebotomi' }
-    ];
-  }
+  if (!pkgs.length) { box.innerHTML = avaKosong('Belum ada paket pemeriksaan dalam kontrak aktif. Hubungi petugas perusahaan.'); return; }
   const branches = (branchesRaw||[]).map(b=>b.name).filter(Boolean);
   const today = new Date().toISOString().slice(0,10);
   const positions = [...new Set((employeeList||[]).map(e=>empPosition(e)).filter(p=>p&&p!=='—'))].sort();
@@ -2461,8 +2257,8 @@ async function renderBookExamination() {
   box.innerHTML = `
     <div class="ci-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap">
-        <h3 style="margin:0; font-size:15px; color:#0f2963; font-weight:800;">Book Examination (Maker Order MCU)</h3>
-        <button class="btn btn-sm btn-teal" style="margin:0;width:auto" onclick="submitExamBooking()">Submit Request</button>
+        <h3 style="margin:0; font-size:15px; color:#0f2963; font-weight:800;">Ajukan Pemeriksaan Karyawan</h3>
+        <button class="btn btn-sm btn-teal" style="margin:0;width:auto" onclick="submitExamBooking()">Kirim Pengajuan</button>
       </div>
       <div class="be-filters">
         <div><label>Branch</label><select id="be-branch">${branches.length?branches.map(b=>`<option>${b}</option>`).join(''):'<option>VIRTU DIGILAB NATIONAL RESEARCH CENTER</option>'}</select></div>
@@ -2519,31 +2315,25 @@ async function submitExamBooking() {
     } catch(e) { console.error('[submitExamBooking]', e); }
   }
   alert(`✅ ${ok || checked.length} permintaan dikirim (batch ${batch}).\nMenunggu approval Manager.`);
-  showView('examination-history-view', 'Examination History');
+  showView('examination-history-view', 'Riwayat Pemeriksaan Karyawan');
 }
 
 // ── Examination Approval (Approver) ──
 async function renderExamApproval() {
-  if (!currentCorporateId) {
-    currentCorporateId = 8000010448;
-    currentCorporateName = 'PT AVA Global Corp';
-  }
+  if (!currentCorporateId) { const box = document.getElementById('exam-approval-content'); if (box) box.innerHTML = avaKosong('Akses perusahaan belum terverifikasi. Masuk ulang melalui portal perusahaan.'); return; }
   const box = document.getElementById('exam-approval-content');
   if (!box) return;
   const reqs = await sbGet('corp_exam_requests', `select=*&corporate_id=eq.${currentCorporateId}&exam_status=eq.Requested&order=requested_at.desc`).catch(()=>[]);
-  const requestList = (reqs && reqs.length > 0) ? reqs : [
-    { id: 901, patient_id_number: 'EMP-001', patient_name: 'Ahmad Subarjo', department: 'Operations', type_of_test: 'MCU', package_name: 'Paket MCU Eksekutif A' },
-    { id: 902, patient_id_number: 'EMP-003', patient_name: 'Bambang Wijaya', department: 'Logistics', type_of_test: 'MCU', package_name: 'Paket MCU Driver' }
-  ];
+  const requestList = reqs || [];
 
   box.innerHTML = `
     <div class="ci-card" style="padding:20px 22px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px">
-        <h3 style="margin:0; font-size:15px; color:#0f2963; font-weight:800;">Examination Approval (Approver Manager)</h3>
+        <h3 style="margin:0; font-size:15px; color:#0f2963; font-weight:800;">Persetujuan Pemeriksaan</h3>
         <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" style="margin:0;width:auto;background:#fee2e2;color:#dc2626" onclick="bulkApprove(false)">Reject All</button>
-          <button class="btn btn-sm" style="margin:0;width:auto;background:#d1fae5;color:#065f46" onclick="bulkApprove(true)">Approve All</button>
-          <button class="btn btn-sm btn-primary" style="margin:0;width:auto" onclick="saveExamApproval()">Save Data</button>
+          <button class="btn btn-sm" style="margin:0;width:auto;background:#fee2e2;color:#dc2626" onclick="bulkApprove(false)">Tolak Semua</button>
+          <button class="btn btn-sm" style="margin:0;width:auto;background:#d1fae5;color:#065f46" onclick="bulkApprove(true)">Setujui Semua</button>
+          <button class="btn btn-sm btn-primary" style="margin:0;width:auto" onclick="saveExamApproval()">Simpan Persetujuan</button>
         </div>
       </div>
       <p style="font-size:11px;color:var(--text-muted);margin-bottom:14px">Centang yang <b>ditolak</b> + isi alasan. Yang tidak dicentang otomatis <b>disetujui</b>.</p>
@@ -2607,20 +2397,13 @@ async function saveExamApproval() {
   renderExamApproval();
 }
 
-// ── Examination History ──
+// ── Riwayat Pemeriksaan Karyawan ──
 async function renderExamHistory() {
-  if (!currentCorporateId) {
-    currentCorporateId = 8000010448;
-    currentCorporateName = 'PT AVA Global Corp';
-  }
+  if (!currentCorporateId) { const box = document.getElementById('exam-history-content'); if (box) box.innerHTML = avaKosong('Akses perusahaan belum terverifikasi. Masuk ulang melalui portal perusahaan.'); return; }
   const box = document.getElementById('exam-history-content');
   if (!box) return;
   const reqs = await sbGet('corp_exam_requests', `select=*&corporate_id=eq.${currentCorporateId}&order=requested_at.desc&limit=500`).catch(()=>[]);
-  const requestList = (reqs && reqs.length > 0) ? reqs : [
-    { book_date: '2026-09-05', booking_batch: 'BATCH-882049', branch: 'VIRTU DIGILAB HQ', patient_name: 'Ahmad Subarjo', type_of_test: 'MCU', package_name: 'Paket MCU Eksekutif A', exam_status: 'Approved' },
-    { book_date: '2026-09-04', booking_batch: 'BATCH-882048', branch: 'AVAHEALTH SUDIRMAN', patient_name: 'Bambang Wijaya', type_of_test: 'MCU', package_name: 'Paket MCU Driver', exam_status: 'Approved' },
-    { book_date: '2026-09-01', booking_batch: 'BATCH-882040', branch: 'AVAHEALTH DIPONEGORO', patient_name: 'Siti Rahma', type_of_test: 'MCU', package_name: 'Paket MCU Dasar', exam_status: 'Requested' }
-  ];
+  const requestList = reqs || [];
 
   const badge = s => {
     const m = { Requested:['#b45309','#fef3c7'], Approved:['#065f46','#d1fae5'], Rejected:['#991b1b','#fee2e2'] };
@@ -2628,7 +2411,7 @@ async function renderExamHistory() {
     return `<span style="background:${c[1]};color:${c[0]};font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px">${s==='Approved'?'Approved by Manager':s}</span>`;
   };
   box.innerHTML = `<div class="ci-card" style="padding:20px 22px">
-    <h3 style="margin:0 0 14px; font-size:15px; color:#0f2963; font-weight:800;">Examination History</h3>
+    <h3 style="margin:0 0 14px; font-size:15px; color:#0f2963; font-weight:800;">Riwayat Pemeriksaan Karyawan</h3>
     ${(requestList||[]).length ? `<div style="overflow-x:auto"><table class="be-table">
       <thead><tr><th>Booking Date</th><th>Batch</th><th>Branch</th><th>Name</th><th>Type</th><th>Item</th><th>Status</th></tr></thead>
       <tbody>${requestList.map(r=>`<tr><td>${r.book_date||'—'}</td><td style="font-family:monospace;font-size:10.5px">${r.booking_batch||'—'}</td><td>${r.branch||'—'}</td><td>${r.patient_name||'—'}</td><td>${r.type_of_test||'MCU'}</td><td>${r.package_name||'—'}</td><td>${badge(r.exam_status)}${r.reject_reason?`<div style="font-size:10px;color:#dc2626;margin-top:3px">${r.reject_reason}</div>`:''}</td></tr>`).join('')}</tbody>
@@ -2648,10 +2431,7 @@ function downloadCsv(filename, headerArr, rows) {
 // ── Hasil MCU per corporate ──
 let _corpResults = [];
 async function renderCorporateResults() {
-  if (!currentCorporateId) {
-    currentCorporateId = 8000010448;
-    currentCorporateName = 'PT AVA Global Corp';
-  }
+  if (!currentCorporateId) { const box = document.getElementById('corp-results-content'); if (box) box.innerHTML = avaKosong('Akses perusahaan belum terverifikasi. Masuk ulang melalui portal perusahaan.'); return; }
   const box = document.getElementById('corp-results-content');
   if (!box) return;
   const adms = await sbGet('admissions', `select=id,patient_name,visit_date,package_name&corporate_id=eq.${currentCorporateId}&order=visit_date.desc&limit=1000`).catch(()=>[]);
@@ -2758,7 +2538,7 @@ async function renderCorporateList(data = corporates) {
   }
 
   // Master Employee = data karyawan murni. Paket TIDAK di sini —
-  // paket ditentukan saat Book Examination & tampil di Examination History.
+  // paket ditentukan saat Book Examination & tampil di Riwayat Pemeriksaan Karyawan.
   container.innerHTML = `
     <div style="overflow-x:auto;">
       <table style="width:100%; border-collapse:collapse; font-size:12.5px; border:none; font-family:'Outfit', sans-serif;">
@@ -3437,7 +3217,7 @@ function renderInvoices() {
           <p>${inv.name} &bull; ${inv.date}</p>
         </div>
         <div style="text-align:right;">
-          <span class="invoice-amount" style="font-weight:700; color:white;">Rp ${inv.amount.toLocaleString('id-ID')}</span>
+          <span class="invoice-amount" style="font-weight:700; color:var(--text-main);">Rp ${inv.amount.toLocaleString('id-ID')}</span>
           <span class="badge ${badgeClass}" style="display:block; width:fit-content; margin-left:auto; margin-top:4px; font-size:9px; padding:2px 6px;">${badgeText}</span>
         </div>
       </div>
@@ -3511,21 +3291,9 @@ function selectInvoiceToPay(invId) {
   document.getElementById('payment-panel').style.display = 'block';
 }
 
-function processInvoicePayment() {
-  if (!selectedInvoiceId) return;
-
-  const method = document.querySelector('input[name="pay-method"]:checked').value;
-  const inv = invoices.find(i => i.id === selectedInvoiceId);
-
-  if (!inv) return;
-
-  inv.status = 'paid';
-  
-  // Hide payment panel
-  document.getElementById('payment-panel').style.display = 'none';
-
-  renderInvoices();
-  alert(`Pembayaran Invoice "${selectedInvoiceId}" sebesar Rp ${inv.amount.toLocaleString('id-ID')} menggunakan "${method}" berhasil diproses!`);
+function processInvoicePayment(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Pembayaran melalui portal belum tersedia. Hubungi petugas untuk konfirmasi pembayaran.");
 }
 
 // --- CLAIM CASHBACK ---
@@ -3589,26 +3357,8 @@ function closeWithdrawFeeModal() {
 }
 
 function processWithdrawFee(event) {
-  event.preventDefault();
-
-  const amtInput = parseInt(document.getElementById('w-amount').value);
-  const bank = document.getElementById('w-bank-name').value;
-
-  if (isNaN(amtInput) || amtInput <= 0) return;
-
-  if (amtInput > referralWallet) {
-    alert('Saldo rujukan tidak mencukupi untuk melakukan penarikan.');
-    return;
-  }
-
-  referralWallet -= amtInput;
-
-  // Update dashboard commission values
-  const feeEl = document.getElementById('r-fee-balance');
-  if (feeEl) feeEl.textContent = `Rp ${referralWallet.toLocaleString('id-ID')}`;
-
-  closeWithdrawFeeModal();
-  alert(`Komisi rujukan sebesar Rp ${amtInput.toLocaleString('id-ID')} berhasil dicairkan ke rekening ${bank}.`);
+  if (event?.preventDefault) event.preventDefault();
+  alert("Pencairan komisi melalui portal belum tersedia. Hubungi petugas kemitraan.");
 }
 
 // Render Referral List
@@ -3652,226 +3402,95 @@ function renderReferralList() {
   }
 }
 
-// Handle Login Submission
+// OWNED_BY: ava — existing portal authentication, fail closed.
+const PORTAL_ROLES = ['patient', 'member', 'corporate', 'staff', 'referral', 'tech'];
+function clearPortalSession() {
+  ['ol_token', 'ol_refresh', 'AVA_CURRENT_USER_ROLE'].forEach(key => { localStorage.removeItem(key); sessionStorage.removeItem(key); });
+  sessionStorage.removeItem('AVA_IS_LOGGED_IN');
+  currentUserProfile = null;
+  currentUserEmail = '';
+  currentUsername = '';
+  currentCorporateId = null;
+  currentCorporateName = '';
+  currentCorpRole = null;
+}
+function showLoginError(message) {
+  const el = document.getElementById('login-error');
+  if (el) { el.textContent = message; el.hidden = !message; }
+}
 async function handleLogin(event) {
   event.preventDefault();
-  
-  const usernameInput = document.getElementById('username').value.trim();
-  const passwordInput = document.getElementById('password').value;
+  const btn = document.querySelector('#login-screen button[type="submit"]');
+  if (btn?.disabled) return;
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
   const selectedRole = document.querySelector('input[name="login-role"]:checked').value;
-  
-  let finalUsername = usernameInput;
-  let finalRole = selectedRole;
-  let profileData = null;
-
-  // ── Gerbang B2B: kode korporat ────────────────────────────────────
-  //
-  // Di sini HANYA diperiksa bahwa kodenya diisi. Pemeriksaan hak akses
-  // sesungguhnya dilakukan SESUDAH autentikasi, lewat RPC
-  // korporat_verifikasi_akses() — lihat catatan panjang di bawah.
-  let corpCodeInputVal = null;
-  if (selectedRole === 'corporate') {
-    corpCodeInputVal = (document.getElementById('login-corp-code')?.value || '').trim();
-    if (!corpCodeInputVal) {
-      alert('Kode Korporat wajib diisi. Kode diterbitkan tim AVA di modul Corporate Management (HIS).');
-      return;
+  const corpCode = (document.getElementById('login-corp-code')?.value || '').trim();
+  showLoginError('');
+  if (!username || !password) { showLoginError('Isi email dan kata sandi Anda.'); return; }
+  if (selectedRole === 'corporate' && !corpCode) { showLoginError('Isi kode perusahaan dari petugas Anda.'); return; }
+  const oldText = btn?.textContent;
+  if (btn) { btn.disabled = true; btn.textContent = 'Memverifikasi akun…'; }
+  clearPortalSession();
+  try {
+    const response = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_RUNTIME_KEY },
+      body: JSON.stringify({ email: username, password })
+    });
+    const auth = await response.json();
+    if (!response.ok || !auth.access_token || !auth.user?.id) throw new Error('Email atau kata sandi tidak sesuai. Silakan coba lagi.');
+    sessionStorage.setItem('ol_token', auth.access_token);
+    if (auth.refresh_token) sessionStorage.setItem('ol_refresh', auth.refresh_token);
+    const profiles = await sbGet('user_profiles', 'select=*&id=eq.' + encodeURIComponent(auth.user.id));
+    const profile = Array.isArray(profiles) ? profiles[0] : null;
+    if (!profile || profile.id !== auth.user.id) throw new Error('Profil akses belum tersedia. Hubungi petugas layanan.');
+    const role = profile.role === 'super_admin' ? selectedRole : profile.role;
+    if (!PORTAL_ROLES.includes(role) || role !== selectedRole) throw new Error('Akun ini tidak memiliki akses ke portal yang dipilih. Pilih portal sesuai peran akun.');
+    if (role === 'corporate') {
+      const corporate = await sbRpc('korporat_verifikasi_akses', { p_kode: corpCode });
+      if (!corporate || corporate.error || !corporate.id) throw new Error('Akses perusahaan tidak dapat diverifikasi. Hubungi petugas perusahaan.');
+      currentCorporateId = corporate.id;
+      currentCorporateName = corporate.nama;
+      currentCorpRole = corporate.corp_role || 'requestor';
     }
+    currentUserProfile = profile;
+    currentUsername = profile.full_name || auth.user.email;
+    currentUserEmail = auth.user.email;
+    currentRole = role;
+    await applyRoleUIState(role);
+    sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
+    localStorage.setItem('AVA_CURRENT_USER_ROLE', role);
+    document.getElementById('password').value = '';
+    const timeline = document.getElementById('timeline-tabs-nav');
+    if (timeline) timeline.style.display = role === 'patient' ? 'block' : 'none';
+    switchTimelinePhase('fase1');
+    showScreen('dashboard-screen');
+  } catch (error) {
+    clearPortalSession();
+    showScreen('login-screen');
+    showLoginError(error instanceof TypeError ? 'Layanan masuk belum dapat dihubungi. Periksa koneksi lalu coba lagi.' : error.message || 'Tidak dapat masuk. Silakan coba lagi.');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = oldText; }
   }
-
-  // ── Verifikasi hak akses korporat (SESUDAH autentikasi) ───────────
-  //
-  // Versi sebelumnya memeriksa kode korporat SEBELUM pengguna masuk, dan
-  // yang diperiksa hanya "apakah kode ini ada dan aktif":
-  //
-  //     sbGet('corporates', 'kode_corp=eq.' + kodeYangDiketik)
-  //     if (ada && status === 'Aktif') currentCorporateId = hasil.id
-  //
-  // Tidak ada pemeriksaan bahwa orang yang masuk berhak atas perusahaan
-  // itu. Ditambah baris resolusi corporate_id yang mendahulukan nilai ini
-  // di atas tautan akunnya sendiri, siapa pun dengan akun sah bisa
-  // mengetik kode perusahaan lain dan membaca roster karyawannya: nama,
-  // NIK, departemen, riwayat pemeriksaan, dan tagihan.
-  //
-  // Kode korporat bukan rahasia — ia tercetak di invoice, penawaran, dan
-  // dokumen PKS.
-  //
-  // Sekarang pemeriksaan dilakukan di basis data oleh
-  // korporat_verifikasi_akses(), yang membaca auth.uid() sendiri sehingga
-  // pemanggil tidak bisa menyebut identitas orang lain. Karena butuh
-  // identitas, ia HARUS dipanggil sesudah token didapat — bukan sebelum.
-  async function verifikasiKorporat(kode) {
-    const tok = localStorage.getItem('ol_token') || '';
-    const isDemoToken = tok.startsWith('master_ava_token_') || tok.startsWith('mock_token_') || usernameInput.includes('avahealth.sbs');
-    if (isDemoToken) {
-      currentCorporateId   = currentCorporateId || 'demo-corp-01';
-      currentCorporateName = currentCorporateName || 'PT. Sukses Mandiri (Demo)';
-      currentCorpRole      = 'requestor';
-      return true;
-    }
-    try {
-      const r = await sbRpc('korporat_verifikasi_akses', { p_kode: kode });
-      if (!r || r.error) {
-        alert(r?.error || 'Verifikasi kode korporat gagal.');
-        return false;
-      }
-      currentCorporateId   = r.id;
-      currentCorporateName = r.nama;
-      currentCorpRole      = r.corp_role || 'requestor';
-      return true;
-    } catch (e) {
-      alert('Tidak dapat memverifikasi kode korporat: ' + e.message);
-      return false;
-    }
-  }
-
-  // Multi-Role Demo Authentication for Mobile Apps
-  const AVA_DEMO_USERS_MAP = {
-    'admin@avahealth.sbs': { id: 'usr-admin-master', full_name: 'Master Super Admin', role: 'super_admin' },
-    'dokter@avahealth.sbs': { id: 'usr-dokter-sp', full_name: 'dr. Andi Pratama, Sp.PD', role: 'dokter' },
-    'pasien@avahealth.sbs': { id: 'usr-pasien-d2c', full_name: 'Rina Kusuma (Pasien)', role: 'patient' },
-    'member@avahealth.sbs': { id: 'usr-member-vip', full_name: 'Dewi Lestari (VIP Member)', role: 'member' },
-    'corp@avahealth.sbs': { id: 'usr-corp-pic', full_name: 'Budi Hartono (PIC Corporate)', role: 'corporate' },
-    'referral@avahealth.sbs': { id: 'usr-ref-faskes', full_name: 'Klinik Pratama Medika (Referral)', role: 'referral' },
-    'nakes@avahealth.sbs': { id: 'usr-nakes-staff', full_name: 'Ns. Ace Darojatun (Homecare)', role: 'staff' },
-    'staff@avahealth.sbs': { id: 'usr-nakes-staff', full_name: 'Ns. Ace Darojatun (Homecare)', role: 'staff' }
-  };
-
-  const lowUsername = usernameInput.toLowerCase();
-  if (AVA_DEMO_USERS_MAP[lowUsername] && (passwordInput === '12345678' || passwordInput.length >= 6)) {
-    const demo = AVA_DEMO_USERS_MAP[lowUsername];
-    localStorage.setItem('ol_token', 'master_ava_token_' + demo.role);
-    localStorage.setItem('ol_refresh', 'master_ava_refresh_' + demo.role);
-    currentUserProfile = { id: demo.id, full_name: demo.full_name, role: demo.role };
-    finalUsername = demo.full_name;
-    finalRole = selectedRole || demo.role;
-  } else if (passwordInput && typeof sbAccessToken === 'function') {
-    // Try real Supabase auth if password is provided
-    const btn = document.querySelector('#login-screen button[type="submit"]');
-    const oldText = btn ? btn.textContent : 'Masuk';
-    if (btn) {
-      btn.textContent = '⏳ Memproses Auth...';
-      btn.disabled = true;
-    }
-    try {
-      const authRes = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY },
-        body: JSON.stringify({ email: usernameInput, password: passwordInput })
-      });
-      const authData = await authRes.json();
-      if (authData.access_token) {
-        localStorage.setItem('ol_token', authData.access_token);
-        if (authData.refresh_token) localStorage.setItem('ol_refresh', authData.refresh_token);
-        
-        // Fetch user profile
-        const profs = await sbGet('user_profiles', `select=*&id=eq.${authData.user.id}`);
-        if (profs && profs[0]) {
-          profileData = profs[0];
-          currentUserProfile = profileData;
-          finalUsername = profileData.full_name || authData.user.email;
-          finalRole = selectedRole || profileData.role || 'patient';
-          currentCorpRole = profileData.corp_role || null;
-          console.log("Logged in user:", finalUsername, "role:", finalRole, "corp_role:", currentCorpRole);
-        }
-      } else {
-        // Fallback to local profile
-        finalUsername = usernameInput.split('@')[0] || 'User';
-        finalRole = selectedRole || 'patient';
-        currentUserProfile = { id: 'local-' + Date.now(), full_name: finalUsername, role: finalRole };
-        localStorage.setItem('ol_token', 'mock_token_' + finalRole);
-      }
-    } catch (e) {
-      console.warn("Gagal menyambungkan ke auth Supabase, falling back to mock login:", e.message);
-      finalUsername = usernameInput.split('@')[0] || 'User';
-      finalRole = selectedRole || 'patient';
-      currentUserProfile = { id: 'local-' + Date.now(), full_name: finalUsername, role: finalRole };
-      localStorage.setItem('ol_token', 'mock_token_' + finalRole);
-    }
-    if (btn) {
-      btn.textContent = oldText;
-      btn.disabled = false;
-    }
-  } else {
-    // Direct local entry
-    finalUsername = usernameInput.split('@')[0] || 'User';
-    finalRole = selectedRole || 'patient';
-    currentUserProfile = { id: 'local-' + Date.now(), full_name: finalUsername, role: finalRole };
-    localStorage.setItem('ol_token', 'mock_token_' + finalRole);
-  }
-
-  // Gerbang B2B dijalankan DI SINI — sesudah token ada, sebelum layar
-  // dashboard dibuka. Kalau gagal, alur berhenti dan pengguna tetap di
-  // halaman masuk; ia tidak boleh sempat melihat data perusahaan mana pun.
-  if (selectedRole === 'corporate') {
-    const boleh = await verifikasiKorporat(corpCodeInputVal);
-    if (!boleh) {
-      // Sesi dibersihkan supaya percobaan berikutnya tidak mewarisi token
-      // yang sudah terlanjur tersimpan di langkah autentikasi.
-      localStorage.removeItem('ol_token');
-      localStorage.removeItem('ol_refresh');
-      return;
-    }
-  }
-
-  // Continue login flow
-  currentUsername = finalUsername;
-  currentUserEmail = usernameInput;
-  currentRole = finalRole;
-  if (!currentUserProfile) {
-    currentUserProfile = { id: 'mock', full_name: finalUsername };
-  }
-  
-  // Set active session flag
-  sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
-
-  localStorage.setItem('AVA_CURRENT_USER_ROLE', finalRole);
-  await applyRoleUIState(finalRole);
-  
-  // Hide timeline tabs for corporate and referral, only show for patient
-  const timelineNav = document.getElementById('timeline-tabs-nav');
-  if (timelineNav) {
-    timelineNav.style.display = (selectedRole === 'patient') ? 'block' : 'none';
-  }
-
-  // Always reset timeline phase to Fase 1 on login
-  switchTimelinePhase('fase1');
-  showScreen('dashboard-screen');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // INSTANT ROLE SWITCHER (SUPER ADMIN & MULTI-ROLE SUPPORT)
 // ═══════════════════════════════════════════════════════════════
 
-function quickFillDemoUser(email, role, corpCode = '') {
-  const uInput = document.getElementById('username');
-  const pInput = document.getElementById('password');
-  const cInput = document.getElementById('login-corp-code');
 
-  if (uInput) uInput.value = email;
-  if (pInput) pInput.value = '12345678';
-  if (cInput && corpCode) cInput.value = corpCode;
-
-  const radio = document.querySelector(`input[name="login-role"][value="${role}"]`);
-  if (radio) {
-    radio.checked = true;
-    updateLoginFormUI(role);
-  }
-
-  const form = document.getElementById('login-form');
-  if (form) {
-    form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-  }
-}
 if (typeof window !== 'undefined') window.quickFillDemoUser = quickFillDemoUser;
 
 async function switchActiveRole(newRole) {
-  if (!newRole) return;
+  if (!PORTAL_ROLES.includes(newRole) || !currentUserProfile || (currentUserProfile.role !== 'super_admin' && newRole !== currentUserProfile.role)) return;
+  if (newRole === 'corporate' && !currentCorporateId) { showScreen('login-screen'); updateLoginFormUI('corporate'); return; }
   currentRole = newRole;
   localStorage.setItem('AVA_CURRENT_USER_ROLE', newRole);
   await applyRoleUIState(newRole);
 }
 
 function switchCorpSubRole(newSubRole) {
+  if (!currentUserProfile || currentUserProfile.role !== 'super_admin') return;
   currentCorpRole = newSubRole;
   const selectEl = document.getElementById('corp-subrole-select');
   if (selectEl) selectEl.value = newSubRole;
@@ -3884,9 +3503,9 @@ async function applyRoleUIState(role) {
   const avatarEl = document.getElementById('user-avatar');
   const welcomeEl = document.getElementById('user-welcome');
   const selectEl = document.getElementById('role-switcher-select');
-  if (selectEl) selectEl.value = role;
+  if (selectEl) { selectEl.value = role; selectEl.disabled = currentUserProfile?.role !== 'super_admin'; }
 
-  const isSuperAdmin = (currentUserEmail === 'admin@avahealth.sbs') || (currentUsername === 'Ace Darojatun Anwar') || (currentUsername === 'Master Super Admin');
+  const isSuperAdmin = currentUserProfile?.role === 'super_admin';
   const adminRealName = 'Ace Darojatun Anwar';
 
   renderSidebarMenu();
@@ -3944,12 +3563,18 @@ async function applyRoleUIState(role) {
 }
 
 // Logout
-function handleLogout() {
+async function handleLogout() {
+  const token = sessionStorage.getItem('ol_token');
+  clearPortalSession();
+  try {
+    if (location.protocol === 'https:') await fetch('/api/staff-session', {method:'DELETE'});
+    if (token) await fetch(SUPABASE_URL + '/auth/v1/logout', {method:'POST', headers:{apikey:SUPABASE_RUNTIME_KEY,Authorization:'Bearer '+token}});
+  } catch (_) { /* Local credentials have already been cleared. */ }
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
   currentUsername = '';
   bookingCart = [];
-  sessionStorage.removeItem('AVA_IS_LOGGED_IN');
+  clearPortalSession();
   if (queueSimulatorInterval) {
     clearInterval(queueSimulatorInterval);
     queueSimulatorInterval = null;
@@ -4060,118 +3685,40 @@ function sendConsultMessage(event) {
 }
 
 // --- WEARABLE SENSOR DATA SYNC SIMULATOR ---
-function syncWearableData() {
-  const stepsEl = document.getElementById('w-steps');
-  const stepsBarEl = document.getElementById('w-steps-bar');
-  const heartEl = document.getElementById('w-heart');
-
-  if (!stepsEl || !heartEl) return;
-
-  stepsEl.textContent = 'Syncing...';
-  heartEl.textContent = 'Syncing...';
-
-  setTimeout(() => {
-    // Generate random realistic metrics
-    const randomSteps = Math.floor(Math.random() * (9900 - 7500 + 1)) + 7500;
-    const stepsPercent = Math.min(Math.round((randomSteps / 10000) * 100), 100);
-    const randomHeart = Math.floor(Math.random() * (86 - 66 + 1)) + 66;
-
-    stepsEl.textContent = randomSteps.toLocaleString('id-ID');
-    if (stepsBarEl) stepsBarEl.style.width = `${stepsPercent}%`;
-    heartEl.innerHTML = `${randomHeart} <small>bpm</small>`;
-
-    alert('Data kesehatan dari Smartwatch berhasil disinkronkan!');
-  }, 1200);
+function syncWearableData(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Sinkronisasi perangkat belum tersedia. Tidak ada data kesehatan yang diambil dari perangkat.");
 }
 
 // ════════════════════════ FUTURISTIC SIMULATORS ════════════════════════
 
 // Fase 2: Continuous Biosensor Pulse Scanner
-function simulateBiosensorPulse() {
-  const sugarEl = document.getElementById('f2-sugar-val');
-  const uricEl = document.getElementById('f2-uric-val');
-
-  if (!sugarEl || !uricEl) return;
-
-  sugarEl.textContent = 'Scanning...';
-  uricEl.textContent = 'Scanning...';
-
-  setTimeout(() => {
-    const randomSugar = Math.floor(Math.random() * (116 - 92 + 1)) + 92;
-    const randomUric = (Math.random() * (6.6 - 5.0) + 5.0).toFixed(1);
-
-    sugarEl.textContent = `${randomSugar} mg/dL`;
-    uricEl.textContent = `${randomUric} mg/dL`;
-
-    alert('Scan sensor tubuh selesai. Data biosensor Anda stabil dan sinkron.');
-  }, 1200);
+function simulateBiosensorPulse(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Fitur biosensor masih berupa konsep dan belum menyediakan pengukuran kesehatan.");
 }
 
 // Fase 4: CRISPR Age Reversal
-function simulateAgeReversal() {
-  const ageEl = document.getElementById('f4-bio-age');
-  if (!ageEl) return;
-
-  let currentAge = parseInt(ageEl.textContent) || 25;
-  
-  if (currentAge > 21) {
-    currentAge -= 1;
-    ageEl.textContent = `${currentAge} Tahun`;
-    alert(`Terapi sel penuaan berhasil dipicu. Usia biologis Anda ter-update menjadi ${currentAge} tahun.`);
-  } else {
-    alert('Usia biologis Anda telah mencapai performa puncak seluler (21 tahun). Terapi optimal tercapai!');
-  }
+function simulateAgeReversal(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Fitur ini masih berupa konsep. Tidak ada terapi atau perubahan usia biologis yang dilakukan.");
 }
 
 // Page load initialization
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
-    // Sync token from URL params (SSO Cross-Subdomain)
-    const urlParams = new URLSearchParams(window.location.search);
-    const qToken = urlParams.get('token') || urlParams.get('access_token');
-    const qRefresh = urlParams.get('refresh') || urlParams.get('refresh_token');
-    if (qToken) {
-      localStorage.setItem('ol_token', qToken);
-      if (qRefresh) localStorage.setItem('ol_refresh', qRefresh);
-      sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
-    }
-
-    // Subdomain ikut menentukan peran yang dituju.
-    const situsIni = (typeof window.situsSaatIni === 'function') ? window.situsSaatIni() : null;
-    const peranSubdomain = situsIni && situsIni.peran ? situsIni.peran : null;
-
-    const hash = window.location.hash || (peranSubdomain === 'corporate' ? '#korporat' : '');
-    const storedRole = localStorage.getItem('AVA_CURRENT_USER_ROLE') || peranSubdomain;
-    const storedToken = localStorage.getItem('ol_token');
-    const isLoggedIn = sessionStorage.getItem('AVA_IS_LOGGED_IN') === 'true';
-
-    if (typeof renderSidebarMenu === 'function') renderSidebarMenu();
-
-    if (storedToken && isLoggedIn) {
-      if (hash === '#member' || storedRole === 'member') {
-        currentRole = 'member';
-        showScreen('dashboard-screen');
-        showView('member-sanctuary-view', 'Queen Sanctuary & VIP Member');
-      } else if (hash === '#korporat' || hash === '#corp' || storedRole === 'corporate') {
-        currentRole = 'corporate';
-        showScreen('dashboard-screen');
-        showView('corporate-view', 'Portal Klien Korporat');
-      } else if (hash === '#rujukan' || storedRole === 'referral') {
-        currentRole = 'referral';
-        showScreen('dashboard-screen');
-        showView('referral-view', 'Dokter & Faskes Referral');
-      } else if (hash === '#nakes' || hash === '#staff' || storedRole === 'staff') {
-        currentRole = 'staff';
-        showScreen('dashboard-screen');
-        showView('staff-homecare-view', 'Tugas Home Care Nakes');
-      } else {
-        currentRole = storedRole || 'patient';
-        showScreen('dashboard-screen');
-        showView('patient-view', 'Dashboard Utama');
-      }
-    } else {
-      if (typeof showScreen === 'function') showScreen('login-screen');
-    }
+    // Re-authenticate on reload until server-verified session restoration is available.
+    // URL tokens and client-side role flags are not proof of identity.
+    const url = new URL(window.location.href);
+    ['token', 'access_token', 'refresh', 'refresh_token'].forEach(key => url.searchParams.delete(key));
+    window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+    clearPortalSession();
+    const site = typeof window.situsSaatIni === 'function' ? window.situsSaatIni() : null;
+    const role = PORTAL_ROLES.includes(site?.peran) ? site.peran : 'patient';
+    const radio = document.querySelector('input[name="login-role"][value="' + role + '"]');
+    if (radio) radio.checked = true;
+    updateLoginFormUI(role);
+    showScreen('login-screen');
   });
 }
 
@@ -4298,37 +3845,14 @@ window.unifiedSuperCart = unifiedSuperCart;
 window.addToUnifiedCart = addToUnifiedCart;
 window.calculateUnifiedCartTotal = calculateUnifiedCartTotal;
 window.processUnifiedCheckout = processUnifiedCheckout;
-function toggleAmbientScribeRecording() {
-  const btn = document.getElementById('scribe-rec-btn');
-  const box = document.getElementById('scribe-status-box');
-  if (!btn || !box) return;
-
-  if (btn.textContent.includes('Mulai')) {
-    btn.textContent = '⏹️ Hentikan Scribe';
-    btn.style.background = '#ef4444';
-    box.innerHTML = `
-      <div style="color:#0f766e; font-weight:700; display:flex; align-items:center; gap:8px; margin-bottom:10px;">
-        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:#ef4444; animation:pulse 1s infinite;"></span>
-        Merekam Dialog Medis Real-Time...
-      </div>
-      <p style="background:#ffffff; border:1px solid #cbd5e1; padding:12px; border-radius:8px; line-height:1.5;">
-        <strong>Dokter:</strong> "Pasien mengeluh sering lemas di sore hari dan pusing ringan."<br>
-        <strong>AI Transcribe (Live):</strong> Anamnesis tercatat. Direkomendasikan e-Order Tes Darah Lengkap, Profil Lipid (LOINC 2093-3), dan Glukosa Puasa (LOINC 2345-7).
-      </p>
-    `;
-  } else {
-    btn.textContent = '🎙️ Mulai Rekam Konsultasi';
-    btn.style.background = 'var(--teal)';
-    alert('Transkripsi medis diselesaikan! Draf SOAP EHR & e-Order Lab rujukan berhasil dibuat.');
-  }
+function toggleAmbientScribeRecording(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Perekaman dan transkripsi konsultasi belum tersedia pada fase ini.");
 }
 
-function generateLaasApiKey() {
-  const keyEl = document.getElementById('laas-api-key-text');
-  if (!keyEl) return;
-  const newKey = 'ava_live_laas_' + Math.random().toString(36).substring(2, 12) + Math.random().toString(36).substring(2, 8);
-  keyEl.textContent = 'API_KEY: ' + newKey;
-  alert('API Key LaaS Baru Berhasil Di-generate! Gunakan header Authorization: Bearer ' + newKey);
+function generateLaasApiKey(event) {
+  if (event?.preventDefault) event.preventDefault();
+  alert("Penerbitan API key belum tersedia melalui portal. Hubungi pengelola layanan.");
 }
 
 function updateLoginFormUI(role) {
@@ -4336,23 +3860,8 @@ function updateLoginFormUI(role) {
   const userInput = document.getElementById('username');
   const corpGroup = document.getElementById('corp-code-group');
   
-  if (userLabel) {
-    if (role === 'patient') userLabel.textContent = 'No. Rekam Medis / NIK / Email';
-    else if (role === 'member') userLabel.textContent = 'ID Member VIP / Email';
-    else if (role === 'corporate') userLabel.textContent = 'Corporate User ID / NIP';
-    else if (role === 'staff') userLabel.textContent = 'ID Nakes / NIP Staff';
-    else if (role === 'referral') userLabel.textContent = 'Kode Dokter / ID Faskes Referral';
-    else if (role === 'tech') userLabel.textContent = 'Email Admin SaaS / Vendor Operator ID';
-  }
-
-  if (userInput && (!userInput.value || userInput.value === 'admin@avahealth.sbs' || userInput.value.includes('@'))) {
-    if (role === 'patient') userInput.placeholder = 'Contoh: 88.000841 atau admin@avahealth.sbs';
-    else if (role === 'member') userInput.placeholder = 'Contoh: VIP-880091';
-    else if (role === 'corporate') userInput.placeholder = 'Contoh: corp@avahealth.sbs';
-    else if (role === 'staff') userInput.placeholder = 'Contoh: nakes@avahealth.sbs';
-    else if (role === 'referral') userInput.placeholder = 'Contoh: referral@avahealth.sbs';
-    else if (role === 'tech') userInput.placeholder = 'Contoh: admin@avahealth.sbs';
-  }
+  if (userLabel) userLabel.textContent = 'Email terdaftar';
+  if (userInput) userInput.placeholder = 'contoh@gmail.com';
 
   const titleEl = document.getElementById('login-form-title');
   const subTitleEl = document.getElementById('login-form-subtitle');
@@ -4362,7 +3871,7 @@ function updateLoginFormUI(role) {
       subTitleEl.textContent = 'Pusat Kendali Vendor SaaS Multi-Tenant & Lisensi Modul';
     } else {
       titleEl.textContent = 'Masuk Portal Layanan';
-      subTitleEl.textContent = 'Pilih tipe hak akses dan masukkan kredensial Anda';
+      subTitleEl.textContent = 'Gunakan akun yang sudah diaktifkan oleh petugas.';
     }
   }
 
@@ -4389,23 +3898,12 @@ function updateLoginFormUI(role) {
   });
 }
 
-function quickFillDemoUser(username, role, corpCode = '') {
+function quickFillDemoUser() {
   const userInput = document.getElementById('username');
-  const corpInput = document.getElementById('login-corp-code');
-  const roleRadios = document.getElementsByName('login-role');
-
-  if (userInput) userInput.value = username;
-  if (corpInput && corpCode) corpInput.value = corpCode;
-
-  if (roleRadios) {
-    for (let radio of roleRadios) {
-      if (radio.value === role) {
-        radio.checked = true;
-        break;
-      }
-    }
-  }
-  updateLoginFormUI(role);
+  const passInput = document.getElementById('password');
+  if (userInput) userInput.value = '';
+  if (passInput) passInput.value = '';
+  showLoginError('Akses demo tidak tersedia. Gunakan akun terdaftar.');
 }
 
 window.toggleAmbientScribeRecording = toggleAmbientScribeRecording;
@@ -4517,5 +4015,3 @@ if (typeof module !== 'undefined' && module.exports) {
     unifiedOrderHistory
   };
 }
-
-

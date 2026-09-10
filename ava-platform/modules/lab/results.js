@@ -298,13 +298,17 @@ async function openResultEntry(admissionId, productId){
   const itemMap={}; (items||[]).forEach(it=>itemMap[it.id]=it);
   const prodName=rows[0].product_name||'';
 
-  openModal(`
-    <div class="modal-header"><div class="modal-title">Input Hasil — ${prodName}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
+  document.getElementById('main-content').innerHTML = `
+    <section id="result-entry-workspace" class="pro-shell" style="max-width:1240px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+        <div><div style="font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">Laboratorium / Input hasil</div><h1 style="font-size:20px;color:var(--text);margin:2px 0 0">Input Hasil — ${prodName}</h1></div>
+        <button class="btn btn-ghost btn-sm" onclick="renderLab('result')">Kembali ke daftar hasil</button>
+      </div>
     <div style="background:var(--mint);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">
       <strong>${_reAdm.patient_name||rows[0].patient_name||''}</strong> · ${_reAdm.visit_number||rows[0].visit_number||''}
       · ${_reAdm.patient_gender||''} ${_reAdm.patient_age?_reAdm.patient_age+' th':''} · ${rows.length} parameter</div>
-    <div class="table-wrap" style="max-height:440px;overflow-y:auto"><table><thead><tr>
+    <div style="font-size:12px;color:var(--text3);margin:0 0 8px">Masukkan nilai per parameter. Nilai kosong tetap disimpan sebagai draft dan tidak dikirim untuk validasi.</div>
+    <div class="table-wrap" style="max-height:calc(100vh - 290px);min-height:280px;overflow-y:auto"><table><thead><tr>
       <th>Parameter</th><th style="width:130px">Hasil</th><th>Unit</th><th>Rujukan</th><th>Interpretasi</th>
     </tr></thead><tbody>
     ${rows.map(r=>{
@@ -322,11 +326,11 @@ async function openResultEntry(admissionId, productId){
       </tr>`;
     }).join('')}
     </tbody></table></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="renderLab('result')">Batal</button>
       <button class="btn btn-teal" onclick="saveResultEntry()">Simpan Semua</button>
-    </div>`);
-  document.querySelectorAll('#modal-box .re-val').forEach(inp=>{ if(inp.value.trim()) reInterpret(inp); });
+    </div></section>`;
+  document.querySelectorAll('#result-entry-workspace .re-val').forEach(inp=>{ if(inp.value.trim()) reInterpret(inp); });
 }
 
 // teks rujukan singkat untuk sebuah parameter
@@ -359,7 +363,7 @@ function reInterpret(input){
 }
 
 async function saveResultEntry(){
-  const trs=[...document.querySelectorAll('#modal-box tbody tr')];
+  const trs=[...document.querySelectorAll('#result-entry-workspace tbody tr')];
   let ok=0;
   for(const tr of trs){
     const rid=parseInt(tr.dataset.rid); if(!rid) continue;
@@ -382,8 +386,8 @@ async function saveResultEntry(){
   }
   // tandai sampel terkait selesai diproses
   for(const sid of _reSampleIds){ await sbPatch('lab_samples',sid,{status:'Done',updated_at:new Date().toISOString()}).catch(()=>{}); }
-  toast(`✅ ${ok} parameter tersimpan → siap divalidasi`,'ok');
-  closeModalForce(); labRefresh();
+  toast(`${ok} parameter tersimpan → siap divalidasi`,'ok');
+  await renderLab('result');
 }
 
 // prefill: konteks opsional dari worklist (sampel yg belum punya draft)
@@ -405,11 +409,13 @@ async function openResultForm(resultId=null, prefill=null){
   prodOpts+=(prods||[]).map(p=>`<option value="${p.id}" data-unit="${p.satuan_hasil||''}" data-name="${p.nama_tes}"
     ${r.product_id==p.id?'selected':''}>${p.kode_internal} — ${p.nama_tes}</option>`).join('');
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${resultId?'Update':'Input'} Hasil Pemeriksaan</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
+  document.getElementById('main-content').innerHTML = `
+    <section id="result-form-workspace" class="pro-shell" style="max-width:980px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)">
+        <div><div style="font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--text3)">Laboratorium / Hasil pemeriksaan</div><h1 style="font-size:20px;color:var(--text);margin:2px 0 0">${resultId?'Perbarui':'Input'} Hasil Pemeriksaan</h1></div>
+        <button class="btn btn-ghost btn-sm" onclick="renderLab('result')">Kembali ke daftar hasil</button>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Isi hasil setelah memastikan kunjungan, pemeriksaan, dan sampel sudah sesuai.</div>
     <input type="hidden" id="rf-sample" value="${r.sample_id||''}">
     <div class="form-row">
       <div class="form-group" style="grid-column:1/-1"><label>Kunjungan Pasien *</label>
@@ -433,10 +439,10 @@ async function openResultForm(resultId=null, prefill=null){
       <div class="form-group"><label>Catatan Analis</label>
         <input type="text" id="rf-notes" value="${labEscape(r.notes||'')}" placeholder="Catatan..."></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-ghost" onclick="renderLab('result')">Batal</button>
       <button class="btn btn-teal" onclick="saveLabResult(${resultId||'null'})">Simpan Hasil</button>
-    </div>`);
+    </div></section>`;
 
   // delta check untuk data prefill/edit
   if(r.patient_name && r.product_id) showDeltaCheck(r.patient_name, r.product_id, resultId);
@@ -493,10 +499,10 @@ function interpretResult(val){
   const crit=(!isNaN(numVal)&&((match.critical_low!=null&&numVal<=match.critical_low)||(match.critical_high!=null&&numVal>=match.critical_high)))||match.condition_type==='critical';
 
   if(box) box.innerHTML=`
-    <div style="background:${crit?'#FEF2F2':c+'15'};border:2px solid ${crit?'#DC2626':c+'40'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
-      <div style="width:12px;height:12px;border-radius:50%;background:${crit?'#DC2626':c};flex-shrink:0"></div>
+    <div style="background:${crit?'var(--danger-soft)':c+'15'};border:2px solid ${crit?'var(--danger-strong)':c+'40'};border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px">
+      <div style="width:12px;height:12px;border-radius:50%;background:${crit?'var(--danger-strong)':c};flex-shrink:0"></div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:800;color:${crit?'#DC2626':c}">${crit?'NILAI KRITIS · ':''}${match.condition_name||match.interpretation||'—'}</div>
+        <div style="font-size:13px;font-weight:800;color:${crit?'var(--danger-deep)':c}">${crit?'NILAI KRITIS · ':''}${match.condition_name||match.interpretation||'—'}</div>
         ${match.description?`<div style="font-size:11px;color:var(--gray)">${match.description}</div>`:''}
         ${match.recommendation?`<div style="font-size:11px;color:${c};margin-top:2px">💡 ${match.recommendation}</div>`:''}
       </div>
@@ -513,7 +519,7 @@ async function showDeltaCheck(patientName, productId, excludeId=null){
     const p=(prev||[]).find(x=>true);
     if(!p){ box.innerHTML=''; return; }
     box.innerHTML=`
-      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink-11)">
+      <div style="background:var(--teal-light);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--text)">
         Hasil sebelumnya: <strong>${labEscape(p.result_value)} ${labEscape(p.unit||'')}</strong>
         <span style="color:var(--text3)">(${new Date(p.created_at).toLocaleDateString('id-ID')})</span>
         <span id="rf-delta-arrow"></span>
@@ -560,12 +566,12 @@ async function saveLabResult(id){
   };
 
   try {
-    if(id){ await sbPatch('lab_results',id,payload); toast('✅ Hasil diupdate','ok'); }
-    else  { await sbPost('lab_results',payload);     toast('✅ Hasil disimpan','ok'); }
+    if(id){ await sbPatch('lab_results',id,payload); toast('Hasil diperbarui','ok'); }
+    else  { await sbPost('lab_results',payload);     toast('Hasil disimpan','ok'); }
     // tandai sampel selesai diproses
     if(sampleId){ await sbPatch('lab_samples',sampleId,{status:'Done',updated_at:new Date().toISOString()}).catch(()=>{}); }
     if(crit && typeof logActivity==='function') logActivity('critical','lab_results',id||0,`Nilai kritis: ${prodName}=${val}`,admName);
-    closeModalForce(); labRefresh();
+    await renderLab('result');
   } catch(e){ toast('❌ '+e.message,'err'); }
 }
 

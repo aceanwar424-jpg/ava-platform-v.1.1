@@ -5,7 +5,7 @@
 
 const SUPPORTIVE_TYPES = {
   'EKG 12 Lead': {
-    icon:'❤️', color:'#EF4444',
+    icon:'', color:'#EF4444',
     fields:[
       {id:'rhythm',    label:'Irama',          type:'select', opts:['Sinus Normal','Sinus Takikardi','Sinus Bradikardi','Atrial Fibrillation','Atrial Flutter','VT','Lainnya']},
       {id:'rate',      label:'Heart Rate (bpm)',type:'number', placeholder:'72'},
@@ -20,7 +20,7 @@ const SUPPORTIVE_TYPES = {
     ]
   },
   'EKG Treadmill': {
-    icon:'🏃', color:'#F97316',
+    icon:'', color:'#F97316',
     fields:[
       {id:'protocol',  label:'Protokol',         type:'select',opts:['Bruce','Modified Bruce','Balke']},
       {id:'duration',  label:'Durasi Test (menit)',type:'number',placeholder:'9'},
@@ -35,7 +35,7 @@ const SUPPORTIVE_TYPES = {
     ]
   },
   'Audiometri': {
-    icon:'👂', color:'#8B5CF6',
+    icon:'', color:'#8B5CF6',
     fields:[
       // Telinga Kanan
       {id:'r_500',   label:'Kanan 500 Hz (dB)',  type:'number',placeholder:'10'},
@@ -58,7 +58,7 @@ const SUPPORTIVE_TYPES = {
     ]
   },
   'Spirometri': {
-    icon:'💨', color:'#0EA5E9',
+    icon:'', color:'#0EA5E9',
     fields:[
       {id:'fvc',     label:'FVC (L)',             type:'number',placeholder:'4.2',step:'0.01'},
       {id:'fvc_pct', label:'FVC % Prediksi',      type:'number',placeholder:'95'},
@@ -91,9 +91,9 @@ async function renderSupportive(params = {}) {
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
     <div class="pro-header">
-      <div><h1>${focusedCfg ? `${focusedCfg.icon} ${focusedType}` : `${svgIcon('heart',18)} Pemeriksaan Penunjang`}</h1>
+      <div><h1>${focusedCfg ? focusedType : 'Pemeriksaan Penunjang'}</h1>
         <span class="pro-sub">${focusedCfg ? `Daftar dan input ${focusedType}. Gunakan dashboard penunjang untuk melihat seluruh jenis pemeriksaan.` : 'EKG 12 Lead · EKG Treadmill · Audiometri · Spirometri'}</span></div>
-      <button class="btn btn-teal btn-sm" onclick="openSupportiveForm()">${svgIcon('plus',14)} Input Pemeriksaan</button>
+      <button class="btn btn-teal btn-sm" onclick="openSupportiveForm()">Input pemeriksaan</button>
     </div>
 
     <div class="pro-kpi" id="supp-type-cards">
@@ -140,7 +140,7 @@ async function loadSupportive() {
 function filterSuppType(type, card) {
   // reset highlight tanpa menghapus aksen border-left tiap kartu
   document.querySelectorAll('.supp-type-card').forEach(c=>{
-    c.style.background='#fff';
+    c.style.background='var(--white)';
     c.style.boxShadow='none';
   });
   if (suppActiveType===type) {
@@ -169,9 +169,8 @@ function renderSuppList(data) {
   const el = document.getElementById('supp-list'); if (!el) return;
   if (!data.length) {
     el.innerHTML=`<div class="empty-state">
-      <div class="ico">❤️</div>
       <h3>${suppAll.length?'Tidak ada hasil':'Belum ada pemeriksaan supportive'}</h3>
-      <button class="btn btn-teal" style="margin-top:12px" onclick="openSupportiveForm()">+ Input Pemeriksaan</button>
+      <button class="btn btn-teal" style="margin-top:12px" onclick="openSupportiveForm()">Input pemeriksaan</button>
     </div>`; return;
   }
 
@@ -195,7 +194,7 @@ function renderSuppList(data) {
         </td>
         <td>
           <span style="background:${cfg.color}15;color:${cfg.color};padding:3px 10px;border-radius:8px;font-size:11px;font-weight:700">
-            ${cfg.icon} ${r.product_name||'—'}
+            ${r.product_name||'—'}
           </span>
         </td>
         <td style="font-size:12px;color:var(--text);max-width:200px">${mainResult}</td>
@@ -204,16 +203,16 @@ function renderSuppList(data) {
         </td>
         <td style="font-size:11px;color:var(--gray)">${r.approved_by||'—'}</td>
         <td>
-          <span style="background:${r.status==='Approved'?'#E8F5E9':r.status==='Validated'?'#E3F2FD':'#FFF8E1'};
-            color:${r.status==='Approved'?'#2E7D32':r.status==='Validated'?'#1565C0':'#92400E'};
+          <span style="background:${r.status==='Approved'?'var(--success-soft)':r.status==='Validated'?'var(--teal-light)':'var(--warn-soft2)'};
+            color:${r.status==='Approved'?'var(--success-deep)':r.status==='Validated'?'var(--info)':'var(--warn-deeper)'};
             padding:2px 8px;border-radius:8px;font-size:11px;font-weight:700">${r.status||'Draft'}</span>
         </td>
         <td>
           <div class="act-row">
-            <button class="act-btn edit" onclick="openSupportiveForm(${r.id})">${icon('edit', 12)}</button>
+            <button class="act-btn edit" onclick="openSupportiveForm(${r.id})">Ubah</button>
             ${r.status==='Draft'?`<button class="act-btn" style="color:var(--success-strong);font-size:10px" onclick="updateResultStatus(${r.id},'Validated')">Validasi</button>`:''}
             ${r.status==='Validated'?`<button class="act-btn" style="color:var(--violet);font-size:10px" onclick="updateResultStatus(${r.id},'Approved')">Approve</button>`:''}
-            <button class="act-btn" onclick="printSuppResult(${r.id})">🖨</button>
+            <button class="act-btn" onclick="printSuppResult(${r.id})">Cetak</button>
           </div>
         </td>
       </tr>`;
@@ -357,7 +356,7 @@ function renderSuppFields(type, existing={}) {
   const measurement=cfg.fields.filter(f=>!interpretationIds.includes(f.id));
   const interpretation=cfg.fields.filter(f=>interpretationIds.includes(f.id));
 
-  measurementEl.innerHTML = `<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">${cfg.icon} Parameter ${type}</div><div style="font-size:11px;color:var(--gray);margin-bottom:12px">Masukkan hasil pengukuran sesuai pemeriksaan yang dilakukan.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${measurement.map(fieldMarkup).join('')}</div>`;
+  measurementEl.innerHTML = `<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">Parameter ${type}</div><div style="font-size:11px;color:var(--gray);margin-bottom:12px">Masukkan hasil pengukuran sesuai pemeriksaan yang dilakukan.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${measurement.map(fieldMarkup).join('')}</div>`;
   interpretationEl.innerHTML = `<div style="font-size:13px;font-weight:800;color:var(--navy);margin-bottom:3px">Interpretasi klinis</div><div style="font-size:11px;color:var(--gray);margin-bottom:12px">Tuliskan kesimpulan dan rekomendasi pemeriksa bila diperlukan.</div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${interpretation.map(fieldMarkup).join('') || '<div style="font-size:11px;color:var(--gray)">Tidak ada kolom interpretasi khusus.</div>'}</div>`;
 }
 
@@ -506,7 +505,7 @@ function printSuppResult(id) {
     tr:nth-child(even){background:var(--bg)}
     .badge{padding:4px 14px;border-radius:10px;font-size:13px;font-weight:700}
     @media print{button{display:none}}</style></head><body>
-    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer">🖨 Print</button>
+    <button onclick="window.print()" style="position:fixed;top:16px;right:16px;padding:8px 18px;background:var(--navy-deep);color:var(--on-accent);border:none;border-radius:6px;cursor:pointer">Cetak</button>
     <div class="header">
       <div><h2>${orgName}</h2></div>
       <div style="text-align:right"><strong style="font-size:16px;color:var(--navy-deep)">${cfg.icon} ${r.product_name}</strong>

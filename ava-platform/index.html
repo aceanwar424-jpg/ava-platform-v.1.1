@@ -120,7 +120,7 @@
   </div>
   <div class="topbar-right">
     <div id="topbar-date" style="font-size:12px;color:var(--text3);font-weight:600;padding-right:6px"></div>
-    <button class="topbar-btn" id="btn-tema" title="Ganti tema terang/gelap" onclick="olToggleTema()">🌙</button>
+    <button class="topbar-btn" id="btn-tema" title="Ganti tema terang/gelap" onclick="olToggleTema()">Tema gelap</button>
     <button class="topbar-btn" title="Notifikasi Sistem" onclick="alert('Tidak ada notifikasi kritis baru.')">
       🔔
       <span class="topbar-notif-dot"></span>
@@ -327,14 +327,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   updateDate();
   setInterval(updateDate, 60000);
 
-  // Sync token from URL query string (Single Sign-On cross-subdomain)
+  // Credentials in URLs are rejected; do not create a session from links.
   const urlParams = new URLSearchParams(window.location.search);
-  const qToken = urlParams.get('token') || urlParams.get('access_token');
-  const qRefresh = urlParams.get('refresh') || urlParams.get('refresh_token');
-  if (qToken) {
-    localStorage.setItem('ol_token', qToken);
-    if (qRefresh) localStorage.setItem('ol_refresh', qRefresh);
+  const cleanUrl = new URL(location.href);
+  for (const key of ['token', 'access_token', 'refresh', 'refresh_token']) {
+    urlParams.delete(key); cleanUrl.searchParams.delete(key);
   }
+  history.replaceState(null, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
 
   // ── Subdomain menentukan isi, bukan query string ────────────────────────
   //
@@ -437,33 +436,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  const token = localStorage.getItem('ol_token');
-  const demoLokal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.localhost');
+  const token = sessionStorage.getItem('ol_token');
   if (token) {
-    if (demoLokal && (token === 'master_ava_token_superadmin_all_access' || token.startsWith('master_ava_'))) {
-      const masterUser = {
-        id: 'master-superadmin-ava',
-        email: 'admin@avahealth.sbs',
-        role: 'super_admin',
-        user_metadata: { full_name: 'Master Super Admin', role: 'super_admin' },
-        profile: { id: 'master-superadmin-ava', full_name: 'Master Super Admin', role: 'super_admin', is_superadmin: true }
-      };
-      window.currentUser = masterUser;
-      if (typeof loadServerAccess === 'function') await loadServerAccess();
-      setupAppUI();
-      applyRoleMenu();
-      
-      if (typeof siapkanNavigasi === 'function') siapkanNavigasi(workspaceAktif);
-      sesuaikanChromeRuangKerja(workspaceAktif);
-
-      if (typeof injectExecToggle === 'function') setTimeout(injectExecToggle, 500);
-      checkConnection();
-      navigate(determineInitialPage());
-      if (typeof prefetchModulUmum === 'function') prefetchModulUmum();
-      setTimeout(() => { if (typeof checkMOURenewals === 'function') checkMOURenewals(); }, 2000);
-      return;
-    }
-
     try {
       const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: { ...SB_HEADERS, 'Authorization': `Bearer ${token}` }
@@ -471,13 +445,12 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (res.ok) {
         const user = await res.json();
         if (user && user.id) {
-          console.log('[BOOT DEBUG] Auth UUID:', user.id, '| Auth email:', user.email);
           window.currentUser = user;
           try {
             const profile = await sbGet('user_profiles',`select=*&id=eq.${user.id}`);
-            console.log('[BOOT DEBUG] Profile query result:', profile);
-            if (profile?.[0]) window.currentUser.profile = profile[0];
-          } catch(e) { console.log('[BOOT DEBUG] Profile query error:', e); }
+            if (!profile?.[0] || profile[0].id !== user.id) throw new Error('Profil akses tidak tersedia');
+            window.currentUser.profile = profile[0];
+          } catch(e) { clearStoredToken(); window.currentUser = null; showLoginScreen(); return; }
           // Hak akses diambil dari server dulu, baru menu disusun. Tanpa ini
           // menu jatuh ke matriks bawaan di berkas — bukan bahaya, tapi
           // perubahan peran oleh admin tidak akan terlihat.
@@ -508,8 +481,8 @@ window.addEventListener('DOMContentLoaded', async () => {
   // engine lokal kini punya autentikasi sendiri (kredensial ter-hash di DB,
   // peran dari user_profiles), sehingga pintasan apa pun sama saja dengan
   // membuka seluruh basis data klinik tanpa kata sandi.
-  localStorage.removeItem('ol_token');
-  localStorage.removeItem('ol_refresh');
+  sessionStorage.removeItem('ol_token');
+  sessionStorage.removeItem('ol_refresh');
   showLoginScreen();
 });
 
@@ -733,9 +706,7 @@ async function refreshMyRole() {
 }
 
 function forceCleanLogout() {
-  localStorage.clear();
-  closeModalForce();
-  location.reload();
+  return doLogout();
 }
 
 async function doSaveProfile() {
@@ -1435,40 +1406,50 @@ function openCategory(cat) {
   const groups = {};
   items.forEach(it => { const g = it.group || 'Menu'; (groups[g] = groups[g] || []).push(it); });
 
+  const groupEntries = Object.entries(groups).map(([name, groupItems], index) => ({
+    name, groupItems, id: `cat-group-${cat}-${index}`,
+  }));
+  const hasGroups = groupEntries.length > 1;
+
   main.innerHTML = `
     <div class="cat-page">
       <header class="cat-head">
-        <p class="cat-eyebrow">Kategori</p>
-        <h1 class="cat-title">${menu.label}</h1>
-        <p class="cat-sub">${items.length} menu tersedia${Object.keys(groups).length>1?` dalam ${Object.keys(groups).length} kelompok`:''}</p>
+        <div>
+          <p class="cat-eyebrow">Direktori ${menu.label}</p>
+          <h1 class="cat-title">${menu.label}</h1>
+        </div>
+        <p class="cat-sub">${items.length} fungsi${hasGroups ? ` · ${groupEntries.length} kelompok proses` : ''}</p>
       </header>
-      ${CATEGORY_SUMMARY[cat]?`<section class="cat-summary" style="margin-bottom:22px"><div id="cat-summary"></div></section>`:''}
-      ${Object.entries(groups).map(([gname, gitems]) => `
-        <section class="cat-group">
-          ${Object.keys(groups).length>1?`<h2 class="cat-group-name">${gname}</h2>`:''}
-          <div class="cat-grid">
-            ${gitems.map(it => it.soon
-              ? `<div class="cat-card disabled">
-                   <span class="cat-card-ico">${icon(it.icon,18)}</span>
-                   <div class="cat-card-body">
-                     <div class="cat-card-label">${it.label}<span class="cat-card-soon">segera</span></div>
-                     ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
-                   </div>
-                 </div>`
-              : `<button class="cat-card" onclick="${it.action};setActiveFlyoutItem('${it.page}')">
-                   <span class="cat-card-ico">${icon(it.icon,18)}</span>
-                   <div class="cat-card-body">
-                     <div class="cat-card-label">${it.label}</div>
-                     ${it.desc?`<div class="cat-card-desc">${it.desc}</div>`:''}
-                   </div>
-                   <span class="cat-card-go" aria-hidden="true">
-                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"
-                       stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                   </span>
-                 </button>`
-            ).join('')}
-          </div>
-        </section>`).join('')}
+      ${CATEGORY_SUMMARY[cat] ? `<section class="cat-summary"><div id="cat-summary"></div></section>` : ''}
+      <div class="cat-layout${hasGroups ? '' : ' cat-layout-single'}">
+        ${hasGroups ? `<nav class="cat-directory" aria-label="Kelompok menu ${menu.label}">
+          <span class="cat-directory-label">Kelompok</span>
+          ${groupEntries.map(group => `<button type="button" class="cat-directory-item" onclick="document.getElementById('${group.id}')?.scrollIntoView({behavior:'smooth',block:'start'})">${group.name}<small>${group.groupItems.length}</small></button>`).join('')}
+        </nav>` : ''}
+        <div class="cat-content">
+          ${groupEntries.map(group => `
+            <section class="cat-group" id="${group.id}">
+              ${hasGroups ? `<h2 class="cat-group-name">${group.name}<span>${group.groupItems.length} fungsi</span></h2>` : ''}
+              <div class="cat-grid">
+                ${group.groupItems.map(it => it.soon
+                  ? `<div class="cat-card disabled" aria-label="${it.label}, belum tersedia">
+                       <div class="cat-card-body">
+                         <div class="cat-card-label">${it.label}<span class="cat-card-soon">Belum tersedia</span></div>
+                         ${it.desc ? `<div class="cat-card-desc">${it.desc}</div>` : ''}
+                       </div>
+                     </div>`
+                  : `<button type="button" class="cat-card" onclick="${it.action};setActiveFlyoutItem('${it.page}')">
+                       <div class="cat-card-body">
+                         <div class="cat-card-label">${it.label}</div>
+                         ${it.desc ? `<div class="cat-card-desc">${it.desc}</div>` : ''}
+                       </div>
+                       <span class="cat-card-go" aria-hidden="true">Buka</span>
+                     </button>`
+                ).join('')}
+              </div>
+            </section>`).join('')}
+        </div>
+      </div>
     </div>`;
 
   // Ringkasan angka (KPI) khusus kategori tertentu — diisi setelah kartu tampil.

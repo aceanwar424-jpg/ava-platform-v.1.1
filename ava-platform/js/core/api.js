@@ -17,8 +17,13 @@ const SUPABASE_URL = _isLocalEngine ? LOCAL_ENGINE_URL : SUPABASE_CLOUD_URL;
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJteXF6eWZ2bG1qeHRhdHBjdGtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyNDQzNzIsImV4cCI6MjA5NjgyMDM3Mn0.tBVQBNH-yi9bmcpY7MRf5w-diwonMTDqwfAOs3t7YK8';
 const SUPABASE_RUNTIME_KEY = _avaRuntimeConfig.supabaseAnonKey || SUPABASE_KEY;
 
+// Invalidate legacy persistent sessions on every origin; never migrate them.
+for (const key of ['ol_token', 'ol_refresh', 'ol_master_user', 'AVA_CURRENT_USER_ROLE']) {
+  try { localStorage.removeItem(key); } catch (_) {}
+}
+
 // ── Sesi (Fase 1.0) ───────────────────────────────────────────
-// Token pengguna dibaca langsung dari localStorage supaya berkas ini tidak
+// Token pengguna dibaca langsung dari sessionStorage supaya berkas ini tidak
 // bergantung pada auth.js yang dimuat belakangan.
 function sbIsJwt(token) {
   // Token demo lama seperti "master_ava_token_*" bukan JWT dan ditolak
@@ -27,11 +32,11 @@ function sbIsJwt(token) {
 }
 function sbAccessToken()  {
   try {
-    const token = localStorage.getItem('ol_token') || '';
+    const token = sessionStorage.getItem('ol_token') || '';
     return sbIsJwt(token) ? token : '';
   } catch(e) { return ''; }
 }
-function sbRefreshToken() { try { return localStorage.getItem('ol_refresh') || ''; } catch(e) { return ''; } }
+function sbRefreshToken() { try { return sessionStorage.getItem('ol_refresh') || ''; } catch(e) { return ''; } }
 
 // PENTING: 'Authorization' sengaja berupa getter, bukan nilai tetap.
 // Object spread ({...SB_HEADERS}) memanggil getter dan menyalin hasilnya,
@@ -61,8 +66,8 @@ async function sbRefreshSession() {
       });
       const data = await res.json();
       if (data && data.access_token) {
-        localStorage.setItem('ol_token', data.access_token);
-        if (data.refresh_token) localStorage.setItem('ol_refresh', data.refresh_token);
+        sessionStorage.setItem('ol_token', data.access_token);
+        if (data.refresh_token) sessionStorage.setItem('ol_refresh', data.refresh_token);
         return true;
       }
     } catch (e) { /* jaringan bermasalah — tangani sebagai gagal */ }

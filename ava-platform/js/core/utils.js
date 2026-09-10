@@ -179,10 +179,7 @@ async function saveMyAlias() {
   }
 }
 function getUserRole() {
-  let role = window.currentUser?.profile?.role 
-      || window.currentUser?.user_metadata?.role
-      || window.currentUser?.role
-      || 'sales';
+  let role = window.currentUser?.profile?.role || '';
   role = String(role).trim().toLowerCase();
   const map = { admin:'super_admin', head:'super_admin', superadmin:'super_admin' };
   return map[role] || role;
@@ -215,9 +212,13 @@ function olTerapkanTema(nama) {
   document.documentElement.setAttribute('data-theme', gelap ? 'dark' : 'light');
   const b = document.getElementById('btn-tema');
   if (b) {
-    b.textContent = gelap ? '☀️' : '🌙';
+    b.textContent = gelap ? 'Tema terang' : 'Tema gelap';
     b.title = gelap ? 'Ganti ke tema terang' : 'Ganti ke tema gelap';
   }
+  document.querySelectorAll('.admission-theme-button').forEach(btn => {
+    btn.textContent = gelap ? 'Terang' : 'Gelap';
+    btn.title = gelap ? 'Ganti ke tema terang' : 'Ganti ke tema gelap';
+  });
 }
 
 function olToggleTema() {

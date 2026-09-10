@@ -257,7 +257,7 @@ async function renderAdmission(params = {}) {
         </div>
         <div class="admission-session" aria-label="Informasi sesi">
           <span class="admission-session-date">${dateText}</span>
-          <button class="admission-session-button" type="button" title="Ganti tema" aria-label="Ganti tema" onclick="olToggleTema()">☾</button>
+          <button class="admission-session-button admission-theme-button" type="button" title="Ganti tema" aria-label="Ganti tema" onclick="olToggleTema()">Tema</button>
           <button class="admission-session-button" type="button" title="Notifikasi sistem" aria-label="Notifikasi sistem" onclick="alert('Tidak ada notifikasi kritis baru.')">🔔<span aria-hidden="true"></span></button>
           <button class="admission-session-user" type="button" onclick="openEditProfile()" title="Buka profil pengguna">
             <b>${userInitials}</b><span><strong>${userName}</strong><small>${userRole}</small></span>
@@ -272,11 +272,11 @@ async function renderAdmission(params = {}) {
         </header>
 
         <div class="admission-toolbar" aria-label="Pencarian dan tindakan registrasi">
-          <label class="admission-search"><span aria-hidden="true">⌕</span><input id="adm-q" type="search" placeholder="Cari nomor registrasi, MR, atau nama pasien" oninput="admFilter.search=this.value;applyAdmFilter()"></label>
-          <label class="admission-field"><span aria-hidden="true">◷</span><input type="date" id="adm-date" aria-label="Tanggal registrasi" onchange="loadAdmissions()" value="${new Date().toISOString().split('T')[0]}"></label>
+          <label class="admission-search"><input id="adm-q" type="search" placeholder="Cari nomor registrasi, MR, atau nama pasien" oninput="admFilter.search=this.value;applyAdmFilter()"></label>
+          <label class="admission-field"><input type="date" id="adm-date" aria-label="Tanggal registrasi" onchange="loadAdmissions()" value="${new Date().toISOString().split('T')[0]}"></label>
           <label class="admission-field"><select id="adm-type" aria-label="Jenis registrasi" onchange="admFilter.type=this.value;applyAdmFilter()"><option value="">Semua jenis</option><option>Walk-in</option><option>Booking</option><option>Rujukan</option><option>Project MCU</option></select></label>
           <button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmissionReport()">Laporan</button>
-          <button class="btn btn-teal btn-sm" type="button" onclick="openAdmissionForm(null,'${mode}')">+ Registrasi</button>
+          <button class="btn btn-teal btn-sm" type="button" onclick="openAdmissionForm(null,'${mode}')">Registrasi baru</button>
         </div>
 
         <div class="admission-filter-row" id="adm-status-tabs" aria-label="Filter status">
@@ -954,8 +954,6 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
   const today = new Date().toISOString().split('T')[0];
   const visitNum = id ? a.visit_number : `VISIT-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Date.now().toString().slice(-3)}`;
   const mrNum = id ? (a.mr_number || '') : `MR-${Date.now().toString().slice(-8)}`;
-  const admissionStepIcons = { patient: 'user', payment: 'note', services: 'tube', cashier: 'print' };
-
   const admissionFormMarkup = `
     <div class="admission-form-notice">
       <strong>${modeDef.label}.</strong> ${modeDef.notice}
@@ -965,7 +963,6 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
       ${modeDef.tabs.map(([k, label], index) => `
         <button onclick="switchAdmTab('${k}')" id="af-tab-${k}"
           class="${k === 'patient' ? 'active' : ''}" data-step="${index + 1}">
-          <span class="admission-tab-icon" aria-hidden="true">${svgIcon(admissionStepIcons[k] || 'note', 15)}</span>
           <span class="admission-tab-copy"><b>${label}</b></span>
         </button>`).join('')}
       </aside>
@@ -1048,7 +1045,7 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
         </div>
         <div style="width:130px;flex-shrink:0">
           <label style="font-size:11px;color:var(--text3);display:block;margin-bottom:4px">Photo Profile</label>
-          <div style="width:120px;height:120px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:28px">👤</div>
+          <div style="width:120px;height:120px;border:2px dashed var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;text-align:center;padding:10px">Foto pasien belum tersedia</div>
         </div>
       </div>
 
@@ -1180,7 +1177,7 @@ async function openAdmissionForm(id = null, requestedMode = window.activeAdmissi
       <header class="admission-form-workspace-head">
         <div class="admission-form-back">
           <button class="btn btn-ghost btn-sm" type="button" onclick="closeAdmissionWorkspace()">← Daftar Registrasi</button>
-          <span>Admission</span>
+          <span>Registrasi</span>
         </div>
         <div class="admission-form-heading"><h1>${id ? 'Ubah ' + modeDef.label : modeDef.label}</h1><p>${id ? 'Perbarui data registrasi dan tagihan sebelum disimpan.' : 'Lengkapi data berikut sebelum registrasi disimpan.'}</p></div>
         <div class="admission-form-context"><span>${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span><button class="btn btn-ghost btn-sm" type="button" onclick="renderAdmissionReport()">Laporan</button></div>

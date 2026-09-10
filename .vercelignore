@@ -1,0 +1,20 @@
+# OWNED_BY: ava. Do not upload configuration secrets or operational data.
+**/.env*
+**/*.pem
+**/*.key
+**/*.sql
+**/*.map
+**/*.sqlite
+**/*.db
+**/*.bak
+**/node_modules/**
+ava-platform/js/config.local.js
+ava-platform/connector/**
+ava-platform/sql_arsip/**
+ava-platform/supabase/**
+desktop-app/**
+db/**
+docs/**
+**/pglite-data/**
+**/.pglite-dev/**
+**/LOGIN_ADMIN_PERTAMA.txt

@@ -201,3 +201,85 @@
 - [x] Rapikan workspace layanan penunjang menjadi halaman penuh tanpa mengubah payload atau skema.
 - [x] Evaluasi dan rapikan pengelompokan menu LIS setelah temuan referensi lengkap.
 - [x] Jalankan pemeriksaan sintaks, menu/manifest, dan uji UI tanpa data produksi.
+
+## Konsistensi halaman kerja LIS dan tema — 2026-09-07
+
+- [x] Klasifikasikan dialog besar versus dialog aksi singkat.
+- [x] Jadikan input hasil batch dan per-tes sebagai halaman kerja.
+- [x] Kurangi ikon dekoratif dan pertegas label tindakan.
+- [x] Audit serta perbaiki kontras tema terang/gelap di workspace yang disentuh.
+- [x] Jalankan validasi teknis dan visual tanpa data produksi.
+
+## Koreksi target HIS — 2026-09-07
+
+- [x] Verifikasi pemetaan host HIS dan LIS.
+- [x] Terapkan halaman penuh untuk anamnesis serta pertahankan registrasi HIS sebagai workspace.
+- [x] Rapikan label dan ikon dekoratif pada registrasi HIS.
+- [x] Terapkan tema/kontras global pada HIS tanpa perubahan data.
+
+## Konsolidasi indeks kategori HIS — 2026-09-07
+
+- [x] Audit ulang pola domain → kelompok → fungsi pada HIS referensi secara read-only.
+- [x] Terapkan direktori kategori ringkas pada HIS.
+- [x] Rapikan hierarki, ukuran, ikon, dan perilaku responsif.
+- [x] Jalankan regresi menu/rute, sintaks, aksesibilitas, dan tema.
+
+## Perapihan pusat konfigurasi HIS — 2026-09-08
+
+- [x] Cocokkan peta menu konfigurasi dengan rute master dan operasional.
+- [x] Ringkas pusat konfigurasi dan halaman domain.
+- [x] Kurangi ikon dekoratif tanpa mengurangi informasi status/field.
+- [x] Jalankan pemeriksaan rute, handler, sintaks, dan regresi manifest.
+
+## Workspace konfigurasi antrean — 2026-09-08
+
+- [x] Klasifikasikan modal antrean berdasarkan panjang/risko tugas.
+- [x] Jadikan form loket dan layanan sebagai halaman kerja.
+- [x] Pertahankan validasi dan refresh daftar setelah simpan.
+- [x] Verifikasi sintaks dan regresi menu/modul tanpa menulis data.
+
+## Workspace perjanjian pasien — 2026-09-08
+
+- [x] Pindahkan form perjanjian panjang dari modal ke halaman kerja.
+- [x] Pertahankan validasi bentrok dan kembali eksplisit ke daftar.
+- [x] Jalankan pemeriksaan sintaks serta regresi menu/rute/modul.
+
+## Workspace master paket — 2026-09-08
+
+- [x] Pindahkan form buat/ubah paket ke halaman kerja.
+- [x] Pertahankan validasi dan pengembalian ke katalog paket setelah simpan.
+- [x] Jalankan pemeriksaan sintaks, menu/rute, keamanan, dan diff.
+
+## Penuntasan menu konfigurasi — 2026-09-08
+
+- [x] Verifikasi tidak ada menu berstatus belum pada peta.
+- [x] Hubungkan semua label master yang semula kerangka ke registry CRUD yang tersedia.
+- [x] Tambahkan domain Integrasi & Konektivitas.
+- [x] Jalankan audit rute/handler/modul tanpa migrasi atau perubahan data.
+
+## Audit Apps fase awal — 2026-09-07
+- [x] Audit halaman publik dan kode login/sesi/modal.
+- [x] Rapikan pintu masuk responsif dan hilangkan akses demo publik.
+- [x] Tutup fallback autentikasi dan peran browser.
+- [x] Verifikasi sintaks, regresi sintetis, rute, dan UI lokal.
+- [x] Dokumentasikan temuan tersisa dan status penerapan.
+
+## Menu Apps siap uji — 2026-09-08
+- [ ] Inventarisasi target dan status menu.
+- [ ] Rapikan penamaan, routing, active state, dan renderer.
+- [ ] Lengkapi beranda/profil serta empty/error states.
+- [ ] Uji seluruh menu dengan fixture sintetis dan dokumentasikan hasil.
+
+## Audit keamanan — 10 September 2026
+- [ ] Inventaris domain dan pemeriksaan HTTP tanpa autentikasi.
+- [ ] Hapus kredensial demo/bypass dan sesi URL.
+- [ ] Batasi sesi/cache dan eksposur file deployment.
+- [ ] Uji regresi negatif dan catat batas verifikasi produksi.
+
+### Hasil audit keamanan — 10 September 2026
+- [x] Inventaris 44 hostname dan HTTP tanpa kredensial; hasil DNS/timeout dicatat.
+- [x] Hapus isian demo, bypass lokal, sesi URL dan role metadata fallback.
+- [x] Siapkan gerbang staf server, no-store, purge cache dan pembatasan file/domain publik.
+- [x] 22 tes sintetis lulus; generator routing dan pemeriksaan deploy statis lulus.
+- [ ] Isi daftar UUID staf dan konfigurasi server, build/deploy Vercel, uji produksi.
+- [ ] Rotasi kredensial terdampak, cabut sesi dan audit RLS/grant/backend produksi.

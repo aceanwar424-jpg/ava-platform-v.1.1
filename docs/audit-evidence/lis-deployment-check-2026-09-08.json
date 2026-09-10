@@ -1,0 +1,17 @@
+{
+  "date": "2026-09-08",
+  "scope": "Read-only Git remote and publicly served frontend assets; no production database access",
+  "repository": "aceanwar424-jpg/ava-platform-v.1.1",
+  "remoteBranch": "codex/lis-integrity-1.1.0-rc1",
+  "remoteHead": "06d0ffe7546a6a93decc74ffd222e0b1572926bc",
+  "containsReleaseCommit": "705dde48c564a8c7e183682db6ce9da6c00f5acc",
+  "mainHead": "36967a841a5557691ae528fe7f2cb384b3e038e8",
+  "publicSite": "https://lis.avahealth.sbs/",
+  "httpStatus": 200,
+  "server": "Vercel",
+  "indexContainsRc1CacheVersion": false,
+  "publicValidationUsesTransactionalRpc": true,
+  "publicValidationContainsLegacyPerRowApproval": false,
+  "productionMigrationStatus": "unverified",
+  "conclusion": "Release commit is already on remote. Some transactional frontend code is publicly served, but matching RC1 frontend/backend activation is not established."
+}

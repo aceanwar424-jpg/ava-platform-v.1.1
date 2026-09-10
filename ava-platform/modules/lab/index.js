@@ -364,10 +364,10 @@ async function renderLab(tab='checkin'){
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:14px;">
         <div>
           <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25); padding:2px 8px; border-radius:999px; font-size:11px; font-weight:800; color:#10b981; margin-bottom:4px;">
-            🔬 LIS &bull; ISO 15189:2022
+            LIS &bull; ISO 15189:2022
           </div>
           <h1 style="font-size:22px; font-weight:800; color:var(--text); margin:0 0 2px 0;">
-            ${meta.ico} ${meta.label}
+            ${meta.label}
           </h1>
           <p style="font-size:13px; color:var(--text3); margin:0;">
             Diagnostic Laboratory Information System &bull; ASTM E1381 / HL7 Integrated
@@ -465,7 +465,7 @@ async function labCategorySummary(containerId){
         onmouseout="this.style.boxShadow='';this.style.transform=''">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <span style="font-size:22px;font-weight:800;color:${k.color};font-variant-numeric:tabular-nums">${k.val}</span>
-          <span style="font-size:16px;opacity:.7">${k.icon}</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text3)">Buka</span>
         </div>
         <div style="font-size:11px;color:var(--gray);margin-top:2px">${k.label}</div>
       </button>`).join('')}

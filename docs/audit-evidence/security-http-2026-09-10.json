@@ -1,0 +1,359 @@
+{
+  "checkedAt": "2026-09-10T08:54:12.636Z",
+  "results": [
+    {
+      "host": "avahealth.sbs",
+      "path": "/",
+      "error": "UND_ERR_CONNECT_TIMEOUT"
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "www.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "his.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "his.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "lis.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "lis.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "lab.avahealth.sbs",
+      "path": "/",
+      "status": 404,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "lab.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "ops.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "ops.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "app.avahealth.sbs",
+      "path": "/",
+      "status": 404,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "apps.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": true
+    },
+    {
+      "host": "app.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "apps.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "cek.avahealth.sbs",
+      "path": "/",
+      "status": 404,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "cek.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "care.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "care.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "nutri.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "nutri.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "sanctuary.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "sanctuary.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "tech.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "tech.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "console.avahealth.sbs",
+      "path": "/",
+      "status": 404,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "console.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "kiosk.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "kiosk.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "nakes.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "nakes.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "corp.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": true
+    },
+    {
+      "host": "corp.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "korporat.avahealth.sbs",
+      "path": "/",
+      "status": 404,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "korporat.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "lacak.avahealth.sbs",
+      "path": "/",
+      "error": "ECONNRESET"
+    },
+    {
+      "host": "lacak.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "antrian.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "antrian.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "crm.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "crm.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "wellness.avahealth.sbs",
+      "path": "/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "wellness.avahelath.sbs",
+      "path": "/",
+      "error": "ENOTFOUND"
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/index.html",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/js/auth.js",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/js/config.local.js",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/connector/config.json",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/sql_arsip/",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    },
+    {
+      "host": "www.avahealth.sbs",
+      "path": "/.env",
+      "status": 200,
+      "hsts": true,
+      "csp": false,
+      "cache": "public, max-age=0, must-revalidate",
+      "demoPasswordMarkup": false
+    }
+  ]
+}

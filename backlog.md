@@ -16,3 +16,10 @@ Rincian bukti dan acceptance: [laporan audit](docs/AUDIT-LIS-MENDALAM-2026-09-06
 - [ ] P1: uji escaping, endpoint role/tenant, login dan viewport di staging (LIS-15).
 - [ ] P1: selaraskan label Verifikasi Teknis, Otorisasi & Rilis, Lot Kontrol serta layout operator.
 - [ ] P2: validasi kebutuhan nyata sebelum modul khusus mikrobiologi/AP/bank darah atau perluasan besar lain.
+
+## Apps — tindak lanjut audit 2026-09-08
+- Audit RLS dan role user_profiles dengan dua tenant sintetis.
+- Pisahkan data contoh dan layanan simulasi dari alur operasional pasien.
+- Pulihkan sesi melalui validasi server; ganti SSO query-token dengan alur aman.
+- Jadikan klaim cashback transaksi server yang idempoten.
+- Uji EHR terikat patient ID/tenant dan akun resmi sebelum release publik.

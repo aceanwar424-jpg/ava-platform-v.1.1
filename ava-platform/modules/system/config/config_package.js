@@ -12,12 +12,12 @@ async function renderConfigPackage() {
   document.getElementById('main-content').innerHTML = `
     <div class="pro-shell">
     <div class="pro-header">
-      <div><h1>${svgIcon('box',18)} Package Service</h1>
+      <div><h1>Paket &amp; Layanan</h1>
         <span class="pro-sub">Master paket pemeriksaan — MCU · Screening · Gut Health · Panel</span></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="navigate('import')">${svgIcon('plus',13)} Bulk Upload</button>
-        <button class="btn btn-ghost btn-sm" onclick="exportPackagesCSV()">${svgIcon('print',13)} Export</button>
-        <button class="btn btn-teal btn-sm" onclick="openPackageForm()">${svgIcon('plus',14)} Buat Paket</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('import')">Impor data</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportPackagesCSV()">Ekspor</button>
+        <button class="btn btn-teal btn-sm" onclick="openPackageForm()">Buat paket</button>
       </div>
     </div>
 
@@ -106,15 +106,15 @@ function renderPkgList() {
 
             ${p.persiapan?`
               <div style="background:var(--warn-soft2);border-radius:6px;padding:6px 8px;margin-top:8px;font-size:11px;color:var(--ink-14)">
-                ⚠️ ${p.persiapan}
+                Persiapan: ${p.persiapan}
               </div>`:''}
 
             <div style="display:flex;gap:6px;margin-top:12px">
               <button class="btn btn-outline btn-sm" style="flex:1" onclick="openPackageItems(${p.id},'${(p.nama_paket||'').replace(/'/g,"\\'")}')">
                 Isi Tes
               </button>
-              <button class="btn btn-ghost btn-sm" onclick="openPackageForm(${p.id})">${icon('edit', 12)}</button>
-              <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePackage(${p.id})">${icon('trash', 12)}</button>
+              <button class="btn btn-ghost btn-sm" onclick="openPackageForm(${p.id})">Ubah</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deletePackage(${p.id})">Hapus</button>
             </div>
           </div>`).join('')}
       </div>
@@ -126,11 +126,11 @@ async function openPackageForm(id=null) {
   if (id) { const d=await sbGet('packages',`select=*&id=eq.${id}`); p=d[0]||{}; }
   const code = `PKG-${Date.now().toString().slice(-5)}`;
 
-  openModal(`
-    <div class="modal-header">
-      <div class="modal-title">${id?'Edit Paket':'Buat Paket Layanan'}</div>
-      <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
-    </div>
+  document.getElementById('main-content').innerHTML = `
+    <section class="config-workspace package-workspace">
+      <header class="config-workspace-head"><div><p class="cat-eyebrow">Pengaturan · Paket layanan</p><h1>${id ? 'Ubah Paket Layanan' : 'Buat Paket Layanan'}</h1><p>Identitas, cakupan target, tarif, TAT, dan instruksi pasien dikelola sebelum isi pemeriksaan ditetapkan.</p></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="renderConfigPackage()">Kembali ke paket</button></header>
+      <form class="workflow-form-card" onsubmit="savePackage(${id || 'null'});return false;">
 
     <div class="form-row">
       <div class="form-group">
@@ -199,10 +199,12 @@ async function openPackageForm(id=null) {
       </select>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-teal" onclick="savePackage(${id||'null'})">Simpan</button>
-    </div>`);
+        <div class="workflow-form-actions">
+          <button type="button" class="btn btn-ghost" onclick="renderConfigPackage()">Batal</button>
+          <button type="submit" class="btn btn-teal">Simpan paket</button>
+        </div>
+      </form>
+    </section>`;
 }
 
 async function savePackage(id) {
@@ -228,11 +230,10 @@ async function savePackage(id) {
   };
 
   try {
-    if (id) { await sbPatch('packages',id,payload); toast('✅ Paket diupdate','ok'); }
-    else    { await sbPost('packages',payload);     toast('✅ Paket dibuat','ok'); }
-    closeModalForce();
-    await loadPackages();
-  } catch(e) { toast('❌ '+e.message,'err'); }
+    if (id) { await sbPatch('packages',id,payload); toast('Paket diperbarui','ok'); }
+    else    { await sbPost('packages',payload);     toast('Paket dibuat','ok'); }
+    await renderConfigPackage();
+  } catch(e) { toast(e.message,'err'); }
 }
 
 async function openPackageItems(pkgId, pkgName) {

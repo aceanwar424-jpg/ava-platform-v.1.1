@@ -147,10 +147,11 @@ function qcfgFormLoket(id) {
     'Dokter', 'Lab', 'Radiologi', 'Kasir',
   ].filter(Boolean))];
 
-  openModal(`
-    <h3 style="margin:0 0 4px">${l ? 'Ubah Loket' : 'Loket Baru'}</h3>
-    <p style="font-size:12px;color:var(--text3);margin:0 0 14px">
-      Konsol panggilan hanya bisa memanggil dari loket yang terdaftar.</p>
+  document.getElementById('main-content').innerHTML = `
+    <section class="config-workspace qcfg-workspace">
+      <header class="config-workspace-head"><div><p class="cat-eyebrow">Antrean · Loket</p><h1>${l ? 'Ubah Loket' : 'Loket Baru'}</h1><p>Konsol panggilan hanya dapat menggunakan loket yang terdaftar dan aktif.</p></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="qcfgGambar()">Kembali ke konfigurasi antrean</button></header>
+      <form class="qcfg-form-card" onsubmit="qcfgSimpanLoket(${l ? l.id : 'null'});return false;">
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="input-group"><label>Kode ${l ? '' : '*'}</label>
@@ -177,11 +178,12 @@ function qcfgFormLoket(id) {
       &ldquo;silakan menuju Loket 1, Lantai 1&rdquo;.
     </p>
 
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-close" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-primary" style="margin-top:0"
-        onclick="qcfgSimpanLoket(${l ? l.id : 'null'})">Simpan</button>
-    </div>`);
+        <div class="qcfg-form-actions">
+          <button type="button" class="btn btn-ghost" onclick="qcfgGambar()">Batal</button>
+          <button type="submit" class="btn btn-teal">Simpan loket</button>
+        </div>
+      </form>
+    </section>`;
 }
 
 async function qcfgSimpanLoket(id) {
@@ -211,7 +213,6 @@ async function qcfgSimpanLoket(id) {
       await sbPost('queue_counters', muatan);
       toast(`Loket ${nama} ditambahkan`, 'ok');
     }
-    closeModalForce();
     await qcfgMuat();
     qcfgGambar();
   } catch (e) { toast('Gagal menyimpan: ' + e.message, 'err'); }
@@ -231,10 +232,11 @@ function qcfgFormLayanan(id) {
   if (!c) return;
   const layanan = c.layanan;
 
-  openModal(`
-    <h3 style="margin:0 0 4px">Pengaturan ${qcfgEsc(layanan)}</h3>
-    <p style="font-size:12px;color:var(--text3);margin:0 0 14px">
-      Berlaku untuk semua loket yang melayani layanan ini.</p>
+  document.getElementById('main-content').innerHTML = `
+    <section class="config-workspace qcfg-workspace">
+      <header class="config-workspace-head"><div><p class="cat-eyebrow">Antrean · Layanan</p><h1>Pengaturan ${qcfgEsc(layanan)}</h1><p>Berlaku untuk setiap loket yang melayani layanan ini.</p></div>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="qcfgGambar()">Kembali ke konfigurasi antrean</button></header>
+      <form class="qcfg-form-card" onsubmit="qcfgSimpanLayanan(${c.id});return false;">
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="input-group"><label>Prefiks nomor</label>
@@ -254,11 +256,12 @@ function qcfgFormLayanan(id) {
       Kuota <b>0</b> berarti tanpa batas.
     </p>
 
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-close" onclick="closeModalForce()">Batal</button>
-      <button class="btn btn-primary" style="margin-top:0"
-        onclick="qcfgSimpanLayanan(${c.id})">Simpan</button>
-    </div>`);
+        <div class="qcfg-form-actions">
+          <button type="button" class="btn btn-ghost" onclick="qcfgGambar()">Batal</button>
+          <button type="submit" class="btn btn-teal">Simpan pengaturan</button>
+        </div>
+      </form>
+    </section>`;
 }
 
 async function qcfgSimpanLayanan(id) {
@@ -272,7 +275,6 @@ async function qcfgSimpanLayanan(id) {
       updated_at: new Date().toISOString(),
     });
     toast('Pengaturan disimpan', 'ok');
-    closeModalForce();
     await qcfgMuat(); qcfgGambar();
   } catch (e) { toast('Gagal: ' + e.message, 'err'); }
 }
