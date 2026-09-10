@@ -1218,6 +1218,14 @@ async function bootstrapAdmin(pg, dataDir, log) {
           [id, 'admin@avahealth.sbs', hashPassword('12345678', salt), salt]);
         await pg.query(`INSERT INTO public.user_profiles (id, full_name, role) VALUES ($1, $2, 'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
           [id, 'Master Super Admin']);
+      } else {
+        // Instalasi lama dapat memiliki akun auth tanpa profil; tanpa profil
+        // frontend sengaja menolak sesi agar peran tidak pernah diasumsikan.
+        await pg.query(
+           `INSERT INTO public.user_profiles (id, full_name, role)
+            VALUES ($1,$2,'super_admin')
+            ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
+           [ada.rows[0].id, 'Master Super Admin']);
       }
     } catch(e) {}
     return;
