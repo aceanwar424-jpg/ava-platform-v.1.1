@@ -1906,14 +1906,7 @@ function updateLoginFormUI(role) {
 
   if (!formTitleEl || !labelEl || !inputEl || !footerEl) return;
 
-  // Pre-fill master credentials on role change for instant access
-  inputEl.value = 'admin@avahealth.sbs';
-  const passEl = document.getElementById('password');
-  if (passEl) passEl.value = '12345678';
-  if (corpCodeInput) {
-    corpCodeInput.value = 'CORP-AVA-01';
-    corpCodeInput.required = false;
-  }
+  if (corpCodeInput) corpCodeInput.required = false;
   if (corpCodeGroup) corpCodeGroup.style.display = 'none';
 
   if (role === 'corporate') {

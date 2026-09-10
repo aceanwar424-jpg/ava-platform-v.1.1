@@ -18,7 +18,27 @@ export default async function middleware(request) {
     const allowed = pathname === '/' || publicFiles.some(file=>file.endsWith('/') ? pathname.startsWith('/'+file) : pathname === '/'+file);
     return allowed && ['GET','HEAD'].includes(request.method) ? undefined : new Response('Not found',{status:404,headers:PRIVATE_HEADERS});
   }
-  if (domains.situs.find(s=>s.kunci === 'web').host.includes(host)) {
+  const site = domains.situs.find(s=>s.host.includes(host));
+  if (site?.kunci === 'app' && ['GET','HEAD'].includes(request.method)) {
+    // The patient portal must load its login UI before Supabase can authenticate
+    // the user. Only its static shell and explicitly referenced shared assets
+    // are public; application data remains protected by Supabase/RLS.
+    const appAssets = new Set([
+      '/css/token.css',
+      '/css/logo-ava-global.png',
+      '/js/core/api.js',
+      '/js/core/whatsappGateway.js',
+      '/js/core/paymentGateway.js',
+      '/js/core/escposPrinter.js',
+      '/js/core/shippingEngine.js',
+      '/js/core/bpjsBridge.js',
+      '/js/core/pacsEngine.js',
+      '/js/core/pdfSigner.js',
+      '/js/core/peta-subdomain.js',
+    ]);
+    if (pathname === '/' || pathname.startsWith('/apps/') || appAssets.has(pathname)) return;
+  }
+  if (site?.kunci === 'web') {
     return new Response(null,{status:308,headers:{Location:'https://'+PUBLIC_HOST+'/',...PRIVATE_HEADERS}});
   }
   // Includes unregistered custom hosts and direct *.vercel.app bypass URLs.

@@ -8,15 +8,25 @@ const policy = import('../../security/staff-access.mjs');
 const synthetic = {AVA_SUPABASE_URL:'https://auth.example.invalid',AVA_SUPABASE_ANON_KEY:'synthetic-public',AVA_STAFF_USER_IDS:'staff-id'};
 async function gateway(env = synthetic, fetcher = async()=>new Response(JSON.stringify({id:'staff-id'}))) {
   const p = await policy;
-  const src = fs.readFileSync('middleware.js','utf8').replace(/^import .*;\n/gm,'').replace('export const config','const config').replace('export default async function middleware','async function middleware');
+  const src = fs.readFileSync('middleware.js','utf8').replace(/^import .*\r?\n/gm,'').replace('export const config','const config').replace('export default async function middleware','async function middleware');
   const c={domains:map,...p,process:{env},settings:()=>p.settings(env), verifyStaff:(t,cfg)=>p.verifyStaff(t,cfg,fetcher),URL,Response};
   vm.createContext(c); vm.runInContext(src,c); return c.middleware;
 }
 test('every configured private domain denies anonymous requests and direct file paths',async()=>{
   const gate=await gateway();
-  for(const site of map.situs.filter(s=>s.kunci!=='web')) for(const host of site.host) for(const path of ['/','/index.html','/apps/index.html','/monitor/antrian.html','/api/runtime-config.js']) {
+  for(const site of map.situs.filter(s=>s.kunci!=='web' && s.kunci!=='app')) for(const host of site.host) for(const path of ['/','/index.html','/apps/index.html','/monitor/antrian.html','/api/runtime-config.js']) {
     const r=await gate(new Request('https://'+host+path)); assert.equal(r.status,401,host+path);
     assert.match(r.headers.get('cache-control'),/no-store/);
+  }
+});
+test('patient portal serves only its public shell and shared static assets anonymously',async()=>{
+  const gate=await gateway();
+  for(const host of map.situs.find(s=>s.kunci==='app').host) {
+    for(const path of ['/', '/apps/index.html', '/apps/style.css', '/apps/login.css', '/apps/app.js', '/css/token.css', '/css/logo-ava-global.png', '/js/core/api.js']) {
+      assert.equal(await gate(new Request('https://'+host+path)), undefined, host+path);
+    }
+    assert.equal((await gate(new Request('https://'+host+'/api/runtime-config.js'))).status, 401);
+    assert.equal((await gate(new Request('https://'+host+'/private.txt'))).status, 401);
   }
 });
 test('only www serves public assets; private files, secrets and unregistered hosts are denied',async()=>{
