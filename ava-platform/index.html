@@ -233,7 +233,7 @@
      Bila berkas tidak ada, 404-nya tidak fatal — pool AI hanya kosong. -->
 <script defer src="js/config.local.js"></script>
 <script defer src="js/core/aiGateway.js?v=20260905-private-status"></script>
-<script defer src="js/auth.js?v=20260719s"></script>
+<script defer src="js/auth.js?v=20260911-login-session"></script>
 
 <script defer src="modules/dashboard/index.js?v=20260719s"></script>
 <!-- Modul bisnis TIDAK lagi dimuat semuanya di awal (dulu 82 berkas / 3,1 MB).
@@ -439,18 +439,27 @@ window.addEventListener('DOMContentLoaded', async () => {
   const token = sessionStorage.getItem('ol_token');
   if (token) {
     try {
-      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      let res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
         headers: { ...SB_HEADERS, 'Authorization': `Bearer ${token}` }
       });
+      if (!res.ok && typeof sbRefreshSession === 'function' && sessionStorage.getItem('ol_refresh')) {
+        const refreshed = await sbRefreshSession();
+        if (refreshed) {
+          res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+            headers: { ...SB_HEADERS, 'Authorization': `Bearer ${sessionStorage.getItem('ol_token') || ''}` }
+          });
+        }
+      }
       if (res.ok) {
         const user = await res.json();
         if (user && user.id) {
           window.currentUser = user;
           try {
-            const profile = await sbGet('user_profiles',`select=*&id=eq.${user.id}`);
+            const profileLoader = typeof sbGetStrict === 'function' ? sbGetStrict : sbGet;
+            const profile = await profileLoader('user_profiles',`select=*&id=eq.${encodeURIComponent(user.id)}`);
             if (!profile?.[0] || profile[0].id !== user.id) throw new Error('Profil akses tidak tersedia');
             window.currentUser.profile = profile[0];
-          } catch(e) { clearStoredToken(); window.currentUser = null; showLoginScreen(); return; }
+          } catch(e) { if (typeof showAccessBlocked === 'function') showAccessBlocked(e); else showLoginScreen(); return; }
           // Hak akses diambil dari server dulu, baru menu disusun. Tanpa ini
           // menu jatuh ke matriks bawaan di berkas — bukan bahaya, tapi
           // perubahan peran oleh admin tidak akan terlihat.

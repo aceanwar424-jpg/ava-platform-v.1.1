@@ -28,7 +28,12 @@ async function initAuth(){
       const user = await res.json();
       if(user && user.id){
         window.currentUser = user;
-        await loadUserProfile();
+        try {
+          await loadUserProfile();
+        } catch (profileError) {
+          showAccessBlocked(profileError);
+          return;
+        }
         showApp();
         return;
       }
@@ -49,11 +54,40 @@ function clearStoredToken(){ sessionStorage.removeItem('ol_token'); sessionStora
 
 async function loadUserProfile(){
   if(!window.currentUser) return;
-  try {
-    const data = await sbGet('user_profiles',`select=*&id=eq.${window.currentUser.id}`);
-    if(!data?.[0] || data[0].id !== window.currentUser.id) throw new Error('Profil akses tidak tersedia.');
-    window.currentUser.profile = data[0];
-  } catch(e){ clearStoredToken(); window.currentUser = null; throw e; }
+  const loader = typeof sbGetStrict === 'function' ? sbGetStrict : sbGet;
+  const data = await loader('user_profiles',`select=*&id=eq.${encodeURIComponent(window.currentUser.id)}`);
+  if(!data?.[0] || data[0].id !== window.currentUser.id) {
+    throw new Error('Profil akses akun ini belum tersedia. Hubungi administrator untuk melengkapi peran akun.');
+  }
+  window.currentUser.profile = data[0];
+}
+
+// Sesi Auth yang masih sah tidak boleh dihapus hanya karena profil/RBAC tidak
+// dapat dibaca. Menghapusnya menghasilkan loop login dan menyamarkan akar
+// masalah (profil belum dibuat, RLS menolak, atau layanan sedang terganggu).
+function showAccessBlocked(error){
+  const message = error?.message || 'Profil akses tidak dapat diverifikasi.';
+  document.body.innerHTML = `
+    <main style="min-height:100vh;background:#020617;display:flex;align-items:center;justify-content:center;padding:20px">
+      <section role="alert" style="background:#0F172A;border:1px solid #334155;border-radius:16px;box-shadow:0 12px 48px rgba(0,0,0,.45);padding:28px;width:100%;max-width:500px;color:#F8FAFC">
+        <p style="margin:0 0 8px;color:#38BDF8;font-size:12px;font-weight:800;letter-spacing:.06em">AKSES PERLU DIVERIFIKASI</p>
+        <h1 style="margin:0 0 10px;font-size:20px">Akun berhasil diautentikasi</h1>
+        <p style="margin:0;color:#CBD5E1;line-height:1.55;font-size:14px">${escapeAuthText(message)}</p>
+        <p style="margin:12px 0 20px;color:#94A3B8;font-size:12px;line-height:1.5">Tidak ada menu atau data klinis yang dibuka. Administrator dapat memeriksa profil dan peran akun, lalu Anda dapat mencoba kembali.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button type="button" onclick="location.reload()" style="padding:10px 14px;background:#0284C7;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer">Coba lagi</button>
+          <button type="button" onclick="resetAccessSession()" style="padding:10px 14px;background:transparent;color:#E2E8F0;border:1px solid #475569;border-radius:8px;font-weight:700;cursor:pointer">Masuk dengan akun lain</button>
+        </div>
+      </section>
+    </main>`;
+}
+function escapeAuthText(value){
+  return String(value).replace(/[&<>\"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '\"':'&quot;', "'":'&#39;' }[ch]));
+}
+function resetAccessSession(){
+  clearStoredToken();
+  window.currentUser = null;
+  location.reload();
 }
 
 // ── Login Screen ──────────────────────────────────

@@ -1724,3 +1724,51 @@ OWNED_BY: ava. Verifikasi baca-saja, uji sintetis tanpa koneksi DB produksi. Tid
 - Rujukan laporan Apps dikoreksi ke docs/AUDIT_APPS_FASE_AWAL_2026-09-08.md yang benar-benar tersedia. Laporan audit lama lainnya berada di docs/archive; direktori docs/audit tidak ada pada baseline ini.
 - Total verifikasi terfokus: 24 uji login/keamanan + 6 uji struktur/navigasi lulus. Tidak ada perubahan kode runtime atau pengamanan sesi dalam langkah verifikasi ini.
 - Lanjutan pekerjaan produk: pengujian visual final dan kelengkapan alur menu Apps tetap perlu diselesaikan; verifikasi struktur tidak menyatakan seluruh layanan siap produksi.
+
+---
+
+## Verifikasi perapihan aplikasi sebelah — 11 September 2026
+
+### Rencana dan checklist
+
+- [x] Pastikan working tree bersih serta identifikasi commit terakhir setelah perapihan file/folder.
+- [x] Telaah dampak commit terhadap connector LIS, QC/lot verification, dokumentasi proyek, dan tes Apps.
+- [x] Jalankan ulang regresi Apps, domain/session security, Fase 2, connector LIS, dan readiness deployment statis.
+- [x] Pastikan tidak ada perubahan data, migrasi, atau deploy produksi selama verifikasi.
+
+### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Verifikasi bersifat lokal dan memakai fixture sintetis. Tidak ada data pasien, kredensial, konfigurasi secret, koneksi DB produksi, ataupun perubahan skema yang dibaca atau diubah. Bukti readiness statis bukan persetujuan untuk mengaktifkan integrasi eksternal atau menerapkan migrasi produksi.
+
+### Bukti
+
+- Working tree bersih pada `2322ad6` (`finalize LIS connector and portal audit fixes`). Commit ini memperbarui connector LIS, evaluator QC/lot verification, artefak connector, status/backlog proyek, serta menambah regresi navigasi Apps; tidak memindahkan entrypoint aplikasi.
+- `node --test scripts/uji/test_apps_auth.cjs scripts/uji/test_security_domains.cjs scripts/uji/test_apps_navigation.cjs`: **30/30 lulus**.
+- `node scripts/uji/test_fase2_e2e.js`: **14/14 skenario lulus**, meliputi QC Westgard, transformasi FHIR, jurnal konsolidasi, dan cold-chain fixture.
+- `node scripts/verify-lis-connector.cjs`: lulus untuk restart durable, deduplikasi, karantina, checksum, frame terfragmentasi, provenance perangkat, dan evaluator QC bersama.
+- `node scripts/verify-deploy-readiness.js`: lulus secara statis. Tidak ada deploy ataupun UAT lingkungan produksi.
+
+---
+
+## Pemulihan sesi login lintas domain — 11 September 2026
+
+### Rencana dan checklist
+
+- [x] Reproduksi sumber masalah secara baca-saja pada aset publik HIS dan LIS; keduanya masih melayani skrip autentikasi yang sama.
+- [x] Telusuri urutan autentikasi browser, refresh token, pemuatan profil akses, dan boot halaman tanpa menggunakan kredensial maupun membaca data produksi.
+- [x] Bedakan sesi tidak sah dari profil/RBAC yang belum tersedia; tambahkan pemulihan refresh token pada boot dan layar akses yang jelas tanpa membuka data klinis.
+- [x] Tambahkan regresi untuk mencegah token sesi dihapus hanya karena profil gagal dimuat atau karena refresh token tidak tersedia.
+- [x] Jalankan pemeriksaan sintaks dan suite autentikasi/domain yang terdampak; catat batas deploy/UAT.
+
+### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Perbaikan dibatasi pada mekanisme sesi browser dan pesan akses. Tidak menyimpan atau mencetak kredensial, token, data pasien, UUID pengguna, maupun konfigurasi rahasia. Tidak mengubah skema, RLS, profil pengguna, database, atau deployment produksi. Akses klinis tetap fail-closed: sesi yang valid tetapi tanpa profil/RBAC tidak boleh membuka aplikasi dan harus menampilkan penjelasan yang dapat ditindaklanjuti, bukan diberi peran bawaan.
+
+### Bukti
+
+- Aset publik HIS dan LIS pada saat pemeriksaan sama-sama melayani `js/auth.js` lama (8.999 byte) yang memuat pola reload lalu menghapus token saat pembacaan profil gagal. Pemeriksaan hanya membaca aset publik dan tidak menjalankan login.
+- `sbGetStrict` dipakai khusus untuk gerbang profil agar penolakan RLS/jaringan tidak berubah menjadi daftar kosong. Pesan pengguna tidak memaparkan detail PostgREST/RLS; sesi Auth sah dipertahankan pada layar `Akses perlu diverifikasi` sampai pengguna memilih masuk dengan akun lain.
+- Boot `index.html` kini mencoba refresh token sekali sebelum menyatakan sesi tidak sah. Semua host berbasis shell bersama—HIS, LIS, OPS, Tech, Care, Nutri, Sanctuary, Console, Nakes, Corporate, CRM, Wellness, Kiosk, Lacak, dan Antrean—menerima perbaikan ini saat bundle yang sama dideploy. Portal `apps` sudah menampilkan error fail-closed tanpa reload setelah klik login dan tetap tercakup oleh regresi portal.
+- `node --test scripts/uji/test_root_auth_session.cjs scripts/uji/test_security_domains.cjs scripts/uji/test_apps_auth.cjs scripts/uji/test_apps_navigation.cjs`: **33/33 lulus**.
+- `node --check ava-platform/js/core/api.js`, `node --check ava-platform/js/auth.js`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js` (214 menu), `node scripts/verify-deploy-readiness.js`, serta `git diff --check`: lulus.
+- Belum deploy. Perubahan baru berlaku pada domain produksi setelah build/deploy dari commit ini selesai. Sesudah deploy, UAT minimal perlu memakai satu akun staf yang memang sudah memiliki profil/peran dan satu akun tanpa profil untuk memastikan layar akses muncul tanpa loop; tidak perlu membuat atau mengubah akun selama UAT.

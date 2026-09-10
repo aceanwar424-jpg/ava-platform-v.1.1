@@ -112,6 +112,22 @@ async function sbGet(table, query='') {
     return [];
   }
 }
+
+// Versi ketat untuk gerbang autentikasi/RBAC. `sbGet` sengaja mempertahankan
+// fallback kosong untuk banyak daftar operasional lama, tetapi gerbang akses
+// tidak boleh menyamakan penolakan RLS, gangguan jaringan, dan profil kosong.
+// Pemanggil wajib menampilkan alasan yang aman tanpa memberi hak akses bawaan.
+async function sbGetStrict(table, query='') {
+  const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`);
+  let data = null;
+  try { data = await res.json(); } catch (_) { /* pesan aman di bawah */ }
+  if (!res.ok) {
+    // Pesan PostgREST/RLS dapat mengungkap struktur internal; cukup tampilkan
+    // status yang dapat ditindaklanjuti kepada pengguna.
+    throw new Error('Profil akses tidak dapat diverifikasi saat ini. Coba lagi atau hubungi administrator.');
+  }
+  return data;
+}
 async function sbPost(table, body) {
   const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}`, { method:'POST', body: JSON.stringify(body) });
   const data = await res.json();
