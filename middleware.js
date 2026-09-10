@@ -61,5 +61,5 @@ export default async function middleware(request) {
   const cfg = settings();
   if (!cfg) return new Response('Akses staf belum dikonfigurasi. Hubungi administrator.',{status:503,headers:PRIVATE_HEADERS});
   if (await verifyStaff(readCookie(request),cfg)) return;
-  return new Response(loginPage(site),{status:401,headers:{...PRIVATE_HEADERS,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"}});
+  return new Response(loginPage(site),{status:401,headers:{...PRIVATE_HEADERS,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"}});
 }

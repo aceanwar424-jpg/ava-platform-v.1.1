@@ -92,13 +92,27 @@ function resetAccessSession(){
 
 // ── Login Screen ──────────────────────────────────
 function showLoginScreen(){
+  const host = typeof location !== 'undefined' ? location.hostname : '';
+  const context = host.startsWith('lis.') || host.startsWith('lab.')
+    ? 'Presisi laboratorium, dari sampel hingga keputusan.'
+    : host.startsWith('his.')
+      ? 'Pelayanan klinis terhubung untuk keputusan yang lebih baik.'
+      : host.startsWith('ops.')
+        ? 'Satu pandangan untuk menggerakkan seluruh ekosistem.'
+        : 'Teknologi yang menyatukan layanan kesehatan dan operasional.';
   document.body.innerHTML = `
-    <div style="min-height:100vh;background:#020617;display:flex;align-items:center;justify-content:center;padding:20px">
-      <div style="background:#0F172A;border:1px solid #1E293B;border-radius:20px;box-shadow:0 12px 48px rgba(0,0,0,.45);padding:32px;width:100%;max-width:440px;color:#F8FAFC">
-        <div style="text-align:center;margin-bottom:24px">
+    <div style="min-height:100vh;background:radial-gradient(circle at 12% 10%,#173b5b 0,transparent 32%),radial-gradient(circle at 88% 90%,#132d49 0,transparent 30%),#020617;display:flex;align-items:center;justify-content:center;padding:20px">
+      <div style="background:linear-gradient(145deg,#111f35f5,#0b1729f5);border:1px solid rgba(212,175,55,.2);border-radius:22px;box-shadow:0 20px 70px rgba(0,0,0,.5);padding:32px;width:100%;max-width:480px;color:#F8FAFC">
+        <div style="text-align:center;margin-bottom:22px">
           <img src="css/logo-ava-global.png" style="width:58px;height:58px;border-radius:50%;border:2px solid #d4af37;object-fit:cover;margin:0 auto 10px;display:block;box-shadow:0 0 16px rgba(212,175,55,0.35);" alt="Logo">
           <h1 style="font-size:20px;font-weight:800;color:#F8FAFC;margin-bottom:4px;letter-spacing:-0.01em">AVA GLOBAL ECOSYSTEM</h1>
-          <p style="font-size:12px;color:#94A3B8">Pintu Masuk Terpadu Multi-Role Platform</p>
+          <p style="font-size:12px;color:#D4AF37;margin:0 0 7px;font-weight:700;letter-spacing:.05em">PINTU MASUK TERPADU</p>
+          <p style="font-size:13px;color:#B4C5D6;margin:0;line-height:1.5">${context}</p>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;margin-bottom:18px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.035)">
+          <span style="font-size:18px;line-height:1" aria-hidden="true">✦</span>
+          <p style="margin:0;color:#CBD8E5;font-size:12px;line-height:1.5">Ruang kerja aman untuk tim yang melayani dengan ketelitian, kepedulian, dan integritas.</p>
         </div>
 
         <div id="auth-tabs" style="display:flex;border-bottom:2px solid #1E293B;margin-bottom:16px">
