@@ -17,26 +17,27 @@ function readSecret(prompt) {
     input.resume();
     let value = '';
     const onData = chunk => {
-      const key = chunk.toString();
-      if (key === '\u0003') {
-        input.setRawMode(false);
-        input.removeListener('data', onData);
-        output.write('\n');
-        reject(new Error('Dibatalkan.'));
-        return;
+      for (const key of chunk.toString()) {
+        if (key === '\u0003') {
+          input.setRawMode(false);
+          input.removeListener('data', onData);
+          output.write('\n');
+          reject(new Error('Dibatalkan.'));
+          return;
+        }
+        if (key === '\r' || key === '\n') {
+          input.setRawMode(false);
+          input.removeListener('data', onData);
+          output.write('\n');
+          resolve(value);
+          return;
+        }
+        if (key === '\u007f' || key === '\b') {
+          value = value.slice(0, -1);
+          continue;
+        }
+        value += key;
       }
-      if (key === '\r' || key === '\n') {
-        input.setRawMode(false);
-        input.removeListener('data', onData);
-        output.write('\n');
-        resolve(value);
-        return;
-      }
-      if (key === '\u007f') {
-        value = value.slice(0, -1);
-        return;
-      }
-      if (key.length === 1) value += key;
     };
     input.on('data', onData);
   });

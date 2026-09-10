@@ -14,7 +14,7 @@ async function gateway(env = synthetic, fetcher = async()=>new Response(JSON.str
 }
 test('every configured private domain denies anonymous requests and direct file paths',async()=>{
   const gate=await gateway();
-  for(const site of map.situs.filter(s=>s.kunci!=='web' && s.kunci!=='app')) for(const host of site.host) for(const path of ['/','/index.html','/apps/index.html','/monitor/antrian.html','/api/runtime-config.js']) {
+  for(const site of map.situs.filter(s=>s.kunci!=='web' && s.kunci!=='app')) for(const host of site.host) for(const path of ['/','/index.html','/apps/index.html','/monitor/antrian.html']) {
     const r=await gate(new Request('https://'+host+path)); assert.equal(r.status,401,host+path);
     assert.match(r.headers.get('cache-control'),/no-store/);
   }
@@ -22,7 +22,7 @@ test('every configured private domain denies anonymous requests and direct file 
 test('private login shells can load frontend assets without exposing protected files',async()=>{
   const gate=await gateway();
   for(const host of map.situs.find(s=>s.kunci==='his').host) {
-    for(const path of ['/css/style.css','/css/dashboard.css','/js/auth.js','/js/core/router.js','/images/logo.svg','/fonts/inter.woff2']) {
+    for(const path of ['/css/style.css','/css/dashboard.css','/js/auth.js','/js/core/router.js','/modules/dashboard/dashboard.js','/images/logo.svg','/fonts/inter.woff2','/api/runtime-config.js']) {
       assert.equal(await gate(new Request('https://'+host+path)),undefined, host+path);
     }
     for(const path of ['/js/config.local.js','/js/core/router.js.map','/sql_arsip/catalog.sql','/connector/config.json']) {
@@ -36,7 +36,7 @@ test('patient portal serves only its public shell and shared static assets anony
     for(const path of ['/', '/apps/index.html', '/apps/style.css', '/apps/login.css', '/apps/app.js', '/css/token.css', '/css/logo-ava-global.png', '/js/core/api.js']) {
       assert.equal(await gate(new Request('https://'+host+path)), undefined, host+path);
     }
-    assert.equal((await gate(new Request('https://'+host+'/api/runtime-config.js'))).status, 401);
+    assert.equal(await gate(new Request('https://'+host+'/api/runtime-config.js')),undefined);
     assert.equal((await gate(new Request('https://'+host+'/private.txt'))).status, 401);
   }
 });

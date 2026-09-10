@@ -4,7 +4,7 @@ import {PUBLIC_HOST, PRIVATE_HEADERS, settings, readCookie, verifyStaff, loginPa
 
 const hosts = new Set(domains.situs.flatMap(s=>s.host));
 const publicFiles = domains.situs.find(s=>s.kunci === 'web').berkas;
-const publicAsset = /^\/(?:css|js|public|apps|kiosk|monitor|vendor|fonts|images)(?:\/|$)/i;
+const publicAsset = /^\/(?:css|js|modules|public|apps|kiosk|monitor|vendor|fonts|images)(?:\/|$)/i;
 const publicAssetFile = /\.(?:css|js|mjs|png|jpe?g|gif|svg|webp|ico|woff2?|ttf|otf|webmanifest)$/i;
 const deniedAsset = /\.(?:map|env|pem|key|sql|db|sqlite|bak|zip)$/i;
 export const config = { matcher: '/:path*' };
@@ -39,8 +39,11 @@ export default async function middleware(request) {
       '/js/core/pdfSigner.js',
       '/js/core/peta-subdomain.js',
     ]);
-    if (pathname === '/' || pathname.startsWith('/apps/') || appAssets.has(pathname)) return;
+    if (pathname === '/' || pathname === '/api/runtime-config.js' || pathname.startsWith('/apps/') || appAssets.has(pathname)) return;
   }
+  // Runtime configuration contains only the public Supabase URL and anon key.
+  // It must load before authentication so the login screen can contact Auth.
+  if (pathname === '/api/runtime-config.js' && ['GET','HEAD'].includes(request.method)) return;
   // Private shells still need their public frontend assets before staff login.
   // This never exposes source maps, credentials, database files, or server code.
   if (['GET','HEAD'].includes(request.method)

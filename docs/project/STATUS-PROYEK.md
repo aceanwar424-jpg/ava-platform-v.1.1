@@ -1772,3 +1772,10 @@ OWNED_BY: ava. Perbaikan dibatasi pada mekanisme sesi browser dan pesan akses. T
 - `node --test scripts/uji/test_root_auth_session.cjs scripts/uji/test_security_domains.cjs scripts/uji/test_apps_auth.cjs scripts/uji/test_apps_navigation.cjs`: **33/33 lulus**.
 - `node --check ava-platform/js/core/api.js`, `node --check ava-platform/js/auth.js`, `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js` (214 menu), `node scripts/verify-deploy-readiness.js`, serta `git diff --check`: lulus.
 - Belum deploy. Perubahan baru berlaku pada domain produksi setelah build/deploy dari commit ini selesai. Sesudah deploy, UAT minimal perlu memakai satu akun staf yang memang sudah memiliki profil/peran dan satu akun tanpa profil untuk memastikan layar akses muncul tanpa loop; tidak perlu membuat atau mengubah akun selama UAT.
+
+### Temuan produksi sesudah deploy
+
+- Pemeriksaan baca-saja 11 September menemukan HIS dan LIS sudah menyajikan bundle baru (`auth.js` berisi `sbGetStrict`; root memuat versi `20260911-login-session`). Jadi patch browser telah sampai ke deployment.
+- Environment `AVA_SUPABASE_URL` dan publishable `AVA_SUPABASE_ANON_KEY` telah disimpan pada Production project Vercel `avahelath.v1.1`, lalu deployment Production baru berhasil dibuat dari commit `0e653e8`. Tidak ada secret key, data klinis, atau perubahan Supabase yang dilakukan.
+- Pemeriksaan pascaredeploy memperjelas 503: respons domain privat berasal dari middleware dan berbunyi `Akses staf belum dikonfigurasi. Hubungi administrator.` Konfigurasi server masih tidak memiliki `AVA_STAFF_USER_IDS`, sehingga fail-closed mengunci HIS/LIS/ruang privat sebagaimana desain keamanan.
+- Pemulihan operasional selanjutnya membutuhkan `AVA_STAFF_USER_IDS` berisi UUID staf yang disetujui. UUID tidak akan ditebak atau dibaca dari Auth/database produksi tanpa checkpoint pemilik data. Setelah UUID disediakan/disetujui, tambahkan ke Production dan redeploy sekali lagi; baru uji login dengan akun yang memiliki `user_profiles` dan peran sah.
