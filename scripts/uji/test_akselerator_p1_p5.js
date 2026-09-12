@@ -84,7 +84,8 @@ const smmPackage = assembler.assemble({
   tenant_id: 'TEN-MEDIKA',
   lab_info: {
     name: 'Laboratorium Klinik Utama Medika',
-    legal_entity: 'PT Medika Sehat Utama'
+    legal_entity: 'PT Medika Sehat Utama',
+    license_number: 'SYNTHETIC-LICENSE-001'
   }
 });
 assert(smmPackage.total_modules > 0 && smmPackage.combined_bundle.includes('Laboratorium Klinik Utama Medika'),

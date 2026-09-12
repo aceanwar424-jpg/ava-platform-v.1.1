@@ -53,11 +53,6 @@ declare global {
       createProduct: (data: Partial<Product>) => Promise<Product>;
       updateProduct: (id: string, data: Partial<Product>) => Promise<Product>;
       deleteProduct: (id: string) => Promise<Product>;
-      seedDatabase: () => Promise<{ success: boolean; count: number }>;
-      execSql: (sql: string) => Promise<SqlResult>;
-      getTables: () => Promise<string[]>;
-      getTableData: (tableName: string) => Promise<any[]>;
-      getTableColumns: (tableName: string) => Promise<TableColumn[]>;
       getAppVersion: () => Promise<string>;
       getSitus: () => Promise<{ port: number; situs: SitusPeta[] }>;
     };

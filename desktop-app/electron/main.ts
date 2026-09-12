@@ -110,50 +110,6 @@ function registerIpc() {
     return { port: PLATFORM_PORT, situs };
   });
 
-  ipcMain.handle('db:getTables', async () => {
-    if (!pg) return [];
-    const r = await pg.query(
-      `SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename`);
-    return r.rows.map((x: any) => x.tablename);
-  });
-
-  ipcMain.handle('db:getTableColumns', async (_e: any, tableName: string) => {
-    if (!pg) return [];
-    const safe = String(tableName).replace(/[^a-zA-Z0-9_]/g, '');
-    const r = await pg.query(
-      `SELECT (ordinal_position - 1) AS cid, column_name AS name, data_type AS type,
-              CASE WHEN is_nullable='NO' THEN 1 ELSE 0 END AS notnull,
-              column_default AS dflt_value, 0 AS pk
-         FROM information_schema.columns
-        WHERE table_schema='public' AND table_name=$1
-        ORDER BY ordinal_position`, [safe]);
-    return r.rows;
-  });
-
-  ipcMain.handle('db:getTableData', async (_e: any, tableName: string) => {
-    if (!pg) return [];
-    const safe = String(tableName).replace(/[^a-zA-Z0-9_]/g, '');
-    const r = await pg.query(`SELECT * FROM "${safe}" LIMIT 200`);
-    return r.rows;
-  });
-
-  ipcMain.handle('db:execSql', async (_e: any, sqlQuery: string) => {
-    const start = Date.now();
-    try {
-      const trimmed = (sqlQuery || '').trim();
-      const isSelect = /^(SELECT|WITH|PRAGMA|EXPLAIN|TABLE|SHOW|VALUES)\b/i.test(trimmed);
-      if (isSelect) {
-        const res = await pg.query(trimmed);
-        return { success: true, isSelect: true, rows: res.rows, rowCount: res.rows.length, executionTimeMs: Date.now() - start };
-      }
-      await pg.exec(trimmed);
-      const stmts = trimmed.split(';').map(s => s.trim()).filter(Boolean).length;
-      return { success: true, isSelect: false, affectedStatements: stmts, executionTimeMs: Date.now() - start };
-    } catch (e: any) {
-      return { success: false, error: e.message || String(e), executionTimeMs: Date.now() - start };
-    }
-  });
-
   ipcMain.handle('db:getProducts', async () => {
     if (!pg) return [];
     const r = await pg.query(`SELECT * FROM products ORDER BY created_at DESC NULLS LAST LIMIT 1000`);
@@ -172,7 +128,11 @@ function registerIpc() {
 
   ipcMain.handle('db:updateProduct', async (_e: any, payload: any) => {
     const { id, data } = payload;
-    const cols = Object.keys(data);
+    const allowed = new Set([
+      'kode_internal', 'kode_material', 'kategori', 'sub_kategori',
+      'nama_tes', 'nama_singkat', 'harga_normal', 'is_active',
+    ]);
+    const cols = Object.keys(data).filter(c => allowed.has(c));
     if (!cols.length) return null;
     const vals = cols.map(c => (c === 'harga_normal' ? (parseFloat(data[c]) || 0) : data[c]));
     const sets = cols.map((c, i) => `"${c}"=$${i + 1}`);
@@ -186,10 +146,6 @@ function registerIpc() {
     return r.rows[0];
   });
 
-  ipcMain.handle('db:seedInitialData', async () => {
-    const r = await pg.query(`SELECT count(*)::int AS c FROM products`);
-    return { success: true, count: r.rows[0].c };
-  });
 }
 
 async function createWindow() {
@@ -200,9 +156,20 @@ async function createWindow() {
     titleBarOverlay: { color: '#0f172a', symbolColor: '#94a3b8', height: 38 },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: false, contextIsolation: true, webSecurity: false,
+      nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true,
     },
     backgroundColor: '#020617', show: false,
+  });
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    const allowed = url.startsWith('http://127.0.0.1:5174/') ||
+      url.startsWith('http://localhost:5173/');
+    return allowed ? { action: 'allow' } : { action: 'deny' };
+  });
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const allowed = url.startsWith('file:') ||
+      url.startsWith('http://127.0.0.1:5174/') ||
+      url.startsWith('http://localhost:5173/');
+    if (!allowed) event.preventDefault();
   });
   mainWindow.once('ready-to-show', () => mainWindow?.show());
 

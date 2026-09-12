@@ -33,8 +33,15 @@ Jalankan dari root repository menggunakan Node.js:
 node scripts/verify-application-boundaries.js
 node scripts/verify-deploy-readiness.js
 node scripts/audit-menu-hidup.js
+node scripts/verify-tenant-rls-coverage.cjs
+node scripts/scan-tracked-secrets.cjs
 git diff --check
 ```
+
+Untuk verifikasi database staging, jalankan query read-only
+[`db/checks/tenant_rls_coverage.sql`](db/checks/tenant_rls_coverage.sql) setelah migration
+diterapkan; gate statis tidak menggantikan bukti runtime `pg_policies` dan uji isolasi
+antar-tenant.
 
 Untuk perubahan yang menyentuh antrean, LIS, atau katalog, jalankan pemeriksaan khusus yang relevan di `scripts/`. Jangan menghubungkan atau menulis ke database produksi tanpa backup, preflight, runbook, dan persetujuan pemilik data.
 

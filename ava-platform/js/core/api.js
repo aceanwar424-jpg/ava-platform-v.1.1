@@ -8,7 +8,7 @@
 // Deteksi berbasis hostname; TIDAK mengubah perilaku deployment cloud.
 const _avaRuntimeConfig = (typeof window !== 'undefined' && window.AVA_RUNTIME_CONFIG) || {};
 // Fallback mempertahankan deployment lama; Vercel dapat menimpa URL ini per tenant.
-const SUPABASE_CLOUD_URL = _avaRuntimeConfig.supabaseUrl || 'https://rmyqzyfvlmjxtatpctks.supabase.co';
+const SUPABASE_CLOUD_URL = _avaRuntimeConfig.supabaseUrl || '';
 const _isLocalEngine = (typeof location !== 'undefined') &&
   (location.hostname === '127.0.0.1' || location.hostname === 'localhost' ||
    location.hostname.endsWith('.localhost'));
@@ -97,19 +97,22 @@ async function sbFetch(url, opts = {}) {
 
 async function sbGet(table, query='') {
   try {
+    if (!SUPABASE_URL || !SUPABASE_RUNTIME_KEY) {
+      throw new Error('Konfigurasi data runtime tidak tersedia');
+    }
     const res = await sbFetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || data.hint || JSON.stringify(data));
     return data;
   } catch (err) {
-    console.warn(`[Local Engine Fallback] Querying table '${table}' via SQLite:`, err);
-    if (table.includes('products') && window.parent?.api?.getProducts) {
-      return await window.parent.api.getProducts();
+    // Only the explicitly local Electron origin may use the local typed bridge.
+    // Cloud failures remain visible and never become success-shaped empty data.
+    if (_isLocalEngine && table === 'products') {
+      if (window.parent?.api?.getProducts) return await window.parent.api.getProducts();
+      if (window.api?.getProducts) return await window.api.getProducts();
     }
-    if (table.includes('products') && window.api?.getProducts) {
-      return await window.api.getProducts();
-    }
-    return [];
+    console.error(`[Data access failed] table '${table}':`, err);
+    throw err;
   }
 }
 

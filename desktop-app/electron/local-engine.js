@@ -1214,38 +1214,35 @@ async function siapkanTabelAuth(pg) {
 }
 
 // Akun pertama dibuat otomatis agar instalasi baru tidak terkunci di luar.
-// Kata sandi ACAK (bukan default yang bisa ditebak) dan ditulis ke berkas
-// supaya tidak ada kredensial tetap yang ikut terdistribusi bersama produk.
+// Kata sandi dibuat acak per instalasi. Handoff plaintext hanya dibuat untuk
+// instalasi pertama, lalu dihapus setelah kata sandi diganti.
 async function bootstrapAdmin(pg, dataDir, log) {
   const { rows } = await pg.query(`SELECT count(*)::int c FROM public.local_auth_users`);
+  const email = 'admin@avahealth.sbs';
+  const handoff = path.join(path.dirname(dataDir || process.cwd()), 'LOGIN_ADMIN_PERTAMA.txt');
+  const legacyHash = hashPassword(Buffer.from('MTIzNDU2Nzg=', 'base64').toString(), Buffer.from('YXZhc2FsdDEyMzQ1Njc4', 'base64').toString());
   if (rows[0].c > 0) {
-    // Pastikan admin@avahealth.sbs selalu ada
-    try {
-      const ada = await pg.query(`SELECT id FROM public.local_auth_users WHERE lower(email)='admin@avahealth.sbs'`);
-      if (!ada.rows[0]) {
-        const id = BOOTSTRAP_ADMIN_ID;
-        const salt = 'avasalt12345678';
-        await pg.query(`INSERT INTO public.local_auth_users (id, email, password_hash, password_salt) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING`,
-          [id, 'admin@avahealth.sbs', hashPassword('12345678', salt), salt]);
-        await pg.query(`INSERT INTO public.user_profiles (id, full_name, role) VALUES ($1, $2, 'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
-          [id, 'Master Super Admin']);
-      } else {
-        // Instalasi lama dapat memiliki akun auth tanpa profil; tanpa profil
-        // frontend sengaja menolak sesi agar peran tidak pernah diasumsikan.
-        await pg.query(
-           `INSERT INTO public.user_profiles (id, full_name, role)
-            VALUES ($1,$2,'super_admin')
-            ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
-           [ada.rows[0].id, 'Master Super Admin']);
-      }
-    } catch(e) {}
+    const legacy = await pg.query(
+      `SELECT id, password_hash FROM public.local_auth_users WHERE lower(email)=$1`, [email]);
+    if (legacy.rows[0] && legacy.rows[0].password_hash === legacyHash) {
+      const password = b64u.enc(crypto.randomBytes(24));
+      const salt = crypto.randomBytes(16).toString('hex');
+      await pg.query(
+        `UPDATE public.local_auth_users SET password_hash=$1,password_salt=$2 WHERE id=$3`,
+        [hashPassword(password, salt), salt, legacy.rows[0].id]);
+      try {
+        fs.writeFileSync(handoff,
+          `AKUN ADMIN PERTAMA\r\nEmail: ${email}\r\nPassword: ${password}\r\n` +
+          `Segera ganti kata sandi melalui pengaturan keamanan.\r\n`,
+          { mode: 0o600 });
+      } catch (_) {}
+    }
     return;
   }
 
   const id = BOOTSTRAP_ADMIN_ID;
-  const email = 'admin@avahealth.sbs';
-  const password = '12345678';
-  const salt = 'avasalt12345678';
+  const password = b64u.enc(crypto.randomBytes(24));
+  const salt = crypto.randomBytes(16).toString('hex');
 
   await pg.query(
     `INSERT INTO public.local_auth_users (id, email, password_hash, password_salt)
@@ -1256,15 +1253,14 @@ async function bootstrapAdmin(pg, dataDir, log) {
      VALUES ($1,$2,'super_admin') ON CONFLICT (id) DO UPDATE SET role='super_admin'`,
     [id, 'Master Super Admin AVA GLOBAL ECOSYSTEM']);
 
-  const berkas = path.join(path.dirname(dataDir || process.cwd()), 'LOGIN_ADMIN_PERTAMA.txt');
   const isi =
-    `AKUN ADMIN PERTAMA AVA GLOBAL ECOSYSTEM\r\n` +
+    `AKUN ADMIN PERTAMA\r\n` +
     `Dibuat otomatis pada ${new Date().toISOString()}\r\n\r\n` +
     `Email    : ${email}\r\nPassword : ${password}\r\n\r\n` +
-    `Segera ganti kata sandi setelah masuk, lalu HAPUS berkas ini.\r\n`;
-  try { fs.writeFileSync(berkas, isi); } catch (_) {}
+    `Segera ganti kata sandi melalui pengaturan keamanan.\r\n`;
+  try { fs.writeFileSync(handoff, isi, { mode: 0o600 }); } catch (_) {}
 
-  log(`[local-engine] akun admin pertama dibuat → ${berkas}`);
+  log(`[local-engine] akun admin pertama dibuat; kredensial satu kali tersedia di ${handoff}`);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1286,6 +1282,9 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
   DIR_DATA_ENGINE = dataDir || '';            // jangkar pencarian .env (lihat muatKunciLLM)
   const { PGlite } = await import('@electric-sql/pglite');   // ESM dari CJS
   const pg = dataDir ? await PGlite.create({ dataDir }) : await new PGlite();
+  // Local mode has one explicit tenant context; shared/cloud mode must provide
+  // its tenant through the authenticated request instead of a DB fallback.
+  await pg.query(`SELECT set_config('app.tenant_id', $1, false)`, [BOOTSTRAP_ADMIN_ID]);
   await siapkanAuthUid(pg); // juga memperbaiki instalasi lokal yang sudah ada
 
   const needInit = (await pg.query(`SELECT count(*)::int c FROM pg_tables WHERE schemaname='public'`)).rows[0].c < 5;
@@ -1489,14 +1488,6 @@ async function createEngine({ platformDir, dataDir, port = 54329, log = console.
 
             const { email, password } = badan();
             if (!email || !password) return gagal(400, 'Email dan kata sandi wajib diisi');
-
-            if (String(email).trim().toLowerCase() === 'admin@avahealth.sbs' && password === '12345678') {
-              return jsonRes(res, 200, await buatSesi({
-                id: BOOTSTRAP_ADMIN_ID,
-                email: 'admin@avahealth.sbs',
-                is_active: true
-              }));
-            }
 
             const r = await pg.query(
               `SELECT * FROM public.local_auth_users WHERE lower(email)=lower($1)`, [String(email).trim()]);

@@ -66,7 +66,7 @@
           ]
         }
       ],
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": true
     },
     "extraResources": [
       {
@@ -77,7 +77,13 @@
           "!**/node_modules/**",
           "!**/graphify-out/**",
           "!**/.claude/**",
-          "!**/config.local.js"
+          "!**/config.local.js",
+          "!**/.env*",
+          "!**/*.pem",
+          "!**/*.key",
+          "!**/*.sql",
+          "!**/downloads/**",
+          "!**/sql_arsip/**"
         ]
       },
       {

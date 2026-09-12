@@ -2,6 +2,30 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Remediasi audit keamanan dan kesiapan multi-tenant — 12 September 2026
+
+### Rencana dan checklist
+
+- [x] P0: menghapus kredensial bootstrap tetap dan jalur autentikasi desktop yang dapat ditebak.
+- [x] P0: menghapus SQL arbitrer dari boundary IPC Electron dan menggantinya dengan operasi bertipe.
+- [x] P0: mengkarantina material private-key serta memverifikasi isi history dan artefak rilis.
+- [x] P1: membuat tenant context cloud fail-closed dan memetakan cakupan RLS seluruh tabel operasional.
+- [x] P1: menonaktifkan fallback/mock pada mode produksi dan mengganti pencarian pasien berbasis nama.
+- [x] P1: memperkuat validator katalog, checker kepatuhan, assembler SMM, dan adapter LLM agar tidak menghasilkan false success.
+- [ ] P1/P2: memverifikasi migration chain, audit immutability, packaging, update signature, dan smoke test runtime.
+
+### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Perubahan ini menyentuh autentikasi, boundary tenant, IPC lokal, migrasi, dan keluaran klinis sehingga diperlakukan sebagai remediasi release-blocker. Tidak ada koneksi ke database produksi, perubahan master katalog, atau integrasi vendor dilakukan tanpa bukti staging, backup, preflight, runbook, dan persetujuan pemilik data. Data uji harus sintetis; private key tidak boleh disalin ke source atau artefak rilis. Perubahan kompatibilitas akan dipisahkan dari migrasi destruktif dan diverifikasi dengan regresi terarah.
+
+### Bukti
+
+- Audit awal menemukan fixed desktop credential, arbitrary SQL IPC, tenant fallback, RLS selektif, fallback/mock produksi, serta bukti runtime yang belum diuji.
+- Remediasi P0 diverifikasi: fixed credential/bypass dihapus, renderer IPC tidak lagi mengekspos SQL/table browsing, private key lokal dihapus, dan desktop build lulus.
+- Runtime config dan cloud data access kini fail-closed; EHR portal memerlukan `patient_id`; production LLM tidak lagi fallback ke mock; SMM menolak identitas tenant yang tidak lengkap.
+- Verifikasi 12 September: boundary/deploy/LIS checks lulus, auth/domain security 3+12 skenario lulus, desktop build lulus, dan master suite 17/17 lulus. Static tenant/RLS matrix serta validator catalog kemudian ditutup dengan gate otomatis.
+- Penutupan lanjutan: validator catalog, compliance checker, SMM assembler, dan LLM adapter diperketat; static tenant/RLS audit menemukan 7/7 tabel tenant-bearing tercakup; secret scan memeriksa 713 file tracked tanpa temuan. SQL runtime matrix tersedia di `db/checks/tenant_rls_coverage.sql` untuk staging.
+
 ## Perapihan repositori GitHub — 12 September 2026
 
 ### Rencana dan checklist
@@ -1812,3 +1836,14 @@ OWNED_BY: ava. Perbaikan dibatasi pada mekanisme sesi browser dan pesan akses. T
 - Environment `AVA_SUPABASE_URL` dan publishable `AVA_SUPABASE_ANON_KEY` telah disimpan pada Production project Vercel `avahelath.v1.1`, lalu deployment Production baru berhasil dibuat dari commit `0e653e8`. Tidak ada secret key, data klinis, atau perubahan Supabase yang dilakukan.
 - Pemeriksaan pascaredeploy memperjelas 503: respons domain privat berasal dari middleware dan berbunyi `Akses staf belum dikonfigurasi. Hubungi administrator.` Konfigurasi server masih tidak memiliki `AVA_STAFF_USER_IDS`, sehingga fail-closed mengunci HIS/LIS/ruang privat sebagaimana desain keamanan.
 - Pemulihan operasional selanjutnya membutuhkan `AVA_STAFF_USER_IDS` berisi UUID staf yang disetujui. UUID tidak akan ditebak atau dibaca dari Auth/database produksi tanpa checkpoint pemilik data. Setelah UUID disediakan/disetujui, tambahkan ke Production dan redeploy sekali lagi; baru uji login dengan akun yang memiliki `user_profiles` dan peran sah.
+
+## Presentasi klien AVA Global Ecosystem — 12 September 2026
+
+### Rencana dan checklist
+- [x] Pelajari blueprint bisnis, ringkasan discovery terbaru, serta batas sistem aplikasi.
+- [ ] Susun satu HTML mandiri: cerita perusahaan, enam pilar, portofolio sistem, peta alur, model bisnis, roadmap dan kemitraan.
+- [ ] Tambahkan navigasi presentasi, responsivitas, dan cetak PDF per slide.
+- [ ] Verifikasi struktur, interaksi dan tampilan; catat bukti serta batas penggunaan.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Materi khusus presentasi AVA kepada calon klien, bukan produk generik. Hanya ringkasan bisnis yang layak dibagikan; formula, harga privat, kontrak, identitas pasien, rahasia konfigurasi dan proyeksi internal tidak disertakan. Penekanan Care inklusif dan penjualan sistem mengikuti discovery terbaru, menggantikan blueprint lama. Status demo dibedakan dari roadmap; tidak mengklaim sertifikasi, pabrik aktif, traction, atau hasil klinis tanpa bukti. Tidak mengubah aplikasi operasional, skema, integrasi eksternal maupun deployment.

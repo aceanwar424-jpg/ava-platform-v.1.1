@@ -48,7 +48,7 @@ CREATE OR REPLACE FUNCTION public.current_tenant_id()
 RETURNS uuid AS $$
   SELECT COALESCE(
     NULLIF(current_setting('app.tenant_id', true), '')::uuid,
-    '00000000-0000-0000-0000-000000000001'::uuid
+    NULLIF(current_setting('request.jwt.claim.tenant_id', true), '')::uuid
   );
 $$ LANGUAGE sql STABLE;
 

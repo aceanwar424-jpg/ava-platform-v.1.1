@@ -37,8 +37,7 @@ let branchesFromDB = [];
 async function loadDataFromSupabase() {
   console.log("Loading live data from Supabase...");
   if (typeof sbGet !== 'function') {
-    console.warn("sbGet is not loaded. Using fallback mocks.");
-    return;
+    throw new Error("Data service is unavailable; production mode refuses mock data.");
   }
   
   try {
@@ -628,9 +627,12 @@ function closeXrayViewer() {
 }
 
 // --- LIVE PATIENT EHR (REKAM MEDIS) DATA FETCHERS ---
-async function loadPatientEHR(patientName) {
-  if (!patientName) return;
-  console.log("Loading patient EHR for:", patientName);
+async function loadPatientEHR(patientName, patientId) {
+  if (!patientId) {
+    console.warn("Patient EHR tidak dimuat tanpa patient_id yang stabil.");
+    return;
+  }
+  console.log("Loading patient EHR for:", patientId);
 
   let labs = [];
   let pres = [];
@@ -640,19 +642,19 @@ async function loadPatientEHR(patientName) {
   let medrecs = [];
 
   try {
-    labs = await sbGet('lab_results', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    labs = await sbGet('lab_results', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil lab_results:", e); }
 
   try {
-    pres = await sbGet('prescriptions', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    pres = await sbGet('prescriptions', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil prescriptions:", e); }
 
   try {
-    radOrders = await sbGet('radiology_orders', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    radOrders = await sbGet('radiology_orders', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil radiology_orders:", e); }
 
   try {
-    medrecs = await sbGet('medical_records', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    medrecs = await sbGet('medical_records', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil medical_records:", e); }
 
   if (pres.length > 0) {
@@ -3550,7 +3552,7 @@ async function applyRoleUIState(role) {
     if (memberNameEl) memberNameEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
 
     await loadDataFromSupabase();
-    await loadPatientEHR(currentUsername || 'Ace Darojatun Anwar');
+    await loadPatientEHR(currentUsername, currentUserProfile?.patient_id);
     showView('patient-view', 'Dashboard Utama Pasien');
   }
 }
