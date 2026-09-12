@@ -2,6 +2,39 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Perapihan repositori GitHub — 12 September 2026
+
+### Rencana dan checklist
+
+- [x] Buat baseline Git bersih dan cabang kerja khusus sebelum mengubah struktur.
+- [x] Inventaris entrypoint runtime, folder aktif, artefak build, arsip, duplikasi, dan seluruh referensi path.
+- [x] Klasifikasikan kandidat: pertahankan, arsipkan, abaikan dari Git, atau hapus; jangan menghapus kandidat sebelum pemeriksaan referensi.
+- [x] Rapikan struktur yang terbukti aman serta perbarui rujukan dokumentasi yang terdampak.
+- [x] Jalankan pemeriksaan boundary, menu, auth/security, deploy readiness, dan `git diff --check`; dokumentasikan bukti dan kandidat yang sengaja dipertahankan.
+
+### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Pekerjaan terbatas pada struktur source, artefak pengembangan, dan dokumentasi. Tidak mengubah database, migrasi yang telah dirilis, data pasien, kredensial, environment Vercel, atau domain produksi. Berkas historis yang memiliki nilai audit/ISO dipindahkan ke arsip terstruktur bila masih direferensikan; tidak dihapus. Penghapusan hanya untuk artefak yang terverifikasi tidak dilacak/dipakai dan tetap dapat dipulihkan dari riwayat Git.
+
+### Hasil inventaris dan keputusan
+
+- Root `vercel.json` adalah konfigurasi deploy kanonis dengan output `ava-platform/`; `ava-platform/vercel.json` dipertahankan sebagai konfigurasi historis dan diberi penegasan pada `README.md`.
+- `ava-platform/sql_arsip/` tetap dipertahankan: dipakai oleh mesin lokal, audit migrasi, dan merupakan rekam pembentukan skema. Jalur resmi tetap `db/migrations/`.
+- `ava-platform/downloads/ava-lis-connector-1.1.0.zip` tetap dipertahankan: direferensikan oleh manifest rilis, UI pengunduhan, dan skrip build connector.
+- Duplikasi logo dipertahankan karena setiap salinan melayani root/desktop/output statis berbeda; satu salinan aktif yang dipakai web berada di `ava-platform/css/logo-ava-global.png`.
+- `_karantina_*/`, `.env`, PGlite, connector lokal, dan kredensial tetap diabaikan Git. Tidak ada data lokal diubah atau dihapus.
+- Ditambahkan `README.md` dan `docs/README.md` sebagai titik orientasi agar struktur, jalur resmi, serta batas arsip mudah ditelusuri dari GitHub.
+
+### Bukti verifikasi
+
+- `node scripts/verify-application-boundaries.js` — lulus: 6 boundary valid, 17 domain terpetakan satu kali, seluruh entrypoint tersedia.
+- `node scripts/verify-deploy-readiness.js` — lulus: konfigurasi domain publik dan runtime config tervalidasi secara statis.
+- `node scripts/audit-menu-hidup.js` — lulus: 214 menu diperiksa; tidak ada layar mati, tabel/view/RPC/handler hilang, atau menu tanpa manifest.
+- `node scripts/uji/test_root_auth_session.cjs` — lulus: 3/3 skenario pemulihan sesi dan anti-login-loop.
+- `node scripts/uji/test_security_domains.cjs` — lulus: 12/12 skenario boundary domain, sesi staf, CSRF, cookie, dan runtime configuration.
+- `node scripts/verify-master-registry-contract.js` — lulus: 20 menu/domain sinkron.
+- `git diff --check` — lulus tanpa whitespace error.
+
 ## Verifikasi restrukturisasi sebelum melanjutkan LIS — 10 September 2026
 
 ### Rencana dan checklist
