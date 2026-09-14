@@ -152,6 +152,13 @@ window.PETA_MENU = {
               "ket": "Kesehatan mesin platform & ringkasan klien"
             },
             {
+              "id": "tech-control-plane",
+              "label": "Control Plane Produksi",
+              "status": "ada",
+              "ket": "Pusat konfigurasi, kesehatan tenant, telemetri, dan trace bug",
+              "admin": true
+            },
+            {
               "id": "tech-roadmap",
               "label": "Roadmap & Rilis",
               "status": "ada",

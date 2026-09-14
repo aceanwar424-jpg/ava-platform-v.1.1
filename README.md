@@ -35,6 +35,7 @@ node scripts/verify-deploy-readiness.js
 node scripts/audit-menu-hidup.js
 node scripts/verify-tenant-rls-coverage.cjs
 node scripts/scan-tracked-secrets.cjs
+node scripts/verify-desktop-artifact.cjs desktop-app/release
 git diff --check
 ```
 
@@ -42,6 +43,40 @@ Untuk verifikasi database staging, jalankan query read-only
 [`db/checks/tenant_rls_coverage.sql`](db/checks/tenant_rls_coverage.sql) setelah migration
 diterapkan; gate statis tidak menggantikan bukti runtime `pg_policies` dan uji isolasi
 antar-tenant.
+
+Control plane produksi berada di rute `tech-control-plane` pada domain Tech.
+Migration `0054_tech_control_plane_observability.sql` menambahkan heartbeat
+tenant-scoped yang persisten; heartbeat tidak boleh dianggap sehat bila RPC atau
+koneksi backend tidak tersedia.
+
+### Windows code signing
+
+Rilis desktop Windows menggunakan Microsoft Trusted Signing melalui workflow
+[`desktop-windows-signed.yml`](.github/workflows/desktop-windows-signed.yml).
+Workflow berhenti fail-closed bila konfigurasi signing belum tersedia,
+menandatangani `.exe`, memverifikasi Authenticode, lalu mengunggah artefak
+bertanda tangan.
+
+Tambahkan secret berikut pada GitHub Actions repository:
+
+- `TRUSTED_SIGNING_TENANT_ID`
+- `TRUSTED_SIGNING_CLIENT_ID`
+- `TRUSTED_SIGNING_CLIENT_SECRET`
+- `TRUSTED_SIGNING_ENDPOINT`
+- `TRUSTED_SIGNING_ACCOUNT_NAME`
+- `TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME`
+
+Service principal hanya boleh memiliki izin signing pada Trusted Signing
+account. Jangan menyimpan certificate, private key, atau secret tersebut di
+repository. Publikasi update `electron-updater` tetap harus dilakukan melalui
+release channel yang benar-benar terkonfigurasi.
+
+Konfigurasi signing sengaja ditunda sampai tenant/client pertama siap. Control
+Plane menampilkan status `NOT_CONFIGURED` tanpa membuat credential placeholder;
+nilai runtime nantinya diisi melalui jalur release terotorisasi, bukan melalui
+frontend atau database operasional.
+Migration `0055_tenant_rls_legacy_completion.sql` melengkapi boundary RLS tabel
+tenant-bearing lama yang ditemukan oleh audit coverage yang diperluas.
 
 Untuk perubahan yang menyentuh antrean, LIS, atau katalog, jalankan pemeriksaan khusus yang relevan di `scripts/`. Jangan menghubungkan atau menulis ke database produksi tanpa backup, preflight, runbook, dan persetujuan pemilik data.
 

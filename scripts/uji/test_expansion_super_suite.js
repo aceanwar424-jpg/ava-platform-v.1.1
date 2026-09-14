@@ -106,8 +106,8 @@ const hbRes = window.recordClientHeartbeat({
   db_size_mb: 520,
   daily_transactions: 185
 });
-assert(hbRes.success === true && hbRes.node.status === 'HEALTHY' && hbRes.node.latency_ms === 22,
-  'Pencatatan telemetri live heartbeat & kesehatan mesin faskes mitra berhasil (22ms)');
+assert(hbRes.success === false && /RPC telemetry/i.test(hbRes.error || ''),
+  'Heartbeat tanpa backend menolak false success dan meminta RPC telemetry persisten');
 
 const billRes = window.calculateSubscriptionBilling('TIER-PRO', 6200, 'MONTHLY');
 assert(billRes.base_price === 5500000 && billRes.overage_orders === 1200 && billRes.total_bill === 6700000,

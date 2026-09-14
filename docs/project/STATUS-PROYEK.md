@@ -12,7 +12,10 @@
 - [x] P1: membuat tenant context cloud fail-closed dan memetakan cakupan RLS seluruh tabel operasional.
 - [x] P1: menonaktifkan fallback/mock pada mode produksi dan mengganti pencarian pasien berbasis nama.
 - [x] P1: memperkuat validator katalog, checker kepatuhan, assembler SMM, dan adapter LLM agar tidak menghasilkan false success.
-- [ ] P1/P2: memverifikasi migration chain, audit immutability, packaging, update signature, dan smoke test runtime.
+- [x] P1/P2: menyediakan control plane Tech, migration observability, RLS completion, artifact gates, dan smoke-test contracts secara lokal.
+- [x] P1/P2: migration chain dan RLS `0054/0055` diterapkan oleh pemilik database dan dilaporkan aman.
+- [ ] P1/P2 (blocked external): menguji update signature end-to-end dan smoke test runtime staging.
+- [x] P2: membangun portable/NSIS artifact dan memindai isi artefak final tanpa secret sensitif.
 
 ### Implikasi IP & Kepatuhan
 
@@ -25,6 +28,18 @@ OWNED_BY: ava. Perubahan ini menyentuh autentikasi, boundary tenant, IPC lokal, 
 - Runtime config dan cloud data access kini fail-closed; EHR portal memerlukan `patient_id`; production LLM tidak lagi fallback ke mock; SMM menolak identitas tenant yang tidak lengkap.
 - Verifikasi 12 September: boundary/deploy/LIS checks lulus, auth/domain security 3+12 skenario lulus, desktop build lulus, dan master suite 17/17 lulus. Static tenant/RLS matrix serta validator catalog kemudian ditutup dengan gate otomatis.
 - Penutupan lanjutan: validator catalog, compliance checker, SMM assembler, dan LLM adapter diperketat; static tenant/RLS audit menemukan 7/7 tabel tenant-bearing tercakup; secret scan memeriksa 713 file tracked tanpa temuan. SQL runtime matrix tersedia di `db/checks/tenant_rls_coverage.sql` untuk staging.
+- Verifikasi artefak lokal: `npm run package:exe` berhasil membuat portable Windows artifact; `node scripts/verify-desktop-artifact.cjs desktop-app/release` memeriksa 701 file tanpa private key, credential value, env, atau database artifact sensitif. Migration SQL dan public license key yang diperlukan local runtime tetap diizinkan secara eksplisit.
+- Verifikasi lanjutan 12 September: `verify-lis-integrity.cjs`, `verify-lis-his-sync.cjs`, menu/security audit, auth/domain security, boundary/deploy, tenant-RLS static, dan secret scan lulus. `db-parity-local-authoritative.cjs` berhenti fail-closed karena URL Supabase tidak disediakan; tidak ada akses cloud yang dicoba.
+- Verifikasi penutupan lokal 12 September 15:07 WIB: master suite 17/17 lulus, 253 file source lulus `node --check`, desktop build lulus, LIS integrity dan LIS-HIS sync lulus, public editorial check lulus, artifact scan 703 file lulus, tenant RLS static 7/7 lulus, secret scan 719 file lulus, dan deploy boundary lulus. Sisa checklist utama secara teknis membutuhkan URL/credential staging, database staging, update channel, dan UAT perangkat/vendor; environment tersebut tidak tersedia di workspace ini sehingga gate tetap fail-closed.
+- Control plane Tech ditambahkan: rute `tech-control-plane` menyatukan status konfigurasi, tenant, heartbeat instalasi, telemetri, audit, dan pelacakan bug; migration `0054_tech_control_plane_observability.sql` menyimpan heartbeat tenant-scoped dengan RLS dan RPC yang menolak tenant mismatch. Telemetri lokal tanpa backend kini menolak false success.
+- Audit RLS diperluas untuk mendeteksi tenant_id langsung pada definisi tabel; temuan 10 tabel legacy ditutup melalui `0055_tenant_rls_legacy_completion.sql`. Static coverage gate kini memeriksa 29 tabel tenant-bearing dan seluruhnya memiliki migration RLS completion.
+- Verifikasi control plane: menu hidup 215, audit keamanan 2.836/2.836, master suite 17/17, contract heartbeat lulus, deploy boundary lulus, dan RLS static coverage 29/29.
+- Perbaikan error `0054`: migration kini memiliki compatibility guard untuk database yang belum menjalankan `0004_tenancy.sql`; guard membuat registry tenant minimal dan `current_tenant_id()` tanpa seed tenant cloud. RLS heartbeat tetap fail-closed berdasarkan tenant context.
+- Konfirmasi pemilik 12 September 2026 18:01 WIB: seluruh file SQL migration/check terkait sudah dijalankan pada database target dan aman. Bukti lokal sesudah aktivasi: RLS static 29/29, master suite 17/17, LIS integrity/sync lulus, menu 215 bersih, audit keamanan 2.836/2.836, 254 file syntax-valid, secret scan 719 file, boundary/deploy readiness lulus.
+- Smoke test `https://tech.avahealth.sbs` menemukan dua masalah deployment yang diperbaiki di source: referensi production ke `js/config.local.js` yang menghasilkan 404/MIME error dihapus, dan request status LLM gateway tidak lagi mengirim header `Prefer` yang memicu CORS preflight rejection.
+- Integrasi Microsoft Trusted Signing disiapkan melalui workflow GitHub Actions `desktop-windows-signed.yml`; workflow fail-closed tanpa enam secret Trusted Signing, menandatangani `.exe`, memverifikasi Authenticode, lalu mengunggah artefak bertanda tangan. Private key tidak disimpan di repository.
+- Pengisian Trusted Signing ditunda sampai client/tenant tersedia. Control Plane menampilkan `NOT_CONFIGURED` secara jujur; tidak ada secret placeholder, private key, atau konfigurasi produksi palsu yang dibuat.
+- Presentasi ekosistem diperjelas: Ace Darojatun Anwar diposisikan sebagai Owner, Founder & CEO dengan visi faskes preventif-promotif-kuratif; AVA Global Ecosystem dijelaskan sebagai bisnis kesehatan hulu-hilir, sedangkan AVA Tech sebagai mesin digital sekaligus komersial yang lahir dari operasi nyata dan membuka partnership hotel, F&B, gym, olahraga, wellness, serta mitra lain.
 
 ## Perapihan repositori GitHub — 12 September 2026
 
@@ -846,9 +861,9 @@ Pengguna menegaskan semua domain selain www harus membutuhkan akun staf. Gerbang
 
 ## Web publik AVA Health â€” 2026-09-05
 - [x] Audit sumber portal, pemetaan domain, dan perubahan pengguna.
-- [ ] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
-- [ ] Satukan login ke apps.avahealth.sbs.
-- [ ] Verifikasi struktur, navigasi, aset, dan routing; catat bukti.
+- [x] Rombak portal menjadi profil perusahaan dengan detail brand dan katalog publik.
+- [x] Satukan login ke apps.avahealth.sbs.
+- [x] Verifikasi struktur, navigasi, aset, dan routing; catat bukti.
 
 ## Web publik AVA Health â€” hasil 2026-09-05
 - [x] Profil perusahaan, enam detail brand, delapan kategori produk/layanan, filter, perjalanan bisnis, sertifikasi, dan kontak.
@@ -1841,9 +1856,65 @@ OWNED_BY: ava. Perbaikan dibatasi pada mekanisme sesi browser dan pesan akses. T
 
 ### Rencana dan checklist
 - [x] Pelajari blueprint bisnis, ringkasan discovery terbaru, serta batas sistem aplikasi.
-- [ ] Susun satu HTML mandiri: cerita perusahaan, enam pilar, portofolio sistem, peta alur, model bisnis, roadmap dan kemitraan.
-- [ ] Tambahkan navigasi presentasi, responsivitas, dan cetak PDF per slide.
-- [ ] Verifikasi struktur, interaksi dan tampilan; catat bukti serta batas penggunaan.
+- [x] Susun satu HTML mandiri: cerita perusahaan, enam pilar, portofolio sistem, peta alur, model bisnis, roadmap dan kemitraan.
+- [x] Tambahkan navigasi presentasi, responsivitas, dan cetak PDF per slide.
+- [x] Verifikasi struktur, interaksi dan tampilan; catat bukti serta batas penggunaan.
+
+Bukti: `docs/client/AVA-GLOBAL-ECOSYSTEM.html` berisi 23 slide mandiri, kontrol pilih
+slide, mode presentasi, navigasi keyboard, responsive CSS, print CSS, dan tidak
+memuat analytics atau library eksternal. Verifikasi file lokal dan browser preview
+lulus pada 12 September 2026. Tautan kontak eksternal hanya membuka email/WhatsApp/
+situs bisnis dan tidak diklaim sebagai integrasi aplikasi.
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: ava. Materi khusus presentasi AVA kepada calon klien, bukan produk generik. Hanya ringkasan bisnis yang layak dibagikan; formula, harga privat, kontrak, identitas pasien, rahasia konfigurasi dan proyeksi internal tidak disertakan. Penekanan Care inklusif dan penjualan sistem mengikuti discovery terbaru, menggantikan blueprint lama. Status demo dibedakan dari roadmap; tidak mengklaim sertifikasi, pabrik aktif, traction, atau hasil klinis tanpa bukti. Tidak mengubah aplikasi operasional, skema, integrasi eksternal maupun deployment.
+
+### Penajaman narasi dari pemilik — 12 September 2026
+Arahan terbaru: nama lengkap Ace Darojatun Anwar (Owner, Founder & CEO). Tujuan pendirian adalah ekosistem bisnis kesehatan milik sendiri dari hulu ke hilir, mencakup preventif, promotif, pengobatan, wellness, nutrisi dan aspirasi pabrik obat. Sistem lahir dari kebutuhan operasional; AVA Tech mengelola aset teknologi dan membuka komersialisasi/kemitraan. Tambahkan model kolaborasi hotel/MCU, F&B/challenge/voucher dalam Apps, gym/olahraga. Semua contoh kemitraan tetap rancangan, bukan klaim kerja sama aktif. Implikasi IP & Kepatuhan tetap berlaku; tidak menampilkan janji efek kesehatan atau kemampuan challenge/reward sebagai fitur yang sudah tersedia.
+
+### Penyelesaian & verifikasi edisi 1.1 — 13 September 2026
+- Versi terkini terdiri atas **25 slide** (menggantikan hitungan 23 pada catatan awal), dengan nama lengkap Ace Darojatun Anwar, cerita ekosistem usaha sendiri, asal AVA Tech dari kebutuhan operasional, serta contoh kemitraan hotel/MCU dan F&B/gym/challenge/voucher.
+- Perubahan presentasi dibatasi pada HTML klien dan catatan ini; perubahan aplikasi/database dari task lain tidak disentuh.
+- Perbaikan cetak: tujuh halaman padat sebelumnya melampaui/berimpit area footer. Pengaturan tipografi dan jarak khusus cetak diperbaiki; pengukuran DOM menggunakan salinan CSS cetak pada ukuran A4 lanskap menunjukkan **25/25 halaman** memiliki jarak positif ke footer (minimum 17 px). Salinan uji sementara `__print-check.html` dihapus agar hanya satu HTML distribusi tersisa.
+- Browser: **25/25 slide** muat pada viewport desktop 1280×720 dalam mode presentasi; dropdown, End, Escape dan kembali ke 25 halaman mode baca berhasil. Viewport 390×844 tidak menghasilkan overflow horizontal ataupun tabrakan konten-footer. Override viewport dikembalikan.
+- Screenshot halaman kemitraan wellness ditinjau secara visual: heading, empat tahap challenge/reward, tiga kartu manfaat dan catatan terbaca tanpa clipping.
+- Node memvalidasi sintaks JS, 25 section, ID unik, logo tertanam, dan tanpa dependency runtime eksternal. HTML dapat dibuka langsung dari file.
+- Tombol Cetak / PDF menggunakan dialog cetak browser dengan aturan A4 lanskap; pemeriksaan di atas memvalidasi layout CSS cetak, **bukan** bukti ekspor PDF aktual. Pilih Save as PDF pada Chrome/Edge untuk menghasilkan PDF dan matikan header/footer browser.
+- Foto founder tetap ruang foto resmi. Pabrik obat, program mitra dan fitur reward ditandai sebagai arah/rancangan, bukan klaim operasi atau fitur aktif.
+
+## Foto founder & penguatan narasi korporat — 13 September 2026
+### Rencana
+- [ ] Tempatkan foto pilihan pemilik di HTML mandiri dan profil founder website.
+- [ ] Perjelas visi, misi, enam nilai, peran pilar, asal AVA Tech dan arah kolaborasi; selaraskan cerita web dan presentasi.
+- [ ] Verifikasi gambar, tautan lokal, layout presentasi/print dan website.
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Foto diberikan dan diizinkan pemilik untuk materi AVA. Salin aset asli tanpa mengubah wajah; gunakan CSS untuk penempatan. Konten mengikuti penjelasan pemilik; status pengembangan, demo, fasilitas/produk dan rencana pabrik tetap dibedakan. Tidak mengubah sistem klinis, data pasien, skema atau integrasi. Perubahan website dilakukan pada sumber lokal; publikasi produksi tidak diasumsikan telah terjadi.
+
+### Hasil foto & narasi — 14 September 2026
+- [x] Foto pilihan pemilik disalin ke `ava-platform/public/assets/ace-darojatun-anwar.png`; ditampilkan pada Tentang AVA dan Founder. Foto asli disematkan ke HTML presentasi sehingga tetap mandiri/offline.
+- [x] Presentasi edisi 1.2 sekarang **27 slide**: tambahan visi/misi per pilar dan enam nilai beserta penerapan. Website Tentang, Founder, Sejarah dan keenam brand diperjelas: tujuan, cara menjalankan, manfaat yang dituju, serta asal teknologi dari kebutuhan operasional.
+- [x] Browser mengonfirmasi gambar founder 1024 px termuat pada website dan presentasi. Screenshot slide founder ditinjau; foto tidak terdistorsi dan identitas lengkap terbaca.
+- [x] Seluruh 27 halaman lulus pengukuran batas konten-footer menggunakan CSS cetak A4 pada salinan uji. Halaman misi diperbaiki setelah ditemukan terlalu padat; salinan uji dihapus. Ini verifikasi layout cetak, bukan ekspor PDF aktual.
+- [x] Sintaks JavaScript, jumlah slide, dua aset gambar tertanam dan penggantian placeholder web lulus pemeriksaan Node.
+- Website diperbarui pada sumber lokal; tidak ada publikasi/deploy produksi dalam pekerjaan ini. Konten yang belum dapat dibuktikan (pabrik aktif, daftar fasilitas/izin, produk siap edar, mitra aktif, tahun pencapaian) tidak direka.
+
+## Perapihan editorial dan arah strategis — 14 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Rapikan perataan, hierarki teks, kolom dan keseimbangan slide; kurangi pengulangan dan pisahkan gagasan strategis agar narasi bernilai. Tegaskan kualitas serta pelayanan dalam ekosistem end-to-end. Tekanan harga aplikasi dibingkai sebagai skenario strategis dari arahan pemilik, bukan ramalan pasar atau klaim data riset. Tidak mengubah sistem klinis, data, atau deploy. Verifikasi layout presentasi/cetak dan web setelah perubahan.
+### Hasil perapihan edisi 1.3
+- Presentasi menjadi 30 halaman: misi dipisah agar terbaca, ditambah arah masa depan dan tujuan pertumbuhan/ukuran mutu. Judul, lebar teks, perataan paragraf, tinggi judul kartu dan ritme jarak diselaraskan; nomor bagian yang bersaing dengan nomor halaman dihapus.
+- Paragraf naratif kolom lebar rata kiri-kanan, kartu/tabel tetap rata kiri, ponsel kembali rata kiri untuk mencegah rongga kata. Website Tentang dan AVA Tech mendapat arah strategi kualitas/pelayanan yang sama, dengan gaya baca diselaraskan pada cerita dan profil.
+- Skenario tekanan harga digital dijelaskan sebagai alasan membangun nilai dari kemampuan operasional, kesinambungan layanan, dukungan dan kemitraan. Tidak menyatakan ramalan pasti, keunggulan kompetitif terukur atau target finansial tanpa data.
+- Seluruh 30 halaman lulus pengukuran batas konten-footer dalam CSS cetak A4. Screenshot slide strategi ditinjau pada 1280×720, footer berada dalam viewport dan isi terbaca. Sintaks JS lulus. File uji cetak sementara dihapus. Belum ekspor PDF aktual atau deploy web produksi.
+
+## Penguatan Nutrition, Wellness, Sanctuary & beranda — 14 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perjelas visi/misi serta rancangan sistem produksi dan wellness, tampilkan di presentasi dan website utama. Tambahkan visual fasilitas sesuai aset berizin yang tersedia dengan keterangan ilustratif. Pengguna meminta penerapan ke avahealth.sbs; publikasi dibatasi aset publik, tanpa membawa perubahan sistem klinis dari task lain. Pabrik dan modul operasional baru tetap roadmap. Pembuatan visual imagegen diblokir kuota (429 usage_limit_reached); tidak beralih ke API berbayar tanpa permintaan pengguna.
+
+### Hasil dan bukti verifikasi
+- [x] Nutrition, Care & Wellness, dan Sanctuary memiliki visi, tiga misi, model kemitraan dan rancangan sistem operasional yang lebih terperinci. Produksi mencakup bahan/lot, batch, QC, distribusi dan penelusuran; wellness mencakup peserta, program, jadwal, mitra dan evaluasi; Sanctuary mencakup ruang, staf, aset dan pengalaman kunjungan. Semua modul baru dinyatakan sebagai rancangan.
+- [x] Beranda memakai hero dua kolom dan galeri tiga ilustrasi SVG orisinal: klinik, produksi, wellness. Caption menyebut ilustrasi konsep, bukan dokumentasi fasilitas aktif. Imagegen gagal karena kuota; tidak ada foto fasilitas pihak ketiga yang digunakan.
+- [x] HTML klien edisi 1.4 menjadi 31 halaman; visi/misi tiga lini diperbarui dan ditambah sistem produksi/wellness. Pengukuran layout cetak pada 31 halaman tidak menemukan clipping terhadap footer. Ini pengujian CSS cetak, bukan ekspor PDF aktual. Fixture __print-check.html dihapus setelah verifikasi.
+- [x] Pemeriksaan deploy-readiness dan git diff --check lulus. Rilis dibuat dari origin/main pada worktree terpisah D:/AVAQUEEN-public-release-20260914, hanya 15 file publik; perubahan aplikasi operasional task lain tidak disertakan.
+- [x] Commit 73e3fdddcd78db459f89c8156cfb29737eccece5 diterbitkan ke main. GitHub status Vercel success: Deployment has completed pada 2026-09-14 00:28:06 UTC. https://www.avahealth.sbs/ mengembalikan 200 dan hero baru.
+- [x] Isi produksi portal, stylesheet dan tiga halaman brand cocok dengan lokal setelah normalisasi line ending; ketiga SVG cocok byte-for-byte dan HTTP 200. Browser ponsel 390x844 pada beranda dan Nutrition tidak overflow horizontal (scrollWidth 375). Screenshot hero ponsel ditinjau: judul, paragraf, CTA dan ilustrasi tersusun jelas. Override viewport dikembalikan setelah uji.

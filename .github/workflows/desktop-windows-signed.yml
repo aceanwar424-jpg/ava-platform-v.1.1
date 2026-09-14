@@ -1,0 +1,85 @@
+name: Build signed AVA Desktop
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  windows-signed:
+    runs-on: windows-latest
+    env:
+      TS_TENANT_ID: ${{ secrets.TRUSTED_SIGNING_TENANT_ID }}
+      TS_CLIENT_ID: ${{ secrets.TRUSTED_SIGNING_CLIENT_ID }}
+      TS_CLIENT_SECRET: ${{ secrets.TRUSTED_SIGNING_CLIENT_SECRET }}
+      TS_ENDPOINT: ${{ secrets.TRUSTED_SIGNING_ENDPOINT }}
+      TS_ACCOUNT_NAME: ${{ secrets.TRUSTED_SIGNING_ACCOUNT_NAME }}
+      TS_CERTIFICATE_PROFILE_NAME: ${{ secrets.TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME }}
+    steps:
+      - name: Check Trusted Signing configuration
+        shell: pwsh
+        run: |
+          $missing = @(
+            @{ Name = "TRUSTED_SIGNING_TENANT_ID"; Value = $env:TS_TENANT_ID },
+            @{ Name = "TRUSTED_SIGNING_CLIENT_ID"; Value = $env:TS_CLIENT_ID },
+            @{ Name = "TRUSTED_SIGNING_CLIENT_SECRET"; Value = $env:TS_CLIENT_SECRET },
+            @{ Name = "TRUSTED_SIGNING_ENDPOINT"; Value = $env:TS_ENDPOINT },
+            @{ Name = "TRUSTED_SIGNING_ACCOUNT_NAME"; Value = $env:TS_ACCOUNT_NAME },
+            @{ Name = "TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME"; Value = $env:TS_CERTIFICATE_PROFILE_NAME }
+          ) | Where-Object { [string]::IsNullOrWhiteSpace($_.Value) }
+          if ($missing.Count -gt 0) {
+            $names = ($missing | ForEach-Object { $_.Name }) -join ", "
+            throw "Missing required GitHub Actions secrets: $names"
+          }
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: desktop-app/package-lock.json
+
+      - name: Install desktop dependencies
+        working-directory: desktop-app
+        run: npm ci
+
+      - name: Build Windows artifacts
+        working-directory: desktop-app
+        run: npm run package:unsigned
+
+      - name: Sign Windows artifacts with Microsoft Trusted Signing
+        uses: azure/trusted-signing-action@v0
+        with:
+          azure-tenant-id: ${{ secrets.TRUSTED_SIGNING_TENANT_ID }}
+          azure-client-id: ${{ secrets.TRUSTED_SIGNING_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.TRUSTED_SIGNING_CLIENT_SECRET }}
+          endpoint: ${{ secrets.TRUSTED_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ secrets.TRUSTED_SIGNING_ACCOUNT_NAME }}
+          certificate-profile-name: ${{ secrets.TRUSTED_SIGNING_CERTIFICATE_PROFILE_NAME }}
+          files-folder: ${{ github.workspace }}\desktop-app\release
+          files-folder-filter: exe
+          files-folder-recurse: true
+
+      - name: Verify Authenticode signatures
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path "$env:GITHUB_WORKSPACE\desktop-app\release" -Filter *.exe -Recurse
+          if ($files.Count -eq 0) { throw "No Windows executable was produced." }
+          foreach ($file in $files) {
+            $signature = Get-AuthenticodeSignature -FilePath $file.FullName
+            if ($signature.Status -ne "Valid") {
+              throw "Invalid Authenticode signature for $($file.FullName): $($signature.Status)"
+            }
+            Write-Host "$($file.Name): $($signature.SignerCertificate.Subject)"
+          }
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ava-desktop-windows-signed
+          path: desktop-app/release/*
+          if-no-files-found: error

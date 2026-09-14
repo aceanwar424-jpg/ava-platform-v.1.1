@@ -177,16 +177,22 @@ function ttGambar() {
 function ttGantiPeriode(p) { ttPeriode = p; ttGambar(); }
 
 function recordClientHeartbeat(data = {}) {
-  return {
-    success: true,
-    node: {
-      client_id: data.client_id || 'CLI-001',
-      name: data.name || 'Client',
-      status: 'HEALTHY',
-      latency_ms: data.latency_ms || 20,
-      timestamp: new Date().toISOString()
-    }
-  };
+  if (typeof sbRpc !== 'function') {
+    return { success: false, error: 'RPC telemetry belum tersedia.' };
+  }
+  if (!data.tenant_id || !data.client_id) {
+    return { success: false, error: 'tenant_id dan client_id wajib diisi.' };
+  }
+  return sbRpc('tech_record_client_heartbeat', {
+      p_tenant: data.tenant_id,
+      p_client_id: data.client_id,
+      p_client_name: data.name || null,
+      p_app_version: data.app_version || null,
+      p_status: data.status || 'HEALTHY',
+      p_latency_ms: data.latency_ms == null ? null : Number(data.latency_ms),
+      p_metadata: data.metadata || {},
+    }).then(result => ({ success: true, node: result }))
+    .catch(error => ({ success: false, error: error.message || String(error) }));
 }
 
 window.renderTechTelemetry = renderTechTelemetry;

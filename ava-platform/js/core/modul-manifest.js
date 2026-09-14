@@ -1866,28 +1866,40 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech_saas": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "license-manager": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "saas-console": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
+ ],
+ "tech-control-plane": [
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "lis-phlebotomy": [
   "modules/lab/qcEngine.js",
@@ -2664,28 +2676,32 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech-telemetri": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech-harga": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tenants": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "db-studio": [
   "modules/system/config/config_family.js",
@@ -2708,28 +2724,32 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech-modul": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech-isu": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "tech-sprint": [
   "modules/tech-platform/techLicenseActivation.js",
   "modules/tech-platform/techPricingPlans.js",
   "modules/tech-platform/techTelemetry.js",
   "modules/tech-platform/tech_saas.js",
-  "modules/tech-platform/tenants.js"
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js"
  ],
  "apps-hub": [
   "modules/system/config/config_family.js",
@@ -3264,5 +3284,6 @@ window.MODUL_SEMUA = [
  "modules/tech-platform/techPricingPlans.js",
  "modules/tech-platform/techTelemetry.js",
  "modules/tech-platform/tech_saas.js",
- "modules/tech-platform/tenants.js"
+ "modules/tech-platform/tenants.js",
+ "modules/tech-platform/techControlPlane.js"
 ];

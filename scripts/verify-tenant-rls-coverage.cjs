@@ -12,6 +12,13 @@ for (const file of files) {
   for (const match of sql.matchAll(/CREATE TABLE IF NOT EXISTS public\.([a-z0-9_]+)/gi)) {
     tables.set(match[1], tables.get(match[1]) || { file, tenant: false });
   }
+  for (const match of sql.matchAll(
+    /CREATE TABLE IF NOT EXISTS public\.([a-z0-9_]+)\s*\(([\s\S]*?)\);/gi
+  )) {
+    const table = tables.get(match[1]) || { file, tenant: false };
+    if (/\btenant_id\s+uuid\b/i.test(match[2])) table.tenant = true;
+    tables.set(match[1], table);
+  }
   for (const match of sql.matchAll(/ALTER TABLE public\.([a-z0-9_]+)\s+ADD COLUMN IF NOT EXISTS tenant_id\b/gi)) {
     const table = tables.get(match[1]) || { file, tenant: false };
     table.tenant = true;
@@ -21,6 +28,13 @@ for (const file of files) {
   if (file === '0053_tenant_rls_completion.sql') {
     rls.add('user_profiles');
     rls.add('admissions');
+  }
+  if (file === '0055_tenant_rls_legacy_completion.sql') {
+    [
+      'sys_number_registry', 'sys_number_void', 'permits',
+      'service_activity_map', 'person_contact', 'person_brand_link',
+      'person_merge_log', 'rbac_user_roles', 'tenant_pemakaian', 'tech_lisensi'
+    ].forEach(table => rls.add(table));
   }
 }
 

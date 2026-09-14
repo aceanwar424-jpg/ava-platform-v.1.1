@@ -430,6 +430,7 @@ async function navigate(page, params={}) {
     case 'tech_saas':
     case 'license-manager':
     case 'saas-console':safeRun('renderTechSaas', params);           break;
+    case 'tech-control-plane': safeRun('renderTechControlPlane');    break;
     case 'lis-phlebotomy':
     case 'phlebotomy':  safeRun('renderPhlebotomy');                 break;
     case 'lis-kelayakan':

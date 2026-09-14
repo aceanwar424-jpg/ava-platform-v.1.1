@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 217 — 🟢 217 ada · 🟡 0 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 218 — 🟢 218 ada · 🟡 0 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -57,6 +57,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Cockpit AVA Tech | `saas-console` | Kesehatan mesin platform & ringkasan klien |
+| 🟢 | Control Plane Produksi | `tech-control-plane` | Pusat konfigurasi, kesehatan tenant, telemetri, dan trace bug |
 | 🟢 | Roadmap & Rilis | `tech-roadmap` | Rencana versi, catatan rilis, status fase |
 | 🟢 | Katalog Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
 | 🟢 | Lacak Bug & Permintaan | `tech-isu` | Antrean perbaikan dan permintaan fitur dari klien |

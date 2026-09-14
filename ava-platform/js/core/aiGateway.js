@@ -36,7 +36,10 @@ const AIGateway = {
   async loadKeysFromGateway() {
     try {
       const res = await fetch(`${SUPABASE_URL}/functions/v1/llm-gateway/status`, {
-        headers: { ...SB_HEADERS },
+        headers: {
+          apikey: SUPABASE_RUNTIME_KEY,
+          Authorization: ['Bearer', SUPABASE_RUNTIME_KEY].join(' '),
+        },
       });
       if (!res.ok) return false;
       const d = await res.json();
@@ -58,7 +61,8 @@ const AIGateway = {
   },
 
   // Cadangan bila gerbang tidak tersedia (mis. deployment lama).
-  // Sumber: window.AVA_KEYS → js/config.local.js, lalu localStorage.
+  // Sumber lokal hanya untuk instalasi desktop/development; deployment web
+  // menggunakan status gateway dan tidak memuat berkas config lokal.
   loadKeys() {
     const seen = new Set();
     const pool = [];
@@ -91,7 +95,7 @@ const AIGateway = {
 
     this.state.keyPool = pool;
     if (!pool.length) {
-      console.warn('[AI Gateway] Pool kosong. Salin js/config.local.example.js → js/config.local.js, atau tambah key lewat Monitor Kuota.');
+      console.warn('[AI Gateway] Pool kosong. Gunakan gateway server atau tambah key melalui Monitor Kuota.');
     }
   },
 
