@@ -49,6 +49,29 @@ body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea
 body.ava-ops-shell input:focus, body.ava-ops-shell select:focus, body.ava-ops-shell textarea:focus { border-color: var(--ava-emerald); box-shadow: 0 0 0 3px rgba(8,127,107,.13); outline: 0; }
 body.ava-ops-shell .modal-box { border-color: var(--ava-line); box-shadow: 0 24px 70px rgba(16,46,48,.22); }
 
+/* Login gate is rendered inline by the shell; these scoped overrides keep it
+   in the same editorial family without touching authentication behavior. */
+body.ava-ops-shell > div:first-child {
+  background: radial-gradient(circle at 12% 10%, #e7f3ee 0, transparent 34%),
+              radial-gradient(circle at 88% 90%, #fdf8e7 0, transparent 30%),
+              var(--ava-paper) !important;
+}
+body.ava-ops-shell > div:first-child > div {
+  background: rgba(255,255,255,.96) !important;
+  border-color: rgba(184,145,43,.38) !important;
+  box-shadow: 0 22px 60px rgba(21,60,61,.14) !important;
+  color: var(--ava-ink) !important;
+}
+body.ava-ops-shell > div:first-child h1 { color: var(--ava-ink) !important; }
+body.ava-ops-shell > div:first-child p { color: var(--ava-muted) !important; }
+body.ava-ops-shell > div:first-child p[style*="D4AF37"] { color: var(--ava-gold) !important; }
+body.ava-ops-shell > div:first-child > div > div[style*="rgba(255,255,255"] { background: var(--ava-emerald-soft) !important; border-color: rgba(8,127,107,.18) !important; }
+body.ava-ops-shell > div:first-child input { background: #fff !important; color: var(--ava-ink) !important; border-color: var(--ava-line) !important; }
+body.ava-ops-shell > div:first-child input::placeholder { color: #86938f !important; }
+body.ava-ops-shell > div:first-child #btn-login { background: linear-gradient(135deg,var(--ava-emerald),var(--ava-emerald-dark)) !important; box-shadow: 0 5px 15px rgba(8,127,107,.24) !important; }
+body.ava-ops-shell > div:first-child .auth-tab.active { color: var(--ava-emerald) !important; border-bottom-color: var(--ava-emerald) !important; }
+body.ava-ops-shell > div:first-child #auth-tabs { border-bottom-color: var(--ava-line) !important; }
+
 /* Self-service kiosk */
 body.ava-kiosk-shell { background: var(--ava-paper); color: var(--ava-ink); }
 body.ava-kiosk-shell .kiosk-container { max-width: 1480px; }
