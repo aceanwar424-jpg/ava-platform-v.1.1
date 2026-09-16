@@ -1976,3 +1976,12 @@ OWNED_BY: ava. Perbaikan hanya menyentuh presentasi dropdown Google Places dan i
 - [x] Dropdown `.pac-container` diberi z-index tinggi, permukaan putih, teks kontras, hover state dan shadow agar tidak tertutup kartu atau menjadi strip gelap pada tema operasional.
 - [x] Input lokasi dipaksa memakai latar putih dan teks AVA ink agar nilai yang diketik tetap terbaca pada shell gelap.
 - [x] `git diff --check` lulus. Pengujian visual Google Places tetap memerlukan API key aktif dan dapat dilakukan setelah stylesheet dipublikasikan.
+
+## Audit tema dan sidebar operasional — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Audit dan perapihan hanya mengubah presentasi UI: satu keluarga font, token warna permukaan/teks, kontras tabel/form, serta perilaku buka-tutup sidebar. Tidak mengubah rute, RBAC, data klinis, atau alur layanan.
+### Hasil dan verifikasi
+- [x] Shell operasional kini memakai Plus Jakarta Sans secara konsisten untuk body, kontrol dan tabel; heading, label form, toolbar, tabel dan input diberi warna AVA yang seragam.
+- [x] Sidebar desktop menampilkan nama domain/menu secara default pada rail 232 px. Tombol panah menjadi sakelar jelas untuk mode ringkas 64 px; panel konteks tetap dipakai untuk rincian layanan/modul.
+- [x] State sidebar disimpan dengan aman di `ava_sidebar_expanded`; mobile tetap menggunakan drawer dan scrim.
+- [x] `node scripts/verify-deploy-readiness.js` dan `git diff --check` lulus.

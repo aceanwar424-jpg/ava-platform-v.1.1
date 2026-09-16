@@ -21,6 +21,27 @@ body.ava-ops-shell {
   color: var(--ava-ink);
   font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
 }
+body.ava-ops-shell button,
+body.ava-ops-shell input,
+body.ava-ops-shell select,
+body.ava-ops-shell textarea,
+body.ava-ops-shell table { font-family: inherit; }
+body.ava-ops-shell h1,
+body.ava-ops-shell h2,
+body.ava-ops-shell h3,
+body.ava-ops-shell h4 { color: var(--ava-ink); letter-spacing: -.018em; }
+body.ava-ops-shell .form-group > label,
+body.ava-ops-shell .field-label,
+body.ava-ops-shell .table-toolbar label { color: #3f5b57; font-weight: 700; }
+body.ava-ops-shell .table-wrap { border-color: var(--ava-line); background: #fff; }
+body.ava-ops-shell .table-toolbar { background: #f5f8f4; border-bottom-color: var(--ava-line); }
+body.ava-ops-shell .table-search,
+body.ava-ops-shell .table-filter { background-color: #fff; color: var(--ava-ink); border-color: var(--ava-line); }
+body.ava-ops-shell .table-wrap table th { background: #edf3ef; color: #38524f; border-bottom-color: var(--ava-line); }
+body.ava-ops-shell .table-wrap table td { color: #36504c; border-bottom-color: #edf0eb; }
+body.ava-ops-shell .form-group input,
+body.ava-ops-shell .form-group select,
+body.ava-ops-shell .form-group textarea { background: #fff; color: var(--ava-ink); }
 body.ava-ops-shell .sidebar-rail {
   background: linear-gradient(180deg, #102e30 0%, #153c3d 100%);
   border-right: 1px solid rgba(184,145,43,.42);
@@ -78,6 +99,27 @@ body.ava-ops-shell .pac-item-selected { background: var(--ava-emerald-soft) !imp
 body.ava-ops-shell .pac-item-query { color: var(--ava-ink) !important; font-weight: 750 !important; }
 body.ava-ops-shell .pac-matched { color: var(--ava-emerald) !important; }
 body.ava-ops-shell .pac-icon { margin-right: 8px; }
+
+/* Sidebar clarity: labels are visible by default on desktop. The arrow in the
+   brand row switches to the compact icon rail only when space is needed. */
+@media (min-width: 769px) {
+  body.ava-ops-shell:not(.sidebar-expanded) { --rail-w: 232px; --sidebar-w: 232px; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-brand-text,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-main-label,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-chevron,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-sub-menu-list,
+  body.ava-ops-shell:not(.sidebar-expanded) #workspace-settings-label,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-footer,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-module-label,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-module-key { display: initial !important; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-brand-text { display: block !important; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-footer { display: flex !important; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-main-btn { justify-content: space-between; padding: 9px 12px; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-main-left { justify-content: flex-start; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-module-btn,
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-settings-btn { justify-content: flex-start; }
+  body.ava-ops-shell.sidebar-expanded { --rail-w: 64px; --sidebar-w: 64px; }
+}
 
 /* Login gate is rendered inline by the shell; these scoped overrides keep it
    in the same editorial family without touching authentication behavior. */

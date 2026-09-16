@@ -276,31 +276,25 @@ window.setSidebarOpen = setSidebarOpen;
 
 function setSidebarExpanded(isExpanded, persist = true) {
   const rail = document.getElementById('sidebar-rail');
-  // Desktop HIS memakai rail ikon permanen. Label/layer menu hidup di panel
-  // konteks, sehingga "expand" lama tidak lagi mengubah lebar layout.
-  const expand = false;
-  document.body.classList.remove('sidebar-expanded');
-  rail?.classList.remove('expanded');
+  // Desktop dimulai dengan label terlihat. Class legacy dipakai sebagai mode
+  // ringkas (ikon saja), sehingga tombol panah tetap menjadi sakelar yang
+  // mudah dipahami tanpa menghilangkan panel konteks layanan.
+  document.body.classList.toggle('sidebar-expanded', !!isExpanded);
+  rail?.classList.toggle('expanded', !!isExpanded);
   document.querySelectorAll('.sidebar-expand-control').forEach((btn) => {
-    btn.setAttribute('aria-label', 'Buka atau tutup menu');
-    btn.setAttribute('title', 'Buka atau tutup menu');
+    btn.setAttribute('aria-label', isExpanded ? 'Tampilkan nama menu' : 'Ringkas sidebar');
+    btn.setAttribute('title', isExpanded ? 'Tampilkan nama menu' : 'Ringkas sidebar');
   });
-  if (persist) localStorage.removeItem('ava_sidebar_expanded');
+  if (persist) {
+    if (isExpanded) localStorage.setItem('ava_sidebar_expanded', '1');
+    else localStorage.removeItem('ava_sidebar_expanded');
+  }
 }
 window.setSidebarExpanded = setSidebarExpanded;
 
 function toggleSidebar() {
   if (window.innerWidth >= 769) {
-    const panel = document.getElementById('navigation-context');
-    if (panel?.classList.contains('open')) {
-      closeNavigationContext();
-      return;
-    }
-    const activeId = window.activeNavigationContext?.groupId ||
-      (window.navigationMenuGroups || []).find((group) =>
-        group.services.some((service) => service.items.some((item) => item.page === window.currentPage)))?.id ||
-      window.navigationMenuGroups?.[0]?.id;
-    if (activeId) openNavigationContext(activeId);
+    setSidebarExpanded(!document.body.classList.contains('sidebar-expanded'));
     return;
   }
   const rail = document.getElementById('sidebar-rail');
