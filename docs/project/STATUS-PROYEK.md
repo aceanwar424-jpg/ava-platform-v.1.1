@@ -2011,3 +2011,14 @@ OWNED_BY: ava. Perubahan hanya memperbaiki keterbacaan input dan observabilitas 
 - [x] Input lokasi memakai warna teks, placeholder, caret, background, dan `-webkit-text-fill-color` eksplisit sehingga teks yang diketik terbaca pada tema gelap maupun terang.
 - [x] Pesan `gm_authFailure` dan error pemuatan SDK kini menyebut hostname aktif serta checklist Maps JavaScript API, Places API, billing, dan HTTP referrer.
 - [x] Status pencarian tetap dinonaktifkan saat Google menolak key, sehingga pengguna tidak mendapat alur setengah aktif.
+
+## Audit grouping menu per workspace — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Audit hanya mengubah daftar kategori navigasi dan narasi peran workspace pada sumber menu. Tidak mengubah route, RBAC, skema data, data klinis, atau kontrak integrasi. Pemisahan mengikuti fungsi jabatan operasional: holding, platform, klinik, laboratorium, dan wellness.
+### Hasil dan verifikasi
+- [x] AVA Tech dipersempit ke `tech` dan `agentic`; menu komersial, lisensi, API, SDM Tech, dan kontrol platform tetap berada di satu kategori Tech agar tidak muncul ganda melalui Marketing/Keuangan/SDM umum.
+- [x] HIS difokuskan pada klinik, radiologi, penunjang, telehealth, korporat/MCU, billing HIS, logistik, mutu, dan master fasilitas; kategori Marketing serta SDM umum dikeluarkan dari rail klinis.
+- [x] LIS mendapat kategori `mutu` sebagai pendamping `lis`; pembayaran tetap tidak masuk LIS karena billing berada di HIS.
+- [x] Wellness memakai `wellness`, `marketing`, `keuangan`, `logistik`, `sdm`, dan `mutu`; pengaturan HIS generik dikeluarkan dari domain Wellness.
+- [x] Generator menghasilkan peta menu terbaru; audit menu lulus dengan 218 menu aktif, 0 layar mati, 0 tabel/view hilang, 0 RPC hilang, 0 handler hilang, dan 0 menu di luar manifest.
+- [x] Rail melakukan deduplikasi berdasarkan `page` per workspace; modul lintas unit seperti Billing, Audit, Leads, Penawaran, dan Integrasi tidak lagi muncul berulang ketika Ops atau workspace klinis memanggil beberapa kategori bersama.

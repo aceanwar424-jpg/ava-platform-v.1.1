@@ -15,10 +15,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | Subdomain | Ruang | Peran | Kategori menu |
 |---|---|---|---|
 | `ops.avahealth.sbs` | Holding HQ — CEO Cockpit | Pemantauan penuh lintas seluruh unit usaha. SATU-SATUNYA ruang yang melihat semua kategori. | **semua kategori** |
-| `tech.avahealth.sbs` | AVA Tech — Pembangun & Penjual Sistem | Tim brand Tech: penguasa pengembangan sistem sekaligus komersialisasinya. Langsung ke halaman masuk. | tech, marketing, keuangan, sdm, konfigurasi, agentic |
-| `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium. | his, radiologi, support-medical, avahealth, korporat, marketing, keuangan, mutu, sdm, konfigurasi |
-| `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
-| `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
+| `tech.avahealth.sbs` | AVA Tech — Pembangun & Penjual Sistem | Pemilik platform, API, tenant, lisensi, rilis, telemetri, dan penjualan sistem AVA Tech. Menu komersial dan SDM Tech berada di dalam kategori Tech agar tidak tampil ganda. | tech, agentic |
+| `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Operasional faskes end-to-end: alur pasien, klinis, radiologi, penunjang, home care, MCU, integrasi, billing HIS, logistik, mutu, dan master fasilitas. | his, radiologi, support-medical, avahealth, korporat, keuangan, logistik, mutu, konfigurasi |
+| `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
+| `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
 **Total menu terpetakan:** 229 — 🟢 221 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
 

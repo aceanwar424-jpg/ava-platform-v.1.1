@@ -1015,6 +1015,10 @@ function gambarRail(ruang) {
 
   const railGroups = [];
   const railByName = new Map();
+  // Satu route hanya boleh tampil sekali dalam satu workspace. Beberapa
+  // kategori lintas unit memang berbagi modul (mis. billing, audit, dan
+  // penawaran); tanpa deduplikasi modul yang sama muncul berulang di rail.
+  const seenPages = new Set();
   const addService = (namaGroup, namaLayanan, items, iconKategori) => {
     let group = railByName.get(namaGroup);
     if (!group) {
@@ -1035,7 +1039,10 @@ function gambarRail(ruang) {
     if (!kat?.items?.length) return;
     const visible = kat.items.filter((it) => {
       if (it.adminOnly && !['super_admin', 'manager', 'direktur'].includes(role)) return false;
-      return !(!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon);
+      if (!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon) return false;
+      if (seenPages.has(it.page)) return false;
+      seenPages.add(it.page);
+      return true;
     });
     const bySourceGroup = {};
     visible.forEach((it) => {

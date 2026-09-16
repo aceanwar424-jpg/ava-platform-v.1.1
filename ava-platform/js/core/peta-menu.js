@@ -36,45 +36,41 @@ window.PETA_MENU = {
     "tech": {
       "nama": "AVA Tech — Pembangun & Penjual Sistem",
       "subdomain": "tech.avahealth.sbs",
-      "peran": "Tim brand Tech: penguasa pengembangan sistem sekaligus komersialisasinya. Langsung ke halaman masuk.",
+      "peran": "Pemilik platform, API, tenant, lisensi, rilis, telemetri, dan penjualan sistem AVA Tech. Menu komersial dan SDM Tech berada di dalam kategori Tech agar tidak tampil ganda.",
       "kategori": [
         "tech",
-        "marketing",
-        "keuangan",
-        "sdm",
-        "konfigurasi",
         "agentic"
       ]
     },
     "his": {
       "nama": "HIS — Klinik & Seluruh Layanan Non-Lab",
       "subdomain": "his.avahealth.sbs",
-      "peran": "Seluruh sistem klinik: rawat jalan, rawat inap, radiologi, farmasi, home care, MCU korporat. Semua yang BUKAN laboratorium.",
+      "peran": "Operasional faskes end-to-end: alur pasien, klinis, radiologi, penunjang, home care, MCU, integrasi, billing HIS, logistik, mutu, dan master fasilitas.",
       "kategori": [
         "his",
         "radiologi",
         "support-medical",
         "avahealth",
         "korporat",
-        "marketing",
         "keuangan",
+        "logistik",
         "mutu",
-        "sdm",
         "konfigurasi"
       ]
     },
     "lis": {
       "nama": "LIS — Laboratorium Diagnostik",
       "subdomain": "lis.avahealth.sbs",
-      "peran": "Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen.",
+      "peran": "Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab.",
       "kategori": [
-        "lis"
+        "lis",
+        "mutu"
       ]
     },
     "wellness": {
       "nama": "Wellness — Nutrition & Personal Care",
       "subdomain": "wellness.avahealth.sbs",
-      "peran": "Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama.",
+      "peran": "Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung.",
       "alias_subdomain": [
         "care",
         "nutri",
@@ -85,7 +81,8 @@ window.PETA_MENU = {
         "marketing",
         "keuangan",
         "logistik",
-        "konfigurasi"
+        "sdm",
+        "mutu"
       ]
     }
   },
