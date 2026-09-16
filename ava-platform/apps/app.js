@@ -935,7 +935,7 @@ function updateCartUIs() {
   if (hcSub) hcSub.textContent = `IDR ${subtotalVal.toLocaleString('en-US')}.00`;
   if (hcFee) hcFee.textContent = `IDR ${serviceFeeVal.toLocaleString('en-US')}.00`;
   if (hcGrand) hcGrand.textContent = `IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
-  if (hcPayBtn) hcPayBtn.textContent = `Pay IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
+  if (hcPayBtn) hcPayBtn.textContent = 'Kirim ke Tagihan HIS';
 }
 
 function checkoutLabBooking() {
@@ -963,7 +963,7 @@ function checkoutLabBooking() {
   if (ticketCurrentEl) ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
   if (ticketBox) ticketBox.style.display = 'block';
 
-  alert(`Pemesanan Berhasil!\nCabang: ${branch}\nTanggal: ${date}\nTiket antrean Anda A-045 telah dibuat.`);
+  alert(`Order layanan siap dikirim ke HIS.\nCabang: ${branch}\nTanggal: ${date}\nPembayaran dan tagihan diproses di HIS; aplikasi hanya menampilkan status antrean.`);
 
   // Reset cart
   bookingCart = [];
@@ -1851,10 +1851,10 @@ function hcAddrHideSuggest(){ const b=document.getElementById('hc-addr-suggest')
 function hcShowBookingSuccess(num, token){
   const link = token ? new URL('../track.html?token='+encodeURIComponent(token), location.href).href : '';
   if(link){
-    if(confirm(`✅ Pesanan Home Care ${num} berhasil dibuat!\n\nTim medis akan mengonfirmasi & menugaskan nakes. Anda bisa melacak posisi nakes secara real-time.\n\nBuka halaman pelacakan sekarang?`))
+    if(confirm(`✅ Order Home Care ${num} dikirim ke HIS.\n\nTim medis akan mengonfirmasi & menugaskan nakes. Penagihan diproses di HIS. Anda bisa melacak posisi nakes secara real-time.\n\nBuka halaman pelacakan sekarang?`))
       window.open(link, '_blank');
   } else {
-    alert(`✅ Pesanan Home Care ${num} berhasil dibuat! Tim medis akan menghubungi Anda untuk konfirmasi jadwal & nakes.`);
+    alert(`✅ Order Home Care ${num} dikirim ke HIS. Tim medis akan menghubungi Anda untuk konfirmasi jadwal & nakes; penagihan diproses di HIS.`);
   }
   showView('patient-view', 'Dashboard');
 }
@@ -3801,13 +3801,13 @@ function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails 
     items: [...unifiedSuperCart],
     totals,
     payment_method: paymentMethod,
-    payment_status: 'PAID_SUCCESS',
-    qris_reference: paymentMethod === 'QRIS_DYNAMIC' ? `NMID-9360052300-${orderId}` : null,
+    payment_status: 'PENDING_HIS_BILLING',
+    qris_reference: null,
     courier_tracking_no: totals.subtotal_product > 0 ? `JNE-RES-${orderId}` : null,
     created_at: now,
     status_timeline: [
-      { time: now, event: 'Pesanan dibuat & Pembayaran Terkonfirmasi' },
-      { time: now, event: 'Notifikasi diteruskan ke Gudang Nutri & Booking Spa' }
+      { time: now, event: 'Pesanan dibuat & menunggu penagihan HIS' },
+      { time: now, event: 'Handoff layanan diteruskan ke HIS untuk billing dan fulfillment' }
     ]
   };
 
@@ -3817,7 +3817,7 @@ function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails 
   return {
     success: true,
     order: newOrder,
-    message: `Checkout berhasil! Nomor Pesanan: ${orderId}. Total: Rp ${Number(totals.grand_total).toLocaleString('id-ID')}`
+    message: `Order berhasil dikirim ke HIS. Nomor Pesanan: ${orderId}. Tagihan akan diterbitkan melalui HIS.`
   };
 }
 

@@ -1932,3 +1932,29 @@ OWNED_BY: ava. Selaraskan presentasi visual aplikasi operasional dengan identita
 - [x] Rilis publik dibuat dari worktree terisolasi `D:/AVAQUEEN-public-release-20260914`, hanya lima berkas UI dalam commit `d92ac8fe22b51712517ce2ac750d9a37ad88b024`; perubahan aplikasi lain tidak ikut dibawa. Status GitHub/Vercel **success — Deployment has completed**.
 - [x] Endpoint produksi `his.avahealth.sbs`, `lis.avahealth.sbs`, `ops.avahealth.sbs`, `kiosk.avahealth.sbs`, `antrian.avahealth.sbs`, dan `crm.avahealth.sbs` semuanya mengembalikan HTTP 200 dan memuat stylesheet/kelas tema baru.
 - [x] Setelah pemeriksaan login HIS menemukan inline theme lama berwarna biru gelap, override scoped ditambahkan untuk latar ivory, kartu putih, aksen zamrud/emas, input, tab dan tombol. Screenshot produksi setelah deployment kedua menunjukkan login sudah menyatu dengan identitas AVA. Commit lanjutan `9407e19` juga berstatus Vercel success.
+
+## Audit QC System Manager & Supervisor IT — Subdomain — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Bandingkan portofolio client dengan `domain.json`, `menu.json`, router dan manifest modul. Audit bersifat read-only terhadap sistem klinis dan bertujuan mengidentifikasi gap menu, boundary akses, readiness dan kontrol mutu. Tidak mengubah skema data, integrasi eksternal, data pasien, atau status legal/operasional fasilitas.
+
+### Hasil
+- [x] Laporan detail dibuat di `docs/project/AUDIT-SUBDOMAIN-AVA-GLOBAL.md`.
+- [x] Ditemukan 19 entri situs pada domain map tetapi hanya 5 ruang kerja menu; Care, Nutri dan Sanctuary belum memiliki isolasi ruang menu yang setara host-nya.
+- [x] Ditemukan 203 menu unik berstatus `ada`; 25 tidak memiliki case router dan 27 tidak memiliki lazy manifest. Dashboard dicatat sebagai pengecualian potensial karena dimuat awal; sisanya perlu keputusan handler, alias induk, atau status rancangan.
+- [x] Gap P0 dicatat pada kontrak HIS–LIS–Billing, boundary Apps/QMS, Care-Nutrition-Sanctuary program/reward/traceability, serta evidence-based menu readiness.
+- [x] Tidak ada perubahan kode atau skema akibat audit ini; report menjadi backlog QC sebelum implementasi P0/P1.
+
+## Closure audit — control hub, Apps boundary & billing handoff — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Menutup temuan UI/menu/readiness dengan control surface yang read-only dan dapat diaudit. Tidak mengubah skema data, kunci relasional, RPC, integrasi produksi, atau sumber klinis. Apps hanya menyerahkan order/status ke HIS; status pembayaran lokal tidak boleh menjadi bukti pembayaran aktual. Delapan readiness hub diberi pengecualian `TANPA_DATA_WAJAR` sampai event source, owner, dan acceptance test disetujui manusia.
+
+### Hasil dan bukti verifikasi
+- [x] Ditambahkan `ava-platform/modules/system/readiness.js` untuk delapan alur: HIS–LIS billing, LIS traceability, Wellness program, partner reward, Nutrition quality, Sanctuary operations, AVA Tech delivery, dan Evidence Register.
+- [x] Ditambahkan rute router, judul halaman, menu, alias Care/Nutri/Sanctuary di bawah Wellness, serta status `parsial` untuk hub konfigurasi yang hanya menjadi launcher/tab.
+- [x] Generator menghasilkan 226 menu: 218 `ada`, 8 `parsial`, 0 `belum`; manifest memuat 225 halaman.
+- [x] `node scripts/audit-menu-hidup.js` lulus: layar mati, tabel/view, RPC, handler dan manifest bersih. `node scripts/bangun-vercel.js --periksa` lulus.
+- [x] Apps Portal tidak lagi menampilkan QMS/Editor SOP internal; diganti akses Program Wellness publik.
+- [x] Tombol lab/home care di Apps menggunakan bahasa “Kirim ke Tagihan HIS”. Checkout terpadu memakai `PENDING_HIS_BILLING`, tanpa referensi QRIS atau klaim pembayaran sukses. Handoff aktual tetap menunggu kontrak API HIS yang harus disetujui sebelum integrasi eksternal.
+- [x] `node --check` untuk modul readiness dan Apps, serta `git diff --check`, lulus.
+- [x] Laporan audit diperbarui untuk membedakan false positive static matching dari hasil generator-aware audit dan mencatat keputusan Care/Nutri/Sanctuary sebagai alias Wellness.
+- [x] Paket publik terpilih dirilis dari worktree terisolasi melalui commit `4a867bc` ke `origin/main`; `avahealth.sbs`, `apps.avahealth.sbs`, dan `his.avahealth.sbs` mengembalikan HTTP 200. Produksi Apps memuat label handoff HIS dan tidak lagi memuat QMS internal. Status deployment provider belum menampilkan entri SHA baru pada API GitHub saat verifikasi; endpoint produksi sudah menyajikan paket baru.

@@ -46,7 +46,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "mou": [
   "modules/crm/crm_pipeline.js",
@@ -320,7 +321,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "sales-corong": [
   "modules/crm/crm_pipeline.js",
@@ -345,7 +347,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "portal-korporat": [
   "modules/system/config/config_family.js",
@@ -361,7 +364,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "portal-akses": [
   "modules/system/config/config_family.js",
@@ -377,7 +381,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "perujuk": [
   "modules/crm/crm_pipeline.js",
@@ -532,7 +537,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "hc-schedule": [
   "modules/his/admission.js",
@@ -1230,7 +1236,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "corporate": [
   "modules/system/config/config_family.js",
@@ -1262,7 +1269,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "ekg-treadmill": [
   "modules/system/config/config_family.js",
@@ -1278,7 +1286,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "audiometry": [
   "modules/system/config/config_family.js",
@@ -1294,7 +1303,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "spirometry": [
   "modules/system/config/config_family.js",
@@ -1310,7 +1320,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "medrecord": [
   "modules/his/admission.js",
@@ -1843,7 +1854,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "settings": [
   "modules/system/config/config_family.js",
@@ -1859,7 +1871,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "tech": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -2717,7 +2730,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "tech-roadmap": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -2765,7 +2779,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "support-hub": [
   "modules/system/config/config_family.js",
@@ -2781,7 +2796,8 @@ window.MODUL_HALAMAN = {
   "modules/system/supportive.js",
   "modules/system/surat.js",
   "modules/system/timeline.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/readiness.js"
  ],
  "portal-wellness": [
   "modules/business_units/ava_health.js",
@@ -3285,5 +3301,6 @@ window.MODUL_SEMUA = [
  "modules/tech-platform/techTelemetry.js",
  "modules/tech-platform/tech_saas.js",
  "modules/tech-platform/tenants.js",
- "modules/tech-platform/techControlPlane.js"
+ "modules/tech-platform/techControlPlane.js",
+ "modules/system/readiness.js"
 ];

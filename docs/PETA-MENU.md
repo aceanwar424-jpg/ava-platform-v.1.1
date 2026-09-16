@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 218 — 🟢 218 ada · 🟡 0 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 226 — 🟢 218 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -38,6 +38,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Pusat Kendali Operasional | `ops-kendali` | Apa yang perlu ditangani sekarang, lintas unit |
 | 🟢 | CEO Master Cockpit | `executive-dashboard` | P&L 6 pilar, tenant aktif, burn rate, BEP |
 | 🟢 | Konsolidasi Finansial 6 Pilar | `holding-finance` | EBITDA konsolidasi & metrik investor |
+| 🟢 | Evidence Register & Risk | `evidence-register` | Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar |
 
 **Gerbang Sistem Lain**
 
@@ -98,6 +99,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | 🟢 | Anggota Tim Tech | `hrd` | Data personel unit Tech |
 | 🟢 | Sprint & Beban Kerja | `tech-sprint` | Pembagian tugas dan kapasitas tim |
+| 🟢 | Delivery, SLA & Customer Success | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
 
 ---
 
@@ -130,6 +132,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Anamnesa & Tanda Vital | `anamnesa` | Keluhan, riwayat, dan pemeriksaan awal |
 | 🟢 | Rawat Inap & Bed Management | `inpatient` | Mutasi tempat tidur & resume pulang |
 | 🟢 | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
+| 🟢 | Hub Integrasi HIS–LIS & Billing | `his-integration` | Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS |
 | 🟢 | Hasil Patologi Klinik (Viewer LIS) | `his-clinical-pathology` | Viewer read-only hasil Patologi Klinik yang sudah dirilis LIS; koreksi dan rilis tetap dilakukan di LIS |
 | 🟢 | Hasil Mikrobiologi (Viewer LIS) | `his-microbiology` | Viewer read-only hasil pewarnaan, kultur, identifikasi, dan sensitivitas yang sudah dirilis LIS |
 | 🟢 | Hasil Patologi Anatomi (Viewer LIS) | `his-anatomical-pathology` | Viewer read-only hasil histopatologi dan sitologi yang sudah dirilis LIS |
@@ -257,6 +260,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Koneksi Alat | `lis-analyzer` | Konfigurasi protokol ASTM E1381/E1394 & channel mapping |
 | 🟢 | Pengaturan Laboratorium | `lis-settings` | Profil instansi, DPJP Sp.PK, critical limits & installer service :9999 |
 | 🟢 | Panduan & Bantuan | `lis-helpdesk` | Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium |
+| 🟢 | Inbox Order & Hasil LIS | `lis-integration` | Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS |
 
 ---
 
@@ -318,6 +322,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Formulasi & R&D Produk | `wellness-rnd` | Resep berversi + BOM. Versi baru = baris baru, supaya batch lama tetap terlacak resepnya. |
 | 🟢 | Kemitraan Maklon | `wellness-maklon` | Produksi untuk merek pihak lain. Hasilnya milik klien, tidak masuk stok AVA. |
 | 🟢 | Uji Mutu Produk ke Lab | `wellness-mutu` | Batch karantina sampai SELURUH uji lulus, bukan uji pertama. |
+| 🟢 | Batch, Release & Mutu Nutrition | `nutrition-quality` | Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall |
+| 🟢 | Program Care & Wellness | `wellness-program` | Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program |
+| 🟢 | Challenge & Rekonsiliasi Mitra | `partner-rewards` | Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner |
+| 🟢 | Operasional Sanctuary | `sanctuary-operations` | Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT |
 
 ---
 
@@ -485,14 +493,14 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Fasilitas, Cabang & Unit | `config` › cfg-facility | Cabang, lokasi, unit, ruang, kelas layanan, dan alat |
-| 🟢 | Praktisi, Jadwal & Fee | `config` › cfg-practitioner | Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan |
-| 🟢 | Pasien, Penjamin & Keluarga | `config` › cfg-patient | Identitas pasien, asuransi, alergi, kondisi, dan relasi |
-| 🟢 | Korporat & Kontrak | `config` › cfg-corporate | Perusahaan, kontrak, jabatan, dan penjamin layanan |
-| 🟢 | Parameter MCU | `config` › cfg-mcu | Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus |
-| 🟢 | Bank, EDC & Pembayaran | `config` › cfg-payment | Metode bayar, bank, EDC, dan mapping akun |
-| 🟢 | Flow, Display & Perangkat Antrean | `config` › cfg-queue | Flow layanan, outlet, ruang, display, kiosk, dan device |
-| 🟢 | Master Obat & Aturan Pakai | `config` › cfg-medicine | Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi |
+| 🟡 | Fasilitas, Cabang & Unit | `config` › cfg-facility | Cabang, lokasi, unit, ruang, kelas layanan, dan alat |
+| 🟡 | Praktisi, Jadwal & Fee | `config` › cfg-practitioner | Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan |
+| 🟡 | Pasien, Penjamin & Keluarga | `config` › cfg-patient | Identitas pasien, asuransi, alergi, kondisi, dan relasi |
+| 🟡 | Korporat & Kontrak | `config` › cfg-corporate | Perusahaan, kontrak, jabatan, dan penjamin layanan |
+| 🟡 | Parameter MCU | `config` › cfg-mcu | Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus |
+| 🟡 | Bank, EDC & Pembayaran | `config` › cfg-payment | Metode bayar, bank, EDC, dan mapping akun |
+| 🟡 | Flow, Display & Perangkat Antrean | `config` › cfg-queue | Flow layanan, outlet, ruang, display, kiosk, dan device |
+| 🟡 | Master Obat & Aturan Pakai | `config` › cfg-medicine | Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi |
 
 **Fasilitas & Sumber Daya**
 

@@ -59,6 +59,14 @@ const POLA_DATA = /\b(sbGet|sbRpc|sbPost|sbPatch|sbDelete|fetch)\s*\(/;
 
 const TANPA_DATA_WAJAR = {
   'lis-helpdesk': 'Modul panduan interaktif SOP, flowchart laboratorium, dan kamus menu 360 derajat',
+  'evidence-register': 'Kerangka registri bukti dan risiko; sengaja read-only sampai sumber dokumen dan workflow persetujuan ditetapkan',
+  'tech-delivery': 'Kerangka delivery, SLA, dan customer success; menunggu kontrak event tenant dan persetujuan integrasi',
+  'his-integration': 'Kerangka status handoff HIS–LIS–billing; tidak membuat klaim transaksi tanpa event sumber',
+  'lis-integration': 'Kerangka inbox dan traceability LIS; menunggu kontrak callback dan data operasional',
+  'nutrition-quality': 'Kerangka batch dan release; tidak menampilkan status produksi sebelum sumber mutu terhubung',
+  'wellness-program': 'Kerangka program dan tindak lanjut; peserta/consent hanya diisi setelah modul sumber disetujui',
+  'partner-rewards': 'Kerangka challenge dan rekonsiliasi; voucher tidak diterbitkan dari layar ini',
+  'sanctuary-operations': 'Kerangka booking dan layanan sanctuary; kapasitas dan ledger tetap berasal dari sistem sumber',
 };
 
 // Halaman → nama fungsi render, dibaca dari router.js:
