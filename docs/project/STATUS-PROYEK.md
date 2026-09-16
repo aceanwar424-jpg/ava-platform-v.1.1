@@ -1968,3 +1968,11 @@ OWNED_BY: ava. Menutup temuan UI/menu/readiness dengan control surface yang read
 - [x] Verifikasi read-only di Supabase SQL Editor pada 16 September 2026 menemukan `user_profiles` untuk `aceanwar424@gmail.com`: `id=385bf4b6-d589-4c00-826f-724402c24c7a`, `role=super_admin`, `tenant_id=00000000-0000-0000-0000-000000000001`. Jadi role aplikasi dan tenant profil sudah benar; error login bukan karena akun belum menjadi superadmin.
 - [x] Audit policy menemukan `user_profiles_tenant_boundary` masih melakukan subquery ke `public.user_profiles` dari policy tabel yang sama. Migration `0057_user_profiles_rls_recursion_fix.sql` disiapkan untuk memindahkan pemeriksaan admin ke helper `SECURITY DEFINER`, sehingga PostgREST tidak lagi memicu recursive RLS HTTP 500. Migration ini belum dijalankan ke production dan tetap memerlukan checkpoint administrator.
 - [x] Source `supabase/functions/llm-gateway/index.ts` diperbaiki untuk CORS preflight (`Prefer`, `GET/POST/OPTIONS`) dan endpoint `GET /status` yang tidak membocorkan secret. Edge Function masih perlu redeploy di Supabase agar source ini aktif.
+
+## Perbaikan dropdown Google Places Maps Prospect — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perbaikan hanya menyentuh presentasi dropdown Google Places dan input lokasi pada Maps Prospecting. Tidak mengubah pencarian, koordinat, data prospek, API key, atau integrasi Google. Data lokasi tetap diproses sesuai izin API dan kebijakan privasi yang berlaku.
+### Hasil dan verifikasi
+- [x] Dropdown `.pac-container` diberi z-index tinggi, permukaan putih, teks kontras, hover state dan shadow agar tidak tertutup kartu atau menjadi strip gelap pada tema operasional.
+- [x] Input lokasi dipaksa memakai latar putih dan teks AVA ink agar nilai yang diketik tetap terbaca pada shell gelap.
+- [x] `git diff --check` lulus. Pengujian visual Google Places tetap memerlukan API key aktif dan dapat dilakukan setelah stylesheet dipublikasikan.

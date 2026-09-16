@@ -49,6 +49,36 @@ body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea
 body.ava-ops-shell input:focus, body.ava-ops-shell select:focus, body.ava-ops-shell textarea:focus { border-color: var(--ava-emerald); box-shadow: 0 0 0 3px rgba(8,127,107,.13); outline: 0; }
 body.ava-ops-shell .modal-box { border-color: var(--ava-line); box-shadow: 0 24px 70px rgba(16,46,48,.22); }
 
+/* Google Places autocomplete is appended directly to <body>, outside the
+   maps card. Keep it above cards and readable when the operational shell is in
+   dark mode; otherwise the native Google list can become a blank dark strip. */
+body.ava-ops-shell #maps-place-input { background: #fff !important; color: var(--ava-ink) !important; }
+body.ava-ops-shell .pac-container {
+  z-index: 12000 !important;
+  margin-top: 4px;
+  border: 1px solid var(--ava-line) !important;
+  border-radius: 10px !important;
+  background: #fff !important;
+  box-shadow: 0 16px 36px rgba(16,46,48,.18) !important;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif !important;
+  overflow: hidden;
+}
+body.ava-ops-shell .pac-item {
+  padding: 10px 12px !important;
+  border-top: 1px solid #edf0eb !important;
+  background: #fff !important;
+  color: var(--ava-ink) !important;
+  font-size: 12px !important;
+  line-height: 1.35 !important;
+  cursor: pointer;
+}
+body.ava-ops-shell .pac-item:first-child { border-top: 0 !important; }
+body.ava-ops-shell .pac-item:hover,
+body.ava-ops-shell .pac-item-selected { background: var(--ava-emerald-soft) !important; }
+body.ava-ops-shell .pac-item-query { color: var(--ava-ink) !important; font-weight: 750 !important; }
+body.ava-ops-shell .pac-matched { color: var(--ava-emerald) !important; }
+body.ava-ops-shell .pac-icon { margin-right: 8px; }
+
 /* Login gate is rendered inline by the shell; these scoped overrides keep it
    in the same editorial family without touching authentication behavior. */
 body.ava-ops-shell > div:first-child {
