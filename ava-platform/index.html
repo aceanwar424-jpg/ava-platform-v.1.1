@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="css/style.css?v=20260906-ops-hubs-lis-his-sync">
 <link rel="stylesheet" href="css/dashboard.css?v=20260719s">
 <link rel="stylesheet" href="css/lis-workspace.css?v=20260906">
+<link rel="stylesheet" href="css/ava-ops-polish.css?v=20260916">
 <!-- Hanya URL dan anon key per-deployment; bukan secret server. -->
 <script src="/api/runtime-config.js" onerror="void 0"></script>
 <script defer src="js/core/rbacService.js"></script>
@@ -20,7 +21,7 @@
 <script defer src="js/core/eventBus.js"></script>
 <script defer src="js/core/moduleManager.js"></script>
 </head>
-<body>
+<body class="ava-ops-shell">
 <!-- ═══ SIDEBAR VERTIKAL PENUH AVA GLOBAL ═══ -->
 <aside class="sidebar-rail" id="sidebar-rail">
   <div class="sidebar-brand-box" onclick="navigate('dashboard')" title="Kembali ke Dashboard Utama">
@@ -231,7 +232,6 @@
 <script defer src="js/core/barcode.js?v=20260725a"></script>
 <!-- Kunci API lokal (tidak masuk repo). Wajib sebelum aiGateway.js.
      Bila berkas tidak ada, 404-nya tidak fatal — pool AI hanya kosong. -->
-<script defer src="js/config.local.js"></script>
 <script defer src="js/core/aiGateway.js?v=20260905-private-status"></script>
 <script defer src="js/auth.js?v=20260911-login-copy"></script>
 
