@@ -2,21 +2,6 @@
 // MOBILE APPS - Logic & Multi-Role Datasets
 // ═══════════════════════════════════════════
 
-// --- MOCK DATASETS ---
-const MOCK_CORPORATES = [
-  { name: 'Ahmad Subarjo', id: 'EMP-001', test: 'Paket MCU Eksekutif A', status: 'fit', remark: 'Fit to Work &bull; Sehat', medrec: { cholesterol: 185, sugar: 95, uric: 5.4, notes: 'Semua marker normal. Kondisi fisik prima.' } },
-  { name: 'Siti Rahma', id: 'EMP-002', test: 'Paket MCU Dasar', status: 'fit', remark: 'Fit to Work &bull; Sehat', medrec: { cholesterol: 192, sugar: 88, uric: 4.8, notes: 'Hasil pemeriksaan laboratorium berada dalam ambang batas normal.' } },
-  { name: 'Bambang Wijaya', id: 'EMP-003', test: 'Paket MCU Driver', status: 'unfit', remark: 'Unfit / Review (Hipertensi Gr. II)', medrec: { cholesterol: 260, sugar: 142, uric: 8.2, notes: 'Peringatan: Kolesterol total tinggi dan indikasi prediabetes. Butuh pantauan tekanan darah rutin.' } },
-  { name: 'Indah Permata', id: 'EMP-004', test: 'Paket MCU Dasar', status: 'pending', remark: 'Proses Analisa Lab', medrec: null },
-  { name: 'Dedi Kurniawan', id: 'EMP-005', test: 'Paket MCU Eksekutif B', status: 'fit', remark: 'Fit to Work &bull; Sehat', medrec: { cholesterol: 175, sugar: 90, uric: 5.1, notes: 'Tubuh dalam kondisi ideal. Lanjutkan gaya hidup sehat.' } }
-];
-
-const MOCK_REFERRALS = [
-  { name: 'Budi Santoso', phone: '08123456789', test: 'Darah Lengkap + Urinalisis', status: 'finished', fee: 150000, date: '19/07/2026' },
-  { name: 'Rian Hidayat', phone: '08567890123', test: 'Profil Lipid + Asam Urat', status: 'waiting', fee: 100000, date: '19/07/2026' },
-  { name: 'Citra Kirana', phone: '08789012345', test: 'HBsAg + Anti-HBs', status: 'finished', fee: 80000, date: '18/07/2026' }
-];
-
 // --- VIRTU STYLE LAB TEST ITEMS ---
 const LAB_TEST_ITEMS = [
   { code: 'CHEM - CALCIUM', name: 'CHEM - CALCIUM', price: 149000, desc: 'Calcium blood is used to help screening, diagnosis, and monitor a state related to bone health.' },
@@ -172,14 +157,16 @@ let currentCorporateId = null;       // corporate yang diwakili user login
 let currentCorporateName = '';
 let currentCorpRole = null;          // 'requestor' | 'approver' | null (superadmin/keduanya)
 let allCorporatesForPicker = [];     // untuk superadmin memilih perusahaan
-let referrals = [...MOCK_REFERRALS];
+// Referral data is loaded from an approved backend source when that contract exists.
+// Empty by default: the portal must never display synthetic patients or balances.
+let referrals = [];
 let queueSimulatorInterval = null;
 let currentCalledQueue = 40; // Counter queue starts at A-040
 let bookingCart = []; // List of selected items
 
 // Financial and Corporate Billing States
-let corporateCashback = 4500000; // Rp 4.500.000
-let referralWallet = 330000; // Rp 330.000
+let corporateCashback = 0;
+let referralWallet = 0;
 let selectedInvoiceId = null;
 let invoices = [];   // diisi dari tabel invoices (real) via loadInvoices()
 
@@ -3598,6 +3585,8 @@ function closeReferralForm() {
 
 function submitReferralForm(event) {
   event.preventDefault();
+  alert('Pengajuan rujukan akan tersedia setelah kontrak backend referral dan approval fee diaktifkan. Tidak ada data pasien atau komisi yang disimpan dari portal ini.');
+  return;
   
   const name = document.getElementById('ref-patient-name').value.trim();
   const phone = document.getElementById('ref-patient-phone').value.trim();
