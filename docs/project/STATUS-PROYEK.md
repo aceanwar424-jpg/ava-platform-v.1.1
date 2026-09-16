@@ -1918,3 +1918,17 @@ OWNED_BY: ava. Perjelas visi/misi serta rancangan sistem produksi dan wellness, 
 - [x] Pemeriksaan deploy-readiness dan git diff --check lulus. Rilis dibuat dari origin/main pada worktree terpisah D:/AVAQUEEN-public-release-20260914, hanya 15 file publik; perubahan aplikasi operasional task lain tidak disertakan.
 - [x] Commit 73e3fdddcd78db459f89c8156cfb29737eccece5 diterbitkan ke main. GitHub status Vercel success: Deployment has completed pada 2026-09-14 00:28:06 UTC. https://www.avahealth.sbs/ mengembalikan 200 dan hero baru.
 - [x] Isi produksi portal, stylesheet dan tiga halaman brand cocok dengan lokal setelah normalisasi line ending; ketiga SVG cocok byte-for-byte dan HTTP 200. Browser ponsel 390x844 pada beranda dan Nutrition tidak overflow horizontal (scrollWidth 375). Screenshot hero ponsel ditinjau: judul, paragraf, CTA dan ilustrasi tersusun jelas. Override viewport dikembalikan setelah uji.
+
+## Audit UI HIS, LIS, OPS, Kiosk & Monitor — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Selaraskan presentasi visual aplikasi operasional dengan identitas AVA Health Solution tanpa mengubah alur klinis, hak akses, data pasien, skema data, atau integrasi LIS/HIS. Lapisan ini hanya mengatur warna, tipografi, permukaan, fokus formulir, status visual, responsif dan aksesibilitas. Warna status klinis dipertahankan semantis; tidak ada data pasien atau kredensial baru.
+
+### Hasil dan bukti verifikasi
+- [x] Dibuat `ava-platform/css/ava-ops-polish.css` sebagai lapisan tema bersama untuk konsol HIS/LIS/OPS, kiosk, monitor antrean dan CRM.
+- [x] Konsol authenticated memakai ivory sebagai bidang kerja, rail hijau tua, aksen emas, permukaan kartu putih, fokus formulir zamrud, bayangan dan border yang lebih tenang; desktop dan mobile mempertahankan struktur menu serta fungsi.
+- [x] Kiosk layanan mandiri serta monitor antrean/CRM memakai identitas yang sama; variasi status layanan tetap dapat dibedakan dan tidak tertukar dengan aksen merek.
+- [x] Server lokal pada struktur output produksi memuat seluruh stylesheet; browser memverifikasi kiosk 1280 px tanpa overflow dan monitor antrean dengan warna/header/kartu baru. Konsol login memuat stylesheet tema dan `scrollWidth - innerWidth = 0`.
+- [x] `git diff --check` dan `node scripts/verify-deploy-readiness.js` lulus.
+- [x] Rilis publik dibuat dari worktree terisolasi `D:/AVAQUEEN-public-release-20260914`, hanya lima berkas UI dalam commit `d92ac8fe22b51712517ce2ac750d9a37ad88b024`; perubahan aplikasi lain tidak ikut dibawa. Status GitHub/Vercel **success — Deployment has completed**.
+- [x] Endpoint produksi `his.avahealth.sbs`, `lis.avahealth.sbs`, `ops.avahealth.sbs`, `kiosk.avahealth.sbs`, `antrian.avahealth.sbs`, dan `crm.avahealth.sbs` semuanya mengembalikan HTTP 200 dan memuat stylesheet/kelas tema baru.
+- [x] Setelah pemeriksaan login HIS menemukan inline theme lama berwarna biru gelap, override scoped ditambahkan untuk latar ivory, kartu putih, aksen zamrud/emas, input, tab dan tombol. Screenshot produksi setelah deployment kedua menunjukkan login sudah menyatu dengan identitas AVA. Commit lanjutan `9407e19` juga berstatus Vercel success.

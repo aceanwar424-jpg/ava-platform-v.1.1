@@ -1,0 +1,119 @@
+/* AVA operational surfaces — shared visual language with avahealth.sbs.
+   OWNED_BY: ava | UI only; clinical status colors remain semantic. */
+:root {
+  --ava-ink: #153c3d;
+  --ava-ink-deep: #102e30;
+  --ava-emerald: #087f6b;
+  --ava-emerald-dark: #056654;
+  --ava-emerald-soft: #e7f3ee;
+  --ava-gold: #b8912b;
+  --ava-gold-soft: #fdf8e7;
+  --ava-paper: #f6f4ec;
+  --ava-surface: #ffffff;
+  --ava-line: #d9ded5;
+  --ava-muted: #60706c;
+  --ava-shadow: 0 10px 28px rgba(21,60,61,.08);
+}
+
+/* Console (HIS, LIS, OPS and other authenticated workspaces) */
+body.ava-ops-shell {
+  background: var(--ava-paper);
+  color: var(--ava-ink);
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
+body.ava-ops-shell .sidebar-rail {
+  background: linear-gradient(180deg, #102e30 0%, #153c3d 100%);
+  border-right: 1px solid rgba(184,145,43,.42);
+  box-shadow: 6px 0 26px rgba(16,46,48,.18);
+}
+body.ava-ops-shell .sidebar-rail::before { background: linear-gradient(90deg, var(--ava-gold), #d8bc68, var(--ava-emerald)); }
+body.ava-ops-shell .sidebar-brand-box { background: rgba(255,255,255,.035); border-bottom-color: rgba(255,255,255,.12); }
+body.ava-ops-shell .sidebar-brand-title { letter-spacing: .06em; }
+body.ava-ops-shell .sidebar-brand-sub { color: #e3c766; }
+body.ava-ops-shell .sidebar-main-btn.active-group { color: #f4d98b; background: rgba(184,145,43,.14); }
+body.ava-ops-shell .sidebar-service-btn.active-service { color: #f4d98b; }
+body.ava-ops-shell .sidebar-sub-link.active { color: #8fe0c1; background: linear-gradient(90deg,rgba(8,127,107,.34),rgba(8,127,107,.08)); border-left-color: #77c9a9; }
+body.ava-ops-shell .topbar { background: rgba(255,255,255,.94); border-bottom: 1px solid var(--ava-line); box-shadow: 0 4px 18px rgba(21,60,61,.05); backdrop-filter: blur(12px); }
+body.ava-ops-shell .topbar-title { color: var(--ava-ink) !important; }
+body.ava-ops-shell .main-content { background: var(--ava-paper); }
+body.ava-ops-shell .page-header h1, body.ava-ops-shell .card-title { color: var(--ava-ink); }
+body.ava-ops-shell .page-header p, body.ava-ops-shell .card-sub { color: var(--ava-muted); }
+body.ava-ops-shell .card, body.ava-ops-shell .kpi-card { background: var(--ava-surface); border-color: var(--ava-line); box-shadow: 0 1px 2px rgba(21,60,61,.04); }
+body.ava-ops-shell .card:hover, body.ava-ops-shell .kpi-card:hover { box-shadow: var(--ava-shadow); border-color: rgba(184,145,43,.44); }
+body.ava-ops-shell .btn-teal, body.ava-ops-shell .btn-accent { background: var(--ava-emerald); box-shadow: 0 5px 14px rgba(8,127,107,.22); }
+body.ava-ops-shell .btn-teal:hover, body.ava-ops-shell .btn-accent:hover { background: var(--ava-emerald-dark); }
+body.ava-ops-shell .btn-navy { background: var(--ava-ink); }
+body.ava-ops-shell .btn-outline { color: var(--ava-emerald); border-color: var(--ava-emerald); }
+body.ava-ops-shell .btn-outline:hover { background: var(--ava-emerald-soft); }
+body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea { border-color: var(--ava-line); border-radius: 9px; }
+body.ava-ops-shell input:focus, body.ava-ops-shell select:focus, body.ava-ops-shell textarea:focus { border-color: var(--ava-emerald); box-shadow: 0 0 0 3px rgba(8,127,107,.13); outline: 0; }
+body.ava-ops-shell .modal-box { border-color: var(--ava-line); box-shadow: 0 24px 70px rgba(16,46,48,.22); }
+
+/* Login gate is rendered inline by the shell; these scoped overrides keep it
+   in the same editorial family without touching authentication behavior. */
+body.ava-ops-shell > div:first-child {
+  background: radial-gradient(circle at 12% 10%, #e7f3ee 0, transparent 34%),
+              radial-gradient(circle at 88% 90%, #fdf8e7 0, transparent 30%),
+              var(--ava-paper) !important;
+}
+body.ava-ops-shell > div:first-child > div {
+  background: rgba(255,255,255,.96) !important;
+  border-color: rgba(184,145,43,.38) !important;
+  box-shadow: 0 22px 60px rgba(21,60,61,.14) !important;
+  color: var(--ava-ink) !important;
+}
+body.ava-ops-shell > div:first-child h1 { color: var(--ava-ink) !important; }
+body.ava-ops-shell > div:first-child p { color: var(--ava-muted) !important; }
+body.ava-ops-shell > div:first-child p[style*="D4AF37"] { color: var(--ava-gold) !important; }
+body.ava-ops-shell > div:first-child > div > div[style*="rgba(255,255,255"] { background: var(--ava-emerald-soft) !important; border-color: rgba(8,127,107,.18) !important; }
+body.ava-ops-shell > div:first-child input { background: #fff !important; color: var(--ava-ink) !important; border-color: var(--ava-line) !important; }
+body.ava-ops-shell > div:first-child input::placeholder { color: #86938f !important; }
+body.ava-ops-shell > div:first-child #btn-login { background: linear-gradient(135deg,var(--ava-emerald),var(--ava-emerald-dark)) !important; box-shadow: 0 5px 15px rgba(8,127,107,.24) !important; }
+body.ava-ops-shell > div:first-child .auth-tab.active { color: var(--ava-emerald) !important; border-bottom-color: var(--ava-emerald) !important; }
+body.ava-ops-shell > div:first-child #auth-tabs { border-bottom-color: var(--ava-line) !important; }
+
+/* Self-service kiosk */
+body.ava-kiosk-shell { background: var(--ava-paper); color: var(--ava-ink); }
+body.ava-kiosk-shell .kiosk-container { max-width: 1480px; }
+body.ava-kiosk-shell .kiosk-header { border-bottom-color: var(--ava-line); }
+body.ava-kiosk-shell .logo-text h1 { color: var(--ava-ink) !important; letter-spacing: -.02em; }
+body.ava-kiosk-shell .logo-text span { color: var(--ava-emerald) !important; }
+body.ava-kiosk-shell .kiosk-time { color: var(--ava-emerald); }
+body.ava-kiosk-shell .welcome-banner h2 { color: var(--ava-ink); }
+body.ava-kiosk-shell .kiosk-card { border-color: var(--ava-line); box-shadow: var(--ava-shadow); }
+body.ava-kiosk-shell .kiosk-card:hover { border-color: var(--ava-gold); box-shadow: 0 16px 34px rgba(21,60,61,.13); }
+body.ava-kiosk-shell .card-content h3 { color: var(--ava-ink); }
+body.ava-kiosk-shell .card-badge { border-color: rgba(184,145,43,.35); background: var(--ava-gold-soft); color: #765c18; }
+body.ava-kiosk-shell .modal-box { border-color: rgba(184,145,43,.38); }
+body.ava-kiosk-shell .btn-close { background: var(--ava-emerald); color: #fff; border-color: var(--ava-emerald); }
+body.ava-kiosk-shell .btn-close:hover { background: var(--ava-emerald-dark); }
+
+/* Queue and CRM display surfaces */
+body.ava-monitor-shell { background: #102e30; }
+body.ava-monitor-shell header { background: #153c3d; border-bottom-color: var(--ava-gold); }
+body.ava-monitor-shell .brand-title p { color: #e3c766; }
+body.ava-monitor-shell .clock-time { color: #8fe0c1; }
+body.ava-monitor-shell .main-call-box { border-color: var(--ava-gold); background: linear-gradient(135deg,#1a4a49,#102e30); }
+body.ava-monitor-shell .target-destination { color: #8fe0c1; }
+body.ava-monitor-shell .counter-card, body.ava-monitor-shell .panel, body.ava-monitor-shell .kpi-box { background: #153c3d; border-color: rgba(227,199,102,.2); }
+
+@media (max-width: 768px) {
+  body.ava-ops-shell .main-content { padding: 14px; }
+  body.ava-kiosk-shell .kiosk-container { padding: 22px 16px; }
+  body.ava-kiosk-shell .kiosk-header { gap: 14px; align-items: flex-start; }
+  body.ava-kiosk-shell .logo-text h1 { font-size: 17px !important; }
+  body.ava-kiosk-shell .logo-text span { font-size: 10px !important; }
+  body.ava-kiosk-shell .time-area { min-width: 92px; }
+  body.ava-kiosk-shell .kiosk-time { font-size: 25px; }
+  body.ava-kiosk-shell .welcome-banner { margin-bottom: 26px; }
+  body.ava-kiosk-shell .welcome-banner h2 { font-size: 29px; }
+  body.ava-kiosk-shell .kiosk-card { padding: 22px 18px; }
+  body.ava-kiosk-shell .card-icon { width: 58px; height: 58px; font-size: 31px; margin-right: 16px; }
+  body.ava-kiosk-shell .card-content h3 { font-size: 18px; }
+  body.ava-kiosk-shell .card-content p { font-size: 13px; }
+  body.ava-kiosk-shell .card-badge { margin-left: 10px; font-size: 11px; padding: 6px 8px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.ava-ops-shell *, body.ava-kiosk-shell *, body.ava-monitor-shell * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}
