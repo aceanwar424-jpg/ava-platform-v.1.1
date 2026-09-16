@@ -73,7 +73,20 @@ body.ava-ops-shell .modal-box { border-color: var(--ava-line); box-shadow: 0 24p
 /* Google Places autocomplete is appended directly to <body>, outside the
    maps card. Keep it above cards and readable when the operational shell is in
    dark mode; otherwise the native Google list can become a blank dark strip. */
-body.ava-ops-shell #maps-place-input { background: #fff !important; color: var(--ava-ink) !important; }
+body.ava-ops-shell #maps-place-input,
+body.ava-ops-shell .maps-place-input {
+  background: var(--ava-surface, #fff) !important;
+  color: var(--ava-ink, #153c3d) !important;
+  -webkit-text-fill-color: var(--ava-ink, #153c3d) !important;
+  caret-color: var(--ava-emerald, #087f6b) !important;
+  opacity: 1 !important;
+}
+body.ava-ops-shell #maps-place-input::placeholder,
+body.ava-ops-shell .maps-place-input::placeholder {
+  color: #71827f !important;
+  -webkit-text-fill-color: #71827f !important;
+  opacity: 1 !important;
+}
 body.ava-ops-shell .pac-container {
   z-index: 12000 !important;
   margin-top: 4px;
@@ -99,6 +112,9 @@ body.ava-ops-shell .pac-item-selected { background: var(--ava-emerald-soft) !imp
 body.ava-ops-shell .pac-item-query { color: var(--ava-ink) !important; font-weight: 750 !important; }
 body.ava-ops-shell .pac-matched { color: var(--ava-emerald) !important; }
 body.ava-ops-shell .pac-icon { margin-right: 8px; }
+body.ava-ops-shell .gm-err-container,
+body.ava-ops-shell .gm-err-content,
+body.ava-ops-shell .gm-err-autocomplete { color: #243b53 !important; }
 
 /* Sidebar clarity: labels are visible by default on desktop. The arrow in the
    brand row switches to the compact icon rail only when space is needed. */

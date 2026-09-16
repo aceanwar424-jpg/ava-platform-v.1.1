@@ -140,7 +140,8 @@ async function renderMaps() {
         <label>Cari lokasi (ketik seperti Google Maps)</label>
         <div style="position:relative">
           <input type="text" id="maps-place-input"
-            style="width:100%;padding:12px 44px 12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border .2s"
+            class="maps-place-input"
+            style="width:100%;padding:12px 44px 12px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border .2s;color:var(--ava-ink);-webkit-text-fill-color:var(--ava-ink);background:var(--ava-surface)"
             placeholder="Ketik nama kota, area, atau alamat..."
             onfocus="this.style.borderColor='var(--teal)'"
             onblur="this.style.borderColor='var(--border)'">
@@ -275,7 +276,7 @@ function connectMaps() {
 
   const s = document.createElement('script'); s.id = 'gmsdk';
   s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places&callback=onMapsReady&language=id`;
-  s.onerror = () => showMapsStatus('err','❌ Gagal. Aktifkan Maps JS API + Places API + Geocoding API di Google Cloud Console.');
+  s.onerror = () => showMapsStatus('err', `❌ SDK Google Maps gagal dimuat untuk ${location.hostname}. Periksa Maps JavaScript API, Places API, billing, dan HTTP referrer key.`);
   document.head.appendChild(s);
 }
 
@@ -285,7 +286,8 @@ function connectMaps() {
 window.gm_authFailure = function() {
   mapsState.ready = false;
   document.getElementById('maps-search-btn')?.setAttribute('disabled', 'disabled');
-  showMapsStatus('err', '❌ Google Maps menolak API key. Cek Maps JavaScript API, Places API, billing, dan HTTP referrer domain.');
+  const host = location.hostname || 'domain ini';
+  showMapsStatus('err', `❌ Google Maps menolak API key untuk ${host}. Pastikan Maps JavaScript API + Places API aktif, billing aktif, dan HTTP referrer mengizinkan https://${host}/*.`);
   toast('Google Maps belum diotorisasi untuk domain ini', 'err', 5200);
 };
 

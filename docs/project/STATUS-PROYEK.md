@@ -2003,3 +2003,11 @@ OWNED_BY: ava. Audit memeriksa token tema terang/gelap, panel navigasi, sumber p
 - [x] Domain Care dikoreksi dari workspace HIS ke workspace Wellness. `care.*` kini membuka menu Care & Home Care bersama fungsi Wellness, sedangkan HIS tetap khusus layanan klinis.
 - [x] Menu Wellness ditambah kelompok eksplisit `Care & Home Care` (order, dispatch dan kompetensi nakes), sehingga mapping Nutrition, Sanctuary dan Care memiliki pintu operasional yang jelas di payung yang sama.
 - [x] Generator memperbarui `peta-menu.js`, `peta-subdomain.js` dan `docs/PETA-MENU.md`; audit menu hidup lulus: 218 menu `ada`, 8 `parsial`, 0 menu mati/handler/manifest hilang.
+
+## Perbaikan input lokasi dan diagnosis Google Maps — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perubahan hanya memperbaiki keterbacaan input dan observabilitas kegagalan SDK Google Maps. Tidak ada API key yang ditanam ke kode, tidak ada data lokasi pasien, dan tidak ada perubahan skema atau alur prospek.
+### Hasil dan verifikasi
+- [x] Input lokasi memakai warna teks, placeholder, caret, background, dan `-webkit-text-fill-color` eksplisit sehingga teks yang diketik terbaca pada tema gelap maupun terang.
+- [x] Pesan `gm_authFailure` dan error pemuatan SDK kini menyebut hostname aktif serta checklist Maps JavaScript API, Places API, billing, dan HTTP referrer.
+- [x] Status pencarian tetap dinonaktifkan saat Google menolak key, sehingga pengguna tidak mendapat alur setengah aktif.
