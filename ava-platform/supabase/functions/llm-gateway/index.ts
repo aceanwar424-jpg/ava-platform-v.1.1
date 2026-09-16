@@ -28,7 +28,8 @@
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, prefer, x-requested-with',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
 };
 const json = (b: unknown, s = 200) =>
   new Response(JSON.stringify(b), { status: s, headers: { ...cors, 'Content-Type': 'application/json' } });
@@ -582,6 +583,14 @@ async function runVideo(body: Record<string, unknown>) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  if (req.method === 'GET' && new URL(req.url).pathname.endsWith('/status')) {
+    await loadConfig();
+    const providers = {
+      NVIDIA: keysOf('NVIDIA_API_KEYS').length > 0,
+      GEMINI: geminiKeys().length > 0,
+    };
+    return json({ ok: true, configured: Object.values(providers).some(Boolean), providers });
+  }
   if (req.method !== 'POST') return json({ error: 'Gunakan POST' }, 405);
 
   const body = await req.json().catch(() => ({}));

@@ -78,6 +78,8 @@ Temuan tersebut adalah pekerjaan backend/kontrak dan fixture hygiene. Tidak bole
 
 Login `aceanwar424@gmail.com` gagal setelah autentikasi karena policy `user_profiles_tenant_boundary` bergantung pada claim `tenant_id`, sedangkan `current_tenant_id()` versi migrasi 0054 mengembalikan `NULL` bila claim belum diterbitkan. Solusi disiapkan pada `db/migrations/0056_auth_profile_tenant_bootstrap.sql`: claim tetap diprioritaskan, lalu tenant profil `auth.uid()` dipakai sebagai fallback melalui fungsi `SECURITY DEFINER`; profil user sendiri boleh dibaca untuk bootstrap RBAC. Migrasi ini harus dijalankan di staging lalu produksi oleh administrator Supabase. Tidak ada bypass password, role, atau RLS dari browser.
 
+Console juga menunjukkan CORS pada `llm-gateway/status`: preflight sebelumnya tidak mengizinkan header `Prefer` dan endpoint status hanya ditangani sebagai POST. Source `ava-platform/supabase/functions/llm-gateway/index.ts` sudah diperbaiki untuk `GET /status`, `OPTIONS`, `Access-Control-Allow-Methods`, dan header yang diperlukan. Edge Function perlu di-deploy ulang agar perubahan source berlaku di Supabase.
+
 ## Gate QC sebelum menyatakan siap produksi
 
 - Satu skenario order lengkap HIS → LIS → hasil → HIS → billing dapat ditelusuri dengan ID korelasi.
