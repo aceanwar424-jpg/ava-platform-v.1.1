@@ -125,6 +125,10 @@ async function renderMaps() {
       <div id="maps-status" class="status-box ${mapsState.apiKey?'status-info':'status-warn'}" style="margin-top:8px">
         ${mapsState.apiKey?'⏳ Key ditemukan, klik Sambungkan...':'⚠️ Masukkan API key lalu simpan.'}
       </div>
+      <p style="margin:8px 0 0;font-size:11px;color:var(--gray);line-height:1.5">
+        Domain produksi yang perlu diizinkan pada HTTP referrer Google Cloud: <b>*.avahealth.sbs/*</b>.
+        Pastikan Maps JavaScript API dan Places API aktif serta billing project tidak diblokir.
+      </p>
     </div>
 
     <!-- Search Config -->
@@ -274,6 +278,16 @@ function connectMaps() {
   s.onerror = () => showMapsStatus('err','❌ Gagal. Aktifkan Maps JS API + Places API + Geocoding API di Google Cloud Console.');
   document.head.appendChild(s);
 }
+
+// Google memanggil hook ini ketika key ditolak (referrer, billing, API belum
+// aktif, atau key tidak valid). Tanpa hook, pengguna hanya melihat peta kosong
+// dan pesan generik dari Google di atas permukaan aplikasi.
+window.gm_authFailure = function() {
+  mapsState.ready = false;
+  document.getElementById('maps-search-btn')?.setAttribute('disabled', 'disabled');
+  showMapsStatus('err', '❌ Google Maps menolak API key. Cek Maps JavaScript API, Places API, billing, dan HTTP referrer domain.');
+  toast('Google Maps belum diotorisasi untuk domain ini', 'err', 5200);
+};
 
 window.onMapsReady = function() {
   try {

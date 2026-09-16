@@ -1985,3 +1985,11 @@ OWNED_BY: ava. Audit dan perapihan hanya mengubah presentasi UI: satu keluarga f
 - [x] Sidebar desktop menampilkan nama domain/menu secara default pada rail 232 px. Tombol panah menjadi sakelar jelas untuk mode ringkas 64 px; panel konteks tetap dipakai untuk rincian layanan/modul.
 - [x] State sidebar disimpan dengan aman di `ava_sidebar_expanded`; mobile tetap menggunakan drawer dan scrim.
 - [x] `node scripts/verify-deploy-readiness.js` dan `git diff --check` lulus.
+
+## Audit Google Maps Prospect API authorization — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Pemeriksaan membedakan kegagalan UI dari penolakan Google Maps API. Tidak menyalin API key ke kode, log, atau dokumentasi. Perubahan hanya menambah pesan error yang dapat ditindaklanjuti dan panduan referrer; kredensial tetap berada di settings/secret store.
+### Hasil dan bukti
+- [x] Screenshot menunjukkan Google Maps JavaScript API menampilkan pesan “Halaman ini tidak dapat memuat Google Maps dengan benar”, sehingga key/referrer/billing/API enablement perlu diperiksa di Google Cloud.
+- [x] Ditambahkan `window.gm_authFailure` untuk mengubah kegagalan generik menjadi status aplikasi yang jelas dan menonaktifkan pencarian sampai key valid.
+- [x] UI Maps menampilkan domain referrer produksi `*.avahealth.sbs/*` serta checklist Maps JavaScript API, Places API dan billing.
