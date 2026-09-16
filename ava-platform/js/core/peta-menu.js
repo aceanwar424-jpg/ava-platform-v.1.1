@@ -1047,6 +1047,29 @@ window.PETA_MENU = {
               "ket": "Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT"
             }
           ]
+        },
+        {
+          "nama": "Care & Home Care",
+          "menu": [
+            {
+              "id": "homecare",
+              "label": "Order Kunjungan Rumah",
+              "status": "ada",
+              "ket": "Sampling, infus, perawatan luka dan layanan promotif-preventif di rumah"
+            },
+            {
+              "id": "hc-schedule",
+              "label": "Jadwal & Dispatch Nakes",
+              "status": "ada",
+              "ket": "Penugasan, zona layanan, keberangkatan dan status kunjungan"
+            },
+            {
+              "id": "hc-staff",
+              "label": "Tenaga Kesehatan & Kompetensi",
+              "status": "ada",
+              "ket": "STR/SIP, kompetensi, zona layanan dan masa berlaku dokumen"
+            }
+          ]
         }
       ],
       "pendek": "Wellness"

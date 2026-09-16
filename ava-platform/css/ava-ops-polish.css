@@ -121,6 +121,46 @@ body.ava-ops-shell .pac-icon { margin-right: 8px; }
   body.ava-ops-shell.sidebar-expanded { --rail-w: 64px; --sidebar-w: 64px; }
 }
 
+/* Dark theme must be coherent end-to-end. The base navigation context uses
+   white surfaces, so remap its surfaces and text together when dark mode is
+   active; otherwise the inherited light text token becomes nearly invisible
+   on white cards (the contrast seen in production screenshots). */
+html[data-theme="dark"] body.ava-ops-shell {
+  --ava-paper: #0b1727;
+  --ava-surface: #122338;
+  --ava-line: #30445d;
+  --ava-ink: #f1f5f9;
+  --ava-muted: #b7c5d6;
+}
+html[data-theme="dark"] body.ava-ops-shell .main-content { background: var(--ava-paper); color: var(--ava-ink); }
+html[data-theme="dark"] body.ava-ops-shell .card,
+html[data-theme="dark"] body.ava-ops-shell .kpi-card,
+html[data-theme="dark"] body.ava-ops-shell .table-wrap { background: var(--ava-surface); border-color: var(--ava-line); }
+html[data-theme="dark"] body.ava-ops-shell .table-toolbar { background: #172a41; border-bottom-color: var(--ava-line); }
+html[data-theme="dark"] body.ava-ops-shell .table-wrap table th { background: #1b3048; color: #e7eef7; border-bottom-color: var(--ava-line); }
+html[data-theme="dark"] body.ava-ops-shell .table-wrap table td { color: #d7e1ec; border-bottom-color: #263b54; }
+html[data-theme="dark"] body.ava-ops-shell .table-search,
+html[data-theme="dark"] body.ava-ops-shell .table-filter,
+html[data-theme="dark"] body.ava-ops-shell .form-group input,
+html[data-theme="dark"] body.ava-ops-shell .form-group select,
+html[data-theme="dark"] body.ava-ops-shell .form-group textarea { background: #0f2034; color: #f1f5f9; border-color: #3b5572; }
+html[data-theme="dark"] body.ava-ops-shell .form-group > label,
+html[data-theme="dark"] body.ava-ops-shell .field-label,
+html[data-theme="dark"] body.ava-ops-shell .table-toolbar label { color: #c9d7e6; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-context { background: #0f1f31; color: #e7eef7; border-color: #30445d; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-context-services { background: #142a40; border-right-color: #30445d; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-context-modules { background: #0f1f31; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-context-module-head { border-bottom-color: #30445d; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-context-module-head h3,
+html[data-theme="dark"] body.ava-ops-shell .navigation-module-item { color: #edf4fb; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-module-item:hover { background: #183649; border-color: rgba(89,211,177,.45); }
+html[data-theme="dark"] body.ava-ops-shell .navigation-module-item.active { background: #16463f; border-color: rgba(89,211,177,.65); }
+html[data-theme="dark"] body.ava-ops-shell .navigation-module-item-copy small,
+html[data-theme="dark"] body.ava-ops-shell .navigation-service-card-meta { color: #aebed0; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-service-card { color: #dce8f3; }
+html[data-theme="dark"] body.ava-ops-shell .navigation-service-card:hover,
+html[data-theme="dark"] body.ava-ops-shell .navigation-service-card.active { background: #1b344d; border-color: rgba(89,211,177,.6); color: #f1f5f9; }
+
 /* Login gate is rendered inline by the shell; these scoped overrides keep it
    in the same editorial family without touching authentication behavior. */
 body.ava-ops-shell > div:first-child {

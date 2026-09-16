@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Seluruh alur laboratorium: pra-analitik, analitik, pasca-analitik, master data tes, rujukan, dan logistik reagen. | lis |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama. | wellness, marketing, keuangan, logistik, konfigurasi |
 
-**Total menu terpetakan:** 226 — 🟢 218 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 229 — 🟢 221 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -326,6 +326,14 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Program Care & Wellness | `wellness-program` | Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program |
 | 🟢 | Challenge & Rekonsiliasi Mitra | `partner-rewards` | Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner |
 | 🟢 | Operasional Sanctuary | `sanctuary-operations` | Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT |
+
+**Care & Home Care**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Order Kunjungan Rumah | `homecare` | Sampling, infus, perawatan luka dan layanan promotif-preventif di rumah |
+| 🟢 | Jadwal & Dispatch Nakes | `hc-schedule` | Penugasan, zona layanan, keberangkatan dan status kunjungan |
+| 🟢 | Tenaga Kesehatan & Kompetensi | `hc-staff` | STR/SIP, kompetensi, zona layanan dan masa berlaku dokumen |
 
 ---
 

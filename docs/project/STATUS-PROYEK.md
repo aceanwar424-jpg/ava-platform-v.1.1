@@ -1993,3 +1993,13 @@ OWNED_BY: ava. Pemeriksaan membedakan kegagalan UI dari penolakan Google Maps AP
 - [x] Screenshot menunjukkan Google Maps JavaScript API menampilkan pesan “Halaman ini tidak dapat memuat Google Maps dengan benar”, sehingga key/referrer/billing/API enablement perlu diperiksa di Google Cloud.
 - [x] Ditambahkan `window.gm_authFailure` untuk mengubah kegagalan generik menjadi status aplikasi yang jelas dan menonaktifkan pencarian sampai key valid.
 - [x] UI Maps menampilkan domain referrer produksi `*.avahealth.sbs/*` serta checklist Maps JavaScript API, Places API dan billing.
+
+## Audit kontras dan pemetaan domain menu — 16 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Audit memeriksa token tema terang/gelap, panel navigasi, sumber peta domain, dan peta menu generatif. Perubahan tidak menyentuh data klinis, RBAC, atau kontrak integrasi; Care/Nutrition/Sanctuary tetap berada di bawah keputusan arsitektur Wellness yang sudah disetujui.
+### Hasil dan verifikasi
+- [x] Tema gelap operasional dipetakan ulang sebagai permukaan gelap yang konsisten dengan teks terang; kartu putih, tabel, input dan panel konteks tidak lagi memakai token yang membuat teks pucat di atas putih.
+- [x] Tema terang mempertahankan teks AVA ink, label form kontras dan permukaan putih; font shell, kontrol dan tabel diseragamkan.
+- [x] Domain Care dikoreksi dari workspace HIS ke workspace Wellness. `care.*` kini membuka menu Care & Home Care bersama fungsi Wellness, sedangkan HIS tetap khusus layanan klinis.
+- [x] Menu Wellness ditambah kelompok eksplisit `Care & Home Care` (order, dispatch dan kompetensi nakes), sehingga mapping Nutrition, Sanctuary dan Care memiliki pintu operasional yang jelas di payung yang sama.
+- [x] Generator memperbarui `peta-menu.js`, `peta-subdomain.js` dan `docs/PETA-MENU.md`; audit menu hidup lulus: 218 menu `ada`, 8 `parsial`, 0 menu mati/handler/manifest hilang.

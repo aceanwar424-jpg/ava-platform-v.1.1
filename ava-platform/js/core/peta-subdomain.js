@@ -84,17 +84,17 @@ window.PETA_SUBDOMAIN = {
   },
   "care.avahealth.sbs": {
     "nama": "AVA Care (Personal Care & Home Care)",
-    "workspace": "his",
+    "workspace": "wellness",
     "awal": "homecare"
   },
   "care.avahelath.sbs": {
     "nama": "AVA Care (Personal Care & Home Care)",
-    "workspace": "his",
+    "workspace": "wellness",
     "awal": "homecare"
   },
   "care.localhost": {
     "nama": "AVA Care (Personal Care & Home Care)",
-    "workspace": "his",
+    "workspace": "wellness",
     "awal": "homecare"
   },
   "nutri.avahealth.sbs": {
