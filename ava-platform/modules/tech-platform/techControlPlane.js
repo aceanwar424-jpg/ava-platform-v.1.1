@@ -52,11 +52,11 @@ async function renderTechControlPlane() {
     </div>
     <div class="grid two">
       <section class="card"><h2 style="font-size:22px">Pengaturan terpusat</h2>
-        <p class="muted">Semua perubahan produksi harus melalui konfigurasi tenant, modul, lisensi, dan integrasi yang tercatat.</p>
+        <p class="muted">Semua perubahan produksi—termasuk API, webhook, tenant, modul, lisensi, dan integrasi—harus dikelola dari AVA Tech. Secret hanya dirujuk melalui secret manager, tidak disimpan di browser.</p>
         <div class="links">
           <button class="btn btn-ghost btn-sm" onclick="navigate('tenants')">Tenant &amp; klien</button>
           <button class="btn btn-ghost btn-sm" onclick="navigate('tech-aktivasi')">Lisensi &amp; aktivasi</button>
-          <button class="btn btn-ghost btn-sm" onclick="navigate('config')">Master &amp; integrasi</button>
+          <button class="btn btn-ghost btn-sm" onclick="navigate('config',{focus:'integration'})">API &amp; konektor</button>
         </div>
       </section>
       <section class="card"><h2 style="font-size:22px">Signing desktop</h2>

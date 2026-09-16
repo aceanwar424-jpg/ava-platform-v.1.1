@@ -74,6 +74,10 @@ Empat hal masih membutuhkan keputusan atau kontrak nyata sebelum dapat disebut s
 
 Temuan tersebut adalah pekerjaan backend/kontrak dan fixture hygiene. Tidak boleh ditutup dengan mengarang data, mengubah skema master, atau mengaktifkan pembayaran dari Apps.
 
+## Login dan bootstrap tenant
+
+Login `aceanwar424@gmail.com` gagal setelah autentikasi karena policy `user_profiles_tenant_boundary` bergantung pada claim `tenant_id`, sedangkan `current_tenant_id()` versi migrasi 0054 mengembalikan `NULL` bila claim belum diterbitkan. Solusi disiapkan pada `db/migrations/0056_auth_profile_tenant_bootstrap.sql`: claim tetap diprioritaskan, lalu tenant profil `auth.uid()` dipakai sebagai fallback melalui fungsi `SECURITY DEFINER`; profil user sendiri boleh dibaca untuk bootstrap RBAC. Migrasi ini harus dijalankan di staging lalu produksi oleh administrator Supabase. Tidak ada bypass password, role, atau RLS dari browser.
+
 ## Gate QC sebelum menyatakan siap produksi
 
 - Satu skenario order lengkap HIS → LIS → hasil → HIS → billing dapat ditelusuri dengan ID korelasi.
