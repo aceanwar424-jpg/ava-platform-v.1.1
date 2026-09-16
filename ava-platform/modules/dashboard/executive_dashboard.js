@@ -120,29 +120,12 @@ async function loadExecData() {
       sbGet('attendance',`select=*&tanggal=eq.${today}&order=employee_name`).catch(()=>[]),
       sbGet('employees','select=id,full_name,position,division&status=eq.Aktif&order=full_name').catch(()=>[]),
     ]);
-    execState.tasks      = Array.isArray(tasks) && tasks.length ? tasks : [
-      { id: 1, title: 'Validasi Laporan ISO 15189:2022 Klausul 6-8', assigned_to: 'dr. Budi Santoso, Sp.PK', priority: 'High', status: 'InProgress', due_date: today, updated_at: new Date().toISOString() },
-      { id: 2, title: 'Finalisasi Integrasi Bridging SATUSEHAT FHIR', assigned_to: 'Ace Anwar', priority: 'Critical', status: 'InProgress', due_date: today, updated_at: new Date().toISOString() },
-      { id: 3, title: 'Review Stok Buffer Reagen Kimia & Hematologi', assigned_to: 'Siti Rahmawati, A.Md.AK', priority: 'Normal', status: 'Todo', due_date: today, updated_at: new Date().toISOString() },
-      { id: 4, title: 'Penyusunan Kontrak Corporate MCU PT Telkom', assigned_to: 'Budi Hartono', priority: 'High', status: 'Todo', due_date: today, updated_at: new Date().toISOString() },
-      { id: 5, title: 'Audit Saldo Sesi Treatment Member VIP Sanctuary', assigned_to: 'Maya Sari', priority: 'Normal', status: 'Done', due_date: today, updated_at: new Date().toISOString() }
-    ];
-    execState.attendance = Array.isArray(att) && att.length ? att : [
-      { employee_name: 'Ace Anwar', clock_in_at: `${today}T07:45:00`, clock_in_status: 'OnTime' },
-      { employee_name: 'dr. Budi Santoso, Sp.PK', clock_in_at: `${today}T08:05:00`, clock_in_status: 'OnTime' },
-      { employee_name: 'Siti Rahmawati, A.Md.AK', clock_in_at: `${today}T07:50:00`, clock_in_status: 'OnTime' },
-      { employee_name: 'Maya Sari, S.Farm', clock_in_at: `${today}T08:00:00`, clock_in_status: 'OnTime' },
-      { employee_name: 'Ahmad Fauzi', clock_in_at: `${today}T08:15:00`, clock_in_status: 'OnTime' }
-    ];
-    execState.employees  = Array.isArray(emps) && emps.length ? emps : [
-      { id: 1, full_name: 'Ace Anwar', position: 'Head of Operations / CEO', division: 'Executive' },
-      { id: 2, full_name: 'dr. Budi Santoso, Sp.PK', position: 'Dokter Penanggung Jawab Lab', division: 'Laboratorium' },
-      { id: 3, full_name: 'Siti Rahmawati, A.Md.AK', position: 'Senior ATLM & Phlebotomist', division: 'Laboratorium' },
-      { id: 4, full_name: 'Maya Sari, S.Farm', position: 'Kepala Instalasi Farmasi', division: 'Farmasi' },
-      { id: 5, full_name: 'Ahmad Fauzi', position: 'Kasir & Front Office', division: 'Finance' }
-    ];
+    execState.tasks      = Array.isArray(tasks) ? tasks : [];
+    execState.attendance = Array.isArray(att) ? att : [];
+    execState.employees  = Array.isArray(emps) ? emps : [];
   } catch(e) {
-    console.warn('[ExecDashboard] load fallback:', e);
+    execState.tasks = []; execState.attendance = []; execState.employees = [];
+    console.warn('[ExecDashboard] data unavailable:', e);
   }
   execState.lastRefresh= new Date();
 }

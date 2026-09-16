@@ -382,7 +382,7 @@
                   <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.03); padding-bottom:10px;">
                     <div>
                       <h6 style="font-size:13px; font-weight:700; color:white;">Profil Lipid &amp; Asam Urat</h6>
-                      <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Layanan Home Care AvaHealth &bull; Perawat Siti</p>
+                      <p style="font-size:11px; color:var(--text-muted); margin-top:2px;">Layanan Home Care AVA &bull; Petugas ditetapkan setelah order HIS</p>
                     </div>
                     <div style="text-align:right;">
                       <span class="badge badge-fit" style="font-size:9px; padding:2px 6px;">Selesai</span>
@@ -465,8 +465,8 @@
               </div>
               <span class="badge badge-fit">STABIL</span>
             </div>
-            <button class="btn btn-sm btn-teal" onclick="simulateBiosensorPulse()" style="width:100%; margin-top:14px;">
-              ⚡ Scan Ulang Sensor Tubuh
+            <button class="btn btn-sm btn-teal" onclick="simulateBiosensorPulse()" disabled style="width:100%; margin-top:14px; opacity:.6;">
+              ⚡ Sensor belum tersambung
             </button>
           </div>
         </div>
@@ -544,7 +544,7 @@
             </div>
             <div class="longevity-badge-row" style="margin-top:14px; border-top:1px solid rgba(255,255,255,0.05); padding-top:12px;">
               <span>Terapi Senolitik (Anti-Aging): <strong style="color:var(--teal)">AKTIF</strong></span>
-              <button class="btn btn-sm btn-teal" onclick="simulateAgeReversal()" style="font-size:10px;">Picu Terapi Sel</button>
+              <button class="btn btn-sm btn-teal" onclick="simulateAgeReversal()" disabled style="font-size:10px; opacity:.6;">Konsep — belum tersedia</button>
             </div>
           </div>
         </div>
@@ -1611,7 +1611,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <p style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Akumulasi Reward Cashback</p>
-              <strong id="c-cashback-balance" style="font-size:24px; color:var(--teal); font-weight:800;">Rp 4.500.000</strong>
+            <strong id="c-cashback-balance" style="font-size:24px; color:var(--teal); font-weight:800;">—</strong>
             </div>
             <button class="btn btn-sm btn-teal" onclick="openClaimCashbackModal()" style="margin:0;">Klaim Cashback</button>
           </div>
@@ -1667,12 +1667,12 @@
             </div>
             <div class="chat-body-widget" id="chat-messages-container">
               <div class="chat-msg msg-received">
-                <p>Selamat pagi Dokter. Untuk sampel pasien Budi Santoso, kadar Trombositnya terpantau kritis (45.000). Apakah perlu kami lakukan sediaan apus darah tepi ulang?</p>
-                <span class="msg-time">05:15</span>
+                <p>Belum ada pesan konsultasi yang terhubung.</p>
+                <span class="msg-time">—</span>
               </div>
               <div class="chat-msg msg-sent">
-                <p>Selamat pagi dr. Haryanto. Ya, mohon lakukan sediaan apus untuk menyingkirkan adanya false thrombocytopenia / platelet clumping. Terima kasih.</p>
-                <span class="msg-time">05:20</span>
+                <p>Pesan dokter akan muncul setelah layanan konsultasi aktif.</p>
+                <span class="msg-time">—</span>
               </div>
             </div>
             <form onsubmit="sendConsultMessage(event)" class="chat-input-form">
@@ -1974,10 +1974,10 @@
         <div class="glass-card" style="padding:20px; background:#ffffff; margin-bottom:20px; border:1px solid var(--border);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
             <div>
-              <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">Kunjungan Flebotomi Home Care #HC-2026-9902</h4>
-              <p style="font-size:11px; color:#64748b; margin-top:2px;">Petugas: Perawat Siti Nakes &bull; Armada No. B 4819 AVA</p>
+            <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">Kunjungan Flebotomi Home Care</h4>
+              <p style="font-size:11px; color:#64748b; margin-top:2px;">Petugas dan armada ditampilkan setelah penugasan HIS.</p>
             </div>
-            <span class="badge badge-fit" style="font-size:11px; padding:6px 12px;">🚚 Menuju Lokasi Pasien (ETA 14 Mins)</span>
+            <span class="badge badge-pending" style="font-size:11px; padding:6px 12px;">Menunggu order aktif</span>
           </div>
 
           <!-- GPS Map & Cold Chain Simulator -->
@@ -2224,36 +2224,8 @@
           <button class="btn btn-sm btn-teal" onclick="openReferralForm()" style="font-size:11px;">+ Buat FPP Rujukan Baru</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:14px;">
-          <div class="glass-card" style="padding:16px; background:#ffffff; border:1px solid var(--border);">
-            <span style="font-size:9.5px; font-weight:800; color:#0f766e; background:#ccfbf1; padding:2px 7px; border-radius:4px;">LOINC 2345-7 &bull; KIMIA KLINIK</span>
-            <h5 style="font-size:13.5px; font-weight:800; color:#0f2963; margin:8px 0 4px 0;">Glukosa Puasa (Fasting Glucose)</h5>
-            <p style="font-size:10.5px; color:#64748b; margin:0 0 10px 0;">Wadah: NaF (Abu-abu) &bull; Stabilitas Cold-Chain: 2-8°C (7 Hari)</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="color:#0f2963; font-size:14px;">Rp 49.000</strong>
-              <span style="font-size:10px; color:#10b981; font-weight:700;">Komisi Dokter: Rp 10.000</span>
-            </div>
-          </div>
-
-          <div class="glass-card" style="padding:16px; background:#ffffff; border:1px solid var(--border);">
-            <span style="font-size:9.5px; font-weight:800; color:#0f766e; background:#ccfbf1; padding:2px 7px; border-radius:4px;">LOINC 2093-3 &bull; KIMIA KLINIK</span>
-            <h5 style="font-size:13.5px; font-weight:800; color:#0f2963; margin:8px 0 4px 0;">Kolesterol Total (Total Cholesterol)</h5>
-            <p style="font-size:10.5px; color:#64748b; margin:0 0 10px 0;">Wadah: Serum (Merah/Kuning) &bull; Stabilitas Cold-Chain: 2-8°C (5 Hari)</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="color:#0f2963; font-size:14px;">Rp 79.000</strong>
-              <span style="font-size:10px; color:#10b981; font-weight:700;">Komisi Dokter: Rp 15.000</span>
-            </div>
-          </div>
-
-          <div class="glass-card" style="padding:16px; background:#ffffff; border:1px solid var(--border);">
-            <span style="font-size:9.5px; font-weight:800; color:#0284c7; background:#e0f2fe; padding:2px 7px; border-radius:4px;">LOINC 4548-4 &bull; ENDOKRINOLOGI</span>
-            <h5 style="font-size:13.5px; font-weight:800; color:#0f2963; margin:8px 0 4px 0;">Hemoglobin A1c (HbA1c)</h5>
-            <p style="font-size:10.5px; color:#64748b; margin:0 0 10px 0;">Wadah: EDTA (Ungu) &bull; Stabilitas Cold-Chain: 2-8°C (3 Hari)</p>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <strong style="color:#0f2963; font-size:14px;">Rp 209.000</strong>
-              <span style="font-size:10px; color:#10b981; font-weight:700;">Komisi Dokter: Rp 40.000</span>
-            </div>
-          </div>
+        <div class="referral-catalog-placeholder" style="padding:24px;border:1px dashed #94a3b8;border-radius:12px;color:#64748b;background:#f8fafc;">
+          Katalog layanan referral akan dimuat dari master HIS/LIS setelah kontrak akses, tarif, LOINC/UCUM, dan aturan fee disetujui. Tidak ada tarif atau komisi contoh yang ditampilkan.
         </div>
       </div>
 
@@ -2264,14 +2236,14 @@
         <div class="glass-card" style="padding:20px; background:#ffffff; border:1px solid var(--border);">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
             <div>
-              <h5 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">Pasien: Budi Santoso &bull; RM-12948</h5>
-              <p style="font-size:11px; color:#64748b; margin-top:2px;">FPP No: #REF-2026-0041 &bull; Dokter Pengirim: dr. Ace Darojatun, Sp.PD</p>
+            <h5 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">Belum ada hasil pasien rujukan</h5>
+            <p style="font-size:11px; color:#64748b; margin-top:2px;">Data akan muncul setelah order referral dan validasi hasil diterima dari LIS.</p>
             </div>
             <button class="btn btn-sm btn-teal" onclick="alert('Mengunduh Sertifikat PDF E-Hasil Lab Terverifikasi...')" style="font-size:11px;">📄 Unduh Sertifikat PDF E-Hasil</button>
           </div>
 
           <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; font-size:11.5px; color:#334155; line-height:1.5;">
-            <strong>Ringkasan AI Bio-Interpreter:</strong> Pasien mengalami elevasi kolesterol total (215 mg/dL) dan prediabetes ringan (Glukosa Puasa 108 mg/dL). Seluruh hasil telah diverifikasi oleh dr. Ahmad Subarjo, Sp.PK dengan TTD Digital QR Valid.
+            <strong>Ringkasan hasil:</strong> Belum tersedia. Portal tidak membuat interpretasi atau validasi klinis tanpa hasil LIS yang sah.
           </div>
         </div>
       </div>
@@ -2287,24 +2259,24 @@
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
               <div class="input-group" style="margin:0;">
                 <label style="font-size:11px; font-weight:700; color:#475569;">No. Barcode Cooler Box Transport</label>
-                <input type="text" value="BOX-COLD-2026-0906" readonly style="background:#f8fafc; font-weight:700;">
+                <input type="text" value="—" placeholder="Menunggu order aktif" readonly style="background:#f8fafc; font-weight:700;">
               </div>
               <div class="input-group" style="margin:0;">
                 <label style="font-size:11px; font-weight:700; color:#475569;">Suhu Saat Diterima di Lab (°C)</label>
-                <input type="text" value="4.1 °C (Valid 2-8°C)" readonly style="background:#f8fafc; color:#059669; font-weight:700;">
+                <input type="text" value="—" placeholder="Menunggu telemetry" readonly style="background:#f8fafc; color:#64748b; font-weight:700;">
               </div>
             </div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:16px;">
               <div class="input-group" style="margin:0;">
                 <label style="font-size:11px; font-weight:700; color:#475569;">Petugas Flebotomis (Pengirim)</label>
-                <input type="text" value="Perawat Siti Nakes, S.Kep" readonly style="background:#f8fafc;">
+                <input type="text" value="—" placeholder="Menunggu petugas terverifikasi" readonly style="background:#f8fafc;">
               </div>
               <div class="input-group" style="margin:0;">
                 <label style="font-size:11px; font-weight:700; color:#475569;">Analis / ATLM Penerima di Lab</label>
-                <input type="text" value="Ahmad Subarjo, A.Md.AK" required style="background:#ffffff;">
+                <input type="text" value="" placeholder="Pilih analis terverifikasi" required style="background:#ffffff;">
               </div>
             </div>
-            <button type="submit" class="btn btn-teal" style="width:100%; padding:12px; font-size:13px; font-weight:800;">✍️ Konfirmasi Handover &amp; Simpan Log Audit</button>
+            <button type="submit" class="btn btn-teal" disabled style="width:100%; padding:12px; font-size:13px; font-weight:800; opacity:.6;">✍️ Menunggu order &amp; petugas terverifikasi</button>
           </form>
         </div>
       </div>
@@ -2833,7 +2805,7 @@
               </div>
             </div>
 
-            <button class="btn btn-teal" onclick="simulateWearableAddSteps()" style="margin-top:16px; width:100%; padding:10px; font-size:12px; font-weight:800;">➕ Simulasi Tambah 1.000 Langkah (Simulasi Sensor)</button>
+            <button class="btn btn-teal" onclick="simulateWearableAddSteps()" disabled style="margin-top:16px; width:100%; padding:10px; font-size:12px; font-weight:800; opacity:.6;">Wearable belum tersambung</button>
           </div>
 
           <!-- Active Challenges & Leaderboard -->
@@ -3360,7 +3332,7 @@
         <div style="text-align:center; margin-bottom:20px;">
           <div style="width:72px; height:72px; border-radius:50%; background:linear-gradient(135deg, var(--primary), var(--teal)); color:white; font-size:32px; font-weight:800; display:flex; align-items:center; justify-content:center; margin: 0 auto 12px auto;">P</div>
           <h4 id="prof-fullname" style="font-size:18px; font-weight:800; color:#0f2963; display:flex; align-items:center; justify-content:center; gap:6px;">
-            Ace Darojatun Anwar
+            —
             <span class="verified-badge-blue" title="Verified Account">✓</span>
           </h4>
           <span style="font-size:11px; background:rgba(20, 184, 166, 0.15); color:var(--teal); padding:2px 8px; border-radius:12px; font-weight:700; text-transform:uppercase;">Verified Patient</span>
@@ -3369,19 +3341,19 @@
         <div style="display:flex; flex-direction:column; gap:12px; border-top:1px solid var(--border); padding-top:16px;">
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Email</span>
-            <strong id="prof-email" style="font-size:13px; color:#0f172a;">admin@avahealth.sbs</strong>
+            <strong id="prof-email" style="font-size:13px; color:#0f172a;">—</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Rekam Medis (RM)</span>
-            <strong style="font-size:13px; color:#0f172a; font-family:monospace;">RM-12948</strong>
+            <strong style="font-size:13px; color:#0f172a; font-family:monospace;">—</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">No. Handphone</span>
-            <strong style="font-size:13px; color:#0f172a;">0812-3456-7890</strong>
+            <strong style="font-size:13px; color:#0f172a;">—</strong>
           </div>
           <div>
             <span style="font-size:9px; text-transform:uppercase; color:var(--text-muted); display:block;">Alamat KTP</span>
-            <strong style="font-size:13px; color:#0f172a;">Komp. Graha Indah Blok C-4, Bandung</strong>
+            <strong style="font-size:13px; color:#0f172a;">—</strong>
           </div>
         </div>
 
@@ -3487,25 +3459,25 @@
     <div id="lab-results-modal" class="modal-overlay">
       <div class="modal-box" style="max-width: 440px; text-align:left;">
         <h3 style="text-align:center;">Hasil Pemeriksaan Lab</h3>
-        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px; text-align:center;">Pasien: <strong id="lab-patient-name">Budi Santoso</strong> &bull; RM-12948</p>
+        <p style="color: var(--text-muted); font-size:12px; margin-bottom: 20px; text-align:center;">Pasien: <strong id="lab-patient-name">—</strong> &bull; RM —</p>
         
         <!-- Lab Value Table -->
         <div class="lab-values-container" style="margin-bottom:20px;">
           <div class="lab-row">
             <span class="lab-label">Hemoglobin (Hb)</span>
-            <span class="lab-val val-normal">14.5 g/dL</span>
+            <span class="lab-val">—</span>
           </div>
           <div class="lab-row">
             <span class="lab-label">Kolesterol Total</span>
-            <span class="lab-val val-high">245 mg/dL ⚠️</span>
+            <span class="lab-val">—</span>
           </div>
           <div class="lab-row">
             <span class="lab-label">Asam Urat</span>
-            <span class="lab-val val-normal">5.8 mg/dL</span>
+            <span class="lab-val">—</span>
           </div>
           <div class="lab-row">
             <span class="lab-label">Glukosa Puasa</span>
-            <span class="lab-val val-high">126 mg/dL ⚠️</span>
+            <span class="lab-val">—</span>
           </div>
         </div>
 
@@ -3516,7 +3488,7 @@
             <span class="ai-badge">V1.0</span>
           </div>
           <div class="ai-assessor-body" id="ai-assessment-text">
-            Menganalisis hasil pemeriksaan Anda...
+            Belum ada hasil yang dapat dianalisis. Data akan muncul setelah hasil LIS tervalidasi.
           </div>
         </div>
 
@@ -3692,7 +3664,7 @@
         
         <div style="background:rgba(20,184,166,0.1); border:1px solid var(--teal); border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
           <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Jumlah Cashback Dapat Diklaim</span>
-          <h2 id="cashback-modal-amt" style="font-size:26px; color:var(--teal); font-weight:800; margin-top:4px;">Rp 4.500.000</h2>
+          <h2 id="cashback-modal-amt" style="font-size:26px; color:var(--teal); font-weight:800; margin-top:4px;">—</h2>
         </div>
         <div style="display:flex; gap:12px;">
           <button type="button" class="btn btn-close" onclick="closeClaimCashbackModal()">Batal</button>
@@ -3709,7 +3681,7 @@
         
         <div style="background:rgba(99,102,241,0.05); border:1px solid #c7d2fe; border-radius:10px; padding:16px; margin-bottom:20px; text-align:center;">
           <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">Saldo Tersedia</span>
-          <h2 id="withdraw-modal-amt" style="font-size:26px; color:#4f46e5; font-weight:800; margin-top:4px;">Rp 330.000</h2>
+          <h2 id="withdraw-modal-amt" style="font-size:26px; color:#4f46e5; font-weight:800; margin-top:4px;">—</h2>
         </div>
 
         <form onsubmit="processWithdrawFee(event)">
@@ -3723,7 +3695,7 @@
           </div>
           <div class="input-group">
             <label for="w-amount">Jumlah Penarikan (Rp)</label>
-            <input type="number" id="w-amount" min="50000" max="330000" value="330000" required style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; color:#0f172a; font-size:12.5px;">
+            <input type="number" id="w-amount" min="50000" max="0" value="0" disabled style="width:100%; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:10px 12px; color:#0f172a; font-size:12.5px;">
           </div>
 
           <div style="display:flex; gap:12px; margin-top:24px;">

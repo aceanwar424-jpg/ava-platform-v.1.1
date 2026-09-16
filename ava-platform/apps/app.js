@@ -2,18 +2,6 @@
 // MOBILE APPS - Logic & Multi-Role Datasets
 // ═══════════════════════════════════════════
 
-// --- VIRTU STYLE LAB TEST ITEMS ---
-const LAB_TEST_ITEMS = [
-  { code: 'CHEM - CALCIUM', name: 'CHEM - CALCIUM', price: 149000, desc: 'Calcium blood is used to help screening, diagnosis, and monitor a state related to bone health.' },
-  { code: 'CHEM - CREATININE', name: 'CHEM - CREATININE', price: 79000, desc: 'Creatinine is a garbage product from solving muscle cells during activities. A healthy kidney filters it.' },
-  { code: 'CHEM - GLUCOSE FASTING', name: 'CHEM - GLUCOSE FASTING', price: 49000, desc: 'Glucose fasting checks can be done both for screening, DM diagnosis, or monitoring of treatment.' },
-  { code: 'CHEM - HEMOGLOBIN A1C (HBA1C)', name: 'CHEM - HEMOGLOBIN A1C (HBA1C)', price: 209000, desc: 'The HBA1C examination measures the average number of Glucose bound to Hemoglobin over 3 months.' },
-  { code: 'CHEM - CHOLESTEROL TOTAL', name: 'CHEM - CHOLESTEROL TOTAL', price: 79000, desc: 'Total cholesterol examination measures the concentration of all cholesterol fractions in blood.' },
-  { code: 'CHEM - GAMMA-GLUTAMYL TRANSFERASE', name: 'CHEM - GAMMA-GLUTAMYL TRANSFERASE (GGT)', price: 139000, desc: 'Gamma Glutamyl Transferase (GGT) is the most sensitive marker for hepatobiliary diseases.' },
-  { code: 'CHEM - GLUCOSE RANDOM', name: 'CHEM - GLUCOSE RANDOM', price: 49000, desc: 'Glucose random measures blood sugar level at any point of time without fasting constraint.' },
-  { code: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', name: 'CHEM - HIGH DENSITY LIPOPROTEIN (HDL)', price: 99000, desc: 'HDL cholesterol examination measures the concentration of good cholesterol protective for heart.' }
-];
-
 // --- LIVE SUPABASE INTEGRATION STATES ---
 let labTestsFromDB = [];
 let packagesFromDB = [];
@@ -816,7 +804,8 @@ function renderLabCatalogue(filterText = '') {
   );
 
   if (filtered.length === 0) {
-    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">Belum ada pemeriksaan yang sesuai dengan pencarian ${appsEscape(filterText)}.</div>`;
+    const msg = itemsList.length ? `Belum ada pemeriksaan yang sesuai dengan pencarian ${appsEscape(filterText)}.` : 'Katalog pemeriksaan belum dapat dimuat dari HIS/LIS. Hubungi petugas layanan.';
+    container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted);">${msg}</div>`;
     return;
   }
 
@@ -847,7 +836,7 @@ function searchLabTest() {
 }
 
 function toggleCartItem(code) {
-  const itemsList = labTestsFromDB.length > 0 ? labTestsFromDB : LAB_TEST_ITEMS;
+  const itemsList = labTestsFromDB;
   const item = itemsList.find(i => i.code === code);
   if (!item) return;
 
@@ -2046,7 +2035,7 @@ function openProfileModal() {
   if (!modal) return;
 
   const isSuperAdmin = (currentUserEmail === 'admin@avahealth.sbs');
-  const finalName = isSuperAdmin ? 'Ace Darojatun Anwar' : (currentUsername || 'Budi Santoso');
+  const finalName = isSuperAdmin ? 'Ace Darojatun Anwar' : (currentUsername || 'Pengguna');
   const finalEmail = isSuperAdmin ? 'admin@avahealth.sbs' : `${finalName.toLowerCase().replace(/\s+/g, '')}@email.com`;
 
   if (nameEl) nameEl.innerHTML = `${finalName} <span class="verified-badge-blue">✓</span>`;
@@ -2434,14 +2423,6 @@ async function renderCorporateResults() {
     ref: (r.normal_min!=null && r.normal_max!=null) ? `${r.normal_min}–${r.normal_max}` : '',
     interp: r.interpretation || '', color: r.color_code || '',
   }));
-
-  if (!_corpResults.length) {
-    _corpResults = [
-      { patient: 'Ahmad Subarjo', date: '2026-09-05', package: 'Paket MCU Eksekutif A', test: 'Kolesterol Total', value: '185', unit: 'mg/dL', ref: '< 200', interp: 'Normal', color: 'green' },
-      { patient: 'Bambang Wijaya', date: '2026-09-04', package: 'Paket MCU Driver', test: 'Glukosa Puasa', value: '142', unit: 'mg/dL', ref: '70–100', interp: 'Prediabetes (Tinggi)', color: 'red' },
-      { patient: 'Siti Rahma', date: '2026-09-02', package: 'Paket MCU Dasar', test: 'Hemoglobin (Hb)', value: '14.2', unit: 'g/dL', ref: '13.0–17.5', interp: 'Normal', color: 'green' }
-    ];
-  }
 
   const rowsHtml = _corpResults.map(r => `<tr>
     <td>${r.patient}</td><td>${r.date}</td><td>${r.test}</td>
@@ -3533,10 +3514,10 @@ async function applyRoleUIState(role) {
   else {
     // Default: Patient
     if (avatarEl) { avatarEl.textContent = 'P'; avatarEl.style.background = 'linear-gradient(135deg, #0ea5e9, #0284c7)'; }
-    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
+    if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Pengguna');
     
     const memberNameEl = document.getElementById('p-member-name');
-    if (memberNameEl) memberNameEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
+    if (memberNameEl) memberNameEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Pengguna');
 
     await loadDataFromSupabase();
     await loadPatientEHR(currentUsername, currentUserProfile?.patient_id);
@@ -3710,11 +3691,9 @@ if (typeof document !== 'undefined') {
 // UNIFIED B2C SUPER-APP CART & MULTI-PAYMENT ENGINE
 // ═══════════════════════════════════════════════════════════════
 
-let unifiedSuperCart = [
-  { id: 'PROD-COL-01', type: 'PRODUCT', name: 'Queen Royal Collagen Glow 250g', unitPrice: 285000, qty: 2, weightGram: 500 },
-  { id: 'SNC-RATUS-01', type: 'SPA', name: 'Empress Ratus Keraton + Suite Rose (90m)', unitPrice: 450000, qty: 1, date: '2026-09-02' },
-  { id: 'LAB-LIPID-01', type: 'LAB', name: 'Profil Lipid Lengkap (Kolesterol, HDL, LDL, TG)', unitPrice: 195000, qty: 1, branch: 'Klinik AVA Pusat' }
-];
+// Cart starts empty. Product, package, and service lines must come from the
+// approved backend catalog; production must never ship sample orders/prices.
+let unifiedSuperCart = [];
 
 let unifiedOrderHistory = [];
 
@@ -3897,12 +3876,12 @@ window.updateLoginFormUI = updateLoginFormUI;
 window.quickFillDemoUser = quickFillDemoUser;
 
 // ════════════════════════ MODUL WELLNESS & WEARABLES HELPER ENGINE ════════════════════════
-let currentStepsCount = 8450;
-let currentWaterIntake = 2100;
+let currentStepsCount = 0;
+let currentWaterIntake = 0;
 
 function syncWearableDevice(provider) {
-  const stepsAdd = Math.floor(Math.random() * 850) + 150;
-  currentStepsCount += stepsAdd;
+  alert(`Sinkronisasi ${provider || 'wearable'} belum tersedia. Tidak ada data kesehatan yang diambil atau dibuat dari portal.`);
+  return;
   
   // Update Hub DOM
   const hubSteps = document.getElementById('hub-step-count');
