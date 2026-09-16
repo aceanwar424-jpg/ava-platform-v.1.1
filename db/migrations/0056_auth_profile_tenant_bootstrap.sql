@@ -18,6 +18,7 @@ SET search_path = public
 AS $$
 DECLARE
   v_claim text;
+  v_setting text;
   v_tenant uuid;
 BEGIN
   v_claim := nullif(auth.jwt() ->> 'tenant_id', '');
@@ -25,8 +26,13 @@ BEGIN
     RETURN v_claim::uuid;
   END IF;
 
-  v_tenant := NULLIF(current_setting('app.tenant_id', true), '')::uuid;
-  IF v_tenant IS NOT NULL THEN RETURN v_tenant; END IF;
+  -- Some hosted requests carry a non-UUID marker (for example `local`) in
+  -- app.tenant_id. Validate before casting so a malformed setting cannot turn
+  -- a profile read into HTTP 500.
+  v_setting := nullif(current_setting('app.tenant_id', true), '');
+  IF v_setting IS NOT NULL AND v_setting ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$' THEN
+    RETURN v_setting::uuid;
+  END IF;
 
   SELECT up.tenant_id INTO v_tenant
     FROM public.user_profiles up
