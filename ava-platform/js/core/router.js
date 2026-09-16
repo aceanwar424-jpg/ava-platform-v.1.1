@@ -143,6 +143,10 @@ const PAGE_TITLES = {
   'compliance-tracker':'Compliance & Legal Tracker',
   'pacs-viewer':'PACS & DICOM Imaging Viewer',
   'catalog-export':'Master Catalog & LIS Exporter',
+  'his-integration':'Hub Integrasi HIS–LIS & Billing', 'lis-integration':'Inbox Order & Hasil LIS',
+  'wellness-program':'Program Care & Wellness', 'partner-rewards':'Challenge & Rekonsiliasi Mitra',
+  'nutrition-quality':'Batch, Release & Mutu Nutrition', 'sanctuary-operations':'Operasional Sanctuary',
+  'tech-delivery':'Delivery, SLA & Customer Success', 'evidence-register':'Evidence Register & Risk',
   'lis-settings':'Konfigurasi LIS & Gateway (:9999)',
   anamnesa:'Anamnesa & Tanda Vital (HIS)',
   'lis-admission':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
@@ -430,6 +434,7 @@ async function navigate(page, params={}) {
     case 'tech_saas':
     case 'license-manager':
     case 'saas-console':safeRun('renderTechSaas', params);           break;
+    case 'tech-control-plane': safeRun('renderTechControlPlane');    break;
     case 'lis-phlebotomy':
     case 'phlebotomy':  safeRun('renderPhlebotomy');                 break;
     case 'lis-kelayakan':
@@ -522,6 +527,14 @@ async function navigate(page, params={}) {
     case 'admission-package': safeRun('renderAdmission', { tab: 'package' }); break;
     case 'admission-subscription':
     case 'admission-package-usage': safeRun('renderSubscription');    break;
+    case 'his-integration': safeRun('renderReadiness', { panel: 'his-integration' }); break;
+    case 'lis-integration': safeRun('renderReadiness', { panel: 'lis-integration' }); break;
+    case 'wellness-program': safeRun('renderReadiness', { panel: 'wellness-program' }); break;
+    case 'partner-rewards': safeRun('renderReadiness', { panel: 'partner-rewards' }); break;
+    case 'nutrition-quality': safeRun('renderReadiness', { panel: 'nutrition-quality' }); break;
+    case 'sanctuary-operations': safeRun('renderReadiness', { panel: 'sanctuary-operations' }); break;
+    case 'tech-delivery': safeRun('renderReadiness', { panel: 'tech-delivery' }); break;
+    case 'evidence-register': safeRun('renderReadiness', { panel: 'evidence-register' }); break;
     default:
       renderRouterError(page, 'Halaman ini belum tersedia.');
   }

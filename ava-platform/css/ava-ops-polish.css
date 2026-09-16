@@ -117,3 +117,23 @@ body.ava-monitor-shell .counter-card, body.ava-monitor-shell .panel, body.ava-mo
 @media (prefers-reduced-motion: reduce) {
   body.ava-ops-shell *, body.ava-kiosk-shell *, body.ava-monitor-shell * { transition-duration: 0ms !important; animation-duration: 0ms !important; }
 }
+
+.readiness-eyebrow { margin: 0 0 6px; color: var(--ava-emerald); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.readiness-hero { display:flex; align-items:center; justify-content:space-between; gap:24px; margin: 0 0 20px; padding: 24px 28px; background: linear-gradient(135deg,#153c3d,#1d5752); color:#fff; border:0; }
+.readiness-hero h2 { margin:8px 0; color:#fff; font-size:24px; }
+.readiness-hero p { margin:0; max-width:720px; color:#c8e3d8; line-height:1.6; }
+.readiness-status { color:#f1d68b; font-size:10px; font-weight:800; letter-spacing:.08em; }
+.readiness-mark { color:#e3c766; font-size:64px; line-height:1; opacity:.72; }
+.readiness-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; margin-bottom:20px; }
+.readiness-step { min-height:150px; padding:17px; border:1px solid var(--ava-line); border-radius:14px; background:#fff; box-shadow:0 1px 2px rgba(21,60,61,.04); }
+.readiness-step > span { display:inline-grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--ava-gold-soft); color:#765c18; font-size:11px; font-weight:800; }
+.readiness-step h3 { margin:14px 0 7px; color:var(--ava-ink); font-size:14px; line-height:1.35; }
+.readiness-step p,.readiness-step small { display:block; color:var(--ava-muted); font-size:11px; line-height:1.45; }
+.readiness-step b { color:#9a6700; }
+.readiness-checklist { padding:20px; }
+.readiness-check-row { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 0; border-bottom:1px solid var(--ava-line); color:var(--ava-ink); font-size:13px; }
+.readiness-check-row:last-child { border-bottom:0; }
+.readiness-check-row label { display:flex; align-items:center; gap:9px; }
+.readiness-check-row span { color:var(--ava-muted); font-size:11px; white-space:nowrap; }
+@media (max-width: 900px) { .readiness-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width: 540px) { .readiness-hero { align-items:flex-start; padding:20px; } .readiness-mark { display:none; } .readiness-grid { grid-template-columns:1fr; } .readiness-check-row { align-items:flex-start; flex-direction:column; gap:5px; } }

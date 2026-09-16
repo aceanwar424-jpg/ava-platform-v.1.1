@@ -75,6 +75,11 @@ window.PETA_MENU = {
       "nama": "Wellness — Nutrition & Personal Care",
       "subdomain": "wellness.avahealth.sbs",
       "peran": "Gabungan AVA Nutrition dan AVA Care di bawah satu payung wellness, ditambah Sanctuary. Sebelumnya terpecah tiga subdomain dengan isi yang sama.",
+      "alias_subdomain": [
+        "care",
+        "nutri",
+        "sanctuary"
+      ],
       "kategori": [
         "wellness",
         "marketing",
@@ -115,6 +120,12 @@ window.PETA_MENU = {
               "label": "Konsolidasi Finansial 6 Pilar",
               "status": "ada",
               "ket": "EBITDA konsolidasi & metrik investor"
+            },
+            {
+              "id": "evidence-register",
+              "label": "Evidence Register & Risk",
+              "status": "ada",
+              "ket": "Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar"
             }
           ]
         },
@@ -150,6 +161,13 @@ window.PETA_MENU = {
               "label": "Cockpit AVA Tech",
               "status": "ada",
               "ket": "Kesehatan mesin platform & ringkasan klien"
+            },
+            {
+              "id": "tech-control-plane",
+              "label": "Control Plane Produksi",
+              "status": "ada",
+              "ket": "Pusat konfigurasi, kesehatan tenant, telemetri, dan trace bug",
+              "admin": true
             },
             {
               "id": "tech-roadmap",
@@ -297,6 +315,12 @@ window.PETA_MENU = {
               "label": "Sprint & Beban Kerja",
               "status": "ada",
               "ket": "Pembagian tugas dan kapasitas tim"
+            },
+            {
+              "id": "tech-delivery",
+              "label": "Delivery, SLA & Customer Success",
+              "status": "ada",
+              "ket": "Implementasi, acceptance, support, incident, adopsi dan renewal tenant"
             }
           ]
         }
@@ -424,6 +448,12 @@ window.PETA_MENU = {
               "label": "Order Terintegrasi",
               "status": "ada",
               "ket": "Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS"
+            },
+            {
+              "id": "his-integration",
+              "label": "Hub Integrasi HIS–LIS & Billing",
+              "status": "ada",
+              "ket": "Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS"
             },
             {
               "id": "his-clinical-pathology",
@@ -811,6 +841,12 @@ window.PETA_MENU = {
               "label": "Panduan & Bantuan",
               "status": "ada",
               "ket": "Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium"
+            },
+            {
+              "id": "lis-integration",
+              "label": "Inbox Order & Hasil LIS",
+              "status": "ada",
+              "ket": "Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS"
             }
           ]
         }
@@ -985,6 +1021,30 @@ window.PETA_MENU = {
               "label": "Uji Mutu Produk ke Lab",
               "status": "ada",
               "ket": "Batch karantina sampai SELURUH uji lulus, bukan uji pertama."
+            },
+            {
+              "id": "nutrition-quality",
+              "label": "Batch, Release & Mutu Nutrition",
+              "status": "ada",
+              "ket": "Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall"
+            },
+            {
+              "id": "wellness-program",
+              "label": "Program Care & Wellness",
+              "status": "ada",
+              "ket": "Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program"
+            },
+            {
+              "id": "partner-rewards",
+              "label": "Challenge & Rekonsiliasi Mitra",
+              "status": "ada",
+              "ket": "Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner"
+            },
+            {
+              "id": "sanctuary-operations",
+              "label": "Operasional Sanctuary",
+              "status": "ada",
+              "ket": "Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT"
             }
           ]
         }
@@ -1405,7 +1465,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-facility",
               "label": "Fasilitas, Cabang & Unit",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'facility'})",
               "ket": "Cabang, lokasi, unit, ruang, kelas layanan, dan alat"
@@ -1413,7 +1473,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-practitioner",
               "label": "Praktisi, Jadwal & Fee",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'practitioner'})",
               "ket": "Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan"
@@ -1421,7 +1481,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-patient",
               "label": "Pasien, Penjamin & Keluarga",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'patient'})",
               "ket": "Identitas pasien, asuransi, alergi, kondisi, dan relasi"
@@ -1429,7 +1489,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-corporate",
               "label": "Korporat & Kontrak",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'corporate'})",
               "ket": "Perusahaan, kontrak, jabatan, dan penjamin layanan"
@@ -1437,7 +1497,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-mcu",
               "label": "Parameter MCU",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'mcu'})",
               "ket": "Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus"
@@ -1445,7 +1505,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-payment",
               "label": "Bank, EDC & Pembayaran",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'payment'})",
               "ket": "Metode bayar, bank, EDC, dan mapping akun"
@@ -1453,7 +1513,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-queue",
               "label": "Flow, Display & Perangkat Antrean",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'queue'})",
               "ket": "Flow layanan, outlet, ruang, display, kiosk, dan device"
@@ -1461,7 +1521,7 @@ window.PETA_MENU = {
             {
               "id": "cfg-medicine",
               "label": "Master Obat & Aturan Pakai",
-              "status": "ada",
+              "status": "parsial",
               "rute": "config",
               "aksi": "navigate('config',{focus:'medicine'})",
               "ket": "Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi"

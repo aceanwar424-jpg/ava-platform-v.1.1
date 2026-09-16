@@ -37,8 +37,7 @@ let branchesFromDB = [];
 async function loadDataFromSupabase() {
   console.log("Loading live data from Supabase...");
   if (typeof sbGet !== 'function') {
-    console.warn("sbGet is not loaded. Using fallback mocks.");
-    return;
+    throw new Error("Data service is unavailable; production mode refuses mock data.");
   }
   
   try {
@@ -628,9 +627,12 @@ function closeXrayViewer() {
 }
 
 // --- LIVE PATIENT EHR (REKAM MEDIS) DATA FETCHERS ---
-async function loadPatientEHR(patientName) {
-  if (!patientName) return;
-  console.log("Loading patient EHR for:", patientName);
+async function loadPatientEHR(patientName, patientId) {
+  if (!patientId) {
+    console.warn("Patient EHR tidak dimuat tanpa patient_id yang stabil.");
+    return;
+  }
+  console.log("Loading patient EHR for:", patientId);
 
   let labs = [];
   let pres = [];
@@ -640,19 +642,19 @@ async function loadPatientEHR(patientName) {
   let medrecs = [];
 
   try {
-    labs = await sbGet('lab_results', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    labs = await sbGet('lab_results', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil lab_results:", e); }
 
   try {
-    pres = await sbGet('prescriptions', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    pres = await sbGet('prescriptions', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil prescriptions:", e); }
 
   try {
-    radOrders = await sbGet('radiology_orders', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    radOrders = await sbGet('radiology_orders', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil radiology_orders:", e); }
 
   try {
-    medrecs = await sbGet('medical_records', 'select=*&patient_name=eq.' + encodeURIComponent(patientName));
+    medrecs = await sbGet('medical_records', 'select=*&patient_id=eq.' + encodeURIComponent(patientId));
   } catch(e) { console.warn("Gagal mengambil medical_records:", e); }
 
   if (pres.length > 0) {
@@ -933,7 +935,7 @@ function updateCartUIs() {
   if (hcSub) hcSub.textContent = `IDR ${subtotalVal.toLocaleString('en-US')}.00`;
   if (hcFee) hcFee.textContent = `IDR ${serviceFeeVal.toLocaleString('en-US')}.00`;
   if (hcGrand) hcGrand.textContent = `IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
-  if (hcPayBtn) hcPayBtn.textContent = `Pay IDR ${grandTotalVal.toLocaleString('en-US')}.00`;
+  if (hcPayBtn) hcPayBtn.textContent = 'Kirim ke Tagihan HIS';
 }
 
 function checkoutLabBooking() {
@@ -961,7 +963,7 @@ function checkoutLabBooking() {
   if (ticketCurrentEl) ticketCurrentEl.textContent = `A-0${currentCalledQueue}`;
   if (ticketBox) ticketBox.style.display = 'block';
 
-  alert(`Pemesanan Berhasil!\nCabang: ${branch}\nTanggal: ${date}\nTiket antrean Anda A-045 telah dibuat.`);
+  alert(`Order layanan siap dikirim ke HIS.\nCabang: ${branch}\nTanggal: ${date}\nPembayaran dan tagihan diproses di HIS; aplikasi hanya menampilkan status antrean.`);
 
   // Reset cart
   bookingCart = [];
@@ -1849,10 +1851,10 @@ function hcAddrHideSuggest(){ const b=document.getElementById('hc-addr-suggest')
 function hcShowBookingSuccess(num, token){
   const link = token ? new URL('../track.html?token='+encodeURIComponent(token), location.href).href : '';
   if(link){
-    if(confirm(`✅ Pesanan Home Care ${num} berhasil dibuat!\n\nTim medis akan mengonfirmasi & menugaskan nakes. Anda bisa melacak posisi nakes secara real-time.\n\nBuka halaman pelacakan sekarang?`))
+    if(confirm(`✅ Order Home Care ${num} dikirim ke HIS.\n\nTim medis akan mengonfirmasi & menugaskan nakes. Penagihan diproses di HIS. Anda bisa melacak posisi nakes secara real-time.\n\nBuka halaman pelacakan sekarang?`))
       window.open(link, '_blank');
   } else {
-    alert(`✅ Pesanan Home Care ${num} berhasil dibuat! Tim medis akan menghubungi Anda untuk konfirmasi jadwal & nakes.`);
+    alert(`✅ Order Home Care ${num} dikirim ke HIS. Tim medis akan menghubungi Anda untuk konfirmasi jadwal & nakes; penagihan diproses di HIS.`);
   }
   showView('patient-view', 'Dashboard');
 }
@@ -3550,7 +3552,7 @@ async function applyRoleUIState(role) {
     if (memberNameEl) memberNameEl.textContent = isSuperAdmin ? adminRealName : (currentUsername || 'Budi Santoso');
 
     await loadDataFromSupabase();
-    await loadPatientEHR(currentUsername || 'Ace Darojatun Anwar');
+    await loadPatientEHR(currentUsername, currentUserProfile?.patient_id);
     showView('patient-view', 'Dashboard Utama Pasien');
   }
 }
@@ -3799,13 +3801,13 @@ function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails 
     items: [...unifiedSuperCart],
     totals,
     payment_method: paymentMethod,
-    payment_status: 'PAID_SUCCESS',
-    qris_reference: paymentMethod === 'QRIS_DYNAMIC' ? `NMID-9360052300-${orderId}` : null,
+    payment_status: 'PENDING_HIS_BILLING',
+    qris_reference: null,
     courier_tracking_no: totals.subtotal_product > 0 ? `JNE-RES-${orderId}` : null,
     created_at: now,
     status_timeline: [
-      { time: now, event: 'Pesanan dibuat & Pembayaran Terkonfirmasi' },
-      { time: now, event: 'Notifikasi diteruskan ke Gudang Nutri & Booking Spa' }
+      { time: now, event: 'Pesanan dibuat & menunggu penagihan HIS' },
+      { time: now, event: 'Handoff layanan diteruskan ke HIS untuk billing dan fulfillment' }
     ]
   };
 
@@ -3815,7 +3817,7 @@ function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails 
   return {
     success: true,
     order: newOrder,
-    message: `Checkout berhasil! Nomor Pesanan: ${orderId}. Total: Rp ${Number(totals.grand_total).toLocaleString('id-ID')}`
+    message: `Order berhasil dikirim ke HIS. Nomor Pesanan: ${orderId}. Tagihan akan diterbitkan melalui HIS.`
   };
 }
 
