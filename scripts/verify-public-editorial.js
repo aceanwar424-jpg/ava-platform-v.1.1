@@ -17,11 +17,11 @@ for(const bad of [{height:0},{weight:-1},{weight:NaN},{age:19},{age:79},{age:20.
 assert.equal(calculate({...input,factor:1.8}).maintenance,3114);
 console.log('PASS: independent calorie examples, BMI boundary classifications, activity factor, excluded and invalid inputs.');
 const files = ['portal.html',...fs.readdirSync(path.join(platform,'public')).filter(f=>f.endsWith('.html')).map(f=>'public/'+f)];
-assert.equal(files.length,32);
+assert(files.length >= 37, 'Website V2 public page set is incomplete');
 const read = file => fs.readFileSync(path.join(platform,file),'utf8');
 const lookup = new Map(files.map(file=>[file,read(file)]));
 const home = lookup.get('portal.html');
-for (const file of ['demo','penawaran','investasi','tentang','ekosistem','kalkulator']) assert(lookup.has(`public/${file}.html`));
+for (const file of ['demo','penawaran','investasi','tentang','ekosistem','layanan','corporate','ava-his','ava-lis','ava-apps','kalkulator','privasi']) assert(lookup.has(`public/${file}.html`));
 assert(lookup.get('public/penawaran.html').includes('Lisensi bulanan') && lookup.get('public/penawaran.html').includes('Biaya awal'));
 for (const file of ['solusi-laboratorium.html','solusi-klinik-pratama.html','solusi-klinik-utama.html','investasi.html']) assert(/uji coba terbatas/i.test(lookup.get('public/'+file)),file);
 for (const [file, content] of lookup) assert(!content.includes('Queen Health Solution'), `Corporate name must remain AVA: ${file}`);
@@ -34,11 +34,13 @@ for (const [file,html] of lookup) {
   for(const [,raw] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
     if (/^(https?:|mailto:)/.test(raw) || raw === '../') continue;
     const [target,hash] = raw.split('#');
-    const relative = target || file;
+    const relative = (target || file).split('?')[0];
     assert(fs.existsSync(path.join(platform,relative)),`Missing ${relative} in ${file}`);
     if(hash) assert(read(relative).includes(`id="${hash}"`),`Missing ${hash} in ${relative}`);
   }
   assert(!/type="password"|mock_token|handleSSOLogin/.test(html),file);
+  assert(html.includes('property="og:title"'),`Missing Open Graph metadata in ${file}`);
+  assert(html.includes('application/ld+json'),`Missing structured data in ${file}`);
 }
 for(const [brand,p] of Object.entries(profiles)) {
   assert.equal(p.mission.length,3); assert(p.flow.length>=5);
@@ -58,4 +60,4 @@ assert(lookup.get('public/brand-care.html').includes('Queen Sanctuary'));
 assert(lookup.get('public/founder.html').includes('founder-photo-slot'));
 assert(lookup.get('public/founder.html').includes('Founder, Owner & CEO'));
 assert.equal((lookup.get('public/sejarah.html').match(/class="story-chapter"/g)||[]).length,6);
-console.log('PASS: 32 pages, all local targets/anchors, one H1, founder photo slot, 6 story chapters, physical businesses, inclusive Care & Wellness, sourced articles, deterministic rebuild.');
+console.log(`PASS: ${files.length} pages, all local targets/anchors, one H1, Website V2 metadata, founder photo slot, 6 story chapters, physical businesses, inclusive Care & Wellness, sourced articles, deterministic rebuild.`);

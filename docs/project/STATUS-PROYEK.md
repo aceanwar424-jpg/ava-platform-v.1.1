@@ -2037,3 +2037,31 @@ OWNED_BY: ava. Audit memakai fixture/sintetis dan pemeriksaan statis lokal. Tida
 - [ ] Probe HTTP menunjukkan alias lama `lab`, `app`, `cek`, `console`, dan `korporat` merespons 404 di edge walaupun route sudah tersedia di `config/domain.json`; ini memerlukan pemeriksaan custom-domain/alias deployment, bukan perubahan route lokal.
 - [ ] Alias typo `avahelath.sbs` belum resolve DNS (`ENOTFOUND`) dan perlu keputusan apakah tetap dipertahankan atau diarahkan secara DNS.
 - [ ] Google Maps tetap bergantung pada API key, billing, API enablement, dan HTTP referrer di Google Cloud; aplikasi sekarang memberi diagnosis domain secara eksplisit.
+
+## Website V2 — gateway AVA Global Ecosystem — 21 September 2026
+### Rencana
+- [x] Audit generator, routing, halaman, aset, form, metadata, responsivitas, dan integrasi website publik.
+- [x] Petakan konten existing ke jalur Individu, Corporate, Faskes, Partner, dan Investor.
+- [x] Refine design system publik dan implementasikan homepage gateway berbasis kebutuhan.
+- [x] Lengkapi halaman Queen Health, Queen Lab, Corporate Health, Partnership, Investor, serta produk AVA HIS/LIS/Apps menggunakan kemampuan yang dapat diverifikasi dari project.
+- [x] Tambahkan status transparansi, trust layer, CTA kontekstual, SEO/Open Graph, analytics event architecture, accessibility, dan responsive QA.
+- [x] Regenerasi seluruh halaman dari source generator, jalankan audit link/asset/metadata/content safety, lalu perbaiki regresi.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Implementasi menggunakan narasi dan aset AVA yang sudah berada di repository. Tidak membuat dokter, lokasi, pelanggan, partner, sertifikasi, izin, harga, statistik, atau klaim klinis baru. Status layanan dibatasi pada fakta yang sudah dikonfirmasi: HIS/LIS/Apps tersedia untuk demo/uji coba terbatas; unit dan portofolio lain ditandai sebagai pengembangan atau perlu konfirmasi. Tidak ada perubahan database, data pasien, kredensial, atau integrasi produksi.
+
+### Hasil implementasi
+- [x] Beranda menjadi gateway berbasis enam kebutuhan, dilengkapi peta ekosistem, transparansi status, spotlight AVA Tech, pemilihan solusi per tipe fasilitas, trust layer, Health Tools, dan CTA kontekstual.
+- [x] Navigasi publik menjadi multipage: Services, Technology, Corporate, Partnership, Insight, About, Contact, serta satu Login Apps ke `apps.avahealth.sbs`.
+- [x] Queen Health dan Queen Lab memiliki visi/misi, cakupan layanan, alur operasional, informasi yang perlu dikonfirmasi, dan CTA appointment/pemeriksaan tanpa membuat jadwal, tenaga, lokasi, harga, atau layanan fiktif.
+- [x] Halaman Corporate Health, Partnership, Investor, AVA HIS, AVA LIS, AVA Apps, dan Privasi dibuat dengan status, batas kemampuan, workflow, target pengguna, integrasi, security/privacy, dan langkah tindak lanjut.
+- [x] Seluruh halaman memiliki canonical, Open Graph, robots, satu H1, JSON-LD Organization, fokus keyboard, menu responsif, dan arsitektur event konversi netral vendor.
+- [x] QA visual browser lulus pada viewport 1440×900, 390×844, dan 320×568: tidak ada horizontal overflow; menu desktop/mobile, header, tipografi, kartu, serta halaman produk/layanan tampil konsisten. Konsol browser 0 error/warning.
+
+### Bukti verifikasi
+- [x] `node scripts/verify-public-profile.js` — lulus.
+- [x] `node scripts/verify-public-editorial.js` — 38 halaman, link/anchor/metadata/konten/deterministic rebuild lulus.
+- [x] `node scripts/verify-deploy-readiness.js` — lulus.
+- [x] `node scripts/verify-application-boundaries.js` — 6 boundary dan 17/17 domain lulus.
+- [x] `node scripts/periksa-html-inline.js`, `node --check scripts/public-multipage.js`, dan `node --check ava-platform/js/public-profile.js` — lulus.
+- [ ] Isi lokasi, jadwal, profil tenaga kesehatan, katalog pemeriksaan, aset screenshot produk, izin/sertifikasi, kontak pengendali data, retensi, dan materi finansial investor setelah data terverifikasi serta persetujuan pemilik/legal tersedia.
