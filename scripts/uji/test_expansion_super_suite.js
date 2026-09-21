@@ -127,20 +127,34 @@ const cartRes = window.addToUnifiedCart({
 assert(cartRes.success === true && cartRes.total_items > 0,
   'Penambahan item nutraseutikal ke Keranjang Belanja Terpadu B2C berhasil');
 
+const spaCartRes = window.addToUnifiedCart({
+  id: 'SPA-CONSULT-01', type: 'SPA', name: 'Sanctuary Wellness Session', unitPrice: 125000, qty: 1
+});
+const clinicalCartRes = window.addToUnifiedCart({
+  id: 'LAB-SCREEN-01', type: 'CLINICAL', name: 'Paket Skrining Dasar', unitPrice: 45000, qty: 1
+});
+assert(spaCartRes.success === true && clinicalCartRes.success === true,
+  'Booking Sanctuary dan layanan klinis dapat ditambahkan ke keranjang terpadu');
+
 const totals = window.calculateUnifiedCartTotal('JNE_REG');
 assert(totals.subtotal_product > 0 && totals.subtotal_spa > 0 && totals.subtotal_clinical > 0,
   'Keranjang terpadu berhasil menggabungkan Produk Nutrisi + Booking Spa + Lab Klinis dalam 1 hitungan');
 assert(totals.shipping_fee === 15000 && totals.grand_total > totals.subtotal_items,
   `Kalkulasi Grand Total (Termasuk Ongkir JNE Rp ${totals.shipping_fee} & Biaya Admin) = Rp ${Number(totals.grand_total).toLocaleString('id-ID')}`);
 
-const checkoutRes = window.processUnifiedCheckout('QRIS_DYNAMIC', {
+// Apps hanya membuat handoff ke billing HIS. Payment/QRIS reference diterbitkan
+// oleh HIS setelah order diterima; Apps tidak boleh membuat kode pembayaran.
+const checkoutRes = window.processUnifiedCheckout('HIS_BILLING_HANDOFF', {
   customer_name: 'Ny. Amanda Manopo',
   phone: '081288990011',
   address: 'Kebayoran Baru, Jakarta Selatan',
   courier: 'JNE_REG'
 });
-assert(checkoutRes.success === true && checkoutRes.order.qris_reference.startsWith('NMID-'),
-  'Checkout instan Dynamic QRIS berhasil menerbitkan kode bayar dan nomor resi kurir');
+assert(checkoutRes.success === true
+  && checkoutRes.order.payment_status === 'PENDING_HIS_BILLING'
+  && checkoutRes.order.qris_reference === null
+  && checkoutRes.order.courier_tracking_no,
+  'Checkout terpadu berhasil mengirim handoff billing ke HIS dan nomor resi kurir tanpa menerbitkan QRIS dari Apps');
 
 const trackRes = window.trackUnifiedOrder(checkoutRes.order.order_id);
 assert(trackRes.found === true && trackRes.timeline.length >= 2,

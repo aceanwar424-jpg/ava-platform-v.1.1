@@ -2022,3 +2022,18 @@ OWNED_BY: ava. Audit hanya mengubah daftar kategori navigasi dan narasi peran wo
 - [x] Wellness memakai `wellness`, `marketing`, `keuangan`, `logistik`, `sdm`, dan `mutu`; pengaturan HIS generik dikeluarkan dari domain Wellness.
 - [x] Generator menghasilkan peta menu terbaru; audit menu lulus dengan 218 menu aktif, 0 layar mati, 0 tabel/view hilang, 0 RPC hilang, 0 handler hilang, dan 0 menu di luar manifest.
 - [x] Rail melakukan deduplikasi berdasarkan `page` per workspace; modul lintas unit seperti Billing, Audit, Leads, Penawaran, dan Integrasi tidak lagi muncul berulang ketika Ops atau workspace klinis memanggil beberapa kategori bersama.
+
+## Audit end-to-end flow, route, dan konfigurasi — 21 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Audit memakai fixture/sintetis dan pemeriksaan statis lokal. Tidak membaca atau menulis database produksi, tidak mengubah kredensial, dan tidak menjalankan sinkronisasi Supabase karena URL/credential cloud tidak tersedia. Temuan UI pihak ketiga (Google Maps) dipisahkan dari kontrak aplikasi internal.
+### Bukti audit
+- [x] Boundary aplikasi: 6 boundary valid, 17/17 domain terpetakan satu kali, seluruh entrypoint tersedia.
+- [x] Manifest dan route: 225 rute terdaftar; audit keamanan modul 2.853/2.853 lulus; registry master 20/20 sinkron.
+- [x] Menu dan dependency: 218 menu aktif lulus; 0 layar mati, 0 tabel/view/RPC/handler hilang, dan 0 menu di luar manifest.
+- [x] Kontrak data dan integrasi: LIS integrity, LIS–HIS sync, LIS connector, antrean multi-tenant, tenant RLS 29/29, serta deploy readiness lulus.
+- [x] Master suite: flow ekspansi B2C diperbaiki agar menguji tiga tipe item nyata (produk, Sanctuary, klinis) dan handoff `PENDING_HIS_BILLING`; suite tersebut kini 15/15 lulus.
+### Temuan yang membutuhkan lingkungan eksternal
+- [ ] Parity database cloud belum dapat dijalankan: `db-parity-local-authoritative.cjs` fail-closed karena `AVA_SUPABASE_URL`/`SUPABASE_URL` belum disediakan. Tidak ada akses cloud yang dicoba.
+- [ ] Probe HTTP menunjukkan alias lama `lab`, `app`, `cek`, `console`, dan `korporat` merespons 404 di edge walaupun route sudah tersedia di `config/domain.json`; ini memerlukan pemeriksaan custom-domain/alias deployment, bukan perubahan route lokal.
+- [ ] Alias typo `avahelath.sbs` belum resolve DNS (`ENOTFOUND`) dan perlu keputusan apakah tetap dipertahankan atau diarahkan secara DNS.
+- [ ] Google Maps tetap bergantung pada API key, billing, API enablement, dan HTTP referrer di Google Cloud; aplikasi sekarang memberi diagnosis domain secara eksplisit.
