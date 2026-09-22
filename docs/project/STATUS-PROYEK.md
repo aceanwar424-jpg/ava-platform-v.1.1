@@ -2096,3 +2096,19 @@ OWNED_BY: ava. Health Tools merupakan materi edukasi publik yang diproses lokal 
 - [x] QA browser beranda → kartu BMI → alat aktif lulus. Viewport 390×844 tidak memiliki overflow horizontal dan tombol kalkulator aktif setelah JavaScript dimuat.
 - [x] Produksi `www.avahealth.sbs` terverifikasi setelah deploy: empat form tersedia, perhitungan sintetis 65 kg/165 cm menghasilkan BMI 23,88 dan kategori rentang berat badan sehat, dengan 0 error/warning pada tab browser baru.
 - [x] `verify-public-editorial`, `verify-public-profile`, `periksa-html-inline`, `verify-deploy-readiness`, `verify-application-boundaries`, pemeriksaan sintaks JavaScript, dan `git diff --check` lulus.
+
+## Pemulihan login Apps setelah deploy — 22 September 2026
+### Rencana
+- [x] Reproduksi error login pada `apps.avahealth.sbs` dengan akun sintetis dan periksa konfigurasi runtime yang diterima browser.
+- [x] Muat konfigurasi Supabase publik sebelum modul API serta cegah pesan parse mentah tampil kepada pengguna.
+- [x] Tambahkan pemeriksaan deployment agar portal Apps tidak dapat lolos audit tanpa runtime config.
+- [ ] Jalankan regresi autentikasi, keamanan domain, browser produksi, lalu deploy perbaikan.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perbaikan hanya memulihkan pemuatan konfigurasi publik Supabase dan penanganan kegagalan login. Tidak membaca atau mengubah akun, kata sandi, role, profil, RLS, skema database, atau data pasien. Pengujian login memakai identitas sintetis dan tetap gagal tertutup.
+
+### Diagnosis dan hasil sementara
+- [x] Error berhasil direproduksi: permintaan autentikasi diarahkan ke origin Apps sendiri karena `window.AVA_RUNTIME_CONFIG` tidak pernah dimuat. Respons HTML kemudian diparse sebagai JSON dan menghasilkan `Unexpected token '<'`.
+- [x] `apps/index.html` kini memuat `/api/runtime-config.js` sebelum `js/core/api.js`; versi aset API dan aplikasi dinaikkan agar browser tidak memakai cache lama.
+- [x] Handler login menolak konfigurasi kosong sebelum membuat permintaan dan menangani respons non-JSON dengan pesan pengguna yang aman.
+- [x] Audit deploy kini mewajibkan runtime config pada portal Apps. Suite autentikasi 12/12, suite keamanan domain 12/12, inline HTML, application boundaries, deploy readiness, syntax, dan diff check lulus.

@@ -3402,12 +3402,15 @@ async function handleLogin(event) {
   if (btn) { btn.disabled = true; btn.textContent = 'Memverifikasi akun…'; }
   clearPortalSession();
   try {
+    if (!SUPABASE_URL || !SUPABASE_RUNTIME_KEY) {
+      throw new Error('Konfigurasi layanan masuk belum tersedia. Muat ulang halaman atau hubungi administrator.');
+    }
     const response = await fetch(SUPABASE_URL + '/auth/v1/token?grant_type=password', {
       method: 'POST', headers: { 'Content-Type': 'application/json', apikey: SUPABASE_RUNTIME_KEY },
       body: JSON.stringify({ email: username, password })
     });
-    const auth = await response.json();
-    if (!response.ok || !auth.access_token || !auth.user?.id) throw new Error('Email atau kata sandi tidak sesuai. Silakan coba lagi.');
+    const auth = await response.json().catch(() => null);
+    if (!response.ok || !auth?.access_token || !auth.user?.id) throw new Error('Email atau kata sandi tidak sesuai. Silakan coba lagi.');
     sessionStorage.setItem('ol_token', auth.access_token);
     if (auth.refresh_token) sessionStorage.setItem('ol_refresh', auth.refresh_token);
     const profiles = await sbGet('user_profiles', 'select=*&id=eq.' + encodeURIComponent(auth.user.id));

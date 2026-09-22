@@ -13,7 +13,7 @@ for (const host of ['kiosk.avahealth.sbs', 'apps.avahealth.sbs', 'antrian.avahea
   if (!hit) errors.push(`Route host ${host} belum didefinisikan pada konfigurasi root.`);
 }
 if (!fs.existsSync(path.join(root, 'api', 'runtime-config.js'))) errors.push('Endpoint runtime-config.js tidak ditemukan di root Vercel.');
-for (const file of ['index.html', 'kiosk/index.html', 'monitor/antrian.html']) {
+for (const file of ['index.html', 'apps/index.html', 'kiosk/index.html', 'monitor/antrian.html']) {
   if (!read(file).includes('/api/runtime-config.js')) errors.push(`${file} belum memuat runtime config.`);
 }
 if (!read('kiosk/queue-api.js').includes('AVA_RUNTIME_CONFIG')) errors.push('Kiosk belum membaca runtime config.');

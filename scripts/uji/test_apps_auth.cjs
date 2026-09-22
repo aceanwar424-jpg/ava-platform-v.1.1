@@ -86,7 +86,12 @@ test('page load refuses stored flags and removes URL credentials', () => {
   let initialize;
   f.c.document.addEventListener = (_, fn) => { initialize = fn; };
   f.c.URL = URL;
-  f.c.window = { location: { href: 'https://portal.example.invalid/apps/?access_token=synthetic&refresh=synthetic#corp' }, history: { replaceState: (_, __, url) => { f.c.cleanedUrl = url; } } };
+  f.c.window = {
+    location: { href: 'https://portal.example.invalid/apps/?access_token=synthetic&refresh=synthetic#corp' },
+    history: { replaceState: (_, __, url) => { f.c.cleanedUrl = url; } },
+    addEventListener: () => {},
+    setTimeout: fn => fn()
+  };
   f.c.updateLoginFormUI = () => {};
   f.c.localStorage.setItem('ol_token', 'mock_token_patient');
   f.c.sessionStorage.setItem('AVA_IS_LOGGED_IN', 'true');
