@@ -43,7 +43,7 @@ test('patient portal serves only its public shell and shared static assets anony
 test('only www serves public assets; private files, secrets and unregistered hosts are denied',async()=>{
   const gate=await gateway();
   for(const path of ['/','/portal.html','/public/tentang.html','/css/public-profile.css']) assert.equal(await gate(new Request('https://www.avahealth.sbs'+path)),undefined);
-  for(const path of ['/index.html','/js/auth.js','/js/config.local.js','/.env','/connector/config.json','/api/staff-session','/public/test.sql']) assert.equal((await gate(new Request('https://www.avahealth.sbs'+path))).status,404,path);
+  for(const path of ['/index.html','/js/auth.js','/js/config.local.js','/.env','/connector/config.json','/docs/project/customer-project-register.ava.json','/api/staff-session','/public/test.sql']) assert.equal((await gate(new Request('https://www.avahealth.sbs'+path))).status,404,path);
   assert.equal((await gate(new Request('https://preview.vercel.app/'))).status,404);
   assert.equal((await gate(new Request('https://avahealth.sbs/'))).status,308);
 });

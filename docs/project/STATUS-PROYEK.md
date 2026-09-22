@@ -2113,3 +2113,23 @@ OWNED_BY: ava. Perbaikan hanya memulihkan pemuatan konfigurasi publik Supabase d
 - [x] Handler login menolak konfigurasi kosong sebelum membuat permintaan dan menangani respons non-JSON dengan pesan pengguna yang aman.
 - [x] Audit deploy kini mewajibkan runtime config pada portal Apps. Suite autentikasi 12/12, suite keamanan domain 12/12, inline HTML, application boundaries, deploy readiness, syntax, dan diff check lulus.
 - [x] Produksi terverifikasi setelah deploy: aset aplikasi versi baru dimuat, email dan kata sandi mulai kosong, percobaan akun sintetis menghasilkan pesan kredensial yang aman tanpa error parse HTML, tombol kembali aktif, dan konsol browser 0 error/warning.
+
+## Analisis MVP Project AHM — Diabetes & Hipertensi — 22 September 2026
+### Rencana
+- [x] Audit kemampuan Apps Personal, Corporate Portal, HIS/IHC, CRM, dan data wellness yang sudah tersedia.
+- [x] Tetapkan batas data peserta, tim medis IHC, Corporate Medical, dan HR agar akses klinis tidak tercampur.
+- [x] Susun MVP, alur data, laporan harian/mingguan/bulanan, serta backlog implementasi bertahap.
+- [x] Catat AHM dalam register customer project internal dengan status komersial yang tidak melebih-lebihkan hubungan.
+- [x] Verifikasi register dan brief tidak mengandung PII, klaim kontrak, data kesehatan, atau perubahan skema produksi.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Nama organisasi dan ruang lingkup awal berasal dari arahan eksplisit pemilik. Catatan ditempatkan pada register proyek internal, tidak di-hardcode ke produk generik atau materi publik. Status dicatat sebagai `qualified_prospect/project_planning`, bukan pelanggan aktif atau kontrak berjalan. Tidak ada nama PIC, kontak, daftar karyawan, hasil pemeriksaan, kredensial, atau data pasien. Audit hanya membaca source lokal; tidak menghubungkan atau mengubah database AHM/Supabase produksi.
+
+### Hasil & Bukti Verifikasi
+- [x] Kemampuan yang sudah dapat dipakai untuk pilot: autentikasi corporate, roster karyawan, impor CSV, permintaan pemeriksaan, registrasi/admission HIS, hasil laboratorium, serta pipeline CRM Lead → Deal → Project → Corporate.
+- [x] Gap utama didokumentasikan: pemisahan akses HR dan tim medis, input tekanan darah/glukosa longitudinal, consent, provenance/validasi data, care plan, alert klinis, dan laporan agregat corporate.
+- [x] Rancangan MVP serta batas sistem tersedia pada `docs/project/AHM-WELLNESS-MVP.md`.
+- [x] AHM dicatat pada register internal sebagai `qualified_prospect/project_planning`; tidak dibuat sebagai corporate aktif dan tidak dipublikasikan sebagai klien terkontrak.
+- [x] `node scripts/verify-customer-project-register.js` lulus: 1 proyek internal valid, tanpa PII, data klinis, atau klaim kontrak.
+- [x] Security domains 12/12, application boundaries 17/17 pada 6 batas aplikasi, deploy readiness, syntax check, dan `git diff --check` lulus.
+- [x] Skema database, Supabase produksi, serta koneksi sistem AHM/IHC tidak diubah; implementasi tersebut menunggu human checkpoint sesuai `AGENTS.md`.

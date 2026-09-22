@@ -1,0 +1,29 @@
+{
+  "$schema": "./customer-project-register.schema.json",
+  "owned_by": "ava",
+  "visibility": "internal_confidential",
+  "updated_at": "2026-09-22",
+  "projects": [
+    {
+      "project_id": "AHM-WELLNESS-001",
+      "organization": "PT Astra Honda Motor",
+      "display_name": "Project AHM — Cardiometabolic Wellness",
+      "lifecycle_status": "qualified_prospect",
+      "project_status": "project_planning",
+      "contract_status": "not_recorded",
+      "public_claim_allowed": false,
+      "focus": ["diabetes", "hypertension"],
+      "care_setting": "AHM In-House Clinic",
+      "proposed_surfaces": ["apps_personal", "corporate_portal", "his_ihc", "ava_tech_integration"],
+      "current_scope": [
+        "corporate participant enrollment",
+        "IHC examination data intake",
+        "participant daily self-monitoring",
+        "medical follow-up queue",
+        "aggregate HR reporting"
+      ],
+      "data_state": "no_participant_or_clinical_data_stored",
+      "next_gate": "approve_mvp_schema_and_data_governance_before_implementation"
+    }
+  ]
+}

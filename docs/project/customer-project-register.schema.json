@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AVA Internal Customer Project Register",
+  "type": "object",
+  "required": ["owned_by", "visibility", "projects"],
+  "properties": {
+    "owned_by": { "const": "ava" },
+    "visibility": { "const": "internal_confidential" },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["project_id", "organization", "lifecycle_status", "project_status", "contract_status", "public_claim_allowed", "data_state"],
+        "properties": {
+          "project_id": { "type": "string", "pattern": "^[A-Z0-9-]+$" },
+          "organization": { "type": "string", "minLength": 2 },
+          "lifecycle_status": { "enum": ["prospect", "qualified_prospect", "proposal", "negotiation", "won", "lost"] },
+          "project_status": { "enum": ["project_planning", "pilot", "active", "paused", "closed"] },
+          "contract_status": { "enum": ["not_recorded", "draft", "signed", "expired", "terminated"] },
+          "public_claim_allowed": { "type": "boolean" },
+          "data_state": { "type": "string" }
+        }
+      }
+    }
+  }
+}
