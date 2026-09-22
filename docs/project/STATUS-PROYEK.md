@@ -2065,3 +2065,13 @@ OWNED_BY: ava. Implementasi menggunakan narasi dan aset AVA yang sudah berada di
 - [x] `node scripts/verify-application-boundaries.js` — 6 boundary dan 17/17 domain lulus.
 - [x] `node scripts/periksa-html-inline.js`, `node --check scripts/public-multipage.js`, dan `node --check ava-platform/js/public-profile.js` — lulus.
 - [ ] Isi lokasi, jadwal, profil tenaga kesehatan, katalog pemeriksaan, aset screenshot produk, izin/sertifikasi, kontak pengendali data, retensi, dan materi finansial investor setelah data terverifikasi serta persetujuan pemilik/legal tersedia.
+
+## Login Apps selalu kosong pada saat dibuka — 22 September 2026
+### Rencana dan Implikasi IP & Kepatuhan
+OWNED_BY: ava. Perubahan hanya mengatur perilaku autofill pada form login publik. Tidak mengubah autentikasi Supabase, akun, password, role, tenant, RLS, atau penyimpanan sesi. Tidak ada kredensial yang dibaca, disimpan, atau ditanam ke source.
+
+### Hasil dan verifikasi
+- [x] Penyebab teridentifikasi: atribut `autocomplete="username"` dan `autocomplete="current-password"` meminta browser mengisi kredensial tersimpan; email pengguna tidak di-hardcode di form aplikasi.
+- [x] Form dan field login tidak lagi meminta pemulihan username/password tersimpan; nama field dibuat khusus portal AVA.
+- [x] Email dan kata sandi dibersihkan pada `DOMContentLoaded`, sesaat setelah autofill awal, dan pada `pageshow`, sehingga halaman login pada perangkat bersama dimulai dalam keadaan kosong.
+- [x] QA browser lokal memastikan `email=""`, `passwordLength=0`, form/email `autocomplete=off`, dan password `autocomplete=new-password`; pemeriksaan syntax, HTML inline, deploy readiness, dan application boundaries lulus.

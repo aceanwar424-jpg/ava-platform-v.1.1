@@ -3377,6 +3377,12 @@ function clearPortalSession() {
   currentCorporateName = '';
   currentCorpRole = null;
 }
+function clearLoginCredentialFields() {
+  const username = document.getElementById('username');
+  const password = document.getElementById('password');
+  if (username) username.value = '';
+  if (password) password.value = '';
+}
 function showLoginError(message) {
   const el = document.getElementById('login-error');
   if (el) { el.textContent = message; el.hidden = !message; }
@@ -3678,6 +3684,10 @@ if (typeof document !== 'undefined') {
     ['token', 'access_token', 'refresh', 'refresh_token'].forEach(key => url.searchParams.delete(key));
     window.history.replaceState(null, '', url.pathname + url.search + url.hash);
     clearPortalSession();
+    clearLoginCredentialFields();
+    // Password managers may apply saved credentials just after DOMContentLoaded.
+    // Clear once more before normal interaction so a shared clinical device opens blank.
+    window.setTimeout(clearLoginCredentialFields, 150);
     const site = typeof window.situsSaatIni === 'function' ? window.situsSaatIni() : null;
     const role = PORTAL_ROLES.includes(site?.peran) ? site.peran : 'patient';
     const radio = document.querySelector('input[name="login-role"][value="' + role + '"]');
@@ -3685,6 +3695,7 @@ if (typeof document !== 'undefined') {
     updateLoginFormUI(role);
     showScreen('login-screen');
   });
+  window.addEventListener('pageshow', clearLoginCredentialFields);
 }
 
 // ═══════════════════════════════════════════════════════════════
