@@ -2102,7 +2102,7 @@ OWNED_BY: ava. Health Tools merupakan materi edukasi publik yang diproses lokal 
 - [x] Reproduksi error login pada `apps.avahealth.sbs` dengan akun sintetis dan periksa konfigurasi runtime yang diterima browser.
 - [x] Muat konfigurasi Supabase publik sebelum modul API serta cegah pesan parse mentah tampil kepada pengguna.
 - [x] Tambahkan pemeriksaan deployment agar portal Apps tidak dapat lolos audit tanpa runtime config.
-- [ ] Jalankan regresi autentikasi, keamanan domain, browser produksi, lalu deploy perbaikan.
+- [x] Jalankan regresi autentikasi, keamanan domain, browser produksi, lalu deploy perbaikan.
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: ava. Perbaikan hanya memulihkan pemuatan konfigurasi publik Supabase dan penanganan kegagalan login. Tidak membaca atau mengubah akun, kata sandi, role, profil, RLS, skema database, atau data pasien. Pengujian login memakai identitas sintetis dan tetap gagal tertutup.
@@ -2112,3 +2112,4 @@ OWNED_BY: ava. Perbaikan hanya memulihkan pemuatan konfigurasi publik Supabase d
 - [x] `apps/index.html` kini memuat `/api/runtime-config.js` sebelum `js/core/api.js`; versi aset API dan aplikasi dinaikkan agar browser tidak memakai cache lama.
 - [x] Handler login menolak konfigurasi kosong sebelum membuat permintaan dan menangani respons non-JSON dengan pesan pengguna yang aman.
 - [x] Audit deploy kini mewajibkan runtime config pada portal Apps. Suite autentikasi 12/12, suite keamanan domain 12/12, inline HTML, application boundaries, deploy readiness, syntax, dan diff check lulus.
+- [x] Produksi terverifikasi setelah deploy: aset aplikasi versi baru dimuat, email dan kata sandi mulai kosong, percobaan akun sintetis menghasilkan pesan kredensial yang aman tanpa error parse HTML, tombol kembali aktif, dan konsol browser 0 error/warning.
