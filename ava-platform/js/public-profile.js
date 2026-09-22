@@ -41,6 +41,7 @@
     'tech_demo_request',
     'partnership_request',
     'investor_deck_request',
+    'health_tool_open',
     'contact_submit'
   ]);
   window.dataLayer = window.dataLayer || [];

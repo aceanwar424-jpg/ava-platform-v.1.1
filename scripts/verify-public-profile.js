@@ -26,7 +26,7 @@ assert(homeSections >= 6 && homeSections <= 10, 'Homepage gateway must stay focu
 for(const marker of ['id="kebutuhan"','ecosystem-map','status-legend','tech-product-grid','trust-section']) {
   assert(html.includes(marker), `Missing Website V2 gateway component ${marker}`);
 }
-for(const event of ['nav_service_click','appointment_request','lab_inquiry','corporate_inquiry','tech_demo_request','partnership_request','investor_deck_request']) {
+for(const event of ['nav_service_click','appointment_request','lab_inquiry','corporate_inquiry','tech_demo_request','partnership_request','investor_deck_request','health_tool_open']) {
   assert(publicSurface.includes(`data-event="${event}"`), `Missing conversion event ${event}`);
 }
 assert(publicJs.includes("'contact_submit'"), 'Missing reserved contact_submit conversion event');
