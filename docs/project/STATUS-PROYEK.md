@@ -2094,4 +2094,5 @@ OWNED_BY: ava. Health Tools merupakan materi edukasi publik yang diproses lokal 
 - [x] Narasi Queen Nutrition diperluas pada visi, misi, audiens, mutu, dan hubungannya dengan Health, Care, Wellness, serta edukasi publik tanpa mengarahkan pengguna ke diagnosis atau produk.
 - [x] Contoh deterministik lulus: BMI 65 kg/165 cm = 23,88; estimasi energi = 1.844 kkal pada skenario uji; cairan 60 kg = 1,8–2,1 L; makronutrien 2.000 kkal = karbohidrat 225–325 g, protein 50–175 g, lemak 44–78 g.
 - [x] QA browser beranda → kartu BMI → alat aktif lulus. Viewport 390×844 tidak memiliki overflow horizontal dan tombol kalkulator aktif setelah JavaScript dimuat.
+- [x] Produksi `www.avahealth.sbs` terverifikasi setelah deploy: empat form tersedia, perhitungan sintetis 65 kg/165 cm menghasilkan BMI 23,88 dan kategori rentang berat badan sehat, dengan 0 error/warning pada tab browser baru.
 - [x] `verify-public-editorial`, `verify-public-profile`, `periksa-html-inline`, `verify-deploy-readiness`, `verify-application-boundaries`, pemeriksaan sintaks JavaScript, dan `git diff --check` lulus.
