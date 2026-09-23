@@ -77,6 +77,21 @@
     node.append(image, note);
     return node;
   };
+
+  // The official portrait is already a public project asset. Reuse it instead
+  // of leaving the company profile with an empty photo treatment.
+  document.querySelectorAll('.founder-photo-inner:not(.has-photo)').forEach(slot => {
+    const portrait = document.createElement('img');
+    portrait.src = 'public/assets/ace-darojatun-anwar.png';
+    portrait.alt = 'Ace Darojatun Anwar, Founder, Owner dan CEO AVA Health Solution';
+    portrait.width = 1024;
+    portrait.height = 1536;
+    portrait.loading = 'eager';
+    portrait.decoding = 'async';
+    slot.classList.add('has-photo');
+    slot.replaceChildren(portrait);
+  });
+
   if (pageVisual) {
     const hero = document.querySelector('.v2-hero-visual, .detail-hero, .tech-priority .section-heading');
     if (hero) {
@@ -91,16 +106,22 @@
   }
 
   // Product pages intentionally avoid presenting conceptual artwork as a
-  // released interface. This keeps the replacement slot useful without a
-  // public-facing TODO or an implied claim about product capabilities.
+  // released interface. Use the relevant approved asset so the page never
+  // shows a blank demo box, while retaining an explicit conceptual label.
   document.querySelectorAll('.screenshot-placeholder').forEach(slot => {
     slot.setAttribute('aria-label', 'Visual konsep produk AVA; bukan screenshot produk aktual');
-    const label = slot.querySelector('span');
-    const title = slot.querySelector('strong');
-    const text = slot.querySelector('p');
-    if (label) label.textContent = 'PRODUCT VISUAL';
-    if (title) title.textContent = 'CONCEPT VISUAL';
-    if (text) text.textContent = 'Visual konseptual mendukung pembahasan demo. Screenshot terverifikasi akan digunakan saat tersedia.';
+    if (!pageVisual?.hero) return;
+    const image = document.createElement('img');
+    image.src = assetPath(pageVisual.hero);
+    image.alt = pageVisual.alt;
+    image.width = 1440;
+    image.height = 720;
+    image.loading = 'eager';
+    image.decoding = 'async';
+    const caption = document.createElement('p');
+    caption.textContent = 'Visual konseptual untuk konteks pembahasan; bukan screenshot produk aktual.';
+    slot.classList.add('has-visual');
+    slot.replaceChildren(image, caption);
   });
 
   // Vendor-neutral conversion event architecture. If an analytics provider is
