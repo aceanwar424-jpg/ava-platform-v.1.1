@@ -44,6 +44,26 @@ OWNED_BY: ava. Aset `Artefak/` diperlakukan sebagai pustaka kreatif AVA; file su
 - HTTP preview lokal — lulus: 20 halaman representatif, 24 visual, `robots.txt`, dan `sitemap.xml` membalas 200; sitemap valid XML dengan 38 URL.
 - `node scripts/verify-deploy-readiness.js` dan `git diff --check` — lulus.
 
+### Penyempurnaan komposisi visual — 23 September 2026
+
+#### Rencana dan checklist
+
+- [x] Telusuri slot visual kosong dan aturan CSS yang berpotensi memangkas aset lebar.
+- [x] Ganti placeholder foto Founder dengan potret resmi yang sudah tersedia di aset publik.
+- [x] Tampilkan visual konseptual produk sebagai gambar nyata berlabel, bukan kotak placeholder kosong.
+- [x] Hilangkan crop paksa pada hero dan visual pendukung; verifikasi desktop serta mobile.
+
+#### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Potret Founder yang sudah berada di `public/assets/` hanya digunakan pada halaman profil perusahaan dan diberi alt text yang akurat. Visual produk tetap diberi label konseptual agar tidak disalahartikan sebagai screenshot atau klaim kapabilitas yang telah dirilis. Tidak ada data pasien, data finansial, atau aset pihak ketiga yang ditambahkan.
+
+#### Bukti verifikasi
+
+- `founder.html` memuat potret resmi dengan alt text nama serta jabatan; tidak ada lagi copy “Foto Founder / Potret akan ditambahkan” saat JavaScript aktif.
+- `ava-his.html` memuat hero konseptual dan slot demo berlabel konseptual; aset hero, potret, enam halaman representatif, dan landing page merespons HTTP 200 pada preview lokal.
+- Aturan visual kini menggunakan rasio sumber `2:1` dan `object-fit: contain`; crop paksa `cover`, tinggi minimum, serta rasio `4:3`/`2.4:1` yang menutupi bagian ilustrasi telah dioverride.
+- `node --check ava-platform/js/public-profile.js`, `node scripts/verify-public-profile.js`, `node scripts/verify-public-editorial.js`, `node scripts/periksa-html-inline.js`, dan `git diff --check` — lulus.
+
 ## Remediasi audit keamanan dan kesiapan multi-tenant — 12 September 2026
 
 ### Rencana dan checklist
