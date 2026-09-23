@@ -58,3 +58,7 @@ Thumbs.db
 # tetap sumber kebenaran; folder ini hanya bahan untuk di-git init sendiri
 # bila suatu saat tiap situs benar-benar dipisah jadi repo terpisah.
 dist-situs/
+
+# Pustaka visual sumber lokal; turunan web teroptimasi berada di
+# ava-platform/public/assets/visuals/ dan boleh dilacak Git.
+Artefak/

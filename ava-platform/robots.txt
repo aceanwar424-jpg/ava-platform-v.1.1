@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Area aplikasi, endpoint, dan berkas implementasi tidak merupakan konten publik.
+Disallow: /api/
+Disallow: /apps/
+Disallow: /connector/
+Disallow: /kiosk/
+Disallow: /modules/
+Disallow: /monitor/
+Disallow: /sql_arsip/
+Disallow: /supabase/
+
+Sitemap: https://www.avahealth.sbs/sitemap.xml
