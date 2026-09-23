@@ -2,6 +2,48 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Penyempurnaan visual website publik — 23 September 2026
+
+### Rencana dan checklist
+
+- [x] Inventaris arsitektur situs publik, halaman, stylesheet, skrip navigasi, metadata, serta 31 aset pada `Artefak/`.
+- [x] Petakan 24 aset master berdasarkan isi visualnya; pisahkan visual konseptual produk dari screenshot produk terverifikasi.
+- [x] Buat turunan gambar web teroptimasi dan integrasikan secara responsif ke halaman publik tanpa mengubah fungsi operasional.
+- [x] Perbaiki konsistensi visual, caption, lazy loading, reduced-motion, dan fallback gambar.
+- [x] Uji tautan, struktur HTML, layout desktop/mobile, metadata, dan pemeriksaan deploy; dokumentasikan hasil.
+
+### Implikasi IP & Kepatuhan
+
+OWNED_BY: ava. Aset `Artefak/` diperlakukan sebagai pustaka kreatif AVA; file sumber tetap lokal dan tidak dihapus. Turunan teroptimasi hanya digunakan di situs publik AVA. Visual HIS/LIS/Apps yang memuat UI generatif diberi label konseptual dan tidak dinyatakan sebagai screenshot produk aktual. Tidak ada data pasien, angka bisnis, kredensial, harga, klaim klinis, alamat, atau kontak baru yang diciptakan.
+
+### Peta aset yang disetujui
+
+| Tujuan | Aset sumber (waktu file) | Target halaman |
+| --- | --- | --- |
+| Hero dan overview ekosistem | 19:32:02, 19:32:09 | Beranda, Ekosistem |
+| Queen Health dan Patient Journey | 19:32:14, 19:42:25 | Queen Health |
+| Queen Lab dan Laboratory Journey | 19:32:19, 19:42:32 | Queen Lab |
+| AVA Tech dan workflow | 19:32:23, 19:42:40 | AVA Tech |
+| Corporate Health dan MCU Journey | 19:32:28, 19:42:36 | Corporate |
+| Konsep HIS/LIS/Apps dan integrasi | 19:32:35, 19:32:40, 19:32:44, 19:33:20 | Halaman produk dan teknologi |
+| Healthcare provider solution | 19:42:57 | Solusi layanan kesehatan |
+| Queen Care, Nutrition, Wellness | 19:43:02, 19:43:20, 19:45:32 | Halaman brand terkait |
+| Partnership, investor, about, insight, tools, contact | 19:57:02, 19:58:34, 20:00:09, 20:02:29, 20:03:43, 20:05:12 | Halaman publik terkait |
+
+### Implementasi dan bukti verifikasi
+
+- Dibuat 24 JPEG `1440×720` pada `ava-platform/public/assets/visuals/` dari pustaka sumber; total ±4,1 MB. Semua sumber PNG tetap berada di `Artefak/` dan diabaikan Git agar tidak mengirim aset mentah yang berat.
+- `ava-platform/js/public-profile.js` menyisipkan visual berdasarkan halaman, dengan alt text kontekstual, dimensi eksplisit untuk mencegah layout shift, `decoding="async"`, lazy loading untuk visual pendukung, serta caption konseptual pada HIS/LIS/Apps.
+- `ava-platform/css/public-profile.css` menambahkan layout hero desktop/mobile yang tetap memprioritaskan informasi HTML, crop responsif, focus image per halaman, focus state yang ada, dan penghormatan `prefers-reduced-motion`.
+- Slot screenshot lama di halaman produk tidak lagi menampilkan TODO kepada pengguna; sekarang menyatakan `CONCEPT VISUAL` dan menjelaskan bahwa screenshot terverifikasi akan menggantikan visual tersebut.
+- Ditambahkan `robots.txt` dan `sitemap.xml` (38 URL publik). Rute aplikasi, connector, kiosk, modul, dan arsip tetap dikecualikan dari crawl; CSS/JS tidak diblokir agar halaman dapat dirender crawler.
+- Preview lokal diverifikasi pada beranda, Queen Health, AVA HIS, dan menu mobile. Navigasi mengubah `aria-expanded` dengan benar; visual hero memiliki alt text, caption, dan tidak menghalangi konten utama.
+- `node scripts/verify-public-profile.js` — lulus.
+- `node scripts/verify-public-editorial.js` — lulus: 38 halaman, tautan/anchor lokal, H1 tunggal, metadata V2, konten editorial, dan status bisnis tervalidasi.
+- `node scripts/periksa-html-inline.js` dan `node --check ava-platform/js/public-profile.js` — lulus.
+- HTTP preview lokal — lulus: 20 halaman representatif, 24 visual, `robots.txt`, dan `sitemap.xml` membalas 200; sitemap valid XML dengan 38 URL.
+- `node scripts/verify-deploy-readiness.js` dan `git diff --check` — lulus.
+
 ## Remediasi audit keamanan dan kesiapan multi-tenant — 12 September 2026
 
 ### Rencana dan checklist
