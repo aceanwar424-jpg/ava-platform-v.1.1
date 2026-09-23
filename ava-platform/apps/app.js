@@ -200,6 +200,8 @@ async function showView(viewId, viewTitle) {
   }
   document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
   target.classList.add('active');
+  const scrollHost = target.closest('main');
+  if (scrollHost) scrollHost.scrollTop = 0;
   target.setAttribute('aria-label', title);
   const heading = document.getElementById('breadcrumb-active-view');
   if (heading) heading.textContent = title;
@@ -216,6 +218,7 @@ async function showView(viewId, viewTitle) {
     'examination-approval-view': renderExamApproval,
     'examination-history-view': renderExamHistory,
     'corporate-view': renderCorporateHome,
+    'corporate-wellness-view': () => window.renderCorporateWellness?.(),
     'corporate-employees-view': renderCorporateList,
     'corporate-billing-view': loadInvoices,
     'book-test-view': renderLabCatalogue,
@@ -223,6 +226,9 @@ async function showView(viewId, viewTitle) {
     'ava-marketplace-view': renderAvaMarketplace,
     'ava-devices-view': renderAvaDevices,
     'ava-caregiver-view': renderAvaCaregiver,
+    'wellness-personal-view': () => window.renderPersonalWellness?.(),
+    'wellness-admin-view': () => window.renderWellnessAdmin?.(),
+    'wellness-import-view': () => window.renderWellnessImport?.(),
     'toko-view': renderToko,
     'toko-checkout-view': renderTokoCheckout,
     'member-sanctuary-view': renderMemberSanctuary,

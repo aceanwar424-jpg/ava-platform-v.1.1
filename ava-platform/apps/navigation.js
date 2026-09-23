@@ -14,6 +14,7 @@ const APPS_PAGES = {
   'ava-caregiver-view': ['Pendamping Keluarga'],
   'nearme-view': ['Daftar Cabang', 'branches'],
   'profile-view': ['Profil Akun', 'profile'],
+  'wellness-personal-view': ['Program Wellness Saya'],
   'member-sanctuary-view': ['Layanan Member'],
   'staff-homecare-view': ['Tugas Kunjungan'],
   'corporate-view': ['Ringkasan Perusahaan'],
@@ -22,6 +23,7 @@ const APPS_PAGES = {
   'examination-approval-view': ['Persetujuan Pemeriksaan'],
   'examination-history-view': ['Riwayat Pemeriksaan Karyawan'],
   'corporate-billing-view': ['Tagihan Perusahaan'],
+  'corporate-wellness-view': ['Monitoring Wellness'],
   'corporate-cashback-view': ['Klaim Cashback', 'planned'],
   'referral-view': ['Rujukan Pasien', 'planned'],
   'referral-catalog-view': ['Katalog Pemeriksaan Rujukan', 'planned'],
@@ -39,6 +41,8 @@ const APPS_PAGES = {
   'staff-custody-view': ['Serah Terima Spesimen', 'planned'],
   'staff-coldchain-check-view': ['Pemeriksaan Transportasi Spesimen', 'planned'],
   'tech-saas-master-console-view': ['Pengelolaan Platform', 'planned'],
+  'wellness-admin-view': ['Rancang Program Wellness'],
+  'wellness-import-view': ['Impor Hasil IHC'],
   'ava-wellness-hub-view': ['Kebugaran & Kebiasaan Sehat', 'planned'],
   'wellness-run-challenge-view': ['Aktivitas Harian', 'planned'],
   'wellness-nutrico-view': ['Rencana Makan', 'planned'],
@@ -50,19 +54,20 @@ const APPS_PAGES = {
 };
 const APPS_MENU_GROUPS = {
   patient: [
-    ['Layanan', ['patient-view', 'book-test-view', 'book-homecare-view', 'buy-package-view', 'ava-consult-view']],
+    ['Layanan', ['patient-view', 'wellness-personal-view', 'book-test-view', 'book-homecare-view', 'buy-package-view', 'ava-consult-view']],
     ['Riwayat & akun', ['medrec-view', 'homecare-results-view', 'ava-devices-view', 'ava-caregiver-view', 'nearme-view', 'profile-view']],
     ['Belanja', ['toko-view', 'ava-marketplace-view']],
     ['Dalam pengembangan', ['ava-biointerpreter-view', 'ava-biotwin-view', 'ava-homecare-tracking-view', 'orders-tracking-view', 'ava-wellness-hub-view']]
   ],
   member: [
-    ['Layanan', ['patient-view', 'member-sanctuary-view', 'book-test-view', 'book-homecare-view', 'buy-package-view', 'ava-consult-view']],
+    ['Layanan', ['patient-view', 'wellness-personal-view', 'member-sanctuary-view', 'book-test-view', 'book-homecare-view', 'buy-package-view', 'ava-consult-view']],
     ['Riwayat & akun', ['medrec-view', 'homecare-results-view', 'ava-devices-view', 'ava-caregiver-view', 'nearme-view', 'profile-view']],
     ['Belanja', ['toko-view', 'ava-marketplace-view']],
     ['Dalam pengembangan', ['ava-wellness-hub-view', 'ava-biotwin-view']]
   ],
   corporate: [
     ['Pemeriksaan karyawan', ['corporate-view', 'corporate-employees-view', 'book-examination-view', 'examination-approval-view', 'examination-history-view']],
+    ['Program wellness', ['corporate-wellness-view']],
     ['Administrasi', ['corporate-billing-view', 'profile-view']],
     ['Dalam pengembangan', ['corporate-analytics-view', 'corporate-onsite-schedule-view', 'ava-corp-burnout-view', 'corporate-cashback-view']]
   ],
@@ -74,7 +79,11 @@ const APPS_MENU_GROUPS = {
     ['Akun & layanan', ['profile-view', 'nearme-view']],
     ['Dalam pengembangan', ['referral-view', 'referral-catalog-view', 'referral-lab-results-view', 'ava-ambient-scribe-view']]
   ],
-  tech: [['Akun', ['profile-view']], ['Dalam pengembangan', ['tech-saas-master-console-view', 'ava-laas-api-view']]]
+  tech: [
+    ['Program wellness', ['wellness-admin-view', 'wellness-import-view']],
+    ['Akun', ['profile-view']],
+    ['Dalam pengembangan', ['tech-saas-master-console-view', 'ava-laas-api-view']]
+  ]
 };
 function appsEscape(value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));

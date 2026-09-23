@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/token.css">
-  <link rel="stylesheet" href="style.css?v=20260907a">
+  <link rel="stylesheet" href="style.css?v=20260923-wellness-ahm">
   <link rel="stylesheet" href="login.css?v=20260908b">
 </head>
 <body>
@@ -171,7 +171,7 @@
 
       <!-- Main Layout Content Area -->
       <main class="app-main-content" style="position:relative; background:#f8fafc; overflow-y:auto;">
-        <p class="portal-pilot-notice">Versi uji awal · Beberapa modul masih menampilkan data contoh. Konfirmasikan hasil pemeriksaan dan transaksi kepada petugas layanan.</p>
+        <p class="portal-pilot-notice">Data kesehatan dilindungi dan setiap sumber pemeriksaan ditandai. Konfirmasikan keputusan klinis kepada tenaga kesehatan.</p>
         
         <!-- Abstract Background Ornaments matching Company Profile -->
         <svg style="position:absolute; bottom:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.65;" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1751,6 +1751,12 @@
 
       </div>
 
+      <!-- Program wellness longitudinal: dirender dari wellness.js -->
+      <div id="wellness-personal-view" class="view-panel"></div>
+      <div id="corporate-wellness-view" class="view-panel"></div>
+      <div id="wellness-admin-view" class="view-panel"></div>
+      <div id="wellness-import-view" class="view-panel"></div>
+
     </div>
 
     <!-- ════════════════════════ MODAL: PROGRAM MEMBER & AFILIASI ════════════════════════ -->
@@ -3209,7 +3215,6 @@
         </div>
       </div>
 
-
     </main>
   </div>
 
@@ -3786,8 +3791,9 @@
        keduanya mendarat di layar yang persis sama.
        Jalur ../ karena berkas ini berada di dalam /apps/. -->
   <script src="../js/core/peta-subdomain.js?v=20260830a"></script>
-  <script src="navigation.js?v=20260908a"></script>
-  <script src="app.js?v=20260922-login-runtime"></script>
+  <script src="navigation.js?v=20260923-wellness-ahm"></script>
+  <script src="app.js?v=20260923-wellness-ahm"></script>
+  <script src="wellness.js?v=20260923-wellness-ahm"></script>
   <script>
     if ('serviceWorker' in navigator && !window.location.hostname.includes('localhost')) {
       window.addEventListener('load', () => {

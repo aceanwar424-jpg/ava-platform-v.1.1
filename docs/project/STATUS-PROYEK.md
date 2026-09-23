@@ -2133,3 +2133,27 @@ OWNED_BY: ava. Nama organisasi dan ruang lingkup awal berasal dari arahan ekspli
 - [x] `node scripts/verify-customer-project-register.js` lulus: 1 proyek internal valid, tanpa PII, data klinis, atau klaim kontrak.
 - [x] Security domains 12/12, application boundaries 17/17 pada 6 batas aplikasi, deploy readiness, syntax check, dan `git diff --check` lulus.
 - [x] Skema database, Supabase produksi, serta koneksi sistem AHM/IHC tidak diubah; implementasi tersebut menunggu human checkpoint sesuai `AGENTS.md`.
+
+## Implementasi MVP Wellness Korporat AHM — 22 September 2026
+
+### Rencana
+- [x] Tambahkan skema wellness generik multi-tenant untuk program, enrollment, observation, impor, reminder, dan laporan agregat.
+- [x] Tambahkan input tekanan darah dan gula darah pada Apps Personal dengan riwayat longitudinal.
+- [x] Tambahkan pemantauan wellness Corporate/HR dengan metrik agregat dan perlindungan data individual.
+- [x] Tambahkan bulk upload hasil IHC dengan preflight, idempotency, provenance, error per baris, dan audit batch.
+- [x] Tambahkan workspace admin untuk menyusun program, jadwal pengukuran, reminder, serta tindak lanjut CRM.
+- [x] Verifikasi sintaks, kontrak data, tenant isolation/RLS, navigasi, keamanan domain, dan kesiapan deploy.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk mesin wellness, tabel, validasi, dan UI yang dapat dikonfigurasi lintas klien. Konfigurasi Project AHM tetap `OWNED_BY: ava` dan tidak di-hardcode ke kode inti. Persetujuan eksplisit untuk perubahan skema diberikan pemilik pada 22 September 2026. Data uji wajib sintetis. HR hanya menerima statistik agregat dan aktivitas program; hasil klinis individual dibatasi untuk peserta serta peran medis yang berwenang. Setiap hasil menyimpan sumber, waktu ukur, status verifikasi, dan jejak perubahan. Threshold klinis tidak menjadi diagnosis otomatis dan harus disahkan medical governance sebelum digunakan sebagai rule operasional.
+
+### Hasil & Bukti Verifikasi
+- [x] Apps Personal menyediakan pencatatan tekanan darah, denyut, dan gula darah dengan konteks pemeriksaan, waktu ukur, perangkat, catatan, label `self_reported`, serta status `unverified`.
+- [x] Impor IHC menerima CSV maksimal 5.000 baris, mencocokkan `employee_id` ke roster, menolak nilai atau konteks yang tidak valid, mencatat checksum batch, dan menandai hasil sebagai `ihc_bulk/verified`.
+- [x] Corporate Portal hanya menerima ringkasan program. Detail karyawan tidak dikembalikan oleh RPC; rata-rata cohort ditekan apabila peserta terukur kurang dari lima.
+- [x] Workspace Pengelola dapat membuat program, menyinkronkan roster, membuat rule reminder, membangkitkan task CRM, mengunduh template CSV, serta memantau riwayat impor.
+- [x] Akses tabel langsung dicabut dari `anon` dan `authenticated`; akses aplikasi melalui RPC `SECURITY DEFINER` yang memvalidasi sesi, tenant, role, corporate, dan enrollment.
+- [x] Migrasi `0058_wellness_cardiometabolic_program.sql` dijalankan dua kali pada PGlite dan dua kali pada Supabase produksi tanpa duplikasi atau error. Verifikasi live menemukan tabel serta RPC tersedia.
+- [x] AHM terdaftar pada database AVA sebagai `Prospek` dengan kode `AHM-WELLNESS-2026`; draft program `AHM-DM-HT-2026` dibuat tanpa data peserta, hasil klinis, PIC, harga, atau klaim kontrak.
+- [x] `verify-wellness-cardiometabolic` lulus untuk self-entry, impor IHC, RLS, pemisahan role, dashboard agregat, small-cell suppression, idempotensi, dan larangan hardcode AHM pada mesin generik.
+- [x] QA browser lulus untuk halaman Personal, Corporate, Rancang Program, dan Impor IHC; kontras, responsivitas, navigasi, kontrol berkas, serta pesan perlindungan data tampil konsisten.
