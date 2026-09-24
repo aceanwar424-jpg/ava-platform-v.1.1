@@ -66,7 +66,9 @@
     image.src = assetPath(src);
     image.alt = alt;
     image.width = 1440;
-    image.height = 720;
+    image.height = src === 'ava-ecosystem-overview.jpg' ? 960 : 720;
+    image.srcset = `${assetPath(src.replace('.jpg', '-small.webp'))} 720w, ${assetPath(src.replace('.jpg', '.webp'))} 1440w`;
+    image.sizes = '(max-width: 600px) calc(100vw - 48px), (max-width: 1320px) calc(100vw - 128px), 1192px';
     image.style.objectPosition = position;
     image.loading = support ? 'lazy' : 'eager';
     image.decoding = 'async';
@@ -98,6 +100,12 @@
       const visual = figure(pageVisual.hero, pageVisual.alt, pageVisual.caption, pageVisual.conceptual, false, pageVisual.position);
       if (hero.classList.contains('v2-hero-visual')) hero.replaceChildren(visual.querySelector('img'), visual.querySelector('figcaption'));
       else { hero.classList.add('has-ava-visual'); hero.append(visual); }
+    } else {
+      const heading = document.querySelector('main .section-heading');
+      const visual = figure(pageVisual.hero, pageVisual.alt, pageVisual.caption, pageVisual.conceptual);
+      visual.classList.add('ava-visual-intro');
+      if (heading) heading.after(visual);
+      else document.querySelector('main .contact-grid')?.append(visual);
     }
     if (pageVisual.support) {
       const host = document.querySelector('.brand-section .wrap, .section .wrap');
@@ -122,6 +130,41 @@
     caption.textContent = 'Visual konseptual untuk konteks pembahasan; bukan screenshot produk aktual.';
     slot.classList.add('has-visual');
     slot.replaceChildren(image, caption);
+  });
+
+  // Full-width compositions preserve the artwork; a native dialog lets readers
+  // inspect small details without cropping or shrinking them into a card.
+  const viewer = document.createElement('dialog');
+  viewer.className = 'visual-viewer';
+  viewer.setAttribute('aria-label', 'Tampilan gambar diperbesar');
+  const dismiss = document.createElement('button');
+  dismiss.type = 'button';
+  dismiss.className = 'visual-viewer-close';
+  dismiss.textContent = 'Tutup gambar ×';
+  const canvas = document.createElement('div');
+  canvas.className = 'visual-viewer-canvas';
+  viewer.append(dismiss, canvas);
+  document.body.append(viewer);
+  dismiss.addEventListener('click', () => viewer.close());
+  viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
+  viewer.addEventListener('close', () => document.body.classList.remove('visual-viewer-open'));
+  document.querySelectorAll('.ava-visual, .v2-hero-visual, .screenshot-placeholder.has-visual').forEach(host => {
+    const original = host.querySelector('img');
+    if (!original) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'visual-expand';
+    button.textContent = 'Perbesar gambar ↗';
+    button.setAttribute('aria-label', `Perbesar: ${original.alt}`);
+    button.addEventListener('click', () => {
+      const expanded = new Image();
+      expanded.src = original.src;
+      expanded.alt = original.alt;
+      canvas.replaceChildren(expanded);
+      document.body.classList.add('visual-viewer-open');
+      viewer.showModal();
+    });
+    host.append(button);
   });
 
   // Vendor-neutral conversion event architecture. If an analytics provider is

@@ -2255,3 +2255,22 @@ OWNED_BY: generic. Pemeriksaan hanya membaca kode lokal dan HTML publik portal, 
 - node --check ava-platform/apps/wellness.js: lulus. node scripts/verify-wellness-cardiometabolic.cjs: PASS, termasuk explicit consent gate dan personal self-entry.
 - Pengambilan langsung aset JS online dibatasi halaman autentikasi; isi aset live dan keberadaan RPC consent di produksi belum diverifikasi. Bukti versi online berasal dari HTML publik dan kecocokan screenshot dengan source lama.
 - Tindak lanjut: rilis perubahan consent yang sudah tersedia setelah meninjau perubahan working tree lain dan memastikan prasyarat backend consent tersedia. Refresh saja belum mengganti HTML server yang masih menunjuk versi lama.
+
+## Penataan proporsional gambar situs utama — 24 September 2026
+### Rencana
+- [x] Audit rasio sumber dan penempatan hero/detail (≤ 1 jam).
+- [x] Pulihkan rasio sumber, buat gambar responsif, dan tata hero selebar konten dengan pembesaran aksesibel (≤ 1 jam).
+- [x] Verifikasi halaman desktop/mobile serta pemeriksaan repo dan catat bukti (≤ 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Aset berasal dari Artefak yang disediakan pengguna untuk situs AVA, bukan produk generik. Tidak mengubah data master, layanan klinis, klaim status produk, atau integrasi database. Visual generatif tetap ilustrasi/konsep; informasi utama tetap HTML. Tidak membutuhkan gambar generatif baru karena koleksi mencakup kebutuhan halaman yang ditata.
+
+### Hasil & bukti
+- 24 komposisi diekspor ulang tanpa crop: JPEG fallback dan WebP 720/1440 px. Rasio overview ekosistem dipulihkan dari 2:1 ke 3:2; provenance pada public/assets/visuals/manifest.json.
+- Hero beranda/detail dan gambar pendukung mengikuti lebar konten; tidak dipaksa masuk kartu sempit. Dialog native menyediakan pembesaran, scroll detail, tombol tutup, dan Escape.
+- Skrip reproduksi: scripts/export-public-visuals.cjs (sharp; SHARP_MODULE opsional). QA: scripts/qa-public-visuals.cjs (Playwright + Edge; PLAYWRIGHT_MODULE opsional).
+- Bukti browser tersimpan pada docs/audit-evidence/public-visual-qa.json dan public-visual-{1440,390}.png.
+- Lulus: syntax JS, public profile, deploy readiness, application boundaries (17 domain / 6 boundaries), audit menu (218), tenant RLS (36/36), secret scan (796 file), desktop artifact (703 file), git diff --check.
+- Pemeriksaan verify-public-editorial gagal pada determinisme generator HTML yang sudah ada: generator mengubah tiga HTML yang tidak disentuh pekerjaan ini. Perubahan samping generator telah dikembalikan; tidak diklaim lulus.
+- Preview lokal: http://localhost:8765/portal.html. Belum deploy: tidak ditemukan Vercel CLI, project link .vercel, atau login CLI pada lokasi standar sesi ini. Tidak melakukan push yang dapat membawa perubahan paralel di luar lingkup visual.
+- QA final lulus: 21 halaman × viewport 1440/390 px = 42 kombinasi, seluruh gambar termuat dengan rasio asli, tanpa overflow horizontal; dialog perbesar dibuka dan ditutup lewat Escape. Empat halaman (Produk, Jurnal, Kalkulator, Kontak) sebelumnya tidak memiliki host hero yang cocok; penempatan visual kini tersedia setelah judul atau pada grid kontak.
+- Inspeksi visual screenshot Queen Health desktop mengonfirmasi gambar tampil penuh selebar konten dan tulisan judul/deskripsi terpisah jelas. Bukti: docs/audit-evidence/public-visual-detail.png.

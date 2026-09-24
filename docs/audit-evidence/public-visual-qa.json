@@ -1,0 +1,556 @@
+[
+  {
+    "width": 1440,
+    "route": "portal.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/ekosistem.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 1.5000196625899564,
+        "natural": 1.5012594458438286
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-health.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-lab.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-tech.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/corporate.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/ava-his.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/ava-lis.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/ava-apps.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/solusi.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-care.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-sanctuary.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/brand-nutrition.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/produk.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/kemitraan.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/investasi.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/tentang.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/jurnal.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/kalkulator.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/kontak.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 1440,
+    "route": "public/layanan.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "portal.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/ekosistem.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 1.500067741498442,
+        "natural": 1.5
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-health.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-lab.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-tech.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/corporate.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/ava-his.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/ava-lis.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/ava-apps.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/solusi.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      },
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-care.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-sanctuary.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/brand-nutrition.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/produk.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/kemitraan.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/investasi.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/tentang.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/jurnal.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/kalkulator.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/kontak.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  },
+  {
+    "width": 390,
+    "route": "public/layanan.html",
+    "overflow": false,
+    "images": [
+      {
+        "ok": true,
+        "ratio": 2,
+        "natural": 2
+      }
+    ]
+  }
+]
