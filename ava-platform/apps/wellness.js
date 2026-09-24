@@ -199,23 +199,79 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
             <div>
               <span style="font-size:10px; font-weight:800; letter-spacing:0.1em; color:#5eead4; text-transform:uppercase;">EXECUTIVE HR DASHBOARD · WELLNESS COHORT</span>
-              <h2 style="margin:6px 0 8px; font-size:24px; color:#fff; font-weight:800;">Monitoring Kesehatan & Wellness Karyawan</h2>
-              <p style="margin:0; max-width:700px; font-size:13px; color:#cbd5e1; line-height:1.6;">Monitoring partisipasi, kepatuhan kontrol, dan tren kardiometabolik (Diabetes & Hipertensi). Privasi individual 100% terlindungi sesuai UU PDP No. 27/2022.</p>
+              <h2 style="margin:6px 0 8px; font-size:24px; color:#fff; font-weight:800;">Monitoring Kesehatan &amp; Wellness Karyawan</h2>
+              <p style="margin:0; max-width:700px; font-size:13px; color:#cbd5e1; line-height:1.6;">Monitoring partisipasi, kepatuhan kontrol, stratifikasi risiko 4 level, dan tren kardiometabolik. Privasi individual 100% terlindungi sesuai UU PDP No. 27/2022.</p>
             </div>
             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
-              <div class="wellness-program-chip" style="background:rgba(94,234,212,0.15); border:1px solid rgba(94,234,212,0.3); color:#5eead4; font-size:11px; font-weight:700; padding:6px 12px; border-radius:20px;">🔒 Aggregate Only · Small-cell $\ge$ ${threshold}</div>
-              ${programs.length ? `<button class="wellness-secondary" onclick="wellnessExportHrReport()" style="background:#fff; color:#0f172a; border:0; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);">📥 Unduh Laporan HRD (CSV)</button>` : ''}
+              <div class="wellness-program-chip" style="background:rgba(94,234,212,0.15); border:1px solid rgba(94,234,212,0.3); color:#5eead4; font-size:11px; font-weight:700; padding:6px 12px; border-radius:20px;">&#x1F512; Aggregate Only · Small-cell &#x2265;${threshold}</div>
+              ${programs.length ? `<button class="wellness-secondary" onclick="wellnessExportHrReport()" style="background:#fff; color:#0f172a; border:0; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);">&#x1F4E5; Unduh Laporan HRD (CSV)</button>` : ''}
             </div>
           </div>
         </section>
 
+        <!-- RISK STRATIFICATION LEGEND / FLOWCHART -->
+        <section style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; margin-bottom:20px; box-shadow:0 4px 16px rgba(0,0,0,0.04);">
+          <div style="margin-bottom:16px;">
+            <span style="font-size:10px; font-weight:800; color:#0e7c86; letter-spacing:0.08em; text-transform:uppercase;">SISTEM STRATIFIKASI RISIKO</span>
+            <h3 style="margin:4px 0 2px; font-size:15px; color:#0f172a; font-weight:800;">Alur Kategorisasi 4 Level Risiko Kardiometabolik</h3>
+            <p style="margin:0; font-size:11.5px; color:#64748b;">Berdasarkan pedoman JNC-8 (Hipertensi) &amp; ADA 2024 (Diabetes). Nilai tekanan darah dalam mmHg, gula darah puasa dalam mg/dL.</p>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative; margin-bottom:16px;">
+            <div style="position:absolute; top:27px; left:12.5%; right:12.5%; height:3px; background:linear-gradient(90deg,#22c55e,#facc15,#f97316,#ef4444); z-index:0; border-radius:4px;"></div>
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; padding:0 6px;">
+              <div style="width:54px; height:54px; border-radius:50%; background:#dcfce7; border:3px solid #22c55e; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; box-shadow:0 4px 12px rgba(34,197,94,0.25);">&#x2705;</div>
+              <div style="background:#dcfce7; border:1.5px solid #22c55e; border-radius:10px; padding:10px 8px; width:100%; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#15803d; text-transform:uppercase; letter-spacing:0.05em;">L1 · Normal</div>
+                <div style="font-size:11px; color:#166534; margin-top:4px; line-height:1.5;">TD: &lt;120/80<br>GDS: &lt;100</div>
+                <div style="margin-top:6px; font-size:10px; color:#15803d; font-weight:700; background:#bbf7d0; padding:3px 6px; border-radius:6px;">&#x2714; Pantau rutin</div>
+              </div>
+            </div>
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; padding:0 6px;">
+              <div style="width:54px; height:54px; border-radius:50%; background:#fef9c3; border:3px solid #facc15; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; box-shadow:0 4px 12px rgba(250,204,21,0.25);">&#x26A0;&#xFE0F;</div>
+              <div style="background:#fef9c3; border:1.5px solid #facc15; border-radius:10px; padding:10px 8px; width:100%; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#a16207; text-transform:uppercase; letter-spacing:0.05em;">L2 · Perhatian</div>
+                <div style="font-size:11px; color:#713f12; margin-top:4px; line-height:1.5;">TD: 120–139/80–89<br>GDS: 100–125</div>
+                <div style="margin-top:6px; font-size:10px; color:#854d0e; font-weight:700; background:#fef08a; padding:3px 6px; border-radius:6px;">&#x26A1; Edukasi &amp; gaya hidup</div>
+              </div>
+            </div>
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; padding:0 6px;">
+              <div style="width:54px; height:54px; border-radius:50%; background:#ffedd5; border:3px solid #f97316; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; box-shadow:0 4px 12px rgba(249,115,22,0.25);">&#x1F536;</div>
+              <div style="background:#ffedd5; border:1.5px solid #f97316; border-radius:10px; padding:10px 8px; width:100%; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#c2410c; text-transform:uppercase; letter-spacing:0.05em;">L3 · Risiko Tinggi</div>
+                <div style="font-size:11px; color:#9a3412; margin-top:4px; line-height:1.5;">TD: 140–159/90–99<br>GDS: 126–199</div>
+                <div style="margin-top:6px; font-size:10px; color:#9a3412; font-weight:700; background:#fed7aa; padding:3px 6px; border-radius:6px;">&#x1F3E5; Rujuk IHC segera</div>
+              </div>
+            </div>
+            <div style="position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; padding:0 6px;">
+              <div style="width:54px; height:54px; border-radius:50%; background:#fee2e2; border:3px solid #ef4444; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:10px; box-shadow:0 4px 12px rgba(239,68,68,0.3);">&#x1F6A8;</div>
+              <div style="background:#fee2e2; border:1.5px solid #ef4444; border-radius:10px; padding:10px 8px; width:100%; text-align:center;">
+                <div style="font-size:10px; font-weight:800; color:#b91c1c; text-transform:uppercase; letter-spacing:0.05em;">L4 · Sangat Berisiko</div>
+                <div style="font-size:11px; color:#7f1d1d; margin-top:4px; line-height:1.5;">TD: &#x2265;160/&#x2265;100<br>GDS: &#x2265;200</div>
+                <div style="margin-top:6px; font-size:10px; color:#7f1d1d; font-weight:700; background:#fecaca; padding:3px 6px; border-radius:6px;">&#x1F691; Tindak darurat &amp; rujuk</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:10.5px; color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:10px;">
+            &#x2695;&#xFE0F; <strong>Referensi klinis:</strong> JNC-8 (Hipertensi) · ADA Standards of Care 2024 (Diabetes) · PERKENI 2021. Kategorisasi untuk pemantauan program, bukan diagnosis klinis.
+          </div>
+        </section>
+
         <div class="wellness-notice privacy" style="background:#f0fdfa; border:1px solid #99f6e4; color:#0f766e; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:12.5px; display:flex; gap:10px; align-items:center;">
-          <span style="font-size:18px;">🛡️</span>
-          <div><strong>Proteksi Kerahasiaan Cohort Aktif.</strong> Rata-rata medis otomatis disembunyikan jika jumlah peserta terukur kurang dari ${threshold} orang agar identitas & data kesehatan individual tidak dapat dikenali.</div>
+          <span style="font-size:18px;">&#x1F6E1;&#xFE0F;</span>
+          <div><strong>Proteksi Kerahasiaan Cohort Aktif.</strong> Rata-rata medis otomatis disembunyikan jika jumlah peserta terukur kurang dari ${threshold} orang agar identitas &amp; data kesehatan individual tidak dapat dikenali.</div>
         </div>
 
         ${programs.length ? programs.map(program => {
           const isHidden = program.avg_systolic_30d == null;
+          const enrolled = program.enrolled || 0;
+          const screened = program.screened_count || 0;
+          const unscreened = program.unscreened_count || 0;
+          const l1 = program.risk_l1_count || 0;
+          const l2 = program.risk_l2_count || 0;
+          const l3 = program.risk_l3_count || 0;
+          const l4 = program.risk_l4_count || 0;
+          const pct = n => screened > 0 ? Math.round((n / screened) * 100) : 0;
+          const hasRiskData = screened > 0;
           return `<section class="wellness-card corporate-program" style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; margin-bottom:20px; box-shadow:0 4px 20px rgba(0,0,0,0.03);">
             <div class="wellness-card-title" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
               <div>
@@ -226,55 +282,149 @@
               <span class="wellness-badge verified" style="background:#d1fae5; color:#047857; font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:20px;">ISO 15189 Compliant</span>
             </div>
 
-            <div class="wellness-kpi-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px;">
+            <div class="wellness-kpi-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:20px;">
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">👥 Peserta Terdaftar</span>
-                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.enrolled || 0)} <small style="font-size:11px; font-weight:500;">orang</small></strong>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x1F465; Peserta Terdaftar</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(enrolled)} <small style="font-size:11px; font-weight:500;">orang</small></strong>
               </article>
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">📱 Apps Tertaut</span>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x1F4F1; Apps Tertaut</span>
                 <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.linked_accounts || 0)} <small style="font-size:11px; font-weight:500;">akun</small></strong>
               </article>
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">⚡ Aktif 7 Hari</span>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x26A1; Aktif 7 Hari</span>
                 <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.active_7d || 0)} <small style="font-size:11px; font-weight:500;">peserta</small></strong>
               </article>
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">📊 Total Sesi (30d)</span>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x1F4CA; Total Sesi (30d)</span>
                 <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.measurements_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
               </article>
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">🫀 Cakupan Tensi</span>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x1FAC0; Cakupan Tensi</span>
                 <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.bp_coverage_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
               </article>
               <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
-                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">🩸 Cakupan Gula</span>
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">&#x1FA78; Cakupan Gula</span>
                 <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.glucose_coverage_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
               </article>
             </div>
 
-            <div style="background:#f1f5f9; border-radius:12px; padding:16px; margin-top:12px;">
-              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                <h4 style="margin:0; font-size:13px; color:#0f172a; font-weight:800;">📊 Rata-rata Cohort Karyawan (30 Hari)</h4>
-                <span style="font-size:11px; font-weight:700; color:${isHidden ? '#9a3412' : '#166534'}; bg:${isHidden ? '#ffedd5' : '#dcfce7'}; padding:3px 8px; border-radius:6px;">${isHidden ? '🔒 Small-cell Protection Active (< 5 peserta)' : '✅ Cohort Terukur (\ge 5 peserta)'}</span>
+            <!-- HRD TIER ASSIGNMENT PANEL -->
+            <div style="background:#fff; border:1.5px solid #0e7c86; border-radius:14px; overflow:hidden; margin-bottom:16px;">
+              <button onclick="(function(btn){const body=btn.parentElement.querySelector('[data-tier-body]');const isOpen=body.style.display!=='none';body.style.display=isOpen?'none':'block';btn.querySelector('.tc').style.transform=isOpen?'rotate(0)':'rotate(180deg)';})(this)" style="width:100%; display:flex; align-items:center; gap:10px; padding:14px 18px; background:linear-gradient(90deg,#f0fdfa,#fff); border:0; cursor:pointer; text-align:left;">
+                <span style="font-size:18px;">&#x1F465;</span>
+                <div style="flex:1;">
+                  <span style="font-size:11px; font-weight:800; color:#0e7c86; text-transform:uppercase; letter-spacing:0.06em;">MANAJEMEN PESERTA PER TIER</span>
+                  <p style="margin:2px 0 0; font-size:12px; color:#475569;">Lihat daftar karyawan per level risiko &middot; Assign treatment tambahan.</p>
+                </div>
+                <span class="tc" style="font-size:14px; color:#0e7c86; transition:transform 0.2s;">&#x25BC;</span>
+              </button>
+              <div data-tier-body style="display:none; border-top:1.5px solid #99f6e4;" id="${_hrdPanelId ? _hrdPanelId(program.id) : ('hrd-tp-'+safe(program.id).replace(/-/g,'').slice(0,10))}">
+                <div style="padding:16px;">
+                  <p style="margin:0 0 10px; font-size:11.5px; color:#64748b;">Klik tombol di bawah untuk memuat roster peserta terbaru berdasarkan tier risiko dan membuat assignment treatment wellness tambahan.</p>
+                  <button onclick="wellnessHrdLoadTierPanel('${safe(program.id)}')" style="font-size:12px; padding:8px 20px; border-radius:8px; border:0; background:linear-gradient(135deg,#0f4c5c,#0e7c86); color:#fff; cursor:pointer; font-weight:700;">&#x1F504; Muat Daftar Peserta</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- RISK DISTRIBUTION CHART -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:18px; margin-bottom:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                <div>
+                  <h4 style="margin:0 0 2px; font-size:13px; color:#0f172a; font-weight:800;">&#x1F4CA; Distribusi Risiko Karyawan</h4>
+                  <p style="margin:0; font-size:11px; color:#64748b;">${screened} dari ${enrolled} peserta sudah terukur &middot; ${unscreened} belum ada data</p>
+                </div>
+                <span style="font-size:10.5px; font-weight:700; padding:3px 10px; border-radius:20px; background:${l3+l4 > 0 ? '#fee2e2' : '#dcfce7'}; color:${l3+l4 > 0 ? '#b91c1c' : '#15803d'};">${l3+l4 > 0 ? '&#x26A0; '+(l3+l4)+' perlu perhatian klinis' : '&#x2705; Profil risiko baik'}</span>
+              </div>
+
+              ${hasRiskData ? `
+              <!-- Horizontal stacked bar chart -->
+              <div style="margin-bottom:14px;">
+                <div style="height:28px; border-radius:8px; overflow:hidden; display:flex; background:#e2e8f0; box-shadow:inset 0 1px 3px rgba(0,0,0,0.08);">
+                  ${pct(l1) > 0 ? `<div title="L1 Normal: ${l1} orang (${pct(l1)}%)" style="width:${pct(l1)}%; background:linear-gradient(90deg,#22c55e,#4ade80); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:800;">${pct(l1) >= 10 ? pct(l1)+'%' : ''}</div>` : ''}
+                  ${pct(l2) > 0 ? `<div title="L2 Perhatian: ${l2} orang (${pct(l2)}%)" style="width:${pct(l2)}%; background:linear-gradient(90deg,#facc15,#fbbf24); display:flex; align-items:center; justify-content:center; color:#78350f; font-size:10px; font-weight:800;">${pct(l2) >= 10 ? pct(l2)+'%' : ''}</div>` : ''}
+                  ${pct(l3) > 0 ? `<div title="L3 Risiko Tinggi: ${l3} orang (${pct(l3)}%)" style="width:${pct(l3)}%; background:linear-gradient(90deg,#f97316,#fb923c); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:800;">${pct(l3) >= 10 ? pct(l3)+'%' : ''}</div>` : ''}
+                  ${pct(l4) > 0 ? `<div title="L4 Sangat Berisiko: ${l4} orang (${pct(l4)}%)" style="width:${pct(l4)}%; background:linear-gradient(90deg,#ef4444,#dc2626); display:flex; align-items:center; justify-content:center; color:#fff; font-size:10px; font-weight:800;">${pct(l4) >= 10 ? pct(l4)+'%' : ''}</div>` : ''}
+                </div>
+                <div style="display:flex; gap:14px; margin-top:8px; flex-wrap:wrap;">
+                  <span style="font-size:10px; color:#15803d; display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:10px; height:10px; background:#22c55e; border-radius:2px;"></span>L1 Normal</span>
+                  <span style="font-size:10px; color:#a16207; display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:10px; height:10px; background:#facc15; border-radius:2px;"></span>L2 Perhatian</span>
+                  <span style="font-size:10px; color:#c2410c; display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:10px; height:10px; background:#f97316; border-radius:2px;"></span>L3 Risiko Tinggi</span>
+                  <span style="font-size:10px; color:#b91c1c; display:flex; align-items:center; gap:4px;"><span style="display:inline-block; width:10px; height:10px; background:#ef4444; border-radius:2px;"></span>L4 Sangat Berisiko</span>
+                </div>
+              </div>
+
+              <!-- 4-Tier cards -->
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px;">
+                <div style="background:#dcfce7; border:1.5px solid #22c55e; border-radius:10px; padding:10px; text-align:center;">
+                  <div style="font-size:18px; margin-bottom:4px;">&#x2705;</div>
+                  <div style="font-size:9.5px; font-weight:800; color:#15803d; text-transform:uppercase;">L1 Normal</div>
+                  <div style="font-size:22px; font-weight:900; color:#14532d; margin:4px 0 2px; line-height:1;">${l1}</div>
+                  <div style="font-size:10px; color:#16a34a;">${pct(l1)}%</div>
+                  <div style="font-size:9px; color:#15803d; margin-top:4px; font-style:italic; line-height:1.3;">Pantau rutin</div>
+                </div>
+                <div style="background:#fef9c3; border:1.5px solid #facc15; border-radius:10px; padding:10px; text-align:center;">
+                  <div style="font-size:18px; margin-bottom:4px;">&#x26A0;&#xFE0F;</div>
+                  <div style="font-size:9.5px; font-weight:800; color:#a16207; text-transform:uppercase;">L2 Perhatian</div>
+                  <div style="font-size:22px; font-weight:900; color:#713f12; margin:4px 0 2px; line-height:1;">${l2}</div>
+                  <div style="font-size:10px; color:#a16207;">${pct(l2)}%</div>
+                  <div style="font-size:9px; color:#854d0e; margin-top:4px; font-style:italic; line-height:1.3;">Edukasi &amp; gaya hidup</div>
+                </div>
+                <div style="background:#ffedd5; border:1.5px solid #f97316; border-radius:10px; padding:10px; text-align:center;">
+                  <div style="font-size:18px; margin-bottom:4px;">&#x1F536;</div>
+                  <div style="font-size:9.5px; font-weight:800; color:#c2410c; text-transform:uppercase;">L3 Risiko Tinggi</div>
+                  <div style="font-size:22px; font-weight:900; color:#7c2d12; margin:4px 0 2px; line-height:1;">${l3}</div>
+                  <div style="font-size:10px; color:#c2410c;">${pct(l3)}%</div>
+                  <div style="font-size:9px; color:#9a3412; margin-top:4px; font-style:italic; line-height:1.3;">Rujuk IHC segera</div>
+                </div>
+                <div style="background:#fee2e2; border:1.5px solid #ef4444; border-radius:10px; padding:10px; text-align:center;">
+                  <div style="font-size:18px; margin-bottom:4px;">&#x1F6A8;</div>
+                  <div style="font-size:9.5px; font-weight:800; color:#b91c1c; text-transform:uppercase;">L4 Sangat Berisiko</div>
+                  <div style="font-size:22px; font-weight:900; color:#7f1d1d; margin:4px 0 2px; line-height:1;">${l4}</div>
+                  <div style="font-size:10px; color:#b91c1c;">${pct(l4)}%</div>
+                  <div style="font-size:9px; color:#7f1d1d; margin-top:4px; font-style:italic; line-height:1.3;">Tindak darurat &amp; rujuk</div>
+                </div>
+              </div>
+
+              ${l3+l4 > 0 ? `
+              <div style="margin-top:12px; background:#fef2f2; border:1px solid #fca5a5; border-radius:10px; padding:12px; display:flex; gap:10px; align-items:flex-start;">
+                <span style="font-size:20px; flex-shrink:0;">&#x2695;&#xFE0F;</span>
+                <div style="font-size:12px; color:#7f1d1d; line-height:1.7;">
+                  <strong>Rekomendasi Tindak Lanjut HR:</strong><br>
+                  ${l4 > 0 ? `<span>• <strong>${l4} karyawan L4</strong> memerlukan tindakan segera — koordinasikan dengan IHC / fasilitas kesehatan rujukan.</span><br>` : ''}
+                  ${l3 > 0 ? `<span>• <strong>${l3} karyawan L3</strong> perlu rujukan IHC dalam 1–2 minggu untuk evaluasi klinis lebih lanjut.</span>` : ''}
+                </div>
+              </div>` : ''}
+              ` : `
+              <div style="background:#fff; border:1px dashed #cbd5e1; border-radius:10px; padding:16px; text-align:center; color:#94a3b8; font-size:12.5px;">
+                &#x1F4EB; Belum ada data pengukuran untuk menghitung distribusi risiko. Peserta perlu mulai merekam data kesehatan.
+              </div>
+              `}
+            </div>
+
+            <!-- AGGREGATE AVERAGES -->
+            <div style="background:#f1f5f9; border-radius:12px; padding:16px; margin-top:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                <h4 style="margin:0; font-size:13px; color:#0f172a; font-weight:800;">&#x1F4C8; Rerata Cohort Karyawan (30 Hari)</h4>
+                <span style="font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; background:${isHidden ? '#ffedd5' : '#dcfce7'}; color:${isHidden ? '#9a3412' : '#166534'};">${isHidden ? '&#x1F512; Small-cell Active (< 5 peserta)' : '&#x2705; Cohort Terukur (&#x2265;5 peserta)'}</span>
               </div>
               ${isHidden ? `
                 <div style="background:#fff; border:1px dashed #fdba74; border-radius:10px; padding:14px; display:flex; gap:12px; align-items:center;">
-                  <div style="font-size:24px;">🛡️</div>
+                  <div style="font-size:24px; flex-shrink:0;">&#x1F6E1;&#xFE0F;</div>
                   <div style="font-size:12px; color:#9a3412; line-height:1.5;">
                     <strong>Statistik Rerata Disembunyikan secara Otomatis</strong><br>
-                    Jumlah peserta terukur pada periode ini belum mencapai ambang batas ${threshold} orang. Sesuai UU PDP, rerata disembunyikan untuk menjaga perlindungan privasi data individu.
+                    Jumlah peserta terukur belum mencapai ambang batas ${threshold} orang. Sesuai UU PDP, rerata disembunyikan untuk menjaga perlindungan privasi data individu.
                   </div>
                 </div>
               ` : `
                 <div class="wellness-aggregate-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
                   <article style="background:#fff; border:1px solid #cbd5e1; padding:14px; border-radius:10px;">
-                    <span style="font-size:11px; color:#475569; font-weight:700;">🫀 Rerata Tekanan Darah Cohort</span>
+                    <span style="font-size:11px; color:#475569; font-weight:700;">&#x1FAC0; Rerata Tekanan Darah Cohort</span>
                     <strong style="display:block; margin-top:4px; font-size:20px; color:#0f172a;">${safe(program.avg_systolic_30d)} / ${safe(program.avg_diastolic_30d)} <small style="font-size:12px;">mmHg</small></strong>
                     <span style="font-size:10.5px; color:#64748b; margin-top:4px; display:block;">Berdasarkan ${safe(program.bp_coverage_30d)} pengukuran terotorisasi</span>
                   </article>
                   <article style="background:#fff; border:1px solid #cbd5e1; padding:14px; border-radius:10px;">
-                    <span style="font-size:11px; color:#475569; font-weight:700;">🩸 Rerata Gula Darah Puasa Cohort</span>
+                    <span style="font-size:11px; color:#475569; font-weight:700;">&#x1FA78; Rerata Gula Darah Puasa Cohort</span>
                     <strong style="display:block; margin-top:4px; font-size:20px; color:#0f172a;">${safe(program.avg_glucose_30d)} <small style="font-size:12px;">mg/dL</small></strong>
                     <span style="font-size:10.5px; color:#64748b; margin-top:4px; display:block;">Berdasarkan ${safe(program.glucose_coverage_30d)} pengukuran terotorisasi</span>
                   </article>
@@ -534,6 +684,201 @@
     wellnessAcceptConsent, wellnessSubmitPersonal, wellnessSaveProgram, wellnessEditProgram, wellnessResetProgramForm,
     wellnessSaveReminder, wellnessEnrollRoster, wellnessImportRosterFile,
     wellnessGenerateReminders, wellnessOpenImport, wellnessReadImportFile, wellnessUploadImport,
-    wellnessDownloadTemplate
+    wellnessDownloadTemplate,
+    wellnessHrdLoadTierPanel, wellnessHrdSelectAll, wellnessHrdClearAll,
+    wellnessHrdOpenAssignModal, wellnessHrdSubmitAssignment
   });
+
+
+  // ─── HRD TIER ASSIGNMENT PANEL ──────────────────────────────────────────────
+
+  const TREATMENT_OPTIONS = [
+    { value: 'konsultasi_dokter', label: 'Konsultasi Dokter / Internist' },
+    { value: 'followup_ihc',      label: 'Follow-up Pemeriksaan IHC' },
+    { value: 'program_diet',      label: 'Program Diet & Nutrisi' },
+    { value: 'program_olahraga',  label: 'Program Olahraga Terstruktur' },
+    { value: 'monitoring_ketat',  label: 'Monitoring Ketat (Harian)' },
+    { value: 'psikologis',        label: 'Pendampingan Psikologis / Stress' },
+    { value: 'rehab_gaya_hidup',  label: 'Rehabilitasi Gaya Hidup' },
+    { value: 'tindak_darurat',    label: 'Tindak Darurat – Rujuk Faskes' },
+  ];
+
+  const TIER_META = {
+    0: { label: 'Belum Terukur',      bg: '#f1f5f9', border: '#cbd5e1', color: '#64748b', icon: '&#x1F4EB;' },
+    1: { label: 'L1 Normal',          bg: '#dcfce7', border: '#22c55e', color: '#15803d', icon: '&#x2705;' },
+    2: { label: 'L2 Perhatian',       bg: '#fef9c3', border: '#facc15', color: '#a16207', icon: '&#x26A0;&#xFE0F;' },
+    3: { label: 'L3 Risiko Tinggi',   bg: '#ffedd5', border: '#f97316', color: '#c2410c', icon: '&#x1F536;' },
+    4: { label: 'L4 Sangat Berisiko', bg: '#fee2e2', border: '#ef4444', color: '#b91c1c', icon: '&#x1F6A8;' },
+  };
+
+  function _hrdPanelId(programId) {
+    return 'hrd-tp-' + String(programId).replace(/-/g,'').slice(0,10);
+  }
+
+  async function wellnessHrdLoadTierPanel(programId) {
+    const panel = document.getElementById(_hrdPanelId(programId));
+    if (!panel) return;
+    panel.innerHTML = '<p style="padding:16px; color:#64748b; font-size:12.5px;">&#x23F3; Memuat daftar peserta per tier&hellip;</p>';
+    try {
+      const data = await rpc('wellness_hrd_participant_tier_list', { p_program_id: programId });
+      const participants = data.tiers || [];
+      const treatmentRequests = data.treatment_requests || [];
+      if (!participants.length) {
+        panel.innerHTML = '<p style="padding:16px; color:#64748b; font-size:12.5px; text-align:center;">&#x1F4EB; Belum ada peserta untuk program ini.</p>';
+        return;
+      }
+      const byTier = { 4:[], 3:[], 2:[], 1:[], 0:[] };
+      participants.forEach(p => { const t = p.risk_tier; (byTier[t] !== undefined ? byTier[t] : byTier[0]).push(p); });
+
+      const safeStr = v => String(v ?? '—');
+      const tierHtml = [4, 3, 2, 1, 0].filter(t => byTier[t].length > 0).map(t => {
+        const m = TIER_META[t];
+        const rows = byTier[t];
+        return `<div style="margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px; flex-wrap:wrap;">
+            <span style="font-size:16px;">${m.icon}</span>
+            <span style="font-size:11px; font-weight:800; color:${m.color}; text-transform:uppercase;">${m.label}</span>
+            <span style="font-size:10.5px; background:${m.bg}; color:${m.color}; border:1px solid ${m.border}; padding:2px 8px; border-radius:12px; font-weight:700;">${rows.length} orang</span>
+            ${t >= 3 ? `<span style="font-size:9.5px; background:#fef2f2; color:#b91c1c; border:1px solid #fca5a5; padding:2px 8px; border-radius:12px; font-weight:700;">&#x26A0; Perlu tindak lanjut</span>` : ''}
+          </div>
+          <div style="border:1px solid ${m.border}; border-radius:10px; overflow:hidden; background:${m.bg};">
+            ${rows.map((p, i) => {
+              const bpStr = (p.sys && p.dia) ? `${p.sys}/${p.dia} mmHg` : '&#x2014;';
+              const gluStr = p.glu ? `${p.glu} mg/dL` : '&#x2014;';
+              const hasTx = p.active_treatment_requests > 0;
+              return `<label style="display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; border-top:${i>0 ? '1px solid '+m.border : 'none'};" onmouseover="this.style.background='rgba(0,0,0,0.04)'" onmouseout="this.style.background='transparent'">
+                <input type="checkbox" data-enrollment-id="${safeStr(p.enrollment_id)}" style="width:16px; height:16px; cursor:pointer; flex-shrink:0; accent-color:${m.border};">
+                <div style="flex:1; min-width:0;">
+                  <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <strong style="font-size:12.5px; color:#0f172a;">${safeStr(p.participant_name)}</strong>
+                    <span style="font-size:10px; color:#94a3b8; font-family:monospace;">ID: ${safeStr(p.employee_code)}</span>
+                    ${hasTx ? `<span style="font-size:9.5px; background:#dbeafe; color:#1e40af; padding:1px 6px; border-radius:10px; font-weight:700;">&#x1F4CC; ${p.active_treatment_requests} aktif</span>` : ''}
+                  </div>
+                  <div style="font-size:11px; color:#64748b; margin-top:2px;">Tensi: <strong>${bpStr}</strong> &nbsp;&middot;&nbsp; Gula: <strong>${gluStr}</strong></div>
+                </div>
+              </label>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }).join('');
+
+      const txHtml = treatmentRequests.length ? `
+        <div style="margin-top:16px; border-top:1px solid #e2e8f0; padding-top:14px;">
+          <h5 style="margin:0 0 10px; font-size:12px; color:#0f172a; font-weight:800;">&#x1F4CB; Riwayat Assignment Treatment</h5>
+          ${treatmentRequests.slice(0,10).map(tx => {
+            const stBg = { pending:'#fef9c3', accepted:'#dbeafe', in_progress:'#ede9fe', completed:'#dcfce7', cancelled:'#f1f5f9' }[tx.status] || '#f1f5f9';
+            const stCl = { pending:'#a16207', accepted:'#0369a1', in_progress:'#7c3aed', completed:'#15803d', cancelled:'#64748b' }[tx.status] || '#64748b';
+            const tm = TIER_META[tx.risk_tier] || TIER_META[1];
+            return `<div style="display:flex; align-items:center; gap:10px; padding:8px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:6px;">
+              <span style="font-size:14px;">${tm.icon}</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${safeStr(tx.treatment_label)}</div>
+                <div style="font-size:10.5px; color:#64748b;">${new Date(tx.created_at).toLocaleString('id-ID',{dateStyle:'short',timeStyle:'short'})}</div>
+              </div>
+              <span style="font-size:10px; font-weight:700; padding:3px 10px; border-radius:12px; background:${stBg}; color:${stCl}; white-space:nowrap;">${tx.status}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      ` : '';
+
+      panel.innerHTML = `
+        <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:14px;">
+          <button onclick="wellnessHrdSelectAll('${_hrdPanelId(programId)}')" style="font-size:11px; padding:5px 12px; border-radius:7px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; font-weight:600;">&#x2611; Pilih Semua</button>
+          <button onclick="wellnessHrdClearAll('${_hrdPanelId(programId)}')" style="font-size:11px; padding:5px 12px; border-radius:7px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; font-weight:600;">&#x2610; Batal Pilih</button>
+          <span style="flex:1;"></span>
+          <button onclick="wellnessHrdOpenAssignModal('${programId}','${_hrdPanelId(programId)}')" style="font-size:12px; font-weight:700; padding:8px 18px; border-radius:9px; border:0; background:linear-gradient(135deg,#0f4c5c,#0e7c86); color:#fff; cursor:pointer; box-shadow:0 2px 8px rgba(14,124,134,0.3);">&#x2795; Assign Treatment</button>
+        </div>
+        ${tierHtml}
+        ${txHtml}
+      `;
+    } catch(err) {
+      panel.innerHTML = `<p style="padding:16px; color:#b91c1c; font-size:12.5px;">&#x274C; Gagal memuat: ${err.message}</p>`;
+    }
+  }
+
+  function wellnessHrdSelectAll(panelId) {
+    document.querySelectorAll('#' + panelId + ' input[type=checkbox]').forEach(cb => cb.checked = true);
+  }
+  function wellnessHrdClearAll(panelId) {
+    document.querySelectorAll('#' + panelId + ' input[type=checkbox]').forEach(cb => cb.checked = false);
+  }
+
+  function wellnessHrdOpenAssignModal(programId, panelId) {
+    const checked = [...document.querySelectorAll('#' + panelId + ' input[type=checkbox]:checked')];
+    if (!checked.length) { notify('Pilih minimal 1 peserta terlebih dahulu.'); return; }
+    const enrollmentIds = checked.map(cb => cb.dataset.enrollmentId);
+    const count = checked.length;
+    let modal = document.getElementById('hrd-assign-modal');
+    if (modal) modal.remove();
+    modal = document.createElement('div');
+    modal.id = 'hrd-assign-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+    modal.innerHTML = `
+      <div style="background:#fff; border-radius:20px; width:100%; max-width:520px; box-shadow:0 32px 80px rgba(15,23,42,0.3); overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#0f172a 0%,#0f4c5c 100%); padding:20px 24px; color:#fff;">
+          <div style="font-size:10px; color:#5eead4; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:6px;">ASSIGN TREATMENT WELLNESS</div>
+          <h3 style="margin:0; font-size:18px; font-weight:800;">Program Tambahan untuk ${count} Peserta</h3>
+          <p style="margin:6px 0 0; font-size:12px; color:#cbd5e1; line-height:1.5;">Semua peserta terpilih akan menerima assignment ini secara bersamaan.</p>
+        </div>
+        <div style="padding:24px;">
+          <label style="display:block; margin-bottom:14px;">
+            <span style="font-size:11px; font-weight:800; color:#374151; text-transform:uppercase; letter-spacing:0.05em;">Jenis Treatment *</span>
+            <select id="hrd-at-type" style="display:block; width:100%; margin-top:6px; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; background:#f8fafc; cursor:pointer;" onchange="const lbl=document.getElementById('hrd-at-label'); if(!lbl.value || lbl.dataset.auto==='1'){lbl.value=this.options[this.selectedIndex].text; lbl.dataset.auto='1';}">
+              <option value="">&#x2014; Pilih jenis treatment &mdash;</option>
+              ${TREATMENT_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('')}
+            </select>
+          </label>
+          <label style="display:block; margin-bottom:14px;">
+            <span style="font-size:11px; font-weight:800; color:#374151; text-transform:uppercase; letter-spacing:0.05em;">Label / Deskripsi Treatment *</span>
+            <input id="hrd-at-label" type="text" placeholder="Mis: Sesi konsultasi dokter Oktober 2026" data-auto="0" oninput="this.dataset.auto='0'" style="display:block; width:100%; margin-top:6px; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; background:#f8fafc; box-sizing:border-box;">
+          </label>
+          <label style="display:block; margin-bottom:14px;">
+            <span style="font-size:11px; font-weight:800; color:#374151; text-transform:uppercase; letter-spacing:0.05em;">Jadwal Pelaksanaan (opsional)</span>
+            <input id="hrd-at-schedule" type="datetime-local" style="display:block; width:100%; margin-top:6px; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; background:#f8fafc; box-sizing:border-box;">
+          </label>
+          <label style="display:block; margin-bottom:18px;">
+            <span style="font-size:11px; font-weight:800; color:#374151; text-transform:uppercase; letter-spacing:0.05em;">Catatan untuk IHC / Pengelola</span>
+            <textarea id="hrd-at-notes" rows="3" placeholder="Alasan, instruksi khusus, atau informasi tambahan&hellip;" style="display:block; width:100%; margin-top:6px; padding:10px 14px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:13px; color:#0f172a; background:#f8fafc; resize:vertical; box-sizing:border-box;"></textarea>
+          </label>
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:9px; padding:10px 14px; margin-bottom:16px; font-size:11.5px; color:#1e40af; line-height:1.5;">
+            &#x1F465; <strong>${count} peserta</strong> dipilih &mdash; semua akan menerima treatment yang sama.
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <button onclick="document.getElementById('hrd-assign-modal').remove()" style="padding:10px 20px; border-radius:9px; border:1.5px solid #e2e8f0; background:#f8fafc; font-size:13px; cursor:pointer; font-weight:600; color:#374151;">Batal</button>
+            <button id="hrd-at-submit" onclick="wellnessHrdSubmitAssignment('${programId}',${JSON.stringify(enrollmentIds)},'${panelId}')" style="padding:10px 24px; border-radius:9px; border:0; background:linear-gradient(135deg,#0f4c5c,#0e7c86); color:#fff; font-size:13px; font-weight:800; cursor:pointer; box-shadow:0 3px 10px rgba(14,124,134,0.4);">&#x2705; Kirim Assignment</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  }
+
+  async function wellnessHrdSubmitAssignment(programId, enrollmentIds, panelId) {
+    const treatmentType  = document.getElementById('hrd-at-type')?.value;
+    const treatmentLabel = (document.getElementById('hrd-at-label')?.value || '').trim();
+    const notes          = (document.getElementById('hrd-at-notes')?.value || '').trim() || null;
+    const schedRaw       = document.getElementById('hrd-at-schedule')?.value;
+    const scheduledAt    = schedRaw ? new Date(schedRaw).toISOString() : null;
+    const btn = document.getElementById('hrd-at-submit');
+    if (!treatmentType) { notify('Pilih jenis treatment terlebih dahulu.'); return; }
+    if (!treatmentLabel) { notify('Isi label / deskripsi treatment.'); return; }
+    setBusy(btn, true, 'Mengirim…');
+    try {
+      const res = await rpc('wellness_hrd_assign_treatment', {
+        p_program_id: programId,
+        p_enrollment_ids: enrollmentIds,
+        p_treatment_type: treatmentType,
+        p_treatment_label: treatmentLabel,
+        p_notes: notes,
+        p_scheduled_at: scheduledAt
+      });
+      document.getElementById('hrd-assign-modal')?.remove();
+      notify('✅ Assignment berhasil! ' + (res.assigned_count || 0) + ' peserta ditetapkan untuk "' + (res.treatment_type || '') + '".');
+      await wellnessHrdLoadTierPanel(programId);
+    } catch(err) {
+      notify('Gagal mengirim assignment: ' + err.message);
+    } finally { setBusy(btn, false); }
+  }
+
 })();

@@ -2274,3 +2274,11 @@ OWNED_BY: ava. Aset berasal dari Artefak yang disediakan pengguna untuk situs AV
 - Preview lokal: http://localhost:8765/portal.html. Belum deploy: tidak ditemukan Vercel CLI, project link .vercel, atau login CLI pada lokasi standar sesi ini. Tidak melakukan push yang dapat membawa perubahan paralel di luar lingkup visual.
 - QA final lulus: 21 halaman × viewport 1440/390 px = 42 kombinasi, seluruh gambar termuat dengan rasio asli, tanpa overflow horizontal; dialog perbesar dibuka dan ditutup lewat Escape. Empat halaman (Produk, Jurnal, Kalkulator, Kontak) sebelumnya tidak memiliki host hero yang cocok; penempatan visual kini tersedia setelah judul atau pada grid kontak.
 - Inspeksi visual screenshot Queen Health desktop mengonfirmasi gambar tampil penuh selebar konten dan tulisan judul/deskripsi terpisah jelas. Bukti: docs/audit-evidence/public-visual-detail.png.
+
+## Visual menyatu dengan tema & identitas ekosistem — 24 September 2026
+### Rencana
+- [ ] Tambahkan gambar konteks pada navigasi ekosistem dan kartu unit layanan, serta logo resmi pada pusat ekosistem (≤ 1 jam).
+- [ ] Terapkan transisi tepi transparan ke latar halaman menggunakan CSS; pertahankan isi gambar dan tampilan perbesar tanpa efek (≤ 1 jam).
+- [ ] Periksa tampilan desktop/mobile, navigasi kartu, rasio gambar dan dialog; simpan screenshot (≤ 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Gunakan pustaka ilustrasi dan logo resmi yang tersedia untuk situs AVA saja. Tidak menciptakan logo brand baru atau mengubah klaim layanan. Efek visual berupa CSS sehingga sumber aset tetap utuh; konten HTML dan tautan kontak resmi tetap sumber informasi. Tidak mengubah data master atau integrasi eksternal.

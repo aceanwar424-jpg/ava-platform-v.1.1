@@ -59,6 +59,36 @@
 
   const pageVisual = visualAssets[document.body.dataset.page || ''];
   const assetPath = name => `public/assets/visuals/${name}`;
+  // Decorative artwork accompanies the existing HTML labels and real links.
+  // Reuse approved images rather than inventing separate brand logos.
+  document.querySelectorAll('.ecosystem-nodes > a, .unit-directory > article, .need-grid > a, .need-grid > article').forEach(card => {
+    const link = card.matches('a') ? card : card.querySelector('a[href]');
+    const visual = visualAssets[link?.getAttribute('href')];
+    if (!visual) return;
+    const image = document.createElement('img');
+    image.className = 'unit-artwork';
+    image.src = assetPath(visual.hero.replace('.jpg', '-small.webp'));
+    image.alt = '';
+    image.width = 720;
+    image.height = 360;
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    card.classList.add('has-unit-artwork');
+    card.querySelector('.need-icon')?.remove();
+    card.prepend(image);
+  });
+  document.querySelectorAll('.ecosystem-core').forEach(core => {
+    const logo = document.createElement('img');
+    logo.src = 'css/logo-ava-global.png';
+    logo.alt = 'AVA Global Ecosystem';
+    logo.width = 160;
+    logo.height = 160;
+    logo.loading = 'lazy';
+    core.replaceChildren(logo);
+    const label = document.createElement('span');
+    label.textContent = 'AVA Global Ecosystem';
+    core.append(label);
+  });
   const figure = (src, alt, caption, conceptual = false, support = false, position = 'center') => {
     const node = document.createElement('figure');
     node.className = support ? 'ava-visual ava-visual-support' : 'ava-visual';

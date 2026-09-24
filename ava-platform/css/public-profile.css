@@ -93,3 +93,37 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 .visual-viewer-open{overflow:hidden}
 @media(max-width:600px){.v2-hero{gap:26px}.detail-hero.has-ava-visual>.ava-visual{margin-top:28px}.ava-visual-support{margin-top:30px}.visual-viewer{padding:12px}.v2-hero-visual{max-width:none}}
 .ava-visual-intro{margin:30px 0 48px;grid-column:1 / -1;width:100%}.contact-grid>.ava-visual-intro{margin-bottom:0}.contact-grid>.ava-visual-intro figcaption{color:var(--muted);background:white;padding:14px}.contact-grid>.ava-visual-intro .visual-expand{color:white}
+
+/* OWNED_BY: ava. Transparent edges inherit each section's actual background. */
+.ava-visual,.v2-hero-visual{overflow:visible;border-radius:0;background:transparent}
+.ava-visual>img,.v2-hero .v2-hero-visual>img{
+  border-radius:0;background:transparent;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent),linear-gradient(to bottom,transparent,#000 5%,#000 88%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 3%,#000 97%,transparent),linear-gradient(to bottom,transparent,#000 5%,#000 88%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+.ava-visual-support>img{mask-image:linear-gradient(to right,transparent,#000 2%,#000 98%,transparent),linear-gradient(to bottom,transparent,#000 3%,#000 94%,transparent)}
+.ava-visual figcaption,.v2-hero-visual>figcaption{padding:6px 0 0;font-size:.78rem}
+.contact-grid>.ava-visual-intro figcaption{background:transparent;padding:6px 0 0}
+.contact-grid>.ava-visual-intro .visual-expand{color:var(--green)}
+.ava-visual figcaption.is-conceptual{background:transparent}
+.ecosystem-map{grid-template-columns:180px minmax(0,1fr);gap:48px}
+.ecosystem-core{max-width:none;aspect-ratio:auto;padding:0;align-items:center;background:transparent;box-shadow:none;border-radius:0;text-align:center}
+.ecosystem-core img{width:160px;height:160px;object-fit:contain;mix-blend-mode:multiply}
+.ecosystem-core span{margin-top:18px;color:var(--navy);font-size:.7rem;letter-spacing:.12em;line-height:1.7}
+.ecosystem-nodes{gap:30px 24px}
+.ecosystem-nodes>a.has-unit-artwork{padding:0 0 16px;min-height:0;border:0;border-bottom:1px solid #cbdad3;background:transparent;font-size:.95rem}
+.unit-artwork{display:block;width:100%;height:auto;aspect-ratio:2/1;object-fit:contain;margin:0 0 18px;background:transparent;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 77%,transparent);
+  mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 4%,#000 77%,transparent);
+  -webkit-mask-composite:source-in;mask-composite:intersect;
+}
+.ecosystem-nodes .unit-artwork{margin-bottom:10px}
+.unit-directory>article.has-unit-artwork{padding:0 0 32px;border:0;border-bottom:1px solid var(--line);background:transparent}
+.unit-directory>article.has-unit-artwork>.eyebrow{display:block;margin-top:14px}
+.need-grid>.has-unit-artwork{padding:0 0 26px;background:transparent;border:0;border-bottom:1px solid var(--line)}
+.need-grid>.has-unit-artwork:hover{background:transparent}
+.ecosystem-nodes>a.has-unit-artwork:hover{border-color:var(--green)}
+@media(max-width:1100px){.ecosystem-map{grid-template-columns:140px minmax(0,1fr);gap:30px}.ecosystem-core img{width:130px;height:130px}}
+@media(max-width:800px){.ecosystem-map{grid-template-columns:1fr}.ecosystem-core{max-width:none;flex-direction:row;gap:20px;justify-content:flex-start;text-align:left}.ecosystem-core img{width:88px;height:88px}.ecosystem-core span{margin:0}.ecosystem-nodes{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px}}
+@media(max-width:560px){.ecosystem-nodes>a.has-unit-artwork{font-size:.85rem}.ecosystem-nodes small{font-size:.72rem;margin-top:6px}.unit-artwork{margin-bottom:12px}}
