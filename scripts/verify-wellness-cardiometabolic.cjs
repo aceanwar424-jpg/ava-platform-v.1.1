@@ -4,6 +4,8 @@ const assert = require('node:assert/strict');
 const { PGlite } = require('../desktop-app/node_modules/@electric-sql/pglite');
 
 const migration = fs.readFileSync('db/migrations/0058_wellness_cardiometabolic_program.sql', 'utf8');
+const consentMigration = fs.readFileSync('db/migrations/0059_wellness_consent_gate.sql', 'utf8');
+const migrations = `${migration}\n${consentMigration}`;
 const navigation = fs.readFileSync('ava-platform/apps/navigation.js', 'utf8');
 const html = fs.readFileSync('ava-platform/apps/index.html', 'utf8');
 const ui = fs.readFileSync('ava-platform/apps/wellness.js', 'utf8');
@@ -11,8 +13,8 @@ const ui = fs.readFileSync('ava-platform/apps/wellness.js', 'utf8');
 for (const token of ['wellness_programs','wellness_enrollments','wellness_observations','wellness_import_batches','wellness_reminder_rules','wellness_tasks']) {
   assert(migration.includes(token), `missing ${token}`);
 }
-for (const rpc of ['wellness_personal_dashboard','wellness_record_self','wellness_corporate_dashboard','wellness_import_ihc','wellness_admin_save_program']) {
-  assert(migration.includes(`FUNCTION public.${rpc}`), `missing ${rpc}`);
+for (const rpc of ['wellness_personal_dashboard','wellness_accept_consent','wellness_record_self','wellness_corporate_dashboard','wellness_import_ihc','wellness_admin_save_program']) {
+  assert(migrations.includes(`FUNCTION public.${rpc}`), `missing ${rpc}`);
   assert(ui.includes(`'${rpc}'`), `UI does not call ${rpc}`);
 }
 assert(!/Astra Honda|\bAHM\b/i.test(migration + navigation + ui), 'client identity leaked into generic core');
@@ -50,6 +52,8 @@ async function main() {
   `);
   await db.exec(migration);
   await db.exec(migration);
+  await db.exec(consentMigration);
+  await db.exec(consentMigration);
 
   const saved = await db.query(`SELECT wellness_admin_save_program($1::jsonb) AS value`, [JSON.stringify({
     corporate_id: 10, code: 'SYN-CARDIO', name: 'Synthetic Cardiometabolic', starts_on: '2026-09-22', status: 'pilot',
@@ -63,6 +67,19 @@ async function main() {
   await db.exec(`SELECT set_config('test.uid','bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',false);`);
   const personalBefore = (await db.query(`SELECT wellness_personal_dashboard() AS value`)).rows[0].value;
   assert.equal(personalBefore.programs.length, 1);
+  assert.equal(personalBefore.programs[0].consent_status, 'pending');
+  await assert.rejects(
+    db.query(`SELECT wellness_record_self($1,'blood_pressure',$2::jsonb,$3,'resting','synthetic device',NULL,'self-before-consent')`, [
+      programId, JSON.stringify({ systolic: 120, diastolic: 80, pulse: 72 }), '2026-09-22T08:00:00+07:00'
+    ]),
+    /Persetujuan peserta belum diberikan/
+  );
+  await assert.rejects(
+    db.query(`SELECT wellness_accept_consent($1,'wellness-privacy-v1',false)`, [programId]),
+    /Persetujuan harus diberikan secara eksplisit/
+  );
+  const consent = await db.query(`SELECT wellness_accept_consent($1,'wellness-privacy-v1',true) AS value`, [programId]);
+  assert.equal(consent.rows[0].value.consent_status, 'granted');
   await db.query(`SELECT wellness_record_self($1,'blood_pressure',$2::jsonb,$3,'resting','synthetic device',NULL,'self-001')`, [
     programId, JSON.stringify({ systolic: 120, diastolic: 80, pulse: 72 }), '2026-09-22T08:00:00+07:00'
   ]);
@@ -95,6 +112,6 @@ async function main() {
   await db.exec(`RESET ROLE;`);
 
   await db.close();
-  console.log('PASS wellness cardiometabolic: repeatable migration, personal self-entry, verified IHC import, aggregate-only HR view, small-cell suppression, generic menus.');
+  console.log('PASS wellness cardiometabolic: repeatable migrations, explicit consent gate, personal self-entry, verified IHC import, aggregate-only HR view, small-cell suppression, generic menus.');
 }
 main().catch(error => { console.error(error); process.exitCode = 1; });

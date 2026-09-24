@@ -1,0 +1,2 @@
+employee_id,measured_at,systolic,diastolic,pulse,glucose,glucose_context,hba1c,external_id
+AHM-UAT-001,2026-09-23T08:15:00+07:00,145,,78,,,,AHM-IHC-UAT-INVALID-001

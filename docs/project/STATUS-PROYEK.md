@@ -2219,3 +2219,39 @@ OWNED_BY: generic untuk mesin wellness, tabel, validasi, dan UI yang dapat dikon
 - [x] AHM terdaftar pada database AVA sebagai `Prospek` dengan kode `AHM-WELLNESS-2026`; draft program `AHM-DM-HT-2026` dibuat tanpa data peserta, hasil klinis, PIC, harga, atau klaim kontrak.
 - [x] `verify-wellness-cardiometabolic` lulus untuk self-entry, impor IHC, RLS, pemisahan role, dashboard agregat, small-cell suppression, idempotensi, dan larangan hardcode AHM pada mesin generik.
 - [x] QA browser lulus untuk halaman Personal, Corporate, Rancang Program, dan Impor IHC; kontras, responsivitas, navigasi, kontrol berkas, serta pesan perlindungan data tampil konsisten.
+
+## Runbook UAT-01 Wellness AHM — 23 September 2026
+
+### Rencana
+- [x] Susun satu skenario UAT end-to-end dari konfigurasi program, roster, enrollment, input mandiri, impor IHC, laporan HR, duplikasi, data invalid, hingga reminder.
+- [x] Sediakan fixture roster dan hasil pemeriksaan sintetis yang dapat langsung dipakai setelah email placeholder diganti akun uji aktif.
+- [x] Tutup pencatatan peserta, impor IHC, dan reminder sampai persetujuan eksplisit atau dasar `not_required` tercatat.
+- [x] Tetapkan bukti yang harus disimpan dan kriteria lulus/gagal setiap tahapan.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava untuk runbook proyek; fixture berstatus sintetis dan tidak memuat identitas, kontak, hasil klinis, kredensial, atau data karyawan nyata. Email peserta wajib diganti oleh pemilik pada salinan lokal sebelum UAT. Hasil uji tidak boleh diperlakukan sebagai diagnosis atau dimasukkan ke akun orang nyata. UAT menggunakan corporate/program AHM yang berstatus prospek/draft dan tidak mengubahnya menjadi klaim kontrak aktif.
+
+### Hasil
+- [x] Runbook tersedia pada `docs/project/UAT-AHM-WELLNESS-01.md`.
+- [x] Fixture tersedia pada `docs/project/uat/ahm-wellness-01/` untuk roster valid, hasil IHC valid, pasangan tekanan darah tidak lengkap, nilai di luar batas, dan Employee ID yang tidak ada pada roster.
+- [x] Skenario satu peserta menguji small-cell suppression HR; perluasan opsional menjadi lima peserta disediakan untuk menguji statistik agregat yang boleh ditampilkan.
+- [x] Migrasi `0059_wellness_consent_gate.sql` menambahkan persetujuan berversi, audit event, gate server-side untuk seluruh observation, dan reminder hanya bagi peserta yang sudah memenuhi dasar pemrosesan.
+- [x] UI Personal menampilkan isi pemberitahuan, checkbox eksplisit, versi notice, dan menahan form sampai persetujuan berhasil disimpan.
+- [x] Kontrak PGlite membuktikan migrasi dapat diulang, penolakan input sebelum consent, penolakan consent `false`, input mandiri setelah consent, impor IHC, dashboard agregat, serta RLS; syntax, deploy readiness, application boundaries, dan diff check lulus.
+- [x] QA browser sintetis pada viewport 418 px membuktikan gate tampil tanpa horizontal overflow (`scrollWidth = clientWidth = 418`) dan dua form baru muncul setelah consent tersimpan.
+
+## Diagnosis checkbox persetujuan Wellness — 24 September 2026
+### Rencana
+- [x] Bandingkan screenshot, source lokal, dan versi aset pada HTML situs online (≤ 1 jam).
+- [x] Jalankan verifikasi alur consent secara lokal dengan data sintetis (≤ 1 jam).
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Pemeriksaan hanya membaca kode lokal dan HTML publik portal, serta menjalankan pengujian database lokal sintetis. Tidak mengakses DB produksi, mengubah persetujuan peserta, atau menjalankan deployment.
+
+### Hasil & Bukti Verifikasi
+- Screenshot cocok dengan source HEAD: status pending hanya menampilkan banner “Persetujuan program belum lengkap” dan arahan menghubungi pengelola, tanpa checkbox.
+- GET https://apps.avahealth.sbs/ pada 24 September 2026 menghasilkan HTTP 200 dan masih merujuk style.css serta wellness.js dengan versi 20260923-wellness-ahm. HTML lokal sudah merujuk versi 20260923-wellness-consent.
+- Working tree sudah memiliki kartu pemberitahuan, checkbox eksplisit, handler wellness_accept_consent, dan pembatasan form sampai consent terpenuhi. Perubahan ini sudah ada sebelum pemeriksaan; tidak ditulis ulang.
+- node --check ava-platform/apps/wellness.js: lulus. node scripts/verify-wellness-cardiometabolic.cjs: PASS, termasuk explicit consent gate dan personal self-entry.
+- Pengambilan langsung aset JS online dibatasi halaman autentikasi; isi aset live dan keberadaan RPC consent di produksi belum diverifikasi. Bukti versi online berasal dari HTML publik dan kecocokan screenshot dengan source lama.
+- Tindak lanjut: rilis perubahan consent yang sudah tersedia setelah meninjau perubahan working tree lain dan memastikan prasyarat backend consent tersedia. Refresh saja belum mengganti HTML server yang masih menunjuk versi lama.

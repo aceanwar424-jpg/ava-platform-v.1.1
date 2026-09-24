@@ -4,6 +4,7 @@
   'use strict';
 
   const $ = id => document.getElementById(id);
+  const WELLNESS_NOTICE_VERSION = 'wellness-privacy-v1';
   const safe = value => typeof appsEscape === 'function' ? appsEscape(value) : String(value ?? '');
   const dateTimeLocal = value => {
     const date = value ? new Date(value) : new Date();
@@ -75,7 +76,8 @@
     try {
       personalData = await rpc('wellness_personal_dashboard');
       const programs = personalData?.programs || [];
-      const activePrograms = programs.filter(program => program.enrollment_status === 'active');
+      const activePrograms = programs.filter(program => ['granted', 'not_required'].includes(program.consent_status));
+      const pendingPrograms = programs.filter(program => !['granted', 'not_required'].includes(program.consent_status));
       if (!programs.length) {
         target.innerHTML = `<section class="wellness-heading"><div><span>PROGRAM WELLNESS</span><h2>Belum ada program aktif</h2><p>Akun Anda belum ditautkan ke program wellness perusahaan.</p></div></section>${state('Enrollment diperlukan', 'Hubungi admin program atau IHC. Setelah roster disinkronkan, program akan muncul otomatis di akun ini.')}`;
         return;
@@ -83,10 +85,18 @@
       const programOptions = activePrograms.map(program => `<option value="${safe(program.id)}">${safe(program.name)}</option>`).join('');
       const groups = groupObservations(personalData.observations);
       const tasks = personalData.open_tasks || [];
+      const consentCards = pendingPrograms.map(program => `<section class="wellness-card wellness-consent-card">
+        <div class="wellness-card-title"><div><span>PERSETUJUAN PESERTA</span><h3>Aktifkan ${safe(program.name)}</h3></div><span class="wellness-badge self">Belum disetujui</span></div>
+        <p>Program memproses hasil tekanan darah, gula darah, HbA1c, aktivitas pencatatan, dan data roster yang diperlukan untuk pemantauan wellness. Input mandiri tetap berlabel belum diverifikasi, sedangkan hasil IHC berlabel terverifikasi.</p>
+        <p>Tim HR hanya menerima ringkasan kelompok dengan perlindungan small-cell; nama, catatan, dan nilai kesehatan individual tidak ditampilkan pada dashboard HR. Data ini membantu pemantauan program dan tidak menggantikan diagnosis atau konsultasi medis.</p>
+        <label class="wellness-consent-check"><input id="wellness-consent-${safe(program.id)}" type="checkbox"> <span>Saya telah membaca pemberitahuan di atas dan menyetujui penggunaan data untuk program ini. Saya dapat menghubungi pengelola program untuk pertanyaan atau penarikan persetujuan.</span></label>
+        <button class="wellness-primary" type="button" onclick="wellnessAcceptConsent(this,'${safe(program.id)}')">Setujui dan aktifkan pencatatan</button>
+        <small>Versi pemberitahuan: ${WELLNESS_NOTICE_VERSION}</small>
+      </section>`).join('');
       target.innerHTML = `
         <section class="wellness-heading"><div><span>PROGRAM WELLNESS</span><h2>Diabetes & Hipertensi</h2><p>Data mandiri diberi label khusus dan dapat ditinjau tim medis IHC. Hasil IHC yang tervalidasi muncul pada timeline yang sama.</p></div><div class="wellness-program-chip">${safe(programs[0].name)}</div></section>
-        ${programs.some(program => program.consent_status === 'pending') ? `<div class="wellness-notice warning"><strong>Persetujuan program belum lengkap.</strong><span>Hubungi pengelola program untuk memastikan pemberitahuan privasi dan persetujuan sudah diselesaikan.</span></div>` : ''}
-        <div class="wellness-layout-two">
+        ${consentCards}
+        ${activePrograms.length ? `<div class="wellness-layout-two">
           <section class="wellness-card">
             <div class="wellness-card-title"><div><span>INPUT MANDIRI</span><h3>Tekanan darah</h3></div><span class="wellness-badge self">Self reported</span></div>
             <form class="wellness-form" onsubmit="wellnessSubmitPersonal(event,'blood_pressure')">
@@ -109,13 +119,29 @@
               <button class="wellness-primary" type="submit">Simpan gula darah</button>
             </form>
           </section>
-        </div>
+        </div>` : state('Pencatatan belum aktif', 'Baca dan setujui pemberitahuan program di atas. Form pencatatan akan terbuka setelah persetujuan tersimpan.')}
         ${tasks.length ? `<section class="wellness-card"><div class="wellness-card-title"><div><span>PENGINGAT</span><h3>Tugas program Anda</h3></div></div><div class="wellness-task-list">${tasks.map(task => `<article><strong>${safe(task.payload?.message || 'Lakukan pengukuran sesuai jadwal.')}</strong><span>${safe(dateLabel(task.due_at))}</span></article>`).join('')}</div></section>` : ''}
         <section class="wellness-card"><div class="wellness-card-title"><div><span>TIMELINE</span><h3>Riwayat pengukuran</h3></div><span>${groups.length} catatan</span></div><div class="wellness-readings">${groups.length ? groups.map(observationCard).join('') : state('Belum ada pengukuran', 'Masukkan tekanan darah atau gula darah pertama Anda.')}</div></section>
         <div class="wellness-safety">Hasil pada halaman ini membantu pemantauan program dan bukan diagnosis. Bila merasa tidak sehat atau hasil sangat berbeda dari biasanya, hubungi IHC atau layanan darurat sesuai kondisi Anda.</div>`;
     } catch (error) {
       target.innerHTML += state('Data belum dapat dimuat', error.message || 'Coba lagi beberapa saat.', 'error');
     }
+  }
+
+  async function wellnessAcceptConsent(button, programId) {
+    const checkbox = $(`wellness-consent-${programId}`);
+    if (!checkbox?.checked) { notify('Centang persetujuan setelah membaca pemberitahuan program.'); return; }
+    setBusy(button, true, 'Menyimpan persetujuan…');
+    try {
+      await rpc('wellness_accept_consent', {
+        p_program_id: programId,
+        p_notice_version: WELLNESS_NOTICE_VERSION,
+        p_accept: true
+      });
+      notify('Persetujuan tersimpan. Pencatatan program sudah aktif.');
+      await renderPersonalWellness();
+    } catch (error) { notify(`Persetujuan belum tersimpan: ${error.message}`); }
+    finally { setBusy(button, false); }
   }
 
   async function wellnessSubmitPersonal(event, type) {
@@ -146,24 +172,117 @@
     return `<article><span>${safe(label)}</span><strong>${value == null ? '—' : safe(value) + suffix}</strong></article>`;
   }
 
+    function wellnessExportHrReport() {
+    if (!window._lastCorporateData || !window._lastCorporateData.programs) { notify('Data laporan HRD belum tersedia.'); return; }
+    const progs = window._lastCorporateData.programs;
+    let csv = 'Kode Program,Nama Program,Perusahaan,Peserta Terdaftar,Akun Apps Tertaut,Aktif 7 Hari,Pengukuran 30 Hari,Cakupan Tensi,Cakupan Gula,Rerata Sistolik,Rerata Diastolik,Rerata Gula\n';
+    progs.forEach(p => {
+      csv += `"${p.code}","${p.name}","${p.corporate_name || ''}",${p.enrolled || 0},${p.linked_accounts || 0},${p.active_7d || 0},${p.measurements_30d || 0},${p.bp_coverage_30d || 0},${p.glucose_coverage_30d || 0},${p.avg_systolic_30d ?? 'Disembunyikan'},${p.avg_diastolic_30d ?? 'Disembunyikan'},${p.avg_glucose_30d ?? 'Disembunyikan'}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `laporan-wellness-hrd-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+  }
+
   async function renderCorporateWellness() {
     const target = $('corporate-wellness-view');
     if (!target) return;
     target.innerHTML = `<section class="wellness-heading"><div><span>CORPORATE WELLNESS</span><h2>Monitoring Program</h2><p>Ringkasan agregat diabetes dan hipertensi untuk HR.</p></div></section>${state('Memuat dashboard', 'Menghitung data cohort yang diizinkan.')}`;
     try {
       const data = await rpc('wellness_corporate_dashboard', { p_program_id: null, p_corporate_id: currentCorporateId || null });
+      window._lastCorporateData = data;
       const programs = data?.programs || [];
+      const threshold = data?.small_cell_threshold || 5;
+
       target.innerHTML = `
-        <section class="wellness-heading"><div><span>CORPORATE WELLNESS</span><h2>Monitoring Diabetes & Hipertensi</h2><p>HR melihat partisipasi, keteraturan pemantauan, dan tren agregat. Identitas serta hasil individual tetap berada pada peserta dan tim medis.</p></div><div class="wellness-program-chip">Aggregate only</div></section>
-        <div class="wellness-notice privacy"><strong>Privasi cohort aktif.</strong><span>Rata-rata otomatis disembunyikan bila jumlah peserta yang berkontribusi kurang dari ${safe(data?.small_cell_threshold || 5)} orang.</span></div>
-        ${programs.length ? programs.map(program => `<section class="wellness-card corporate-program">
-          <div class="wellness-card-title"><div><span>${safe(program.code)} · ${safe(program.status)}</span><h3>${safe(program.name)}</h3><p>${safe(program.description || 'Program pemantauan kardiometabolik.')}</p></div></div>
-          <div class="wellness-kpi-grid">${programMetric(program,'enrolled','Peserta terdaftar')}${programMetric(program,'linked_accounts','Akun Apps tertaut')}${programMetric(program,'active_7d','Aktif 7 hari')}${programMetric(program,'measurements_30d','Pengukuran 30 hari')}${programMetric(program,'bp_coverage_30d','Cakupan tekanan darah')}${programMetric(program,'glucose_coverage_30d','Cakupan gula darah')}</div>
-          <div class="wellness-aggregate-grid">
-            <article><span>Rerata tekanan darah 30 hari</span><strong>${program.avg_systolic_30d == null ? 'Disembunyikan' : `${safe(program.avg_systolic_30d)}/${safe(program.avg_diastolic_30d)} mmHg`}</strong></article>
-            <article><span>Rerata gula darah 30 hari</span><strong>${program.avg_glucose_30d == null ? 'Disembunyikan' : `${safe(program.avg_glucose_30d)} mg/dL`}</strong></article>
+        <section class="wellness-heading corporate-hero" style="background: linear-gradient(135deg, #0f172a 0%, #0f4c5c 100%); border-radius: 16px; padding: 24px; color: #fff; margin-bottom: 20px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:16px;">
+            <div>
+              <span style="font-size:10px; font-weight:800; letter-spacing:0.1em; color:#5eead4; text-transform:uppercase;">EXECUTIVE HR DASHBOARD · WELLNESS COHORT</span>
+              <h2 style="margin:6px 0 8px; font-size:24px; color:#fff; font-weight:800;">Monitoring Kesehatan & Wellness Karyawan</h2>
+              <p style="margin:0; max-width:700px; font-size:13px; color:#cbd5e1; line-height:1.6;">Monitoring partisipasi, kepatuhan kontrol, dan tren kardiometabolik (Diabetes & Hipertensi). Privasi individual 100% terlindungi sesuai UU PDP No. 27/2022.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:8px;">
+              <div class="wellness-program-chip" style="background:rgba(94,234,212,0.15); border:1px solid rgba(94,234,212,0.3); color:#5eead4; font-size:11px; font-weight:700; padding:6px 12px; border-radius:20px;">🔒 Aggregate Only · Small-cell $\ge$ ${threshold}</div>
+              ${programs.length ? `<button class="wellness-secondary" onclick="wellnessExportHrReport()" style="background:#fff; color:#0f172a; border:0; padding:8px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(0,0,0,0.1);">📥 Unduh Laporan HRD (CSV)</button>` : ''}
+            </div>
           </div>
-        </section>`).join('') : state('Belum ada program', 'Admin perlu membuat program dan melakukan enrollment roster perusahaan.')}`;
+        </section>
+
+        <div class="wellness-notice privacy" style="background:#f0fdfa; border:1px solid #99f6e4; color:#0f766e; border-radius:12px; padding:14px 16px; margin-bottom:20px; font-size:12.5px; display:flex; gap:10px; align-items:center;">
+          <span style="font-size:18px;">🛡️</span>
+          <div><strong>Proteksi Kerahasiaan Cohort Aktif.</strong> Rata-rata medis otomatis disembunyikan jika jumlah peserta terukur kurang dari ${threshold} orang agar identitas & data kesehatan individual tidak dapat dikenali.</div>
+        </div>
+
+        ${programs.length ? programs.map(program => {
+          const isHidden = program.avg_systolic_30d == null;
+          return `<section class="wellness-card corporate-program" style="background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:20px; margin-bottom:20px; box-shadow:0 4px 20px rgba(0,0,0,0.03);">
+            <div class="wellness-card-title" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+              <div>
+                <span style="font-size:10px; font-weight:800; color:#0e7c86; letter-spacing:0.05em; text-transform:uppercase;">PROGRAM: ${safe(program.code)} · STATUS: ${safe(program.status).toUpperCase()}</span>
+                <h3 style="margin:4px 0 2px; font-size:18px; color:#0f172a; font-weight:800;">${safe(program.name)}</h3>
+                <p style="margin:0; font-size:12px; color:#64748b;">${safe(program.description || 'Program pemantauan kardiometabolik corporate.')}</p>
+              </div>
+              <span class="wellness-badge verified" style="background:#d1fae5; color:#047857; font-size:10.5px; font-weight:700; padding:4px 10px; border-radius:20px;">ISO 15189 Compliant</span>
+            </div>
+
+            <div class="wellness-kpi-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; margin-bottom:16px;">
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">👥 Peserta Terdaftar</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.enrolled || 0)} <small style="font-size:11px; font-weight:500;">orang</small></strong>
+              </article>
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">📱 Apps Tertaut</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.linked_accounts || 0)} <small style="font-size:11px; font-weight:500;">akun</small></strong>
+              </article>
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">⚡ Aktif 7 Hari</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.active_7d || 0)} <small style="font-size:11px; font-weight:500;">peserta</small></strong>
+              </article>
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">📊 Total Sesi (30d)</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.measurements_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
+              </article>
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">🫀 Cakupan Tensi</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.bp_coverage_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
+              </article>
+              <article style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; border-radius:10px;">
+                <span style="font-size:10px; color:#64748b; font-weight:700; text-transform:uppercase;">🩸 Cakupan Gula</span>
+                <strong style="display:block; margin-top:4px; font-size:17px; color:#0f172a;">${safe(program.glucose_coverage_30d || 0)} <small style="font-size:11px; font-weight:500;">sesi</small></strong>
+              </article>
+            </div>
+
+            <div style="background:#f1f5f9; border-radius:12px; padding:16px; margin-top:12px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h4 style="margin:0; font-size:13px; color:#0f172a; font-weight:800;">📊 Rata-rata Cohort Karyawan (30 Hari)</h4>
+                <span style="font-size:11px; font-weight:700; color:${isHidden ? '#9a3412' : '#166534'}; bg:${isHidden ? '#ffedd5' : '#dcfce7'}; padding:3px 8px; border-radius:6px;">${isHidden ? '🔒 Small-cell Protection Active (< 5 peserta)' : '✅ Cohort Terukur (\ge 5 peserta)'}</span>
+              </div>
+              ${isHidden ? `
+                <div style="background:#fff; border:1px dashed #fdba74; border-radius:10px; padding:14px; display:flex; gap:12px; align-items:center;">
+                  <div style="font-size:24px;">🛡️</div>
+                  <div style="font-size:12px; color:#9a3412; line-height:1.5;">
+                    <strong>Statistik Rerata Disembunyikan secara Otomatis</strong><br>
+                    Jumlah peserta terukur pada periode ini belum mencapai ambang batas ${threshold} orang. Sesuai UU PDP, rerata disembunyikan untuk menjaga perlindungan privasi data individu.
+                  </div>
+                </div>
+              ` : `
+                <div class="wellness-aggregate-grid" style="display:grid; grid-template-columns:repeat(2, 1fr); gap:12px;">
+                  <article style="background:#fff; border:1px solid #cbd5e1; padding:14px; border-radius:10px;">
+                    <span style="font-size:11px; color:#475569; font-weight:700;">🫀 Rerata Tekanan Darah Cohort</span>
+                    <strong style="display:block; margin-top:4px; font-size:20px; color:#0f172a;">${safe(program.avg_systolic_30d)} / ${safe(program.avg_diastolic_30d)} <small style="font-size:12px;">mmHg</small></strong>
+                    <span style="font-size:10.5px; color:#64748b; margin-top:4px; display:block;">Berdasarkan ${safe(program.bp_coverage_30d)} pengukuran terotorisasi</span>
+                  </article>
+                  <article style="background:#fff; border:1px solid #cbd5e1; padding:14px; border-radius:10px;">
+                    <span style="font-size:11px; color:#475569; font-weight:700;">🩸 Rerata Gula Darah Puasa Cohort</span>
+                    <strong style="display:block; margin-top:4px; font-size:20px; color:#0f172a;">${safe(program.avg_glucose_30d)} <small style="font-size:12px;">mg/dL</small></strong>
+                    <span style="font-size:10.5px; color:#64748b; margin-top:4px; display:block;">Berdasarkan ${safe(program.glucose_coverage_30d)} pengukuran terotorisasi</span>
+                  </article>
+                </div>
+              `}
+            </div>
+          </section>`;
+        }).join('') : state('Belum ada program aktif', 'Admin perlu membuat program corporate dan menyinkronkan roster karyawan.')}`;
     } catch (error) { target.innerHTML += state('Dashboard belum dapat dimuat', error.message, 'error'); }
   }
 
@@ -187,14 +306,15 @@
       target.innerHTML = `
         <section class="wellness-heading"><div><span>ADMIN WELLNESS</span><h2>Rancang Program & Reminder</h2><p>Susun periode, frekuensi pemantauan, enrollment roster, serta antrean reminder tanpa menanam konfigurasi klien ke kode inti.</p></div></section>
         <div class="wellness-layout-two admin-layout">
-          <section class="wellness-card"><div class="wellness-card-title"><div><span>PROGRAM</span><h3>Buat program corporate</h3></div></div>
-            <form class="wellness-form" onsubmit="wellnessSaveProgram(event)">
+          <section class="wellness-card"><div class="wellness-card-title"><div><span>PROGRAM</span><h3 id="wellness-program-form-title">Buat program corporate</h3></div></div>
+            <form id="wellness-program-form" class="wellness-form" onsubmit="wellnessSaveProgram(event)">
+              <input name="id" type="hidden">
               <label>Perusahaan<select name="corporate_id" required><option value="">Pilih perusahaan</option>${corporates.map(c => `<option value="${safe(c.id)}">${safe(c.name)}</option>`).join('')}</select></label>
               <div class="wellness-fields two"><label>Kode program<input name="code" placeholder="CARDIOMET-2026" required></label><label>Nama program<input name="name" placeholder="Program Diabetes & Hipertensi" required></label></div>
               <label>Tujuan program<textarea name="description" rows="3" placeholder="Tujuan, cohort, dan cakupan program"></textarea></label>
               <div class="wellness-fields three"><label>Mulai<input name="starts_on" type="date" value="${new Date().toISOString().slice(0,10)}" required></label><label>Selesai<input name="ends_on" type="date"></label><label>Status<select name="status"><option value="draft">Draft</option><option value="pilot">Pilot</option><option value="active">Aktif</option><option value="paused">Ditunda</option></select></label></div>
               <div class="wellness-fields two"><label>Frekuensi tekanan darah<select name="bp_frequency"><option value="daily">Harian</option><option value="weekly">Mingguan</option></select></label><label>Frekuensi gula darah<select name="glucose_frequency"><option value="daily">Harian</option><option value="weekly">Mingguan</option><option value="custom">Sesuai care plan</option></select></label></div>
-              <button class="wellness-primary" type="submit">Simpan program</button>
+              <div class="wellness-row-actions"><button class="wellness-primary" type="submit">Simpan program</button><button id="wellness-program-cancel" class="wellness-secondary" type="button" onclick="wellnessResetProgramForm()" hidden>Batal edit</button></div>
             </form>
           </section>
           <section class="wellness-card"><div class="wellness-card-title"><div><span>CRM REMINDER</span><h3>Atur pengingat peserta</h3></div></div>
@@ -212,7 +332,7 @@
           <div class="wellness-admin-programs">${programs.length ? programs.map(program => `<article>
             <div><span>${safe(program.code)} · ${safe(program.status)}</span><h4>${safe(program.name)}</h4><p>${safe(program.corporate_name)}</p></div>
             <div class="wellness-program-stats"><b>${safe(program.enrolled)} peserta</b><b>${safe(program.observations)} hasil</b><b>${safe(program.open_tasks)} task</b></div>
-            <div class="wellness-row-actions"><button onclick="wellnessEnrollRoster('${safe(program.id)}',this)">Sinkronkan roster</button><button onclick="wellnessGenerateReminders('${safe(program.id)}',this)">Buat task reminder</button><button onclick="wellnessOpenImport('${safe(program.id)}')">Impor hasil IHC</button></div>
+            <div class="wellness-row-actions"><button onclick="wellnessEditProgram('${safe(program.id)}')">Edit konfigurasi</button><button onclick="wellnessImportRosterFile('${safe(program.id)}')">Impor roster CSV</button><button onclick="wellnessEnrollRoster('${safe(program.id)}',this)">Sinkronkan roster</button><button onclick="wellnessGenerateReminders('${safe(program.id)}',this)">Buat task reminder</button><button onclick="wellnessOpenImport('${safe(program.id)}')">Impor hasil IHC</button></div>
           </article>`).join('') : state('Belum ada program', 'Buat program pertama menggunakan formulir di atas.')}</div>
         </section>
         <section class="wellness-card"><div class="wellness-card-title"><div><span>RULE AKTIF</span><h3>Reminder tersimpan</h3></div></div><div class="wellness-task-list">${(data.reminder_rules || []).length ? data.reminder_rules.map(rule => `<article><strong>${safe(rule.name)}</strong><span>${safe(rule.measurement_type)} · ${safe(rule.inactivity_days)} hari · ${safe(rule.channel)} · ${safe(String(rule.send_time).slice(0,5))}</span></article>`).join('') : '<p>Belum ada rule reminder.</p>'}</div></section>`;
@@ -224,7 +344,7 @@
     setBusy(button, true, 'Menyimpan…');
     try {
       await rpc('wellness_admin_save_program', { p_data: {
-        corporate_id: data.get('corporate_id'), code: data.get('code'), name: data.get('name'), description: data.get('description'),
+        id: data.get('id') || null, corporate_id: data.get('corporate_id'), code: data.get('code'), name: data.get('name'), description: data.get('description'),
         starts_on: data.get('starts_on'), ends_on: data.get('ends_on'), status: data.get('status'),
         measurement_plan: { blood_pressure: data.get('bp_frequency'), blood_glucose: data.get('glucose_frequency') },
         reporting_plan: { daily: 'ihc', weekly: 'corporate_medical', monthly: 'hr_aggregate' }
@@ -232,6 +352,29 @@
       notify('Program wellness tersimpan. Lanjutkan dengan sinkronisasi roster.'); await renderWellnessAdmin();
     } catch (error) { notify(`Program belum tersimpan: ${error.message}`); }
     finally { setBusy(button, false); }
+  }
+
+  function wellnessEditProgram(programId) {
+    const program = (adminData?.programs || []).find(item => item.id === programId);
+    const form = $('wellness-program-form');
+    if (!program || !form) { notify('Konfigurasi program tidak ditemukan.'); return; }
+    const set = (name, value) => { const field = form.elements.namedItem(name); if (field) field.value = value ?? ''; };
+    set('id', program.id); set('corporate_id', program.corporate_id); set('code', program.code);
+    set('name', program.name); set('description', program.description); set('starts_on', program.starts_on);
+    set('ends_on', program.ends_on); set('status', program.status);
+    set('bp_frequency', program.measurement_plan?.blood_pressure || 'daily');
+    set('glucose_frequency', program.measurement_plan?.blood_glucose || 'custom');
+    const title = $('wellness-program-form-title'); if (title) title.textContent = 'Edit konfigurasi program';
+    const cancel = $('wellness-program-cancel'); if (cancel) cancel.hidden = false;
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function wellnessResetProgramForm() {
+    const form = $('wellness-program-form'); if (!form) return;
+    form.reset(); form.elements.namedItem('id').value = '';
+    const starts = form.elements.namedItem('starts_on'); if (starts) starts.value = new Date().toISOString().slice(0,10);
+    const title = $('wellness-program-form-title'); if (title) title.textContent = 'Buat program corporate';
+    const cancel = $('wellness-program-cancel'); if (cancel) cancel.hidden = true;
   }
 
   async function wellnessSaveReminder(event) {
@@ -346,6 +489,40 @@
     finally { setBusy(button, false); }
   }
 
+  function wellnessImportRosterFile(programId) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,text/csv';
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const rows = parseCsv(text);
+        if (!rows.length) { notify('Berkas CSV kosong.'); return; }
+        const mapped = rows.map(r => {
+          const obj = {};
+          for (const k in r) obj[k.toLowerCase().trim()] = r[k];
+          return {
+            employee_id: obj.nik || obj.employee_id || '',
+            nik: obj.nik || obj.employee_id || '',
+            first_name: obj.first_name || obj.nama || obj.full_name || '',
+            last_name: obj.last_name || '',
+            email: obj.email || '',
+            department: obj.department || obj.departemen || '',
+            job_position: obj.job_position || obj.jabatan || ''
+          };
+        });
+        const res = await rpc('wellness_admin_import_roster', { p_program_id: programId, p_rows: mapped });
+        notify(`Impor roster berhasil: ${res.imported_rows || 0} karyawan diproses dan tersinkron.`);
+        await renderWellnessAdmin();
+      } catch (err) {
+        notify(`Impor roster gagal: ${err.message}`);
+      }
+    };
+    input.click();
+  }
+
   function wellnessDownloadTemplate() {
     const csv = 'employee_id,measured_at,systolic,diastolic,pulse,glucose,glucose_context,hba1c,external_id\nSYNTH-001,2026-09-22T08:00:00+07:00,120,80,72,105,fasting,5.6,IHC-SYNTH-001\n';
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
@@ -354,7 +531,8 @@
 
   Object.assign(window, {
     renderPersonalWellness, renderCorporateWellness, renderWellnessAdmin, renderWellnessImport,
-    wellnessSubmitPersonal, wellnessSaveProgram, wellnessSaveReminder, wellnessEnrollRoster,
+    wellnessAcceptConsent, wellnessSubmitPersonal, wellnessSaveProgram, wellnessEditProgram, wellnessResetProgramForm,
+    wellnessSaveReminder, wellnessEnrollRoster, wellnessImportRosterFile,
     wellnessGenerateReminders, wellnessOpenImport, wellnessReadImportFile, wellnessUploadImport,
     wellnessDownloadTemplate
   });

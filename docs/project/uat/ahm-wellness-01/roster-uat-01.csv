@@ -1,0 +1,6 @@
+"first_name,last_name,nik,department,level,job_position,gender,birth_date,place_of_birth,blood_type,marital_status,phone,email,id_type,id_number,country_of_birth,address,city,subdistrict,district,province,postal_code,citizenship,package_name"
+"Peserta,UAT 001,AHM-UAT-001,UAT Wellness,STAFF,Peserta UAT 1,M,1990-01-01,Jakarta,O,Single,,uat.karyawan@avahealth.sbs,KTP,,INDONESIA,,Jakarta,,,,,WNI,"
+"Peserta,UAT 002,AHM-UAT-002,UAT Wellness,STAFF,Peserta UAT 2,F,1992-03-15,Jakarta,A,Married,,uat.karyawan2@avahealth.sbs,KTP,,INDONESIA,,Jakarta,,,,,WNI,"
+"Peserta,UAT 003,AHM-UAT-003,UAT Wellness,STAFF,Peserta UAT 3,M,1988-07-20,Bandung,B,Married,,uat.karyawan3@avahealth.sbs,KTP,,INDONESIA,,Bandung,,,,,WNI,"
+"Peserta,UAT 004,AHM-UAT-004,UAT Wellness,STAFF,Peserta UAT 4,F,1995-11-10,Surabaya,AB,Single,,uat.karyawan4@avahealth.sbs,KTP,,INDONESIA,,Surabaya,,,,,WNI,"
+"Peserta,UAT 005,AHM-UAT-005,UAT Wellness,STAFF,Peserta UAT 5,M,1991-05-05,Semarang,O,Married,,uat.karyawan5@avahealth.sbs,KTP,,INDONESIA,,Semarang,,,,,WNI,"

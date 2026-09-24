@@ -214,7 +214,7 @@ $$;
 
 CREATE OR REPLACE FUNCTION public.wellness_personal_dashboard()
 RETURNS jsonb
-LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public
+LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = public
 AS $$
 DECLARE v_uid uuid; v_tenant uuid;
 BEGIN
