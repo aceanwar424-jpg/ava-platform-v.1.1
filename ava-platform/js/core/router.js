@@ -167,6 +167,7 @@ const PAGE_TITLES = {
   'tech-harga':'Paket & Daftar Harga',
   'queue-console':'Konsol Panggilan Antrean',
   'queue-config':'Konfigurasi Antrean',
+  'his-wellness':'Orkestrasi Wellness',
   'his-orders':'Order Terintegrasi',
   'his-mpi':'Master Rekam Medis (MPI)',
   worklist:'Worklist Analyzer',
@@ -451,6 +452,7 @@ async function navigate(page, params={}) {
     case 'critical-value': safeRun('renderCriticalValue');           break;
     case 'lis-sample-archive':
     case 'sample-archiving': safeRun('renderSampleArchiving');       break;
+    case 'his-wellness': safeRun('renderHisWellness'); break;
     case 'his-orders':  safeRun('renderIntegratedOrders');           break;
     case 'package-service': safeRun('renderPackageServiceHub');      break;
     // Hasil LIS pada HIS hanya untuk dibaca. Fungsi workflow/otorisasi tetap

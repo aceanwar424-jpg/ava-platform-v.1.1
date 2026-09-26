@@ -27,6 +27,7 @@
   <link rel="stylesheet" href="../css/token.css">
   <link rel="stylesheet" href="style.css?v=20260923-wellness-consent">
   <link rel="stylesheet" href="login.css?v=20260908b">
+  <link rel="stylesheet" href="../css/wellness-flow.css?v=20260925">
 </head>
 <body>
   <div class="app-container">
@@ -84,6 +85,10 @@
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="referral" onchange="updateLoginFormUI('referral')">
                   <span class="role-pill-span" data-role="referral" style="display:block; text-align:center; padding:9px 5px; font-size:11px; font-weight:700; border-radius:9px; border:1px solid #e2e8f0; background:#f8fafc; color:#475569; transition:all 0.2s;">Dokter / Faskes</span>
+                </label>
+                <label class="role-btn" style="cursor:pointer;">
+                  <input type="radio" name="login-role" value="ihc" onchange="updateLoginFormUI('ihc')">
+                  <span class="role-pill-span" data-role="ihc">IHC · Pemasok hasil</span>
                 </label>
                 <label class="role-btn" style="cursor:pointer;">
                   <input type="radio" name="login-role" value="tech" onchange="updateLoginFormUI('tech')">
@@ -150,6 +155,7 @@
                 <option value="corporate" style="color:#0f172a; background:#ffffff;">Perusahaan</option>
                 <option value="staff" style="color:#0f172a; background:#ffffff;">Tenaga kesehatan</option>
                 <option value="referral" style="color:#0f172a; background:#ffffff;">Dokter / Faskes</option>
+                <option value="ihc">IHC · Pemasok hasil</option>
                 <option value="tech" style="color:#0f172a; background:#ffffff;">Pengelola</option>
               </select>
             </div>
@@ -3791,9 +3797,10 @@
        keduanya mendarat di layar yang persis sama.
        Jalur ../ karena berkas ini berada di dalam /apps/. -->
   <script src="../js/core/peta-subdomain.js?v=20260830a"></script>
-  <script src="navigation.js?v=20260923-wellness-ahm"></script>
-  <script src="app.js?v=20260923-wellness-ahm"></script>
-  <script src="wellness.js?v=20260923-wellness-consent"></script>
+  <script src="navigation.js?v=20260925-orchestration"></script>
+  <script src="app.js?v=20260925-orchestration"></script>
+  <script src="../js/wellness-flow.js?v=20260925"></script>
+  <script src="wellness.js?v=20260925-orchestration"></script>
   <script>
     if ('serviceWorker' in navigator && !window.location.hostname.includes('localhost')) {
       window.addEventListener('load', () => {

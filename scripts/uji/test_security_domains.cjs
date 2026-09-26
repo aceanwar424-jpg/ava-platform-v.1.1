@@ -33,7 +33,7 @@ test('private login shells can load frontend assets without exposing protected f
 test('patient portal serves only its public shell and shared static assets anonymously',async()=>{
   const gate=await gateway();
   for(const host of map.situs.find(s=>s.kunci==='app').host) {
-    for(const path of ['/', '/apps/index.html', '/apps/style.css', '/apps/login.css', '/apps/app.js', '/css/token.css', '/css/logo-ava-global.png', '/js/core/api.js']) {
+    for(const path of ['/', '/apps/index.html', '/apps/style.css', '/apps/login.css', '/apps/app.js', '/css/token.css', '/css/logo-ava-global.png', '/js/core/api.js', '/js/wellness-flow.js', '/css/wellness-flow.css']) {
       assert.equal(await gate(new Request('https://'+host+path)), undefined, host+path);
     }
     assert.equal(await gate(new Request('https://'+host+'/api/runtime-config.js')),undefined);

@@ -81,6 +81,7 @@ const ALL_PAGES = {
   // Korporat & B2B (Pilar 6)
   'corporate':        ['Korporat B2B',     'Layanan Korporat',   '🏢'],
   'mcu':              ['Korporat B2B',     'Project MCU Massal', '💼'],
+  'his-wellness':     ['Korporat B2B',     'Orkestrasi Wellness', '📋'],
 
   // Finance & Billing
   'cashier':          ['Finance',          'Cashier POS',        '🏧'],
@@ -148,6 +149,11 @@ const ROLE_DEFAULT_PAGES = {
 };
 
 const ROLES = {
+  ihc: {
+    label:'IHC · Pemasok hasil', color:'#0d6470',
+    desc:'Akun eksternal APPS: unggah hasil hanya untuk program yang ditugaskan dari HIS.',
+    pages: [], canDelete:false, canBulkDelete:false, canExport:false, canManageUsers:false,
+  },
   head_operation: {
     label:'Head of Operations (Ace Anwar)', color:'#D4AF37',
     desc:'Master Orchestration: Marketing B2B, Agentic AI Suite, Prosedur SOP QMS & Holding Cockpit',

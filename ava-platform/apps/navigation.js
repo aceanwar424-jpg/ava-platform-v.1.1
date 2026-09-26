@@ -79,8 +79,11 @@ const APPS_MENU_GROUPS = {
     ['Akun & layanan', ['profile-view', 'nearme-view']],
     ['Dalam pengembangan', ['referral-view', 'referral-catalog-view', 'referral-lab-results-view', 'ava-ambient-scribe-view']]
   ],
+  ihc: [
+    ['Pengiriman hasil', ['wellness-import-view', 'profile-view']]
+  ],
   tech: [
-    ['Program wellness', ['wellness-admin-view', 'wellness-import-view']],
+    ['Pengelolaan di HIS', ['wellness-admin-view']],
     ['Akun', ['profile-view']],
     ['Dalam pengembangan', ['tech-saas-master-console-view', 'ava-laas-api-view']]
   ]

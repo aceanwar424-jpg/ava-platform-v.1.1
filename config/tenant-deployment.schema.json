@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "required": ["tenant_id", "display_name", "core_version", "deployment", "features"],
+  "properties": {
+    "tenant_id": {"type":"string","pattern":"^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "display_name": {"type":"string","minLength":2},
+    "core_version": {"type":"string","pattern":"^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "deployment": {
+      "type":"object",
+      "required":["mode","environment","domain","repository","database"],
+      "properties": {
+        "mode":{"enum":["shared-core","dedicated-db","dedicated-instance"]},
+        "environment":{"enum":["staging","production"]},
+        "domain":{"type":"string","minLength":3},
+        "repository":{"type":"string","minLength":3},
+        "database":{"type":"object","required":["url_env","anon_key_env","service_role_key_env"]}
+      }
+    },
+    "features":{"type":"object"},
+    "ip_ownership":{"type":"string","minLength":1}
+  }
+}

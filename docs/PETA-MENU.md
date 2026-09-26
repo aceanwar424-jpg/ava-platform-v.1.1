@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 229 — 🟢 221 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 230 — 🟢 222 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -58,10 +58,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Cockpit AVA Tech | `saas-console` | Kesehatan mesin platform & ringkasan klien |
-| 🟢 | Control Plane Produksi | `tech-control-plane` | Pusat konfigurasi, kesehatan tenant, telemetri, dan trace bug |
-| 🟢 | Roadmap & Rilis | `tech-roadmap` | Rencana versi, catatan rilis, status fase |
+| 🟢 | Pusat Operasi & Monitoring | `tech-control-plane` | Kendali tenant, health check, alert, incident, backup, release, dan trace operasional |
+| 🟢 | Release & Change Control | `tech-roadmap` | Approval release, migration, deployment tenant, dan rollback |
 | 🟢 | Katalog Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
-| 🟢 | Lacak Bug & Permintaan | `tech-isu` | Antrean perbaikan dan permintaan fitur dari klien |
+| 🟢 | Incident, Problem & Support | `tech-isu` | Tiket client, incident, problem preventif, SLA, dan tindak lanjut |
 | 🟢 | Database Studio | `db-studio` | Inspeksi tabel Postgres & SQL editor |
 | 🟢 | Jejak Audit Sistem | `audit` | Log kronologis perubahan data sensitif |
 
@@ -72,7 +72,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Tenant & Klien Faskes | `tenants` | Faskes pemakai sistem, paket, kuota & pemakaian |
 | 🟢 | Lisensi Instalasi | `lisensi` | Status lisensi Ed25519 & sidik mesin |
 | 🟢 | Penerbitan & Aktivasi Lisensi | `tech-aktivasi` | Buat berkas lisensi untuk mesin klien |
-| 🟢 | Telemetri Instalasi Klien | `tech-telemetri` | Versi terpasang, kesehatan, dan pemakaian per klien |
+| 🟢 | Health, Telemetri & SLO | `tech-telemetri` | Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant |
 
 **Komersial Sistem**
 
@@ -186,6 +186,12 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Integrasi SATUSEHAT | `satusehat` | Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4 |
 | 🟢 | Izin & Kepatuhan Faskes | `compliance-tracker` | Masa berlaku izin operasional dan SIP nakes |
 | 🟢 | Laporan RL Kemenkes | `rl-reports` | Rekapitulasi RL terisi dari data operasional |
+
+**Program Kesehatan Korporat**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟢 | Orkestrasi Wellness | `his-wellness` | Program, roster, risiko terbaru, request treatment, sesi, kehadiran dan laporan evaluasi HR |
 
 ---
 

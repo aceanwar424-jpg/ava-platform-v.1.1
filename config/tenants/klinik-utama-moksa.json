@@ -1,0 +1,26 @@
+{
+  "$schema": "../../config/tenant-deployment.schema.json",
+  "tenant_id": "klinik-utama-moksa",
+  "display_name": "Klinik Utama Moksa",
+  "legal_name": "Klinik Utama Moksa",
+  "core_version": "0.1.0",
+  "deployment": {
+    "mode": "dedicated-db",
+    "environment": "staging",
+    "domain": "REPLACE_WITH_MOKSA_DOMAIN",
+    "repository": "REPLACE_WITH_MOKSA_REPOSITORY",
+    "database": {
+      "url_env": "MOKSA_DATABASE_URL",
+      "anon_key_env": "MOKSA_SUPABASE_ANON_KEY",
+      "service_role_key_env": "MOKSA_SUPABASE_SERVICE_ROLE_KEY"
+    }
+  },
+  "features": {
+    "wellness": false,
+    "ihc_import": false,
+    "treatment": false,
+    "tenant_monitoring": true
+  },
+  "secrets_policy": "All values ending in _env are secret-manager references; no secret values belong in this file.",
+  "ip_ownership": "ava-configured"
+}

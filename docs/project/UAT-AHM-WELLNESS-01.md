@@ -1,5 +1,7 @@
 # UAT-01 — Alur End-to-End Wellness AHM
 
+> Skenario historis sebelum orkestrasi HIS. Untuk rilis 25 September 2026, gunakan [UAT-02](UAT-WELLNESS-ORCHESTRATION-02.md): HR berwenang melihat hasil individual sesuai arahan pemilik, notice memakai versi v2, admin melaksanakan treatment dari HIS, IHC hanya pemasok hasil. Kriteria HR aggregate-only di dokumen lama ini sudah digantikan.
+
 **Tujuan:** membuktikan satu alur realistis dari setup program sampai laporan HR tanpa memakai data karyawan atau hasil kesehatan nyata.
 
 **OWNED_BY:** ava  

@@ -8,7 +8,7 @@ const consentMigration = fs.readFileSync('db/migrations/0059_wellness_consent_ga
 const migrations = `${migration}\n${consentMigration}`;
 const navigation = fs.readFileSync('ava-platform/apps/navigation.js', 'utf8');
 const html = fs.readFileSync('ava-platform/apps/index.html', 'utf8');
-const ui = fs.readFileSync('ava-platform/apps/wellness.js', 'utf8');
+const ui = fs.readFileSync('ava-platform/apps/wellness.js', 'utf8') + fs.readFileSync('ava-platform/js/wellness-flow.js', 'utf8');
 
 for (const token of ['wellness_programs','wellness_enrollments','wellness_observations','wellness_import_batches','wellness_reminder_rules','wellness_tasks']) {
   assert(migration.includes(token), `missing ${token}`);

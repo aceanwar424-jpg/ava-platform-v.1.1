@@ -2277,8 +2277,142 @@ OWNED_BY: ava. Aset berasal dari Artefak yang disediakan pengguna untuk situs AV
 
 ## Visual menyatu dengan tema & identitas ekosistem — 24 September 2026
 ### Rencana
-- [ ] Tambahkan gambar konteks pada navigasi ekosistem dan kartu unit layanan, serta logo resmi pada pusat ekosistem (≤ 1 jam).
-- [ ] Terapkan transisi tepi transparan ke latar halaman menggunakan CSS; pertahankan isi gambar dan tampilan perbesar tanpa efek (≤ 1 jam).
-- [ ] Periksa tampilan desktop/mobile, navigasi kartu, rasio gambar dan dialog; simpan screenshot (≤ 1 jam).
+- [x] Tambahkan gambar konteks pada navigasi ekosistem dan kartu unit layanan, serta logo resmi pada pusat ekosistem (≤ 1 jam).
+- [x] Terapkan transisi tepi transparan ke latar halaman menggunakan CSS; pertahankan isi gambar dan tampilan perbesar tanpa efek (≤ 1 jam).
+- [x] Periksa tampilan desktop/mobile, navigasi kartu, rasio gambar dan dialog; simpan screenshot (≤ 1 jam).
 ### Implikasi IP & Kepatuhan
 OWNED_BY: ava. Gunakan pustaka ilustrasi dan logo resmi yang tersedia untuk situs AVA saja. Tidak menciptakan logo brand baru atau mengubah klaim layanan. Efek visual berupa CSS sehingga sumber aset tetap utuh; konten HTML dan tautan kontak resmi tetap sumber informasi. Tidak mengubah data master atau integrasi eksternal.
+
+### Hasil & bukti — 25 September 2026
+- Gambar hero/pendukung memakai alpha mask CSS di tepi, mengikuti warna latar setiap section. Tampilan perbesar mempertahankan gambar penuh tanpa mask.
+- Navigasi ekosistem, direktori unit, dan kartu kebutuhan memakai ilustrasi yang sesuai tautan layanan. Logo resmi AVA menggantikan lingkaran teks pusat; latar logo dilebur secara radial. Label dan tautan tetap HTML yang aksesibel.
+- Lulus 42 kombinasi halaman/viewport dari qa-public-visuals.cjs; enam pemeriksaan tambahan membuktikan mask aktif, gambar termuat, kartu dapat dinavigasi, dan tanpa overflow pada 1440/390 px.
+- Bukti: docs/audit-evidence/blended-visual-qa.json, blended-ecosystem-1440.png, blended-ecosystem-390.png, blended-units.png, blended-contact.png.
+- Syntax JS, verify-public-profile, deploy readiness, application boundaries, dan git diff --check lulus. Perubahan ini diverifikasi lokal, belum dirilis ke produksi.
+
+## Review AHM setelah pengembangan Antigravity — 25 September 2026
+### Rencana
+- [x] Review source dan cakupan bukti UAT terbaru (≤ 1 jam).
+- [x] Uji regresi dasar serta probe migrasi 0062–0063 pada PGlite sintetis (≤ 1 jam).
+- [x] Laporkan prioritas perbaikan tanpa mengubah implementasi (≤ 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Review lokal dengan identitas sintetis; tidak membaca database produksi, tidak mengubah consent pengguna, tidak deploy. Penilaian akses HR dibandingkan dengan pemberitahuan peserta dan acceptance UAT dalam repo, bukan pendapat hukum atau validasi ambang klinis.
+### Hasil & bukti
+- node --check ava-platform/apps/wellness.js dan node scripts/verify-wellness-cardiometabolic.cjs lulus. Suite ini hanya memuat migrasi 0058–0059, bukan 0060–0063.
+- Probe in-memory memperluas fixture suite dengan kolom full_name sintetis dan menjalankan migrasi 0062–0063. Role corporate menerima participant_name, employee_code, sys=120, dia=80, glu=105, risk_tier=2. Bertentangan dengan notice UI yang menjanjikan HR hanya melihat agregat serta acceptance UAT bagian 10.
+- Dashboard satu peserta mengembalikan risk_l2_count=1 meski small_cell_suppressed=true. Suppression belum berlaku pada kategori risiko.
+- Pemanggilan wellness_hrd_assign_treatment dua kali dengan payload sama menghasilkan dua baris; setelah enrollment.status dan consent_status diubah menjadi withdrawn dalam fixture lokal, assignment masih mengembalikan ok=true dan assigned_count=1.
+- Review statis: daftar HR menghitung tier dari observasi terbaru per kode, tetapi assignment memakai maksimum sepanjang riwayat. Perhitungan tier tidak memakai measurement_context, verification_status, batas umur hasil, atau medical_governance.
+- Pencarian repo menemukan tabel treatment_requests hanya digunakan oleh migrasi 0063 dan UI HR; belum ditemukan alur peserta/petugas untuk menerima, menyelesaikan, atau membatalkan assignment.
+- Bukti UAT yang ditemukan berupa runbook dan CSV fixture; pelaksanaan UAT terbaru yang dilaporkan pemilik tidak dipungkiri, namun hasil/sign-off terbaru tidak ditemukan dalam artefak yang diperiksa.
+
+## Orkestrasi Wellness end-to-end dari HIS — 25 September 2026
+### Rencana
+- [x] Petakan integrasi HIS/APPS, peran dan kontrak data (≤ 1 jam).
+- [x] Tambahkan migrasi forward untuk risiko terbaru, riwayat peserta dan batas akses HR/IHC (≤ 1 jam).
+- [x] Lengkapi request treatment, penjadwalan sesi, laporan kehadiran/kedisiplinan dan penyelesaian oleh admin (≤ 1 jam).
+- [x] Sediakan workspace HIS dan perbaiki tampilan peserta/HR serta import IHC terbatas (≤ 1 jam).
+- [x] Uji database sintetis, UI dan boundary, dokumentasikan UAT serta kesiapan rilis (≤ 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk engine, UI dan pengujian sintetis. Arahan pemilik 25 September 2026 memperjelas HR berwenang melihat hasil individu dan evaluasi karyawan perusahaannya; HR/admin dapat meminta treatment, admin HIS melaksanakan dan melaporkan sesi, IHC hanya pemasok hasil. Notice dan UAT harus diselaraskan dengan kebijakan ini. Perubahan berupa tabel transaksi wellness dan RPC generik, bukan skema katalog master. Tidak menyalin data AVA ke produk generik. Persetujuan lama tidak otomatis ditulis ulang; versi notice baru dapat ditinjau peserta. Tidak menghubungkan DB produksi atau sistem IHC eksternal dalam implementasi lokal. Ambang lama diperlakukan sebagai aturan operasional yang perlu tata kelola medis, bukan diagnosis otomatis.
+
+### Hasil & bukti verifikasi
+- HIS memiliki menu Program Kesehatan Korporat → Orkestrasi Wellness, dengan konfigurasi program/roster, peserta & pelaksanaan, dan impor hasil. APPS pengelola mengarahkan konfigurasi ke HIS.
+- HR tetap berwenang melihat hasil individual perusahaan sendiri sesuai arahan pemilik. Notice v2 menjelaskan akses HR, admin, IHC, laporan sesi, dan penarikan; persetujuan v1 tidak diubah otomatis.
+- Daftar peserta langsung termuat, dengan pencarian, filter level, hasil terbaru, waktu/status verifikasi, serta riwayat hasil dan treatment. Pembuatan tombol lama yang membawa array JSON dalam atribut HTML dihapus; handler baru memakai event listener.
+- Snapshot terbaru dipakai bersama oleh daftar, distribusi dan tier saat request. Hasil lama tetap tersedia, hasil rejected/superseded tidak menentukan tier. Nonpuasa ditandai perlu tinjauan, bukan memakai ambang puasa.
+- HR/admin dapat meminta treatment; admin HIS menerima, memilih pelaksana, menjadwalkan/mengubah/membatalkan sesi, mencatat kehadiran dan kedisiplinan beserta laporan/tindak lanjut, serta menutup treatment dengan kesimpulan. CSV laporan sesi tersedia.
+- Request dan jadwal memiliki perlindungan pengiriman ulang. Laporan sesi tidak dapat ditimpa; perubahan jadwal/pembatalan meninggalkan audit. Penarikan consent menghentikan request, sesi dan reminder aktif, tanpa menghapus riwayat pribadi peserta.
+- IHC menggunakan peran eksternal khusus dan grant per program, hanya untuk upload hasil/batch sendiri. Peran IHC tidak diberi menu HIS atau RPC treatment/history. Akun UAT lama yang pernah diangkat menjadi admin tidak didemosi diam-diam: pengecekan operator menjadi prasyarat rilis.
+- Strict tenant resolver dipulihkan; sinkronisasi roster menautkan akun berdasarkan email auth terverifikasi dan tenant yang sama. Employee ID diprioritaskan atas NIK pada impor, dan jumlah inserted/skipped dihitung sesuai operasi aktual.
+- PASS: 46 pemeriksaan PGlite end-to-end/negatif dengan seluruh migrasi 0058–0064 diulang dua kali; regresi dasar cardiometabolic; 14 tes autentikasi Apps; 12 tes keamanan domain.
+- PASS: browser Edge headless HR → HIS → peserta → upload IHC melalui RPC lokal yang mengeksekusi SQL PGlite. Filter level, escaping identitas, request, penerimaan, jadwal, laporan, penutupan, riwayat peserta, tab konfigurasi dan impor HIS bekerja. Viewport 390 px tanpa overflow dokumen dan tidak ada exception JavaScript.
+- Bukti: docs/audit-evidence/wellness/browser-qa.json, hr-desktop.png, hr-mobile.png, his-completed.png, participant-report.png, ihc-import.png. Screenshot HIS dan mobile telah diperiksa secara visual.
+- PASS: audit menu hidup (219 menu diperiksa; tidak ada handler/RPC/manifest hilang), konsistensi menu, syntax JS, application boundaries (17 domain / 6 boundary), deploy readiness, git diff --check.
+- Runbook baru: docs/project/UAT-WELLNESS-ORCHESTRATION-02.md. Rencana rilis/pemulihan: db/runbooks/0064_wellness_orchestration.md. Preflight read-only: db/preflight/0064_wellness_orchestration.sql.
+- Status: implementasi dan UAT lokal selesai; belum rilis produksi. AGENTS.md §2/§5 mensyaratkan checkpoint sebelum koneksi/migrasi DB produksi. Tidak ditemukan CLI/config Vercel atau Supabase di lokasi konfigurasi yang diperiksa maupun environment terkait; penerapan memerlukan jalur deployment dan akses target yang disetujui. Perubahan visual situs utama yang sudah ada sebelum pekerjaan ini tetap dipertahankan dan tidak dirilis bersama secara otomatis.
+
+## Panduan Akses UAT AHM Wellness — 25 September 2026
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Panduan memakai screenshot sintetis dan menjelaskan role operasional terbaru tanpa menyalin data peserta nyata. Password tidak ditulis ulang.
+### Hasil
+- [x] Matriks akses lama direview terhadap source dan migration terbaru: IHC berubah dari super_admin/Pengelola menjadi role eksternal ihc; HR berubah dari aggregate-only menjadi akses individual sesuai arahan pemilik; peserta memakai notice v2; admin mengorkestrasi melalui HIS.
+- [x] Panduan HTML lengkap tersedia di [UAT-AHM-WELLNESS-GUIDE.html](UAT-AHM-WELLNESS-GUIDE.html), dengan langkah dan screenshot HR, HIS, peserta, dan IHC.
+
+## Fondasi Dedicated Tenant & Tech Control Plane — 26 September 2026
+
+### Rencana
+- [ ] Tambahkan manifest deployment terpisah untuk tenant AHM dan Klinik Utama Moksa (≤ 1 jam).
+- [ ] Tambahkan validator manifest agar domain, mode deployment, secret reference, dan versi core wajib terisi tanpa secret di repo (≤ 1 jam).
+- [ ] Perjelas monitoring control plane: HEALTHY, STALE, dan UNKNOWN berdasarkan umur heartbeat, tanpa menyamakan data kosong dengan sehat (≤ 1 jam).
+- [ ] Jalankan syntax, validator, dan pemeriksaan diff; catat bukti dan backlog dedicated provisioning (≤ 1 jam).
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk schema manifest, validator, dan UI monitoring. Identitas AHM dan Klinik Utama Moksa hanya berada pada konfigurasi tenant/deployment yang dimiliki pemilik platform dan tidak masuk ke core generik. Tidak menyimpan password, token, `DATABASE_URL`, API key, atau data pasien. Tidak mengubah skema master, menghubungkan database produksi, atau melakukan provisioning domain/repository eksternal tanpa human checkpoint. Dedicated database dan integrasi eksternal tetap memerlukan checkpoint sebelum eksekusi.
+
+### Kriteria selesai
+- Setiap tenant memiliki manifest yang dapat divalidasi dan menjelaskan `shared-core`/`dedicated-db`/`dedicated-instance`.
+- Control plane menampilkan umur heartbeat dan status yang jujur; instalasi yang tidak melapor tidak dianggap sehat.
+- Secret hanya dirujuk melalui nama environment/secret manager.
+
+### Hasil & bukti verifikasi — 26 September 2026
+- [x] Manifest dedicated staging tersedia untuk `ahm` dan `klinik-utama-moksa` di `config/tenants/`, dengan mode `dedicated-db`, domain/repository placeholder, dan nama secret environment tanpa nilai secret.
+- [x] Folder tenant memiliki deploy README terpisah untuk AHM dan Klinik Utama Moksa.
+- [x] Validator `scripts/tech/validate-tenant-manifests.cjs` lulus untuk dua manifest.
+- [x] Control plane menampilkan daftar heartbeat dan membedakan `HEALTHY` (≤10 menit), `STALE` (11–30 menit), `OFFLINE` (>30 menit), dan `UNKNOWN` bila data tidak cukup.
+- [x] `node --check ava-platform/modules/tech-platform/techControlPlane.js` dan `git diff --check` lulus.
+- [ ] Provisioning domain, repository, database dedicated, secret, backup, dan deployment production belum dijalankan; membutuhkan nilai target dan human checkpoint sebelum integrasi eksternal.
+
+## Audit end-to-end Tech Control Plane — 26 September 2026
+### Rencana
+- [x] Audit tenant, lisensi, telemetri, heartbeat, control plane, release, backup, audit, support, incident, dan problem preventif.
+- [x] Bandingkan kemampuan source dan migration dengan kebutuhan operasi dedicated tenant.
+- [x] Susun target domain data, alur alert-to-incident-to-problem-to-change, SLA awal, dan urutan implementasi P0–P2.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk desain control plane dan audit. Tidak menyimpan data pasien, password, token, private key, atau full backup payload. Audit bersifat read-only terhadap source lokal dan artefak dokumentasi; tidak menghubungkan database produksi, mengubah schema produksi, membuat backup cloud, mengubah DNS, atau mengaktifkan integrasi eksternal. Implementasi tabel incident/backup/release dan integrasi alert berikutnya memerlukan checkpoint skema serta target environment yang disetujui.
+
+### Hasil
+- [x] Audit lengkap tersedia di `docs/project/TECH-CONTROL-PLANE-END-TO-END-AUDIT.md`.
+- [x] Temuan utama: fondasi tenant/lisensi/telemetri/heartbeat ada; alert lifecycle, incident, problem preventif, backup/restore evidence, release governance, correlation ID, support linkage, dan access review belum terpadu.
+- [x] Acceptance criteria dan rancangan domain data untuk operasi AHM dan Klinik Utama Moksa sudah ditetapkan.
+- [x] Putusan readiness: dua tenant belum boleh disebut go-live sebelum P0 observability, incident/problem, backup/restore evidence, dan release governance dibuktikan di staging.
+
+## Eksekusi P0 Control Plane Operasional — 26 September 2026
+### Rencana
+- [x] Tambahkan kontrak event operasional dengan correlation/request ID.
+- [x] Tambahkan registry alert, incident, problem preventif, change, backup, restore drill, dan support ticket.
+- [x] Tambahkan fungsi pencatatan event yang menolak tenant mismatch.
+- [x] Rapikan label menu Tech menjadi Pusat Operasi & Monitoring, Incident/Problem/Support, Release/Change Control, dan Health/Telemetri/SLO.
+- [x] Jalankan simulasi skenario gagal save, false success, akses gagal, deduplikasi alert, dan restore drill gagal.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk kontrak operasi dan test sintetis. Migrasi `0065_tech_operations_control_plane.sql` belum dijalankan ke database produksi. Tidak menyimpan password, token, private key, data pasien, atau backup payload. RLS diaktifkan sebagai fail-closed default; policy/role production harus direview dan diuji di staging sebelum migration dijalankan. Perubahan menu hanya mengubah navigasi dan label, bukan data klinis.
+
+### Hasil & bukti verifikasi
+- [x] Migration source tersedia: `db/migrations/0065_tech_operations_control_plane.sql`.
+- [x] Lima simulasi operasi lulus pada `scripts/uji/test_tech_ops_control_plane.cjs`.
+- [x] `node --check ava-platform/modules/tech-platform/techControlPlane.js` lulus.
+- [x] Generator menu dan pemeriksaan menu lulus: 230 menu, 222 ada, 8 parsial, 0 tanpa status.
+- [ ] Penerapan staging, notification adapter, cron/scheduler, dan integrasi storage backup masih memerlukan target environment serta checkpoint deployment.
+
+### Penguatan meja penyelesaian kendala — 26 September 2026
+- [x] Control Plane sekarang membaca queue alert, incident, problem preventif, support ticket, backup, dan change secara bersamaan.
+- [x] KPI operasi menampilkan alert aktif, incident aktif, dan tiket support terbuka.
+- [x] CS/operator dapat mencatat tiket kendala dari Control Plane dengan tenant, detail gejala, prioritas, dan correlation ID; false success ditolak.
+- [x] Ticket list menampilkan tenant, status, prioritas, dan correlation ID untuk penelusuran lintas log.
+- [x] Syntax, audit menu, simulasi login 14/14, dan simulasi operasi 5/5 lulus.
+- [ ] Action transition acknowledge/resolve incident dan verification problem berikutnya perlu RPC server-side serta policy role di staging; UI sengaja tidak mengarang keberhasilan sebelum backend tersedia.
+
+## Penutupan transisi operasional Tech — 26 September 2026
+- [x] Migration `0066_tech_operations_transitions.sql` menambahkan RPC server-side untuk membuka incident, transisi incident dengan state machine/SLA, transisi problem preventif dengan evidence, dan approval change.
+- [x] Transisi wajib tenant scope, alasan/evidence, actor, timestamp, dan correlation event; transisi ilegal ditolak.
+- [x] Test lifecycle operasi lulus 9/9: incident valid/invalid, problem analysis-action-verification, false success, deduplikasi alert, dan restore gap.
+- [x] QC regresi login lulus 14/14, audit menu lulus, validator dua manifest tenant lulus, dan generator menu lulus.
+- [ ] Migration belum dijalankan ke staging/production; scheduler synthetic check, connector backup storage, notification, dan policy role perlu target environment sebelum validasi runtime.
+
+- [x] Perbaikan 0066: grant tenant-first dipindahkan setelah wrapper dibuat; error function tidak ditemukan telah ditutup di source.
+
+### Konfirmasi penerapan oleh pengguna — 26 September 2026
+- [x] Pengguna mengonfirmasi eksekusi migration `0066_tech_operations_transitions.sql` berhasil.
+- [ ] Target environment (staging/production) dan hasil query verifikasi runtime tetap perlu dicatat saat deployment resmi.

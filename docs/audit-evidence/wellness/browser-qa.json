@@ -1,0 +1,17 @@
+{
+  "date": "2026-09-25T12:58:20.193Z",
+  "synthetic": true,
+  "productionAccess": false,
+  "checks": [
+    "HR list auto-load",
+    "tier filter",
+    "escaped identity",
+    "HR request",
+    "HIS accept/schedule/report/complete",
+    "HIS setup/import tabs",
+    "participant history/report",
+    "IHC upload",
+    "mobile no page overflow",
+    "zero browser exceptions"
+  ]
+}

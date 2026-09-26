@@ -161,16 +161,16 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-control-plane",
-              "label": "Control Plane Produksi",
+              "label": "Pusat Operasi & Monitoring",
               "status": "ada",
-              "ket": "Pusat konfigurasi, kesehatan tenant, telemetri, dan trace bug",
+              "ket": "Kendali tenant, health check, alert, incident, backup, release, dan trace operasional",
               "admin": true
             },
             {
               "id": "tech-roadmap",
-              "label": "Roadmap & Rilis",
+              "label": "Release & Change Control",
               "status": "ada",
-              "ket": "Rencana versi, catatan rilis, status fase"
+              "ket": "Approval release, migration, deployment tenant, dan rollback"
             },
             {
               "id": "tech-modul",
@@ -180,9 +180,9 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-isu",
-              "label": "Lacak Bug & Permintaan",
+              "label": "Incident, Problem & Support",
               "status": "ada",
-              "ket": "Antrean perbaikan dan permintaan fitur dari klien"
+              "ket": "Tiket client, incident, problem preventif, SLA, dan tindak lanjut"
             },
             {
               "id": "db-studio",
@@ -225,9 +225,9 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-telemetri",
-              "label": "Telemetri Instalasi Klien",
+              "label": "Health, Telemetri & SLO",
               "status": "ada",
-              "ket": "Versi terpasang, kesehatan, dan pemakaian per klien",
+              "ket": "Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant",
               "admin": true
             }
           ]
@@ -619,6 +619,17 @@ window.PETA_MENU = {
               "label": "Laporan RL Kemenkes",
               "status": "ada",
               "ket": "Rekapitulasi RL terisi dari data operasional"
+            }
+          ]
+        },
+        {
+          "nama": "Program Kesehatan Korporat",
+          "menu": [
+            {
+              "id": "his-wellness",
+              "label": "Orkestrasi Wellness",
+              "status": "ada",
+              "ket": "Program, roster, risiko terbaru, request treatment, sesi, kehadiran dan laporan evaluasi HR"
             }
           ]
         }

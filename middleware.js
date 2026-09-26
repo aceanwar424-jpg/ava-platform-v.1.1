@@ -28,6 +28,8 @@ export default async function middleware(request) {
     // are public; application data remains protected by Supabase/RLS.
     const appAssets = new Set([
       '/css/token.css',
+      '/css/wellness-flow.css',
+      '/js/wellness-flow.js',
       '/css/logo-ava-global.png',
       '/js/core/api.js',
       '/js/core/whatsappGateway.js',

@@ -3372,7 +3372,7 @@ function renderReferralList() {
 }
 
 // OWNED_BY: ava — existing portal authentication, fail closed.
-const PORTAL_ROLES = ['patient', 'member', 'corporate', 'staff', 'referral', 'tech'];
+const PORTAL_ROLES = ['patient', 'member', 'corporate', 'staff', 'referral', 'tech', 'ihc'];
 function clearPortalSession() {
   ['ol_token', 'ol_refresh', 'AVA_CURRENT_USER_ROLE'].forEach(key => { localStorage.removeItem(key); sessionStorage.removeItem(key); });
   sessionStorage.removeItem('AVA_IS_LOGGED_IN');
@@ -3520,6 +3520,9 @@ async function applyRoleUIState(role) {
     if (welcomeEl) welcomeEl.textContent = isSuperAdmin ? `Ns. ${adminRealName}` : (currentUsername || 'Petugas Home Care');
     await loadDataFromSupabase();
     showView('staff-homecare-view', 'Tugas Home Care Nakes');
+  }
+  else if (role === 'ihc') {
+    showView('wellness-import-view', 'IHC · Pemasok hasil');
   }
   else if (role === 'tech') {
     if (avatarEl) { avatarEl.textContent = '💻'; avatarEl.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)'; }

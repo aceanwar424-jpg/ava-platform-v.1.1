@@ -41,6 +41,16 @@ test('network failure never creates mock login', async () => {
 test('verified patient enters patient portal', async () => {
   const f = fixture(); await f.login(); assert.equal(f.c.screen, 'dashboard-screen'); assert.equal(f.c.appliedRole, 'patient'); assert.equal(f.els.password.value, '');
 });
+
+test('verified IHC account enters only its selected external role', async () => {
+  const f = fixture({role:'ihc',profileRole:'ihc'});
+  await f.login(); assert.equal(f.c.appliedRole,'ihc');
+});
+
+test('IHC account cannot choose the internal management role', async () => {
+  const f = fixture({role:'tech',profileRole:'ihc'});
+  await f.login(); assert.equal(f.c.screen,'login-screen'); assert.equal(f.c.appliedRole,undefined);
+});
 test('patient cannot select staff privileges', async () => {
   const f = fixture({ role: 'staff' }); await f.login(); assert.equal(f.c.screen, 'login-screen'); assert.equal(f.c.appliedRole, undefined); assert.equal(f.c.localStorage.getItem('ol_token'), null);
 });

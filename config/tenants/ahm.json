@@ -1,0 +1,26 @@
+{
+  "$schema": "../../config/tenant-deployment.schema.json",
+  "tenant_id": "ahm",
+  "display_name": "AHM",
+  "legal_name": "AHM",
+  "core_version": "0.1.0",
+  "deployment": {
+    "mode": "dedicated-db",
+    "environment": "staging",
+    "domain": "REPLACE_WITH_AHM_DOMAIN",
+    "repository": "REPLACE_WITH_AHM_REPOSITORY",
+    "database": {
+      "url_env": "AHM_DATABASE_URL",
+      "anon_key_env": "AHM_SUPABASE_ANON_KEY",
+      "service_role_key_env": "AHM_SUPABASE_SERVICE_ROLE_KEY"
+    }
+  },
+  "features": {
+    "wellness": true,
+    "ihc_import": true,
+    "treatment": true,
+    "tenant_monitoring": true
+  },
+  "secrets_policy": "All values ending in _env are secret-manager references; no secret values belong in this file.",
+  "ip_ownership": "ava-configured"
+}
