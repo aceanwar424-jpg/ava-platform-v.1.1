@@ -2447,3 +2447,22 @@ OWNED_BY: generic. Telemetry hanya metadata operasional sintetis. RLS dan tenant
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic untuk UI dan label operasional. Perubahan hanya pada presentasi, navigasi, dan copy; tidak mengubah data klinis, hak akses, tenant scope, atau alur persetujuan.
+
+
+## Housekeeping repositori — 26 September 2026
+- [x] Inventaris folder, arsip, fixture, stylesheet, dan duplikasi logo selesai.
+- [x] Tidak ada artefak .bak/.tmp/.old/.orig/.swp aktif yang aman dihapus.
+- [x] Struktur aktif/arsip didokumentasikan di docs/project/REPO-HOUSEKEEPING.md.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Arsip historis dan fixture sintetis dipertahankan agar audit dan QC dapat diulang.
+
+## Premium compact visual pass AVA Tech — 26 September 2026
+- [x] Menurunkan lebar sidebar menjadi 224px dan tinggi topbar menjadi 54px.
+- [x] Mengecilkan heading, label, KPI, card, hero, tombol, dan menu drawer agar tidak terasa oversized.
+- [x] Mengurangi saturasi/kontras berlebihan; deep teal, emerald, gold, paper, dan white dipakai sebagai palet editorial operational.
+- [x] Menambah cache-busting stylesheet `tech-premium` agar deployment tidak memakai CSS lama.
+- [x] QC audit menu, generator menu, syntax modul, dan diff check lulus.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk UI. Perubahan hanya pada presentasi, ukuran, warna, dan navigasi; tidak mengubah data klinis, hak akses, tenant scope, atau audit trail.
