@@ -22,10 +22,18 @@ let tntData = [];
 let tntCari = '';
 
 const TNT_PAKET = {
-  STARTER_LIS:    { label: 'Starter LIS',        tes: 2000,  kunjungan: 0 },
-  CLINIC_PRATAMA: { label: 'Klinik Pratama',     tes: 3000,  kunjungan: 6000 },
-  ENTERPRISE_RS:  { label: 'Enterprise RS',      tes: 25000, kunjungan: 50000 },
-  MASTER_HOLDING: { label: 'Master Holding',     tes: 0,     kunjungan: 0 },
+  STARTER_LIS:     { label: 'Starter LIS',             tes: 2000,  kunjungan: 0 },
+  LAB_MANDIRI:     { label: 'Laboratorium Mandiri',    tes: 12000, kunjungan: 0 },
+  CLINIC_PRATAMA:  { label: 'Klinik Pratama',          tes: 3000,  kunjungan: 6000 },
+  CLINIC_UTAMA:    { label: 'Klinik Utama',            tes: 10000, kunjungan: 20000 },
+  CLINIC_UTAMA_LIS:{ label: 'Klinik Utama + LIS',     tes: 15000, kunjungan: 25000 },
+  DOKTER_PRAKTIK:  { label: 'Dokter Praktik Bersama',  tes: 1500,  kunjungan: 3000 },
+  PUSKESMAS:       { label: 'Puskesmas',               tes: 8000,  kunjungan: 15000 },
+  ENTERPRISE_RS:   { label: 'Enterprise RS',           tes: 25000, kunjungan: 50000 },
+  RS_UTAMA:        { label: 'Rumah Sakit Utama',       tes: 50000, kunjungan: 100000 },
+  CORPORATE:       { label: 'Perusahaan / Corporate',  tes: 5000,  kunjungan: 15000 },
+  APOTEK:          { label: 'Apotek & Farmasi',        tes: 1000,  kunjungan: 5000 },
+  MASTER_HOLDING:  { label: 'Master Holding',          tes: 0,     kunjungan: 0 },
 };
 
 const TNT_STATUS = {
@@ -318,3 +326,4 @@ window.tntForm = tntForm;
 window.tntSimpan = tntSimpan;
 window.tntSetCari = tntSetCari;
 window.tntIsiKuota = tntIsiKuota;
+

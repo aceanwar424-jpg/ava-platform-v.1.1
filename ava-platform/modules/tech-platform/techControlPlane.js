@@ -157,10 +157,40 @@ async function renderTechControlPlane() {
         </div>
       </section>
     </div>
-    <div class="card" style="padding:14px 16px;margin-top:16px;font-size:12px;line-height:1.7">
+    <section class="card tech-deployment-center" style="padding:16px;margin-top:16px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><h2 style="font-size:18px;margin:0">Pengaturan deployment tenant</h2><p class="muted" style="margin:4px 0 0">Domain, project hosting, repository, dan branch diatur dari sini. Perubahan masuk antrean sinkronisasi.</p></div><span class="status-badge status-pilot">CHANGE CONTROL</span></div>
+      <div class="grid three" style="margin-top:14px">
+        <label class="form-group"><span class="field-label">Tenant ID</span><input id="tcp-deploy-tenant" placeholder="UUID tenant"></label>
+        <label class="form-group"><span class="field-label">Environment</span><select id="tcp-deploy-env"><option value="staging">Staging</option><option value="production">Production</option><option value="dr">Disaster recovery</option></select></label>
+        <label class="form-group"><span class="field-label">Provider</span><input id="tcp-deploy-provider" value="vercel"></label>
+        <label class="form-group"><span class="field-label">Nama project</span><input id="tcp-deploy-project" placeholder="moksa-web"></label>
+        <label class="form-group"><span class="field-label">Domain</span><input id="tcp-deploy-domain" placeholder="moksa.avahealth.sbs"></label>
+        <label class="form-group"><span class="field-label">Branch</span><input id="tcp-deploy-branch" value="main"></label>
+      </div>
+      <label class="form-group" style="display:block;margin-top:10px"><span class="field-label">Repository URL</span><input id="tcp-deploy-repo" placeholder="https://github.com/organisasi/repository"></label>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-teal btn-sm" onclick="tcpSimpanDeployment()">Simpan & antrekan sinkronisasi</button></div>
+    </section>    <div class="card" style="padding:14px 16px;margin-top:16px;font-size:12px;line-height:1.7">
       Control plane tidak menampilkan secret, token, atau data pasien. Status <b>unknown</b>
       berarti koneksi/konfigurasi perlu diperbaiki; bukan bukti bahwa sistem sehat.
     </div>`;
 }
 
 window.renderTechControlPlane = renderTechControlPlane;
+
+async function tcpSimpanDeployment() {
+  const tenant = document.getElementById('tcp-deploy-tenant')?.value.trim();
+  const env = document.getElementById('tcp-deploy-env')?.value;
+  const project = document.getElementById('tcp-deploy-project')?.value.trim();
+  const domain = document.getElementById('tcp-deploy-domain')?.value.trim();
+  const provider = document.getElementById('tcp-deploy-provider')?.value.trim() || 'vercel';
+  const branch = document.getElementById('tcp-deploy-branch')?.value.trim() || 'main';
+  const repo = document.getElementById('tcp-deploy-repo')?.value.trim() || null;
+  if (!tenant || !project || !domain) { toast('Tenant, project, dan domain wajib diisi.', 'error'); return; }
+  try {
+    const result = await sbRpc('tech_ops_save_deployment', { p_tenant: tenant, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center' } });
+    if (!result?.ok) throw new Error('Perubahan tidak dikonfirmasi server.');
+    toast('Konfigurasi tersimpan dan masuk antrean sinkronisasi.', 'ok');
+    await renderTechControlPlane();
+  } catch (e) { toast(`Konfigurasi gagal disimpan: ${e.message || e}`, 'error'); }
+}
+window.tcpSimpanDeployment = tcpSimpanDeployment;

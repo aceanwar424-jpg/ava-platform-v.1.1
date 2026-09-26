@@ -2466,3 +2466,36 @@ OWNED_BY: generic. Arsip historis dan fixture sintetis dipertahankan agar audit 
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic untuk UI. Perubahan hanya pada presentasi, ukuran, warna, dan navigasi; tidak mengubah data klinis, hak akses, tenant scope, atau audit trail.
+
+## Panduan onboarding Klinik Utama Moksa — 26 September 2026
+- [x] Panduan HTML tenant dibuat untuk registrasi dedicated deployment, HIS, LIS, operasional, inventory, role, UAT, monitoring, dan go-live.
+- [x] README tenant diarahkan ke panduan HTML.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Dokumen tidak memuat password, service key, domain final, repository final, atau data pasien. UAT diarahkan menggunakan data sintetis; konfigurasi produksi diisi melalui secret manager dan checkpoint implementasi.
+
+## Panduan provisioning domain Klinik Moksa — 26 September 2026
+- [x] Menambahkan langkah domain, repository dedicated, database, secret environment, DNS/TLS, konfigurasi tenant, deploy, dan verifikasi.
+- [x] Menambahkan template data provisioning dengan placeholder aman.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Domain, repository, dan secret final belum diisi karena belum diberikan secara resmi. Service role key wajib server-side dan tidak boleh masuk source code, file tenant, atau browser.
+
+## Tech Deployment Center — 26 September 2026
+- [x] Menambahkan migration `0068_tech_deployment_center.sql` untuk konfigurasi domain, provider, project, repository, branch, environment, dan status sinkronisasi per tenant.
+- [x] Menambahkan form pengaturan deployment di Control Plane; penyimpanan menggunakan RPC server-side dan audit event.
+- [x] Perubahan diberi status `PENDING_SYNC` agar tidak pernah dianggap sudah aktif sebelum adapter hosting mengonfirmasi.
+- [x] QC syntax dan audit menu lulus.
+- [ ] Adapter Vercel perlu token server-side dan endpoint target sebelum sinkronisasi DNS/project dapat dijalankan.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Tidak ada token Vercel atau credential provider di browser/source. Deployment production wajib melalui change control, secret manager, dan checkpoint environment.
+
+## Perluasan pilihan paket tenant — 27 September 2026
+- [x] Dropdown paket tenant diperluas dari 4 menjadi 12 pilihan.
+- [x] Ditambahkan Laboratorium Mandiri, Klinik Utama, Klinik Utama + LIS, Dokter Praktik Bersama, Puskesmas, Rumah Sakit Utama, Corporate, serta Apotek & Farmasi.
+- [x] Setiap pilihan memiliki kuota tes dan kunjungan awal yang berbeda; nilai tetap dapat disesuaikan melalui konfigurasi komersial.
+- [x] Syntax module tenant lulus.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Pilihan paket bersifat konfigurasi komersial dan tidak membawa data klien/pasien. Kuota awal harus dikonfirmasi melalui kontrak sebelum aktivasi produksi.
