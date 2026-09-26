@@ -1,0 +1,12 @@
+const fs = require('fs');
+const assert = require('assert');
+const migration = fs.readFileSync('db/migrations/0067_tech_auto_telemetry.sql','utf8');
+const api = fs.readFileSync('ava-platform/js/core/api.js','utf8');
+assert(migration.includes('tech_ops_ingest_client_error'));
+assert(migration.includes("CLIENT_FAILURE"));
+assert(migration.includes('tech_incidents'));
+assert(!migration.includes('ON CONFLICT (fingerprint, status)'));
+assert(api.includes('techRecordClientFailure'));
+assert(api.includes('unhandledrejection'));
+assert(api.includes('api.request_failed'));
+console.log('auto telemetry contract: PASS');

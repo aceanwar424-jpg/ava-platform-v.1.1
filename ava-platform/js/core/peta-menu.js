@@ -151,49 +151,49 @@ window.PETA_MENU = {
       "ikon": "sliders",
       "grup": [
         {
-          "nama": "Pengembangan Sistem",
+          "nama": "Operasi Platform",
           "menu": [
             {
               "id": "saas-console",
-              "label": "Cockpit AVA Tech",
+              "label": "Ringkasan Operasi",
               "status": "ada",
               "ket": "Kesehatan mesin platform & ringkasan klien"
             },
             {
               "id": "tech-control-plane",
-              "label": "Pusat Operasi & Monitoring",
+              "label": "Pantau Operasi",
               "status": "ada",
               "ket": "Kendali tenant, health check, alert, incident, backup, release, dan trace operasional",
               "admin": true
             },
             {
               "id": "tech-roadmap",
-              "label": "Release & Change Control",
+              "label": "Rilis & Perubahan",
               "status": "ada",
               "ket": "Approval release, migration, deployment tenant, dan rollback"
             },
             {
               "id": "tech-modul",
-              "label": "Katalog Modul & Versi",
+              "label": "Modul & Versi",
               "status": "ada",
               "ket": "Daftar modul yang dilisensikan beserta versinya"
             },
             {
               "id": "tech-isu",
-              "label": "Incident, Problem & Support",
+              "label": "Kendala & Tindak Lanjut",
               "status": "ada",
               "ket": "Tiket client, incident, problem preventif, SLA, dan tindak lanjut"
             },
             {
               "id": "db-studio",
-              "label": "Database Studio",
+              "label": "Studio Database",
               "status": "ada",
               "ket": "Inspeksi tabel Postgres & SQL editor",
               "admin": true
             },
             {
               "id": "audit",
-              "label": "Jejak Audit Sistem",
+              "label": "Riwayat Aktivitas",
               "status": "ada",
               "ket": "Log kronologis perubahan data sensitif",
               "admin": true
@@ -201,7 +201,7 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Klien & Lisensi",
+          "nama": "Tenant, Lisensi & Health",
           "menu": [
             {
               "id": "tenants",
@@ -225,7 +225,7 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-telemetri",
-              "label": "Health, Telemetri & SLO",
+              "label": "Kesehatan Sistem",
               "status": "ada",
               "ket": "Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant",
               "admin": true
@@ -233,7 +233,7 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Komersial Sistem",
+          "nama": "Customer Success & Komersial",
           "menu": [
             {
               "id": "leads",
@@ -268,7 +268,7 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Interoperabilitas",
+          "nama": "Integrasi & Konektor",
           "menu": [
             {
               "id": "catalog-export",
@@ -299,23 +299,23 @@ window.PETA_MENU = {
           ]
         },
         {
-          "nama": "Tim Tech",
+          "nama": "Tim & Delivery",
           "menu": [
             {
               "id": "hrd",
-              "label": "Anggota Tim Tech",
+              "label": "Tim Operasional",
               "status": "ada",
               "ket": "Data personel unit Tech"
             },
             {
               "id": "tech-sprint",
-              "label": "Sprint & Beban Kerja",
+              "label": "Pekerjaan & Kapasitas",
               "status": "ada",
               "ket": "Pembagian tugas dan kapasitas tim"
             },
             {
               "id": "tech-delivery",
-              "label": "Delivery, SLA & Customer Success",
+              "label": "Implementasi & SLA",
               "status": "ada",
               "ket": "Implementasi, acceptance, support, incident, adopsi dan renewal tenant"
             }

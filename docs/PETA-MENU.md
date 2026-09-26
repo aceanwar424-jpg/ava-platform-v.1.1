@@ -53,28 +53,28 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 `tech`
 
-**Pengembangan Sistem**
+**Operasi Platform**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Cockpit AVA Tech | `saas-console` | Kesehatan mesin platform & ringkasan klien |
-| 🟢 | Pusat Operasi & Monitoring | `tech-control-plane` | Kendali tenant, health check, alert, incident, backup, release, dan trace operasional |
-| 🟢 | Release & Change Control | `tech-roadmap` | Approval release, migration, deployment tenant, dan rollback |
-| 🟢 | Katalog Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
-| 🟢 | Incident, Problem & Support | `tech-isu` | Tiket client, incident, problem preventif, SLA, dan tindak lanjut |
-| 🟢 | Database Studio | `db-studio` | Inspeksi tabel Postgres & SQL editor |
-| 🟢 | Jejak Audit Sistem | `audit` | Log kronologis perubahan data sensitif |
+| 🟢 | Ringkasan Operasi | `saas-console` | Kesehatan mesin platform & ringkasan klien |
+| 🟢 | Pantau Operasi | `tech-control-plane` | Kendali tenant, health check, alert, incident, backup, release, dan trace operasional |
+| 🟢 | Rilis & Perubahan | `tech-roadmap` | Approval release, migration, deployment tenant, dan rollback |
+| 🟢 | Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
+| 🟢 | Kendala & Tindak Lanjut | `tech-isu` | Tiket client, incident, problem preventif, SLA, dan tindak lanjut |
+| 🟢 | Studio Database | `db-studio` | Inspeksi tabel Postgres & SQL editor |
+| 🟢 | Riwayat Aktivitas | `audit` | Log kronologis perubahan data sensitif |
 
-**Klien & Lisensi**
+**Tenant, Lisensi & Health**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Tenant & Klien Faskes | `tenants` | Faskes pemakai sistem, paket, kuota & pemakaian |
 | 🟢 | Lisensi Instalasi | `lisensi` | Status lisensi Ed25519 & sidik mesin |
 | 🟢 | Penerbitan & Aktivasi Lisensi | `tech-aktivasi` | Buat berkas lisensi untuk mesin klien |
-| 🟢 | Health, Telemetri & SLO | `tech-telemetri` | Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant |
+| 🟢 | Kesehatan Sistem | `tech-telemetri` | Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant |
 
-**Komersial Sistem**
+**Customer Success & Komersial**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
@@ -84,7 +84,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Paket & Daftar Harga | `tech-harga` | Definisi paket lisensi beserta kuota dan tarifnya |
 | 🟢 | Tagihan Langganan | `finance` | Faktur langganan klien & status pelunasan |
 
-**Interoperabilitas**
+**Integrasi & Konektor**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
@@ -93,13 +93,13 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Konektor Analyzer | `tech-analyzer` | ASTM E1381/E1394 di porta 9999; layar pengaturannya belum ada |
 | 🟢 | Monitor Kuota AI Gateway | `agentic` › agentic-apimonitor | Pemakaian kunci API & rotasi terpusat |
 
-**Tim Tech**
+**Tim & Delivery**
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Anggota Tim Tech | `hrd` | Data personel unit Tech |
-| 🟢 | Sprint & Beban Kerja | `tech-sprint` | Pembagian tugas dan kapasitas tim |
-| 🟢 | Delivery, SLA & Customer Success | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
+| 🟢 | Tim Operasional | `hrd` | Data personel unit Tech |
+| 🟢 | Pekerjaan & Kapasitas | `tech-sprint` | Pembagian tugas dan kapasitas tim |
+| 🟢 | Implementasi & SLA | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
 
 ---
 

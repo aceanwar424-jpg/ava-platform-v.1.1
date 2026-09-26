@@ -92,7 +92,10 @@ async function sbFetch(url, opts = {}) {
     const ok = await sbRefreshSession();
     if (ok) res = await fetch(url, build());   // header dibangun ulang → token baru
   }
-  return res;
+  if (!res.ok && typeof techRecordClientFailure === 'function') {
+    const endpoint = String(url).replace(/^https?:\/\/[^/]+/, '').replace(/[?#].*$/, '');
+    techRecordClientFailure({ event_type: 'api.request_failed', title: 'API request failed (' + res.status + ')', detail: endpoint, endpoint, http_status: res.status, module: endpoint.split('/')[3] || 'api' });
+  }  return res;
 }
 
 async function sbGet(table, query='') {
@@ -179,3 +182,66 @@ async function logActivity(action, tableName, recordId, description, name='', be
     });
   } catch(e) {}
 }
+
+// ── AVA Tech auto telemetry ─────────────────────────────────────
+// Captures technical failures only. Secrets, tokens, request bodies, and clinical
+// payloads are deliberately excluded. The RPC is guarded to avoid telemetry loops.
+let _techTelemetryBusy = false;
+function techTelemetryCorrelation() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return `corr-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+function techTelemetryTenant() {
+  return window.currentUser?.tenant_id || window.currentUser?.profile?.tenant_id || window.AVA_RUNTIME_CONFIG?.tenantId || null;
+}
+function techTelemetryFingerprint(parts) {
+  const raw = parts.filter(Boolean).join('|').toLowerCase().replace(/\s+/g, ' ').slice(0, 500);
+  let h = 2166136261;
+  for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return `client-${(h >>> 0).toString(16)}`;
+}
+function techRecordClientFailure(input = {}) {
+  if (_techTelemetryBusy || typeof sbRpc !== 'function') return Promise.resolve(null);
+  const correlation = input.correlation_id || techTelemetryCorrelation();
+  const title = String(input.title || 'Client application failure').slice(0, 240);
+  const detail = String(input.detail || '').replace(/[\r\n]+/g, ' ').slice(0, 2000);
+  const tenant = input.tenant_id || techTelemetryTenant();
+  const payload = {
+    module: String(input.module || 'unknown').slice(0, 120),
+    endpoint: String(input.endpoint || '').replace(/[?#].*$/, '').slice(0, 240),
+    http_status: Number.isFinite(Number(input.http_status)) ? Number(input.http_status) : null,
+    error_code: String(input.error_code || '').slice(0, 120),
+    app_version: String(window.AVA_RUNTIME_CONFIG?.appVersion || '').slice(0, 80),
+    user_agent: String(navigator.userAgent || '').slice(0, 240),
+    occurred_at: new Date().toISOString(),
+  };
+  _techTelemetryBusy = true;
+  return sbRpc('tech_ops_ingest_client_error', {
+    p_tenant: tenant,
+    p_installation_id: window.AVA_RUNTIME_CONFIG?.installationId || location.hostname,
+    p_event_type: input.event_type || 'client.error',
+    p_severity: input.severity || (Number(input.http_status) >= 500 ? 'error' : 'warning'),
+    p_fingerprint: input.fingerprint || techTelemetryFingerprint([input.event_type, input.module, input.endpoint, input.error_code, title]),
+    p_title: title,
+    p_detail: detail,
+    p_correlation_id: correlation,
+    p_payload: payload,
+  }).catch(() => null).finally(() => { _techTelemetryBusy = false; });
+}
+function techInstallAutoTelemetry() {
+  if (typeof window === 'undefined' || window.__avaTechTelemetryInstalled) return;
+  window.__avaTechTelemetryInstalled = true;
+  window.addEventListener('error', e => {
+    techRecordClientFailure({ event_type: 'client.unhandled_error', title: 'Unhandled client error', detail: e.message, module: location.pathname });
+  });
+  window.addEventListener('unhandledrejection', e => {
+    const reason = e.reason instanceof Error ? e.reason.message : String(e.reason || 'Unhandled promise rejection');
+    techRecordClientFailure({ event_type: 'client.unhandled_rejection', title: 'Unhandled promise rejection', detail: reason, module: location.pathname });
+  });
+}
+if (typeof window !== 'undefined') {
+  window.techRecordClientFailure = techRecordClientFailure;
+  techInstallAutoTelemetry();
+}
+
+

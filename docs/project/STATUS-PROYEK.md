@@ -2416,3 +2416,34 @@ OWNED_BY: generic untuk kontrak operasi dan test sintetis. Migrasi `0065_tech_op
 ### Konfirmasi penerapan oleh pengguna — 26 September 2026
 - [x] Pengguna mengonfirmasi eksekusi migration `0066_tech_operations_transitions.sql` berhasil.
 - [ ] Target environment (staging/production) dan hasil query verifikasi runtime tetap perlu dicatat saat deployment resmi.
+
+## Work Item — Auto telemetry → alert → incident
+
+### Rencana
+- Tambah RPC ingest error client yang menyimpan event, melakukan deduplikasi fingerprint, dan membuka incident otomatis untuk P0/P1.
+- Pasang global error/unhandled rejection capture serta instrumentasi kegagalan API tanpa merekam rahasia/data pasien.
+- Tampilkan bukti korelasi di AVA Tech Control Plane dan uji dengan simulasi sintetis.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Payload dibatasi metadata teknis sintetis (tenant/installasi, modul, endpoint, error code, correlation ID); password, token, isi rekam medis, dan data pasien tidak dikirim. Tenant scope/RLS tetap berlaku dan event otomatis mengikuti audit trail.
+
+## Implementasi Auto Telemetry & Auto Incident — 26 September 2026
+- [x] Menambahkan migration `0067_tech_auto_telemetry.sql` dengan RPC `tech_ops_ingest_client_error`.
+- [x] Event client menyimpan metadata teknis, membuat fingerprint deduplikasi, memperbarui alert terbuka, dan otomatis membuka incident P0/P1.
+- [x] Memasang global `window.error`, `unhandledrejection`, dan capture kegagalan API di `ava-platform/js/core/api.js`.
+- [x] Payload membuang query string, membatasi panjang detail, dan tidak mengirim body/token/password/data klinis.
+- [x] QC kontrak auto telemetry lulus; syntax JavaScript lulus; lifecycle operasi 9/9 tetap lulus.
+- [ ] Migration `0067` perlu dijalankan di environment target setelah `0065` dan `0066`; notification adapter eksternal masih mengikuti konfigurasi target.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Telemetry hanya metadata operasional sintetis. RLS dan tenant context tetap wajib diuji di staging; tidak ada integrasi eksternal atau data pasien yang ditambahkan.
+
+## Penyelarasan UI Tech dengan AVA Health — 26 September 2026
+- [x] Palette operational diselaraskan ke emerald, deep teal, gold, paper, dan surface AVA Health.
+- [x] Tipografi, ukuran heading, jarak konten, KPI, tombol, tabel, navigation drawer, dan responsive spacing dirapikan.
+- [x] Grouping Tech memakai bahasa operasional: Operasi Platform; Tenant, Lisensi & Health; Customer Success & Komersial; Integrasi & Konektor; Tim & Delivery.
+- [x] Penamaan menu dipadatkan menjadi Ringkasan Operasi, Pantau Operasi, Rilis & Perubahan, Kendala & Tindak Lanjut, Kesehatan Sistem, dan Riwayat Aktivitas.
+- [x] Cache-busting stylesheet diperbarui dan audit menu hidup lulus tanpa layar/RPC/handler mati.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk UI dan label operasional. Perubahan hanya pada presentasi, navigasi, dan copy; tidak mengubah data klinis, hak akses, tenant scope, atau alur persetujuan.

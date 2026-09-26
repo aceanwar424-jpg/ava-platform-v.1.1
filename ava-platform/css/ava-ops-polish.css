@@ -265,3 +265,49 @@ body.ava-monitor-shell .counter-card, body.ava-monitor-shell .panel, body.ava-mo
 .readiness-check-row span { color:var(--ava-muted); font-size:11px; white-space:nowrap; }
 @media (max-width: 900px) { .readiness-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width: 540px) { .readiness-hero { align-items:flex-start; padding:20px; } .readiness-mark { display:none; } .readiness-grid { grid-template-columns:1fr; } .readiness-check-row { align-items:flex-start; flex-direction:column; gap:5px; } }
+
+/* AVA Tech workspace polish — operational, compact, and legible. */
+body.ava-ops-shell {
+  --rail-w: 248px;
+  --sidebar-w: 248px;
+  --topbar-h: 58px;
+  --ava-paper: #f3f7f5;
+  --ava-surface: #ffffff;
+  --ava-line: #d8e3de;
+  --ava-ink: #123b3c;
+  --ava-muted: #5f7470;
+  font-size: 13px;
+}
+body.ava-ops-shell .sidebar-rail {
+  background: linear-gradient(180deg, #123b3c 0%, #0d2f31 100%);
+  border-right: 1px solid rgba(184,145,43,.28);
+}
+body.ava-ops-shell .sidebar-brand-box { padding: 18px 16px 16px; }
+body.ava-ops-shell .sidebar-brand-title { font-size: 15px; }
+body.ava-ops-shell .sidebar-brand-sub { font-size: 10px; letter-spacing: .08em; }
+body.ava-ops-shell .sidebar-main-btn { min-height: 42px; border-radius: 10px; margin: 3px 10px; font-size: 12px; }
+body.ava-ops-shell .sidebar-main-btn.active-group { box-shadow: inset 3px 0 0 var(--ava-gold); }
+body.ava-ops-shell .topbar { min-height: var(--topbar-h); padding: 0 24px; }
+body.ava-ops-shell .topbar-title { font-size: 13px; font-weight: 750; letter-spacing: .01em; }
+body.ava-ops-shell .main-content { padding: 26px 30px 42px; max-width: 1680px; }
+body.ava-ops-shell .page-header { margin-bottom: 20px; }
+body.ava-ops-shell .page-header h1 { font-size: 25px; line-height: 1.2; }
+body.ava-ops-shell .page-header p { font-size: 12.5px; line-height: 1.6; max-width: 780px; }
+body.ava-ops-shell .card,
+body.ava-ops-shell .kpi-card { border-radius: 14px; }
+body.ava-ops-shell .kpi-card { padding: 16px 18px; }
+body.ava-ops-shell .kpi-card .kpi-value { font-size: 25px; }
+body.ava-ops-shell .navigation-context { border-radius: 0 16px 16px 0; box-shadow: 12px 0 32px rgba(16,46,48,.14); }
+body.ava-ops-shell .navigation-context-head { min-height: 76px; background: linear-gradient(120deg,#123b3c,#176052); border-bottom-color: rgba(227,199,102,.55); }
+body.ava-ops-shell .navigation-context-modules { padding: 20px 22px 26px; }
+body.ava-ops-shell .navigation-module-item { border-radius: 11px; padding: 13px 14px; margin-bottom: 7px; }
+body.ava-ops-shell .navigation-module-item-copy strong { font-size: 12.5px; }
+body.ava-ops-shell .navigation-module-item-copy small { font-size: 11px; line-height: 1.45; }
+body.ava-ops-shell .table-wrap { border-radius: 12px; overflow: hidden; }
+body.ava-ops-shell .btn { border-radius: 9px; font-weight: 750; }
+body.ava-ops-shell .badge, body.ava-ops-shell .status-badge { border-radius: 999px; }
+@media (max-width: 768px) {
+  body.ava-ops-shell .main-content { padding: 18px 14px 28px; }
+  body.ava-ops-shell .page-header h1 { font-size: 21px; }
+  body.ava-ops-shell .topbar { padding: 0 14px; }
+}
