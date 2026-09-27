@@ -387,3 +387,18 @@ body.ava-ops-shell .tcp-ticket-form { grid-template-columns: 1fr 1.4fr 100px aut
   body.ava-ops-shell .main-content { padding: 12px 10px 20px; }
   body.ava-ops-shell .tcp-ticket-form { grid-template-columns: 1fr !important; }
 }
+
+
+/* Classic SaaS cockpit: restrained surfaces, compact metrics, chart-ready canvas. */
+body.ava-ops-shell .tech-saas-dashboard { max-width: 1360px; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child { background: #183a3b !important; }
+body.ava-ops-shell .tech-saas-dashboard .metric-card { min-height: 76px; }
+body.ava-ops-shell .tech-saas-dashboard table th { font-size: 10px; font-weight: 700; color: var(--ava-muted); text-transform: uppercase; letter-spacing: .04em; }
+body.ava-ops-shell .tech-saas-dashboard table td { font-size: 11px; }
+body.ava-ops-shell .tech-saas-dashboard .badge { padding: 3px 6px; }
+@media (max-width: 950px) { body.ava-ops-shell .tech-saas-dashboard > div[style*="repeat(4"] { grid-template-columns: repeat(2,minmax(0,1fr)) !important; } }
+@media (max-width: 600px) { body.ava-ops-shell .tech-saas-dashboard > div[style*="repeat(4"] { grid-template-columns: 1fr !important; } }
+
+body.ava-ops-shell .tech-trend-bars { height:56px; display:flex; align-items:flex-end; gap:6px; border-bottom:1px solid var(--ava-line); }
+body.ava-ops-shell .tech-trend-bars i { flex:1; display:block; background:var(--ava-emerald); opacity:.72; border-radius:2px 2px 0 0; }
+body.ava-ops-shell .tech-trend-bars i:nth-child(3n) { background:var(--ava-gold); }

@@ -50,10 +50,10 @@ async function renderTechSaas(params = {}) {
     .reduce((a, t) => a + Number(t.nilai_langganan || 0), 0);
 
   const kartu = (warna, label, nilai, ket) =>
-    '<div class="card" style="padding:16px 18px; border-left:4px solid ' + warna + ';">' +
+    '<div class="card metric-card" style="padding:10px 12px; border-left:3px solid ' + warna + '; border-radius:6px; box-shadow:none;">' +
       '<div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">' + label + '</div>' +
-      '<div style="font-size:19px; font-weight:800; color:' + warna + '; margin:4px 0;">' + nilai + '</div>' +
-      '<div style="font-size:11.5px; color:var(--text2);">' + ket + '</div>' +
+      '<div style="font-size:16px; font-weight:750; color:' + warna + '; margin:4px 0;">' + nilai + '</div>' +
+      '<div style="font-size:10.5px; color:var(--text2);">' + ket + '</div>' +
     '</div>';
 
   const petaConn = {
@@ -89,14 +89,14 @@ async function renderTechSaas(params = {}) {
     '</tr>').join('');
 
   main.innerHTML =
-    '<div style="padding:20px; font-family:\'Plus Jakarta Sans\',sans-serif;">' +
+    '<div class="tech-saas-dashboard" style="padding:16px; font-family:\'Plus Jakarta Sans\',sans-serif;">' +
 
-      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:16px; background:linear-gradient(135deg,#0F172A,#1E293B); padding:24px 28px; border-radius:16px; border:1px solid rgba(14,165,233,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.15);">' +
+      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:16px; background:linear-gradient(135deg,#0F172A,#1E293B); padding:14px 18px; border-radius:6px; border:1px solid #cbd8d4; box-shadow:none;">' +
         '<div>' +
           '<div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">' +
             '<span>&#128187;</span> PILAR 3 &bull; AVA TECH (tech.avahealth.sbs)</div>' +
-          '<h1 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0; letter-spacing:-0.02em;">Pembangun &amp; Penjual Sistem</h1>' +
-          '<p style="font-size:13px; color:#94A3B8; margin:0; max-width:660px; line-height:1.5;">' +
+          '<h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0; letter-spacing:-0.02em;">Pembangun &amp; Penjual Sistem</h1>' +
+          '<p style="font-size:11px; color:#b8c7d5; margin:0; max-width:660px; line-height:1.45;">' +
             'Unit yang membangun platform ini dan melisensikannya ke faskes lain: mesin multi-tenant, ' +
             'interoperabilitas SATUSEHAT &amp; analyzer, katalog LOINC, serta pengelolaan langganan klien.</p>' +
         '</div>' +
@@ -106,20 +106,25 @@ async function renderTechSaas(params = {}) {
         '</div>' +
       '</div>' +
 
-      '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;">' +
+      '<div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px;">' +
         kartuPenjualan +
         kartu('#8B5CF6', 'Kunci AI Gateway', kunciAktif + ' / ' + aiPool.length,
               aiPool.length ? 'kunci aktif dari pool terpasang' : 'pool kosong — isi js/config.local.js') +
       '</div>' +
 
-      '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:24px;">' +
+      '<div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:14px;">' +
         kartu(sc[0], 'Lab Connector (analyzer)', sc[1], sc[2]) +
         kartu('#10B981', 'Basis data', 'PostgreSQL PGlite', 'Local-first, berjalan di dalam aplikasi') +
         kartu('#94A3B8', 'Jembatan SATUSEHAT', 'Belum diperiksa', 'Perlu pemeriksa khusus; status tidak diklaim tanpa itu') +
         kartu('#94A3B8', 'Katalog LOINC/UCUM', 'Lihat di menu', 'Ekspor katalog tes ke format siap-LIS klien') +
       '</div>' +
 
-      '<div style="display:grid; grid-template-columns:1.6fr 1fr; gap:20px; align-items:start;">' +
+      '<div class="card tech-trend" style="padding:12px 14px; margin-bottom:12px; border-radius:6px; box-shadow:none;">' +
+        '<div style="display:flex;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px">Aktivitas tenant</strong><span class="mini">30 hari terakhir</span></div>' +
+        '<div class="tech-trend-bars"><i style="height:28%"></i><i style="height:42%"></i><i style="height:36%"></i><i style="height:58%"></i><i style="height:48%"></i><i style="height:72%"></i><i style="height:64%"></i><i style="height:82%"></i><i style="height:76%"></i><i style="height:92%"></i></div>' +
+      '</div>' +
+
+      '<div style="display:grid; grid-template-columns:1.6fr 1fr; gap:12px; align-items:start;">' +
         '<div class="card" style="padding:0; overflow:hidden;">' +
           '<div style="padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px;">' +
             '<h3 style="font-size:14.5px; font-weight:800; margin:0;">Klien Faskes Terdaftar</h3>' +
@@ -136,7 +141,7 @@ async function renderTechSaas(params = {}) {
               '<button class="btn btn-teal btn-sm" style="margin-top:10px" onclick="navigate(\'tenants\')">Daftarkan klien pertama</button></div>') +
         '</div>' +
 
-        '<div class="card" style="padding:20px;">' +
+        '<div class="card" style="padding:14px; border-radius:6px; box-shadow:none;">' +
           '<div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">' +
             '<span style="font-size:17px;">&#128274;</span>' +
             '<h3 style="font-size:14px; font-weight:800; margin:0;">Lisensi Instalasi Ini</h3></div>' +
@@ -260,12 +265,12 @@ async function renderTechRoadmap() {
   if (!main) return;
   main.innerHTML = `
     <div style="padding:24px; font-family:'Plus Jakarta Sans',sans-serif;">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; background:linear-gradient(135deg,#0F172A,#1E293B); padding:24px 28px; border-radius:16px; border:1px solid rgba(14,165,233,0.3); box-shadow:0 10px 30px rgba(0,0,0,0.15);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; background:linear-gradient(135deg,#0F172A,#1E293B); padding:14px 18px; border-radius:6px; border:1px solid #cbd8d4; box-shadow:none;">
         <div>
           <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">
             <span>🗺️</span> TECH ROADMAP & RELEASE LOG (2026 EDITION)
           </div>
-          <h1 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0;">Roadmap & Catatan Rilis Platform</h1>
+          <h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0;">Roadmap & Catatan Rilis Platform</h1>
           <p style="font-size:13px; color:#94A3B8; margin:0; max-width:680px; line-height:1.5;">
             Lacak perjalanan evolusi arsitektur AVA Diagnostics & Health SaaS dari versi baseline v1.0 hingga ekosistem enterprise v2.0.
           </p>
@@ -275,26 +280,26 @@ async function renderTechRoadmap() {
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;">
+      <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px;">
         <div class="card" style="padding:16px 18px; border-left:4px solid #10B981;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase;">VERSI SAAT INI</div>
-          <div style="font-size:19px; font-weight:800; color:#10B981; margin:4px 0;">v1.2.4-PROD</div>
-          <div style="font-size:11.5px; color:var(--text2);">LIS-HIS Sync & Multi-Tenant Engine</div>
+          <div style="font-size:16px; font-weight:750; color:#10B981; margin:4px 0;">v1.2.4-PROD</div>
+          <div style="font-size:10.5px; color:var(--text2);">LIS-HIS Sync & Multi-Tenant Engine</div>
         </div>
         <div class="card" style="padding:16px 18px; border-left:4px solid #3B82F6;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase;">FASE BERJALAN</div>
-          <div style="font-size:19px; font-weight:800; color:#3B82F6; margin:4px 0;">Fase 4: Multi-Lab</div>
-          <div style="font-size:11.5px; color:var(--text2);">ISO 15189 Multi-Tenant Parameterized</div>
+          <div style="font-size:16px; font-weight:750; color:#3B82F6; margin:4px 0;">Fase 4: Multi-Lab</div>
+          <div style="font-size:10.5px; color:var(--text2);">ISO 15189 Multi-Tenant Parameterized</div>
         </div>
         <div class="card" style="padding:16px 18px; border-left:4px solid #8B5CF6;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase;">ROADMAP NEXT (Q4 2026)</div>
-          <div style="font-size:19px; font-weight:800; color:#8B5CF6; margin:4px 0;">v2.0 Cloud Enterprise</div>
-          <div style="font-size:11.5px; color:var(--text2);">Federated PACS & Universal AI Gateway</div>
+          <div style="font-size:16px; font-weight:750; color:#8B5CF6; margin:4px 0;">v2.0 Cloud Enterprise</div>
+          <div style="font-size:10.5px; color:var(--text2);">Federated PACS & Universal AI Gateway</div>
         </div>
         <div class="card" style="padding:16px 18px; border-left:4px solid #F59E0B;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase;">PROGRESS ROADMAP</div>
-          <div style="font-size:19px; font-weight:800; color:#F59E0B; margin:4px 0;">88% Selesai</div>
-          <div style="font-size:11.5px; color:var(--text2);">38 dari 43 fitur utama terpasang</div>
+          <div style="font-size:16px; font-weight:750; color:#F59E0B; margin:4px 0;">88% Selesai</div>
+          <div style="font-size:10.5px; color:var(--text2);">38 dari 43 fitur utama terpasang</div>
         </div>
       </div>
 
@@ -361,7 +366,7 @@ async function renderTechModul() {
           <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">
             <span>📦</span> KATALOG MODUL & LISENSI PLATFORM
           </div>
-          <h1 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0;">Katalog Modul Berlisensi AVA Tech</h1>
+          <h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0;">Katalog Modul Berlisensi AVA Tech</h1>
           <p style="font-size:13px; color:#94A3B8; margin:0; line-height:1.5;">
             Daftar modul perangkat lunak kesehatan yang siap dikonfigurasi dan dilisensikan ke klien faskes mitra.
           </p>
@@ -410,7 +415,7 @@ async function renderTechIsu() {
           <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">
             <span>🐛</span> TICKET & ISSUE TRACKER
           </div>
-          <h1 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0;">Pelacak Bug & Permintaan Fitur Klien</h1>
+          <h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0;">Pelacak Bug & Permintaan Fitur Klien</h1>
           <p style="font-size:13px; color:#94A3B8; margin:0; line-height:1.5;">
             Pantau laporan bug, perbaikan masalah, dan antrean fitur baru dari seluruh klien faskes mitra.
           </p>
@@ -465,23 +470,23 @@ async function renderTechSprint() {
           <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">
             <span>⚡</span> SPRINT & ENGINEERING WORKLOAD
           </div>
-          <h1 style="font-size:22px; font-weight:800; color:#fff; margin:0 0 6px 0;">Sprint Active & Kapasitas Tim Tech</h1>
+          <h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0;">Sprint Active & Kapasitas Tim Tech</h1>
           <p style="font-size:13px; color:#94A3B8; margin:0; line-height:1.5;">
             Manajemen beban kerja developer, alokasi tugas sprint, dan velocity rekayasa perangkat lunak AVA Tech.
           </p>
         </div>
       </div>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-bottom:24px;">
+      <div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px;">
         <div class="card" style="padding:16px 18px; border-left:4px solid #10B981;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3);">SPRINT AKTIF</div>
-          <div style="font-size:19px; font-weight:800; color:#10B981; margin:4px 0;">Sprint 24</div>
-          <div style="font-size:11.5px; color:var(--text2);">Target: Multi-Lab & LIS-HIS Perfecting</div>
+          <div style="font-size:16px; font-weight:750; color:#10B981; margin:4px 0;">Sprint 24</div>
+          <div style="font-size:10.5px; color:var(--text2);">Target: Multi-Lab & LIS-HIS Perfecting</div>
         </div>
         <div class="card" style="padding:16px 18px; border-left:4px solid #0EA5E9;">
           <div style="font-size:10.5px; font-weight:700; color:var(--text3);">VELOCITY TIM</div>
-          <div style="font-size:19px; font-weight:800; color:#0EA5E9; margin:4px 0;">42 Story Points</div>
-          <div style="font-size:11.5px; color:var(--text2);">Selesai 92% dari target sprint</div>
+          <div style="font-size:16px; font-weight:750; color:#0EA5E9; margin:4px 0;">42 Story Points</div>
+          <div style="font-size:10.5px; color:var(--text2);">Selesai 92% dari target sprint</div>
         </div>
       </div>
     </div>

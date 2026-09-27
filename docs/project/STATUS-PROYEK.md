@@ -2550,3 +2550,13 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada UX operasional; data tike
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya pada presentasi dan keterbacaan UI; tidak mengubah data, kewenangan, atau alur klinis.
+
+
+## Restyle cockpit klasik AVA Tech — 27 September 2026
+- [x] Dashboard SaaS diturunkan dari hero/kartu besar menjadi cockpit metrik ringkas.
+- [x] Radius, bayangan, padding, dan ukuran angka dikurangi agar mengikuti pola aplikasi operasional klasik.
+- [x] Grid metrik dibuat empat kolom pada desktop dan responsif pada tablet/mobile.
+- [x] Cache style dinaikkan ke `20260927-classic`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya presentasi dashboard dan tidak mengubah data atau aturan operasional.
