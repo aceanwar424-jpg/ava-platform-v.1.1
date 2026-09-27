@@ -82,11 +82,18 @@ async function renderTechControlPlane() {
         <p class="muted">Konfigurasi, tenant, kesehatan instalasi, dan jejak perubahan dari satu pusat kendali.</p></div>
       <button class="btn btn-ghost btn-sm" onclick="renderTechControlPlane()">Periksa ulang</button>
     </div>
-    <div class="card" style="padding:16px;border-left:4px solid ${statusColor};margin-bottom:16px">
+    <nav class="tcp-workspace-nav" aria-label="Bagian pusat kendali">
+      <button class="active" data-panel="ringkasan" onclick="tcpGantiPanel('ringkasan', this)">Ringkasan</button>
+      <button data-panel="kesehatan" onclick="tcpGantiPanel('kesehatan', this)">Kesehatan sistem</button>
+      <button data-panel="tiket" onclick="tcpGantiPanel('tiket', this)">Tiket &amp; tindak lanjut</button>
+      <button data-panel="deployment" onclick="tcpGantiPanel('deployment', this)">Deployment tenant</button>
+      <button data-panel="pengaturan" onclick="tcpGantiPanel('pengaturan', this)">Pengaturan &amp; trace</button>
+    </nav>
+    <div class="card tcp-panel" data-tcp-panel="ringkasan" style="padding:16px;border-left:4px solid ${statusColor};margin-bottom:16px">
       <strong style="color:${statusColor}">${status}</strong>
       <span class="muted"> — ${unknown ? `${unknown} sumber data belum dapat dibaca; tidak dianggap sehat.` : 'sumber data control plane terbaca.'}</span>
     </div>
-    <div class="kpi-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:16px">
+    <div class="kpi-grid tcp-panel" data-tcp-panel="ringkasan" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:13px;margin-bottom:16px">
       ${[
         ['Tenant klien', tenantCount == null ? '—' : tenantCount, tenants.ok ? 'data tenant terbaca' : 'unknown'],
         ['Heartbeat sehat', healthy == null ? '—' : healthy, heartbeats.ok ? `${stale} stale · ${offline} offline` : 'unknown'],
@@ -98,7 +105,7 @@ async function renderTechControlPlane() {
         <div class="label">${label}</div><div style="font-size:25px;font-weight:800">${tcpEsc(value)}</div>
         <div class="mini">${tcpEsc(note)}</div></div>`).join('')}
     </div>
-    <div class="card" style="padding:16px;margin-bottom:16px;border-left:4px solid var(--warning,#b45309)">
+    <div class="card tcp-panel" data-tcp-panel="tiket" style="padding:16px;margin-bottom:16px;border-left:4px solid var(--warning,#b45309)">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
         <div><h2 style="font-size:20px;margin:0">Meja penyelesaian kendala</h2>
           <p class="muted" style="margin:4px 0 0">Setiap laporan harus punya tenant, waktu, bukti, owner, correlation ID, dan hasil verifikasi.</p></div>
@@ -124,7 +131,7 @@ async function renderTechControlPlane() {
       ${tickets.ok && tickets.value.length ? `<div style="overflow:auto;margin-top:14px"><table class="data-table"><thead><tr><th>Ticket</th><th>Tenant</th><th>Masalah</th><th>Prioritas</th><th>Status</th><th>Correlation</th></tr></thead><tbody>
         ${tickets.value.slice(0, 10).map(t => `<tr><td><b>${tcpEsc(t.ticket_no)}</b></td><td>${tcpEsc(t.tenant_id || 'platform')}</td><td>${tcpEsc(t.title)}</td><td>${tcpEsc(t.priority)}</td><td>${tcpEsc(t.status)}</td><td><code>${tcpEsc(t.correlation_id || '—')}</code></td></tr>`).join('')}</tbody></table></div>` : '<div class="mini" style="margin-top:14px">Belum ada tiket support aktif.</div>'}
     </div>
-    ${heartbeats.ok && heartbeats.value.length ? `<div class="card" style="padding:0;overflow:auto;margin-bottom:16px">
+    ${heartbeats.ok && heartbeats.value.length ? `<div class="card tcp-panel" data-tcp-panel="kesehatan" style="padding:0;overflow:auto;margin-bottom:16px">
       <table class="data-table"><thead><tr><th>Instalasi</th><th>Tenant</th><th>Terakhir melapor</th><th>Status monitor</th></tr></thead><tbody>
       ${heartbeats.value.map((h, i) => { const s = tcpHeartbeatState(h); return `<tr>
         <td>${tcpEsc(h.installation_name || h.installation_id || `Instalasi ${i + 1}`)}</td>
@@ -134,7 +141,7 @@ async function renderTechControlPlane() {
       </tr>`; }).join('')}</tbody></table>
       <div class="mini" style="padding:10px 14px">HEALTHY ≤ 10 menit · STALE 11–30 menit · OFFLINE &gt; 30 menit. Unknown berarti data tidak cukup.</div>
     </div>` : ''}
-    <div class="grid two">
+    <div class="grid two tcp-panel" data-tcp-panel="pengaturan">
       <section class="card"><h2 style="font-size:22px">Pengaturan terpusat</h2>
         <p class="muted">Semua perubahan produksi—termasuk API, webhook, tenant, modul, lisensi, dan integrasi—harus dikelola dari AVA Tech. Secret hanya dirujuk melalui secret manager, tidak disimpan di browser.</p>
         <div class="links">
@@ -159,7 +166,7 @@ async function renderTechControlPlane() {
         </div>
       </section>
     </div>
-    <section class="card tech-deployment-center" style="padding:16px;margin-top:16px">
+    <section class="card tech-deployment-center tcp-panel" data-tcp-panel="deployment" style="padding:16px;margin-top:16px">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><h2 style="font-size:18px;margin:0">Pengaturan deployment tenant</h2><p class="muted" style="margin:4px 0 0">Domain, project hosting, repository, dan branch diatur dari sini. Perubahan masuk antrean sinkronisasi.</p></div><span class="status-badge status-pilot">CHANGE CONTROL</span></div>
       <div class="grid three" style="margin-top:14px">
         <label class="form-group"><span class="field-label">Tenant ID</span><input id="tcp-deploy-tenant" placeholder="UUID tenant"></label>
@@ -177,6 +184,12 @@ async function renderTechControlPlane() {
     </div>`;
     setTimeout(tcpApplyDeploymentPrefill, 0);
 }
+
+function tcpGantiPanel(panel, button) {
+  document.querySelectorAll('.tcp-panel').forEach(el => { el.hidden = el.getAttribute('data-tcp-panel') !== panel; });
+  document.querySelectorAll('.tcp-workspace-nav button').forEach(el => el.classList.toggle('active', el === button));
+}
+window.tcpGantiPanel = tcpGantiPanel;
 
 function tcpApplyDeploymentPrefill() {
   try {

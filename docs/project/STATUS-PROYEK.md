@@ -2693,3 +2693,13 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada layout navigasi dan tidak
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya pada proporsi presentasi dan tidak mengubah fungsi, role, atau data.
+
+
+## Refactor workspace Pusat Kendali — 27 September 2026
+- [x] Mengganti section panjang menjadi menu konteks tab: Ringkasan, Kesehatan sistem, Tiket & Tindak Lanjut, Deployment tenant, Pengaturan & trace.
+- [x] Setiap tab hanya menampilkan workspace terkait; pengguna tidak perlu scroll untuk menemukan menu berikutnya.
+- [x] Sidebar tetap menjadi navigasi utama antar modul; tab hanya konteks di dalam Pusat Kendali.
+- [x] Cache style dinaikkan ke `20260927-workspace`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Refactor hanya mengubah navigasi presentasi; seluruh query, role, audit, dan fungsi operasional tetap sama.
