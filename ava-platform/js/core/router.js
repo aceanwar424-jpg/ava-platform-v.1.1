@@ -102,7 +102,7 @@ const PAGE_TITLES = {
   queue:'Antrian', appointments:'Perjanjian', 'queue-kiosk':'Kiosk Antrian', accounting:'Akuntansi', payables:'Hutang Usaha', assets:'Aset & Kalibrasi', referral:'Rujukan Lab Luar', payroll:'Penggajian', 'rl-reports':'Laporan Kemenkes', inpatient:'Rawat Inap', pharmacy:'Farmasi', 'crm-pipeline':'Pipeline & Pendapatan',
   package:'Package Service', family:'Family Registry',
   settings:'Pengaturan', users:'User Management',
-  audit:'Jejak Audit', 'db-studio':'Database Studio (Supabase GUI)',
+  audit:'Jejak Audit', 'tech-control-plane':'Pusat Kendali Operasi', 'db-studio':'Database Studio (Supabase GUI)',
   satusehat:'SATUSEHAT — Kemenkes RI',
   'ar-aging':'Umur Piutang', 'lab-tat':'Turnaround Time Lab', penawaran:'Penawaran Harga', 'ops-kendali':'Pusat Kendali Operasional', 'sales-corong':'Corong Penjualan', 'portal-akses':'Akses Portal', perujuk:'Dokter & Klinik Perujuk', lisensi:'Lisensi',
   'hc-schedule':'Home Care — Jadwal', 'hc-staff':'Home Care — Petugas',

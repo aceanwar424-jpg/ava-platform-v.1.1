@@ -402,3 +402,32 @@ body.ava-ops-shell .tech-saas-dashboard .badge { padding: 3px 6px; }
 body.ava-ops-shell .tech-trend-bars { height:56px; display:flex; align-items:flex-end; gap:6px; border-bottom:1px solid var(--ava-line); }
 body.ava-ops-shell .tech-trend-bars i { flex:1; display:block; background:var(--ava-emerald); opacity:.72; border-radius:2px 2px 0 0; }
 body.ava-ops-shell .tech-trend-bars i:nth-child(3n) { background:var(--ava-gold); }
+
+
+/* Reference-led cockpit components */
+body.ava-ops-shell .metric-icon { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:12px; color:var(--metric-color); background:color-mix(in srgb, var(--metric-color) 12%, white); }
+body.ava-ops-shell .metric-icon svg { stroke:currentColor; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child { min-height:150px; position:relative; overflow:hidden; background:linear-gradient(110deg,#e9f8f5 0%,#eaf7fb 58%,#dff0ef 100%) !important; color:#063b42; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child:after { content:""; position:absolute; width:420px; height:220px; right:-80px; top:-50px; border-radius:50%; border:28px solid rgba(16,168,139,.10); box-shadow:0 0 0 30px rgba(16,168,139,.06),0 0 0 65px rgba(16,168,139,.04); pointer-events:none; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child h1 { color:#063b42 !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child p { color:#53657d !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child > div:last-child { position:relative; z-index:1; }
+
+
+/* Unified AVA Tech system across secondary pages */
+body.ava-ops-shell .page-header h1 { font-weight:650; }
+body.ava-ops-shell .table-wrap, body.ava-ops-shell .data-table { border:0; box-shadow:0 2px 12px rgba(16,45,60,.04); }
+body.ava-ops-shell .data-table thead th, body.ava-ops-shell .table-wrap table th { height:38px; padding:8px 12px; background:#f5f8f8; border-bottom:1px solid #e1ebe8; font-size:10px; text-transform:uppercase; letter-spacing:.04em; }
+body.ava-ops-shell .data-table tbody td, body.ava-ops-shell .table-wrap table td { height:42px; padding:8px 12px; font-size:12px; }
+body.ava-ops-shell .data-table tbody tr:hover { background:#f7fbfa; }
+body.ava-ops-shell .tabs, body.ava-ops-shell .tab-bar { border-bottom:1px solid var(--ava-line); gap:4px; }
+body.ava-ops-shell .tab-btn, body.ava-ops-shell .tabs button { min-height:34px; padding:7px 11px; font-size:11px; border-radius:7px 7px 0 0; }
+body.ava-ops-shell .modal-box { max-width:760px; border-radius:12px; padding:18px; }
+body.ava-ops-shell .modal-title { font-size:15px; }
+body.ava-ops-shell .empty-state { padding:28px 20px; border:1px dashed var(--ava-line); border-radius:10px; background:#fbfdfc; }
+body.ava-ops-shell .section-header { margin:16px 0 10px; }
+body.ava-ops-shell .section-header h2 { font-size:15px; }
+body.ava-ops-shell .form-grid, body.ava-ops-shell .grid.two, body.ava-ops-shell .grid.three { gap:12px; }
+body.ava-ops-shell .form-group { margin-bottom:10px; }
+body.ava-ops-shell .status-badge, body.ava-ops-shell .badge { font-size:10px; padding:4px 8px; }
+body.ava-ops-shell .toast { border-radius:8px; font-size:12px; }

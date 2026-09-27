@@ -57,11 +57,11 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Ringkasan Operasi | `saas-console` | Kesehatan mesin platform & ringkasan klien |
-| 🟢 | Pantau Operasi | `tech-control-plane` | Kendali tenant, health check, alert, incident, backup, release, dan trace operasional |
+| 🟢 | Ringkasan Sistem | `saas-console` | Kesehatan mesin platform & ringkasan klien |
+| 🟢 | Pusat Kendali Operasi | `tech-control-plane` | Status sistem, tenant, alert, incident, backup, dan alur tindak lanjut |
 | 🟢 | Rilis & Perubahan | `tech-roadmap` | Approval release, migration, deployment tenant, dan rollback |
 | 🟢 | Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
-| 🟢 | Kendala & Tindak Lanjut | `tech-isu` | Tiket client, incident, problem preventif, SLA, dan tindak lanjut |
+| 🟢 | Tiket & Tindak Lanjut | `tech-isu` | Tiket client, triage, incident, problem preventif, SLA, dan tindak lanjut |
 | 🟢 | Studio Database | `db-studio` | Inspeksi tabel Postgres & SQL editor |
 | 🟢 | Riwayat Aktivitas | `audit` | Log kronologis perubahan data sensitif |
 

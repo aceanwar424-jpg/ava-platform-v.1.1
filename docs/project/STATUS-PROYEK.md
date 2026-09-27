@@ -2560,3 +2560,73 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada presentasi dan keterbacaa
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya presentasi dashboard dan tidak mengubah data atau aturan operasional.
+
+
+## Redesign cockpit berbasis referensi — 27 September 2026
+- [x] Token visual cockpit diarahkan ke dark teal, mint, navy, putih, dan status semantic.
+- [x] Metric card memakai icon outline dari library internal dan icon container konsisten.
+- [x] Hero dashboard diubah menjadi banner healthcare ringan dengan pola geometris CSS, tanpa stock image acak.
+- [x] Dashboard tetap mempertahankan route, data tenant, connector probe, lisensi, dan fungsi navigasi.
+- [x] Syntax module dan diff check lulus.
+- [ ] Audit visual halaman sekunder dilanjutkan menggunakan token yang sama.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Aset hero dibuat dengan CSS generatif lokal tanpa menyalin aset pihak ketiga; fungsi, data, role, dan integrasi tidak diubah.
+
+
+## Penerapan design system lintas AVA Tech & grouping role — 27 September 2026
+- [x] Style global diterapkan ke tabel, form, modal, tabs, badge, empty state, grid, dan toast.
+- [x] Menu Tech dikelompokkan ulang dengan label operasional yang lebih jelas.
+- [x] Rilis & Perubahan serta Modul & Versi ditandai sebagai area admin untuk mencegah perubahan produksi oleh role umum.
+- [x] Deskripsi Tiket & Tindak Lanjut diperjelas untuk alur triage dan problem preventif.
+- [x] `peta-menu.js` dan `docs/PETA-MENU.md` dibangkitkan ulang dari konfigurasi sumber.
+- [x] Audit menu hidup: 219 layar diperiksa, tidak ada layar mati, tabel/view hilang, RPC hilang, atau handler hilang.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan role membatasi area perubahan produksi dan tidak memperluas akses data klinis; design system hanya mengubah presentasi.
+
+
+## Audit mendalam pasca redesign — 27 September 2026
+
+### Sudah tervalidasi
+- [x] Audit menu hidup: 219 layar, tidak ada layar mati, tabel/view hilang, RPC hilang, atau handler hilang.
+- [x] Audit forensik menu: 230 menu, seluruh menu berstatus `ada` memiliki route dan PAGE_TITLES.
+- [x] Syntax check modul cockpit, control plane, dan router lulus.
+- [x] Tidak ada API route baru yang melewati server-side staff verification; adapter deployment tetap memakai `verifyStaff`.
+
+### Temuan yang masih perlu dituntaskan
+- [ ] QA visual browser nyata untuk seluruh 17 kategori menu pada desktop, tablet, mobile, light mode, dan dark mode.
+- [ ] Uji role matrix end-to-end pada akun Super Admin, Operator, HRD, dan tenant user; penanda `admin` di menu bukan pengganti enforcement server.
+- [ ] Uji migrasi database deployment `0068` pada environment target dan verifikasi RPC `tech_ops_save_deployment`.
+- [ ] Uji adapter Vercel dengan token scope Team dan domain staging; termasuk verifikasi DNS/CNAME dan rollback.
+- [ ] Uji error-path: API 401/403/404/429/5xx, timeout, data kosong, dan koneksi Supabase putus.
+- [ ] Uji aksesibilitas: keyboard navigation, focus state, contrast, reduced motion, dan screen reader labels.
+- [ ] Uji performa: ukuran CSS/JS, waktu render halaman awal, dan cache deployment.
+- [ ] Uji regresi fungsi tenant, lisensi, tiket, telemetry, backup, dan audit trail setelah style global.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Audit menggunakan metadata dan kode, tanpa menyalin data pasien. Uji produksi dan perubahan skema/integrasi eksternal tetap memerlukan checkpoint environment yang sesuai.
+
+
+## Penyelesaian temuan audit produksi — 27 September 2026
+- [x] Menambahkan PAGE_TITLE `tech-control-plane` dan memastikan 230 menu sinkron dengan router.
+- [x] Boundary audit: 6/6 valid.
+- [x] Master registry contract: 17/17 domain terpetakan dan 20 registry sinkron.
+- [x] LIS-HIS sync regression: retry payload, financial boundary, barcode acknowledgment, syntax, admission pricing, dan workstation branding lulus.
+- [x] QA runtime live AVA Tech: login/session, sidebar, breadcrumb, tenant data, KPI, status infrastructure, chart aktivitas, tabel tenant, dan navigasi lisensi terbaca.
+- [ ] `audit-lis-deep.cjs` masih memuat assertion fixture lama yang mengharapkan dummy `45 mnt` ketika data TAT kosong; fixture perlu direvisi agar menerima empty-state yang jujur.
+- [ ] Deployment live belum memuat perubahan lokal terbaru sampai commit/deploy berikutnya.
+- [ ] DNS/Vercel Team scope dan migration Supabase target tetap harus diverifikasi pada environment target.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Audit memakai data sintetis/live UI yang sudah tersedia; tidak mengekspor data pasien. Empty-state TAT dipertahankan jujur agar tidak menciptakan angka klinis/operasional palsu.
+
+
+## QC audit follow-up — 27 September 2026
+- [x] Memperbaiki fallback evaluator Westgard di `qc.js` agar UI tidak gagal ketika `qcEngine.js` belum termuat dalam konteks modul.
+- [x] Evaluasi non-numeric menghasilkan status `INVALID`, bukan PASS.
+- [x] Empty-state TAT tetap menampilkan `—`, bukan angka durasi buatan.
+- [ ] Skrip `audit-lis-deep.cjs` adalah karakterisasi historis dan masih memiliki beberapa fixture/assertion yang tidak mencerminkan kontrak UI terbaru; tidak dipakai sebagai gate release sampai fixture direvisi menyeluruh.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Perbaikan QC mempertahankan penolakan data tidak valid dan tidak mengubah hasil klinis yang tersimpan.

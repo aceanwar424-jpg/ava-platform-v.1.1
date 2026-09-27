@@ -49,12 +49,13 @@ async function renderTechSaas(params = {}) {
     .filter((t) => t.status_langganan !== 'kedaluwarsa')
     .reduce((a, t) => a + Number(t.nilai_langganan || 0), 0);
 
-  const kartu = (warna, label, nilai, ket) =>
-    '<div class="card metric-card" style="padding:10px 12px; border-left:3px solid ' + warna + '; border-radius:6px; box-shadow:none;">' +
-      '<div style="font-size:10.5px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">' + label + '</div>' +
-      '<div style="font-size:16px; font-weight:750; color:' + warna + '; margin:4px 0;">' + nilai + '</div>' +
-      '<div style="font-size:10.5px; color:var(--text2);">' + ket + '</div>' +
-    '</div>';
+  const kartu = (warna, label, nilai, ket) => {
+    const ico = /klien|tenant/i.test(label) ? 'users' : /perpanjang/i.test(label) ? 'calendar' : /nilai|langganan/i.test(label) ? 'wallet' : /AI/i.test(label) ? 'key' : /connector|analyzer/i.test(label) ? 'activity' : /basis|database/i.test(label) ? 'database' : /SATUSEHAT/i.test(label) ? 'shield' : 'book';
+    return '<div class="card metric-card" style="padding:12px 14px; border-radius:14px; box-shadow:0 4px 14px rgba(16,45,60,.05);">' +
+      '<div style="display:flex;align-items:flex-start;gap:10px;"><span class="metric-icon" style="--metric-color:' + warna + '">' + (typeof icon === 'function' ? icon(ico, 19) : '') + '</span><div style="min-width:0"><div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.05em;">' + label + '</div>' +
+      '<div style="font-size:18px; font-weight:750; color:var(--text1,var(--ava-ink)); margin:5px 0 2px;">' + nilai + '</div>' +
+      '<div style="font-size:11px; color:var(--text2);">' + ket + '</div></div></div></div>';
+  };
 
   const petaConn = {
     hidup:   ['#10B981', 'Terhubung', 'ASTM E1381/E1394 di porta 9999'],

@@ -263,7 +263,19 @@ function westgardEvaluate(runs) {
   const z=r=>r.z_score!=null?Number(r.z_score):
     (r.measured!=null && r.target!=null && Number(r.sd)>0?(Number(r.measured)-Number(r.target))/Number(r.sd):NaN);
   const sameRun=current.run_id?runs.filter(r=>r.run_id===current.run_id).map(z):[];
-  const ev=evaluateWestgardZ(sameSeries.slice().reverse().map(z),sameRun);
+  const evaluator = (typeof evaluateWestgardZ === 'function') ? evaluateWestgardZ : window.westgardQcEngine?.evaluateWestgardZ;
+  const localEvaluator = (scores, run) => {
+    if (!scores.length || scores.some(v => !Number.isFinite(v))) return {status:'INVALID',triggeredRule:null,recommendation:'Data QC tidak valid.'};
+    const last=scores.at(-1), same=(n,t) => scores.length>=n && (scores.slice(-n).every(v=>v>t)||scores.slice(-n).every(v=>v<-t));
+    let rule=null,status='PASS';
+    if (Math.abs(last)>3) { rule='1-3s'; status='REJECT'; }
+    else if (same(2,2)) { rule='2-2s'; status='REJECT'; }
+    else if (same(10,0)) { rule='10x'; status='REJECT'; }
+    else if (same(4,1)) { rule='4-1s'; status='WARNING'; }
+    else if (Math.abs(last)>2) { rule='1-2s'; status='WARNING'; }
+    return {status,triggeredRule:rule,recommendation:rule ? 'Tinjau QC sesuai SOP.' : 'Tidak ada pelanggaran aturan terpilih.'};
+  };
+  const ev=(evaluator || localEvaluator)(sameSeries.slice().reverse().map(z),sameRun);
   const labels={PASS:'TERKENDALI',WARNING:'PERINGATAN',REJECT:'TOLAK',INVALID:'DATA TIDAK VALID'};
   return {label:labels[ev.status],color:ev.status==='PASS'?'#15803d':ev.status==='WARNING'?'#b45309':'#b91c1c',rule:ev.triggeredRule,detail:ev.recommendation};
 }

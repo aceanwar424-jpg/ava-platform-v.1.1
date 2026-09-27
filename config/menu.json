@@ -187,19 +187,21 @@
               "id": "tech-roadmap",
               "label": "Rilis & Perubahan",
               "status": "ada",
-              "ket": "Approval release, migration, deployment tenant, dan rollback"
+              "ket": "Approval release, migration, deployment tenant, dan rollback",
+              "admin": true
             },
             {
               "id": "tech-modul",
               "label": "Modul & Versi",
               "status": "ada",
-              "ket": "Daftar modul yang dilisensikan beserta versinya"
+              "ket": "Daftar modul yang dilisensikan beserta versinya",
+              "admin": true
             },
             {
               "id": "tech-isu",
               "label": "Tiket & Tindak Lanjut",
               "status": "ada",
-              "ket": "Tiket client, incident, problem preventif, SLA, dan tindak lanjut"
+              "ket": "Tiket client, triage, incident, problem preventif, SLA, dan tindak lanjut"
             },
             {
               "id": "db-studio",
@@ -2239,4 +2241,3 @@
     ]
   }
 }
-
