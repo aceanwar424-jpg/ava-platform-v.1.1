@@ -463,3 +463,41 @@ body.ava-ops-shell .tech-saas-dashboard > div:first-child {
 body.ava-ops-shell .tech-saas-dashboard > div:first-child h1 { color:#063b42 !important; text-shadow:none !important; }
 body.ava-ops-shell .tech-saas-dashboard > div:first-child p { color:#53657d !important; }
 body.ava-ops-shell .tech-saas-dashboard > div:first-child > div:first-child > div:first-child { color:#087f6b !important; background:rgba(255,255,255,.65) !important; border-color:rgba(8,127,107,.18) !important; }
+
+/* Pixel correction pass for Cockpit layout */
+body.ava-ops-shell { --sidebar-w:272px; --rail-w:272px; --ava-paper:#f8fafc; }
+body.ava-ops-shell .sidebar-rail { width:272px; background:linear-gradient(180deg,#073e45 0%,#06383e 45%,#052f35 100%); }
+body.ava-ops-shell .sidebar-main-btn.active-group { background:linear-gradient(90deg,rgba(32,201,151,.28),rgba(15,118,110,.35)); border-left:3px solid #5eead4; box-shadow:none; color:#fff; }
+body.ava-ops-shell .sidebar-main-btn.active-group, body.ava-ops-shell .sidebar-main-btn:hover { border-left-color:#5eead4; }
+body.ava-ops-shell .topbar { min-height:66px; border-bottom:1px solid #e8eef2; box-shadow:0 2px 10px rgba(15,23,42,.03); }
+body.ava-ops-shell .main-content { max-width:none; padding:18px 30px 32px; background:#f8fafc; }
+body.ava-ops-shell .tech-saas-dashboard { max-width:1500px; margin:auto; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child { min-height:190px; padding:25px 36px !important; border-radius:16px !important; background:linear-gradient(90deg,rgba(232,248,250,.98) 0%,rgba(225,245,248,.90) 40%,rgba(225,245,248,.25) 72%,rgba(225,245,248,.05) 100%),url("../assets/tech/ava-tech-hero-campus.webp") center right/cover no-repeat !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child h1 { font-size:28px !important; line-height:1.15; color:#10233f !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child p { font-size:14px !important; color:#36546b !important; max-width:620px; }
+body.ava-ops-shell .tech-hero-actions .btn { background:#073e45; color:white; border:0; padding:9px 14px; }
+body.ava-ops-shell .tech-hero-callout { top:40px; right:24px; }
+body.ava-ops-shell .tech-saas-dashboard .metric-card { height:92px; border:1px solid #e7edf0; }
+body.ava-ops-shell .tech-analytics-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(320px,.85fr); gap:16px; margin-bottom:16px; }
+body.ava-ops-shell .tech-trend, body.ava-ops-shell .tech-system-status { min-height:255px; padding:14px 16px; }
+body.ava-ops-shell .tech-panel-head h3 { font-size:18px !important; color:#10233f; }
+body.ava-ops-shell .tech-panel-head small { display:block; color:#718096; font-size:12px; margin-top:3px; }
+body.ava-ops-shell .tech-panel-head select { height:34px; min-height:34px; }
+body.ava-ops-shell .tech-chart { display:flex; height:170px; margin-top:14px; }
+body.ava-ops-shell .tech-chart-y { width:28px; display:flex; flex-direction:column; justify-content:space-between; padding:0 0 22px; color:#718096; font-size:10px; }
+body.ava-ops-shell .tech-chart-body { position:relative; flex:1; border-bottom:1px solid #dfe8eb; }
+body.ava-ops-shell .tech-grid-lines { position:absolute; inset:0 0 22px; background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(20% - 1px),#e8eef2 calc(20% - 1px),#e8eef2 20%); }
+body.ava-ops-shell .tech-chart-bars { position:absolute; inset:0 8px 22px; display:flex; align-items:flex-end; gap:12px; }
+body.ava-ops-shell .tech-chart-bars i { position:relative; flex:1; background:#4fb3a5; border-radius:4px 4px 0 0; animation:techBarGrow .6s ease-out both; }
+body.ava-ops-shell .tech-chart-bars i.amber { background:#d7b765; }
+body.ava-ops-shell .tech-chart-bars i b { display:none; }
+body.ava-ops-shell .tech-chart-bars i:hover { filter:brightness(1.08); }
+body.ava-ops-shell .tech-chart-x { position:absolute; bottom:0; left:0; right:0; display:flex; justify-content:space-between; color:#718096; font-size:10px; }
+body.ava-ops-shell .tech-status-row { display:flex; align-items:center; gap:9px; min-height:32px; border-top:1px solid #eef2f3; font-size:12px; color:#10233f; }
+body.ava-ops-shell .tech-status-row i { width:9px; height:9px; border-radius:50%; background:#10b981; }
+body.ava-ops-shell .tech-status-row i.danger { background:#ef4444; } body.ava-ops-shell .tech-status-row i.warn { background:#f59e0b; } body.ava-ops-shell .tech-status-row i.neutral { background:#94a3b8; }
+body.ava-ops-shell .tech-status-row em { margin-left:auto; padding:4px 8px; border-radius:999px; font-style:normal; font-size:10px; background:#dff8ee; color:#087f6b; }
+body.ava-ops-shell .tech-status-row em.danger { background:#ffe7e7; color:#d8344a; } body.ava-ops-shell .tech-status-row em.warn { background:#fff2d9; color:#b77900; } body.ava-ops-shell .tech-status-row em.neutral { background:#eef1f5; color:#718096; }
+@keyframes techBarGrow { from { transform:scaleY(0); transform-origin:bottom; } to { transform:scaleY(1); transform-origin:bottom; } }
+@media (prefers-reduced-motion:reduce) { body.ava-ops-shell .tech-chart-bars i { animation:none; } }
+@media (max-width:1000px) { body.ava-ops-shell .tech-analytics-grid { grid-template-columns:1fr; } }

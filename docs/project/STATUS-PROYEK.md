@@ -2651,3 +2651,16 @@ OWNED_BY: generic/ava-configured. Aset dibuat khusus untuk produk dan tidak memu
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Komponen hanya menyajikan ringkasan dan shortcut berdasarkan data yang sudah ada; tidak menambah kewenangan atau data pasien.
+
+
+## Pixel correction cockpit AVA Tech — 27 September 2026
+- [x] Hero direfactor menjadi banner terang 190px dengan CTA tunggal dan floating callout.
+- [x] Tombol Periksa Ulang dan Kelola Tenant dipindahkan dari hero; refresh berada di panel status, kelola tenant tersedia melalui CTA dan menu.
+- [x] Analytics direfactor menjadi chart + Status Sistem berdampingan.
+- [x] Chart memiliki axis, grid, responsive container, hover, animasi grow, dan reduced-motion fallback.
+- [x] Sidebar dikunci ke dark teal target 272px dan active state mint tanpa aksen kuning.
+- [x] KPI dan system cards mengikuti proporsi target.
+- [x] Cache style dinaikkan ke `20260927-pixel`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada presentation layer; data aktual tenant dan status sistem tetap berasal dari sumber aplikasi.

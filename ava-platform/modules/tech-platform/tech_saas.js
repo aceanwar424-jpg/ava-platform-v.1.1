@@ -102,10 +102,7 @@ async function renderTechSaas(params = {}) {
             'interoperabilitas SATUSEHAT &amp; analyzer, katalog LOINC, serta pengelolaan langganan klien.</p>' +
         '</div>' +
         '<div class="tech-hero-callout"><strong>✦ Platform siap berkembang</strong><span>Kelola tenant, integrasi, dan operasional dalam satu dashboard terpusat.</span><button class="tech-callout-arrow" onclick="navigate(&#39;tech-control-plane&#39;)" aria-label="Buka pusat kendali operasi">→</button></div>' +
-        '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">' +
-          '<button class="btn btn-ghost" onclick="renderTechSaas()" style="background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.15); font-size:12px;">&#8635; Periksa Ulang</button>' +
-          '<button class="btn btn-teal" onclick="navigate(\'tenants\')" style="font-size:12px; font-weight:700;">Kelola Tenant Klien</button>' +
-        '</div>' +
+        '<div class="tech-hero-actions"><button class="btn btn-teal" onclick="navigate(\'tenants\')">Kelola Platform <span>→</span></button></div>' +
       '</div>' +
 
       '<div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:12px;">' +
@@ -121,9 +118,17 @@ async function renderTechSaas(params = {}) {
         kartu('#94A3B8', 'Katalog LOINC/UCUM', 'Lihat di menu', 'Ekspor katalog tes ke format siap-LIS klien') +
       '</div>' +
 
-      '<div class="card tech-trend" style="padding:12px 14px; margin-bottom:12px; border-radius:6px; box-shadow:none;">' +
-        '<div style="display:flex;justify-content:space-between;margin-bottom:8px;"><strong style="font-size:13px">Aktivitas tenant</strong><span class="mini">30 hari terakhir</span></div>' +
-        '<div class="tech-trend-bars"><i style="height:28%"></i><i style="height:42%"></i><i style="height:36%"></i><i style="height:58%"></i><i style="height:48%"></i><i style="height:72%"></i><i style="height:64%"></i><i style="height:82%"></i><i style="height:76%"></i><i style="height:92%"></i></div>' +
+      '<div class="tech-analytics-grid">' +
+        '<div class="card tech-trend"><div class="tech-panel-head"><div><h3>Aktivitas tenant</h3><small>Ringkasan aktivitas tenant dalam 30 hari terakhir</small></div><select aria-label="Rentang aktivitas"><option>30 hari terakhir</option></select></div>' +
+        '<div class="tech-chart"><div class="tech-chart-y"><span>25</span><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span></div><div class="tech-chart-body"><div class="tech-grid-lines"></div><div class="tech-chart-bars"><i style="height:14%"><b>3</b></i><i style="height:22%"><b>5</b></i><i class="amber" style="height:18%"><b>4</b></i><i style="height:34%"><b>8</b></i><i style="height:27%"><b>6</b></i><i class="amber" style="height:52%"><b>13</b></i><i style="height:40%"><b>10</b></i><i style="height:57%"><b>14</b></i><i style="height:48%"><b>12</b></i><i style="height:76%"><b>19</b></i></div><div class="tech-chart-x"><span>28 Agu</span><span>3 Sep</span><span>9 Sep</span><span>15 Sep</span><span>21 Sep</span><span>27 Sep</span></div></div></div></div>' +
+        '<div class="card tech-system-status"><div class="tech-panel-head"><div><h3>Status Sistem</h3><small>Kesehatan komponen utama platform</small></div><button class="btn btn-ghost btn-sm" onclick="renderTechSaas()">↻ Periksa Ulang</button></div>' +
+          '<div class="tech-status-row"><i class="ok"></i><span>Aplikasi Web</span><em class="ok">Berjalan normal</em></div>' +
+          '<div class="tech-status-row"><i class="ok"></i><span>Database (PostgreSQL PGlite)</span><em class="ok">Berjalan normal</em></div>' +
+          '<div class="tech-status-row"><i class="danger"></i><span>Lab Connector (Analyzer)</span><em class="danger">Tidak berjalan</em></div>' +
+          '<div class="tech-status-row"><i class="neutral"></i><span>AI Gateway</span><em class="neutral">Belum dikonfigurasi</em></div>' +
+          '<div class="tech-status-row"><i class="warn"></i><span>Jembatan SATUSEHAT</span><em class="warn">Perlu diperiksa</em></div>' +
+          '<div class="tech-status-row"><i class="ok"></i><span>Katalog LOINC/UCUM</span><em class="ok">Tersedia</em></div>' +
+        '</div>' +
       '</div>' +
 
       '<div style="display:grid; grid-template-columns:1.6fr 1fr; gap:12px; align-items:start;">' +
