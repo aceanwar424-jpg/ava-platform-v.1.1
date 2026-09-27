@@ -407,7 +407,7 @@ body.ava-ops-shell .tech-trend-bars i:nth-child(3n) { background:var(--ava-gold)
 /* Reference-led cockpit components */
 body.ava-ops-shell .metric-icon { width:38px; height:38px; flex:0 0 38px; display:grid; place-items:center; border-radius:12px; color:var(--metric-color); background:color-mix(in srgb, var(--metric-color) 12%, white); }
 body.ava-ops-shell .metric-icon svg { stroke:currentColor; }
-body.ava-ops-shell .tech-saas-dashboard > div:first-child { min-height:150px; position:relative; overflow:hidden; background:linear-gradient(110deg,#e9f8f5 0%,#eaf7fb 58%,#dff0ef 100%) !important; color:#063b42; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child { min-height:150px; position:relative; overflow:hidden; background-image:linear-gradient(90deg,rgba(233,248,245,.98) 0%,rgba(233,248,245,.86) 42%,rgba(223,240,239,.30) 100%),url("../assets/tech/ava-tech-hero-campus.webp"); background-size:cover; background-position:center right; background-repeat:no-repeat; color:#063b42; }
 body.ava-ops-shell .tech-saas-dashboard > div:first-child:after { content:""; position:absolute; width:420px; height:220px; right:-80px; top:-50px; border-radius:50%; border:28px solid rgba(16,168,139,.10); box-shadow:0 0 0 30px rgba(16,168,139,.06),0 0 0 65px rgba(16,168,139,.04); pointer-events:none; }
 body.ava-ops-shell .tech-saas-dashboard > div:first-child h1 { color:#063b42 !important; }
 body.ava-ops-shell .tech-saas-dashboard > div:first-child p { color:#53657d !important; }

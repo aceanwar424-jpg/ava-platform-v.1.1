@@ -2630,3 +2630,13 @@ OWNED_BY: generic/ava-configured. Audit memakai data sintetis/live UI yang sudah
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic. Perbaikan QC mempertahankan penolakan data tidak valid dan tidak mengubah hasil klinis yang tersimpan.
+
+
+## Hero visual AVA Tech — 27 September 2026
+- [x] Membuat aset hero gedung healthcare modern khusus AVA Tech.
+- [x] Mengoptimalkan aset menjadi WebP sekitar 90 KB dan menyimpannya di `ava-platform/assets/tech/ava-tech-hero-campus.webp`.
+- [x] Menghubungkan aset ke banner cockpit dengan overlay untuk menjaga keterbacaan teks.
+- [x] Cache style dinaikkan ke `20260927-hero`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Aset dibuat khusus untuk produk dan tidak memuat logo pihak ketiga, teks, watermark, atau data pasien.
