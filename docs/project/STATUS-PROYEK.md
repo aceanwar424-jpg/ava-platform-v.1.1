@@ -2703,3 +2703,13 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada proporsi presentasi dan t
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Refactor hanya mengubah navigasi presentasi; seluruh query, role, audit, dan fungsi operasional tetap sama.
+
+
+## Compact profile seluruh halaman AVA Tech — 27 September 2026
+- [x] Profil ukuran compact diterapkan ke semua page header, banner, card, table, form, button, tab, modal, grid, dan section.
+- [x] Tabel operasional dipadatkan ke row 34px dan header 32px.
+- [x] Banner non-cockpit dipadatkan agar halaman seperti Tiket & Permintaan tidak terasa seperti poster.
+- [x] Cache style dinaikkan ke `20260927-globalcompact`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan lintas halaman hanya presentasi; business logic, role, API, dan data tetap dipertahankan.

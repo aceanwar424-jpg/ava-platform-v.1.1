@@ -552,3 +552,27 @@ body.ava-ops-shell .tcp-workspace-nav button { border:0; background:transparent;
 body.ava-ops-shell .tcp-workspace-nav button:hover { background:#eef8f5; color:#087f6b; }
 body.ava-ops-shell .tcp-workspace-nav button.active { background:#0f766e; color:#fff; box-shadow:0 2px 6px rgba(15,118,110,.18); }
 body.ava-ops-shell .tcp-panel[hidden] { display:none !important; }
+
+
+/* Global compact profile for every AVA Tech page */
+body.ava-ops-shell .main-content { padding:12px 18px 22px !important; }
+body.ava-ops-shell .page-header { padding:0 !important; margin:0 0 10px !important; min-height:0 !important; }
+body.ava-ops-shell .page-header h1 { font-size:18px !important; line-height:1.2 !important; margin:0 0 3px !important; }
+body.ava-ops-shell .page-header p { font-size:11px !important; line-height:1.4 !important; margin:0 !important; }
+body.ava-ops-shell .welcome-banner, body.ava-ops-shell .hero, body.ava-ops-shell [class*="hero"] { min-height:0 !important; padding:14px 18px !important; margin-bottom:12px !important; border-radius:10px !important; }
+body.ava-ops-shell .welcome-banner h1, body.ava-ops-shell .welcome-banner h2, body.ava-ops-shell .hero h1, body.ava-ops-shell .hero h2 { font-size:20px !important; line-height:1.2 !important; }
+body.ava-ops-shell .welcome-banner p, body.ava-ops-shell .hero p { font-size:11px !important; line-height:1.4 !important; }
+body.ava-ops-shell .card, body.ava-ops-shell .kpi-card { padding:10px 12px !important; border-radius:9px !important; box-shadow:0 1px 5px rgba(15,23,42,.035) !important; }
+body.ava-ops-shell .card h2 { font-size:15px !important; margin:0 0 5px !important; }
+body.ava-ops-shell .card h3, body.ava-ops-shell .card-title { font-size:13px !important; }
+body.ava-ops-shell .card p { font-size:11px; line-height:1.4; }
+body.ava-ops-shell .table-wrap, body.ava-ops-shell .data-table { border-radius:8px !important; }
+body.ava-ops-shell .data-table thead th, body.ava-ops-shell .table-wrap table th { height:32px !important; padding:6px 10px !important; font-size:9px !important; }
+body.ava-ops-shell .data-table tbody td, body.ava-ops-shell .table-wrap table td { height:34px !important; padding:6px 10px !important; font-size:11px !important; }
+body.ava-ops-shell .btn { min-height:28px !important; padding:5px 9px !important; border-radius:7px !important; font-size:10.5px !important; }
+body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea { min-height:30px !important; padding:6px 8px !important; font-size:11px !important; }
+body.ava-ops-shell .section-header { margin:10px 0 7px !important; }
+body.ava-ops-shell .section-header h2 { font-size:14px !important; }
+body.ava-ops-shell .grid, body.ava-ops-shell .form-grid { gap:9px !important; }
+body.ava-ops-shell .modal-box { max-height:88vh; padding:14px !important; }
+body.ava-ops-shell .modal-title { font-size:14px !important; }
