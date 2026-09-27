@@ -454,3 +454,12 @@ body.ava-ops-shell .tech-quick-grid button { border:1px solid #e3ecea; backgroun
 body.ava-ops-shell .tech-quick-grid span { display:block; color:#0b8b7d; font-size:16px; margin-bottom:3px; }
 @media (max-width: 950px) { body.ava-ops-shell .tech-hero-callout { position:static; margin-top:12px; width:auto; } body.ava-ops-shell .tech-lower-grid { grid-template-columns:1fr 1fr; } }
 @media (max-width: 600px) { body.ava-ops-shell .tech-lower-grid { grid-template-columns:1fr; } }
+
+/* Override legacy inline hero background so reference visual remains readable. */
+body.ava-ops-shell .tech-saas-dashboard > div:first-child {
+  background: linear-gradient(90deg, rgba(233,248,245,.98) 0%, rgba(233,248,245,.88) 40%, rgba(223,240,239,.30) 100%), url("../assets/tech/ava-tech-hero-campus.webp") center right / cover no-repeat !important;
+  color:#063b42 !important;
+}
+body.ava-ops-shell .tech-saas-dashboard > div:first-child h1 { color:#063b42 !important; text-shadow:none !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child p { color:#53657d !important; }
+body.ava-ops-shell .tech-saas-dashboard > div:first-child > div:first-child > div:first-child { color:#087f6b !important; background:rgba(255,255,255,.65) !important; border-color:rgba(8,127,107,.18) !important; }
