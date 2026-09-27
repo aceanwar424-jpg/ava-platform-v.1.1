@@ -155,15 +155,15 @@ window.PETA_MENU = {
           "menu": [
             {
               "id": "saas-console",
-              "label": "Ringkasan Operasi",
+              "label": "Ringkasan Sistem",
               "status": "ada",
               "ket": "Kesehatan mesin platform & ringkasan klien"
             },
             {
               "id": "tech-control-plane",
-              "label": "Pantau Operasi",
+              "label": "Pusat Kendali Operasi",
               "status": "ada",
-              "ket": "Kendali tenant, health check, alert, incident, backup, release, dan trace operasional",
+              "ket": "Status sistem, tenant, alert, incident, backup, dan alur tindak lanjut",
               "admin": true
             },
             {
@@ -180,7 +180,7 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-isu",
-              "label": "Kendala & Tindak Lanjut",
+              "label": "Tiket & Tindak Lanjut",
               "status": "ada",
               "ket": "Tiket client, incident, problem preventif, SLA, dan tindak lanjut"
             },

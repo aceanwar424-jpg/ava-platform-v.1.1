@@ -2530,3 +2530,23 @@ OWNED_BY: generic/ava-configured. Token tidak dicatat ulang di repository atau d
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya menyentuh alur kontrol deployment; tidak menyimpan token, data pasien, atau credential provider di browser. Retry tanpa tenant hanya untuk konfigurasi operasional Super Admin dan tetap meninggalkan jejak metadata.
+
+
+## Perapihan alur navigasi dan input AVA Tech — 27 September 2026
+- [x] Form tiket kendala dipindahkan dari `prompt()` browser ke form inline yang tetap terlihat di halaman.
+- [x] Label menu Operasi Platform diperjelas menjadi Ringkasan Sistem, Pusat Kendali Operasi, dan Tiket & Tindak Lanjut.
+- [x] Alur pencatatan tiket ditampilkan langsung sebagai Catat → Triage → Tindak Lanjut.
+- [x] QC syntax modul control plane lulus.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada UX operasional; data tiket tetap mengikuti tenant, correlation ID, dan jejak audit yang sudah ada.
+
+
+## Compact visual system AVA Tech — 27 September 2026
+- [x] Menurunkan ukuran teks kerja ke 12px dan heading bertingkat 13–18px.
+- [x] Mengurangi padding kartu, tinggi tombol, jarak grid, dan ukuran panel navigasi.
+- [x] Menyetel form tiket agar responsif dan tidak menumpuk pada layar sempit.
+- [x] Cache CSS dinaikkan ke `20260927-compact` untuk memastikan browser mengambil gaya terbaru.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada presentasi dan keterbacaan UI; tidak mengubah data, kewenangan, atau alur klinis.

@@ -30,26 +30,22 @@ function tcpNewCorrelation(prefix = 'CS') {
 }
 
 async function tcpBuatTiket() {
-  const title = prompt('Ringkasan kendala tenant:');
-  if (!title || !title.trim()) return;
-  const description = prompt('Detail gejala, langkah yang dilakukan, dan waktu kejadian:');
-  if (!description || !description.trim()) return;
-  const tenantId = prompt('ID tenant (kosongkan jika belum diketahui):', '') || null;
+  const title = document.getElementById('tcp-ticket-title')?.value.trim();
+  const description = document.getElementById('tcp-ticket-description')?.value.trim();
+  const tenantId = document.getElementById('tcp-ticket-tenant')?.value.trim() || null;
+  const priority = document.getElementById('tcp-ticket-priority')?.value || 'P2';
+  if (!title || !description) { toast('Ringkasan dan detail kendala wajib diisi.', 'error'); return; }
   const correlation = tcpNewCorrelation();
   try {
     const result = await sbPost('tech_support_tickets', {
       ticket_no: `CS-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`,
-      tenant_id: tenantId, title: title.trim(), description: description.trim(),
-      priority: 'P2', channel: 'internal', status: 'TRIAGED', correlation_id: correlation,
+      tenant_id: tenantId, title, description, priority, channel: 'internal', status: 'TRIAGED', correlation_id: correlation,
     });
-    if (!result || result.error || (Array.isArray(result) && !result.length)) {
-      toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return;
-    }
+    if (!result || result.error || (Array.isArray(result) && !result.length)) { toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return; }
     toast(`Tiket tercatat dengan correlation ID ${correlation}`, 'ok');
     await renderTechControlPlane();
   } catch (e) { toast(`Tiket gagal disimpan: ${e.message || e}`, 'error'); }
 }
-
 window.tcpBuatTiket = tcpBuatTiket;
 
 async function renderTechControlPlane() {
@@ -106,7 +102,13 @@ async function renderTechControlPlane() {
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
         <div><h2 style="font-size:20px;margin:0">Meja penyelesaian kendala</h2>
           <p class="muted" style="margin:4px 0 0">Setiap laporan harus punya tenant, waktu, bukti, owner, correlation ID, dan hasil verifikasi.</p></div>
-        <button class="btn btn-teal btn-sm" onclick="tcpBuatTiket()">+ Catat kendala dari CS</button>
+        <span class="status-badge status-pilot">ALUR: CATAT → TRIAGE → TINDAK LANJUT</span>
+      </div>
+      <div class="tcp-ticket-form" style="display:grid;grid-template-columns:1fr 1fr 120px auto;gap:10px;align-items:end;margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-subtle,#f8fafc)">
+        <label class="form-group"><span class="field-label">Ringkasan kendala</span><input id="tcp-ticket-title" placeholder="Contoh: Data hasil tidak tersimpan"></label>
+        <label class="form-group"><span class="field-label">Detail & waktu kejadian</span><input id="tcp-ticket-description" placeholder="Gejala, langkah terakhir, waktu"></label>
+        <label class="form-group"><span class="field-label">Prioritas</span><select id="tcp-ticket-priority"><option value="P1">P1 kritis</option><option value="P2" selected>P2 tinggi</option><option value="P3">P3 normal</option></select></label>
+        <button class="btn btn-teal btn-sm" onclick="tcpBuatTiket()">Catat tiket</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px">
         ${[
