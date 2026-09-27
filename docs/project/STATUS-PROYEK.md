@@ -2664,3 +2664,12 @@ OWNED_BY: generic/ava-configured. Komponen hanya menyajikan ringkasan dan shortc
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya pada presentation layer; data aktual tenant dan status sistem tetap berasal dari sumber aplikasi.
+
+
+## Perbaikan asset hero dan proporsi live — 27 September 2026
+- [x] Menghapus asset hero dari `.vercelignore` agar ikut deployment.
+- [x] Menurunkan tinggi hero, heading, metric card, icon, dan jarak workspace untuk viewport kompak.
+- [x] Cache style dinaikkan ke `20260927-assetfix`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Asset hero adalah aset produk internal tanpa credential, data pasien, atau konten pihak ketiga.
