@@ -511,3 +511,12 @@ body.ava-ops-shell .tech-saas-dashboard .metric-card { height:82px; padding:10px
 body.ava-ops-shell .tech-saas-dashboard .metric-icon { width:34px; height:34px; flex-basis:34px; }
 body.ava-ops-shell .tech-saas-dashboard .metric-card [style*="font-size:18px"] { font-size:16px !important; }
 body.ava-ops-shell .tech-saas-dashboard .tech-trend, body.ava-ops-shell .tech-saas-dashboard .tech-system-status { min-height:230px; }
+
+/* Collapse fix: sidebar-expanded is the compact rail state in the existing shell. */
+@media (min-width:769px) {
+  body.ava-ops-shell.sidebar-expanded { --rail-w:64px !important; --sidebar-w:64px !important; }
+  body.ava-ops-shell.sidebar-expanded .sidebar-rail { width:64px !important; min-width:64px !important; }
+  body.ava-ops-shell.sidebar-expanded .main-content, body.ava-ops-shell.sidebar-expanded .topbar { margin-left:64px !important; }
+  body.ava-ops-shell:not(.sidebar-expanded) .sidebar-rail { width:272px !important; min-width:272px !important; }
+  body.ava-ops-shell:not(.sidebar-expanded) .main-content, body.ava-ops-shell:not(.sidebar-expanded) .topbar { margin-left:272px !important; }
+}

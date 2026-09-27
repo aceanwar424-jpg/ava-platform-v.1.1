@@ -2673,3 +2673,13 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada presentation layer; data 
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Asset hero adalah aset produk internal tanpa credential, data pasien, atau konten pihak ketiga.
+
+
+## Perbaikan collapse sidebar — 27 September 2026
+- [x] Menyamakan class `sidebar-expanded` dengan mode compact rail yang digunakan shell lama.
+- [x] Lebar sidebar compact dikunci 64px; lebar normal 272px.
+- [x] Offset topbar dan main content mengikuti mode sidebar sehingga tidak tertutup atau terpotong.
+- [x] Cache style dinaikkan ke `20260927-collapsefix`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada layout navigasi dan tidak mengubah permission atau data.
