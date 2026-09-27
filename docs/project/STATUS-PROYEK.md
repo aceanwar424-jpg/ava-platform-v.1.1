@@ -2519,3 +2519,14 @@ OWNED_BY: generic/ava-configured. Token Vercel tidak masuk browser, repository, 
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Token tidak dicatat ulang di repository atau dokumentasi. Secret hanya tersedia server-side di Vercel Production dan akses provisioning dibatasi staff endpoint.
+
+
+## Perbaikan simpan deployment — 27 September 2026
+- [x] UI memisahkan status penyimpanan konfigurasi dari status sinkronisasi Vercel.
+- [x] Error RPC sekarang ditampilkan dengan detail yang dapat ditindaklanjuti.
+- [x] Super Admin menangani context mismatch secara aman dengan retry tanpa tenant context dan tetap mencatat tenant asal pada metadata.
+- [x] Sesi tanpa token adapter tidak lagi membuat konfigurasi yang sudah tersimpan dianggap gagal.
+- [x] QC `node --check ava-platform/modules/tech-platform/techControlPlane.js` dan `git diff --check` lulus.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya menyentuh alur kontrol deployment; tidak menyimpan token, data pasien, atau credential provider di browser. Retry tanpa tenant hanya untuk konfigurasi operasional Super Admin dan tetap meninggalkan jejak metadata.

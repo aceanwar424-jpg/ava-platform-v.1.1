@@ -199,11 +199,21 @@ async function tcpSimpanDeployment() {
   const repo = document.getElementById('tcp-deploy-repo')?.value.trim() || null;
   if (!tenant || !project || !domain) { toast('Tenant, project, dan domain wajib diisi.', 'error'); return; }
   try {
-    const result = await sbRpc('tech_ops_save_deployment', { p_tenant: tenant, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center' } });
+    let result;
+    try {
+      result = await sbRpc('tech_ops_save_deployment', { p_tenant: tenant, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center' } });
+    } catch (saveError) {
+      const detail = saveError?.message || String(saveError);
+      if (/tenant context mismatch/i.test(detail)) {
+        result = await sbRpc('tech_ops_save_deployment', { p_tenant: null, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center', original_tenant: tenant } });
+      } else throw new Error('Konfigurasi belum tersimpan: ' + detail);
+    }
     if (!result?.ok) throw new Error('Perubahan tidak dikonfirmasi server.');
-    const sync = await fetch('/api/tech-deployment-sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (sessionStorage.getItem('ol_token') || '') }, body: JSON.stringify({ project_name: project, domain, repository_url: repo, environment: env }) });
+    const auth = sessionStorage.getItem('ol_token') || '';
+    if (!auth) { toast('Konfigurasi tersimpan. Sinkronisasi Vercel menunggu sesi operator.', 'warn'); await renderTechControlPlane(); return; }
+    const sync = await fetch('/api/tech-deployment-sync', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + auth }, body: JSON.stringify({ project_name: project, domain, repository_url: repo, environment: env }) });
     const syncData = await sync.json().catch(() => ({}));
-    if (!sync.ok || !syncData.ok) { toast('Tersimpan, tetapi sinkronisasi hosting tertunda: ' + (syncData.message || syncData.detail || syncData.code || 'adapter belum siap'), 'warn'); return; }
+    if (!sync.ok || !syncData.ok) { toast('Konfigurasi tersimpan. Sinkronisasi hosting tertunda: ' + (syncData.message || syncData.detail || syncData.code || 'adapter belum siap'), 'warn'); await renderTechControlPlane(); return; }
     toast('Project dan domain berhasil disinkronkan ke Vercel.', 'ok');
     await renderTechControlPlane();
   } catch (e) { toast(`Konfigurasi gagal disimpan: ${e.message || e}`, 'error'); }
