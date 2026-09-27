@@ -181,7 +181,7 @@ function tntBaris(t) {
     </td>
     <td>${tntRp(t.nilai_langganan)}</td>
     <td style="padding-right:16px;white-space:nowrap">
-      <button class="btn btn-ghost btn-sm" onclick="tntForm('${t.id}')">Ubah</button>
+      <button class="btn btn-ghost btn-sm" onclick="tntForm('${t.id}')">Ubah</button> <button class="btn btn-teal btn-sm" onclick="tntBukaDeployment('${t.id}')">Deployment</button>
     </td></tr>`;
 }
 
@@ -327,3 +327,12 @@ window.tntSimpan = tntSimpan;
 window.tntSetCari = tntSetCari;
 window.tntIsiKuota = tntIsiKuota;
 
+
+
+function tntBukaDeployment(id) {
+  const t = (tntData || []).find(x => String(x.id) === String(id));
+  if (!t) return;
+  try { sessionStorage.setItem('avaTechDeploymentPrefill', JSON.stringify({ tenant_id: t.id, domain: t.subdomain || '', project_name: t.kode || '', environment: 'staging' })); } catch (_) {}
+  navigate('tech-control-plane');
+}
+window.tntBukaDeployment = tntBukaDeployment;

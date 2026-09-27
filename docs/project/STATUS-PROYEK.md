@@ -2499,3 +2499,23 @@ OWNED_BY: generic/ava-configured. Tidak ada token Vercel atau credential provide
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic. Pilihan paket bersifat konfigurasi komersial dan tidak membawa data klien/pasien. Kuota awal harus dikonfirmasi melalui kontrak sebelum aktivasi produksi.
+
+## Vercel auto provisioning adapter — 27 September 2026
+- [x] Menambahkan API server-side `api/tech-deployment-sync.js` untuk membuat/membaca project Vercel dan menambahkan domain secara otomatis.
+- [x] Adapter memvalidasi host, staff session, project/domain input, timeout, dan error provider.
+- [x] UI deployment center mengirim konfigurasi ke adapter setelah RPC menyimpan status `PENDING_SYNC`.
+- [x] Vercel token dan team ID hanya dibaca dari secret environment server-side.
+- [x] Syntax endpoint dan modul control plane lulus.
+- [ ] Runtime sync aktif setelah `VERCEL_TOKEN` dan, bila memakai team, `VERCEL_TEAM_ID` diisi pada environment Tech.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Token Vercel tidak masuk browser, repository, atau file tenant. Operasi pembuatan project/domain dibatasi staff session dan host Tech; setiap perubahan tetap melewati audit/change control.
+
+## Vercel credentials configured — 27 September 2026
+- [x] `VERCEL_TOKEN` disimpan sebagai Secret environment variable Production pada project Vercel Tech.
+- [x] `VERCEL_TEAM_ID` disimpan sebagai Config environment variable Production.
+- [x] Production redeploy berhasil dibuat dan status Vercel terverifikasi `Ready` (deployment `EWvPBdViy...`).
+- [ ] Uji auto-create project/domain dari AVA Tech masih perlu dilakukan; bila API mengembalikan 403, token perlu dibuat ulang dengan scope Team yang tepat, bukan scope project saja.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Token tidak dicatat ulang di repository atau dokumentasi. Secret hanya tersedia server-side di Vercel Production dan akses provisioning dibatasi staff endpoint.

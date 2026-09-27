@@ -173,8 +173,20 @@ async function renderTechControlPlane() {
       Control plane tidak menampilkan secret, token, atau data pasien. Status <b>unknown</b>
       berarti koneksi/konfigurasi perlu diperbaiki; bukan bukti bahwa sistem sehat.
     </div>`;
+    setTimeout(tcpApplyDeploymentPrefill, 0);
 }
 
+function tcpApplyDeploymentPrefill() {
+  try {
+    const raw = sessionStorage.getItem('avaTechDeploymentPrefill');
+    if (!raw) return;
+    const v = JSON.parse(raw);
+    for (const [id, value] of Object.entries({ 'tcp-deploy-tenant': v.tenant_id, 'tcp-deploy-env': v.environment, 'tcp-deploy-project': v.project_name, 'tcp-deploy-domain': v.domain })) {
+      const el = document.getElementById(id); if (el && value) el.value = value;
+    }
+    sessionStorage.removeItem('avaTechDeploymentPrefill');
+  } catch (_) {}
+}
 window.renderTechControlPlane = renderTechControlPlane;
 
 async function tcpSimpanDeployment() {
@@ -189,8 +201,14 @@ async function tcpSimpanDeployment() {
   try {
     const result = await sbRpc('tech_ops_save_deployment', { p_tenant: tenant, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center' } });
     if (!result?.ok) throw new Error('Perubahan tidak dikonfirmasi server.');
-    toast('Konfigurasi tersimpan dan masuk antrean sinkronisasi.', 'ok');
+    const sync = await fetch('/api/tech-deployment-sync', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (sessionStorage.getItem('ol_token') || '') }, body: JSON.stringify({ project_name: project, domain, repository_url: repo, environment: env }) });
+    const syncData = await sync.json().catch(() => ({}));
+    if (!sync.ok || !syncData.ok) { toast('Tersimpan, tetapi sinkronisasi hosting tertunda: ' + (syncData.message || syncData.detail || syncData.code || 'adapter belum siap'), 'warn'); return; }
+    toast('Project dan domain berhasil disinkronkan ke Vercel.', 'ok');
     await renderTechControlPlane();
   } catch (e) { toast(`Konfigurasi gagal disimpan: ${e.message || e}`, 'error'); }
 }
 window.tcpSimpanDeployment = tcpSimpanDeployment;
+
+
+
