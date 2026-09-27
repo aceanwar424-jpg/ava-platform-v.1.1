@@ -431,3 +431,26 @@ body.ava-ops-shell .form-grid, body.ava-ops-shell .grid.two, body.ava-ops-shell 
 body.ava-ops-shell .form-group { margin-bottom:10px; }
 body.ava-ops-shell .status-badge, body.ava-ops-shell .badge { font-size:10px; padding:4px 8px; }
 body.ava-ops-shell .toast { border-radius:8px; font-size:12px; }
+
+body.ava-ops-shell .tech-hero-callout { position:absolute; right:22px; top:28px; z-index:2; width:260px; padding:14px 42px 14px 16px; border:1px solid rgba(255,255,255,.55); border-radius:14px; background:rgba(255,255,255,.72); box-shadow:0 8px 22px rgba(11,85,89,.10); color:#063b42; }
+body.ava-ops-shell .tech-hero-callout strong, body.ava-ops-shell .tech-hero-callout span { display:block; }
+body.ava-ops-shell .tech-hero-callout strong { font-size:13px; }
+body.ava-ops-shell .tech-hero-callout span { margin-top:5px; font-size:10.5px; line-height:1.4; color:#53657d; }
+body.ava-ops-shell .tech-callout-arrow { position:absolute; right:12px; top:50%; transform:translateY(-50%); width:30px; height:30px; border:0; border-radius:50%; background:#fff; color:#0b7773; font-size:18px; }
+body.ava-ops-shell .tech-lower-grid { display:grid; grid-template-columns:1.1fr 1.1fr .9fr; gap:12px; margin-top:12px; }
+body.ava-ops-shell .tech-panel { padding:13px 14px; box-shadow:0 3px 12px rgba(16,45,60,.04); }
+body.ava-ops-shell .tech-panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+body.ava-ops-shell .tech-panel-head h3 { margin:0; font-size:13px !important; }
+body.ava-ops-shell .tech-list-row { display:flex; align-items:center; gap:9px; min-height:38px; border-top:1px solid #edf2f1; font-size:11px; }
+body.ava-ops-shell .tech-list-row > span:nth-child(2) { flex:1; }
+body.ava-ops-shell .tech-list-row b, body.ava-ops-shell .tech-list-row small { display:block; }
+body.ava-ops-shell .tech-list-row small { color:var(--ava-muted); font-size:10px; }
+body.ava-ops-shell .tech-avatar, body.ava-ops-shell .tech-alert-dot { width:26px; height:26px; display:grid; place-items:center; border-radius:50%; background:#e6f6f2; color:#087f6b; font-style:normal; }
+body.ava-ops-shell .tech-alert-dot.danger { background:#fff0f0; color:#dc3545; }
+body.ava-ops-shell .tech-alert-dot.warn { background:#fff7e6; color:#b77900; }
+body.ava-ops-shell .status-ok { margin-left:auto; color:#087f6b; font-style:normal; font-size:10px; }
+body.ava-ops-shell .tech-quick-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+body.ava-ops-shell .tech-quick-grid button { border:1px solid #e3ecea; background:#f8fbfa; border-radius:8px; padding:9px 7px; text-align:left; font-size:10px; color:var(--ava-ink); }
+body.ava-ops-shell .tech-quick-grid span { display:block; color:#0b8b7d; font-size:16px; margin-bottom:3px; }
+@media (max-width: 950px) { body.ava-ops-shell .tech-hero-callout { position:static; margin-top:12px; width:auto; } body.ava-ops-shell .tech-lower-grid { grid-template-columns:1fr 1fr; } }
+@media (max-width: 600px) { body.ava-ops-shell .tech-lower-grid { grid-template-columns:1fr; } }

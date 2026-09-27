@@ -101,6 +101,7 @@ async function renderTechSaas(params = {}) {
             'Unit yang membangun platform ini dan melisensikannya ke faskes lain: mesin multi-tenant, ' +
             'interoperabilitas SATUSEHAT &amp; analyzer, katalog LOINC, serta pengelolaan langganan klien.</p>' +
         '</div>' +
+        '<div class="tech-hero-callout"><strong>✦ Platform siap berkembang</strong><span>Kelola tenant, integrasi, dan operasional dalam satu dashboard terpusat.</span><button class="tech-callout-arrow" onclick="navigate(&#39;tech-control-plane&#39;)" aria-label="Buka pusat kendali operasi">→</button></div>' +
         '<div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">' +
           '<button class="btn btn-ghost" onclick="renderTechSaas()" style="background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.15); font-size:12px;">&#8635; Periksa Ulang</button>' +
           '<button class="btn btn-teal" onclick="navigate(\'tenants\')" style="font-size:12px; font-weight:700;">Kelola Tenant Klien</button>' +
@@ -154,6 +155,18 @@ async function renderTechSaas(params = {}) {
           '<button class="btn btn-teal" style="width:100%; margin-top:14px; font-size:12px; font-weight:700;" ' +
             'onclick="navigate(\'lisensi\')">Buka Layar Lisensi</button>' +
         '</div>' +
+      '</div>' +
+      '<div class="tech-lower-grid">' +
+        '<div class="card tech-panel"><div class="tech-panel-head"><h3>Tenant Terbaru</h3><button class="btn btn-ghost btn-sm" onclick="navigate(&#39;tenants&#39;)">Lihat semua</button></div>' +
+          (klien.length ? klien.slice(0,3).map(t => '<div class="tech-list-row"><span class="tech-avatar">' + tsEsc((t.nama||'T').slice(0,1)) + '</span><span><b>' + tsEsc(t.nama) + '</b><small>' + tsEsc(t.subdomain||t.kode||'') + '</small></span><em class="status-ok">Aktif</em></div>').join('') : '<div class="tech-empty">Belum ada tenant baru.</div>') +
+        '</div>' +
+        '<div class="card tech-panel"><div class="tech-panel-head"><h3>Notifikasi &amp; Perhatian</h3><button class="btn btn-ghost btn-sm" onclick="navigate(&#39;tech-isu&#39;)">Lihat semua</button></div>' +
+          '<div class="tech-list-row"><span class="tech-alert-dot danger">!</span><span><b>Lab Connector</b><small>Periksa koneksi analyzer</small></span><small>sekarang</small></div>' +
+          '<div class="tech-list-row"><span class="tech-alert-dot warn">!</span><span><b>Jembatan SATUSEHAT</b><small>Status belum diperiksa</small></span><small>perlu cek</small></div>' +
+        '</div>' +
+        '<div class="card tech-panel"><div class="tech-panel-head"><h3>Aksi Cepat</h3></div><div class="tech-quick-grid">' +
+          '<button onclick="navigate(\'tenants\')"><span>♙</span>Tambah Tenant</button><button onclick="navigate(\'lisensi\')"><span>▣</span>Kelola Lisensi</button><button onclick="navigate(\'satusehat\')"><span>↔</span>Cek Integrasi</button><button onclick="navigate(\'product\')"><span>▤</span>Lihat Katalog LOINC</button>' +
+        '</div></div>' +
       '</div>' +
     '</div>';
 }

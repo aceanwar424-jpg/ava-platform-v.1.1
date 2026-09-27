@@ -2640,3 +2640,14 @@ OWNED_BY: generic. Perbaikan QC mempertahankan penolakan data tidak valid dan ti
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Aset dibuat khusus untuk produk dan tidak memuat logo pihak ketiga, teks, watermark, atau data pasien.
+
+
+## Penyelesaian komponen referensi cockpit — 27 September 2026
+- [x] Floating callout Platform siap berkembang ditambahkan ke hero.
+- [x] Panel Tenant Terbaru, Notifikasi & Perhatian, dan Aksi Cepat ditambahkan.
+- [x] Shortcut operasional dihubungkan ke tenant, lisensi, SATUSEHAT, katalog, dan tiket.
+- [x] Layout tambahan responsif pada desktop, tablet, dan mobile.
+- [x] Cache style dinaikkan ke 20260927-complete.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Komponen hanya menyajikan ringkasan dan shortcut berdasarkan data yang sudah ada; tidak menambah kewenangan atau data pasien.
