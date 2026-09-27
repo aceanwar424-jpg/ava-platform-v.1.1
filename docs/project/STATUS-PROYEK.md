@@ -2683,3 +2683,13 @@ OWNED_BY: generic/ava-configured. Asset hero adalah aset produk internal tanpa c
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya pada layout navigasi dan tidak mengubah permission atau data.
+
+
+## Audit proporsi final cockpit — 27 September 2026
+- [x] Menyatukan profil ukuran desktop: sidebar 240px normal, 64px compact, hero 145px, KPI 70px, analytics 205px.
+- [x] Mengurangi padding workspace, ukuran heading, icon, angka KPI, dan callout agar tidak menghabiskan viewport.
+- [x] Menjaga background hero gambar healthcare dengan overlay terang dan kontras teks aman.
+- [x] Cache style dinaikkan ke `20260927-compactfinal`.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada proporsi presentasi dan tidak mengubah fungsi, role, atau data.
