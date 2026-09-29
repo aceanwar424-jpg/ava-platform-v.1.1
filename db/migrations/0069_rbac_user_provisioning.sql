@@ -114,6 +114,13 @@ BEGIN
     corp_role = EXCLUDED.corp_role,
     updated_at = now();
 
+  IF to_regclass('public.activity_logs') IS NOT NULL THEN
+    INSERT INTO public.activity_logs(action, table_name, record_id, record_name, description, user_id, user_name, created_at)
+    VALUES('user.provisioned', 'user_profiles', v_user_id::text, btrim(p_full_name),
+           'Akun Auth dan profile tenant dibuat/ditautkan oleh Super Admin.', v_actor,
+           coalesce((SELECT full_name FROM public.user_profiles WHERE id = v_actor), v_actor::text), now());
+  END IF;
+
   RETURN v_user_id;
 END;
 $$;
@@ -234,6 +241,12 @@ BEGIN
   INSERT INTO public.user_pages(user_id, page)
   SELECT p_user_id, btrim(x) FROM unnest(coalesce(p_pages, ARRAY[]::text[])) x
   ON CONFLICT DO NOTHING;
+  IF to_regclass('public.activity_logs') IS NOT NULL THEN
+    INSERT INTO public.activity_logs(action, table_name, record_id, record_name, description, user_id, user_name, created_at)
+    VALUES('user.access_changed', 'user_profiles', p_user_id::text, p_user_id::text,
+           'Role dan akses menu diperbarui oleh Super Admin.', v_actor,
+           coalesce((SELECT full_name FROM public.user_profiles WHERE id = v_actor), v_actor::text), now());
+  END IF;
   RETURN jsonb_build_object('ok', true, 'user_id', p_user_id, 'role', v_role,
                             'page_count', coalesce(array_length(p_pages, 1), 0));
 END;

@@ -2743,6 +2743,7 @@ OWNED_BY: generic/ava-configured. Perubahan menjaga isolasi tenant, least privil
 - [x] Provisioning Super Admin, HRD, dan corporate memakai RPC Auth server-side yang sama.
 - [x] Menu User Management memiliki batas `superAdminOnly` dan tidak lagi tampil untuk Manager/Direktur.
 - [x] Akses efektif dan perubahan halaman khusus dipindahkan dari localStorage/REST langsung ke RPC ber-tenant.
+- [x] Provisioning dan perubahan akses menulis jejak `activity_logs` bila ledger audit tersedia.
 - [x] `node --check` lulus untuk modul JavaScript yang diubah.
 - [x] Audit generator menu, seluruh menu, dan application boundaries lulus.
 - [ ] Migration 0069 masih harus dijalankan dan diuji di Supabase staging sebelum tombol provisioning diaktifkan pada deployment target.
