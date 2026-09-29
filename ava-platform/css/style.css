@@ -61,7 +61,7 @@
      satu blok override sudah cukup. */
 
   /* Teks & permukaan tambahan */
-  --text4:        #94A3B8;   /* teks samar / disabled — 158 pemakaian */
+  --text4:        #64748B;   /* teks samar / disabled; tetap terbaca pada bidang terang */
   --text-dim:     #475569;
   --slate:        #546E7A;
   --surface:      #FFFFFF;   /* permukaan kartu */

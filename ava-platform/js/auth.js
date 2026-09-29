@@ -125,13 +125,13 @@ function showLoginScreen(){
         <!-- LOGIN FORM -->
         <div id="form-login">
           <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-            <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase">Email Akun</label>
+            <label style="font-size:11px;font-weight:700;color:#36504C;text-transform:uppercase">Email Akun</label>
             <input type="email" id="login-email" placeholder="contoh@gmail.com" autocomplete="username"
               style="padding:10px 12px;background:#020617;border:1.5px solid #334155;border-radius:8px;font-size:13.5px;color:#F8FAFC;outline:none"
               onfocus="this.style.borderColor='#38BDF8'" onblur="this.style.borderColor='#334155'">
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px">
-            <label style="font-size:11px;font-weight:700;color:#94A3B8;text-transform:uppercase">Password</label>
+            <label style="font-size:11px;font-weight:700;color:#36504C;text-transform:uppercase">Password</label>
             <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
               style="padding:10px 12px;background:#020617;border:1.5px solid #334155;border-radius:8px;font-size:13.5px;color:#F8FAFC;outline:none"
               onfocus="this.style.borderColor='#38BDF8'" onblur="this.style.borderColor='#334155'"

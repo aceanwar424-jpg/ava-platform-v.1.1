@@ -195,7 +195,11 @@ body.ava-ops-shell > div:first-child p { color: var(--ava-muted) !important; }
 body.ava-ops-shell > div:first-child p[style*="D4AF37"] { color: var(--ava-gold) !important; }
 body.ava-ops-shell > div:first-child > div > div[style*="rgba(255,255,255"] { background: var(--ava-emerald-soft) !important; border-color: rgba(8,127,107,.18) !important; }
 body.ava-ops-shell > div:first-child input { background: #fff !important; color: var(--ava-ink) !important; border-color: var(--ava-line) !important; }
-body.ava-ops-shell > div:first-child input::placeholder { color: #86938f !important; }
+/* The auth shell is rendered with inline legacy colours. Keep the light
+   operational treatment, but do not let labels/placeholders disappear on
+   white inputs (WCAG AA requires at least 4.5:1 for normal text). */
+body.ava-ops-shell > div:first-child label { color: #36504c !important; }
+body.ava-ops-shell > div:first-child input::placeholder { color: #536b65 !important; -webkit-text-fill-color: #536b65 !important; opacity: 1 !important; }
 body.ava-ops-shell > div:first-child #btn-login { background: linear-gradient(135deg,var(--ava-emerald),var(--ava-emerald-dark)) !important; box-shadow: 0 5px 15px rgba(8,127,107,.24) !important; }
 body.ava-ops-shell > div:first-child .auth-tab.active { color: var(--ava-emerald) !important; border-bottom-color: var(--ava-emerald) !important; }
 body.ava-ops-shell > div:first-child #auth-tabs { border-bottom-color: var(--ava-line) !important; }
@@ -481,10 +485,10 @@ body.ava-ops-shell .tech-saas-dashboard .metric-card { height:92px; border:1px s
 body.ava-ops-shell .tech-analytics-grid { display:grid; grid-template-columns:minmax(0,2fr) minmax(320px,.85fr); gap:16px; margin-bottom:16px; }
 body.ava-ops-shell .tech-trend, body.ava-ops-shell .tech-system-status { min-height:255px; padding:14px 16px; }
 body.ava-ops-shell .tech-panel-head h3 { font-size:18px !important; color:#10233f; }
-body.ava-ops-shell .tech-panel-head small { display:block; color:#718096; font-size:12px; margin-top:3px; }
+body.ava-ops-shell .tech-panel-head small { display:block; color:#53657d; font-size:12px; margin-top:3px; }
 body.ava-ops-shell .tech-panel-head select { height:34px; min-height:34px; }
 body.ava-ops-shell .tech-chart { display:flex; height:170px; margin-top:14px; }
-body.ava-ops-shell .tech-chart-y { width:28px; display:flex; flex-direction:column; justify-content:space-between; padding:0 0 22px; color:#718096; font-size:10px; }
+body.ava-ops-shell .tech-chart-y { width:28px; display:flex; flex-direction:column; justify-content:space-between; padding:0 0 22px; color:#53657d; font-size:10px; }
 body.ava-ops-shell .tech-chart-body { position:relative; flex:1; border-bottom:1px solid #dfe8eb; }
 body.ava-ops-shell .tech-grid-lines { position:absolute; inset:0 0 22px; background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(20% - 1px),#e8eef2 calc(20% - 1px),#e8eef2 20%); }
 body.ava-ops-shell .tech-chart-bars { position:absolute; inset:0 8px 22px; display:flex; align-items:flex-end; gap:12px; }
@@ -492,12 +496,12 @@ body.ava-ops-shell .tech-chart-bars i { position:relative; flex:1; background:#4
 body.ava-ops-shell .tech-chart-bars i.amber { background:#d7b765; }
 body.ava-ops-shell .tech-chart-bars i b { display:none; }
 body.ava-ops-shell .tech-chart-bars i:hover { filter:brightness(1.08); }
-body.ava-ops-shell .tech-chart-x { position:absolute; bottom:0; left:0; right:0; display:flex; justify-content:space-between; color:#718096; font-size:10px; }
+body.ava-ops-shell .tech-chart-x { position:absolute; bottom:0; left:0; right:0; display:flex; justify-content:space-between; color:#53657d; font-size:10px; }
 body.ava-ops-shell .tech-status-row { display:flex; align-items:center; gap:9px; min-height:32px; border-top:1px solid #eef2f3; font-size:12px; color:#10233f; }
 body.ava-ops-shell .tech-status-row i { width:9px; height:9px; border-radius:50%; background:#10b981; }
 body.ava-ops-shell .tech-status-row i.danger { background:#ef4444; } body.ava-ops-shell .tech-status-row i.warn { background:#f59e0b; } body.ava-ops-shell .tech-status-row i.neutral { background:#94a3b8; }
-body.ava-ops-shell .tech-status-row em { margin-left:auto; padding:4px 8px; border-radius:999px; font-style:normal; font-size:10px; background:#dff8ee; color:#087f6b; }
-body.ava-ops-shell .tech-status-row em.danger { background:#ffe7e7; color:#d8344a; } body.ava-ops-shell .tech-status-row em.warn { background:#fff2d9; color:#b77900; } body.ava-ops-shell .tech-status-row em.neutral { background:#eef1f5; color:#718096; }
+body.ava-ops-shell .tech-status-row em { margin-left:auto; padding:4px 8px; border-radius:999px; font-style:normal; font-size:10px; background:#dff8ee; color:#056654; }
+body.ava-ops-shell .tech-status-row em.danger { background:#ffe7e7; color:#b42318; } body.ava-ops-shell .tech-status-row em.warn { background:#fff2d9; color:#8a5a00; } body.ava-ops-shell .tech-status-row em.neutral { background:#eef1f5; color:#53657d; }
 @keyframes techBarGrow { from { transform:scaleY(0); transform-origin:bottom; } to { transform:scaleY(1); transform-origin:bottom; } }
 @media (prefers-reduced-motion:reduce) { body.ava-ops-shell .tech-chart-bars i { animation:none; } }
 @media (max-width:1000px) { body.ava-ops-shell .tech-analytics-grid { grid-template-columns:1fr; } }

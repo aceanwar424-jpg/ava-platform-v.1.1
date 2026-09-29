@@ -17,6 +17,10 @@
 #login-screen .role-pill-span { font-size: 14px !important; min-height: 44px; display: flex !important; align-items: center; justify-content: center; box-shadow: none !important; }
 #login-screen .role-pill-span.active { border-color: #0f2963 !important; background: #edf3fc !important; color: #0a2342 !important; }
 #login-screen input:not([type=radio]) { font-size: 16px !important; min-height: 46px; }
+#login-screen input:not([type=radio]), #login-screen select, #login-screen textarea { color: #0f172a !important; -webkit-text-fill-color: #0f172a; }
+#login-screen :is(input, select, textarea)::placeholder { color: #64748b !important; -webkit-text-fill-color: #64748b; opacity: 1 !important; }
+#login-screen .input-group label, #login-screen .role-label { color: #334155 !important; }
+#login-screen .role-pill-span:not(.active) { color: #334155 !important; }
 #login-screen button[type=submit] { min-height: 48px; font-size: 15px !important; background: #0f2963 !important; color: #fff !important; box-shadow: none !important; }
 #login-screen button:disabled { opacity: .65; cursor: wait; }
 #login-screen :is(a, button, input):focus-visible { outline: 3px solid #2563eb !important; outline-offset: 3px; }

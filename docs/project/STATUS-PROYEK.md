@@ -2739,6 +2739,24 @@ OWNED_BY: generic/ava-configured. Audit hanya membaca kode dan skema; tidak meny
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan menjaga isolasi tenant, least privilege, dan jejak audit; tidak menambahkan data pasien atau kredensial ke repository. Migration Supabase hanya disiapkan sebagai artefak deploy dan tidak dijalankan ke database produksi dari workspace ini.
 
+
+## Audit kontras dan keterbacaan UI — 29 September 2026
+### Plan
+- [x] Audit jalur login, token warna global, placeholder, label, tombol, badge, tabel, status, dan mode gelap.
+- [x] Perbaiki token warna bersama serta komponen yang terbukti memiliki kontras rendah.
+- [x] Jalankan pemeriksaan kontras statis, syntax check, dan smoke test halaman login/domain.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya pada presentasi dan aksesibilitas; tidak mengubah data pasien, aturan klinis, role, atau integrasi eksternal. Target kontras mengikuti WCAG 2.2 AA sebagai baseline keterbacaan.
+
+### Execute & Verify
+- [x] Label form login pada shell operasional dinaikkan dari `#94A3B8` menjadi `#36504C` (8,72:1 terhadap putih); placeholder dinaikkan menjadi `#536B65` (5,74:1).
+- [x] Teks sumbu/chart dan status dashboard yang sebelumnya memakai `#718096` diperbaiki ke `#53657D`; badge status memakai warna yang lulus 4,5:1 terhadap latarnya.
+- [x] Token `--text4` pada tema terang diperbaiki ke `#64748B`; mode gelap mempertahankan token khususnya sendiri.
+- [x] Versi cache stylesheet dinaikkan ke `20260929-contrast` agar perbaikan tidak tertahan cache deployment.
+- [x] `node --check` lulus untuk `auth.js` dan `apps/app.js`; uji auth/domain sintetis lulus 15/15.
+- [x] Pemeriksaan pasangan kontras kritis lulus: seluruh pasangan teks normal yang diaudit berada di atas 4,5:1.
+
 ### Execute & Verify
 - [x] Provisioning Super Admin, HRD, dan corporate memakai RPC Auth server-side yang sama.
 - [x] Menu User Management memiliki batas `superAdminOnly` dan tidak lagi tampil untuk Manager/Direktur.
