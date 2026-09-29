@@ -2713,3 +2713,16 @@ OWNED_BY: generic/ava-configured. Refactor hanya mengubah navigasi presentasi; s
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan lintas halaman hanya presentasi; business logic, role, API, dan data tetap dipertahankan.
+
+
+## Audit role flow Super Admin — 29 September 2026
+- [x] Menelusuri akses dari menu `Pengaturan & Master HIS` sampai `settings?tab=users`.
+- [x] Memeriksa form `+ Tambah User`, perubahan role, halaman khusus, RLS tenant, dan jalur pembuatan akun dari HRD/corporate.
+- [ ] **Blocker:** `+ Tambah User` hanya melakukan `POST user_profiles`; ia tidak membuat `auth.users`, tidak menerima email/password, dan tidak mengisi `id`/`tenant_id` yang diwajibkan oleh alur cloud.
+- [ ] **Blocker:** menu beratribut `admin` masih terlihat untuk Manager/Direktur, sedangkan layar User Management hanya menerima `super_admin`.
+- [ ] **Blocker:** endpoint `/auth/v1/permissions` tidak memiliki implementasi di repo; fallback akses membaca localStorage, sementara `user_pages` belum memiliki policy/RPC server yang membuat perubahan halaman efektif.
+- [ ] **Blocker keamanan:** `ava-platform/supabase_create_user_rpc.sql` memberi `EXECUTE` ke `anon` dan tidak memeriksa actor/tenant/role sebelum menulis `auth.users`.
+- [ ] Jalur pembuatan akun yang benar perlu dipusatkan pada provisioning server-side: Super Admin → email + identitas + tenant aktif → Auth user → profile → role default → audit event → undangan/aktivasi.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Audit hanya membaca kode dan skema; tidak menyentuh database produksi, tidak membuat akun nyata, dan tidak menyalin data pasien. Perbaikan berikutnya wajib mempertahankan isolasi `tenant_id`, pembatasan role server-side, jejak audit, dan prinsip least privilege; migrasi Supabase harus diuji di staging sebelum diterapkan.
