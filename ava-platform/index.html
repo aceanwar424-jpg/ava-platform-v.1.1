@@ -883,6 +883,7 @@ function susunMenu() {
           // tetapi tidak bisa diklik, dengan penanda.
           soon:  m.status === 'belum',
           adminOnly: !!m.admin,
+          superAdminOnly: !!m.superAdminOnly,
           // Banyak menu adalah tab di dalam halaman lain; aksinya disimpan
           // di sumber supaya tidak perlu ditebak dari id-nya.
           action: m.aksi || ("navigate('" + (m.rute || m.id) + "')"),
@@ -1038,6 +1039,7 @@ function gambarRail(ruang) {
     const kat = FLYOUT_MENUS[k];
     if (!kat?.items?.length) return;
     const visible = kat.items.filter((it) => {
+      if (it.superAdminOnly && role !== 'super_admin') return false;
       if (it.adminOnly && !['super_admin', 'manager', 'direktur'].includes(role)) return false;
       if (!isSuperAdmin && allowedPages && !allowedPages.includes(it.page) && !it.soon) return false;
       if (seenPages.has(it.page)) return false;
@@ -1356,6 +1358,7 @@ function visibleCategoryItems(cat) {
   const allowedPages = window.roleConfig?.pages || null;
   const isSuperAdmin = role === 'super_admin';
   return menu.items.filter(item => {
+    if (item.superAdminOnly && role !== 'super_admin') return false;
     if (item.adminOnly && !['super_admin','manager','direktur'].includes(role)) return false;
     if (!isSuperAdmin && allowedPages && !allowedPages.includes(item.page) && !item.soon) return false;
     return true;

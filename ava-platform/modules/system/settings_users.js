@@ -239,17 +239,12 @@ const ROLES = {
   },
 };
 
-// ── Load custom page overrides from localStorage ─────────────
+// ── Role/page fallback (server is the source of truth) ─────
 function getRolePages(role) {
-  const stored = localStorage.getItem('ol_role_pages_' + role);
-  if (stored) {
-    try { return JSON.parse(stored); } catch(e) {}
-  }
+  // Hak akses tidak boleh berasal dari localStorage: nilainya dapat diubah
+  // lewat DevTools. Akses efektif dibaca dari get_my_access() di server;
+  // fungsi ini hanya menjadi fallback aman ketika RPC belum tersedia.
   return ROLES[role]?.pages || ROLE_DEFAULT_PAGES[role] || ['dashboard'];
-}
-
-function saveRolePages(role, pages) {
-  localStorage.setItem('ol_role_pages_' + role, JSON.stringify(pages));
 }
 
 // ── Apply menu visibility based on role pages ────────────────
@@ -261,9 +256,7 @@ function saveRolePages(role, pages) {
 // modul. Sumbernya kini matriks di basis data.
 async function loadServerAccess() {
   try {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/permissions`, { headers: { ...SB_HEADERS } });
-    if (!res.ok) return null;
-    const d = await res.json();
+    const d = await sbRpc('get_my_access', {});
     if (!d || !Array.isArray(d.permissions)) return null;
     window.serverAccess = d;
     return d;
@@ -420,14 +413,16 @@ async function loadUsers() {
     const [users, employees, halamanKhusus] = await Promise.all([
       sbGet('user_profiles','select=*&order=created_at.asc'),
       sbGet('employees','select=id,full_name,email,position,division&status=eq.Aktif').catch(()=>[]),
-      sbGet('user_pages','select=user_id,page').catch(()=>[]),
+      sbRpc('list_user_access', {}).catch(()=>[]),
     ]);
 
     // Jumlah halaman khusus per pengguna, dibaca dari basis data (dulu dari
     // localStorage, yang hanya berlaku di peramban yang kebetulan dipakai).
     window._jumlahHalamanKhusus = {};
+    window._userPageMap = {};
     (Array.isArray(halamanKhusus) ? halamanKhusus : []).forEach(r => {
       window._jumlahHalamanKhusus[r.user_id] = (window._jumlahHalamanKhusus[r.user_id] || 0) + 1;
+      (window._userPageMap[r.user_id] ||= []).push(r.page);
     });
     const userList = Array.isArray(users) ? users : [];
     const empList  = Array.isArray(employees) ? employees : [];
@@ -536,7 +531,8 @@ function renderUsersTable(users, employees=[]) {
 }
 
 function openEditUserRole(userId, userName, currentRole) {
-  const customPages = getRolePages(currentRole);
+  const customPages = (window._userPageMap || {})[userId] ||
+    ROLE_DEFAULT_PAGES[currentRole] || getRolePages(currentRole);
   const groups = {};
   Object.entries(ALL_PAGES).forEach(([key,[grp,label,icon]]) => {
     if (!groups[grp]) groups[grp] = [];
@@ -671,32 +667,11 @@ async function saveUserRoleAndMenu(userId, userName) {
     if (document.getElementById('menu-'+key)?.checked) selectedPages.push(key);
   });
   try {
-    await sbPatch('user_profiles', userId, {
-      role, updated_at: new Date().toISOString()
+    await sbRpc('set_user_access', {
+      p_user_id: userId,
+      p_role: role,
+      p_pages: selectedPages,
     });
-    // Halaman khusus pengguna disimpan di BASIS DATA (tabel user_pages),
-    // bukan localStorage. localStorage bisa ditulis ulang lewat DevTools,
-    // jadi tidak boleh menjadi sumber hak akses — dan sejak menu dibaca dari
-    // server, penyimpanan di localStorage tidak berpengaruh apa pun.
-    const isCustom = JSON.stringify([...selectedPages].sort()) !==
-                     JSON.stringify([...(ROLE_DEFAULT_PAGES[role]||[])].sort());
-    try {
-      await fetch(`${SUPABASE_URL}/rest/v1/user_pages?user_id=eq.${userId}`,
-                  { method:'DELETE', headers: SB_HEADERS });
-      if (isCustom && selectedPages.length) {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/user_pages`, {
-          method:'POST', headers: SB_HEADERS,
-          body: JSON.stringify(selectedPages.map(p => ({ user_id: userId, page: p }))),
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      }
-      // Bersihkan sisa penyimpanan lama agar tidak menyesatkan saat ditelusuri.
-      localStorage.removeItem('ol_user_pages_'+userId);
-      localStorage.removeItem('ol_role_pages_'+role+'_'+userId);
-    } catch (e) {
-      toast('Gagal menyimpan akses menu: ' + (e.message || e), 'err');
-      return;
-    }
     toast(`✅ Role & akses menu ${userName} disimpan`,'ok');
     closeModalForce();
     await loadUsers();
@@ -719,11 +694,15 @@ function openInviteUserForm() {
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div style="background:var(--warn-soft2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--ink-14);margin-bottom:12px">
-      ℹ️ User mendaftar sendiri di halaman login. Setelah login pertama, role diatur di sini.
+      ℹ️ Akun dibuat langsung melalui Auth dan otomatis ditempatkan pada tenant aktif. Sampaikan password awal melalui kanal aman dan minta pengguna menggantinya setelah login.
     </div>
     <div class="form-group">
       <label>Nama Lengkap *</label>
       <input type="text" id="inv-name" placeholder="Nama karyawan">
+    </div>
+    <div class="form-group">
+      <label>Email Login *</label>
+      <input type="email" id="inv-email" placeholder="nama@perusahaan.id" autocomplete="off">
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -737,6 +716,10 @@ function openInviteUserForm() {
         <label>No. HP / WA</label>
         <input type="text" id="inv-phone" placeholder="08xxxxxxxxxx">
       </div>
+      <div class="form-group">
+        <label>Password Awal * (min. 8 karakter)</label>
+        <input type="password" id="inv-password" placeholder="Buat password sementara" autocomplete="new-password">
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
@@ -746,16 +729,24 @@ function openInviteUserForm() {
 
 async function createUserProfile() {
   const name  = document.getElementById('inv-name').value.trim();
+  const email = document.getElementById('inv-email').value.trim().toLowerCase();
   const role  = document.getElementById('inv-role').value;
   const phone = document.getElementById('inv-phone').value.trim();
+  const password = document.getElementById('inv-password').value;
   if (!name) { toast('Nama wajib diisi','err'); return; }
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) { toast('Email login wajib diisi dengan format yang valid','err'); return; }
+  if (!password || password.length < 8) { toast('Password awal minimal 8 karakter','err'); return; }
   try {
-    await sbPost('user_profiles', {
-      full_name:name, role, phone,
-      created_at:new Date().toISOString(),
-      updated_at:new Date().toISOString()
+    await sbRpc('create_auth_user', {
+      p_email: email,
+      p_password: password,
+      p_full_name: name,
+      p_phone: phone || null,
+      p_role: role,
+      p_corporate_id: null,
+      p_corp_role: null,
     });
-    toast('✅ User profile dibuat','ok');
+    toast(`✅ Akun ${email} dibuat dengan role ${ROLES[role]?.label || role}. Minta pengguna segera mengganti password.`, 'ok', 6000);
     closeModalForce();
     await loadUsers();
   } catch(e) { toast('❌ '+e.message,'err'); }

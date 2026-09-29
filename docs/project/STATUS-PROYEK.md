@@ -2726,3 +2726,23 @@ OWNED_BY: generic/ava-configured. Perubahan lintas halaman hanya presentasi; bus
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Audit hanya membaca kode dan skema; tidak menyentuh database produksi, tidak membuat akun nyata, dan tidak menyalin data pasien. Perbaikan berikutnya wajib mempertahankan isolasi `tenant_id`, pembatasan role server-side, jejak audit, dan prinsip least privilege; migrasi Supabase harus diuji di staging sebelum diterapkan.
+
+
+## Perbaikan provisioning akun & RBAC Super Admin — 29 September 2026
+### Plan
+- [ ] Memusatkan pembuatan akun Auth + profile tenant pada RPC `create_auth_user` yang memvalidasi actor Super Admin.
+- [ ] Menambahkan RPC pembaca dan penyimpan akses efektif (`get_my_access`, `set_user_access`) agar role/page permission berasal dari server.
+- [ ] Memperbaiki UI User Management, HRD, dan corporate agar memakai provisioning server-side yang sama.
+- [ ] Memisahkan item menu `superAdminOnly` dari menu admin umum.
+- [ ] Menjalankan pemeriksaan syntax, audit menu, dan diff review sebelum push.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan menjaga isolasi tenant, least privilege, dan jejak audit; tidak menambahkan data pasien atau kredensial ke repository. Migration Supabase hanya disiapkan sebagai artefak deploy dan tidak dijalankan ke database produksi dari workspace ini.
+
+### Execute & Verify
+- [x] Provisioning Super Admin, HRD, dan corporate memakai RPC Auth server-side yang sama.
+- [x] Menu User Management memiliki batas `superAdminOnly` dan tidak lagi tampil untuk Manager/Direktur.
+- [x] Akses efektif dan perubahan halaman khusus dipindahkan dari localStorage/REST langsung ke RPC ber-tenant.
+- [x] `node --check` lulus untuk modul JavaScript yang diubah.
+- [x] Audit generator menu, seluruh menu, dan application boundaries lulus.
+- [ ] Migration 0069 masih harus dijalankan dan diuji di Supabase staging sebelum tombol provisioning diaktifkan pada deployment target.

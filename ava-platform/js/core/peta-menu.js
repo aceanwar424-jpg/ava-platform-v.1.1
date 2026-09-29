@@ -1475,7 +1475,8 @@ window.PETA_MENU = {
               "ket": "RBAC per peran dan per halaman",
               "rute": "settings",
               "aksi": "navigate('settings',{tab:'users'})",
-              "admin": true
+              "admin": true,
+              "superAdminOnly": true
             },
             {
               "id": "import",

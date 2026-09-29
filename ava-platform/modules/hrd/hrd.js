@@ -783,7 +783,7 @@ async function saveBulkSyncPositionShift() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// BUAT AKUN dari Data SDM — placeholder user_profiles ter-link
+// BUAT AKUN dari Data SDM — provisioning Auth + profile ter-link
 // ══════════════════════════════════════════════════════════════
 function openCreateAccountForm(empId, empName, empEmail) {
   openModal(`
@@ -792,9 +792,7 @@ function openCreateAccountForm(empId, empName, empEmail) {
       <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button>
     </div>
     <div class="status-box status-info" style="font-size:12px;margin-bottom:14px">
-      ℹ️ Ini membuat profil akses di sistem. Karyawan tetap perlu mendaftar/login sendiri
-      di halaman login menggunakan email yang sama — begitu login pertama kali,
-      akun ini otomatis terhubung ke data karyawan dan role berikut langsung berlaku.
+      ℹ️ Akun login dibuat langsung pada tenant aktif dan langsung dihubungkan ke data karyawan. Sampaikan password awal melalui kanal aman, lalu minta pengguna menggantinya setelah login.
     </div>
     <div class="form-group">
       <label>Email (wajib sama dengan yang dipakai untuk login nanti) *</label>
@@ -808,6 +806,10 @@ function openCreateAccountForm(empId, empName, empEmail) {
           <option value="${k}" ${k==='sales'?'selected':''}>${r.label}</option>`).join('')}
       </select>
     </div>
+    <div class="form-group">
+      <label>Password Awal * (minimal 8 karakter)</label>
+      <input type="password" id="ca-password" placeholder="Password sementara" autocomplete="new-password">
+    </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModalForce()">Batal</button>
       <button class="btn btn-teal" onclick="saveCreateAccount(${empId},'${empName.replace(/'/g,"\\'")}')">👤 Buat Akun</button>
@@ -817,20 +819,29 @@ function openCreateAccountForm(empId, empName, empEmail) {
 async function saveCreateAccount(empId, empName) {
   const email = document.getElementById('ca-email')?.value.trim();
   const role  = document.getElementById('ca-role')?.value;
+  const password = document.getElementById('ca-password')?.value || '';
   if (!email) { toast('Email wajib diisi','err'); return; }
+  if (password.length < 8) { toast('Password awal minimal 8 karakter','err'); return; }
   try {
     // If employee record doesn't have this email yet, sync it back
     await sbPatch('employees', empId, { email, updated_at: new Date().toISOString() }).catch(()=>{});
 
-    await sbPost('user_profiles', {
-      full_name:   empName,
-      email,
-      role,
-      employee_id: empId,
-      created_at:  new Date().toISOString(),
-      updated_at:  new Date().toISOString(),
+    const userId = await sbRpc('create_auth_user', {
+      p_email: email.toLowerCase(),
+      p_password: password,
+      p_full_name: empName,
+      p_phone: null,
+      p_role: role,
+      p_corporate_id: null,
+      p_corp_role: null,
     });
-    toast(`✅ Akun untuk ${empName} dibuat dan terhubung ke Data SDM`,'ok');
+    if (userId) {
+      await sbPatch('user_profiles', userId, {
+        employee_id: empId,
+        updated_at: new Date().toISOString(),
+      });
+    }
+    toast(`✅ Akun ${email} dibuat, role ${role}, dan terhubung ke ${empName}. Minta pengguna mengganti password.`, 'ok', 6000);
     closeModalForce();
     await loadEmployees();
   } catch(e) { toast('❌ '+e.message,'err'); }

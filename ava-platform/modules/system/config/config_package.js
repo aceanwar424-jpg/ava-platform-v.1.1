@@ -1214,6 +1214,7 @@ async function renderCorporateDetail(id = null) {
                     <option value="approver" selected>Approver</option>
                     <option value="">None / View Only</option>
                   </select>
+                  <input type="password" id="erp-corp-temp-password" placeholder="Password awal (min. 8)" autocomplete="new-password" style="width:190px; padding:8px; border:1px solid var(--border2); border-radius:6px; background:var(--white); color:var(--text); font-size:12.5px;">
                   <button class="btn btn-teal btn-sm" onclick="linkUserToCorporate(${id})" style="padding:8px 16px; margin:0;">➕ Link User</button>
                 </div>
               </div>
@@ -1545,6 +1546,7 @@ window.filterCorpUserSelect = function(query) {
 window.linkUserToCorporate = async function(corpId) {
   const selectedVal = document.getElementById('erp-corp-user-select')?.value;
   const corpRole = document.getElementById('erp-corp-role-select')?.value || null;
+  const tempPassword = document.getElementById('erp-corp-temp-password')?.value || '';
   const corpName = window.currentDetailCorpName || 'Corporate';
   if (!selectedVal) { toast('Silakan pilih karyawan atau user terlebih dahulu', 'err'); return; }
 
@@ -1581,23 +1583,26 @@ window.linkUserToCorporate = async function(corpId) {
         });
         toast(`✅ Akun login ${userProfile.full_name} ditautkan sebagai ${corpRole || 'none'}`, 'ok');
       } else {
-        const defaultPassword = 'UserAVA123!';
         const targetEmail = emp.email || `${emp.full_name.toLowerCase().replace(/[^a-z0-9]/g, '')}@queenhealth.co.id`;
+        if (tempPassword.length < 8) {
+          toast('Isi password awal minimal 8 karakter untuk akun baru.', 'err');
+          return;
+        }
         
         try {
           await sbRpc('create_auth_user', {
             p_email: targetEmail,
-            p_password: defaultPassword,
+            p_password: tempPassword,
             p_full_name: emp.full_name,
             p_phone: emp.phone || '',
             p_role: 'corporate',
             p_corporate_id: corpId,
             p_corp_role: corpRole
           });
-          toast(`✅ Akun login otomatis dibuat & ditautkan untuk ${emp.full_name}. Password: ${defaultPassword}`, 'ok', 7000);
+          toast(`✅ Akun ${targetEmail} dibuat dan ditautkan untuk ${emp.full_name}. Sampaikan password melalui kanal aman.`, 'ok', 7000);
         } catch (rpcErr) {
           console.error(rpcErr);
-          toast(`⚠️ Pembuatan akun otomatis gagal. Silakan jalankan file SQL 'supabase_create_user_rpc.sql' di SQL Editor Supabase terlebih dahulu untuk mengaktifkan fitur ini.`, 'err', 10000);
+          toast(`⚠️ Pembuatan akun gagal: ${rpcErr.message || rpcErr}`, 'err', 10000);
         }
       }
     }
