@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-02T05:02:32.197Z",
+  "generated_at": "2026-10-02T09:41:44.953Z",
   "scope": "local static readiness; no external connections",
   "status": "BLOCKED_FOR_STAGING",
   "checks": [
