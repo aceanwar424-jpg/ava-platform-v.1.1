@@ -113,7 +113,6 @@ async function renderExecutiveDashboard() {
 
 async function loadExecData() {
   const today = new Date().toISOString().split('T')[0];
-  const weekStart = getWeekStart ? getWeekStart() : today;
   try {
     const [tasks, att, emps] = await Promise.all([
       sbGet('tasks',`select=*&order=due_date.asc,status.asc&limit=200`).catch(()=>[]),

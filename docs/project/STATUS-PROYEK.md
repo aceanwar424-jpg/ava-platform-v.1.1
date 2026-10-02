@@ -2765,3 +2765,18 @@ OWNED_BY: generic/ava-configured. Perubahan hanya pada presentasi dan aksesibili
 - [x] `node --check` lulus untuk modul JavaScript yang diubah.
 - [x] Audit generator menu, seluruh menu, dan application boundaries lulus.
 - [ ] Migration 0069 masih harus dijalankan dan diuji di Supabase staging sebelum tombol provisioning diaktifkan pada deployment target.
+
+## Audit lintas domain, UI dan alur fitur — 1 Oktober 2026
+### Rencana / sub-task ≤ 1 jam
+- [x] Petakan 17 domain, entrypoint, pemeriksaan lokal, fitur parsial, dan dependensi backend.
+- [x] Jalankan baseline kontrak/routing/security dan audit browser desktop/mobile dengan data sintetis.
+- [x] Perbaiki keterbacaan token, ukuran kontrol/tabel, overflow, serta chart yang terbukti bermasalah.
+- [x] Perbaiki alur gagal atau menggantung yang ditemukan; uji ulang regresi relevan.
+- [x] Dokumentasikan cakupan, bukti, sisa prasyarat akun/staging, dan status rilis secara jujur.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk perbaikan komponen/UI dan fixture sintetis; konfigurasi visual situs AVA tetap OWNED_BY: ava. Tidak memakai data pasien nyata, tidak mengubah kunci katalog/skema master, tidak menjalankan migrasi atau menghubungkan DB/LIS produksi. Uji browser dibatasi server lokal dan respons sintetis. Cakupan lintas domain mengikuti permintaan eksplisit pengguna. Perubahan berisiko pada skema/integrasi tetap mengikuti checkpoint AGENTS.md. Laporan membedakan uji kode lokal dari validasi transaksi produksi.
+
+### Execute & Verify (lanjutan)
+- [x] Uji browser lokal memakai runtime Playwright workspace: 17 domain × 2 viewport tanpa error JavaScript; overflow kiosk 4px ditemukan dan diperbaiki dengan grid fluida mobile.
+- [x] Ikon emoji kartu kiosk ditandai dekoratif (`aria-hidden`) sehingga tidak diperlakukan sebagai teks yang harus memenuhi kontras.
+- [x] Uji monitor sintetis lulus 8/8; uji recovery router/lazy-load lulus 9/9.

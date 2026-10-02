@@ -256,7 +256,7 @@ async function checkSetConn() {
   if(!el)return;
   el.className='status-box status-info'; el.textContent='⏳ Memeriksa...';
   try {
-    await sbGet('partners','select=count&limit=1');
+    await sbGetStrict('partners','select=count&limit=1');
     el.className='status-box status-ok'; el.textContent='✅ Supabase terhubung & normal.';
   } catch(e){
     el.className='status-box status-err'; el.textContent='❌ '+e.message;
@@ -268,15 +268,16 @@ async function loadSetStats() {
   if(!el)return;
   const tables=['partners','partner_deals','vouchers','voucher_campaigns','outgoing_letters','marketing_templates','activity_logs'];
   try {
-    const counts=await Promise.all(tables.map(t=>sbGet(t,'select=count').catch(()=>[])));
+    const counts=await Promise.all(tables.map(t=>sbGetStrict(t,'select=count').catch(()=>null)));
+    el.classList.remove('loading-row');
     el.innerHTML=`<div style="display:flex;gap:10px;flex-wrap:wrap">
       ${tables.map((t,i)=>`
         <div style="text-align:center;padding:10px 14px;background:var(--lgray);border-radius:8px;min-width:100px">
-          <div style="font-size:20px;font-weight:800;color:var(--navy)">${Array.isArray(counts[i])?counts[i].length:'?'}</div>
+          <div style="font-size:20px;font-weight:800;color:var(--text)">${Array.isArray(counts[i]) && counts[i][0]?.count != null && Number.isFinite(Number(counts[i][0].count)) ? Number(counts[i][0].count).toLocaleString('id-ID') : '—'}</div>
           <div style="font-size:11px;color:var(--gray);margin-top:2px">${t.replace(/_/g,' ')}</div>
         </div>`).join('')}
     </div>`;
-  } catch(e){ el.innerHTML='<span style="color:var(--gray);font-size:13px">Gagal load</span>'; }
+  } catch(e){ el.classList.remove('loading-row'); el.innerHTML='<span style="color:var(--text3);font-size:13px">Statistik belum dapat dimuat. Coba buka ulang tab ini.</span>'; }
 }
 
 // loadSetUsers removed — User Management is now the single source of truth (navigate('users'))

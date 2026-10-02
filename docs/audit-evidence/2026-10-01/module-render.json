@@ -1,0 +1,1087 @@
+[
+  {
+    "route": "dashboard",
+    "text": "AVA\n226 modul terdaftar\nOmzet lunas bulan ini Rp 0\nSelamat Pagi, Synthetic Admin\n\nJumat, 2 Oktober 2026\n\n↻ Segarkan\nKonsolidasi P&L\nBasis data lokal:\nTerhubung\nModul QC lab:\nTerbaca\nSATUSEHAT FHIR:\nBelum diperiksa\nJembatan analyzer:\nBelum diperiksa\n6 Pilar Bisnis Terintegrasi\nKlik pilar untuk membuka modulnya →\n🔬\nPILAR 1 • DIAGNOSTIK\nLaboratorium & LIS Terpadu\n\n530+ parameter · QC Westgard · delt",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ops-kendali",
+    "text": "Pusat Kendali Operasional\n\nApa yang perlu ditangani sekarang — lintas lab, klinik, stok, dan tagihan\n\nTertahan > 2 jam\nTertahan > 4 jam\nTertahan > 8 jam\nTertahan > 24 jam\nSegarkan otomatis\nMuat Ulang\nTidak ada yang menunggu tindakan\ndiperbarui 11.48.42\nSAMPEL TERTAHAN\n0\n> 4 jam belum ada hasil\nMENUNGGU VALIDASI\n0\nhasil siap divalidasi\nMENUNGGU APPROVAL\n0\nsudah divalidasi\nBELUM BAYAR\n0\nkunjungan be",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "executive-dashboard",
+    "text": "Executive Dashboard\n\nReal-time monitoring · Semua tim · Quick decision Last refresh: 11.48\n\n↻ Refresh\n← Standard View\n0/0\nHadir Hari Ini\n⚠️\n0\nTask Overdue\n🚫\n0\nTask Blocked\n✅\n0\nDone Hari Ini\n❗\n0\nPrioritas Tinggi\n👤\n0\nTanpa PIC\n⏰ Kehadiran Hari Ini\nLihat Detail →\nTidak ada data karyawan\nAll Tasks — Live Monitor\nSemua\nOverdue\n(0)\nBlocked\n(0)\nTodo\n(0)\nInProgress\n(0)\nTidak ada task aktif 🎉",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "holding-finance",
+    "text": "Konsolidasi Finansial\n\nRingkasan buku besar lintas unit usaha.\n\n📒\nBuku besar masih kosong\nLayar ini hanya menampilkan yang sudah tercatat di jurnal. Versi sebelumnya menampilkan proyeksi CapEx, titik impas, dan target pendanaan — angka yang ditulis di berkas tampilan dan tidak pernah dihitung dari apa pun. Proyeksi punya tempatnya di dokumen investor, bukan di layar yang terlihat seperti laporan.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "evidence-register",
+    "text": "HQ · QUALITY GOVERNANCE\n\nEvidence Register & Risk\n\nRegistri bukti untuk SOP, izin, sertifikasi, audit, CAPA, risiko, pemilik dokumen dan tanggal kedaluwarsa. Status bukti harus jelas sebelum dipakai sebagai klaim.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperl",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "apps-hub",
+    "text": "Akses Portal\n\nTautan bertoken untuk klien korporat dan dokter perujuk — hanya-baca, bisa dicabut, berbatas waktu\n\n+ Buat Tautan\nMuat Ulang\nTautan ini setara kunci. Siapa pun yang memilikinya dapat melihat data perusahaan atau perujuk yang bersangkutan tanpa perlu masuk. Kirim hanya kepada pihak yang berhak, dan cabut segera begitu kerja sama berakhir atau PIC berganti.\nTautan terdaftar\n0 aktif dar",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "support-hub",
+    "text": "Pemeriksaan Penunjang\nEKG 12 Lead · EKG Treadmill · Audiometri · Spirometri\nInput pemeriksaan\nEKG 12 Lead\n0\nEKG Treadmill\n0\nAudiometri\n0\nSpirometri\n0\n \nSemua Status\nDraft\nValidated\nApproved\nBelum ada pemeriksaan supportive\nInput pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "saas-console",
+    "text": "💻\nPILAR 3 • AVA TECH (tech.avahealth.sbs)\nPembangun & Penjual Sistem\n\nUnit yang membangun platform ini dan melisensikannya ke faskes lain: mesin multi-tenant, interoperabilitas SATUSEHAT & analyzer, katalog LOINC, serta pengelolaan langganan klien.\n\n✦ Platform siap berkembang\nKelola tenant, integrasi, dan operasional dalam satu dashboard terpusat.\n→\nKelola Platform\n→\nKLIEN FASKES AKTIF\n0\nbelum ad",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-control-plane",
+    "text": "AVA TECH / CONTROL PLANE\n\nKontrol Produksi & Observabilitas\n\nKonfigurasi, tenant, kesehatan instalasi, dan jejak perubahan dari satu pusat kendali.\n\nPeriksa ulang\nRingkasan\nKesehatan sistem\nTiket & tindak lanjut\nDeployment tenant\nPengaturan & trace\nOPERATIONAL — sumber data control plane terbaca.\nTenant klien\n0\ndata tenant terbaca\nHeartbeat sehat\n0\n0 stale · 0 offline\nAudit terbaru\n0\nevent terakhi",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-roadmap",
+    "text": "🗺️\nTECH ROADMAP & RELEASE LOG (2026 EDITION)\nRoadmap & Catatan Rilis Platform\n\nLacak perjalanan evolusi arsitektur AVA Diagnostics & Health SaaS dari versi baseline v1.0 hingga ekosistem enterprise v2.0.\n\n🔄 Sinkronkan Versioning\nVERSI SAAT INI\nv1.2.4-PROD\nLIS-HIS Sync & Multi-Tenant Engine\nFASE BERJALAN\nFase 4: Multi-Lab\nISO 15189 Multi-Tenant Parameterized\nROADMAP NEXT (Q4 2026)\nv2.0 Cloud Ente",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-modul",
+    "text": "📦\nKATALOG MODUL & LISENSI PLATFORM\nKatalog Modul Berlisensi AVA Tech\n\nDaftar modul perangkat lunak kesehatan yang siap dikonfigurasi dan dilisensikan ke klien faskes mitra.\n\n+ Tambah Modul Baru\nAVA-LIS\nv1.2.4\nAVA LIS Engine\n\nSistem LIS lengkap: pra-analitik, interfacing instrument, QC Westgard, otorisasi Sp.PK.\n\nKategori: Laboratorium\nEnterprise\nAVA-HIS\nv1.2.1\nAVA HIS & EMR\n\nEMR SOAP PMK 24/2022,",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-isu",
+    "text": "🐛\nTICKET & ISSUE TRACKER\nPelacak Bug & Permintaan Fitur Klien\n\nPantau laporan bug, perbaikan masalah, dan antrean fitur baru dari seluruh klien faskes mitra.\n\n+ Buat Tiket Masalah\nDaftar Tiket Terdaftar\n4 tiket aktif\nID TIKET\tKLIEN FASKES\tJUDUL PERMINTAAN / BUG\tTIPE\tPRIORITAS\tSTATUS\nTICK-102\tKlinik AVA Utama\tPercepatan loading EMR SOAP pada koneksi 3G\tOptimasi\tHigh\tIn Progress\nTICK-101\tLab Diagno",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "db-studio",
+    "text": "⚡\nLocal Supabase Database Studio\nPGlite WASM · Postgres Local Engine\n\nInspektur Tabel GUI, Editor Baris Data, & Penguji SQL Interaktif (Port 54329 / Supabase REST).\n\n🟢 Server Status: 127.0.0.1:54329 (Active)\n🚀 Push & Sync ke GitHub\n☁️ Sinkron ke Cloud Supabase\n🔄 Refresh Table\n🗄️ DAFTAR TABEL DATABASE (11)\n👤 User Profiles & Access Roles\nuser_profiles\n🧬 Master Produk & Tes Lab\nproducts\n🩺 AVA ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "audit",
+    "text": " Jejak Audit\n\nCatatan perbuatan pada sistem — siapa melakukan apa, kapan, pada data mana\n\nEkspor CSV\nMuat Ulang\n Jejak ini belum kebal-ubah. Tabel activity_logs masih mengizinkan pengubahan dan penghapusan, sehingga catatan di bawah belum dapat dijadikan bukti audit. Jalankan supabase_audit_ledger.sql untuk menjadikannya hanya-tambah.\nCari\nPerbuatan\nSemua\nData\nSemua\nPelaku\nSemua\nDari\nSampai\nTerapk",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tenants",
+    "text": "Tenant & Klien Faskes\n\nFaskes yang memakai sistem ini — paket langganan, masa berlaku, dan pemakaian bulan berjalan\n\n+ Tenant Baru\nMuat Ulang\nKLIEN FASKES AKTIF\n0\nbelum ada klien\nPERLU PERPANJANGAN\n0\ntidak ada yang mendesak\nNILAI LANGGANAN BERJALAN\nRp 0\ndari kontrak yang masih berlaku\nDaftar Klien\nBelum ada klien faskes terdaftar. Klik \"+ Tenant Baru\" untuk mencatat yang pertama.\nInstalasi ini sen",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lisensi",
+    "text": "Lisensi\n\nStatus lisensi instalasi ini dan sidik mesinnya\n\nPeriksa Ulang\nTidak diperiksa\n\nInstalasi ini dibuka lewat peramban, bukan aplikasi desktop. Lisensi hanya diperiksa pada instalasi desktop di komputer klinik.\n\nEDISI\n—\nBERLAKU SAMPAI\nTanpa batas waktu\nIKATAN KOMPUTER\nTidak terikat\nSidik Mesin\n\nKirimkan kode ini ke penyedia aplikasi saat meminta lisensi baru atau perpanjangan. Kode ini tidak",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-aktivasi",
+    "text": "Aktivasi Lisensi\n\nLisensi per tenant, masa berlaku, dan status aktivasinya.\n\nAktifkan Kode\nSemua lisensi\n0\nAktif\n0\nBelum diaktifkan\n0\nBerakhir ≤30 hari\n0\nDicabut\n0\n🔑\nBelum ada lisensi diterbitkan\nLisensi diterbitkan per tenant setelah paket disepakati.\nMencabut lisensi tidak mematikan akses tenant. Pencabutan sering terjadi saat perpanjangan sedang diurus, dan mematikan akses seketika berarti kli",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-telemetri",
+    "text": "Telemetri Pemakaian\n\nPemakaian nyata tiap tenant — dasar penagihan dan peninjauan paket.\n\nPeriode\n2026-10\n0 dari 0 tenant mengirim data\n📡\nBelum ada tenant terdaftar\nTenant yang belum mengirim telemetri ditandai belum ada data, bukan 0. Nol berarti dipakai tapi tidak ada transaksi; belum ada data berarti kita tidak tahu. Menyamakan keduanya membuat instalasi yang gagal mengirim terlihat seperti kl",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "leads",
+    "text": "🎯 Leads Management\n\nPipeline prospek — dari kontak pertama sampai closing\n\nMaps\nKanban\n+ Tambah Lead\n0\nTOTAL LEADS\n0\nBARU\n0\nDIHUBUNGI\n0\nQUALIFIED\n0\nPRESENTASI\n0\nPROPOSAL\n0\nNEGOSIASI\n0\nWON ✓\n0\nOVERDUE\nSemua Status\nBaru\nDihubungi\nQualified\nPresentasi\nProposal\nNegosiasi\nWon ✓\nLost ✗\nSemua Sumber\nMaps Prospecting\nReferral Internal\nReferral Eksternal\nCold Call\nEvent/Pameran\nMedia Sosial\nWalk-in\nLainny",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "penawaran",
+    "text": "Penawaran Harga\n\nDokumen penawaran ke klinik dan korporat — dari draft sampai jadi invoice\n\n+ Penawaran Baru\nTOTAL PENAWARAN\n0 dokumen\nMENUNGGU JAWABAN\nRp 0\nDITERIMA\nRp 0\nDITOLAK\nRp 0\nSemua\nDraft\nTerkirim\nDiterima\nDitolak\nKedaluwarsa\nBelum ada penawaran. Klik \"+ Penawaran Baru\" untuk membuat yang pertama.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "mou",
+    "text": "MOU / Perjanjian Kerjasama\n\nKelola semua dokumen perjanjian dengan mitra AVA\n\nCSV\n+ Buat MOU\n0\nAktif\n0\nDitandatangani\n0\nReview Internal\n0\nExpired\nSemua Status\nDraft\nReview Internal\nReview Partner\nRevisi\nDitandatangani\nAktif\nExpired\nTerminasi\nBelum ada MOU\n\nBuat MOU baru atau generate dari Output Kerjasama.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-harga",
+    "text": "Paket & Harga\n\nPaket berlangganan yang dijual AVA Tech beserta batas pemakaiannya.\n\n💠\nBelum ada paket ditetapkan\nTetapkan paket beserta harga dan batas pemakaiannya sebelum menerbitkan lisensi untuk klien.\n+ Tetapkan Paket",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "finance",
+    "text": "Finance & Billing\n\nInvoice, pembayaran, laporan keuangan, dan komisi sales\n\n🏢 Invoice MCU Korporat\n+ Buat Invoice\nTOTAL TAGIHAN\nRp 0\nSUDAH DIBAYAR\nRp 0\nBELUM DIBAYAR\nRp 0\nOVERDUE\nRp 0\nInvoice\n💳 Pembayaran\nLaporan\n🏆 Komisi Sales\nSemua Status\nDraft\nDikirim\nDibayar\nOverdue\nDibatalkan\nBelum ada invoice\n\nKlik \"+ Buat Invoice\" untuk membuat invoice pertama.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "catalog-export",
+    "text": "Master Katalog Tes & Ekspor LIS\n\nKatalog pemeriksaan dengan pemetaan LOINC dan rentang rujukan.\n\n📚\nKatalog pemeriksaan masih kosong\nVersi sebelumnya menampilkan contoh rentang rujukan yang ditulis di berkas tampilan. Rentang rujukan menentukan hasil pasien disebut normal atau tidak, bergantung metode dan reagen tiap lab, dan wajib divalidasi sebelum dipakai — jadi ia harus datang dari master lab ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "satusehat",
+    "text": " SATUSEHAT\n\nPertukaran data kesehatan dengan Kemenkes RI melalui FHIR R4\n\nUji Koneksi\nMuat Ulang\nBelum siap\n-\nKredensial belum lengkap. Isi SATUSEHAT_CLIENT_ID, SATUSEHAT_CLIENT_SECRET, dan SATUSEHAT_ORG_ID di desktop-app/.env, lalu jalankan ulang aplikasi. Client secret sengaja tidak pernah dikirim ke peramban, jadi tidak bisa diisi dari layar ini.\nLingkungan\nSandbox (stg)\nAlamat FHIR\n-\nOrganizat",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-analyzer",
+    "text": "Interfacing Analyzer\n\nSambungan alat laboratorium ke LIS dan lalu lintas pesannya.\n\n🔬\nBelum ada alat terdaftar\nDaftarkan analyzer lebih dulu di master alat sebelum menyambungkannya.\nLalu Lintas Pesan (semua alat)\nBelum ada pesan yang tercatat.\nStatus sambungan dihitung dari kapan alat terakhir terdengar (last_seen_at). Ambang diam: 15 menit.\n⚡ Simulator ASTM & Injeksi Hasil",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "agentic",
+    "text": "🤖\nAgentic AI Enterprise Suite\n2026 HIGH PERFORMANCE EDITION\n\nOrganisasi Agent · QMS ISO 15189 · MCP Protocol · A2A Inter-Agent · Content Studio · RAG SOP\n\n8 Agents & Services Active\n🕸 Kanvas Orkestrator\nData langsung\n🌐 Orchestrator & A2A\nSkema statis\n👥 Organisasi Agent\nStruktur AI\n📄 Dokumen QMS\nISO 15189\n📬 Approval Inbox\nMandat R1-R3\n🩺 Clinical & Lab Ops\nLIS-AI\n🔌 MCP Tools Console\n8 Connec",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hrd",
+    "text": "HRD & SDM\n\nData karyawan, absensi, cuti, dan penggajian AVA Health & Lab Diagnostics\n\nLengkapi Jabatan & Jadwal\nPayroll\n+ Tambah Karyawan\n0\nTotal Karyawan\n✅\n0\nAktif\n0\nProbasi\n0\nKontrak\nRp 0\nTotal Gaji/Bln\n🏆\n—\nDivisi Terbesar\nData Karyawan\n🕐 Absensi & Cuti\nPenggajian\nSemua Divisi\nLaboratory\nSales & Marketing\nOperasional\nFinance\nHRD\nIT\nManagement\nLainnya\nSemua Status\nAktif\nNon-Aktif\nProbasi\nKontra",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-sprint",
+    "text": "⚡\nSPRINT & ENGINEERING WORKLOAD\nSprint Active & Kapasitas Tim Tech\n\nManajemen beban kerja developer, alokasi tugas sprint, dan velocity rekayasa perangkat lunak AVA Tech.\n\nSPRINT AKTIF\nSprint 24\nTarget: Multi-Lab & LIS-HIS Perfecting\nVELOCITY TIM\n42 Story Points\nSelesai 92% dari target sprint",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tech-delivery",
+    "text": "AVA TECH · DELIVERY\n\nDelivery, SLA & Customer Success\n\nPusat kesiapan komersialisasi sistem: implementasi, scope, acceptance, SLA, incident, release, adopsi tenant dan rekonsiliasi lisensi.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "admission",
+    "text": "Registrasi Rawat Jalan (OPD)\n\nPasien · penjamin · jadwal/unit/dokter · layanan · kasir\n\nJumat, 2 Oktober 2026\nTema\n🔔\nU\n—\n—\nDaftar Registrasi\n\n0 registrasi pada periode terpilih\n\nUntuk kunjungan poli. Pilih konteks jadwal, unit, dan dokter sebelum layanan ditagihkan.\nSemua jenis\nWalk-in\nBooking\nRujukan\nProject MCU\nLaporan\nRegistrasi baru\nSemua 0\nRegistered 0\nAnamnesa 0\nLab 0\nRadiology 0\nDone 0\nCan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "queue",
+    "text": "Antrean\n\nNomor antrian harian per layanan, panggil, dan lewati\n\n🖥️ Layar Ruang Tunggu\n+ Ambil Nomor\nSemua\nLab\nRadiologi\nDokter\nKasir\n—\nSedang Dipanggil\n0\nMenunggu\n0\nDilayani\n0\nSelesai\n🎫\nBelum ada antrian hari ini\n+ Ambil Nomor",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "queue-console",
+    "text": "Konsol Panggilan Antrean\n🎫\nBelum ada loket terdaftar\n\nKonsol ini memanggil antrean per loket. Daftarkan loket lebih dulu — nama, layanan yang dilayaninya, dan ruangnya.\n\nBuka Konfigurasi Antrean",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "queue-kiosk",
+    "text": "OL\nSelamat Datang\n\nSilakan pilih layanan untuk mengambil nomor antrian\n\nLaboratorium\nPemeriksaan darah, urin, dan lainnya\nRadiologi\nRontgen, USG, dan pencitraan\nDokter\nKonsultasi & pemeriksaan dokter\nKasir\nPembayaran & administrasi\nSentuh salah satu layanan di atas",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "appointments",
+    "text": "Perjanjian\n\nJadwalkan kunjungan pasien beserta pengingatnya\n\n+ Buat Perjanjian\ns/d\nBelum ada perjanjian",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "emr-soap",
+    "text": "EMR SOAP & CPPT\n\nLembar konsultasi: subjektif, objektif, asesmen, dan rencana.\n\n🗒️\nBelum ada kunjungan tercatat\nKunjungan yang terdaftar di Pendaftaran & Admisi akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "anamnesa",
+    "text": "← Menu Anamnesa\nAnamnesa & Skrining Awal\nPemeriksaan awal wajib · TTV & antropometri · cetak barcode · rujuk ke Lab\nJumat, 2 Oktober 2026\n🕒\n0\nMenunggu Anamnesa\n0\nAnamnesa Selesai\n0\nDi Lab\n0\nTotal Antrian\nBelum ada antrian anamnesa",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "inpatient",
+    "text": "← Menu Rawat Inap\nRawat Inap (Inpatient Management)\nPapan tempat tidur, admisi, visite, billing harian, dan resume pulang\nJumat, 2 Oktober 2026\n+ Admisi Rawat Inap\nPapan Tempat Tidur\nPasien Dirawat\nRuang & Tarif\n0\nPasien Dirawat\n0\nTempat Tidur Kosong\n0%\nBOR Hari Ini\n0\nPerlu Dibersihkan\nBelum ada tempat tidur\n\nBuat bangsal dan tempat tidurnya pada tab Ruang & Tarif.\n\nBuka Ruang & Tarif",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-orders",
+    "text": "Order Terintegrasi\n\nSatu permintaan pemeriksaan lintas lab, radiologi, dan tindakan.\n\nDaftar Order\nOrder Baru\n📋\nBelum ada order tercatat\nBuat order baru untuk meminta pemeriksaan lintas layanan sekaligus.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-integration",
+    "text": "HIS · LIS · BILLING\n\nHub Integrasi & Rekonsiliasi\n\nSatu tempat untuk melihat status order, hasil, billing handoff, retry, dan pengecualian lintas HIS–LIS. Pembayaran tetap dimiliki HIS; panel ini hanya menunjukkan kontrak dan status.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, d",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-clinical-pathology",
+    "text": "PELAYANAN KLINIS · VIEWER LIS\n🧪 Viewer Hasil Patologi Klinik\n\nHasil kimia klinik, hematologi, imunologi, dan pemeriksaan laboratorium klinik yang sudah dirilis LIS.\n\n🔒\nRead-only dari LIS\nHanya hasil yang sudah dirilis\nⓘ\nKoreksi, validasi, persetujuan, dan rilis hasil dilakukan di LIS. HIS menampilkan salinan hasil untuk kesinambungan pelayanan klinis.\n30 hari terakhir\n90 hari terakhir\n12 bulan t",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-microbiology",
+    "text": "PELAYANAN KLINIS · VIEWER LIS\n🦠 Viewer Hasil Mikrobiologi\n\nHasil pewarnaan, kultur, identifikasi, dan sensitivitas yang sudah dirilis LIS.\n\n🔒\nRead-only dari LIS\nHanya hasil yang sudah dirilis\nⓘ\nKoreksi, validasi, persetujuan, dan rilis hasil dilakukan di LIS. HIS menampilkan salinan hasil untuk kesinambungan pelayanan klinis.\n30 hari terakhir\n90 hari terakhir\n12 bulan terakhir\nSemua periode\nSemu",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-anatomical-pathology",
+    "text": "PELAYANAN KLINIS · VIEWER LIS\n🔬 Viewer Hasil Patologi Anatomi\n\nHasil histopatologi, sitologi, dan pemeriksaan anatomi patologi yang sudah dirilis LIS.\n\n🔒\nRead-only dari LIS\nHanya hasil yang sudah dirilis\nⓘ\nKoreksi, validasi, persetujuan, dan rilis hasil dilakukan di LIS. HIS menampilkan salinan hasil untuk kesinambungan pelayanan klinis.\n30 hari terakhir\n90 hari terakhir\n12 bulan terakhir\nSemua ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-procedures",
+    "text": "Tindakan & Prosedur\n\nPenjadwalan, persetujuan tindakan, pelaksanaan, dan hasilnya.\n\nDaftar Tindakan (0)\nProgram Terapi\nKatalog\n🩹\nBelum ada tindakan tercatat\nIsi katalog tindakan lebih dulu di tab Katalog.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-immunization",
+    "text": "Vaksinasi & Imunisasi\n\nPemberian, stok batch, rantai dingin, dan kejadian ikutan.\n\nPemberian tercatat\n0\nBatch layak\n0\nSegera kedaluwarsa\n0\nJadwal jatuh tempo\n0\nPemberian (0)\nJadwal Jatuh Tempo (0)\nStok & Rantai Dingin (0)\nMaster Vaksin\n💉\nBelum ada pemberian tercatat\nIsi master vaksin dan batch-nya lebih dulu.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "medrecord",
+    "text": "← Menu Rekam Medis\nRekam Medis\nRekam medis gabungan per pasien — anamnesa, lab, radiologi, EKG, semua dalam satu\nJumat, 2 Oktober 2026\nCari Pasien\nCari dan pilih pasien untuk melihat rekam medisnya",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-mpi",
+    "text": "Master Patient Index\n\nIdentitas tunggal pasien lintas unit dan lintas kunjungan.\n\nCari Pasien (0)\nKemungkinan Ganda (0)\nRiwayat Penggabungan\nmenampilkan 0 dari 0 pasien\n👤\nBelum ada pasien terdaftar di MPI",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-mr-governance",
+    "text": "Kelengkapan & Retensi Rekam Medis\n\nPenilaian kelengkapan berkas dan pengelolaan masa simpan.\n\nUnsur kelengkapan belum ditetapkan. Kelengkapan belum bisa dinilai sampai ada daftar unsur yang harus ada di berkas. Tetapkan di tab Unsur Kelengkapan.\nSemua dinilai\n0\nLengkap\n0\nTidak lengkap\n0\nSiap dimusnahkan\n0\nRerata kelengkapan\n0%\nPenilaian (0)\nUnsur Kelengkapan (0)\nAturan Retensi\n📁\nBelum ada berkas ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "package-service",
+    "text": "ALUR PASIEN · PAKET & MEMBERSHIP\nPaket & Membership\n\nRegistrasi, hak paket, dan penebusan layanan dipisahkan dari konfigurasi master agar petugas tidak mengubah katalog saat melayani pasien.\n\nMaster paket dikelola pada Administrasi Sistem\n0\npaket aktif\n0\nregistrasi paket\nperiode data tersedia\n0\nlangganan tercatat\nperlu ledger otoritatif\nOperasional pasien\nRegistrasi Paket\nDaftarkan paket/MCU dan a",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "igd-triase",
+    "text": "Triase & Keselamatan Pasien\n\nPenilaian kegawatan IGD, skrining risiko, dan catatan pemberian obat.\n\n+ Triase Pasien\nTriase IGD (0 aktif)\nSkrining Risiko\nPemberian Obat\n🚑\nBelum ada pasien ditriase\nTriase menjawab pertanyaan yang berbeda dari antrean: berapa lama pasien ini masih aman menunggu.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "skrining-risiko",
+    "text": "Triase & Keselamatan Pasien\n\nPenilaian kegawatan IGD, skrining risiko, dan catatan pemberian obat.\n\nTriase IGD (0 aktif)\nSkrining Risiko\nPemberian Obat\nTiga skrining wajib saat admisi: risiko jatuh, nyeri, dan gizi. Ketiganya dinilai di menit-menit pertama dan menentukan tindakan yang berbeda. Alat ukur yang dipakai selalu dicatat — skor 45 pada satu instrumen berarti hal yang berbeda pada instrum",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "mar",
+    "text": "Triase & Keselamatan Pasien\n\nPenilaian kegawatan IGD, skrining risiko, dan catatan pemberian obat.\n\nTriase IGD (0 aktif)\nSkrining Risiko\nPemberian Obat\n💊\nBelum ada jadwal pemberian obat\nFarmasi menyerahkan obat, tapi yang mencatat siapa memberikannya ke pasien dan jam berapa adalah layar ini. Tanpa catatan itu, dosis yang terlewat dan dosis ganda sama-sama tidak terdeteksi sampai pasien bereaksi.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "farmasi",
+    "text": "← Menu Farmasi\nFarmasi & Apotek\nPharmacy Information System\nJumat, 2 Oktober 2026\n+ Resep Baru\nResep Elektronik\nMaster Obat\nStok & Kedaluwarsa\nPencatatan Narkotika\nLaporan Farmasi\nBelum ada resep\n+ Resep Baru",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "homecare",
+    "text": "← Menu Home Care\nHome Care\nManajemen order layanan kunjungan rumah · jadwal · nakes · billing\nJumat, 2 Oktober 2026\nPeta Live\nMaster Nakes\nMaster Tarif\nLaporan\n+ Order Baru\n0\nTotal Order\n0\nJadwal Hari Ini\n⏳\n0\nMenunggu\n🔵\n0\nAktif\n✅\n0\nSelesai\nRp 0\nRevenue\nSemua\nBaru\nDikonfirmasi\nDijadwalkan\nDalam Perjalanan\nSedang Dilayani\nSelesai\nDibatalkan\n🏠\nBelum ada order Home Care\n\nBuat order baru untuk layana",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hc-schedule",
+    "text": "Jadwal Kunjungan Home Care\n\nKalender harian nakes & assign tugas\n\n← Orders\nBilling Nakes\nReport\n← Kemarin\nBesok →\nHari Ini\nTidak ada jadwal untuk 02 Okt 2026",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hc-staff",
+    "text": "Master Nakes\n\nTenaga kesehatan Home Care — kompetensi, wilayah, komisi\n\n← Orders\n+ Tambah Nakes\nBelum ada Nakes\n\nKlik \"+ Tambah Nakes\".",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hc-tariff",
+    "text": "🏷️ Master Tarif Home Care\n\nTarif dasar & komisi per jenis layanan\n\n← Orders\n+ Tambah Tarif\n🏷️\nBelum ada tarif",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hc-billing",
+    "text": "Billing Fee Nakes\n\nRekap fee per nakes berdasarkan order yang selesai\n\n← Jadwal\nJanuari\nFebruari\nMaret\nApril\nMei\nJuni\nJuli\nAgustus\nSeptember\nOktober\nNovember\nDesember\n2024\n2025\n2026\n0 order selesai · 0 nakes\nBelum ada order selesai bulan ini",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "hc-report",
+    "text": "Report Home Care\n\nRekap kunjungan dan revenue per periode\n\n← Orders\ns/d\nTampilkan\n0\nTotal Order\n0\nSelesai\n0\nDibatalkan\n0%\nTingkat Penyelesaian\nRp 0\nRevenue\nRp 0\nMargin Kotor\n—\nRata Kepuasan\nRp 0\nBelum Lunas\nPer Jenis Layanan\nBelum ada data\nStruktur Biaya\nRevenue\nRp 0\n– Komisi Nakes\nRp 0\n– Nilai BHP\nRp 0\n= Margin Kotor\nRp 0\nKinerja per Nakes\nNAKES\tKUNJUNGAN\tREVENUE\tRATA RATING\nBelum ada data",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "bpjs-claim",
+    "text": "Klaim Penjamin\n\nBPJS, asuransi swasta, dan TPA — kelengkapan berkas dan status pembayaran.\n\nLayar ini tidak menghitung tarif INA-CBG. Tarif dihitung aplikasi E-Klaim resmi dari tabel tarif ber-SK; angka di kolom \"Tarif E-Klaim\" dimasukkan dari keluarannya. Nomor SEP juga diterbitkan VClaim dan disalin ke sini. Menghitung sendiri menghasilkan angka berbeda dari yang diakui verifikator, dan selisih ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "compliance-tracker",
+    "text": "Izin & Kepatuhan\n\nPerizinan faskes, sertifikasi, dan kredensial tenaga kesehatan.\n\nIzin terdaftar\n0\nKredensial nakes\n0\nBerakhir ≤90 hari\n0\nSudah lewat\n0\nPerizinan Faskes (0)\nSTR / SIP Nakes (0)\n📄\nBelum ada izin terdaftar\nDaftarkan izin operasional, sertifikasi, dan izin edar beserta tanggal berakhirnya agar peringatan bisa terbit sebelum habis.\nSisa hari dihitung dari tanggal berakhir, bukan diba",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "rl-reports",
+    "text": "Laporan Kemenkes\n\nRekapitulasi RL dari data operasional — kunjungan, morbiditas, ketenagaan\n\n⬇️ Unduh CSV\n🖨 Cetak\nAngka di bawah adalah rekapitulasi dari data operasional Anda, siap disalin ke format resmi yang berlaku. Format RL berubah mengikuti peraturan — periksa definisi tiap indikator sebelum dikirimkan.\nPeriode 2026-10-01 s/d 2026-10-30\n0\nTotal Kunjungan\n0\nPasien Unik\n0\nPasien Baru\n0\nPemer",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "his-wellness",
+    "text": "Orkestrasi Wellness\n\nHIS mengatur program, peserta, permintaan treatment, pelaksana dan laporan sesi. HR melakukan evaluasi dan request melalui APPS; IHC hanya mengirim hasil.\n\nPeserta & pelaksanaan\nKonfigurasi program & roster\nImpor hasil\nProgram\nPilih program",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-admission",
+    "text": "← Keluar\nAVA LAB\nPermintaan Pemeriksaan\n📄 Form Baru\n💾 Simpan & Barcode (Ctrl+Enter)\nNo. kunjungan HIS\nMuat Order HIS\nRegistrasi baru · layanan dan tagihan ditautkan ke HIS\nLAB NO / ACCESSION\nNO. RM / PID *\nNAMA PASIEN *\nNIK / KTP\nUSIA *\nGENDER *\nLaki-laki (L)\nPerempuan (P)\nPRIORITAS\nROUTINE\n⚡ STAT / CITO\nDOKTER / FASKES\nCATATAN KLINIS / SAMPLING\nPRESET KLINIS:\n+ Puasa 10-12 jam\n+ Suspek DBD (Dem",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-phlebotomy",
+    "text": "Flebotomi\n\nPengambilan sampel dan urutan tabung.\n\nMenunggu Pengambilan\nUrutan Tabung\n💉\nTidak ada sampel yang menunggu diambil\nPermintaan pemeriksaan yang sudah terdaftar akan muncul di sini.\nSudah Diambil (terbaru)\nBelum ada pengambilan tercatat.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab",
+    "text": "LIS • ISO 15189:2022\nPenerimaan & Barcode\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\nCheck In Barcode\n+ Order Walk-In LIS (Mandiri)\n🏥 Tarik Order HIS\nDAFTAR SAMPEL — CHECK-IN S/D SELESAI\n🧪\nBelum ada sampel\n\nScan barcode untuk check-in.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-kelayakan",
+    "text": "Kelayakan Spesimen\n\nVerifikasi penerimaan sampel dan pencatatan penolakan.\n\nMenunggu Verifikasi\nRiwayat Penolakan\nKriteria Penolakan\n🔎\nTidak ada sampel yang menunggu verifikasi\nSampel yang sudah diambil akan muncul di sini untuk diperiksa kelayakannya sebelum diproses.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "audiometry",
+    "text": "Audiometri\nDaftar dan input Audiometri. Gunakan dashboard penunjang untuk melihat seluruh jenis pemeriksaan.\nInput pemeriksaan\nEKG 12 Lead\n0\nEKG Treadmill\n0\nAudiometri\n0\nSpirometri\n0\nSemua Status\nDraft\nValidated\nApproved\nBelum ada pemeriksaan supportive\nInput pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "spirometry",
+    "text": "Spirometri\nDaftar dan input Spirometri. Gunakan dashboard penunjang untuk melihat seluruh jenis pemeriksaan.\nInput pemeriksaan\nEKG 12 Lead\n0\nEKG Treadmill\n0\nAudiometri\n0\nSpirometri\n0\nSemua Status\nDraft\nValidated\nApproved\nBelum ada pemeriksaan supportive\nInput pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "supportive",
+    "text": "Pemeriksaan Penunjang\nEKG 12 Lead · EKG Treadmill · Audiometri · Spirometri\nInput pemeriksaan\nEKG 12 Lead\n0\nEKG Treadmill\n0\nAudiometri\n0\nSpirometri\n0\nSemua Status\nDraft\nValidated\nApproved\nBelum ada pemeriksaan supportive\nInput pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "worklist",
+    "text": "LIS • ISO 15189:2022\nWorklist Mesin Analyzer\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\nSemua\nPending\nEnter Result\nValidate\nApprove\nTerima Hasil Alat\nWorklist Kosong\n\nBelum ada order pasien atau sampel yang sesuai dengan filter.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-result",
+    "text": "LIS • ISO 15189:2022\nInput Hasil & Delta Check\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\n0 pasien menunggu input hasil\n+ Input Manual\n✅\nSemua hasil sudah diinput",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "referral",
+    "text": "← Menu Rujukan\nRujukan Lab Luar\nPemeriksaan lab rekanan · pengiriman · hasil · margin\nJumat, 2 Oktober 2026\n+ Lab Rekanan\nKirim Pemeriksaan\nPeriode\nRingkasan dan margin mengikuti periode ini. Daftar keterlambatan selalu menampilkan seluruh pemeriksaan yang hasilnya belum kembali, termasuk dari periode sebelumnya.\n0\nTerkirim · Oktober 2026\n0\nMenunggu hasil\n0\nTerlambat\nRp 0\nMargin · Oktober 2026\nPel",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-critical-value",
+    "text": "Pelaporan Nilai Kritis\n\nLogbook wajib akreditasi — hasil kritis, siapa dihubungi, dan kapan.\n\nTotal tercatat\n0\nBelum dilaporkan\n0\nBelum ada read-back\n0\n🔔\nBelum ada nilai kritis tercatat\nCatatan terbit otomatis saat hasil melewati ambang kritis yang ditetapkan lab.\nKolom Ambang menampilkan batas yang berlaku saat kejadian itu tercatat, disalin ke barisnya masing-masing. Mengubah ambang di kemudian",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-validation",
+    "text": "LIS • ISO 15189:2022\nOtorisasi Dokter Sp.PK\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\nAutoverifikasi — 0 pemeriksaan aktif · 0 kandidat untuk tinjauan teknis\nAtur Aturan\n0 hasil siap divalidasi\n✅\nTidak ada hasil menunggu verifikasi pada data yang dimuat",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-approval",
+    "text": "LIS • ISO 15189:2022\nApproval & TTE QR\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\n0 hasil siap diapprove & rilis\n✅\nSemua hasil sudah diapprove",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-tat",
+    "text": "⏱️ Kinerja & Waktu Penyelesaian\nRingkasan Periode\n\nDurasi pemeriksaan berdasarkan data yang tercatat pada periode terpilih.\n\n7 Hari Terakhir\n30 Hari Terakhir\n90 Hari Terakhir\n🔄 Refresh\nRINGKASAN SAMPEL DALAM PERIODE TERPILIH\n0\nSAMPEL TERCATAT\n0\nSELESAI\n0\nBELUM SELESAI\nTAT MEDIAN\n—\nTAT P90 (EKOR KETERLAMBATAN)\n—\nSAMPEL SELESAI\n0 / 0 (0%)\nTITIK HAMBATAN UTAMA\nBelum tersedia\nDurasi Tiap Tahap Pemeri",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-qc",
+    "text": "LIS • ISO 15189:2022\nQC & Kendali Mutu\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\n0 analyzer\n+ Analyzer + Log QC\n🧬 Analyzer & Status Kalibrasi\nALAT\tKATEGORI\tLOKASI\tINTEGRASI\tKALIBRASI BERIKUTNYA\tSTATUS\tAKSI\nBelum ada analyzer. Klik \"+ Analyzer\".\nLog Quality Control (Westgard)\nWAKTU\tALAT\tTES\tLEVEL\tTARGET±SD\tTERUKUR\tZ-SCORE\tEVALUASI\t\nBelum ada log QC. K",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-lot-verification",
+    "text": "Verifikasi Lot QC\n\nLot bahan kontrol, nilai target, dan hasil pemantapan mutu internal.\n\n🧪\nBelum ada lot QC terdaftar\nDaftarkan lot beserta nilai target dan SD dari sisipan pabrik sebelum menjalankan QC.\nHasil Run QC (terbaru)\nBelum ada run QC.\nAturan Westgard yang diperiksa di sini terbatas pada 1-3s dan 2-2s — hanya itu yang bisa dihitung dari data yang tersimpan. Aturan lain (4-1s, 10x, dan R-",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-pme",
+    "text": "PME / Uji Profisiensi\n\nPemantapan mutu eksternal — program, siklus, dan evaluasi hasil.\n\n🎯\nBelum ada program PME terdaftar\nDaftarkan penyelenggara yang diikuti lab beserta nomor pesertanya, lalu catat tiap siklusnya.\n+ Daftarkan Program",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lab-report",
+    "text": "LIS • ISO 15189:2022\nRekam Medis Lab & Arsip\n\nDiagnostic Laboratory Information System • ASTM E1381 / HL7 Integrated\n\nAnalyzer Online\n0 kunjungan selesai\n🖨️ Setting PDF\n📁\nBelum ada hasil yang diapprove",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-sample-archive",
+    "text": "Arsip & Retensi Sampel\n\nPenyimpanan sampel selesai periksa, masa simpan, dan pemusnahan.\n\nBelum diarsipkan\n0\nTersimpan\n0\nSiap dimusnahkan\n0\nSudah dimusnahkan\n0\n🗄️\nTidak ada sampel pada kelompok ini",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "product",
+    "text": "Master Produk & Tes\n\nKelola semua tes, layanan, harga, HPP, dan nilai rujukan\n\nRef Range\nImport Excel\nExport CSV\n+ Tambah Tes\n0\nTotal Tes\n0\nAktif\n0\nNon-Aktif\n0\nKategori\n-\nTerbanyak\nSemua Kategori\nHematologi\nKimia Klinik\nImunologi\nUrinalisa\nMikrobiologi\nPatologi Anatomi\nRadiologi\nFisiologi\nSpirometry\nEKG\nAudiometri\nLainnya\nSemua\nAktif\nNon-Aktif\n🧬\nBelum ada produk/tes\n+ Tambah Tes",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "package",
+    "text": "Paket & Layanan\nMaster paket pemeriksaan — MCU · Screening · Gut Health · Panel\nImpor data\nEkspor\nBuat paket\n0\nTotal Paket\n0\nAktif\nRp∞\nHarga Terendah\n-Rp∞\nHarga Tertinggi\nBelum ada paket layanan\n+ Buat Paket",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "refrange",
+    "text": "Reference Range / Nilai Rujukan\n\nNilai normal per tes — berdasarkan gender, usia, dan kondisi klinis\n\n← Produk\n+ Tambah Range\n-- Pilih Tes untuk filter --\nTampilkan Semua\nBelum ada reference range\n\nTambah nilai rujukan per tes untuk mendukung interpretasi hasil lab.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "inventory",
+    "text": "â† Menu Inventory\nInventory & Logistik\nStok, Purchase Request/Order, Stock Opname, dan MRP\nJumat, 2 Oktober 2026\nStok Barang\nPurchase Request\nPurchase Order\nGoods Issue\nStock Opname\nStock Ledger\nMRP\nLaporan\nSupplier\nResep BHP\nSemua Kategori\nReagen\nBHP Lab\nAPD\nATK\nConsumable Radiologi\nConsumable EKG\nObat & Alkes\nLainnya\nâ‡„ Pindah Barang\n+ Tambah Barang\nBelum ada barang\n\nKlik \"+ Tambah Barang\" unt",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-analyzer",
+    "text": "Interfacing Analyzer\n\nSambungan alat laboratorium ke LIS dan lalu lintas pesannya.\n\n🔬\nBelum ada alat terdaftar\nDaftarkan analyzer lebih dulu di master alat sebelum menyambungkannya.\nLalu Lintas Pesan (semua alat)\nBelum ada pesan yang tercatat.\nStatus sambungan dihitung dari kapan alat terakhir terdengar (last_seen_at). Ambang diam: 15 menit.\n⚡ Simulator ASTM & Injeksi Hasil",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-settings",
+    "text": "⚙️ KONFIGURASI LIS • ISO 15189:2022\nPengaturan Laboratorium & LIS Master Config\n\nPreferensi tampilan pada browser ini. Nilai rujukan dan batas kritis dikelola melalui master server; identitas otorisator mengikuti akun petugas.\n\n⬇️\nDownload Connector (.ZIP)\n🏥 Profil Lab & Sp.PK\n🚨 Nilai Kritis per Parameter\n🔌 Alat & Connector (:9999)\n🧪 Katalog Pemeriksaan\n📄 Format Lembar Hasil PDF\nIdentitas Lab",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-helpdesk",
+    "text": "ISO 15189:2022 SOP\n•\nAlur Layanan AVA Lab\n💡 Pusat Bantuan, SOP & Panduan Alur Kerja LIS\n\nPanduan interaktif menyeluruh mengenai alur operasional laboratorium, penjelasan fungsi tiap menu, standar keselamatan pasien, dan solusi cepat penanganan kendala teknis.\n\n🗺️ Alur Kerja Laboratorium\n📖 Penjelasan Menu (360°)\n🛠️ Troubleshooting Cepat\n🧭 Peta Alur Kerja Laboratorium End-to-End (SOP Klinis)\n\nB",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "lis-integration",
+    "text": "LIS · TRACEABILITY\n\nInbox Order & Hasil LIS\n\nDaftar kerja untuk memantau order dari HIS, kelayakan spesimen, hasil yang perlu dikirim kembali, koreksi, retry, dan jejak audit.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan klaim operasio",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "corporate",
+    "text": "Corporate Management\n\nManajemen klien korporat — kontrak, billing, limit kredit\n\n🏢 Health Facility\n📥 Import\n📤 Export\n➕ Tambah Corporate\n🏢\n0\nTOTAL CORPORATE\n✅\n0\nCORPORATE AKTIF\n💳\nRp 0\nTOTAL CREDIT LIMIT\n🧾\n0\nINVOICE CLIENT\n🔍\nSemua Status\nAktif\nNon-Aktif\nSuspend\nSemua Billing\nInvoice\nPrepaid\nCredit\n🏢\nBelum ada data corporate\n\nSilakan tambah data corporate baru di atas.\n\n➕ Tambah Corporate",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "mcu",
+    "text": "← Menu MCU\nProject MCU Korporat\nManajemen project MCU B2B · 6 Fase · 31 Tahapan · Gate System\nJumat, 2 Oktober 2026\nRefresh\n+ Buat Project MCU\n0\nTOTAL PROJECT\n0\nPROJECT AKTIF\n0\nPLANNING\n0\nSELESAI\nRp 0\nTOTAL NILAI\nRp 0\nTOTAL RAB\nSemua Status\nPlanning\nActive\nCompleted\nCancelled\nSemua Tipe\nMCU\nHealthDay\nScreening\nWellness\nBelum ada Project MCU\n\nKlik \"+ Buat Project MCU\" untuk memulai.\n\n+ Buat Project",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "portal-akses",
+    "text": "Akses Portal\n\nTautan bertoken untuk klien korporat dan dokter perujuk — hanya-baca, bisa dicabut, berbatas waktu\n\n+ Buat Tautan\nMuat Ulang\nTautan ini setara kunci. Siapa pun yang memilikinya dapat melihat data perusahaan atau perujuk yang bersangkutan tanpa perlu masuk. Kirim hanya kepada pihak yang berhak, dan cabut segera begitu kerja sama berakhir atau PIC berganti.\nTautan terdaftar\n0 aktif dar",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ecommerce-oms",
+    "text": "Pesanan D2C Multi-Kanal\n\nShopee, TikTok Shop, Tokopedia, web sendiri, apotek mitra.\n\nPesanan\nKonsinyasi Apotek\nBatch & Stok FEFO\nEkspedisi & Resi\nLangganan\n📦\nBelum ada pesanan tercatat\nPesanan masuk dari kanal marketplace atau web akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "subscription",
+    "text": "Langganan & Auto-Refill\n\nPengiriman rutin produk wellness ke pelanggan tetap.\n\nLangganan aktif\n0\nJatuh tempo ≤3 hari\n0\nTerlambat kirim\n0\nPerkiraan nilai / bulan\nRp 0\nPesanan tidak dibuat otomatis. Pengiriman rutin yang berjalan tanpa ada yang menengok adalah cara tercepat mengirim barang ke alamat lama, ke pelanggan yang sudah minta berhenti, atau untuk produk yang stoknya kosong. Tanggal kirim be",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sanctuary-booking",
+    "text": "AVA Sanctuary\n\nReservasi treatment, member VIP, dan okupansi ruangan.\n\n+ Reservasi Baru\nReservasi\nMember & Saldo Sesi\nOkupansi Ruangan\nKatalog Terapi\nTanggal\n0 reservasi · selesai 0\n🗓️\nBelum ada reservasi pada tanggal ini\nGunakan tombol \"Reservasi Baru\" untuk menjadwalkan sesi.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "pabrik",
+    "text": "Pabrik\n\nFormulasi, perintah produksi, maklon, dan uji mutu produk.\n\nPerintah Produksi\nFormulasi & R&D\nKemitraan Maklon\nUji Mutu\n🧪\nBelum ada formulasi tercatat\nResep disimpan berversi — versi baru jadi baris baru, supaya batch yang sudah beredar tetap punya catatan dibuat dengan resep yang mana.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "wellness-rnd",
+    "text": "Pabrik\n\nFormulasi, perintah produksi, maklon, dan uji mutu produk.\n\nPerintah Produksi\nFormulasi & R&D\nKemitraan Maklon\nUji Mutu\n🧪\nBelum ada formulasi tercatat\nResep disimpan berversi — versi baru jadi baris baru, supaya batch yang sudah beredar tetap punya catatan dibuat dengan resep yang mana.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "wellness-maklon",
+    "text": "Pabrik\n\nFormulasi, perintah produksi, maklon, dan uji mutu produk.\n\nPerintah Produksi\nFormulasi & R&D\nKemitraan Maklon\nUji Mutu\n🤝\nBelum ada kontrak maklon\nMaklon: AVA memproduksi untuk merek pihak lain. Hasilnya milik klien dan tidak masuk stok jualan AVA.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "wellness-mutu",
+    "text": "Pabrik\n\nFormulasi, perintah produksi, maklon, dan uji mutu produk.\n\nPerintah Produksi\nFormulasi & R&D\nKemitraan Maklon\nUji Mutu\n🔬\nBelum ada uji mutu tercatat\nBatch hasil produksi tetap berstatus Karantina sampai semua uji lulus.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "nutrition-quality",
+    "text": "NUTRITION · PLANT\n\nBatch, Release & Product Quality\n\nKontrol kesiapan produksi dan mutu: formula berversi, bahan, batch record, karantina, release, deviasi, complaint dan recall.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan klaim opera",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "wellness-program",
+    "text": "CARE · WELLNESS\n\nProgram, Peserta & Tindak Lanjut\n\nRuang kendali program kesehatan yang menghubungkan peserta, consent, jadwal, kehadiran, catatan layanan, follow-up dan evaluasi pengalaman.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "partner-rewards",
+    "text": "PARTNERSHIP · REWARD\n\nChallenge & Rekonsiliasi Mitra\n\nKerangka operasional untuk challenge, kuota voucher, verifikasi pemenuhan, penukaran, rekonsiliasi mitra dan perlindungan data peserta.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sanctuary-operations",
+    "text": "SANCTUARY · SERVICE\n\nOperasional Sanctuary\n\nAlur operasional untuk booking, screening, consent, kapasitas ruang, penugasan therapist, hygiene, no-show, saldo paket dan follow-up.\n\nKembali ke dashboard\nKERANGKA KENDALI · SIAP DIISI DATA OPERASIONAL\nUrutan kerja yang dapat ditelusuri.\n\nPanel ini memisahkan status proses, pemilik tindak lanjut, dan bukti yang diperlukan. Tidak menampilkan klaim opera",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "cashier",
+    "text": "â† Menu Kasir\nKasir & Pembayaran\nPembayaran, refund, dan tagihan korporat\nShift Kas\nLaporan\n+ Transaksi Baru\nRp 0\nTotal Revenue\nRp 0\nCash\nðŸ“±\nRp 0\nNon-Cash\n0\nRefund\nðŸ¢\n0\nTagihan Korporat\n0\nTransaksi\nâ³ Antrian Pembayaran\nRefresh\nâœ… Tidak ada antrian pembayaran\nSemua Tipe\nPayment\nRefund\nCancellation\nCorporate Bill\nBelum ada transaksi hari ini",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ar-aging",
+    "text": "Umur Piutang\n\nTagihan belum lunas dikelompokkan menurut lama lewat jatuh tempo\n\nEkspor CSV\nMuat Ulang\nTidak ada piutang tercatat\nSemua tagihan sudah lunas, atau belum ada invoice yang dibuat.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "payables",
+    "text": "Hutang Usaha\n\nFaktur supplier, pencocokan tiga arah, dan pengendalian pembayaran\n\n＋ Faktur Baru\nAturan pembayaran: faktur hanya dapat dibayar bila hasil pencocokan tiga arah berstatus Cocok — yaitu nilai faktur sepadan dengan nilai barang yang benar-benar diterima. Aturan ini dijaga langsung oleh basis data dan tidak dapat dilewati dari layar mana pun.\n💳\nRp 0\nTotal Hutang Berjalan\n0 faktur belum ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "accounting",
+    "text": "Akuntansi\n\nBuku besar, neraca saldo, dan laba rugi per unit layanan\n\nBagan Akun\nPemetaan Akun\nSebelum diandalkan: bagan akun terpasang dengan template standar klinik. Minta akuntan Anda memeriksa nomor dan nama akunnya, lalu jalankan paralel dengan pembukuan manual selama satu periode penuh.\nNeraca Saldo\nLaba Rugi per Unit\nJurnal\nBelum ada jurnal pada periode ini\n\nJurnal terbentuk otomatis saat ka",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "assets",
+    "text": "Aset Tetap & Kalibrasi\n\nDaftar aset, penyusutan garis lurus, dan jadwal kalibrasi alat\n\nJadwal Baru\n+ Tambah Aset\nRp 0\nNilai Perolehan · 0 aset aktif\n📉\nRp 0\nNilai Buku Berjalan\n0\nJadwal Terlambat\n⏳\n0\nJatuh Tempo ≤ 30 Hari\nDaftar Aset\n📉 Penyusutan\n🔧 Jadwal Kalibrasi\nSemua Kategori\nAlat Laboratorium\nAlat Radiologi\nPerangkat IT\nKendaraan\nFurnitur & Interior\nBangunan\nLainnya\nSemua Status\nAktif\nDile",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "remuneration",
+    "text": "KEUANGAN · REMUNERASI\nRemunerasi\n\nSatu titik navigasi untuk data periode gaji, presensi, komisi, dan fee layanan—tanpa menghitung ulang nilai atau melewati approval payroll.\n\nFinalisasi hanya dari Penggajian\n0\nhadir hari ini\n0 presensi lengkap\n0\nkaryawan periode\nbelum dihitung\n0\nnet payroll\nbelum ada run\nDasar perhitungan\nRoster & Jadwal Kerja\nShift dan kapasitas kerja\n→\nPresensi\nClock in/out, riw",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "payroll",
+    "text": "Penggajian\n\nGaji pokok, tunjangan, komisi nakes, BPJS, dan PPh 21\n\nParameter\nðŸ’¼ Tunjangan Karyawan\nðŸ§® Hitung Gaji Periode Ini\nBelum ada perhitungan gaji untuk 2026-10\n\nKlik \"Hitung Gaji Periode Ini\". Perhitungan dapat diulang selama belum final.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "workforce",
+    "text": "SDM · WORKFORCE\nWorkforce\n\nMaster karyawan, struktur, kehadiran, dan produktivitas dikelompokkan agar perencanaan tenaga kerja tidak tercampur dengan penggajian.\n\nKredensial klinis dikelola melalui kepatuhan\n0\nstaf aktif\n0\nroster aktif\n0\nclock-in hari ini\nPersonalia & kapasitas\nDatabase Karyawan\nBiodata dan status staf\n→\nStruktur Organisasi\nPosisi, departemen, dan pelaporan\n→\nJadwal & Roster\nPemet",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "org-structure",
+    "text": "Struktur Organisasi\n\nJabatan, hierarki, dan org chart AVA Health & Lab Diagnostics\n\nImport dari Template\n+ Tambah Jabatan\n🗂️ Org Chart\nDaftar Jabatan\nBelum ada data jabatan\n\nKlik \"Import dari Template\" untuk load jabatan dari data klinik.\n\nImport Template",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "work-schedule",
+    "text": "Jadwal Kerja & Shift\n\nSetup shift per karyawan — jam weekday vs sabtu, rotasi P1↔P2\n\nImport dari Template\nKalender Shift\n+ Tambah Jadwal\nℹ️ Tabel di bawah ini adalah template shift mingguan per karyawan (jam masuk/pulang, hari kerja). Untuk assign shift ke tanggal spesifik di kalender (misal: tanggal 25 Juni karyawan X masuk P2), gunakan tombol \"Kalender Shift\" — itu sistem terpisah yang mencatat ",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "shift-calendar",
+    "text": "Kalender Shift\n\nKlik tanggal → set shift. Pilih shift dulu di panel atas. Simpan otomatis menambahkan karyawan ke Daftar Jadwal jika belum ada.\n\n← Daftar\nImport OKR Tasks (164)\nSimpan\nKaryawan\nData karyawan belum dimuat\n← Prev\nOktober 2026\nNext →\nP1\nP2\nP3\nOH\nML\nOFF\nCUTI\nSAKIT\nIZIN\nPilih shift di atas, lalu klik tanggal\nMin\nSen\nSel\nRab\nKam\nJum\nSab\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "attendance",
+    "text": "⏰ Absensi & Clock In/Out\n\nPresensi harian dengan validasi GPS dan foto selfie\n\n↻ Refresh\n⏰ Clock In/Out\nRiwayat\nTim (SPV)\nKonfigurasi\n11.49\nJumat, 2 Oktober 2026\nBelum clock in hari ini\n📍 Clock In Sekarang",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "tasks",
+    "text": "Task Management\n\nAlokasi task harian berdasarkan kapasitas shift — Primary & Secondary\n\n↻\n+ Task Baru\nMy Tasks\nTeam Board\nLogbook\nWeekly Summary\n← Kemarin\nJumat, 2 Oktober\nBesok →\nHari Ini\n⏱ Kapasitas Hari Ini\n0.0j / 8.0j\n🔴 Primary: 0.0j / 6.4j maks\n🟡 Secondary: 0.0j\nSisa: 8.0j\nSemua (0)\nTodo (0)\nInProgress (0)\nDone (0)\nBlocked (0)\n+ Primary\n+ Secondary\n🔴 PRIMARY TASKS (0 TASK · 0.0J)\nBelum ada",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "keselamatan-ikp",
+    "text": "Keselamatan Pasien\n\nPelaporan insiden, investigasi, tindakan perbaikan, dan indikator mutu.\n\nLaporkan Insiden\nPelaporan boleh tanpa nama. Insiden yang paling berharga untuk dipelajari justru nyaris-cedera yang hanya diketahui pelakunya sendiri, dan tidak ada yang melaporkan dirinya ke sistem yang mencatat namanya.\nInsiden (0)\nIndikator Mutu\nSemua insiden\n0\nBelum ditutup\n0\nBelum digrading\n0\nLewat b",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "mutu-indikator",
+    "text": "Keselamatan Pasien\n\nPelaporan insiden, investigasi, tindakan perbaikan, dan indikator mutu.\n\nLaporkan Insiden\nPelaporan boleh tanpa nama. Insiden yang paling berharga untuk dipelajari justru nyaris-cedera yang hanya diketahui pelakunya sendiri, dan tidak ada yang melaporkan dirinya ke sistem yang mencatat namanya.\nInsiden (0)\nIndikator Mutu\n📊\nIndikator mutu belum ditetapkan\nDefinisi indikator sen",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "regulatory",
+    "text": "Pelaporan & Audit\n\nINM · IKP · SISDMK · SIMPEL · Audit Internal · Rekap Kasir\n\n+ Buat Laporan / Task\nDashboard\nRiwayat\nKalender\nIndikator Nasional Mutu\nBulanan · Tgl 10 bulan berikutnya\nPelaporan indikator mutu wajib ke Kemenkes/Dinkes setiap bulan.\nPIC: Faiz, Hilmy\n✅ Clear\n⚠️\nInsiden Keselamatan Pasien\nEvent-based · H+24 jam sejak insiden\nPelaporan insiden keselamatan pasien segera setelah kejadi",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "wiki",
+    "text": "Wiki AVA\nDokumen & SOP · Perbaikan SOP (AI) · Content Studio · Media\nAI: teks Gemini/NVIDIA · gambar 100% NVIDIA\n0\nTotal Dokumen\n0\nApproved\n0\nTemplate Acuan\n0\nPerlu Review\n0\nKonten\n0\nMedia\n Dokumen SOP\n Media & Gambar\nSemua Tipe\nSOP\nKebijakan\nInstruksi Kerja\nForm\nPanduan\nTemplate\nSemua Status\nDraft\nReview\nApproved\nObsolete\nUpload Dokumen\n📚\nBelum ada dokumen\n\nUpload SOP/kebijakan, tandai satu seba",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "surat",
+    "text": "Surat Keluar\n\nGenerate surat dari template DOCX — penomoran otomatis, arsip terpusat\n\n+ Buat Surat\nArsip Surat\n📄 Template Surat\nPengaturan Nomor\n❓ Panduan\nSemua Tipe\nSurat Penawaran\nSurat Permohonan Kerjasama\nSurat Pemberitahuan\nMOU / Perjanjian\nSurat Izin\nSurat Keterangan\nSurat Lainnya\nSemua Status\nDraft\nSent\nArchived\n📄\nBelum ada surat\n\nKlik \"+ Buat Surat\" untuk membuat surat pertama.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "partners",
+    "text": "Partner Database\n\nHitlist, pipeline progress, dan visualisasi lokasi peta semua mitra AVA\n\nPipeline (Kanban)\nExport\nImport Excel\n+ Tambah Partner\nSales Pipeline\n0 total partner\nProspect 0\nDihubungi 0\nMeeting 0\nProposal Dikirim 0\nMOU 0\nAktif 0\nTidak Berminat 0\nSemua Kategori\nApotek\nKlinik Pratama\nKlinik Utama\nDokter Praktik\nDokter Spesialis\nKlinik Gigi\nKlinik Mata\nPuskesmas\nRumah Sakit\nLab Klinik\nP",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "portal-pasien",
+    "text": "Akses Portal\n\nTautan bertoken untuk klien korporat dan dokter perujuk — hanya-baca, bisa dicabut, berbatas waktu\n\n+ Buat Tautan\nMuat Ulang\nTautan ini setara kunci. Siapa pun yang memilikinya dapat melihat data perusahaan atau perujuk yang bersangkutan tanpa perlu masuk. Kirim hanya kepada pihak yang berhak, dan cabut segera begitu kerja sama berakhir atau PIC berganti.\nTautan terdaftar\n0 aktif dar",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "portal-korporat",
+    "text": "Akses Portal\n\nTautan bertoken untuk klien korporat dan dokter perujuk — hanya-baca, bisa dicabut, berbatas waktu\n\n+ Buat Tautan\nMuat Ulang\nTautan ini setara kunci. Siapa pun yang memilikinya dapat melihat data perusahaan atau perujuk yang bersangkutan tanpa perlu masuk. Kirim hanya kepada pihak yang berhak, dan cabut segera begitu kerja sama berakhir atau PIC berganti.\nTautan terdaftar\n0 aktif dar",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "portal-wellness",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🩺\nBelum ada sesi telekonsultasi\nSesi yang dibuat dari aplikasi pasien akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "settings",
+    "text": "Pusat Pengaturan & Konfigurasi\n\nKelola pengaturan sistem, pengguna, cetakan, dan keamanan platform\n\nPENGATURAN SISTEM\n⚙️ Umum & API Key\n🖨️ Layout Cetak PDF\nHAK AKSES & USER\n👥 User Management\n🔐 Akses Menu\nDATA & LOG\n🗄️ Master Data Hub\n🗃️ Data & Bulk Upload\n📜 Log Aktivitas (Audit)\nSupabase Connection\nProject URL\n✅ Supabase terhubung & normal.\nCek Koneksi\nGoogle Maps API\nAPI Key\nShow Key\nSimpan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "import",
+    "text": "Pusat Pengaturan & Konfigurasi\n\nKelola pengaturan sistem, pengguna, cetakan, dan keamanan platform\n\nPENGATURAN SISTEM\n⚙️ Umum & API Key\n🖨️ Layout Cetak PDF\nHAK AKSES & USER\n👥 User Management\n🔐 Akses Menu\nDATA & LOG\n🗄️ Master Data Hub\n🗃️ Data & Bulk Upload\n📜 Log Aktivitas (Audit)\n⚠️ Manajemen Data\n\nTindakan berikut tidak dapat dibatalkan. Lakukan dengan hati-hati.\n\nExport Semua Data (Backup C",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "family",
+    "text": "👨‍👩‍👧 Family Registry\n\nData keluarga & anggota untuk skema diskon Family Member di registrasi klinik\n\n+ Keluarga Baru\n👨‍👩‍👧\nBelum ada data keluarga\n+ Keluarga Baru",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "master-records",
+    "text": "⚠️\nDomain master tidak dikenal\nKembali ke konfigurasi",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "queue-config",
+    "text": "Konfigurasi Antrean\n\nLoket, prefiks nomor, kuota harian, dan urutan prioritas\n\n+ Loket Baru\nKonsol Panggilan\nLoket & Counter 0 aktif dari 0\nBelum ada loket. Konsol panggilan tidak bisa dipakai sampai minimal satu loket terdaftar.\nPrefiks & Kuota per Layanan\nBelum ada layanan terdaftar. Baris akan muncul sendiri begitu ada tiket antrean pertama.\nUrutan Prioritas Panggilan\n\nAntrean dipanggil menurut",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "maps",
+    "text": "Maps Prospecting\n\nCari mitra via Google Maps → visualisasi peta & radius → import langsung ke Leads Management\n\n🔑 Google Maps API Key\nSambungkan\nSimpan\n⚠️ Masukkan API key lalu simpan.\n\nDomain produksi yang perlu diizinkan pada HTTP referrer Google Cloud: *.avahealth.sbs/*. Pastikan Maps JavaScript API dan Places API aktif serta billing project tidak diblokir.\n\n📍 Lokasi & Kategori\nCari lokasi (k",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "crm-pipeline",
+    "text": "Pipeline & Pendapatan\n\nMenyambungkan corong penjualan ke pendapatan yang benar-benar masuk\n\nTahapan\ns/d\nPapan Pipeline\n🔻 Corong & Konversi\n🏢 Nilai Pelanggan\n🎯 Target vs Realisasi\nTahapan pipeline belum diatur\nAtur Tahapan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sales-corong",
+    "text": "Corong Penjualan\n\nProspek → Deal → Penawaran → Invoice, beserta di mana kebocorannya\n\n30 hari\n90 hari\n1 tahun\nMuat Ulang\nBelum ada aktivitas penjualan\nBelum ada prospek, deal, penawaran, atau invoice dalam 90 hari terakhir.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "marketing",
+    "text": "📣 Marketing & Voucher\n\nTemplate konten, proposal, skrip, dan manajemen voucher campaign\n\n+ Tambah Template ▾\n📣 Template & Konten\nVoucher Builder\nSemua\n💬 Pesan WA\n🎤 Skrip Health Talk\n📧 Email\nProposal Mitra\n📄 Flyer / Brosur\n✉️ Surat Penawaran\nTemplate MOU\nSemua Channel\nKomunitas & Warga\nDokter & Klinik\nApotek\nPerusahaan SME\nGym & Sport\nSekolah / Kampus\nInternal\n📣\nBelum ada template\n\nKlik \"+ T",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "voucher",
+    "text": "Voucher Builder\n\nBuat campaign, generate voucher massal, share WA/Email, dan tracking redeem\n\n+ Campaign Baru\n🎯 Campaign\nDaftar Voucher\n🎯\nBelum ada campaign\n\nBuat campaign pertama untuk mulai generate voucher.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "perujuk",
+    "text": "Dokter & Klinik Perujuk\n\nTarif komisi, akumulasi dari pendaftaran nyata, dan pencairan\n\n+ Perujuk Baru\nMuat Ulang\nPerujuk aktif\n0\nPasien dirujuk\n0\nKomisi terkumpul\nRp 0\nBelum dicairkan\nRp 0\nDaftar Perujuk\nBelum ada perujuk terdaftar. Klik \"+ Perujuk Baru\" untuk menambahkan.\nKomisi dihitung ulang dari pendaftaran yang tercatat, bukan disimpan sebagai angka. Setiap pendaftaran memakai tarif yang ber",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "okr",
+    "text": "OKR & Target Sales\n\nObjective, Key Results, dan tracking realisasi tim sales\n\n🎯 Leads\n+ Tambah OKR\n0\nPartner Baru (YTD)\nRp 0\nRevenue Terkumpul\nRp 0\nPipeline Value\n0\nLeads Won\n0\nDeal Aktif\n0%\nConversion Rate\nSemua Periode\nQ1 2026\nQ2 2026\nQ3 2026\nQ4 2026 ← Sekarang\nQ1 2027\nQ2 2027\nTahunan 2026\nTahunan 2025\nSemua Sales\n0 OKR\n📈\nBelum ada OKR\n\nTambah Objective dan Key Results untuk periode ini.\n\n+ Ta",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-consult",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🩺\nBelum ada sesi telekonsultasi\nSesi yang dibuat dari aplikasi pasien akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-caregiver",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n👨‍👩‍👧\nBelum ada caregiver tertaut\nCaregiver adalah orang yang diberi izin memantau kesehatan pasien lain.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-devices",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n⌚\nBelum ada pembacaan perangkat\nPembacaan dari alat dan wearable yang tertaut ke akun pasien akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-calibration",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🏅\nBelum ada sertifikat kalibrasi terdaftar\n\"AVA Verified\" adalah pernyataan bahwa sertifikat kalibrasi alat sudah diperiksa. Daftar ini kosong sampai ada yang benar-benar diperiksa — menampilkannya",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-marketplace",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🛒\nBelum ada alat yang ditawarkan\nAlat sewa dan jual dari vendor mitra akan muncul di sini.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-corporate",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🏢\nBelum ada perusahaan klien terdaftar\nPerusahaan klien dikelola di modul Corporate Management (HIS).",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ava-portals",
+    "text": "AVA Health\n\nTelehealth dan lapisan kepercayaan: alat, kalibrasi, dan izin akses.\n\nTelekonsultasi\nPerangkat & Wearables\nBadge Kalibrasi\nMarketplace Alkes\nCaregiver & Keluarga\nKorporat B2B\nPortal & Akses\n🔗\nBelum ada tautan portal diterbitkan\nPortal bertoken diterbitkan per perusahaan atau per pasien, dan masa berlakunya terbatas.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "radiology",
+    "text": "← Menu Radiologi\nRadiologi (RIS & PACS)\nRadiology Information System\nJumat, 2 Oktober 2026\n+ Order Pemeriksaan\nSemua\nDijadwalkan\nAntrian Alat\nDikerjakan\nMenunggu Baca\nDibaca\nSelesai\n0\nJadwal Hari Ini\n0\nMenunggu Baca\n0\nCito\n0\nSelesai\nBelum ada order radiologi\n+ Order Pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "pacs-viewer",
+    "text": "PACS Viewer\n\nDaftar studi dan pratinjau citra radiologi.\n\nLayar ini menampilkan berkas pratinjau, bukan berkas DICOM asli. Tidak ada alat ukur jarak dan pengaturan windowing di sini: alat ukur yang tidak terkalibrasi ke piksel-per-milimeter DICOM akan memberi angka yang dikira benar. Untuk pembacaan diagnostik, buka berkas DICOM-nya di penampil ber-standar.\n🖼️\nBelum ada citra tersimpan\nCitra yang",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "rad-unggah",
+    "text": "Master Radiologi\n\nModalitas dan jadwalnya, katalog pemeriksaan, dan citra tersimpan.\n\nModalitas & Jadwal (0)\nKatalog Pemeriksaan (0)\nCitra & Studi (0)\n+ Catat Citra\n🖼️\nBelum ada citra tercatat\nModul ini mencatat lokasi berkas dan pratinjaunya — ia tidak mengurai DICOM. Jalur DICOM sesungguhnya lewat PACS, dan path-nya dicatat di sini sebagai rujukan.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "rad-ekspertise",
+    "text": "Ekspertise Radiologi\n\nPembacaan, kesan, dan penandatanganan laporan.\n\nMenunggu Baca (0)\nSudah Ditandatangani (0)\n🩻\nTidak ada pemeriksaan yang menunggu dibaca\nPemeriksaan yang sudah selesai diakuisisi akan muncul di sini.\nWaktu tunggu dihitung dari pemeriksaan selesai sampai dibaca, bukan dari order dibuat — yang diukur kinerja pembacaan, bukan lamanya pasien menunggu jadwal. Laporan yang sudah di",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "rad-modalitas",
+    "text": "Master Radiologi\n\nModalitas dan jadwalnya, katalog pemeriksaan, dan citra tersimpan.\n\nModalitas & Jadwal (0)\nKatalog Pemeriksaan (0)\nCitra & Studi (0)\n🖥️\nBelum ada modalitas terdaftar\nDaftarkan alat beserta jam operasi, kapasitas harian, jadwal kalibrasi, dan izin BAPETEN-nya.\n+ Tambah Modalitas",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "rad-katalog",
+    "text": "Master Radiologi\n\nModalitas dan jadwalnya, katalog pemeriksaan, dan citra tersimpan.\n\nModalitas & Jadwal (0)\nKatalog Pemeriksaan (0)\nCitra & Studi (0)\n📖\nKatalog pemeriksaan masih kosong\nTiap pemeriksaan perlu menyebutkan persiapan pasien dan apakah memakai kontras — keduanya menentukan apa yang harus disampaikan sebelum pasien datang.\n+ Tambah Pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "ekg-treadmill",
+    "text": "EKG 12 Lead\nDaftar dan input EKG 12 Lead. Gunakan dashboard penunjang untuk melihat seluruh jenis pemeriksaan.\nInput pemeriksaan\nEKG 12 Lead\n0\nEKG Treadmill\n0\nAudiometri\n0\nSpirometri\n0\nSemua Status\nDraft\nValidated\nApproved\nBelum ada pemeriksaan supportive\nInput pemeriksaan",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sm-usg",
+    "text": "USG Non-Radiologi\n\nPenjadwalan, persetujuan tindakan, pelaksanaan, dan hasilnya.\n\nDaftar Tindakan (0)\nKatalog\n🩹\nBelum ada tindakan tercatat\nIsi katalog tindakan lebih dulu di tab Katalog.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sm-fisioterapi",
+    "text": "Fisioterapi & Rehabilitasi Medik\n\nPenjadwalan, persetujuan tindakan, pelaksanaan, dan hasilnya.\n\nDaftar Tindakan (0)\nProgram Terapi\nKatalog\n🩹\nBelum ada tindakan tercatat\nIsi katalog tindakan lebih dulu di tab Katalog.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  },
+  {
+    "route": "sm-endoskopi",
+    "text": "Endoskopi\n\nPenjadwalan, persetujuan tindakan, pelaksanaan, dan hasilnya.\n\nDaftar Tindakan (0)\nKatalog\n🩹\nBelum ada tindakan tercatat\nIsi katalog tindakan lebih dulu di tab Katalog.",
+    "empty": false,
+    "loading": false,
+    "errors": []
+  }
+]

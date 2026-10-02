@@ -20,7 +20,7 @@
 // buruk daripada perilaku lama.
 // ═══════════════════════════════════════════════════════════════
 
-const MODUL_VER = '20260907-lis-integrity-rc1';
+const MODUL_VER = '20261002-readability-flow';
 const _modulDimuat = new Map();   // src → Promise
 
 function muatSkrip(src) {
@@ -30,10 +30,15 @@ function muatSkrip(src) {
     s.src = `${src}?v=${MODUL_VER}`;
     s.async = false;              // jaga urutan eksekusi antar berkas sekelompok
     s.onload = () => resolve(src);
-    s.onerror = () => reject(new Error(`gagal memuat ${src}`));
+    s.onerror = () => {
+      s.remove();
+      reject(new Error(`gagal memuat ${src}`));
+    };
     document.head.appendChild(s);
   });
   _modulDimuat.set(src, p);
+  // A failed request must not permanently poison navigation for this session.
+  p.catch(() => { if (_modulDimuat.get(src) === p) _modulDimuat.delete(src); });
   return p;
 }
 
@@ -54,9 +59,11 @@ function muatSemuaModul() {
   if (_semuaPromise) return _semuaPromise;
   console.warn('[Lazy] Jaring pengaman aktif — memuat sisa modul.');
   _semuaPromise = (async () => {
+    let failed = false;
     for (const f of (window.MODUL_SEMUA || [])) {
-      try { await muatSkrip(f); } catch (e) { console.warn('[Lazy]', e.message); }
+      try { await muatSkrip(f); } catch (e) { failed = true; console.warn('[Lazy]', e.message); }
     }
+    if (failed) _semuaPromise = null;
   })();
   return _semuaPromise;
 }

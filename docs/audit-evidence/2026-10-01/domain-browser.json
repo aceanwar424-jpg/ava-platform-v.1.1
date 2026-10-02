@@ -1,0 +1,336 @@
+[
+  {
+    "domain": "web",
+    "width": 1440,
+    "title": "Beranda — AVA Health Solution",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "his",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "lis",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "ops",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "app",
+    "width": 1440,
+    "title": "AVA Health — Portal Layanan",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "care",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "nutri",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "sanctuary",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "tech",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "console",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "kiosk",
+    "width": 1440,
+    "title": "Kiosk Antrian Layanan Mandiri — AVA GLOBAL ECOSYSTEM",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [
+      {
+        "tag": "DIV",
+        "class": "card-icon",
+        "text": "👑",
+        "size": 44,
+        "color": "rgb(212, 175, 55)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.1
+      }
+    ],
+    "errors": []
+  },
+  {
+    "domain": "nakes",
+    "width": 1440,
+    "title": "Portal Nakes — AVA Home Care",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "corporate",
+    "width": 1440,
+    "title": "AVA Health — Portal Layanan",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "lacak",
+    "width": 1440,
+    "title": "Lacak Nakes — AVA Home Care",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "antrian",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Display Antrian Ruang Tunggu",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "crm",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "wellness",
+    "width": 1440,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "web",
+    "width": 390,
+    "title": "Beranda — AVA Health Solution",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "his",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "lis",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "ops",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "app",
+    "width": 390,
+    "title": "AVA Health — Portal Layanan",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "care",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "nutri",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "sanctuary",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "tech",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "console",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "kiosk",
+    "width": 390,
+    "title": "Kiosk Antrian Layanan Mandiri — AVA GLOBAL ECOSYSTEM",
+    "overflow": true,
+    "scrollWidth": 394,
+    "findings": [
+      {
+        "tag": "DIV",
+        "class": "card-icon",
+        "text": "👑",
+        "size": 31,
+        "color": "rgb(212, 175, 55)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.1
+      }
+    ],
+    "errors": []
+  },
+  {
+    "domain": "nakes",
+    "width": 390,
+    "title": "Portal Nakes — AVA Home Care",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "corporate",
+    "width": 390,
+    "title": "AVA Health — Portal Layanan",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "lacak",
+    "width": 390,
+    "title": "Lacak Nakes — AVA Home Care",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "antrian",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Display Antrian Ruang Tunggu",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "crm",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  },
+  {
+    "domain": "wellness",
+    "width": 390,
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
+    "errors": []
+  }
+]

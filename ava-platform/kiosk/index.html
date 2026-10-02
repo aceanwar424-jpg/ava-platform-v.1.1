@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260826b">
-  <link rel="stylesheet" href="../css/ava-ops-polish.css?v=20260916">
+  <link rel="stylesheet" href="style.css?v=20261002-kioskqa">
+  <link rel="stylesheet" href="../css/ava-ops-polish.css?v=20261002-kioskqa">
 </head>
 <body class="ava-kiosk-shell">
   <div class="kiosk-container">
@@ -39,7 +39,7 @@
       <div class="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:18px;">
         <!-- Button 1: Pendaftaran Klinik -->
         <button class="kiosk-card card-primary" onclick="ambilAntrian('Umum')">
-          <div class="card-icon">🏥</div>
+          <div class="card-icon" aria-hidden="true">🏥</div>
           <div class="card-content">
             <h3>Pendaftaran Poliklinik</h3>
             <p>Pemeriksaan Dokter Umum, Dokter Gigi, Rekam Medis &amp; Rawat Jalan</p>
@@ -49,7 +49,7 @@
 
         <!-- Button 2: Check-in Lab -->
         <button class="kiosk-card card-success" onclick="ambilAntrian('Laboratorium')">
-          <div class="card-icon">🧪</div>
+          <div class="card-icon" aria-hidden="true">🧪</div>
           <div class="card-content">
             <h3>Laboratorium Diagnostik</h3>
             <p>Pengambilan Sampel Darah/Urin, Tes Patologi &amp; Pengambilan Hasil</p>
@@ -59,7 +59,7 @@
 
         <!-- Button 3: Medical Check Up (MCU) -->
         <button class="kiosk-card card-warning" onclick="ambilAntrian('MCU')">
-          <div class="card-icon">💼</div>
+          <div class="card-icon" aria-hidden="true">💼</div>
           <div class="card-content">
             <h3>Medical Check Up (MCU)</h3>
             <p>Pemeriksaan Berkala Mandiri, Karyawan Korporat &amp; Surat Sehat</p>
@@ -69,7 +69,7 @@
 
         <!-- Button 4: Queen Sanctuary VIP -->
         <button class="kiosk-card card-gold" onclick="ambilAntrian('Sanctuary')" style="border-left:5px solid #D4AF37;">
-          <div class="card-icon" style="background:rgba(212,175,55,0.12);color:#D4AF37;">👑</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(212,175,55,0.12);color:#D4AF37;">👑</div>
           <div class="card-content">
             <h3 style="color:#B45309;">Queen Sanctuary VIP</h3>
             <p>Wellness Spa, Terapi Pelvic Floor, Biosensor Scan &amp; VIP Lounge</p>
@@ -79,7 +79,7 @@
 
         <!-- Button 5: Spesialis & Telehealth -->
         <button class="kiosk-card card-purple" onclick="ambilAntrian('Spesialis')" style="border-left:5px solid #7C3AED;">
-          <div class="card-icon" style="background:rgba(124,58,237,0.1);color:#7C3AED;">🩺</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(124,58,237,0.1);color:#7C3AED;">🩺</div>
           <div class="card-content">
             <h3 style="color:#6D28D9;">Dokter Spesialis</h3>
             <p>Spesialis Penyakit Dalam (Sp.PD), Jantung, Anak, Obgyn &amp; Konsultasi</p>
@@ -89,7 +89,7 @@
 
         <!-- Button 6: Farmasi & Kasir -->
         <button class="kiosk-card card-teal" onclick="ambilAntrian('Farmasi')" style="border-left:5px solid #0E7C86;">
-          <div class="card-icon" style="background:rgba(14,124,134,0.1);color:#0E7C86;">💊</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(14,124,134,0.1);color:#0E7C86;">💊</div>
           <div class="card-content">
             <h3 style="color:#0E7C86;">Farmasi &amp; Kasir</h3>
             <p>Pengambilan Resep Obat, Pelunasan Tagihan Kasir POS &amp; Asuransi</p>

@@ -10,18 +10,19 @@
 //
 // Yang bisa diperiksa murah, diperiksa. Sisanya ditulis "belum diperiksa".
 async function tsProbeConnector() {
+  const ac = new AbortController();
+  const t = setTimeout(() => ac.abort(), 2000);
   try {
-    const ac = new AbortController();
-    const t = setTimeout(() => ac.abort(), 2000);
     const r = await fetch('http://127.0.0.1:9999/api/status', { signal: ac.signal });
-    clearTimeout(t);
     return r.ok ? 'hidup' : 'menolak';
   } catch (e) { return 'mati'; }
+  finally { clearTimeout(t); }
 }
 
 async function tsAmbilTenant() {
   try {
-    const d = await sbGet('tenant_ringkasan', 'select=*');
+    const loader = typeof sbGetStrict === 'function' ? sbGetStrict : sbGet;
+    const d = await loader('tenant_ringkasan', 'select=*');
     return Array.isArray(d) ? d : null;
   } catch (e) { return null; }
 }
@@ -29,6 +30,19 @@ async function tsAmbilTenant() {
 const tsRp = (n) => 'Rp ' + Number(n || 0).toLocaleString('id-ID');
 const tsEsc = (x) => String(x == null ? '' : x)
   .replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Current snapshot only: no invented time series or implied telemetry.
+function tsTenantSummary(tenant) {
+  if (tenant === null) return '<p class="tech-chart-empty" role="status">Data tenant belum dapat dimuat. Periksa koneksi lalu coba lagi.</p>';
+  const rows = tenant.filter(t => t.kode !== 'lokal');
+  if (!rows.length) return '<p class="tech-chart-empty">Belum ada tenant terdaftar. Ringkasan muncul setelah tenant tersedia.</p>';
+  const groups = [
+    {label:'Aktif', count:rows.filter(t=>t.is_active && !['kedaluwarsa','segera-berakhir'].includes(t.status_langganan)).length, color:'#087f6b'},
+    {label:'Perlu perpanjangan', count:rows.filter(t=>['kedaluwarsa','segera-berakhir'].includes(t.status_langganan)).length, color:'#946200'},
+    {label:'Nonaktif', count:rows.filter(t=>!t.is_active && !['kedaluwarsa','segera-berakhir'].includes(t.status_langganan)).length, color:'#64748b'}
+  ];
+  return '<p class="tech-chart-note">Jumlah tenant per status · total '+rows.length+' tenant · snapshot saat dimuat</p><ul class="tech-status-chart" aria-label="Jumlah tenant per status">'+groups.map(g=>'<li><span>'+g.label+'</span><span class="tech-bar-track" aria-hidden="true"><i style="width:'+g.count/rows.length*100+'%;background:'+g.color+'"></i></span><strong>'+g.count+' <small>tenant</small></strong></li>').join('')+'</ul>';
+}
 
 async function renderTechSaas(params = {}) {
   const main = document.getElementById('main-content');
@@ -113,21 +127,20 @@ async function renderTechSaas(params = {}) {
 
       '<div style="display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:14px;">' +
         kartu(sc[0], 'Lab Connector (analyzer)', sc[1], sc[2]) +
-        kartu('#10B981', 'Basis data', 'PostgreSQL PGlite', 'Local-first, berjalan di dalam aplikasi') +
+        kartu(tenant === null ? '#946200' : '#087f6b', 'Sumber data tenant', tenant === null ? 'Tidak terbaca' : 'Terbaca', 'Berdasarkan permintaan data terakhir') +
         kartu('#94A3B8', 'Jembatan SATUSEHAT', 'Belum diperiksa', 'Perlu pemeriksa khusus; status tidak diklaim tanpa itu') +
         kartu('#94A3B8', 'Katalog LOINC/UCUM', 'Lihat di menu', 'Ekspor katalog tes ke format siap-LIS klien') +
       '</div>' +
 
       '<div class="tech-analytics-grid">' +
-        '<div class="card tech-trend"><div class="tech-panel-head"><div><h3>Aktivitas tenant</h3><small>Ringkasan aktivitas tenant dalam 30 hari terakhir</small></div><select aria-label="Rentang aktivitas"><option>30 hari terakhir</option></select></div>' +
-        '<div class="tech-chart"><div class="tech-chart-y"><span>25</span><span>20</span><span>15</span><span>10</span><span>5</span><span>0</span></div><div class="tech-chart-body"><div class="tech-grid-lines"></div><div class="tech-chart-bars"><i style="height:14%"><b>3</b></i><i style="height:22%"><b>5</b></i><i class="amber" style="height:18%"><b>4</b></i><i style="height:34%"><b>8</b></i><i style="height:27%"><b>6</b></i><i class="amber" style="height:52%"><b>13</b></i><i style="height:40%"><b>10</b></i><i style="height:57%"><b>14</b></i><i style="height:48%"><b>12</b></i><i style="height:76%"><b>19</b></i></div><div class="tech-chart-x"><span>28 Agu</span><span>3 Sep</span><span>9 Sep</span><span>15 Sep</span><span>21 Sep</span><span>27 Sep</span></div></div></div></div>' +
+        '<div class="card tech-trend"><div class="tech-panel-head"><div><h3>Komposisi tenant</h3><small>Status langganan saat ini, bukan riwayat aktivitas</small></div></div>' + tsTenantSummary(tenant) + '</div>' +
         '<div class="card tech-system-status"><div class="tech-panel-head"><div><h3>Status Sistem</h3><small>Kesehatan komponen utama platform</small></div><button class="btn btn-ghost btn-sm" onclick="renderTechSaas()">↻ Periksa Ulang</button></div>' +
           '<div class="tech-status-row"><i class="ok"></i><span>Aplikasi Web</span><em class="ok">Berjalan normal</em></div>' +
-          '<div class="tech-status-row"><i class="ok"></i><span>Database (PostgreSQL PGlite)</span><em class="ok">Berjalan normal</em></div>' +
-          '<div class="tech-status-row"><i class="danger"></i><span>Lab Connector (Analyzer)</span><em class="danger">Tidak berjalan</em></div>' +
-          '<div class="tech-status-row"><i class="neutral"></i><span>AI Gateway</span><em class="neutral">Belum dikonfigurasi</em></div>' +
+          '<div class="tech-status-row"><i class="neutral"></i><span>Data tenant</span><em class="neutral">' + (tenant === null ? 'Gagal dimuat' : 'Terbaca') + '</em></div>' +
+          '<div class="tech-status-row"><i class="neutral"></i><span>Lab Connector (Analyzer)</span><em class="neutral">' + sc[1] + '</em></div>' +
+          '<div class="tech-status-row"><i class="neutral"></i><span>AI Gateway</span><em class="neutral">' + kunciAktif + ' kunci aktif; koneksi belum diuji</em></div>' +
           '<div class="tech-status-row"><i class="warn"></i><span>Jembatan SATUSEHAT</span><em class="warn">Perlu diperiksa</em></div>' +
-          '<div class="tech-status-row"><i class="ok"></i><span>Katalog LOINC/UCUM</span><em class="ok">Tersedia</em></div>' +
+          '<div class="tech-status-row"><i class="ok"></i><span>Katalog LOINC/UCUM</span><em class="neutral">Belum diperiksa</em></div>' +
         '</div>' +
       '</div>' +
 
@@ -163,7 +176,7 @@ async function renderTechSaas(params = {}) {
       '</div>' +
       '<div class="tech-lower-grid">' +
         '<div class="card tech-panel"><div class="tech-panel-head"><h3>Tenant Terbaru</h3><button class="btn btn-ghost btn-sm" onclick="navigate(&#39;tenants&#39;)">Lihat semua</button></div>' +
-          (klien.length ? klien.slice(0,3).map(t => '<div class="tech-list-row"><span class="tech-avatar">' + tsEsc((t.nama||'T').slice(0,1)) + '</span><span><b>' + tsEsc(t.nama) + '</b><small>' + tsEsc(t.subdomain||t.kode||'') + '</small></span><em class="status-ok">Aktif</em></div>').join('') : '<div class="tech-empty">Belum ada tenant baru.</div>') +
+          (klien.length ? klien.slice(0,3).map(t => '<div class="tech-list-row"><span class="tech-avatar">' + tsEsc((t.nama||'T').slice(0,1)) + '</span><span><b>' + tsEsc(t.nama) + '</b><small>' + tsEsc(t.subdomain||t.kode||'') + '</small></span><em>' + tsEsc(t.is_active ? (t.status_langganan || 'Aktif') : 'Nonaktif') + '</em></div>').join('') : '<div class="tech-empty">Belum ada tenant baru.</div>') +
         '</div>' +
         '<div class="card tech-panel"><div class="tech-panel-head"><h3>Notifikasi &amp; Perhatian</h3><button class="btn btn-ghost btn-sm" onclick="navigate(&#39;tech-isu&#39;)">Lihat semua</button></div>' +
           '<div class="tech-list-row"><span class="tech-alert-dot danger">!</span><span><b>Lab Connector</b><small>Periksa koneksi analyzer</small></span><small>sekarang</small></div>' +

@@ -101,7 +101,7 @@ function showLoginScreen(){
         ? 'Satu pandangan untuk menggerakkan seluruh ekosistem.'
         : 'Teknologi yang menyatukan layanan kesehatan dan operasional.';
   document.body.innerHTML = `
-    <div style="min-height:100vh;background:radial-gradient(circle at 12% 10%,#173b5b 0,transparent 32%),radial-gradient(circle at 88% 90%,#132d49 0,transparent 30%),#020617;display:flex;align-items:center;justify-content:center;padding:20px">
+    <div class="auth-shell" style="min-height:100vh;background:radial-gradient(circle at 12% 10%,#173b5b 0,transparent 32%),radial-gradient(circle at 88% 90%,#132d49 0,transparent 30%),#020617;display:flex;align-items:center;justify-content:center;padding:20px">
       <div style="background:linear-gradient(145deg,#111f35f5,#0b1729f5);border:1px solid rgba(212,175,55,.2);border-radius:22px;box-shadow:0 20px 70px rgba(0,0,0,.5);padding:32px;width:100%;max-width:480px;color:#F8FAFC">
         <div style="text-align:center;margin-bottom:22px">
           <img src="css/logo-ava-global.png" style="width:58px;height:58px;border-radius:50%;border:2px solid #d4af37;object-fit:cover;margin:0 auto 10px;display:block;box-shadow:0 0 16px rgba(212,175,55,0.35);" alt="Logo">
@@ -125,13 +125,13 @@ function showLoginScreen(){
         <!-- LOGIN FORM -->
         <div id="form-login">
           <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">
-            <label style="font-size:11px;font-weight:700;color:#36504C;text-transform:uppercase">Email Akun</label>
+            <label for="login-email" style="font-size:13px;font-weight:700;color:#CBD8E5;text-transform:uppercase">Email Akun</label>
             <input type="email" id="login-email" placeholder="contoh@gmail.com" autocomplete="username"
               style="padding:10px 12px;background:#020617;border:1.5px solid #334155;border-radius:8px;font-size:13.5px;color:#F8FAFC;outline:none"
               onfocus="this.style.borderColor='#38BDF8'" onblur="this.style.borderColor='#334155'">
           </div>
           <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:18px">
-            <label style="font-size:11px;font-weight:700;color:#36504C;text-transform:uppercase">Password</label>
+            <label for="login-pass" style="font-size:13px;font-weight:700;color:#CBD8E5;text-transform:uppercase">Password</label>
             <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"
               style="padding:10px 12px;background:#020617;border:1.5px solid #334155;border-radius:8px;font-size:13.5px;color:#F8FAFC;outline:none"
               onfocus="this.style.borderColor='#38BDF8'" onblur="this.style.borderColor='#334155'"

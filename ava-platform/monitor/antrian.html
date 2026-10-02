@@ -280,6 +280,11 @@
         const kunci = `${utama.queue_number}|${utama.called_at || utama.updated_at || ''}`;
         panggilAntrian(utama.queue_number, utama.service_type, utama.counter || 'Loket layanan', kunci !== panggilanTerakhir);
         panggilanTerakhir = kunci;
+      } else {
+        panggilanTerakhir = '';
+        document.getElementById('call-number').textContent = '—';
+        document.getElementById('call-dest').textContent = 'MENUNGGU PANGGILAN';
+        document.getElementById('call-meta').textContent = 'Belum ada panggilan aktif';
       }
       LAYANAN.forEach((layanan, i) => {
         const call = calls.find(x => x.service_type === layanan);
@@ -289,12 +294,16 @@
       });
     }
 
+    let boardRequest = 0;
     async function segarkanPapan() {
+      const request = ++boardRequest;
       try {
         if (!window.AVA_QUEUE_PUBLIC) throw new Error('Modul antrean belum termuat');
-        gambarPapan(await window.AVA_QUEUE_PUBLIC.display());
-        document.getElementById('call-meta').textContent = 'Kiosk dan konsol loket memakai antrean yang sama';
+        const data = await window.AVA_QUEUE_PUBLIC.display();
+        if (request !== boardRequest) return;
+        gambarPapan(data);
       } catch (e) {
+        if (request !== boardRequest) return;
         document.getElementById('call-meta').textContent = 'Koneksi antrean belum tersedia — ' + (e.message || 'coba lagi');
       }
     }

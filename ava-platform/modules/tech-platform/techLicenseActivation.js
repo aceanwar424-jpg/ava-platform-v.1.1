@@ -24,7 +24,7 @@
 // ═══════════════════════════════════════════════════════════════
 
 let tlData = null;
-let tlFilter = 'semua';
+let tlLicenseFilter = 'semua';
 
 function tlEsc(s) {
   return String(s ?? '').replace(/[&<>"']/g,
@@ -73,10 +73,10 @@ function tlGambar() {
   const lewat = L.filter(x => x.status === 'Aktif' && Number(x.sisa_hari) < 0);
   const dicabut = L.filter(x => x.status === 'Dicabut');
 
-  const daftar = tlFilter === 'aktif' ? aktif
-               : tlFilter === 'belum' ? belum
-               : tlFilter === 'segera' ? segera
-               : tlFilter === 'dicabut' ? dicabut : L;
+  const daftar = tlLicenseFilter === 'aktif' ? aktif
+               : tlLicenseFilter === 'belum' ? belum
+               : tlLicenseFilter === 'segera' ? segera
+               : tlLicenseFilter === 'dicabut' ? dicabut : L;
 
   const warna = {
     'Aktif': 'var(--success)', 'Belum Aktif': 'var(--info)',
@@ -114,7 +114,7 @@ function tlGambar() {
       <div class="card" style="padding:32px; text-align:center">
         <div style="font-size:28px; opacity:.4; margin-bottom:8px">🔑</div>
         <div style="font-weight:700; margin-bottom:4px">
-          ${tlFilter === 'semua' ? 'Belum ada lisensi diterbitkan'
+          ${tlLicenseFilter === 'semua' ? 'Belum ada lisensi diterbitkan'
                                  : 'Tidak ada lisensi pada kelompok ini'}</div>
         <div style="font-size:13px; color:var(--text3)">
           Lisensi diterbitkan per tenant setelah paket disepakati.</div>
@@ -174,14 +174,14 @@ function tlGambar() {
 
 function tlKartu(label, angka, kunci, warna) {
   return `<div class="card" style="padding:14px; cursor:pointer;
-            ${tlFilter === kunci ? 'outline:2px solid var(--primary)' : ''}"
+            ${tlLicenseFilter === kunci ? 'outline:2px solid var(--primary)' : ''}"
             onclick="tlSaring('${kunci}')">
     <div style="font-size:12px; color:var(--text3)">${label}</div>
     <div style="font-size:22px; font-weight:800; color:${warna}">${angka}</div>
   </div>`;
 }
 
-function tlSaring(k) { tlFilter = k; tlGambar(); }
+function tlSaring(k) { tlLicenseFilter = k; tlGambar(); }
 
 async function tlAktivasi(kodeAwal) {
   const kode = kodeAwal || prompt('Kode lisensi yang akan diaktifkan:');

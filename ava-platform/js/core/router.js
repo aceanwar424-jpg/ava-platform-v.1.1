@@ -251,13 +251,14 @@ async function navigate(page, params={}) {
         if (currentPage !== resolvedPage) return;
       }
       if (typeof window[fnName] === 'function') {
-        window[fnName](...args);
+        await window[fnName](...args);
       } else {
         console.warn(`[Router] Module function ${fnName} not found.`);
         renderRouterError(resolvedPage, `Modul '${resolvedPage}' (${fnName}) belum dimuat.`);
       }
     } catch (err) {
       console.error(`[Router] Error executing ${fnName}:`, err);
+      if (currentPage !== resolvedPage) return;
       renderRouterError(resolvedPage, err.message || String(err));
     }
   }
@@ -545,12 +546,13 @@ async function navigate(page, params={}) {
 function renderRouterError(page, msg) {
   const main = document.getElementById('main-content');
   if (!main) return;
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
   main.innerHTML = `
     <div class="empty-state" style="min-height:70vh; padding:40px; text-align:center;">
       <div class="ico" style="font-size:48px; margin-bottom:12px;">⚠️</div>
-      <h3 style="margin:0 0 8px; color:var(--text, #F8FAFC);">Gagal Memuat Modul '${page}'</h3>
-      <p style="color:var(--text3, #94A3B8); font-size:13.5px; margin:0 0 18px;">${msg}</p>
-      <div style="display:flex; gap:10px; justify-content:center;">
+      <h3 style="margin:0 0 8px; color:var(--text, #F8FAFC);">Gagal Memuat Modul '${escape(page)}'</h3>
+      <p style="color:var(--text3, #94A3B8); font-size:13.5px; margin:0 0 18px; overflow-wrap:anywhere;">${escape(msg)}</p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center;">
         <button class="btn btn-ghost" onclick="location.reload()">🔄 Muat Ulang Halaman</button>
         <button class="btn btn-teal" onclick="navigate('dashboard')">← Kembali ke Dashboard</button>
       </div>

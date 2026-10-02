@@ -42,7 +42,7 @@ testSuites.forEach((suite, idx) => {
   console.log(`▶ Menjalankan [${idx + 1}/${testSuites.length}]: ${suite.name}...`);
   try {
     const output = execSync(`node "${scriptPath}"`, { encoding: 'utf-8' });
-    const match = output.match(/(\d+)\s+DARI\s+(\d+)\s+SKENARIO\s+LULUS/i) || output.match(/(\d+)\s*\/\s*(\d+)/);
+    const match = output.match(/(\d+)\s+DARI\s+(\d+)\s+SKENARIO\s+LULUS/i);
     const passedCount = match ? match[1] : 'ALL';
     const totalCount = match ? match[2] : 'ALL';
 
@@ -56,7 +56,7 @@ testSuites.forEach((suite, idx) => {
 });
 
 console.log('═══════════════════════════════════════════════════════════════');
-console.log(`🏆 HASIL AKHIR: ${totalPassedSuites} DARI ${testSuites.length} SUITE PENGUJIAN LULUS (100%)`);
+console.log(`🏆 HASIL AKHIR: ${totalPassedSuites} DARI ${testSuites.length} SUITE PENGUJIAN LULUS (${Math.round(totalPassedSuites / testSuites.length * 100)}%)`);
 console.log('═══════════════════════════════════════════════════════════════\n');
 
 results.forEach(r => {
@@ -64,7 +64,7 @@ results.forEach(r => {
 });
 
 console.log('\n===============================================================');
-console.log('🎉 SELURUH SISTEM SIAP DIGUNAKAN DAN MEMENUHI SELURUH STANDAR!');
+console.log(totalPassedSuites === testSuites.length ? 'Seluruh suite lokal lulus. Validasi browser, staging, dan integrasi nyata tetap terpisah.' : 'Ada suite gagal. Periksa hasil sebelum melanjutkan rilis.');
 console.log('===============================================================\n');
 
 if (totalPassedSuites === testSuites.length) {

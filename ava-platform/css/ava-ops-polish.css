@@ -179,30 +179,30 @@ html[data-theme="dark"] body.ava-ops-shell .navigation-service-card.active { bac
 
 /* Login gate is rendered inline by the shell; these scoped overrides keep it
    in the same editorial family without touching authentication behavior. */
-body.ava-ops-shell > div:first-child {
+body.ava-ops-shell .auth-shell {
   background: radial-gradient(circle at 12% 10%, #e7f3ee 0, transparent 34%),
               radial-gradient(circle at 88% 90%, #fdf8e7 0, transparent 30%),
               var(--ava-paper) !important;
 }
-body.ava-ops-shell > div:first-child > div {
-  background: rgba(255,255,255,.96) !important;
+body.ava-ops-shell .auth-shell > div {
+  background: var(--ava-surface) !important;
   border-color: rgba(184,145,43,.38) !important;
   box-shadow: 0 22px 60px rgba(21,60,61,.14) !important;
   color: var(--ava-ink) !important;
 }
-body.ava-ops-shell > div:first-child h1 { color: var(--ava-ink) !important; }
-body.ava-ops-shell > div:first-child p { color: var(--ava-muted) !important; }
-body.ava-ops-shell > div:first-child p[style*="D4AF37"] { color: var(--ava-gold) !important; }
-body.ava-ops-shell > div:first-child > div > div[style*="rgba(255,255,255"] { background: var(--ava-emerald-soft) !important; border-color: rgba(8,127,107,.18) !important; }
-body.ava-ops-shell > div:first-child input { background: #fff !important; color: var(--ava-ink) !important; border-color: var(--ava-line) !important; }
+body.ava-ops-shell .auth-shell h1 { color: var(--ava-ink) !important; }
+body.ava-ops-shell .auth-shell p { color: var(--ava-muted) !important; }
+body.ava-ops-shell .auth-shell p[style*="D4AF37"] { color: var(--ava-gold) !important; }
+body.ava-ops-shell .auth-shell > div > div[style*="rgba(255,255,255"] { background: var(--ava-emerald-soft) !important; border-color: rgba(8,127,107,.18) !important; }
+body.ava-ops-shell .auth-shell input { background: #fff !important; color: var(--ava-ink) !important; border-color: var(--ava-line) !important; }
 /* The auth shell is rendered with inline legacy colours. Keep the light
    operational treatment, but do not let labels/placeholders disappear on
    white inputs (WCAG AA requires at least 4.5:1 for normal text). */
-body.ava-ops-shell > div:first-child label { color: #36504c !important; }
-body.ava-ops-shell > div:first-child input::placeholder { color: #536b65 !important; -webkit-text-fill-color: #536b65 !important; opacity: 1 !important; }
-body.ava-ops-shell > div:first-child #btn-login { background: linear-gradient(135deg,var(--ava-emerald),var(--ava-emerald-dark)) !important; box-shadow: 0 5px 15px rgba(8,127,107,.24) !important; }
-body.ava-ops-shell > div:first-child .auth-tab.active { color: var(--ava-emerald) !important; border-bottom-color: var(--ava-emerald) !important; }
-body.ava-ops-shell > div:first-child #auth-tabs { border-bottom-color: var(--ava-line) !important; }
+body.ava-ops-shell .auth-shell label { color: #36504c !important; }
+body.ava-ops-shell .auth-shell input::placeholder { color: #536b65 !important; -webkit-text-fill-color: #536b65 !important; opacity: 1 !important; }
+body.ava-ops-shell .auth-shell #btn-login { background: linear-gradient(135deg,var(--ava-emerald),var(--ava-emerald-dark)) !important; box-shadow: 0 5px 15px rgba(8,127,107,.24) !important; }
+body.ava-ops-shell .auth-shell .auth-tab.active { color: var(--ava-emerald) !important; border-bottom-color: var(--ava-emerald) !important; }
+body.ava-ops-shell .auth-shell #auth-tabs { border-bottom-color: var(--ava-line) !important; }
 
 /* Self-service kiosk */
 body.ava-kiosk-shell { background: var(--ava-paper); color: var(--ava-ink); }
@@ -219,6 +219,12 @@ body.ava-kiosk-shell .card-badge { border-color: rgba(184,145,43,.35); backgroun
 body.ava-kiosk-shell .modal-box { border-color: rgba(184,145,43,.38); }
 body.ava-kiosk-shell .btn-close { background: var(--ava-emerald); color: #fff; border-color: var(--ava-emerald); }
 body.ava-kiosk-shell .btn-close:hover { background: var(--ava-emerald-dark); }
+@media (max-width: 768px) {
+  /* The inline desktop minimum (360px) plus container padding exceeded a
+     390px kiosk viewport by 4px. Keep one fluid column on small devices. */
+  body.ava-kiosk-shell .kiosk-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  body.ava-kiosk-shell .kiosk-time { font-size:20px !important; letter-spacing:-.02em; white-space:nowrap; }
+}
 
 /* Queue and CRM display surfaces */
 body.ava-monitor-shell { background: #102e30; }
@@ -558,25 +564,90 @@ body.ava-ops-shell .tcp-workspace-nav button.active { background:#0f766e; color:
 body.ava-ops-shell .tcp-panel[hidden] { display:none !important; }
 
 
-/* Global compact profile for every AVA Tech page */
+/* Readable density across operational workspaces; do not shrink text to fit. */
 body.ava-ops-shell .main-content { padding:12px 18px 22px !important; }
 body.ava-ops-shell .page-header { padding:0 !important; margin:0 0 10px !important; min-height:0 !important; }
-body.ava-ops-shell .page-header h1 { font-size:18px !important; line-height:1.2 !important; margin:0 0 3px !important; }
-body.ava-ops-shell .page-header p { font-size:11px !important; line-height:1.4 !important; margin:0 !important; }
+body.ava-ops-shell .page-header h1 { font-size:22px !important; line-height:1.2 !important; margin:0 0 3px !important; }
+body.ava-ops-shell .page-header p { font-size:13px !important; line-height:1.55 !important; margin:0 !important; }
 body.ava-ops-shell .welcome-banner, body.ava-ops-shell .hero, body.ava-ops-shell [class*="hero"] { min-height:0 !important; padding:14px 18px !important; margin-bottom:12px !important; border-radius:10px !important; }
 body.ava-ops-shell .welcome-banner h1, body.ava-ops-shell .welcome-banner h2, body.ava-ops-shell .hero h1, body.ava-ops-shell .hero h2 { font-size:20px !important; line-height:1.2 !important; }
-body.ava-ops-shell .welcome-banner p, body.ava-ops-shell .hero p { font-size:11px !important; line-height:1.4 !important; }
+body.ava-ops-shell .welcome-banner p, body.ava-ops-shell .hero p { font-size:13px !important; line-height:1.55 !important; }
 body.ava-ops-shell .card, body.ava-ops-shell .kpi-card { padding:10px 12px !important; border-radius:9px !important; box-shadow:0 1px 5px rgba(15,23,42,.035) !important; }
 body.ava-ops-shell .card h2 { font-size:15px !important; margin:0 0 5px !important; }
 body.ava-ops-shell .card h3, body.ava-ops-shell .card-title { font-size:13px !important; }
-body.ava-ops-shell .card p { font-size:11px; line-height:1.4; }
+body.ava-ops-shell .card p { font-size:13px; line-height:1.55; }
 body.ava-ops-shell .table-wrap, body.ava-ops-shell .data-table { border-radius:8px !important; }
-body.ava-ops-shell .data-table thead th, body.ava-ops-shell .table-wrap table th { height:32px !important; padding:6px 10px !important; font-size:9px !important; }
-body.ava-ops-shell .data-table tbody td, body.ava-ops-shell .table-wrap table td { height:34px !important; padding:6px 10px !important; font-size:11px !important; }
-body.ava-ops-shell .btn { min-height:28px !important; padding:5px 9px !important; border-radius:7px !important; font-size:10.5px !important; }
-body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea { min-height:30px !important; padding:6px 8px !important; font-size:11px !important; }
+body.ava-ops-shell .data-table thead th, body.ava-ops-shell .table-wrap table th { height:40px !important; padding:6px 10px !important; font-size:12px !important; }
+body.ava-ops-shell .data-table tbody td, body.ava-ops-shell .table-wrap table td { height:44px !important; padding:6px 10px !important; font-size:13px !important; }
+body.ava-ops-shell .btn { min-height:36px !important; padding:5px 9px !important; border-radius:7px !important; font-size:13px !important; }
+body.ava-ops-shell input, body.ava-ops-shell select, body.ava-ops-shell textarea { min-height:38px !important; padding:6px 8px !important; font-size:13px !important; }
 body.ava-ops-shell .section-header { margin:10px 0 7px !important; }
 body.ava-ops-shell .section-header h2 { font-size:14px !important; }
 body.ava-ops-shell .grid, body.ava-ops-shell .form-grid { gap:9px !important; }
 body.ava-ops-shell .modal-box { max-height:88vh; padding:14px !important; }
 body.ava-ops-shell .modal-title { font-size:14px !important; }
+
+/* OWNED_BY: generic. Readable metrics, responsive columns, explicit chart values. */
+body.ava-ops-shell .tech-saas-dashboard .metric-card{height:auto !important;min-height:112px;padding:14px !important}
+body.ava-ops-shell .tech-saas-dashboard .metric-card [style*="font-size:10px"],body.ava-ops-shell .tech-saas-dashboard .metric-card [style*="font-size:11px"]{font-size:12px !important;line-height:1.5;overflow-wrap:anywhere}
+body.ava-ops-shell .tech-saas-dashboard .metric-card [style*="font-size:18px"]{font-size:20px !important;line-height:1.3;overflow-wrap:anywhere}
+body.ava-ops-shell .tech-panel-head small,.tech-chart-note{font-size:13px;line-height:1.5;color:var(--ava-muted)}
+.tech-status-chart{list-style:none;margin:20px 0;padding:0;display:grid;gap:20px}
+.tech-status-chart li{display:grid;grid-template-columns:minmax(100px,1.2fr) minmax(60px,2fr) auto;gap:14px;align-items:center;font-size:13px}
+.tech-status-chart strong{font-variant-numeric:tabular-nums;white-space:nowrap}
+.tech-status-chart small{font-size:12px;font-weight:400}
+.tech-bar-track{height:18px;background:var(--bg2,#edf3ef);border-radius:4px;overflow:hidden}
+.tech-bar-track i{display:block;height:100%;border-radius:4px}
+.tech-chart-empty{padding:24px 0;line-height:1.6;color:var(--ava-muted)}
+body.ava-ops-shell .tech-status-row{gap:12px;flex-wrap:wrap}
+body.ava-ops-shell .tech-status-row em{font-size:12px;white-space:normal;text-align:right}
+body.ava-ops-shell .tech-panel-head{gap:12px;flex-wrap:wrap}
+body.ava-ops-shell .card,body.ava-ops-shell .form-grid>*{min-width:0}
+body.ava-ops-shell .table-wrap{max-width:100%;overflow-x:auto}
+body.ava-ops-shell .data-table th,body.ava-ops-shell .data-table td{line-height:1.5;white-space:normal;overflow-wrap:break-word}
+body.ava-ops-shell textarea{height:auto}
+body.ava-ops-shell input[type=checkbox],body.ava-ops-shell input[type=radio]{min-height:18px !important;width:18px;height:18px;padding:0 !important;flex-shrink:0}
+body.ava-ops-shell .tech-hero-callout{position:static;width:auto;max-width:320px}
+body.ava-ops-shell .tech-hero-callout strong,body.ava-ops-shell .tech-hero-callout span{font-size:12px;line-height:1.5}
+@media(max-width:1000px){body.ava-ops-shell .tech-saas-dashboard>div[style*="repeat(4"]{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}
+@media(max-width:600px){body.ava-ops-shell .tech-saas-dashboard>div[style*="repeat(4"]{grid-template-columns:1fr !important}body.ava-ops-shell .main-content{padding:14px 12px 24px !important}body.ava-ops-shell .form-grid{grid-template-columns:1fr !important}body.ava-ops-shell input:not([type=checkbox]):not([type=radio]),body.ava-ops-shell select,body.ava-ops-shell textarea{font-size:16px !important}body.ava-ops-shell .btn{min-height:44px !important}.tech-status-chart li{grid-template-columns:1fr auto;gap:8px}.tech-bar-track{grid-column:1 / -1;grid-row:2}.tech-status-chart strong{grid-column:2;grid-row:1}}
+/* Audit 2026-10-02: readable supporting copy and responsive display surfaces. */
+body.ava-ops-shell{--ava-muted:#506761}
+body.ava-kiosk-shell .logo-text span{color:#066653 !important}
+body.ava-kiosk-shell .kiosk-date,body.ava-kiosk-shell .welcome-banner p,body.ava-kiosk-shell .kiosk-footer p{color:#526175}
+body.ava-kiosk-shell .logo-text span{font-size:12px !important}
+body.ava-monitor-shell{--purple:#c4b5fd}
+body.ava-monitor-shell .main-grid>*,body.ava-monitor-shell main>*{min-width:0}
+@media(max-width:800px){
+ body.ava-monitor-shell{height:auto;min-height:100vh;overflow:auto;padding:16px !important}
+ body.ava-monitor-shell header{gap:16px;flex-wrap:wrap;padding:16px}
+ body.ava-monitor-shell .brand{min-width:0;align-items:flex-start}
+ body.ava-monitor-shell .brand img{flex-shrink:0}
+ body.ava-monitor-shell .brand h1{font-size:18px;overflow-wrap:anywhere}
+ body.ava-monitor-shell main,body.ava-monitor-shell .main-grid{grid-template-columns:1fr;padding:16px 0;gap:16px}
+ body.ava-monitor-shell .kpi-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+ body.ava-monitor-shell .legend-grid{grid-template-columns:1fr}
+ body.ava-monitor-shell .grid-counters{grid-template-columns:1fr}
+ body.ava-monitor-shell .main-call-box{padding:24px 12px}
+ body.ava-monitor-shell .call-number{font-size:clamp(56px,18vw,100px)}
+ body.ava-monitor-shell .target-destination{font-size:26px;overflow-wrap:anywhere}
+ body.ava-monitor-shell .deal-item,body.ava-monitor-shell .panel-title{flex-wrap:wrap;gap:12px}
+ body.ava-monitor-shell .clock-widget{text-align:left}
+ body.ava-monitor-shell footer{position:static;flex-wrap:wrap;height:auto}
+}
+/* Use semantic foregrounds on both themes; avoid dark text on dark panels. */
+body.ava-ops-shell .tech-panel-head h3,body.ava-ops-shell .tech-status-row{color:var(--ava-ink)}
+body.ava-ops-shell .tech-list-row small,body.ava-ops-shell .tech-quick-grid button{font-size:12px;line-height:1.5}
+body.ava-ops-shell .tech-quick-grid button{color:var(--ava-ink);background:var(--ava-surface);border-color:var(--ava-line);min-height:44px}
+body.ava-ops-shell .tech-quick-grid span,body.ava-ops-shell .tech-avatar{color:#066653}
+body.ava-ops-shell .tech-alert-dot.danger{color:#a51d2d}body.ava-ops-shell .tech-alert-dot.warn{color:#805500}
+body.ava-ops-shell .tech-saas-dashboard th{font-size:12px !important;line-height:1.5}
+body.ava-ops-shell .tech-saas-dashboard .badge{font-size:12px !important}
+html[data-theme=dark] body.ava-ops-shell .tech-quick-grid span{color:#8fe0c1}
+body.ava-ops-shell .auth-shell p[style*="D4AF37"]{color:#876a25 !important}
+html[data-theme=dark] body.ava-ops-shell .auth-shell label{color:#d7e4ef !important}
+html[data-theme=dark] body.ava-ops-shell .auth-shell input{background:#0f2034 !important;color:#f1f5f9 !important}
+html[data-theme=dark] body.ava-ops-shell .auth-shell input::placeholder{color:#b7c5d6 !important;-webkit-text-fill-color:#b7c5d6 !important}
+html[data-theme=dark] body.ava-ops-shell .auth-shell>div>div[style*="rgba(255,255,255"]{background:#163a37 !important}
+html[data-theme=dark] body.ava-ops-shell .auth-shell p[style*="D4AF37"]{color:#e3c766 !important}
+html[data-theme=dark] body.ava-ops-shell .topbar{background:#122338}

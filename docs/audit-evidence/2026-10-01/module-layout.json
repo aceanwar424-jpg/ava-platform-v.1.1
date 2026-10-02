@@ -1,0 +1,34 @@
+[
+  {
+    "width": 1440,
+    "theme": "light",
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": []
+  },
+  {
+    "width": 1440,
+    "theme": "dark",
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 1440,
+    "findings": []
+  },
+  {
+    "width": 390,
+    "theme": "light",
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": []
+  },
+  {
+    "width": 390,
+    "theme": "dark",
+    "title": "AVA GLOBAL ECOSYSTEM — Growth Platform",
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": []
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "productionAccess": false,
+  "passed": [
+    "CRM no session",
+    "CRM populated data and chart labels",
+    "CRM offline clears stale results",
+    "CRM retry enabled",
+    "CRM invalid date period",
+    "queue active call and destination",
+    "queue clears completed calls",
+    "mobile no overflow"
+  ]
+}
