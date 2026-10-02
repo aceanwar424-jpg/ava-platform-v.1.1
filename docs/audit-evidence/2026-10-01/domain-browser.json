@@ -95,21 +95,7 @@
     "title": "Kiosk Antrian Layanan Mandiri — AVA GLOBAL ECOSYSTEM",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [
-      {
-        "tag": "DIV",
-        "class": "card-icon",
-        "text": "👑",
-        "size": 44,
-        "color": "rgb(212, 175, 55)",
-        "bg": [
-          255,
-          255,
-          255
-        ],
-        "contrast": 2.1
-      }
-    ],
+    "findings": [],
     "errors": []
   },
   {
@@ -260,23 +246,9 @@
     "domain": "kiosk",
     "width": 390,
     "title": "Kiosk Antrian Layanan Mandiri — AVA GLOBAL ECOSYSTEM",
-    "overflow": true,
-    "scrollWidth": 394,
-    "findings": [
-      {
-        "tag": "DIV",
-        "class": "card-icon",
-        "text": "👑",
-        "size": 31,
-        "color": "rgb(212, 175, 55)",
-        "bg": [
-          255,
-          255,
-          255
-        ],
-        "contrast": 2.1
-      }
-    ],
+    "overflow": false,
+    "scrollWidth": 390,
+    "findings": [],
     "errors": []
   },
   {

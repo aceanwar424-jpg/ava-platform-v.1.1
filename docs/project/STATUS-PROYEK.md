@@ -2780,3 +2780,20 @@ OWNED_BY: generic untuk perbaikan komponen/UI dan fixture sintetis; konfigurasi 
 - [x] Uji browser lokal memakai runtime Playwright workspace: 17 domain × 2 viewport tanpa error JavaScript; overflow kiosk 4px ditemukan dan diperbaiki dengan grid fluida mobile.
 - [x] Ikon emoji kartu kiosk ditandai dekoratif (`aria-hidden`) sehingga tidak diperlakukan sebagai teks yang harus memenuhi kontras.
 - [x] Uji monitor sintetis lulus 8/8; uji recovery router/lazy-load lulus 9/9.
+
+## Paket clearance dan runbook uji operasional — 2 Oktober 2026
+### Rencana
+- [x] Tambahkan gate QA LIS yang memeriksa perilaku kontrak terbaru dengan fixture sintetis (≤ 1 jam).
+- [x] Tambahkan audit readiness otomatis untuk manifest tenant, urutan migrasi, referensi secret, dan adapter deployment tanpa koneksi eksternal (≤ 1 jam).
+- [x] Buat runbook uji end-to-end yang memisahkan local, staging, dan production checkpoint (≤ 1 jam).
+- [x] Jalankan gate lokal, seluruh suite regresi, dan pemeriksaan diff; simpan bukti audit (≤ 1 jam).
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk script QA, fixture, dan runbook; konfigurasi tenant tetap AVA-configured. Semua data uji bersifat sintetis dan tidak memuat pasien nyata, password, token, private key, atau isi backup. Paket ini tidak menjalankan migrasi, tidak menghubungkan database/LIS produksi, tidak mengubah DNS, dan tidak mengaktifkan scheduler eksternal. Migrasi Supabase, sinkronisasi Vercel, backup/restore, serta akun UAT tetap memerlukan target staging yang disetujui dan checkpoint pemilik data.
+
+### Hasil & bukti verifikasi
+- [x] Gate LIS kontrak terbaru ditambahkan pada `scripts/qa-lis-current.cjs` dan lulus 6/6.
+- [x] Audit readiness lokal ditambahkan pada `scripts/qa-release-readiness.cjs` dan menghasilkan laporan JSON; 9 kontrak lulus, 4 blocker manifest, 2 warning environment.
+- [x] Runbook clearance staging/local dibuat pada `docs/project/TECH-CLEARANCE-RUNBOOK.md`.
+- [x] Suite regresi 17/17, audit browser 34/34 viewport, monitor 8/8, recovery 9/9, module render 155 route lulus.
+- [ ] Migrasi, DNS/Vercel, scheduler, backup/restore, dan role matrix runtime tetap menunggu target staging serta checkpoint.

@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-10-02T05:02:32.197Z",
+  "scope": "local static readiness; no external connections",
+  "status": "BLOCKED_FOR_STAGING",
+  "checks": [
+    {
+      "id": "migration-source:0065_tech_operations_control_plane.sql",
+      "status": "PASS",
+      "detail": "Source tersedia; eksekusi target belum dibuktikan oleh audit lokal."
+    },
+    {
+      "id": "migration-source:0066_tech_operations_transitions.sql",
+      "status": "PASS",
+      "detail": "Source tersedia; eksekusi target belum dibuktikan oleh audit lokal."
+    },
+    {
+      "id": "migration-source:0067_tech_auto_telemetry.sql",
+      "status": "PASS",
+      "detail": "Source tersedia; eksekusi target belum dibuktikan oleh audit lokal."
+    },
+    {
+      "id": "migration-source:0068_tech_deployment_center.sql",
+      "status": "PASS",
+      "detail": "Source tersedia; eksekusi target belum dibuktikan oleh audit lokal."
+    },
+    {
+      "id": "migration-source:0069_rbac_user_provisioning.sql",
+      "status": "PASS",
+      "detail": "Source tersedia; eksekusi target belum dibuktikan oleh audit lokal."
+    },
+    {
+      "id": "manifest:ahm.json:domain",
+      "status": "BLOCKED",
+      "detail": "domain masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "manifest:ahm.json:repository",
+      "status": "BLOCKED",
+      "detail": "repository masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "secret-scan:ahm.json",
+      "status": "PASS",
+      "detail": "Tidak menemukan nilai secret pada manifest."
+    },
+    {
+      "id": "manifest:klinik-utama-moksa.json:domain",
+      "status": "BLOCKED",
+      "detail": "domain masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "manifest:klinik-utama-moksa.json:repository",
+      "status": "BLOCKED",
+      "detail": "repository masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "secret-scan:klinik-utama-moksa.json",
+      "status": "PASS",
+      "detail": "Tidak menemukan nilai secret pada manifest."
+    },
+    {
+      "id": "vercel-adapter-contract",
+      "status": "PASS",
+      "detail": "Adapter membaca secret server-side dan mendukung team scope."
+    },
+    {
+      "id": "heartbeat-honesty",
+      "status": "PASS",
+      "detail": "Status heartbeat membedakan UNKNOWN/STALE/OFFLINE."
+    },
+    {
+      "id": "staging-runtime",
+      "status": "WARN",
+      "detail": "Belum ada koneksi target; migrasi, RLS, RPC, DNS, scheduler, notification, backup, dan restore belum terbukti runtime."
+    },
+    {
+      "id": "live-deployment",
+      "status": "WARN",
+      "detail": "Audit lokal tidak membuktikan deployment live memakai commit terbaru."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "manifest:ahm.json:domain",
+      "detail": "domain masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "manifest:ahm.json:repository",
+      "detail": "repository masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "manifest:klinik-utama-moksa.json:domain",
+      "detail": "domain masih placeholder; target dedicated belum siap."
+    },
+    {
+      "id": "manifest:klinik-utama-moksa.json:repository",
+      "detail": "repository masih placeholder; target dedicated belum siap."
+    }
+  ],
+  "warnings": [
+    {
+      "id": "staging-runtime",
+      "detail": "Belum ada koneksi target; migrasi, RLS, RPC, DNS, scheduler, notification, backup, dan restore belum terbukti runtime."
+    },
+    {
+      "id": "live-deployment",
+      "detail": "Audit lokal tidak membuktikan deployment live memakai commit terbaru."
+    }
+  ]
+}
