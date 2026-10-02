@@ -52,17 +52,34 @@ Gunakan dua project database staging terpisah agar pola isolasinya sama dengan d
 
 Nama di atas adalah contoh. Ganti dengan nama final yang disepakati dan jangan memakai domain production.
 
-### 2.2 Siapkan akses manusia
+### 2.2 Siapkan akses internal untuk staging
 
-Buat daftar akses sebelum membuat resource:
+Bagian ini **bukan pendaftaran user client**. Ini hanya daftar orang internal AVA/platform yang boleh menyiapkan dan mengawasi environment staging melalui Tech atau provider infrastrukturnya:
 
-1. **Owner platform** — menyetujui perubahan dan rollback.
-2. **Operator Tech** — mengisi deployment dan memantau status.
-3. **Database owner** — menjalankan/menyetujui SQL dan backup.
-4. **QA/UAT** — menjalankan skenario sintetis.
-5. **On-call** — menerima alert dan mengakui incident.
+| Akses internal | Fungsi | Boleh masuk Tech? |
+|---|---|---|
+| Owner platform | Menyetujui perubahan dan rollback | Ya, Super Admin terbatas |
+| Operator Tech | Mengisi deployment dan memantau status | Ya, role operasional Tech |
+| Database owner | Menyetujui SQL, backup, dan restore | Tidak wajib; cukup akses database staging |
+| QA/UAT internal | Menjalankan skenario sintetis | Tidak wajib; memakai akun aplikasi staging |
+| On-call | Menerima alert dan mengakui incident | Ya jika menangani operasi Tech |
 
-Berikan akses minimum yang diperlukan, aktifkan MFA, dan catat email owner di change record. Jangan membagikan service-role key, password, atau token melalui chat.
+Berikan akses minimum, aktifkan MFA, dan catat email owner di change record. Jangan membagikan service-role key, password, atau token melalui chat.
+
+### 2.2.1 User client dibuat di platform masing-masing
+
+AHM dan Klinik Utama Moksa tidak perlu memakai Tech untuk operasional harian. Akun client dibuat pada aplikasi yang mereka gunakan:
+
+| Pengguna | Platform akun | Contoh kewenangan |
+|---|---|---|
+| Super Admin AVA / operator platform | Tech | Tenant, deployment, health, incident, release |
+| Admin klinik Moksa | HIS/LIS Moksa | Registrasi, pelayanan, hasil, inventory sesuai kontrak |
+| Dokter/analis/perawat Moksa | HIS atau LIS | Modul klinis sesuai role fasilitas |
+| HR AHM | HIS/Wellness/portal korporat AHM | Roster, hasil, evaluasi, treatment sesuai kewenangan |
+| Karyawan AHM | Portal/Wellness AHM | Consent, input mandiri, melihat hasil yang diizinkan |
+| Operator IHC | Modul hasil/IHC yang ditetapkan | Impor atau pengiriman hasil tanpa menjadi pengguna Tech |
+
+Tech hanya menerima telemetry, status, incident, dan metadata operasi yang diperlukan. Tech tidak menjadi tempat client menginput rekam medis, hasil laboratorium, roster, atau treatment. Role dan RLS client tetap ditegakkan di HIS/LIS/portal masing-masing.
 
 ### 2.3 Buat project database staging
 

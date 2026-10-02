@@ -2810,3 +2810,7 @@ OWNED_BY: generic untuk script QA, fixture, dan runbook; konfigurasi tenant teta
 
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic/ava-configured. Perubahan hanya dokumentasi operasional dan tidak membuat project, domain, akun, secret, migration, atau koneksi database eksternal. Password, token, service-role key, data pasien, dan isi backup tetap dilarang masuk chat, repo, screenshot, atau form publik.
+
+### Klarifikasi batas akses staging
+- [x] Runbook membedakan akses internal Tech untuk owner/operator platform dari akun client HIS/LIS/Wellness/portal.
+- [x] Ditegaskan bahwa client tidak memakai Tech untuk operasional harian; role client tetap dibuat dan ditegakkan pada platform masing-masing.
