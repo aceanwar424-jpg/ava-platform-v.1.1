@@ -39,7 +39,121 @@ Catat viewport, URL lokal, tanggal, dan commit. Audit ini tidak membuktikan data
 
 ## 2. Persiapan staging
 
-Pemilik database harus menyetujui nama project staging, tenant UUID staging AHM/Moksa, backup dan rollback database, secret manager, owner on-call, kanal notifikasi, maintenance window, dan batas data sintetis. Jangan menjalankan migration dari runbook ini dengan koneksi production.
+Bagian ini menyiapkan environment saja. Migration belum dijalankan pada tahap ini.
+
+### 2.1 Tetapkan bentuk environment
+
+Gunakan dua project database staging terpisah agar pola isolasinya sama dengan dedicated production:
+
+| Tenant | Project database staging | Domain aplikasi staging | Repository/branch |
+|---|---|---|---|
+| AHM | `ava-ahm-staging` | isi domain staging resmi | repo AHM / `staging` |
+| Klinik Utama Moksa | `ava-moksa-staging` | isi domain staging resmi | repo Moksa / `staging` |
+
+Nama di atas adalah contoh. Ganti dengan nama final yang disepakati dan jangan memakai domain production.
+
+### 2.2 Siapkan akses manusia
+
+Buat daftar akses sebelum membuat resource:
+
+1. **Owner platform** — menyetujui perubahan dan rollback.
+2. **Operator Tech** — mengisi deployment dan memantau status.
+3. **Database owner** — menjalankan/menyetujui SQL dan backup.
+4. **QA/UAT** — menjalankan skenario sintetis.
+5. **On-call** — menerima alert dan mengakui incident.
+
+Berikan akses minimum yang diperlukan, aktifkan MFA, dan catat email owner di change record. Jangan membagikan service-role key, password, atau token melalui chat.
+
+### 2.3 Buat project database staging
+
+Untuk masing-masing tenant:
+
+1. buat project Supabase/database staging;
+2. pilih region yang disetujui pemilik data;
+3. catat `project_ref`, URL API, dan nama environment;
+4. aktifkan log/audit bawaan;
+5. buat backup awal kosong sebelum migration;
+6. pastikan project tidak memakai data pasien production;
+7. buat tenant UUID staging yang akan dipakai pada UAT;
+8. simpan nilai non-secret pada change record.
+
+Yang dicatat di Tech/manifest hanya nama reference environment, misalnya `AHM_DATABASE_URL` dan `AHM_SUPABASE_ANON_KEY`. Nilai secret dimasukkan ke secret manager atau environment Vercel, bukan ke repository.
+
+### 2.4 Siapkan project hosting staging
+
+Untuk setiap tenant buat atau pilih project Vercel staging:
+
+1. hubungkan repository yang benar;
+2. pilih branch `staging` atau branch release yang disetujui;
+3. set build command dan output sesuai project;
+4. isi environment variable staging dari secret manager;
+5. pastikan `VERCEL_TOKEN` hanya berada di server-side Tech;
+6. pastikan `VERCEL_TEAM_ID` benar jika project berada pada Team;
+7. deploy commit yang sudah lulus QC lokal;
+8. catat deployment ID dan commit SHA.
+
+Jangan memasukkan token Vercel ke form browser, file tenant, screenshot, atau commit.
+
+### 2.5 Siapkan domain dan DNS staging
+
+Gunakan subdomain khusus staging, misalnya `ahm-staging.<domain-anda>` dan `moksa-staging.<domain-anda>`.
+
+1. tambahkan domain staging pada project Vercel;
+2. salin nilai DNS yang diminta Vercel;
+3. buat record DNS pada provider domain;
+4. tunggu status verification dan TLS menjadi valid;
+5. uji `https://domain-staging/...` dari browser;
+6. pastikan domain production tidak berubah;
+7. catat waktu verifikasi, record, dan actor.
+
+Jika DNS belum disetujui, gunakan URL preview Vercel dan jangan mengubah DNS production.
+
+### 2.6 Siapkan backup, notifikasi, dan operasi
+
+Sebelum migration, owner harus mengisi:
+
+- lokasi backup staging dan retention;
+- jadwal backup serta restore drill;
+- owner on-call dan escalation level;
+- kanal notifikasi (email/webhook internal);
+- maintenance window;
+- SLA acknowledgement dan recovery untuk UAT;
+- prosedur rollback database dan deployment.
+
+Simpan hanya metadata backup di Tech: waktu, status, checksum/manifest, retention, dan evidence pointer. Jangan menaruh isi backup atau credential storage di aplikasi.
+
+### 2.7 Isi Deployment Center Tech
+
+Setelah project siap, login sebagai Super Admin dan isi form **Pengaturan deployment tenant** untuk setiap tenant:
+
+| Field | Isi |
+|---|---|
+| Tenant ID | UUID tenant staging yang sudah dibuat |
+| Environment | `Staging` |
+| Provider | `vercel` |
+| Nama project | project Vercel staging |
+| Domain | domain staging yang sudah diverifikasi |
+| Branch | `staging` atau branch release |
+| Repository URL | URL repository staging resmi |
+
+Klik **Simpan & antrekan sinkronisasi**. Status yang benar sebelum adapter bekerja adalah `PENDING_SYNC`; jangan menganggap domain sudah aktif hanya karena konfigurasi tersimpan.
+
+### 2.8 Checklist checkpoint sebelum migration
+
+Migration baru boleh dimulai jika semua jawaban berikut `YA`:
+
+- project database AHM dan Moksa sudah terpisah;
+- backup awal dan rollback plan tersedia;
+- owner database menyetujui urutan migration;
+- secret reference sudah terisi tanpa nilai secret di repo;
+- domain staging tidak memakai domain production;
+- repository dan branch sudah diverifikasi;
+- owner on-call dan kanal notifikasi tersedia;
+- tenant UUID staging sudah dicatat;
+- data uji disepakati sintetis;
+- change record memiliki approver dan maintenance window.
+
+Jika satu jawaban `TIDAK`, berhenti di tahap persiapan dan jangan menjalankan SQL. Jangan menjalankan migration dari runbook ini dengan koneksi production.
 
 ## 3. Urutan migrasi staging
 

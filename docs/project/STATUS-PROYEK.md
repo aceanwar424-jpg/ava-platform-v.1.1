@@ -2798,3 +2798,15 @@ OWNED_BY: generic untuk script QA, fixture, dan runbook; konfigurasi tenant teta
 - [x] Suite regresi 17/17, audit browser 34/34 viewport, monitor 8/8, recovery 9/9, module render 155 route lulus.
 - [x] Resolver Playwright otomatis ditambahkan agar audit browser dapat dijalankan langsung tanpa set environment manual.
 - [ ] Migrasi, DNS/Vercel, scheduler, backup/restore, dan role matrix runtime tetap menunggu target staging serta checkpoint.
+
+## Perincian persiapan staging — 2 Oktober 2026
+### Rencana
+- [x] Perjelas checklist pembuatan environment staging dedicated AHM dan Klinik Utama Moksa.
+- [x] Perjelas data non-secret yang harus diisi pada Tech Deployment Center.
+- [x] Perjelas pemetaan akses, backup, owner, DNS, dan checkpoint sebelum migration.
+
+### Hasil
+- [x] Runbook bagian persiapan staging diperluas dengan arsitektur, akses, project database/hosting, DNS, secret reference, backup, Deployment Center, dan checklist checkpoint.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic/ava-configured. Perubahan hanya dokumentasi operasional dan tidak membuat project, domain, akun, secret, migration, atau koneksi database eksternal. Password, token, service-role key, data pasien, dan isi backup tetap dilarang masuk chat, repo, screenshot, atau form publik.
