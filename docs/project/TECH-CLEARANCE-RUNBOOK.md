@@ -28,9 +28,12 @@ Hasil yang diharapkan:
 Untuk audit browser lintas domain:
 
 ```powershell
-$env:PLAYWRIGHT_MODULE='C:\Users\acean\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\node_modules\playwright'
 node scripts/qa-domain-readability.cjs
+node scripts/qa-module-render.cjs
+node scripts/qa-monitor-flow.cjs
 ```
+
+Script otomatis mencari Playwright dari instalasi lokal atau runtime workspace. Jika runtime berada di lokasi lain, isi `PLAYWRIGHT_MODULE` secara manual.
 
 Catat viewport, URL lokal, tanggal, dan commit. Audit ini tidak membuktikan database atau DNS.
 

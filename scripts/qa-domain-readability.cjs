@@ -1,6 +1,6 @@
 // OWNED_BY: generic. All browser requests are fulfilled locally; no production access.
 const fs=require('node:fs'),path=require('node:path');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const {chromium}=require('./lib/playwright.cjs');
 const root=path.resolve('ava-platform'),out=path.resolve('docs/audit-evidence/2026-10-01');
 const sites=JSON.parse(fs.readFileSync('config/domain.json')).situs;
 const mime={'.html':'text/html','.css':'text/css','.js':'application/javascript','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.webp':'image/webp'};

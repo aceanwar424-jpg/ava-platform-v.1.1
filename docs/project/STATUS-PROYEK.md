@@ -2796,4 +2796,5 @@ OWNED_BY: generic untuk script QA, fixture, dan runbook; konfigurasi tenant teta
 - [x] Audit readiness lokal ditambahkan pada `scripts/qa-release-readiness.cjs` dan menghasilkan laporan JSON; 9 kontrak lulus, 4 blocker manifest, 2 warning environment.
 - [x] Runbook clearance staging/local dibuat pada `docs/project/TECH-CLEARANCE-RUNBOOK.md`.
 - [x] Suite regresi 17/17, audit browser 34/34 viewport, monitor 8/8, recovery 9/9, module render 155 route lulus.
+- [x] Resolver Playwright otomatis ditambahkan agar audit browser dapat dijalankan langsung tanpa set environment manual.
 - [ ] Migrasi, DNS/Vercel, scheduler, backup/restore, dan role matrix runtime tetap menunggu target staging serta checkpoint.

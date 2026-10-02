@@ -8,14 +8,14 @@
   },
   {
     "route": "ops-kendali",
-    "text": "Pusat Kendali Operasional\n\nApa yang perlu ditangani sekarang — lintas lab, klinik, stok, dan tagihan\n\nTertahan > 2 jam\nTertahan > 4 jam\nTertahan > 8 jam\nTertahan > 24 jam\nSegarkan otomatis\nMuat Ulang\nTidak ada yang menunggu tindakan\ndiperbarui 12.01.24\nSAMPEL TERTAHAN\n0\n> 4 jam belum ada hasil\nMENUNGGU VALIDASI\n0\nhasil siap divalidasi\nMENUNGGU APPROVAL\n0\nsudah divalidasi\nBELUM BAYAR\n0\nkunjungan be",
+    "text": "Pusat Kendali Operasional\n\nApa yang perlu ditangani sekarang — lintas lab, klinik, stok, dan tagihan\n\nTertahan > 2 jam\nTertahan > 4 jam\nTertahan > 8 jam\nTertahan > 24 jam\nSegarkan otomatis\nMuat Ulang\nTidak ada yang menunggu tindakan\ndiperbarui 16.48.09\nSAMPEL TERTAHAN\n0\n> 4 jam belum ada hasil\nMENUNGGU VALIDASI\n0\nhasil siap divalidasi\nMENUNGGU APPROVAL\n0\nsudah divalidasi\nBELUM BAYAR\n0\nkunjungan be",
     "empty": false,
     "loading": false,
     "errors": []
   },
   {
     "route": "executive-dashboard",
-    "text": "Executive Dashboard\n\nReal-time monitoring · Semua tim · Quick decision Last refresh: 12.01\n\n↻ Refresh\n← Standard View\n0/0\nHadir Hari Ini\n⚠️\n0\nTask Overdue\n🚫\n0\nTask Blocked\n✅\n0\nDone Hari Ini\n❗\n0\nPrioritas Tinggi\n👤\n0\nTanpa PIC\n⏰ Kehadiran Hari Ini\nLihat Detail →\nTidak ada data karyawan\nAll Tasks — Live Monitor\nSemua\nOverdue\n(0)\nBlocked\n(0)\nTodo\n(0)\nInProgress\n(0)\nTidak ada task aktif 🎉",
+    "text": "Executive Dashboard\n\nReal-time monitoring · Semua tim · Quick decision Last refresh: 16.48\n\n↻ Refresh\n← Standard View\n0/0\nHadir Hari Ini\n⚠️\n0\nTask Overdue\n🚫\n0\nTask Blocked\n✅\n0\nDone Hari Ini\n❗\n0\nPrioritas Tinggi\n👤\n0\nTanpa PIC\n⏰ Kehadiran Hari Ini\nLihat Detail →\nTidak ada data karyawan\nAll Tasks — Live Monitor\nSemua\nOverdue\n(0)\nBlocked\n(0)\nTodo\n(0)\nInProgress\n(0)\nTidak ada task aktif 🎉",
     "empty": false,
     "loading": false,
     "errors": []
@@ -806,7 +806,7 @@
   },
   {
     "route": "attendance",
-    "text": "⏰ Absensi & Clock In/Out\n\nPresensi harian dengan validasi GPS dan foto selfie\n\n↻ Refresh\n⏰ Clock In/Out\nRiwayat\nTim (SPV)\nKonfigurasi\n12.01\nJumat, 2 Oktober 2026\nBelum clock in hari ini\n📍 Clock In Sekarang",
+    "text": "⏰ Absensi & Clock In/Out\n\nPresensi harian dengan validasi GPS dan foto selfie\n\n↻ Refresh\n⏰ Clock In/Out\nRiwayat\nTim (SPV)\nKonfigurasi\n16.48\nJumat, 2 Oktober 2026\nBelum clock in hari ini\n📍 Clock In Sekarang",
     "empty": false,
     "loading": false,
     "errors": []
