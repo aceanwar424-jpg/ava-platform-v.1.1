@@ -2890,7 +2890,7 @@ Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
 - [x] Implementasikan penyimpanan workflow, transisi, role, tenant, idempotensi dan audit.
 - [x] Lengkapi alur reservasi, housekeeping, handover dan checklist pulang dengan relasi sumber.
 - [x] Uji simulasi database/UI sintetis, kegagalan dan isolasi; catat batas operasional.
-- [ ] Jalankan gate repo, commit selektif dan git push.
+- [x] Jalankan gate repo, commit selektif dan git push.
 
 
 ### Bukti operasional RS lokal
@@ -2904,3 +2904,5 @@ Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
 - Regresi Tech existing gagal locator usang: mencari “Ubah tenant”, tombol HEAD bernama “Ubah Data Tenant”. File tenant tidak diubah tugas RS; hasil tidak dihitung lulus. Screenshot Tech hasil percobaan dikembalikan.
 - Bukti: docs/audit-evidence/2026-10-06/hospital-operations-simulation.json, hospital-ui-simulation.json, serta screenshot hospital-board desktop/mobile dan bed-reservation.
 - Batas: tidak apply migrasi/menulis DB produksi. Sink audit/jurnal existing adalah fixture sintetis; bukan validasi akuntansi. Kompetisi bed diuji berurutan dan constraint, belum konkurensi beberapa sesi PostgreSQL. Unit khusus belum punya mesin klinis/stock ledger/kapasitas booking serta otomatisasi billing lengkap; rinci di rencana dan backlog. UAT RS dan pemetaan tenant bed lama wajib sebelum penggunaan nyata.
+
+- Push terverifikasi: commit implementasi 5c4da7d didorong ke origin/main, dari 9c669ed; tidak menyertakan perubahan Apps/cleanup lokal milik pekerjaan lain. Tidak menjalankan migrasi produksi.
