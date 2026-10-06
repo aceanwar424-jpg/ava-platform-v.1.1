@@ -2868,3 +2868,14 @@ Implikasi IP & Kepatuhan: tetap menggunakan kontrak baca/tulis tenant yang sudah
 - Menu Rilis/Tiket sekarang daftar baca-saja aktual dengan empty/error state. Status manifest menjadi parsial. Katalog Modul menjadi inventaris konfigurasi tanpa versi rekaan. Sprint ditandai belum tersedia, route lama tetap memberi penjelasan sehingga bookmark tidak error.
 - Monitor AI di Tech memakai area kerja utama; Tenant detail/editor memakai halaman, modal lama hanya dipertahankan di workspace lain.
 - Batas tahap struktur: belum deploy dan belum menguji akun/RLS produksi. Browser history/deep-link sampai tingkat record, seluruh editor komersial/SDM/Agentic, dan implementasi sprint masih memerlukan pekerjaan lanjutan; jangan menyatakan keseluruhan Tech selesai.
+
+## Validasi deployment produksi — 6 Oktober 2026
+### Implikasi IP & Kepatuhan
+Deployment frontend diminta pengguna. Tidak menjalankan migrasi atau menulis database produksi. Pemeriksaan live terbatas ke halaman/aset publik dan status deployment GitHub/Vercel.
+### Bukti
+- Selama preflight, commit `f785d51b7def205c1b86e67009f16c2de297291c` dibuat dan didorong oleh proses lain ke main. Commit memuat Tech dan Corporate. Tidak ditimpa atau di-revert.
+- GitHub deployment `6872450348`, environment Production, Vercel state `success` (Deployment has completed).
+- Sembilan halaman/aset Tech dan tiga Apps Corporate: HTTP 200 dan isi sesuai file lokal setelah normalisasi CRLF; bukti `docs/audit-evidence/2026-10-06/production-deploy.json`.
+- Uji Tech dan Corporate sintetis lulus. Application boundaries, deploy readiness, secret scan (968 file), dan desktop artifact scan (703 file) lulus. Konfigurasi domain terbangkitkan telah diperiksa sinkron.
+- Verifier RLS lokal diperbaiki agar mengenali loop SQL unconditional; statis 48/48 tabel tenant memiliki deklarasi RLS. Ini tidak membuktikan migrasi telah diterapkan atau policy runtime benar di produksi. Perbaikan verifier ini masih lokal dan tidak diperlukan oleh frontend yang sudah deploy.
+- Batas: belum login sebagai akun produksi atau melakukan transaksi nyata. Status fitur parsial/Sprint belum tersedia tetap berlaku.

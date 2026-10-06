@@ -1,0 +1,75 @@
+{
+  "commit": "f785d51b7def205c1b86e67009f16c2de297291c",
+  "deployment": "6872450348",
+  "checks": [
+    {
+      "file": "index.html",
+      "status": 200,
+      "type": "text/html; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "js/core/tech-navigation.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "css/tech-navigation.css",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "js/core/router.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "js/core/peta-menu.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "modules/tech-platform/techControlPlane.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "modules/tech-platform/tech_saas.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "modules/tech-platform/tenants.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "js/core/aiGateway.js",
+      "status": 200,
+      "type": "application/javascript; charset=utf-8",
+      "matches": true
+    },
+    {
+      "file": "apps/index.html",
+      "status": 200,
+      "matches": true
+    },
+    {
+      "file": "apps/corporate-dashboard.js",
+      "status": 200,
+      "matches": true
+    },
+    {
+      "file": "apps/corporate-dashboard.css",
+      "status": 200,
+      "matches": true
+    }
+  ]
+}

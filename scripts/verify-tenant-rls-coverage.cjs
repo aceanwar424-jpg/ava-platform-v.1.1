@@ -25,6 +25,12 @@ for (const file of files) {
     tables.set(match[1], table);
   }
   for (const match of sql.matchAll(/ALTER TABLE public\.([a-z0-9_]+)\s+ENABLE ROW LEVEL SECURITY/gi)) rls.add(match[1]);
+  // Recognize literal, unconditional loops used by the Tech migrations.
+  // Only accept the exact ALTER statement using the declared loop variable.
+  for (const loop of sql.matchAll(/FOREACH\s+(\w+)\s+IN ARRAY ARRAY\[([^\]]+)\]\s+LOOP\s+EXECUTE format\('ALTER TABLE public\.%I ENABLE ROW LEVEL SECURITY',\s*(\w+)\);\s+END LOOP;/gi)) {
+    if (loop[1] !== loop[3] || !/^\s*'[a-z0-9_]+'(?:\s*,\s*'[a-z0-9_]+')*\s*$/i.test(loop[2])) continue;
+    for (const table of loop[2].matchAll(/'([a-z0-9_]+)'/gi)) rls.add(table[1]);
+  }
   if (file === '0053_tenant_rls_completion.sql') {
     rls.add('user_profiles');
     rls.add('admissions');
