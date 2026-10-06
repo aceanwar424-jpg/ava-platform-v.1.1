@@ -18,7 +18,7 @@ function tcpHeartbeatState(row, now = Date.now()) {
 
 async function tcpRead(table, query) {
   try {
-    const value = await sbGet(table, query);
+    const value = await (typeof sbGetStrict === 'function' ? sbGetStrict : sbGet)(table, query);
     return { ok: true, value: Array.isArray(value) ? value : [] };
   } catch (error) {
     return { ok: false, error: error.message || String(error) };
@@ -182,7 +182,8 @@ async function renderTechControlPlane() {
       Control plane tidak menampilkan secret, token, atau data pasien. Status <b>unknown</b>
       berarti koneksi/konfigurasi perlu diperbaiki; bukan bukti bahwa sistem sehat.
     </div>`;
-    setTimeout(tcpApplyDeploymentPrefill, 0);
+    tcpGantiPanel('ringkasan', document.querySelector('[data-panel="ringkasan"]'));
+    tcpApplyDeploymentPrefill();
 }
 
 function tcpGantiPanel(panel, button) {
@@ -196,6 +197,7 @@ function tcpApplyDeploymentPrefill() {
     const raw = sessionStorage.getItem('avaTechDeploymentPrefill');
     if (!raw) return;
     const v = JSON.parse(raw);
+    tcpGantiPanel('deployment', document.querySelector('[data-panel="deployment"]'));
     for (const [id, value] of Object.entries({ 'tcp-deploy-tenant': v.tenant_id, 'tcp-deploy-env': v.environment, 'tcp-deploy-project': v.project_name, 'tcp-deploy-domain': v.domain })) {
       const el = document.getElementById(id); if (el && value) el.value = value;
     }

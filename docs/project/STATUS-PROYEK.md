@@ -2814,3 +2814,57 @@ OWNED_BY: generic/ava-configured. Perubahan hanya dokumentasi operasional dan ti
 ### Klarifikasi batas akses staging
 - [x] Runbook membedakan akses internal Tech untuk owner/operator platform dari akun client HIS/LIS/Wellness/portal.
 - [x] Ditegaskan bahwa client tidak memakai Tech untuk operasional harian; role client tetap dibuat dan ditegakkan pada platform masing-masing.
+
+## Corporate Apps dashboard berbasis referensi visual — 3 Oktober 2026
+### Analisis desain
+Referensi: header identitas + konteks, filter horizontal, empat KPI, donut status, tren garis, batang departemen, ringkasan risiko dan tindak lanjut. Adaptasi AVA menggunakan navy/emerald, latar biru pucat, kartu lapang, label nilai langsung, SVG aksesibel, dan tata letak responsif. Tidak menyalin identitas MEDIAS atau angka/identitas contoh.
+### Rencana (masing-masing ≤ 1 jam)
+- [x] Ganti ringkasan corporate dengan dashboard visual; pertahankan info perusahaan dan navigasi yang sudah ada.
+- [x] Hubungkan filter periode/lokasi/departemen/jenis ke data permintaan yang tersedia; agregat wellness memakai program server, tidak disaring seolah memiliki histori yang belum tersedia.
+- [x] Tampilkan donut status permintaan, tren permintaan bulanan, batang departemen, risiko program, serta unduhan ringkasan agregat.
+- [x] Hilangkan angka Fit/Unfit berbasis modulo ID; jangan mengganti dengan diagnosis rekaan.
+- [x] Uji fixture sintetis berisi data, kosong, error, filter, ekspor, navigasi, dan viewport desktop/mobile.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk komponen dashboard dan fixture; brand AVA merupakan konfigurasi situs. Referensi digunakan untuk komposisi saja. Tidak memuat nama/angka MEDIAS atau data pasien nyata. Tidak mengubah skema/RPC/aturan klasifikasi medis atau akses backend. Dashboard menggunakan data akun corporate yang sudah terverifikasi dan agregat dari RPC yang ada. Tidak menyatakan booking Approved sebagai pemeriksaan selesai; tidak menciptakan TAT, tren risiko, diagnosis, atau tren pembanding tanpa data. Null/suppressed tetap tidak tersedia. Detail klinis tetap melalui alur berotorisasi yang sudah ada.
+
+### Bukti verifikasi
+- Implementasi: `ava-platform/apps/corporate-dashboard.js` dan `.css`, terhubung ke `renderCorporateHome`; informasi perusahaan tetap tersedia melalui panel detail.
+- `node scripts/qa-corporate-dashboard.cjs`: fixture sintetis menguji data, filter, CSV, null/privasi, rentang tanggal salah, navigasi, kondisi kosong/error, retry, akun tanpa perusahaan, dan viewport 1440/390 dalam kerangka Apps. Tidak mengakses backend produksi.
+- `node scripts/uji/test_apps_navigation.cjs`: 6/6 lulus; target halaman tetap unik dan menu maker/approver valid.
+- Bukti lokal: `artifacts/corporate-dashboard/desktop.png`, `mobile.png`, `apps-shell-1440.png`, `apps-shell-390.png`, dan `synthetic-summary.csv`.
+- Angka kelayakan kerja berbasis modulo ID dihapus. TAT/diagnosis dan perubahan persentase periode sebelumnya tidak direkayasa.
+- Batas verifikasi: implementasi lokal; belum deploy atau uji akun corporate produksi. Grafik departemen adalah volume permintaan, bukan distribusi risiko, karena kontrak data saat ini tidak menyediakan agregat risiko per departemen.
+
+## Audit navigasi Tech — 6 Oktober 2026
+### Rencana
+- [ ] Inventaris sidebar, kelompok layanan, route, detail/modal dan fungsi bertumpuk (≤ 1 jam).
+- [ ] Reproduksi lokal memakai fixture sintetis dan susun peta halaman sasaran (≤ 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk analisis struktur dan fixture. Referensi gambar hanya pola navigasi; tidak menyalin daftar identitas atau data bisnis di gambar. Audit tidak menulis ke backend, mengubah skema, atau melakukan integrasi produksi. Perubahan Apps Corporate yang masih lokal dipertahankan. Tahap ini audit terlebih dahulu sesuai permintaan pengguna.
+### Hasil audit
+- [x] Inventaris awal: 23 entri Tech dalam lima kelompok; Agentic terpisah.
+- [x] Reproduksi browser: empat fungsi control plane terlihat bersamaan saat pembukaan pertama; pemilihan panel eksplisit mengisolasi ringkasan.
+- [x] Peta direktori → daftar → detail → edit dan urutan implementasi tercatat di `docs/project/AUDIT-NAVIGASI-TECH-2026-10-06.md`.
+- Bukti: `docs/audit-evidence/2026-10-06/tech-navigation.json`.
+- Batas: sumber lokal dan fixture sintetis; produksi belum terverifikasi, seluruh handler komersial/SDM/Agentic belum diaudit interaktif. Tahap ini tidak mengubah aplikasi.
+
+## Restrukturisasi navigasi Tech — 6 Oktober 2026
+### Rencana dan implikasi IP & Kepatuhan
+OWNED_BY: generic. Perubahan khusus ruang Tech menggunakan manifest dan penyaringan role yang ada; tidak mengubah skema, API, akses backend, atau data produksi.
+- [x] Direktori halaman menggantikan panel kanan Tech, breadcrumb kembali ke direktori (≤ 1 jam).
+- [x] Pisahkan tampilan awal control plane agar fungsi tidak bertumpuk (≤ 1 jam).
+- [x] Validasi inventaris route dan navigasi role dengan fixture; catat fungsi yang perlu tahap detail berikutnya (≤ 1 jam).
+### Lanjutan halaman Tenant dan kejujuran fungsi
+- [x] Tenant daftar/detail/tambah/edit sebagai halaman Tech, penjagaan perubahan belum tersimpan dan validasi respons simpan (≤ 1 jam).
+- [x] Daftar tiket/rilis menggantikan data contoh; Sprint ditandai belum tersedia; inventaris modul tidak mengklaim versi deployment.
+- [x] Monitor AI membuka area kerja Tech, bukan overlay; perilaku ruang lain dipertahankan.
+Implikasi IP & Kepatuhan: tetap menggunakan kontrak baca/tulis tenant yang sudah ada tanpa perubahan kunci atau skema. Pengujian simpan memakai respons sintetis, bukan data produksi.
+
+### Verifikasi restrukturisasi Tech
+- `scripts/uji/test_tech_navigation.cjs` lulus: inventaris lima role dengan allowlist sintetis, tujuan direktori, mobile overflow, grup tak dikenal, isolasi non-Tech, panel awal, prefill deployment, daftar/detail/edit tenant, konfirmasi perubahan, respons simpan kosong ditolak dan respons ID valid diterima.
+- `test_tech_ops_control_plane.cjs`: 5/5 lulus. `test_tech_ops_transitions.cjs`: 4/4 lulus.
+- `bangun-menu.js --periksa`: manifest sinkron. `audit-menu-hidup.js`: tidak menemukan masalah berat pada audit statis; ini bukan bukti semua fitur operasional selesai.
+- Bukti direktori dengan shell fixture minimal: `docs/audit-evidence/2026-10-06/tech-directory-desktop.png` dan `tech-directory-mobile.png`.
+- Menu Rilis/Tiket sekarang daftar baca-saja aktual dengan empty/error state. Status manifest menjadi parsial. Katalog Modul menjadi inventaris konfigurasi tanpa versi rekaan. Sprint ditandai belum tersedia, route lama tetap memberi penjelasan sehingga bookmark tidak error.
+- Monitor AI di Tech memakai area kerja utama; Tenant detail/editor memakai halaman, modal lama hanya dipertahankan di workspace lain.
+- Batas tahap struktur: belum deploy dan belum menguji akun/RLS produksi. Browser history/deep-link sampai tingkat record, seluruh editor komersial/SDM/Agentic, dan implementasi sprint masih memerlukan pekerjaan lanjutan; jangan menyatakan keseluruhan Tech selesai.

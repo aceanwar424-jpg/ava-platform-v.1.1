@@ -1,0 +1,70 @@
+{
+  "date": "2026-10-06",
+  "fixture": "synthetic empty backend; all network blocked",
+  "initialVisiblePanels": [
+    "ringkasan",
+    "ringkasan",
+    "tiket",
+    "pengaturan",
+    "deployment"
+  ],
+  "afterExplicitSelect": [
+    "ringkasan",
+    "ringkasan"
+  ],
+  "groups": [
+    {
+      "name": "Operasi Platform",
+      "count": 7,
+      "routes": [
+        "saas-console",
+        "tech-control-plane",
+        "tech-roadmap",
+        "tech-modul",
+        "tech-isu",
+        "db-studio",
+        "audit"
+      ]
+    },
+    {
+      "name": "Tenant, Lisensi & Health",
+      "count": 4,
+      "routes": [
+        "tenants",
+        "lisensi",
+        "tech-aktivasi",
+        "tech-telemetri"
+      ]
+    },
+    {
+      "name": "Customer Success & Komersial",
+      "count": 5,
+      "routes": [
+        "leads",
+        "penawaran",
+        "mou",
+        "tech-harga",
+        "finance"
+      ]
+    },
+    {
+      "name": "Integrasi & Konektor",
+      "count": 4,
+      "routes": [
+        "catalog-export",
+        "satusehat",
+        "tech-analyzer",
+        "agentic-apimonitor"
+      ]
+    },
+    {
+      "name": "Tim & Delivery",
+      "count": 3,
+      "routes": [
+        "hrd",
+        "tech-sprint",
+        "tech-delivery"
+      ]
+    }
+  ]
+}

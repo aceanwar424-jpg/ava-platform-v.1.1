@@ -186,22 +186,22 @@
             {
               "id": "tech-roadmap",
               "label": "Rilis & Perubahan",
-              "status": "ada",
-              "ket": "Approval release, migration, deployment tenant, dan rollback",
+              "status": "parsial",
+              "ket": "Catatan perubahan dan versi dari change control; daftar baca-saja, bukan sinkronisasi Git.",
               "admin": true
             },
             {
               "id": "tech-modul",
               "label": "Modul & Versi",
-              "status": "ada",
-              "ket": "Daftar modul yang dilisensikan beserta versinya",
+              "status": "parsial",
+              "ket": "Inventaris fungsi dari konfigurasi; bukan versi deployment tenant.",
               "admin": true
             },
             {
               "id": "tech-isu",
               "label": "Tiket & Tindak Lanjut",
-              "status": "ada",
-              "ket": "Tiket client, triage, incident, problem preventif, SLA, dan tindak lanjut"
+              "status": "parsial",
+              "ket": "Daftar tiket aktual sesuai akses; pengelolaan alur tindak lanjut masih terbatas."
             },
             {
               "id": "db-studio",
@@ -329,8 +329,8 @@
             {
               "id": "tech-sprint",
               "label": "Pekerjaan & Kapasitas",
-              "status": "ada",
-              "ket": "Pembagian tugas dan kapasitas tim"
+              "status": "belum",
+              "ket": "Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh."
             },
             {
               "id": "tech-delivery",

@@ -196,6 +196,7 @@ const PAGE_TITLES = {
 let currentPage = '';
 
 async function navigate(page, params={}) {
+  if (window.TechNavigation?.enabled() && !window.TechNavigation.canLeave()) return;
   // Resolusi 3-segmen rute ke target handler (Strangler Fig)
   const resolvedPage = ROUTE_ALIASES_3SEG[page] || page;
   const isAdmissionWorkspace = ['admission', 'pendaftaran', 'regis', 'registrasi', 'registration'].includes(resolvedPage);

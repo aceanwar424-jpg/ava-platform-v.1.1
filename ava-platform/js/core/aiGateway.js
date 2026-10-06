@@ -360,7 +360,18 @@ const AIGateway = {
         </div>
       </div>
     `;
-    document.body.appendChild(modal);
+    if (window.TechNavigation?.enabled()) {
+      modal.style.cssText = 'padding:20px;';
+      const main = document.getElementById('main-content');
+      main.replaceChildren(modal);
+      modal.querySelectorAll('button').forEach(button => {
+        if ((button.getAttribute('onclick') || '').includes(".remove()")) {
+          button.textContent = 'Kembali ke menu';
+          button.removeAttribute('onclick');
+          button.onclick = () => window.TechNavigation.directory();
+        }
+      });
+    } else document.body.appendChild(modal);
   },
 
   resetKeyStatus(keyId) {

@@ -68,7 +68,7 @@ async function renderTenants() {
 
 async function tntMuat() {
   try {
-    tntData = await sbGet('tenant_ringkasan', 'select=*&order=nama') || [];
+    tntData = await (typeof sbGetStrict === 'function' ? sbGetStrict : sbGet)('tenant_ringkasan', 'select=*&order=nama') || [];
     if (!Array.isArray(tntData)) tntData = [];
   } catch (e) {
     // View belum ada berarti migrasi 0029 belum terpasang. Dikatakan apa
@@ -85,8 +85,7 @@ function tntGambar() {
   if (tntData === null) {
     el.innerHTML = `<div class="card" style="padding:20px;font-size:13px;line-height:1.7">
       <strong>Data tenant tidak dapat dibaca.</strong><br>
-      View <code>tenant_ringkasan</code> belum ada di basis data ini. Jalankan ulang
-      aplikasi agar migrasi <code>0029_ava_tech_penjualan_lisensi.sql</code> terpasang.
+      Periksa koneksi atau hak akses akun, lalu gunakan Muat Ulang.
     </div>`;
     return;
   }
@@ -125,7 +124,7 @@ function tntGambar() {
     <div class="card" style="padding:0;overflow:hidden">
       <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <strong style="font-size:13px">Daftar Klien</strong>
-        <input class="input" placeholder="Cari nama, kota, subdomain…" oninput="tntSetCari(this.value)"
+        <input class="input" value="${tntEsc(tntCari)}" placeholder="Cari nama, kota, subdomain…" oninput="tntSetCari(this.value)"
           style="margin-left:auto;width:230px;padding:6px 10px;font-size:12.5px">
       </div>
 
@@ -181,21 +180,24 @@ function tntBaris(t) {
     </td>
     <td>${tntRp(t.nilai_langganan)}</td>
     <td style="padding-right:16px;white-space:nowrap">
-      <button class="btn btn-ghost btn-sm" onclick="tntForm('${t.id}')">Ubah</button> <button class="btn btn-teal btn-sm" onclick="tntBukaDeployment('${t.id}')">Deployment</button>
+      <button class="btn btn-ghost btn-sm" onclick="tntOpenRecord('${t.id}')">${window.TechNavigation?.enabled() ? 'Detail' : 'Ubah'}</button> <button class="btn btn-teal btn-sm" onclick="tntBukaDeployment('${t.id}')">Deployment</button>
     </td></tr>`;
 }
 
 function tntSetCari(v) {
   tntCari = v;
   tntGambar();
+  const search=document.querySelector('#tnt-isi input');if(search){search.focus();search.setSelectionRange(v.length,v.length);}
 }
 
 // ── Formulir tambah / ubah ──────────────────────────────────────
 function tntForm(id) {
+  if(window.TechNavigation?.enabled() && !window.TechNavigation.canLeave())return;
   const t = id ? (tntData || []).find(x => String(x.id) === String(id)) : null;
+  if(id && !t){tntDetail(id);return;}
   const v = (k, d) => (t && t[k] != null ? String(t[k]) : (d || ''));
 
-  openModal(`
+  tntShowEditor(`
     <h3 style="margin:0 0 4px">${t ? 'Ubah Tenant' : 'Tenant Faskes Baru'}</h3>
     <p style="font-size:12px;color:var(--text3);margin:0 0 14px">
       Data klien yang membeli lisensi sistem ini.</p>
@@ -251,7 +253,7 @@ function tntForm(id) {
     </p>
 
     <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-close" onclick="closeModalForce()">Batal</button>
+      <button class="btn btn-close" onclick="tntCancelEditor()">Batal</button>
       <button class="btn btn-primary" style="margin-top:0"
         onclick="tntSimpan(${t ? `'${t.id}'` : 'null'})">Simpan</button>
     </div>`);
@@ -292,7 +294,8 @@ async function tntSimpan(id) {
 
   try {
     if (id) {
-      await sbPatch('tenants', id, muatan);
+      const saved=await sbPatch('tenants', id, muatan);
+      if(!saved || saved.error || (Array.isArray(saved) ? !saved.some(row=>String(row.id)===String(id)) : String(saved.id)!==String(id)))throw new Error('Penyimpanan belum terkonfirmasi.');
       toast('Data tenant diperbarui', 'ok');
     } else {
       const kode = ambil('kode').toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -310,12 +313,12 @@ async function tntSimpan(id) {
       muatan.kode = kode;
       muatan.jenis = 'klinik';
       muatan.is_active = true;
-      await sbPost('tenants', muatan);
+      const saved=await sbPost('tenants', muatan);
+      if(!saved || saved.error || (Array.isArray(saved) ? !saved.some(row=>String(row.id)===String(muatan.id)) : String(saved.id)!==String(muatan.id)))throw new Error('Penyimpanan belum terkonfirmasi.');
       toast(`Tenant ${nama} terdaftar`, 'ok');
     }
-    closeModalForce();
-    await tntMuat();
-    tntGambar();
+    window.TechNavigation?.setDirty(false);
+    if(window.TechNavigation?.enabled()){await renderTenants();}else{closeModalForce();await tntMuat();tntGambar();}
   } catch (e) {
     toast('Gagal menyimpan: ' + e.message, 'err');
   }
@@ -336,3 +339,31 @@ function tntBukaDeployment(id) {
   navigate('tech-control-plane');
 }
 window.tntBukaDeployment = tntBukaDeployment;
+
+function tntCancelEditor(){
+  if(window.TechNavigation?.enabled()){if(!window.TechNavigation.canLeave())return;renderTenants();}
+  else closeModalForce();
+}
+function tntShowEditor(content){
+  if(!window.TechNavigation?.enabled()){openModal(content);return;}
+  const main=document.getElementById('main-content');
+  main.innerHTML='<section class="tech-directory tnt-page-editor">'+content+'</section>';
+  main.querySelector('.tnt-page-editor').addEventListener('input',()=>window.TechNavigation.setDirty(true));
+  main.querySelector('.tnt-page-editor').addEventListener('change',()=>window.TechNavigation.setDirty(true));
+  window.TechNavigation.onPage('tenants');
+  const trail=document.getElementById('tech-page-trail');
+  if(trail){const label=document.createElement('span');label.textContent='› Formulir tenant';trail.append(label);}
+}
+function tntDetail(id){
+  if(window.TechNavigation?.enabled()&&!window.TechNavigation.canLeave())return;
+  const t=(tntData||[]).find(row=>String(row.id)===String(id));
+  const main=document.getElementById('main-content');
+  main.innerHTML='<section class="tech-directory"><button class="btn btn-ghost" id="tnt-back">← Daftar tenant</button><h1>'+tntEsc(t?.nama||'Tenant tidak tersedia')+'</h1>'+(t?'<dl>'+[['Kode',t.kode],['Kota',t.kota],['Paket',t.paket],['Status',t.status_langganan],['Mulai',tntTgl(t.mulai_langganan)],['Berakhir',tntTgl(t.habis_langganan)],['PIC',t.pic_nama]].map(([label,value])=>'<dt>'+label+'</dt><dd>'+tntEsc(value||'—')+'</dd>').join('')+'</dl><button class="btn btn-teal" id="tnt-edit">Ubah tenant</button>':'<p>Data tidak ditemukan atau tidak tersedia untuk akses akun ini.</p>')+'</section>';
+  main.querySelector('#tnt-back').onclick=()=>renderTenants();
+  if(t)main.querySelector('#tnt-edit').onclick=()=>tntForm(t.id);
+  window.TechNavigation?.onPage('tenants');
+}
+window.tntDetail=tntDetail;
+window.tntCancelEditor=tntCancelEditor;
+
+window.tntOpenRecord=id=>window.TechNavigation?.enabled()?tntDetail(id):tntForm(id);

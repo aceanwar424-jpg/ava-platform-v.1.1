@@ -20,6 +20,8 @@
 <script defer src="js/core/numberingService.js"></script>
 <script defer src="js/core/eventBus.js"></script>
 <script defer src="js/core/moduleManager.js"></script>
+<link rel="stylesheet" href="css/tech-navigation.css?v=20261006">
+<script defer src="js/core/tech-navigation.js?v=20261006"></script>
 </head>
 <body class="ava-ops-shell">
 <!-- ═══ SIDEBAR VERTIKAL PENUH AVA GLOBAL ═══ -->
@@ -1161,6 +1163,7 @@ function closeModulePicker(event) {
 window.closeModulePicker = closeModulePicker;
 
 function modulePickerNavigate(page) {
+  if (window.TechNavigation?.enabled() && !window.TechNavigation.canLeave()) return;
   const item = (window.modulePickerItems || []).find(x => x.page === page);
   if (!item || item.soon || item.status === 'belum') return;
   closeModulePicker();
@@ -1259,6 +1262,7 @@ function renderNavigationContext(groupId, preferredServiceIndex) {
 }
 
 function openNavigationContext(groupId) {
+  if (window.TechNavigation?.enabled()) { window.TechNavigation.directory(groupId); return; }
   const group = findNavigationGroup(groupId);
   if (!group) return;
   const panel = document.getElementById('navigation-context');
@@ -1330,6 +1334,7 @@ function setActiveFlyoutItem(page) {
     renderNavigationContext(activeGroup.id, activeNavigationServiceIndex(activeGroup));
   }
   updateBreadcrumb(page);
+  window.TechNavigation?.onPage(page);
 }
 
 // Menyelaraskan penanda aktif saat berpindah halaman via navigate().

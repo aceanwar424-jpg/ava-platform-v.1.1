@@ -2110,6 +2110,7 @@ async function loadCorporateData() {
 
 // Isi kartu Corporate Info (Home) dari data corporate nyata
 async function renderCorporateHome() {
+  if (window.CorporateDashboard) window.CorporateDashboard.render({ corporateId: currentCorporateId, corporateName: currentCorporateName });
   if (!currentCorporateId || typeof sbGet !== 'function') return;
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = (val || val === 0) ? val : '—'; };
   let c = {};
@@ -2767,54 +2768,14 @@ function updateCorporateStats() {
   const bookedNoResult = corporates.filter(e => e.booking_admission_id && !e.mcu_date).length;
   const notBook = corporates.filter(e => !e.booking_admission_id).length;
   
-  // Real or realistic dynamic calculations for Fit/Unfit categories
-  const fitCount = corporates.filter(e => e.id % 5 !== 0).length;
-  const noteCount = corporates.filter(e => e.id % 5 === 0 && e.id % 2 === 0).length;
-  const unfitCount = corporates.filter(e => e.id % 5 === 0 && e.id % 2 !== 0).length;
-
-  if (document.getElementById('stat-total-emp')) document.getElementById('stat-total-emp').textContent = total;
-  if (document.getElementById('stat-book-no-res')) document.getElementById('stat-book-no-res').textContent = bookedNoResult;
-  if (document.getElementById('stat-book-with-res')) document.getElementById('stat-book-with-res').textContent = bookedWithResult;
-  if (document.getElementById('stat-not-book')) document.getElementById('stat-not-book').textContent = notBook;
-  if (document.getElementById('stat-fit-work')) document.getElementById('stat-fit-work').textContent = fitCount;
-  if (document.getElementById('stat-fit-note')) document.getElementById('stat-fit-note').textContent = noteCount;
-  if (document.getElementById('stat-unfit')) document.getElementById('stat-unfit').textContent = unfitCount;
-  if (document.getElementById('stat-temp-unfit')) document.getElementById('stat-temp-unfit').textContent = "0";
-
-  // Also update standard overview widgets if present
-  const totalEl = document.getElementById('c-stat-total');
-  const mcuEl = document.getElementById('c-stat-mcu');
-  const fitEl = document.getElementById('c-stat-fit');
-  const unfitEl = document.getElementById('c-stat-unfit');
-  const progressTxt = document.getElementById('c-progress-txt');
-  const progressBar = document.getElementById('c-progress-bar');
-
-  if (totalEl) totalEl.textContent = `${total} Orang`;
-  if (mcuEl) mcuEl.textContent = `${bookedNoResult + bookedWithResult} Orang`;
-  if (fitEl) fitEl.textContent = fitCount;
-  if (unfitEl) unfitEl.textContent = unfitCount;
-  const percent = total > 0 ? Math.round(((bookedNoResult + bookedWithResult) / total) * 100) : 0;
-  if (progressTxt) progressTxt.textContent = `${percent}%`;
-  if (progressBar) progressBar.style.width = `${percent}%`;
-
-  // Update cohort visual indicators
-  const fitPct = total > 0 ? Math.round((fitCount / total) * 100) : 0;
-  const notePct = total > 0 ? Math.round((noteCount / total) * 100) : 0;
-  const unfitPct = total > 0 ? Math.round((unfitCount / total) * 100) : 0;
-
-  const fPctEl = document.getElementById('cohort-fit-pct');
-  const fBarEl = document.getElementById('cohort-fit-bar');
-  const nPctEl = document.getElementById('cohort-note-pct');
-  const nBarEl = document.getElementById('cohort-note-bar');
-  const uPctEl = document.getElementById('cohort-unfit-pct');
-  const uBarEl = document.getElementById('cohort-unfit-bar');
-
-  if (fPctEl) fPctEl.textContent = `${fitPct}%`;
-  if (fBarEl) fBarEl.style.width = `${fitPct}%`;
-  if (nPctEl) nPctEl.textContent = `${notePct}%`;
-  if (nBarEl) nBarEl.style.width = `${notePct}%`;
-  if (uPctEl) uPctEl.textContent = `${unfitPct}%`;
-  if (uBarEl) uBarEl.style.width = `${unfitPct}%`;
+  for (const [id, value] of Object.entries({
+    'stat-total-emp': total, 'stat-book-no-res': bookedNoResult,
+    'stat-book-with-res': bookedWithResult, 'stat-not-book': notBook,
+    'stat-fit-work': '—', 'stat-fit-note': '—', 'stat-unfit': '—', 'stat-temp-unfit': '—'
+  })) {
+    const el = document.getElementById(id);
+    if (el) { el.textContent = value; if (value === '—') el.title = 'Penilaian kelayakan kerja terverifikasi belum tersedia.'; }
+  }
 }
 
 async function openAddEmployeeModal() {

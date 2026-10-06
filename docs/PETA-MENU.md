@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 230 — 🟢 222 ada · 🟡 8 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 230 — 🟢 218 ada · 🟡 11 sebagian · ⚪ 1 belum dibuat
 
 ---
 
@@ -59,9 +59,9 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | 🟢 | Ringkasan Sistem | `saas-console` | Kesehatan mesin platform & ringkasan klien |
 | 🟢 | Pusat Kendali Operasi | `tech-control-plane` | Status sistem, tenant, alert, incident, backup, dan alur tindak lanjut |
-| 🟢 | Rilis & Perubahan | `tech-roadmap` | Approval release, migration, deployment tenant, dan rollback |
-| 🟢 | Modul & Versi | `tech-modul` | Daftar modul yang dilisensikan beserta versinya |
-| 🟢 | Tiket & Tindak Lanjut | `tech-isu` | Tiket client, triage, incident, problem preventif, SLA, dan tindak lanjut |
+| 🟡 | Rilis & Perubahan | `tech-roadmap` | Catatan perubahan dan versi dari change control; daftar baca-saja, bukan sinkronisasi Git. |
+| 🟡 | Modul & Versi | `tech-modul` | Inventaris fungsi dari konfigurasi; bukan versi deployment tenant. |
+| 🟡 | Tiket & Tindak Lanjut | `tech-isu` | Daftar tiket aktual sesuai akses; pengelolaan alur tindak lanjut masih terbatas. |
 | 🟢 | Studio Database | `db-studio` | Inspeksi tabel Postgres & SQL editor |
 | 🟢 | Riwayat Aktivitas | `audit` | Log kronologis perubahan data sensitif |
 
@@ -98,7 +98,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Tim Operasional | `hrd` | Data personel unit Tech |
-| 🟢 | Pekerjaan & Kapasitas | `tech-sprint` | Pembagian tugas dan kapasitas tim |
+| ⚪ | Pekerjaan & Kapasitas | `tech-sprint` | Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh. |
 | 🟢 | Implementasi & SLA | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
 
 ---
