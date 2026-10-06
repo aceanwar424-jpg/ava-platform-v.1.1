@@ -379,6 +379,27 @@ async function navigate(page, params={}) {
     case 'audiometry':  safeRun('renderSupportive', { type: 'Audiometri' }); break;
     case 'spirometry':  safeRun('renderSupportive', { type: 'Spirometri' }); break;
     case 'medrecord':   safeRun('renderMedRecord');              break;
+    case 'rs-patient-flow': safeRun('renderHospitalOperations', {page:'rs-patient-flow'}); break;
+    case 'rs-bed-reservation': safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
+    case 'rs-housekeeping': safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
+    case 'rs-nurse-station': safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
+    case 'rs-discharge': safeRun('renderHospitalOperations', {page:'rs-discharge'}); break;
+    case 'rs-igd-flow': safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
+    case 'rs-inpatient-billing': safeRun('renderHospitalOperations', {page:'rs-inpatient-billing'}); break;
+    case 'rs-capacity': safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
+    case 'rs-operating-room': safeRun('renderHospitalOperations', {page:'rs-operating-room'}); break;
+    case 'rs-cssd': safeRun('renderHospitalOperations', {page:'rs-cssd'}); break;
+    case 'rs-diet': safeRun('renderHospitalOperations', {page:'rs-diet'}); break;
+    case 'rs-transfusion': safeRun('renderHospitalOperations', {page:'rs-transfusion'}); break;
+    case 'rs-ppi': safeRun('renderHospitalOperations', {page:'rs-ppi'}); break;
+    case 'rs-ward-pharmacy': safeRun('renderHospitalOperations', {page:'rs-ward-pharmacy'}); break;
+    case 'rs-transport': safeRun('renderHospitalOperations', {page:'rs-transport'}); break;
+    case 'rs-critical-care': safeRun('renderHospitalOperations', {page:'rs-critical-care'}); break;
+    case 'rs-maternity': safeRun('renderHospitalOperations', {page:'rs-maternity'}); break;
+    case 'rs-day-care': safeRun('renderHospitalOperations', {page:'rs-day-care'}); break;
+    case 'rs-linen': safeRun('renderHospitalOperations', {page:'rs-linen'}); break;
+    case 'rs-facility': safeRun('renderHospitalOperations', {page:'rs-facility'}); break;
+    case 'rs-mortuary': safeRun('renderHospitalOperations', {page:'rs-mortuary'}); break;
     case 'inpatient':   safeRun('renderInpatient');              break;
     // Dulu menunjuk renderFarmasi di farmasi_eprescription.js — 367 baris
     // tanpa satu pun panggilan data. Sementara itu pharmacy.js yang nyata

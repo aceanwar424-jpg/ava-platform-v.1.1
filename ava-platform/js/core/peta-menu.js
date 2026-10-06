@@ -43,7 +43,7 @@ window.PETA_MENU = {
       ]
     },
     "his": {
-      "nama": "HIS — Klinik & Seluruh Layanan Non-Lab",
+      "nama": "HIS — Rumah Sakit, Klinik & Layanan Non-Lab",
       "subdomain": "his.avahealth.sbs",
       "peran": "Operasional faskes end-to-end: alur pasien, klinis, radiologi, penunjang, home care, MCU, integrasi, billing HIS, logistik, mutu, dan master fasilitas.",
       "kategori": [
@@ -327,7 +327,7 @@ window.PETA_MENU = {
       "pendek": "AVA Tech"
     },
     "his": {
-      "label": "Klinik & HIS",
+      "label": "Rumah Sakit, Klinik & HIS",
       "ikon": "hospital",
       "grup": [
         {
@@ -632,6 +632,147 @@ window.PETA_MENU = {
               "label": "Orkestrasi Wellness",
               "status": "ada",
               "ket": "Program, roster, risiko terbaru, request treatment, sesi, kehadiran dan laporan evaluasi HR"
+            }
+          ]
+        },
+        {
+          "nama": "Kendali Operasional RS",
+          "menu": [
+            {
+              "id": "rs-patient-flow",
+              "label": "Pusat Kendali Alur Pasien",
+              "status": "parsial",
+              "ket": "Papan pekerjaan lintas unit dengan status, prioritas, petugas, pagination dan audit."
+            },
+            {
+              "id": "rs-bed-reservation",
+              "label": "Reservasi & Daftar Tunggu Bed",
+              "status": "parsial",
+              "ket": "Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0071 dan pemetaan bed."
+            },
+            {
+              "id": "rs-housekeeping",
+              "label": "Housekeeping & Kesiapan Bed",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-nurse-station",
+              "label": "Nurse Station & Handover",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-discharge",
+              "label": "Perencanaan & Checklist Pulang",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-igd-flow",
+              "label": "Tracking Pelayanan IGD",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-inpatient-billing",
+              "label": "Rekonsiliasi Billing Rawat Inap",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-capacity",
+              "label": "Kapasitas & Indikator Rawat Inap",
+              "status": "parsial",
+              "ket": "Kapasitas dan okupansi saat ini; indikator historis belum tersedia."
+            }
+          ]
+        },
+        {
+          "nama": "Unit Pelayanan RS",
+          "menu": [
+            {
+              "id": "rs-operating-room",
+              "label": "Kamar Operasi & Anestesi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-cssd",
+              "label": "CSSD & Sterilisasi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-diet",
+              "label": "Gizi & Dapur Pasien",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-transfusion",
+              "label": "Bank Darah & Transfusi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-ppi",
+              "label": "PPI & Surveilans Infeksi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-ward-pharmacy",
+              "label": "Farmasi Bangsal & Unit Dose",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-transport",
+              "label": "Transport Pasien & Ambulans",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            }
+          ]
+        },
+        {
+          "nama": "Unit Khusus & Pendukung RS",
+          "menu": [
+            {
+              "id": "rs-critical-care",
+              "label": "ICU, HCU & Perawatan Neonatal",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-maternity",
+              "label": "Persalinan & Perinatologi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-day-care",
+              "label": "Hemodialisis & Kemoterapi",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-linen",
+              "label": "Laundry & Linen",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-facility",
+              "label": "Fasilitas & Utilitas RS",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-mortuary",
+              "label": "Pelayanan & Serah Terima Jenazah",
+              "status": "parsial",
+              "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
             }
           ]
         }

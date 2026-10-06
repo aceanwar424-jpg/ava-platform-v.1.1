@@ -2879,3 +2879,15 @@ Deployment frontend diminta pengguna. Tidak menjalankan migrasi atau menulis dat
 - Uji Tech dan Corporate sintetis lulus. Application boundaries, deploy readiness, secret scan (968 file), dan desktop artifact scan (703 file) lulus. Konfigurasi domain terbangkitkan telah diperiksa sinkron.
 - Verifier RLS lokal diperbaiki agar mengenali loop SQL unconditional; statis 48/48 tabel tenant memiliki deklarasi RLS. Ini tidak membuktikan migrasi telah diterapkan atau policy runtime benar di produksi. Perbaikan verifier ini masih lokal dan tidak diperlukan oleh frontend yang sudah deploy.
 - Batas: belum login sebagai akun produksi atau melakukan transaksi nyata. Status fitur parsial/Sprint belum tersedia tetap berlaku.
+
+## Operasional RS — 6 Oktober 2026
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Pengguna menyetujui penambahan skema dan uji lokal pada chat ini. Fixture sintetis; tidak menyalin data AVA, mengubah katalog, atau menerapkan migrasi produksi. Tenant dan role diperiksa server; mutasi diaudit. Modul khusus klinis hanya mengelola workflow operasional dan referensi bukti, tidak menggantikan catatan klinis atau validasi tenaga medis.
+### Plan → Execute → Verify
+Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
+- [x] Inventaris awal dan tambah 21 menu RS; generator dan audit menu statis lulus.
+- [x] Checkpoint skema lokal diterima pengguna.
+- [ ] Implementasikan penyimpanan workflow, transisi, role, tenant, idempotensi dan audit.
+- [ ] Lengkapi alur reservasi, housekeeping, handover dan checklist pulang dengan relasi sumber.
+- [ ] Uji simulasi database/UI sintetis, kegagalan dan isolasi; catat batas operasional.
+- [ ] Jalankan gate repo, commit selektif dan git push.

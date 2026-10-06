@@ -138,7 +138,7 @@
         }).join('')}
       </svg>
       <details>
-        <summary>► Lihat tabel tren bulanan</summary>
+        <summary>▶ Lihat tabel tren bulanan</summary>
         <table>
           <thead><tr><th>Bulan</th><th>Permintaan</th></tr></thead>
           <tbody>${months.map(([m, v]) => `<tr><td>${m}</td><td>${v}</td></tr>`).join('')}</tbody>
@@ -263,10 +263,10 @@
         <label>Departemen<select data-filter="department" ${!employeesOk ? 'disabled' : ''}>${options(deptsList, 'Semua departemen')}</select></label>
         <label>Jenis pemeriksaan<select data-filter="type">${options(typesList, 'Semua jenis')}</select></label>
       </div>
-      <p class="cd-note">Filter berlaku untuk permintaan berdasarkan tanggal pengajuan. Karyawan dan wellness merupakan data real-time database.</p>
+      <p class="cd-note">Filter berlaku untuk permintaan berdasarkan tanggal pengajuan. Karyawan dan wellness merupakan snapshot saat ini.</p>
 
       <div id="cd-results" aria-live="polite"></div>
-      <p class="cd-meta">Diperbarui ${esc(new Date().toLocaleString('id-ID'))} · Data asli sesuai akses akun perusahaan.</p>
+      <p class="cd-meta">Diperbarui ${esc(new Date().toLocaleString('id-ID'))} · Data sesuai akses akun perusahaan.</p>
     `;
 
     function paint() {
@@ -293,7 +293,7 @@
 
       target.innerHTML = `
         <div class="cd-kpis">
-          ${kpi('Karyawan terdaftar', employeesOk ? number(employees.length) : '—', 'Seluruh karyawan perusahaan di database')}
+          ${kpi('Karyawan terdaftar', employeesOk ? number(employees.length) : '—', 'Seluruh karyawan perusahaan')}
           ${kpi('Permintaan disetujui', requestsOk ? number(summary.counts[0]) : '—', 'Sesuai filter · bukan hasil selesai')}
           ${kpi('Cakupan skrining', coverage, 'Peserta terskrining / peserta program')}
           ${kpi('Risiko tinggi · L3 + L4', high != null ? number(high) : '—', 'Klasifikasi server · program terpilih')}
@@ -348,7 +348,7 @@
                 <small>Perbarui peserta dan departemen perusahaan.</small>
               </button>
             </div>
-            <p class="cd-note" style="margin-top:16px">TAT laboratorium dan tren diagnosis bersumber dari data verifikasi laboratorium.</p>
+            <p class="cd-note" style="margin-top:16px">TAT laboratorium dan tren diagnosis belum ditampilkan karena sumber data terverifikasi belum tersedia.</p>
           </article>
         </div>
       `;

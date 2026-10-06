@@ -125,6 +125,11 @@
      */
     canAccessRoute(userRole, targetRoute, userBrand = 'ALL') {
       if (!userRole) return false;
+      // RS pages use the server-issued effective page allowlist. Mutations still enforce tenant/stage roles in SQL.
+      if (targetRoute.startsWith('rs-')) {
+        const privileged=['super_admin','head_operation','direktur','SUPERADMIN','HQ_EXECUTIVE'].includes(userRole);
+        return privileged || (Array.isArray(root.roleConfig?.pages) && root.roleConfig.pages.includes(targetRoute));
+      }
       const role = ROLES_DEFINITIONS[userRole];
       if (!role) return false;
 

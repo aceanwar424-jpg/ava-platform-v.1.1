@@ -95,7 +95,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
@@ -173,7 +174,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "inventory": [
   "modules/logistics/assets.js",
@@ -215,7 +217,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "shift-calendar": [
   "modules/hrd/attendance.js",
@@ -562,7 +565,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -583,7 +587,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -604,7 +609,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -625,7 +631,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -646,7 +653,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -725,7 +733,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "homecare-order": [
   "modules/his/admission.js",
@@ -746,7 +755,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "homecare": [
   "modules/his/admission.js",
@@ -767,7 +777,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his": [
   "modules/his/admission.js",
@@ -788,7 +799,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "klinik": [
   "modules/his/admission.js",
@@ -809,7 +821,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "poliklinik": [
   "modules/his/admission.js",
@@ -830,7 +843,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "clinic": [
   "modules/his/admission.js",
@@ -851,7 +865,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "fmcg": [
   "modules/crm/crm_pipeline.js",
@@ -890,7 +905,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "regis": [
   "modules/his/admission.js",
@@ -911,7 +927,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "registrasi": [
   "modules/his/admission.js",
@@ -932,7 +949,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "registration": [
   "modules/his/admission.js",
@@ -953,7 +971,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -974,7 +993,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "laboratorium": [
   "modules/lab/qcEngine.js",
@@ -1362,7 +1382,470 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-patient-flow": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-bed-reservation": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-housekeeping": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-nurse-station": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-discharge": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-igd-flow": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-inpatient-billing": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-capacity": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-operating-room": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-cssd": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-diet": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-transfusion": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-ppi": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-ward-pharmacy": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-transport": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-critical-care": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-maternity": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-day-care": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-linen": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-facility": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
+ ],
+ "rs-mortuary": [
+  "modules/his/admission.js",
+  "modules/his/anamnesa.js",
+  "modules/his/clinicflow.js",
+  "modules/his/emr_soap.js",
+  "modules/his/homecare.js",
+  "modules/his/inpatient.js",
+  "modules/his/mcu.js",
+  "modules/his/medrecord.js",
+  "modules/his/queue_config.js",
+  "modules/his/queue_console.js",
+  "modules/his/integratedOrders.js",
+  "modules/his/mpiManagement.js",
+  "modules/his/imunisasi.js",
+  "modules/his/rm_governance.js",
+  "modules/his/tindakan.js",
+  "modules/his/triase.js",
+  "modules/his/lis_result_viewer.js",
+  "modules/his/operations_hubs.js",
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -1383,7 +1866,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "pharmacy": [
   "modules/pharmacy/pharmacy.js"
@@ -1410,7 +1894,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "emr_soap": [
   "modules/his/admission.js",
@@ -1431,7 +1916,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "emr-soap": [
   "modules/his/admission.js",
@@ -1452,7 +1938,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -1664,7 +2151,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "queue-console": [
   "modules/his/admission.js",
@@ -1685,7 +2173,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "queue-config": [
   "modules/his/admission.js",
@@ -1706,7 +2195,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -1727,7 +2217,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -1748,7 +2239,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "kasir": [
   "modules/finance/accounting.js",
@@ -1869,7 +2361,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -2380,7 +2873,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-orders": [
   "modules/his/admission.js",
@@ -2401,7 +2895,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "package-service": [
   "modules/his/admission.js",
@@ -2422,7 +2917,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-clinical-pathology": [
   "modules/his/admission.js",
@@ -2443,7 +2939,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-microbiology": [
   "modules/his/admission.js",
@@ -2464,7 +2961,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-anatomical-pathology": [
   "modules/his/admission.js",
@@ -2485,7 +2983,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "rad-ekspertise": [
   "modules/radiology/dicomViewer.js",
@@ -2514,7 +3013,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-procedures": [
   "modules/his/admission.js",
@@ -2535,7 +3035,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "sm-usg": [
   "modules/his/admission.js",
@@ -2556,7 +3057,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "sm-endoskopi": [
   "modules/his/admission.js",
@@ -2577,7 +3079,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "sm-fisioterapi": [
   "modules/his/admission.js",
@@ -2598,7 +3101,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-immunization": [
   "modules/his/admission.js",
@@ -2619,7 +3123,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "his-mr-governance": [
   "modules/his/admission.js",
@@ -2640,7 +3145,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "igd-triase": [
   "modules/his/admission.js",
@@ -2661,7 +3167,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "skrining-risiko": [
   "modules/his/admission.js",
@@ -2682,7 +3189,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "mar": [
   "modules/his/admission.js",
@@ -2703,7 +3211,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "keselamatan-ikp": [
   "modules/compliance/audit.js",
@@ -2979,7 +3488,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-mcu-parameter": [
   "modules/his/admission.js",
@@ -3000,7 +3510,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-mcu-assessment": [
   "modules/his/admission.js",
@@ -3021,7 +3532,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-payment": [
   "modules/finance/accounting.js",
@@ -3069,7 +3581,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-queue-flow": [
   "modules/his/admission.js",
@@ -3090,7 +3603,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-queue-device": [
   "modules/his/admission.js",
@@ -3111,7 +3625,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "cfg-medicine": [
   "modules/pharmacy/pharmacy.js"
@@ -3185,7 +3700,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "admission-medical-kit": [
   "modules/his/admission.js",
@@ -3206,7 +3722,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "admission-package": [
   "modules/his/admission.js",
@@ -3227,7 +3744,8 @@ window.MODUL_HALAMAN = {
   "modules/his/triase.js",
   "modules/his/lis_result_viewer.js",
   "modules/his/operations_hubs.js",
-  "modules/his/wellness_orchestration.js"
+  "modules/his/wellness_orchestration.js",
+  "modules/his/hospital_operations.js"
  ],
  "admission-subscription": [
   "modules/finance/accounting.js",
@@ -3379,5 +3897,6 @@ window.MODUL_SEMUA = [
  "modules/tech-platform/tenants.js",
  "modules/tech-platform/techControlPlane.js",
  "modules/system/readiness.js",
- "modules/his/wellness_orchestration.js"
+ "modules/his/wellness_orchestration.js",
+ "modules/his/hospital_operations.js"
 ];

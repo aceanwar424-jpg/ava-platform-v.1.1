@@ -1,0 +1,901 @@
+[
+  {
+    "code": "rs-housekeeping",
+    "label": "Housekeeping & Kesiapan Bed",
+    "patient_required": false,
+    "owner_roles": [
+      "housekeeping"
+    ],
+    "stages": [
+      {
+        "label": "Mulai pembersihan",
+        "fields": [
+          "area",
+          "checklist_pembersihan"
+        ],
+        "roles": [
+          "housekeeping"
+        ]
+      },
+      {
+        "label": "Selesai pembersihan",
+        "fields": [
+          "hasil_pembersihan",
+          "disinfeksi"
+        ],
+        "roles": [
+          "housekeeping"
+        ]
+      },
+      {
+        "label": "Verifikasi kesiapan",
+        "fields": [
+          "verifikasi_kamar",
+          "petugas_verifikasi"
+        ],
+        "roles": [
+          "admin",
+          "admin_faskes",
+          "nurse",
+          "perawat"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-nurse-station",
+    "label": "Nurse Station & Handover",
+    "patient_required": true,
+    "owner_roles": [
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Penugasan & asesmen",
+        "fields": [
+          "shift",
+          "referensi_asesmen",
+          "tugas_tertunda"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Serah terima SBAR",
+        "fields": [
+          "situation",
+          "background",
+          "assessment",
+          "recommendation"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Penerimaan shift",
+        "fields": [
+          "konfirmasi_penerimaan",
+          "rencana_tindak_lanjut"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ],
+        "receiver": true
+      }
+    ]
+  },
+  {
+    "code": "rs-discharge",
+    "label": "Perencanaan & Checklist Pulang",
+    "patient_required": true,
+    "owner_roles": [
+      "admin",
+      "admin_faskes",
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Persetujuan klinis",
+        "fields": [
+          "referensi_resume",
+          "instruksi_kontrol",
+          "persetujuan_dpjp"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Rekonsiliasi obat",
+        "fields": [
+          "referensi_obat_pulang",
+          "edukasi_obat"
+        ],
+        "roles": [
+          "pharmacist",
+          "apoteker"
+        ]
+      },
+      {
+        "label": "Kesiapan pasien & keluarga",
+        "fields": [
+          "edukasi_pulang",
+          "transportasi"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Rekonsiliasi penjamin & tagihan",
+        "fields": [
+          "referensi_tagihan",
+          "status_penjamin"
+        ],
+        "roles": [
+          "finance",
+          "cashier"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-igd-flow",
+    "label": "Tracking Pelayanan IGD",
+    "patient_required": true,
+    "owner_roles": [
+      "admin",
+      "admin_faskes",
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Penempatan zona",
+        "fields": [
+          "referensi_triase",
+          "zona",
+          "petugas"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Keputusan layanan",
+        "fields": [
+          "referensi_catatan_klinis",
+          "keputusan_layanan"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Handoff layanan tujuan",
+        "fields": [
+          "unit_tujuan",
+          "konfirmasi_penerima"
+        ],
+        "roles": [
+          "admin",
+          "admin_faskes",
+          "nurse",
+          "perawat"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-inpatient-billing",
+    "label": "Rekonsiliasi Billing Rawat Inap",
+    "patient_required": true,
+    "owner_roles": [
+      "finance",
+      "cashier"
+    ],
+    "stages": [
+      {
+        "label": "Review sumber biaya",
+        "fields": [
+          "referensi_kamar",
+          "referensi_obat_bhp",
+          "referensi_tindakan_penunjang"
+        ],
+        "roles": [
+          "finance",
+          "cashier"
+        ]
+      },
+      {
+        "label": "Review penjamin & deposit",
+        "fields": [
+          "referensi_penjamin",
+          "referensi_deposit",
+          "selisih_rekonsiliasi"
+        ],
+        "roles": [
+          "finance",
+          "cashier"
+        ]
+      },
+      {
+        "label": "Verifikasi tagihan",
+        "fields": [
+          "referensi_invoice",
+          "hasil_verifikasi"
+        ],
+        "roles": [
+          "finance",
+          "cashier"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-operating-room",
+    "label": "Kamar Operasi & Anestesi",
+    "patient_required": true,
+    "owner_roles": [
+      "admin",
+      "admin_faskes",
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Booking & persiapan",
+        "fields": [
+          "jadwal_ruang",
+          "tim_operasi",
+          "referensi_persetujuan"
+        ],
+        "roles": [
+          "admin",
+          "admin_faskes",
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Checklist pra operasi",
+        "fields": [
+          "referensi_checklist",
+          "referensi_asesmen_anestesi"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Tindakan & pemulihan",
+        "fields": [
+          "referensi_laporan_operasi",
+          "referensi_anestesi",
+          "referensi_recovery"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Serah terima bangsal",
+        "fields": [
+          "unit_tujuan",
+          "konfirmasi_penerima"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-cssd",
+    "label": "CSSD & Sterilisasi",
+    "patient_required": false,
+    "owner_roles": [
+      "cssd"
+    ],
+    "stages": [
+      {
+        "label": "Terima & cuci",
+        "fields": [
+          "set_instrumen",
+          "batch",
+          "hasil_pencucian"
+        ],
+        "roles": [
+          "cssd"
+        ]
+      },
+      {
+        "label": "Sterilisasi",
+        "fields": [
+          "mesin_siklus",
+          "indikator_sterilisasi"
+        ],
+        "roles": [
+          "cssd"
+        ]
+      },
+      {
+        "label": "Release",
+        "fields": [
+          "hasil_verifikasi",
+          "kedaluwarsa"
+        ],
+        "roles": [
+          "cssd"
+        ]
+      },
+      {
+        "label": "Distribusi",
+        "fields": [
+          "unit_tujuan",
+          "bukti_serah_terima"
+        ],
+        "roles": [
+          "cssd"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-diet",
+    "label": "Gizi & Dapur Pasien",
+    "patient_required": true,
+    "owner_roles": [
+      "nutrition"
+    ],
+    "stages": [
+      {
+        "label": "Review diet",
+        "fields": [
+          "referensi_order_diet",
+          "alergi",
+          "status_puasa"
+        ],
+        "roles": [
+          "nutrition"
+        ]
+      },
+      {
+        "label": "Produksi porsi",
+        "fields": [
+          "menu",
+          "jumlah_porsi",
+          "waktu_makan"
+        ],
+        "roles": [
+          "nutrition"
+        ]
+      },
+      {
+        "label": "Distribusi & penerimaan",
+        "fields": [
+          "bangsal",
+          "bukti_penerimaan"
+        ],
+        "roles": [
+          "nutrition"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-transfusion",
+    "label": "Bank Darah & Transfusi",
+    "patient_required": true,
+    "owner_roles": [
+      "lab",
+      "analis"
+    ],
+    "stages": [
+      {
+        "label": "Permintaan darah",
+        "fields": [
+          "referensi_order",
+          "komponen",
+          "identifikasi_pasien"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Verifikasi komponen",
+        "fields": [
+          "referensi_komponen",
+          "referensi_kompatibilitas"
+        ],
+        "roles": [
+          "lab",
+          "analis"
+        ]
+      },
+      {
+        "label": "Transfusi & monitoring",
+        "fields": [
+          "referensi_pemberian",
+          "referensi_monitoring",
+          "reaksi_transfusi"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Evaluasi",
+        "fields": [
+          "referensi_evaluasi",
+          "disposisi_komponen"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-ppi",
+    "label": "PPI & Surveilans Infeksi",
+    "patient_required": true,
+    "owner_roles": [
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Identifikasi risiko",
+        "fields": [
+          "referensi_surveilans",
+          "kebutuhan_isolasi"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Tindak lanjut",
+        "fields": [
+          "referensi_intervensi",
+          "audit_kepatuhan"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Review efektivitas",
+        "fields": [
+          "hasil_review",
+          "rencana_lanjutan"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-ward-pharmacy",
+    "label": "Farmasi Bangsal & Unit Dose",
+    "patient_required": true,
+    "owner_roles": [
+      "pharmacist",
+      "apoteker"
+    ],
+    "stages": [
+      {
+        "label": "Skrining & rekonsiliasi",
+        "fields": [
+          "referensi_resep",
+          "referensi_rekonsiliasi"
+        ],
+        "roles": [
+          "pharmacist",
+          "apoteker"
+        ]
+      },
+      {
+        "label": "Dispensing",
+        "fields": [
+          "referensi_dispensing",
+          "batch_kedaluwarsa"
+        ],
+        "roles": [
+          "pharmacist",
+          "apoteker"
+        ]
+      },
+      {
+        "label": "Pemberian & retur",
+        "fields": [
+          "referensi_mar",
+          "referensi_retur"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Penutupan rekonsiliasi",
+        "fields": [
+          "hasil_rekonsiliasi"
+        ],
+        "roles": [
+          "pharmacist",
+          "apoteker"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-transport",
+    "label": "Transport Pasien & Ambulans",
+    "patient_required": true,
+    "owner_roles": [
+      "porter"
+    ],
+    "stages": [
+      {
+        "label": "Dispatch",
+        "fields": [
+          "asal",
+          "tujuan",
+          "petugas_kendaraan"
+        ],
+        "roles": [
+          "porter"
+        ]
+      },
+      {
+        "label": "Pengambilan",
+        "fields": [
+          "konfirmasi_identitas",
+          "waktu_pengambilan"
+        ],
+        "roles": [
+          "porter"
+        ]
+      },
+      {
+        "label": "Serah terima tujuan",
+        "fields": [
+          "waktu_tiba",
+          "bukti_penerimaan"
+        ],
+        "roles": [
+          "porter"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-critical-care",
+    "label": "ICU, HCU & Perawatan Neonatal",
+    "patient_required": true,
+    "owner_roles": [
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Persiapan unit",
+        "fields": [
+          "referensi_admisi",
+          "kesiapan_perangkat"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Pemantauan",
+        "fields": [
+          "referensi_flowsheet",
+          "referensi_balance_cairan"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Review & transfer",
+        "fields": [
+          "referensi_review_dpjp",
+          "unit_tujuan"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      },
+      {
+        "label": "Handover",
+        "fields": [
+          "konfirmasi_penerima"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-maternity",
+    "label": "Persalinan & Perinatologi",
+    "patient_required": true,
+    "owner_roles": [
+      "midwife",
+      "bidan",
+      "doctor",
+      "dokter"
+    ],
+    "stages": [
+      {
+        "label": "Admisi ibu",
+        "fields": [
+          "referensi_asesmen",
+          "rencana_persalinan"
+        ],
+        "roles": [
+          "midwife",
+          "bidan",
+          "doctor",
+          "dokter"
+        ]
+      },
+      {
+        "label": "Persalinan",
+        "fields": [
+          "referensi_partograf",
+          "referensi_laporan"
+        ],
+        "roles": [
+          "midwife",
+          "bidan",
+          "doctor",
+          "dokter"
+        ]
+      },
+      {
+        "label": "Identifikasi ibu bayi",
+        "fields": [
+          "referensi_identitas_bayi",
+          "verifikasi_gelang"
+        ],
+        "roles": [
+          "midwife",
+          "bidan",
+          "doctor",
+          "dokter"
+        ]
+      },
+      {
+        "label": "Serah terima",
+        "fields": [
+          "unit_tujuan",
+          "konfirmasi_penerima"
+        ],
+        "roles": [
+          "midwife",
+          "bidan",
+          "doctor",
+          "dokter"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-day-care",
+    "label": "Hemodialisis & Kemoterapi",
+    "patient_required": true,
+    "owner_roles": [
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Jadwal & persiapan",
+        "fields": [
+          "jenis_layanan",
+          "jadwal_kursi_mesin",
+          "referensi_order"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Pelaksanaan sesi",
+        "fields": [
+          "referensi_catatan_sesi",
+          "referensi_bahan"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Review & tindak lanjut",
+        "fields": [
+          "referensi_review",
+          "jadwal_berikutnya"
+        ],
+        "roles": [
+          "doctor",
+          "dokter",
+          "clinical_governance"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-linen",
+    "label": "Laundry & Linen",
+    "patient_required": false,
+    "owner_roles": [
+      "housekeeping"
+    ],
+    "stages": [
+      {
+        "label": "Pengambilan",
+        "fields": [
+          "unit_asal",
+          "jumlah_jenis",
+          "kondisi_linen"
+        ],
+        "roles": [
+          "housekeeping"
+        ]
+      },
+      {
+        "label": "Pencucian",
+        "fields": [
+          "batch_pencucian",
+          "hasil_pemeriksaan"
+        ],
+        "roles": [
+          "housekeeping"
+        ]
+      },
+      {
+        "label": "Distribusi",
+        "fields": [
+          "unit_tujuan",
+          "jumlah_distribusi",
+          "selisih"
+        ],
+        "roles": [
+          "housekeeping"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-facility",
+    "label": "Fasilitas & Utilitas RS",
+    "patient_required": false,
+    "owner_roles": [
+      "facility"
+    ],
+    "stages": [
+      {
+        "label": "Triase kerusakan",
+        "fields": [
+          "lokasi_kerusakan",
+          "dampak_layanan",
+          "prioritas_perbaikan"
+        ],
+        "roles": [
+          "facility"
+        ]
+      },
+      {
+        "label": "Perbaikan",
+        "fields": [
+          "tindakan_perbaikan",
+          "referensi_material"
+        ],
+        "roles": [
+          "facility"
+        ]
+      },
+      {
+        "label": "Verifikasi layanan",
+        "fields": [
+          "hasil_uji",
+          "konfirmasi_unit"
+        ],
+        "roles": [
+          "facility"
+        ]
+      }
+    ]
+  },
+  {
+    "code": "rs-mortuary",
+    "label": "Pelayanan & Serah Terima Jenazah",
+    "patient_required": true,
+    "owner_roles": [
+      "nurse",
+      "perawat"
+    ],
+    "stages": [
+      {
+        "label": "Identifikasi & penerimaan",
+        "fields": [
+          "referensi_kematian",
+          "verifikasi_identitas",
+          "lokasi_penyimpanan"
+        ],
+        "roles": [
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Review dokumen",
+        "fields": [
+          "referensi_dokumen",
+          "identitas_penerima"
+        ],
+        "roles": [
+          "admin",
+          "admin_faskes",
+          "nurse",
+          "perawat"
+        ]
+      },
+      {
+        "label": "Serah terima",
+        "fields": [
+          "bukti_serah_terima",
+          "waktu_serah_terima"
+        ],
+        "roles": [
+          "admin",
+          "admin_faskes",
+          "nurse",
+          "perawat"
+        ]
+      }
+    ]
+  }
+]

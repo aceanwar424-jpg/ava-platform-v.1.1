@@ -16,11 +16,11 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | `ops.avahealth.sbs` | Holding HQ — CEO Cockpit | Pemantauan penuh lintas seluruh unit usaha. SATU-SATUNYA ruang yang melihat semua kategori. | **semua kategori** |
 | `tech.avahealth.sbs` | AVA Tech — Pembangun & Penjual Sistem | Pemilik platform, API, tenant, lisensi, rilis, telemetri, dan penjualan sistem AVA Tech. Menu komersial dan SDM Tech berada di dalam kategori Tech agar tidak tampil ganda. | tech, agentic |
-| `his.avahealth.sbs` | HIS — Klinik & Seluruh Layanan Non-Lab | Operasional faskes end-to-end: alur pasien, klinis, radiologi, penunjang, home care, MCU, integrasi, billing HIS, logistik, mutu, dan master fasilitas. | his, radiologi, support-medical, avahealth, korporat, keuangan, logistik, mutu, konfigurasi |
+| `his.avahealth.sbs` | HIS — Rumah Sakit, Klinik & Layanan Non-Lab | Operasional faskes end-to-end: alur pasien, klinis, radiologi, penunjang, home care, MCU, integrasi, billing HIS, logistik, mutu, dan master fasilitas. | his, radiologi, support-medical, avahealth, korporat, keuangan, logistik, mutu, konfigurasi |
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 230 — 🟢 218 ada · 🟡 11 sebagian · ⚪ 1 belum dibuat
+**Total menu terpetakan:** 251 — 🟢 218 ada · 🟡 32 sebagian · ⚪ 1 belum dibuat
 
 ---
 
@@ -103,7 +103,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 ---
 
-### Klinik & HIS
+### Rumah Sakit, Klinik & HIS
 
 `his`
 
@@ -192,6 +192,42 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Orkestrasi Wellness | `his-wellness` | Program, roster, risiko terbaru, request treatment, sesi, kehadiran dan laporan evaluasi HR |
+
+**Kendali Operasional RS**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Pusat Kendali Alur Pasien | `rs-patient-flow` | Papan pekerjaan lintas unit dengan status, prioritas, petugas, pagination dan audit. |
+| 🟡 | Reservasi & Daftar Tunggu Bed | `rs-bed-reservation` | Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0071 dan pemetaan bed. |
+| 🟡 | Housekeeping & Kesiapan Bed | `rs-housekeeping` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Nurse Station & Handover | `rs-nurse-station` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Perencanaan & Checklist Pulang | `rs-discharge` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Tracking Pelayanan IGD | `rs-igd-flow` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Rekonsiliasi Billing Rawat Inap | `rs-inpatient-billing` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Kapasitas & Indikator Rawat Inap | `rs-capacity` | Kapasitas dan okupansi saat ini; indikator historis belum tersedia. |
+
+**Unit Pelayanan RS**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | Kamar Operasi & Anestesi | `rs-operating-room` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | CSSD & Sterilisasi | `rs-cssd` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Gizi & Dapur Pasien | `rs-diet` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Bank Darah & Transfusi | `rs-transfusion` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | PPI & Surveilans Infeksi | `rs-ppi` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Farmasi Bangsal & Unit Dose | `rs-ward-pharmacy` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Transport Pasien & Ambulans | `rs-transport` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+
+**Unit Khusus & Pendukung RS**
+
+| | Menu | Halaman | Keterangan |
+|---|---|---|---|
+| 🟡 | ICU, HCU & Perawatan Neonatal | `rs-critical-care` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Persalinan & Perinatologi | `rs-maternity` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Hemodialisis & Kemoterapi | `rs-day-care` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Laundry & Linen | `rs-linen` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Fasilitas & Utilitas RS | `rs-facility` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Pelayanan & Serah Terima Jenazah | `rs-mortuary` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 
 ---
 

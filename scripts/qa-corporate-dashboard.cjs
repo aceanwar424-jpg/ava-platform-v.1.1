@@ -11,7 +11,7 @@ fs.mkdirSync(out,{recursive:true});
  const page=await browser.newPage({viewport:{width:1440,height:1100},acceptDownloads:true});
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/*',route=>route.abort());
- await page.setContent('<html lang="id"><head></head><body style="margin:0;font-family:Arial,sans-serif"><section class="corp-dashboard" id="corporate-dashboard"></section></body></html>');
+ await page.setContent('<html lang="id"><head><style>body{margin:0;padding:28px 24px;background:#f0f4f8;font-family:Arial,sans-serif;box-sizing:border-box}@media(max-width:680px){body{padding:0 !important}}</style></head><body><section class="corp-dashboard" id="corporate-dashboard"></section></body></html>');
  await page.addStyleTag({path:path.join(root,'ava-platform/apps/corporate-dashboard.css')});
  await page.evaluate(()=>{
   window.mode='data';window.destination=null;
