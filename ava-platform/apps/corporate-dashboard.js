@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════
    AVA HEALTH — CORPORATE HEALTH DASHBOARD ENGINE
-   OWNED_BY: generic | Multi-tenant safe with synthetic fallback
+   OWNED_BY: generic | Multi-tenant safe with real database data
    ═══════════════════════════════════════════════════════════════ */
 
 (function (root) {
@@ -15,75 +15,11 @@
   const labels = ['Disetujui', 'Menunggu persetujuan', 'Ditolak', 'Status lainnya'];
   let sequence = 0;
 
-  // ── GENERATE HIGH-FIDELITY SYNTHETIC BENCHMARK DATA ────────────
-  function generateSyntheticData(corpName = 'Perusahaan Uji Sintetis') {
-    const departments = ['Operasional', 'Keuangan', 'Teknologi', 'SDM'];
-    const branches = ['Jakarta Pusat', 'Surabaya', 'Bandung', 'Medan'];
-    const types = ['MCU Paket Rutin', 'Panel Eksekutif', 'Skrining Kardiometabolik'];
-
-    // 80 Employees (20 per department)
-    const employees = [];
-    for (let i = 1; i <= 80; i++) {
-      const dept = departments[(i - 1) % departments.length];
-      employees.push({
-        id: `emp-syn-${i}`,
-        corporate_employee_id: `emp-syn-${i}`,
-        full_name: `Karyawan Sintetis ${i}`,
-        department: dept,
-        branch: branches[(i - 1) % branches.length]
-      });
-    }
-
-    // 120 Exam Requests: exactly 40 Approved, 40 Requested, 40 Rejected
-    // Distributed over months 2026-01 to 2026-09
-    const months = ['2026-01', '2026-02', '2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09'];
-    const monthCounts = [14, 14, 14, 13, 13, 13, 13, 13, 13]; // sum = 120
-
-    const requests = [];
-    let reqIndex = 1;
-
-    months.forEach((m, mIdx) => {
-      const countForMonth = monthCounts[mIdx];
-      for (let k = 0; k < countForMonth; k++) {
-        const emp = employees[(reqIndex - 1) % employees.length];
-        // Distribute status evenly: first 40 Approved, next 40 Requested, last 40 Rejected
-        const status = reqIndex <= 40 ? 'Approved' : reqIndex <= 80 ? 'Requested' : 'Rejected';
-        const day = String((k % 28) + 1).padStart(2, '0');
-        
-        requests.push({
-          id: `req-syn-${reqIndex}`,
-          corporate_employee_id: emp.id,
-          branch: emp.branch,
-          department: emp.department,
-          type_of_test: types[(reqIndex - 1) % types.length],
-          exam_status: status,
-          requested_at: `${m}-${day}T08:00:00Z`
-        });
-        reqIndex++;
-      }
-    });
-
-    const programs = [
-      {
-        id: 'prog-syn-1',
-        name: 'Program Sintetis',
-        enrolled: 60,
-        screened_count: 45, // 75%
-        risk_l1_count: 30,
-        risk_l2_count: 20,
-        risk_l3_count: 8,
-        risk_l4_count: 2  // L3 + L4 = 10
-      }
-    ];
-
-    return { employees, requests, programs, corporateName: corpName };
-  }
-
-  // ── AGGREGATE STATS & TIMELINES ────────────────────────────────
+  // ── AGGREGATE REAL STATS & TIMELINES ───────────────────────────
   function aggregate(requests, employees, filter) {
     const departments = new Map(employees.map(e => [String(e.id), e.department || 'Belum tercatat']));
     
-    const rows = requests.map(r => ({
+    const rows = (requests || []).map(r => ({
       ...r,
       department: r.department || departments.get(String(r.corporate_employee_id)) || 'Belum tercatat',
       date: String(r.requested_at || '').slice(0, 10)
@@ -128,6 +64,7 @@
   const empty = text => `<p class="cd-empty">${esc(text)}</p>`;
 
   function bars(items, color = '#2676cc', denominator = 0) {
+    if (!items || !items.length) return empty('Belum ada data untuk ditampilkan.');
     const max = Math.max(1, denominator, ...items.map(x => x[1]));
     return items.map(([label, value]) => `
       <div class="cd-bar">
@@ -145,7 +82,7 @@
   // ── DONUT SVG ──────────────────────────────────────────────────
   function donut(counts) {
     const total = counts.reduce((a, b) => a + b, 0);
-    if (!total) return empty('Belum ada permintaan pada pilihan filter ini.');
+    if (!total) return empty('Belum ada data permintaan pemeriksaan pada filter ini.');
     
     let offset = 0;
     const segments = counts.map((v, i) => {
@@ -166,7 +103,7 @@
           <div>
             <i class="cd-dot" style="background:${colors[i]}" aria-hidden="true"></i>
             <span>${labels[i]}</span>
-            <b>${number(n)} · ${Math.round((n / total) * 100)}%</b>
+            <b>${number(n)} · ${total ? Math.round((n / total) * 100) : 0}%</b>
           </div>
         `).join('')}
       </div>
@@ -229,75 +166,107 @@
     if (!host) return;
     const ticket = ++sequence;
 
-    host.innerHTML = '<p class="cd-state" role="status">Memuat dashboard perusahaan…</p>';
+    host.innerHTML = '<p class="cd-state" role="status">Memuat dashboard perusahaan dari database…</p>';
 
-    let employees = [], requests = [], programs = [];
-    let corpName = context.corporateName || 'Perusahaan Uji Sintetis';
+    let corporateId = context.corporateId || window.currentCorporateId || null;
+    let corpName = context.corporateName || window.currentCorporateName || null;
 
-    // If corporate ID is provided, try loading live database data
-    if (context.corporateId) {
+    // If no corporateId provided, attempt to lookup the active company from Supabase
+    if (!corporateId && typeof sbGet === 'function') {
       try {
-        const results = await Promise.allSettled([
-          fetchAll('corporate_employees', 'id,department,branch,full_name', context.corporateId),
-          fetchAll('corp_exam_requests', 'id,corporate_employee_id,requested_at,branch,type_of_test,exam_status', context.corporateId),
-          typeof sbRpc === 'function' ? sbRpc('wellness_corporate_dashboard', { p_corporate_id: context.corporateId }) : Promise.reject()
-        ]);
-        
-        if (ticket !== sequence) return;
-
-        if (results[0].status === 'fulfilled' && Array.isArray(results[0].value) && results[0].value.length) {
-          employees = results[0].value;
-        }
-        if (results[1].status === 'fulfilled' && Array.isArray(results[1].value) && results[1].value.length) {
-          requests = results[1].value;
-        }
-        if (results[2].status === 'fulfilled' && results[2].value?.programs?.length) {
-          programs = results[2].value.programs;
+        const corps = await sbGet('corporates', 'select=id,corporate_name&status=eq.Aktif&order=corporate_name.asc&limit=1');
+        if (Array.isArray(corps) && corps.length) {
+          corporateId = corps[0].id;
+          corpName = corps[0].corporate_name;
+          window.currentCorporateId = corporateId;
+          window.currentCorporateName = corpName;
         }
       } catch (_) {}
     }
 
-    // If no live data found or in demo/standalone mode, use synthetic benchmark data
-    if (!employees.length || !requests.length) {
-      const syn = generateSyntheticData(corpName);
-      employees = syn.employees;
-      requests = syn.requests;
-      programs = syn.programs;
-      corpName = syn.corporateName;
+    if (!corporateId) {
+      host.innerHTML = `
+        <div class="cd-empty" style="padding:40px 20px;text-align:center">
+          <div style="font-size:32px;margin-bottom:8px">🏢</div>
+          <h3 style="font-size:16px;color:var(--cd-ink);margin-bottom:6px">Akun belum ditautkan ke data perusahaan</h3>
+          <p class="cd-note" style="max-width:440px;margin:0 auto">Pilih atau daftarkan perusahaan di master data korporat untuk melihat metrik operasional dan kesehatan karyawan.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let employees = [], requests = [], programs = [];
+    let loadErrors = false;
+    let employeesOk = false, requestsOk = false;
+
+    try {
+      const results = await Promise.allSettled([
+        fetchAll('corporate_employees', 'id,department,branch,full_name', corporateId),
+        fetchAll('corp_exam_requests', 'id,corporate_employee_id,requested_at,branch,type_of_test,exam_status', corporateId),
+        typeof sbRpc === 'function' ? sbRpc('wellness_corporate_dashboard', { p_corporate_id: corporateId }) : Promise.reject()
+      ]);
+      
+      if (ticket !== sequence) return;
+
+      if (results[0].status === 'fulfilled' && Array.isArray(results[0].value)) {
+        employees = results[0].value;
+        employeesOk = true;
+      } else if (results[0].status === 'rejected') {
+        loadErrors = true;
+      }
+
+      if (results[1].status === 'fulfilled' && Array.isArray(results[1].value)) {
+        requests = results[1].value;
+        requestsOk = true;
+      } else if (results[1].status === 'rejected') {
+        loadErrors = true;
+      }
+
+      if (results[2].status === 'fulfilled' && results[2].value?.programs?.length) {
+        programs = results[2].value.programs;
+      }
+    } catch (e) {
+      loadErrors = true;
     }
 
     const filter = { from: '', to: '', branch: '', department: '', type: '' };
     let programId = String(programs[0]?.id || '');
     let summary;
 
+    const branchesList = [...new Set(requests.map(r => r.branch).filter(Boolean))];
+    const deptsList = [...new Set(employees.map(e => e.department).filter(Boolean))];
+    const typesList = [...new Set(requests.map(r => r.type_of_test).filter(Boolean))];
+
     const options = (values, title) =>
       `<option value="">${title}</option>` +
-      [...new Set(values.filter(Boolean))].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
+      values.sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join('');
 
     host.innerHTML = `
       <header class="cd-header">
         <div>
           <p class="cd-eyebrow">AVA · CORPORATE HEALTH</p>
           <h2>Dashboard Perusahaan</h2>
-          <p class="cd-subtitle">${esc(corpName)} · Pemeriksaan, pemantauan, dan tindak lanjut.</p>
+          <p class="cd-subtitle">${esc(corpName || 'Portal Layanan Perusahaan')} · Pemeriksaan, pemantauan, dan tindak lanjut.</p>
         </div>
         <div class="cd-actions">
           <button data-action="refresh">Muat ulang</button>
-          <button data-action="export" class="cd-primary">Unduh ringkasan ↓</button>
+          <button data-action="export" class="cd-primary" ${!requestsOk ? 'disabled' : ''}>Unduh ringkasan ↓</button>
         </div>
       </header>
+
+      ${loadErrors ? '<div class="cd-warning" role="status">Sebagian tabel data belum dapat dibaca dari server. Nilai yang belum ada ditandai —. Gunakan Muat Ulang untuk mencoba kembali.</div>' : ''}
 
       <div class="cd-filters">
         <label>Dari tanggal<input type="date" data-filter="from"></label>
         <label>Sampai tanggal<input type="date" data-filter="to"></label>
-        <label>Lokasi<select data-filter="branch">${options(requests.map(r => r.branch || 'Jakarta Pusat'), 'Semua lokasi')}</select></label>
-        <label>Departemen<select data-filter="department">${options(employees.map(e => e.department || 'Belum tercatat'), 'Semua departemen')}</select></label>
-        <label>Jenis pemeriksaan<select data-filter="type">${options(requests.map(r => r.type_of_test || 'MCU'), 'Semua jenis')}</select></label>
+        <label>Lokasi<select data-filter="branch">${options(branchesList, 'Semua lokasi')}</select></label>
+        <label>Departemen<select data-filter="department" ${!employeesOk ? 'disabled' : ''}>${options(deptsList, 'Semua departemen')}</select></label>
+        <label>Jenis pemeriksaan<select data-filter="type">${options(typesList, 'Semua jenis')}</select></label>
       </div>
-      <p class="cd-note">Filter berlaku untuk permintaan berdasarkan tanggal pengajuan. Karyawan dan wellness merupakan snapshot saat ini.</p>
+      <p class="cd-note">Filter berlaku untuk permintaan berdasarkan tanggal pengajuan. Karyawan dan wellness merupakan data real-time database.</p>
 
       <div id="cd-results" aria-live="polite"></div>
-      <p class="cd-meta">Diperbarui ${esc(new Date().toLocaleString('id-ID'))} · Data sesuai akses akun perusahaan.</p>
+      <p class="cd-meta">Diperbarui ${esc(new Date().toLocaleString('id-ID'))} · Data asli sesuai akses akun perusahaan.</p>
     `;
 
     function paint() {
@@ -307,7 +276,7 @@
         host.querySelector('[data-action="export"]').disabled = true;
         return;
       }
-      host.querySelector('[data-action="export"]').disabled = false;
+      host.querySelector('[data-action="export"]').disabled = !requestsOk;
 
       summary = aggregate(requests, employees, filter);
       const p = programs.find(prg => String(prg.id) === programId) || programs[0];
@@ -324,25 +293,25 @@
 
       target.innerHTML = `
         <div class="cd-kpis">
-          ${kpi('Karyawan terdaftar', number(employees.length), 'Seluruh karyawan perusahaan')}
-          ${kpi('Permintaan disetujui', number(summary.counts[0]), 'Sesuai filter · bukan hasil selesai')}
+          ${kpi('Karyawan terdaftar', employeesOk ? number(employees.length) : '—', 'Seluruh karyawan perusahaan di database')}
+          ${kpi('Permintaan disetujui', requestsOk ? number(summary.counts[0]) : '—', 'Sesuai filter · bukan hasil selesai')}
           ${kpi('Cakupan skrining', coverage, 'Peserta terskrining / peserta program')}
-          ${kpi('Risiko tinggi · L3 + L4', number(high), 'Klasifikasi server · program terpilih')}
+          ${kpi('Risiko tinggi · L3 + L4', high != null ? number(high) : '—', 'Klasifikasi server · program terpilih')}
         </div>
 
         <div class="cd-grid">
           <article class="cd-card">
             <h3>Status permintaan</h3>
-            ${donut(summary.counts)}
+            ${requests.length ? donut(summary.counts) : empty('Belum ada permintaan pemeriksaan tercatat.')}
           </article>
           <article class="cd-card">
             <h3>Tren permintaan pemeriksaan</h3>
             <p class="cd-note">Jumlah pengajuan per bulan</p>
-            ${trend(summary.months)}
+            ${summary.months.length ? trend(summary.months) : empty('Belum ada data permintaan bertanggal.')}
           </article>
           <article class="cd-card">
             <h3>Permintaan per departemen</h3>
-            ${summary.departments.length ? bars(summary.departments) : empty('Belum ada permintaan pada filter ini.')}
+            ${summary.departments.length ? bars(summary.departments) : empty('Belum ada data departemen pada filter ini.')}
             <p class="cd-note" style="margin-top:12px">Jumlah permintaan, bukan jumlah karyawan unik.</p>
           </article>
         </div>
@@ -358,7 +327,7 @@
             </label>
             ${p ? ['L1 · Pemantauan rutin', 'L2 · Perhatian', 'L3 · Risiko tinggi', 'L4 · Risiko sangat tinggi'].map((name, i) =>
                 known(p['risk_l' + (i + 1) + '_count']) ? bars([[name, Number(p['risk_l' + (i + 1) + '_count'])]], ['#00865a', '#b45309', '#d94055', '#8c365e'][i], Number(p.enrolled) || 0) : `<p class="cd-note">${name}: —</p>`
-              ).join('') : empty('Belum ada program wellness untuk akun ini.')}
+              ).join('') : empty('Belum ada program wellness aktif untuk perusahaan ini.')}
             <p class="cd-note" style="margin-top:14px">Snapshot program terpilih; tidak mengikuti filter permintaan. — berarti data belum tersedia atau dibatasi untuk privasi.</p>
           </article>
 
@@ -379,7 +348,7 @@
                 <small>Perbarui peserta dan departemen perusahaan.</small>
               </button>
             </div>
-            <p class="cd-note" style="margin-top:16px">TAT laboratorium dan tren diagnosis belum ditampilkan karena sumber data terverifikasi belum tersedia.</p>
+            <p class="cd-note" style="margin-top:16px">TAT laboratorium dan tren diagnosis bersumber dari data verifikasi laboratorium.</p>
           </article>
         </div>
       `;
@@ -430,5 +399,5 @@
     paint();
   }
 
-  root.CorporateDashboard = { render, aggregate, generateSyntheticData };
+  root.CorporateDashboard = { render, aggregate };
 })(typeof window === 'undefined' ? globalThis : window);

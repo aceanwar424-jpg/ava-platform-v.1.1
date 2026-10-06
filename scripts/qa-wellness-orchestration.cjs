@@ -1,6 +1,6 @@
 // OWNED_BY: generic. Browser -> local RPC adapter -> real PGlite migrations. No production access.
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+const {chromium}=require('./lib/playwright.cjs');
 const {createFixture,A,P,H,I}=require('./verify-wellness-orchestration.cjs');
 async function main(){
  const {db,actor,rpc,program,eid}=await createFixture();
