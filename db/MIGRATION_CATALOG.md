@@ -44,3 +44,14 @@ node scripts/db-parity-local-authoritative.cjs --deep --apply --confirm-local-au
 Perintah apply tidak menghapus baris cloud yang tidak ada di lokal. Penghapusan
 cloud memerlukan prosedur terpisah, backup, daftar tabel, dan persetujuan pemilik
 database. Tabel tanpa primary key dilewati karena tidak aman untuk di-upsert.
+
+## Operasional RS — 0070–0073 (6 Oktober 2026)
+
+- `0070_hospital_operations.sql`: workflow operasional bertahap, penugasan dan bukti.
+- `0071_hospital_bed_flow.sql`: reservasi, proteksi episode dan housekeeping.
+- `0072_hospital_staff_roles.sql`: perluasan provisioning role RS.
+- `0073_hospital_operations_hardening.sql`: penyelesaian forward-only untuk 0070–0072 yang terlanjur dipush proses workspace lain saat implementasi; role tahap tanpa substitusi profesi oleh administrator, RLS baca per layanan, direktori staf minimal, audit reservasi, kapasitas aktual, proteksi housekeeping dan RPC master bed. Tidak mengubah checksum 0070–0072.
+
+Prasyarat: baseline rawat inap existing dan migrasi tenant/auth/RBAC. Preflight: `db/preflight/0070_hospital_operations_preflight.sql`. Runbook: `db/runbooks/0070_hospital_operations.md`. Pemetaan tenant bed lama wajib ditinjau; jangan backfill seluruh bed ke satu tenant. Persetujuan chat hanya skema repo/uji lokal. Tidak ada instruksi apply produksi pada pekerjaan ini.
+
+Verifikasi: `node scripts/uji/test_hospital_operations.cjs` memakai RPC/trigger SQL nyata dan fixture sintetis; `node scripts/qa-hospital-operations.cjs` menghubungkan browser ke PGlite. Sink jurnal/audit lama adalah fixture, bukan validasi akuntansi/produksi. Unit khusus memakai workflow koordinasi dan referensi sumber; tidak mengklaim mesin klinis/stock ledger baru.

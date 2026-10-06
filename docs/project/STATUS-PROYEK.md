@@ -2887,7 +2887,20 @@ OWNED_BY: generic. Pengguna menyetujui penambahan skema dan uji lokal pada chat 
 Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
 - [x] Inventaris awal dan tambah 21 menu RS; generator dan audit menu statis lulus.
 - [x] Checkpoint skema lokal diterima pengguna.
-- [ ] Implementasikan penyimpanan workflow, transisi, role, tenant, idempotensi dan audit.
-- [ ] Lengkapi alur reservasi, housekeeping, handover dan checklist pulang dengan relasi sumber.
-- [ ] Uji simulasi database/UI sintetis, kegagalan dan isolasi; catat batas operasional.
+- [x] Implementasikan penyimpanan workflow, transisi, role, tenant, idempotensi dan audit.
+- [x] Lengkapi alur reservasi, housekeeping, handover dan checklist pulang dengan relasi sumber.
+- [x] Uji simulasi database/UI sintetis, kegagalan dan isolasi; catat batas operasional.
 - [ ] Jalankan gate repo, commit selektif dan git push.
+
+
+### Bukti operasional RS lokal
+- 21 menu/route RS, 18 workflow operasional dengan siklus permintaan → penugasan → bukti per tahap → penutupan dan audit; status menu tetap parsial untuk membedakan koordinasi dari mesin klinis/stock ledger khusus.
+- Alur bed terhubung ke RPC rawat inap existing: reservasi → admisi → checklist DPJP/farmasi/perawat/finance → pemulangan → tugas housekeeping otomatis → verifikasi → bed siap. Master bed lewat RPC dengan hak khusus; mutasi tabel langsung ditolak.
+- Tahap klinis wajib profesi yang sesuai; administrator tidak menggantikannya. Role dan tenant diuji server. Penerima handover berbeda dari pengirim tahap sebelumnya.
+- Migrasi 0070–0072 ikut commit/push proses workspace lain pada 9c669ed saat implementasi berlangsung. Definisi historis tidak diubah; penyelesaian ada pada 0073 dengan preflight/runbook.
+- test_hospital_operations.cjs: 21 skenario SQL lulus; mencakup semua 18 lifecycle dengan role pelaksana, retry/input berbeda, versi lama, RLS lintas tenant/per layanan, viewer, expiry, pembatalan, provisioning dan master bed.
+- qa-hospital-operations.cjs: 27 skenario UI lulus, browser terhubung ke SQL PGlite nyata; desktop/mobile, semua workflow, reservasi, error/retry, escaping, filter kosong, pagination dan 21 route/lazy manifest.
+- Regresi keselamatan pasien 21/21 serta tindakan/imunisasi/RM 18/18 lulus. Gate application boundaries, deploy readiness, menu, RLS statis 54/54, secret scan dan desktop artifact scan lulus.
+- Regresi Tech existing gagal locator usang: mencari “Ubah tenant”, tombol HEAD bernama “Ubah Data Tenant”. File tenant tidak diubah tugas RS; hasil tidak dihitung lulus. Screenshot Tech hasil percobaan dikembalikan.
+- Bukti: docs/audit-evidence/2026-10-06/hospital-operations-simulation.json, hospital-ui-simulation.json, serta screenshot hospital-board desktop/mobile dan bed-reservation.
+- Batas: tidak apply migrasi/menulis DB produksi. Sink audit/jurnal existing adalah fixture sintetis; bukan validasi akuntansi. Kompetisi bed diuji berurutan dan constraint, belum konkurensi beberapa sesi PostgreSQL. Unit khusus belum punya mesin klinis/stock ledger/kapasitas booking serta otomatisasi billing lengkap; rinci di rencana dan backlog. UAT RS dan pemetaan tenant bed lama wajib sebelum penggunaan nyata.

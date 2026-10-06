@@ -117,6 +117,13 @@ async function renderInpatient(tab) {
       </div>
     </div>
     <div id="inp-warn"></div>
+    <nav aria-label="Alur operasional rawat inap" style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+      <button class="btn btn-sm" onclick="navigate('rs-bed-reservation')">Reservasi bed</button>
+      <button class="btn btn-sm" onclick="navigate('rs-nurse-station')">Nurse station & handover</button>
+      <button class="btn btn-sm" onclick="navigate('rs-discharge')">Checklist pulang</button>
+      <button class="btn btn-sm" onclick="navigate('rs-housekeeping')">Housekeeping</button>
+      <button class="btn btn-sm" onclick="navigate('rs-patient-flow')">Kendali alur RS</button>
+    </nav>
     <div class="tabs" id="inp-tabs" style="margin-bottom:14px">
       ${tabs.map(t => `<button class="tab-btn ${inpTab === t.k ? 'active' : ''}"
         onclick="inpSwitchTab('${t.k}')">${t.l}</button>`).join('')}
@@ -1321,12 +1328,14 @@ async function inpSaveBed(id) {
 
   try {
     if (id) {
-      await sbPatch('inpatient_beds', id, { ...base, bed_no: bedNo });
+      const saved = await sbRpc('rs_save_beds', { p_id: id, p_beds: [{ ...base, bed_no: bedNo }] });
+      if (!Array.isArray(saved) || !saved[0]?.id) throw new Error('Server belum mengonfirmasi master bed; periksa migrasi 0073');
     } else {
       const n = Math.max(1, Math.min(20, parseInt(document.getElementById('inp-b-count')?.value) || 1));
       const rows = [];
       for (let i = 0; i < n; i++) rows.push({ ...base, bed_no: inpNextBedNo(bedNo, i), status: 'Kosong' });
-      await sbPost('inpatient_beds', rows);
+      const saved = await sbRpc('rs_save_beds', { p_id: null, p_beds: rows });
+      if (!Array.isArray(saved) || saved.length !== rows.length) throw new Error('Server belum mengonfirmasi seluruh bed; periksa migrasi 0073');
     }
     toast('✅ Tempat tidur tersimpan', 'ok');
     closeModalForce(); await inpLoadAll();

@@ -1,0 +1,94 @@
+{
+  "synthetic": true,
+  "engine": "PGlite/PostgreSQL actual migrations and existing inpatient RPCs",
+  "limitations": [
+    "post_journal and write_audit sinks use synthetic fixture tables; not accounting or production UAT",
+    "simulated competing allocations run sequentially; unique constraints and row locks verified, multi-session PostgreSQL concurrency still requires staging"
+  ],
+  "steps": [
+    {
+      "name": "migrations can be reapplied",
+      "status": "passed"
+    },
+    {
+      "name": "anonymous and viewer mutations denied",
+      "status": "passed"
+    },
+    {
+      "name": "foreign admission rejected",
+      "status": "passed"
+    },
+    {
+      "name": "creation replay and conflicting replay",
+      "status": "passed"
+    },
+    {
+      "name": "assignment, stage evidence, stale version and role enforcement",
+      "status": "passed"
+    },
+    {
+      "name": "all 18 operational workflows complete actual SQL stages",
+      "status": "passed"
+    },
+    {
+      "name": "handover requires another receiver",
+      "status": "passed"
+    },
+    {
+      "name": "completed and cancelled records cannot advance",
+      "status": "passed"
+    },
+    {
+      "name": "transition retry is idempotent and mismatched evidence rejected",
+      "status": "passed"
+    },
+    {
+      "name": "bed request replay, foreign bed and competing allocation",
+      "status": "passed"
+    },
+    {
+      "name": "reserved patient admitted by real existing inpatient RPC",
+      "status": "passed"
+    },
+    {
+      "name": "discharge blocked without current episode checklist",
+      "status": "passed"
+    },
+    {
+      "name": "discharge checklist then real discharge creates housekeeping",
+      "status": "passed"
+    },
+    {
+      "name": "manual clean release denied; housekeeping verifies and releases bed",
+      "status": "passed"
+    },
+    {
+      "name": "cross tenant mutation, staff directory and RLS reads",
+      "status": "passed"
+    },
+    {
+      "name": "administrator cannot substitute clinical stage profession",
+      "status": "passed"
+    },
+    {
+      "name": "hospital role provisioning and unauthorized role changes",
+      "status": "passed"
+    },
+    {
+      "name": "role-specific reads and viewer data exclusion",
+      "status": "passed"
+    },
+    {
+      "name": "expiry and cancellation release reservation without occupying bed",
+      "status": "passed"
+    },
+    {
+      "name": "authenticated bed reads, master RPC and direct write rejection",
+      "status": "passed"
+    },
+    {
+      "name": "audit events persisted for completed flow",
+      "status": "passed"
+    }
+  ]
+}

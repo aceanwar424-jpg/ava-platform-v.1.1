@@ -43,3 +43,12 @@ Pasien sintetis ditriase → permintaan bed → reservasi → admisi → penugas
 ## Batas status
 
 Menu baru berstatus `belum` sampai implementasi dan simulasi terkait lulus. Keberadaan menu, halaman, atau SQL saja tidak membuktikan alur selesai. Modul klinis khusus belum dapat disebut siap produksi sebelum UAT RS.
+
+## Hasil implementasi lokal
+
+- 21 menu RS dengan route dan lazy manifest; 18 layanan memiliki formulir permintaan, penugasan, transisi per peran, bukti, histori dan status akhir. Dua halaman untuk kendali/kapsitas, satu untuk reservasi.
+- Reservasi terhubung ke RPC admisi existing. Pemulangan oleh dokter memerlukan checklist episode saat ini; bed menjadi Dibersihkan, task dibuat otomatis, release setelah verifikasi. Master bed menggunakan RPC, bukan mutasi tabel langsung.
+- Tahap klinis wajib peran profesi sesuai tahap; administrator dapat mengatur pekerjaan tetapi tidak menggantikan profesi pelaksana. Handover harus diterima aktor berbeda dari pengirim tahap sebelumnya.
+- Tenant/RLS, retry, versi data, expiry, pembatalan, audit dan error backend diuji lokal. Konkurensi beberapa sesi PostgreSQL serta UAT RS masih membutuhkan staging.
+- Menu tetap parsial secara jujur: unit khusus adalah workflow koordinasi bukti. Booking kapasitas operasi/mesin, stock ledger darah/CSSD/linen, flowsheet klinis, sumber tagihan/deposit otomatis, indikator historis dan validasi dokumen sumber belum dibangun sebagai mesin khusus. Jangan menyamakan status workflow completed dengan tindakan klinis sudah tervalidasi secara otomatis.
+- Migrasi 0070–0072 dipush oleh proses lain selama implementasi; perbaikan terakhir ada pada 0073 agar checksum historis tidak berubah.

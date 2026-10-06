@@ -2,6 +2,7 @@
 let rsOpsPage = 'rs-patient-flow', rsOpsOffset = 0, rsOpsEpoch = 0;
 let rsOpsTypes = [], rsOpsRows = [], rsOpsProfiles = [], rsOpsAdmissions = [], rsOpsBeds = [];
 let rsOpsStatus = 'active', rsOpsBusy = false;
+let rsOpsCapacityData = null;
 const rsOpsLabels = {'rs-patient-flow':'Pusat Kendali Alur Pasien','rs-bed-reservation':'Reservasi & Daftar Tunggu Bed','rs-capacity':'Kapasitas Rawat Inap'};
 function rsOpsEsc(v) { return String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function rsOpsKey() { return 'rs-' + crypto.randomUUID(); }
@@ -18,20 +19,24 @@ async function rsOpsLoad() {
   rsOpsMain().innerHTML='<section aria-live="polite">Memuat operasional RS…</section>';
   try {
     const bedPage=['rs-bed-reservation','rs-capacity'].includes(rsOpsPage);
-    const [types,rows,profiles,admissions,beds]=await Promise.all([
-      sbGet('rs_workflow_types','select=*&order=label'),
+    const definitions=await sbGet('rs_workflow_types','select=*&order=label');
+    const needPatients=rsOpsPage==='rs-bed-reservation'||rsOpsPage==='rs-patient-flow'||definitions.find(t=>t.code===rsOpsPage)?.patient_required;
+    const [types,rows,profiles,admissions,beds,capacity]=await Promise.all([
+      Promise.resolve(definitions),
       bedPage ? sbGet('rs_bed_reservations',`select=*&order=created_at.desc&limit=51&offset=${rsOpsOffset}`)
-        : sbGet('rs_work_orders',`select=*&status=eq.${rsOpsStatus}${rsOpsPage==='rs-patient-flow'?'':`&kind=eq.${encodeURIComponent(rsOpsPage)}`}&order=priority.desc,updated_at.desc&limit=51&offset=${rsOpsOffset}`),
+        : sbGet('rs_work_orders',`select=*&status=eq.${rsOpsStatus}${rsOpsPage==='rs-patient-flow'?'':`&kind=eq.${encodeURIComponent(rsOpsPage)}`}&order=priority.desc,updated_at.desc,id.desc&limit=51&offset=${rsOpsOffset}`),
       sbRpc('rs_staff_directory',{}),
-      sbGet('admissions','select=id,visit_number,patient_name&order=id.desc&limit=200'),
+      needPatients?sbGet('admissions','select=id,visit_number,patient_name&order=id.desc&limit=200'):Promise.resolve([]),
       bedPage ? sbGet('inpatient_beds','select=id,room_no,bed_no,status,is_active,tenant_id&order=id&limit=1001') : Promise.resolve([]),
+      rsOpsPage==='rs-capacity'?sbRpc('rs_bed_capacity',{}):Promise.resolve(null),
     ]);
-    if(epoch!==rsOpsEpoch)return;
+    if(epoch!==rsOpsEpoch||(typeof currentPage==='string'&&currentPage!==rsOpsPage))return;
     rsOpsTypes=types;rsOpsRows=rows;rsOpsProfiles=profiles;rsOpsAdmissions=admissions;rsOpsBeds=beds;
+    rsOpsCapacityData=capacity;
     rsOpsPaint();
   } catch(e) {
-    if(epoch!==rsOpsEpoch)return;
-    rsOpsMain().innerHTML=`<section><h1>Operasional RS belum dapat dibaca</h1><p>${rsOpsEsc(e.message)}</p><p>Periksa akses serta migrasi 0070–0071 dan pemetaan tenant bed melalui runbook.</p><button id="rs-retry">Coba lagi</button></section>`;
+    if(epoch!==rsOpsEpoch||(typeof currentPage==='string'&&currentPage!==rsOpsPage))return;
+    rsOpsMain().innerHTML=`<section><h1>Operasional RS belum dapat dibaca</h1><p>${rsOpsEsc(e.message)}</p><p>Periksa akses serta migrasi 0070–0073 dan pemetaan tenant bed melalui runbook.</p><button id="rs-retry">Coba lagi</button></section>`;
     document.getElementById('rs-retry').onclick=rsOpsLoad;
   }
 }
@@ -68,9 +73,8 @@ function rsOpsBedCard(r) {
   return `<article><h2>${rsOpsEsc(rsOpsPatient(r.admission_id))}</h2><p>${rsOpsEsc(r.requirements)}</p><p>Status: ${expired?'Reservasi kedaluwarsa':rsOpsEsc(r.status)} · Bed #${rsOpsEsc(r.bed_id || 'belum dialokasikan')}</p>${r.expires_at?`<p>Berlaku sampai: ${rsOpsEsc(new Date(r.expires_at).toLocaleString('id-ID'))}</p>`:''}<div class="rs-actions">${r.status==='waiting'?`<button data-bed="${r.id}">Alokasikan bed</button>`:''}${['waiting','reserved','expired'].includes(r.status)?`<button data-cancel-bed="${r.id}">Batalkan</button>`:''}</div></article>`;
 }
 function rsOpsCapacity() {
-  if(rsOpsBeds.length>1000)return '<p>Jumlah bed melebihi batas ringkasan. Persempit cakupan sebelum menghitung kapasitas.</p>';
-  const active=rsOpsBeds.filter(b=>b.is_active!==false),occupied=active.filter(b=>b.status==='Terisi').length;
-  return `<div class="rs-grid">${[['Bed aktif',active.length],['Terisi',occupied],['Okupansi saat ini',active.length?`${(occupied/active.length*100).toFixed(1)}%`:'Tidak tersedia'],['Perlu dibersihkan',active.filter(b=>b.status==='Dibersihkan').length],['Perbaikan',active.filter(b=>b.status==='Perbaikan').length]].map(([l,v])=>`<article><p>${l}</p><span class="rs-kpi">${v}</span></article>`).join('')}</div>`;
+  const c=rsOpsCapacityData;if(!c||typeof c.active!=='number')return '<p>Ringkasan kapasitas tidak tersedia.</p>';
+  return `<div class="rs-grid">${[['Bed aktif',c.active],['Terisi',c.occupied],['Okupansi saat ini',c.active?`${(c.occupied/c.active*100).toFixed(1)}%`:'Tidak tersedia'],['Siap dialokasikan',c.available],['Direservasi',c.reserved],['Perlu dibersihkan',c.cleaning],['Perbaikan',c.repair]].map(([l,v])=>`<article><p>${l}</p><span class="rs-kpi">${rsOpsEsc(v)}</span></article>`).join('')}</div>`;
 }
 function rsOpsPatientField(required) { return `<label>Kunjungan pasien<select name="admission_id" ${required?'required':''}><option value="">${required?'Pilih kunjungan':'Tanpa pasien'}</option>${rsOpsAdmissions.map(a=>`<option value="${a.id}">${rsOpsEsc(rsOpsPatient(a.id))}</option>`).join('')}</select></label><small>Daftar 200 kunjungan terbaru; gunakan ID kunjungan melalui pencarian bila belum tampil.</small><label>ID kunjungan lainnya (opsional)<input name="admission_override" type="number" min="1"></label>`; }
 function rsOpsForm(inner,onSave) {
@@ -83,7 +87,7 @@ function rsOpsForm(inner,onSave) {
 }
 function rsOpsNew() {
   const t=rsOpsType();
-  rsOpsForm(`<h2>Permintaan ${rsOpsEsc(t.label)}</h2><label>Judul<input name="title" minlength="3" maxlength="200" required></label><label>Unit / lokasi<input name="location" maxlength="200" required></label>${rsOpsPatientField(false)}<label>Prioritas<select name="priority"><option value="normal">Normal</option><option value="urgent">Urgent</option></select></label>`,async(d,k)=>{
+  rsOpsForm(`<h2>Permintaan ${rsOpsEsc(t.label)}</h2><label>Judul<input name="title" minlength="3" maxlength="200" required></label><label>Unit / lokasi<input name="location" maxlength="200" required></label>${t.patient_required?rsOpsPatientField(false):''}<label>Prioritas<select name="priority"><option value="normal">Normal</option><option value="urgent">Urgent</option></select></label>`,async(d,k)=>{
     const admission=d.get('admission_override') || d.get('admission_id');if(t.patient_required&&!admission)throw Error('Pilih kunjungan pasien');
     const r=await sbRpc('rs_create_order',{p_kind:t.code,p_title:d.get('title'),p_location:d.get('location'),p_admission_id:admission?Number(admission):null,p_priority:d.get('priority'),p_request_key:k});if(!r?.id)throw Error('Server tidak mengonfirmasi penyimpanan');
   });

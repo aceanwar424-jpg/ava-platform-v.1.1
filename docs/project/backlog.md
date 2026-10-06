@@ -23,3 +23,12 @@ Rincian bukti dan acceptance: [laporan audit](docs/archive/AUDIT-LIS-MENDALAM-20
 - Pulihkan sesi melalui validasi server; ganti SSO query-token dengan alur aman.
 - Jadikan klaim cashback transaksi server yang idempoten.
 - Uji EHR terikat patient ID/tenant dan akun resmi sebelum release publik.
+
+## RS — cakupan lanjutan setelah workflow koordinasi (2026-10-06)
+OWNED_BY: generic. Menu RS berstatus parsial; simulator tidak menjadi validasi klinis.
+- Kapasitas sumber daya dan deteksi benturan booking operasi, kursi/mesin dan kendaraan.
+- Ledger instrumen CSSD, komponen darah, linen dan distribusi porsi; bukan sekadar referensi bukti.
+- Flowsheet ICU/neonatal, partograf, hubungan identitas ibu-bayi dan pencatatan sesi unit khusus yang tervalidasi pengguna RS.
+- Rekonsiliasi biaya/deposit/penjamin otomatis dari transaksi sumber; validasi referensi bukti bertipe ID.
+- ALOS/BTO/TOI berbasis riwayat lengkap, definisi hari perawatan dan periode pelaporan yang disepakati.
+- UAT staging: dua sesi memperebutkan bed, tenant/role aktual, master bangsal/kelas lama, fresh baseline cloud melalui konsolidasi resmi dan upgrade mapping tenant yang ditinjau.
