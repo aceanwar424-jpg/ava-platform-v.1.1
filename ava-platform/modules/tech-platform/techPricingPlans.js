@@ -154,6 +154,67 @@ function tpGambar() {
 }
 
 async function tpTambah() {
+  if (typeof openModal === 'function') {
+    openModal(`
+      <div style="padding:18px;max-width:560px">
+        <h3 style="margin:0 0 6px;font-size:16px;font-weight:750">Tambah Paket Berlangganan</h3>
+        <p style="font-size:12px;color:var(--ava-muted,#60706c);margin:0 0 16px">Tetapkan kuota, batas pemakaian, dan skema harga untuk paket klien.</p>
+        
+        <div class="grid two">
+          <div class="form-group">
+            <label class="field-label" for="tp-m-kode">Kode Paket *</label>
+            <input id="tp-m-kode" placeholder="mis. PRO, STARTER" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="tp-m-nama">Nama Paket *</label>
+            <input id="tp-m-nama" placeholder="mis. Klinik Utama Pro">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label" for="tp-m-untuk">Target Usaha</label>
+          <select id="tp-m-untuk">
+            <option value="klinik" selected>Klinik (Pratama / Utama)</option>
+            <option value="lab">Laboratorium Mandiri</option>
+            <option value="wellness">Wellness &amp; Aesthetic</option>
+            <option value="suite">Master Holding / Suite</option>
+          </select>
+        </div>
+
+        <div class="grid two">
+          <div class="form-group">
+            <label class="field-label" for="tp-m-bln">Harga Bulanan (Rp) *</label>
+            <input id="tp-m-bln" type="number" min="0" placeholder="0">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="tp-m-thn">Harga Tahunan (Rp)</label>
+            <input id="tp-m-thn" type="number" min="0" placeholder="Kosongkan bila tidak ada">
+          </div>
+        </div>
+
+        <div class="grid three">
+          <div class="form-group">
+            <label class="field-label" for="tp-m-user">Batas Pengguna</label>
+            <input id="tp-m-user" type="number" min="0" placeholder="0 = tdk termasuk, ksg = unlimited">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="tp-m-trx">Batas Trx / Bln</label>
+            <input id="tp-m-trx" type="number" min="0" placeholder="0 = tdk termasuk, ksg = unlimited">
+          </div>
+          <div class="form-group">
+            <label class="field-label" for="tp-m-gb">Penyimpanan (GB)</label>
+            <input id="tp-m-gb" type="number" min="0" placeholder="0 = tdk termasuk, ksg = unlimited">
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+          <button class="btn btn-ghost btn-sm" onclick="closeModal()">Batal</button>
+          <button class="btn btn-teal btn-sm" onclick="tpEksekusiTambah()">Simpan Paket</button>
+        </div>
+      </div>
+    `);
+    return;
+  }
   const kode = prompt('Kode paket (mis. PRO):');
   if (!kode) return;
   const nama = prompt('Nama paket:');
@@ -164,16 +225,34 @@ async function tpTambah() {
   if (bln === null) return;
   const thn = prompt('Harga per tahun (Rp, kosongkan bila tidak dijual tahunan):', '');
   if (thn === null) return;
-  const pengguna = prompt('Batas jumlah pengguna\n'
-    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  const pengguna = prompt('Batas jumlah pengguna (kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
   if (pengguna === null) return;
-  const trx = prompt('Batas transaksi per bulan\n'
-    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  const trx = prompt('Batas transaksi per bulan (kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
   if (trx === null) return;
-  const gb = prompt('Batas penyimpanan (GB)\n'
-    + '(kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
+  const gb = prompt('Batas penyimpanan (GB) (kosongkan = tanpa batas, isi 0 = tidak termasuk):', '');
   if (gb === null) return;
+  await tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb });
+}
 
+async function tpEksekusiTambah() {
+  const kode = document.getElementById('tp-m-kode')?.value.trim().toUpperCase();
+  const nama = document.getElementById('tp-m-nama')?.value.trim();
+  const untuk = document.getElementById('tp-m-untuk')?.value;
+  const bln = document.getElementById('tp-m-bln')?.value;
+  const thn = document.getElementById('tp-m-thn')?.value;
+  const pengguna = document.getElementById('tp-m-user')?.value;
+  const trx = document.getElementById('tp-m-trx')?.value;
+  const gb = document.getElementById('tp-m-gb')?.value;
+
+  if (!kode || !nama) {
+    toast?.('Kode dan nama paket wajib diisi', 'warn') || alert('Kode dan nama paket wajib diisi');
+    return;
+  }
+  closeModal?.();
+  await tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb });
+}
+
+async function tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb }) {
   try {
     await sbPost('tech_paket', {
       kode: kode.trim().toUpperCase(), nama: nama.trim(),
@@ -184,8 +263,9 @@ async function tpTambah() {
       batas_transaksi_bln: trx === '' ? null : parseInt(trx, 10),
       batas_penyimpanan_gb: gb === '' ? null : parseFloat(gb),
     });
+    toast?.(`Paket ${nama} berhasil disimpan`, 'ok') || alert('Paket berhasil disimpan.');
     await renderTechPricingPlans();
-  } catch (e) { alert('Gagal menyimpan paket: ' + e.message); }
+  } catch (e) { toast?.('Gagal menyimpan paket: ' + e.message, 'err') || alert('Gagal menyimpan paket: ' + e.message); }
 }
 
 function calculateSubscriptionBilling(tier, ordersCount, cycle = 'MONTHLY') {

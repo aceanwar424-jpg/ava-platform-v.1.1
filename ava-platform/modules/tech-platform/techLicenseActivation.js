@@ -184,35 +184,94 @@ function tlKartu(label, angka, kunci, warna) {
 function tlSaring(k) { tlLicenseFilter = k; tlGambar(); }
 
 async function tlAktivasi(kodeAwal) {
+  if (typeof openModal === 'function') {
+    openModal(`
+      <div style="padding:16px;max-width:480px">
+        <h3 style="margin:0 0 6px;font-size:16px;font-weight:750">Aktivasi Lisensi Tenant</h3>
+        <p style="font-size:12px;color:var(--ava-muted,#60706c);margin:0 0 16px">Masukkan kode lisensi dan sidik kunci publik untuk mengaktifkan akses faskes.</p>
+        <div class="form-group">
+          <label class="field-label" for="tl-modal-kode">Kode Lisensi *</label>
+          <input id="tl-modal-kode" value="${tlEsc(kodeAwal || '')}" placeholder="mis. LIC-2026-XXXX">
+        </div>
+        <div class="form-group">
+          <label class="field-label" for="tl-modal-sidik">Sidik Kunci Publik (Opsional)</label>
+          <input id="tl-modal-sidik" placeholder="Fingerprint ED25519 dari berkas lisensi">
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+          <button class="btn btn-ghost btn-sm" onclick="closeModal()">Batal</button>
+          <button class="btn btn-teal btn-sm" onclick="tlEksekusiAktivasi()">Aktifkan Sekarang</button>
+        </div>
+      </div>
+    `);
+    return;
+  }
   const kode = kodeAwal || prompt('Kode lisensi yang akan diaktifkan:');
   if (!kode) return;
   const sidik = prompt('Sidik kunci publik dari berkas lisensi (opsional):', '');
   if (sidik === null) return;
+  await tlKirimAktivasi(kode, sidik);
+}
 
+async function tlEksekusiAktivasi() {
+  const kode = document.getElementById('tl-modal-kode')?.value.trim();
+  const sidik = document.getElementById('tl-modal-sidik')?.value.trim();
+  if (!kode) { toast?.('Kode lisensi wajib diisi', 'warn') || alert('Kode lisensi wajib diisi'); return; }
+  closeModal?.();
+  await tlKirimAktivasi(kode, sidik);
+}
+
+async function tlKirimAktivasi(kode, sidik) {
   try {
     const r = await sbRpc('tech_aktifkan_lisensi', {
       p_kode: kode, p_sidik_kunci: sidik || null,
       p_oleh: (window.currentUsername || 'admin'),
     });
-    if (r && r.error) { alert(r.error); return; }
-    alert(`Lisensi aktif.\n\nTenant: ${r.tenant}\nPaket: ${r.paket}\n`
-      + `Berlaku sampai: ${r.berlaku_sampai || '—'}`);
+    if (r && r.error) { toast?.(r.error, 'err') || alert(r.error); return; }
+    toast?.(`Lisensi aktif untuk ${r.tenant || 'tenant'}. Berlaku sampai: ${r.berlaku_sampai || '—'}`, 'ok') || alert(`Lisensi aktif.\n\nTenant: ${r.tenant}\nPaket: ${r.paket}\nBerlaku sampai: ${r.berlaku_sampai || '—'}`);
     await renderTechLicenseActivation();
-  } catch (e) { alert('Gagal mengaktifkan lisensi: ' + e.message); }
+  } catch (e) { toast?.('Gagal mengaktifkan lisensi: ' + e.message, 'err') || alert('Gagal mengaktifkan lisensi: ' + e.message); }
 }
 
 async function tlCabut(id) {
+  if (typeof openModal === 'function') {
+    openModal(`
+      <div style="padding:16px;max-width:480px">
+        <h3 style="margin:0 0 6px;font-size:16px;font-weight:750;color:var(--danger,#ef4444)">Pencabutan Lisensi</h3>
+        <p style="font-size:12px;color:var(--ava-muted,#60706c);margin:0 0 16px">Pencabutan mencatat status lisensi tidak aktif. Akses tenant tetap dapat dikelola secara terpisah.</p>
+        <div class="form-group">
+          <label class="field-label" for="tl-modal-alasan">Alasan Pencabutan *</label>
+          <textarea id="tl-modal-alasan" placeholder="Tuliskan alasan resmi pencabutan lisensi..."></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+          <button class="btn btn-ghost btn-sm" onclick="closeModal()">Batal</button>
+          <button class="btn btn-teal btn-sm" style="background:var(--danger,#ef4444)" onclick="tlEksekusiCabut(${id})">Cabut Lisensi</button>
+        </div>
+      </div>
+    `);
+    return;
+  }
   const alasan = prompt('Alasan pencabutan (wajib):');
   if (!alasan) return;
+  await tlKirimCabut(id, alasan);
+}
+
+async function tlEksekusiCabut(id) {
+  const alasan = document.getElementById('tl-modal-alasan')?.value.trim();
+  if (!alasan) { toast?.('Alasan pencabutan wajib diisi', 'warn') || alert('Alasan pencabutan wajib diisi'); return; }
+  closeModal?.();
+  await tlKirimCabut(id, alasan);
+}
+
+async function tlKirimCabut(id, alasan) {
   try {
     const r = await sbRpc('tech_cabut_lisensi', {
       p_lisensi_id: id, p_alasan: alasan,
       p_oleh: (window.currentUsername || 'admin'),
     });
-    if (r && r.error) { alert(r.error); return; }
-    alert(r.catatan || 'Lisensi dicabut.');
+    if (r && r.error) { toast?.(r.error, 'err') || alert(r.error); return; }
+    toast?.(r.catatan || 'Lisensi berhasil dicabut.', 'ok') || alert(r.catatan || 'Lisensi dicabut.');
     await renderTechLicenseActivation();
-  } catch (e) { alert('Gagal mencabut lisensi: ' + e.message); }
+  } catch (e) { toast?.('Gagal mencabut lisensi: ' + e.message, 'err') || alert('Gagal mencabut lisensi: ' + e.message); }
 }
 
 function issueEd25519License(data = {}) {

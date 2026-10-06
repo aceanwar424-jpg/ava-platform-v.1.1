@@ -372,3 +372,323 @@
     transform: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM FORM CONTROLS & COMPONENT STYLING
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Form Groups & Field Labels ──────────────────────────────── */
+.form-group,
+label.form-group,
+.input-group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.field-label,
+.form-group > label,
+.input-group > label,
+.form-group > .field-label,
+label.form-group > .field-label {
+  display: block !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  color: var(--ava-ink, #153c3d) !important;
+  letter-spacing: .02em;
+  margin: 0 0 2px 0;
+  line-height: 1.35;
+  user-select: none;
+}
+
+/* ── Inputs, Selects & Textareas ─────────────────────────────── */
+input:not([type=checkbox]):not([type=radio]),
+select,
+textarea,
+.form-group input,
+.form-group select,
+.form-group textarea,
+.input-group input,
+.input-group select,
+.input-group textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ava-ink, #153c3d);
+  background: #ffffff;
+  border: 1px solid var(--ava-line, #cbd8d4);
+  border-radius: 8px;
+  min-height: 38px;
+  height: 38px;
+  padding: 8px 12px;
+  line-height: 1.4;
+  outline: 0;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background-color .18s ease;
+}
+
+textarea,
+.form-group textarea,
+.input-group textarea {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+}
+
+input:not([type=checkbox]):not([type=radio]):focus,
+select:focus,
+textarea:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--ava-emerald, #087f6b) !important;
+  box-shadow: 0 0 0 3px rgba(8, 127, 107, .15) !important;
+  background-color: #ffffff;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+select,
+.form-group select,
+.input-group select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2338524f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+
+/* ── Grids & Responsive Form Layouts ─────────────────────────── */
+.grid.two,
+.tech-form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.grid.three,
+.tech-form-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.grid.four,
+.tech-form-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .grid.two,
+  .grid.three,
+  .grid.four,
+  .tech-form-grid-2,
+  .tech-form-grid-3,
+  .tech-form-grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Control Plane Workspace Nav ─────────────────────────────── */
+.tcp-workspace-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 5px;
+  border: 1px solid rgba(21, 60, 61, .08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .88);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 66px;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(21, 60, 61, .03);
+}
+
+.tcp-workspace-nav button {
+  border: 0;
+  background: transparent;
+  color: var(--ava-muted, #60706c);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+.tcp-workspace-nav button:hover {
+  background: rgba(8, 127, 107, .08);
+  color: var(--ava-emerald, #087f6b);
+}
+
+.tcp-workspace-nav button.active {
+  background: var(--ava-emerald, #087f6b);
+  color: #ffffff;
+  box-shadow: 0 3px 10px rgba(8, 127, 107, .25);
+}
+
+/* ── Ticket & Incident Desk Form ─────────────────────────────── */
+.tcp-ticket-form {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 130px auto;
+  gap: 12px;
+  align-items: flex-end;
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--ava-line, #cbd8d4);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbfb 100%);
+  box-shadow: 0 2px 6px rgba(21, 60, 61, .03);
+}
+
+.tcp-ticket-form .form-group {
+  margin-bottom: 0 !important;
+}
+
+.tcp-ticket-form .btn {
+  height: 38px;
+  min-height: 38px;
+  align-self: flex-end;
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .tcp-ticket-form {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .tcp-ticket-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Deployment Center ────────────────────────────────────────── */
+.tech-deployment-center {
+  padding: 20px;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.tech-deployment-center .field-label {
+  color: var(--ava-ink, #153c3d);
+}
+
+/* ── Status Badges ────────────────────────────────────────────── */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.status-badge::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+.status-badge.status-pilot {
+  background: rgba(184, 145, 43, .1);
+  color: #92400e;
+  border: 1px solid rgba(184, 145, 43, .22);
+}
+.status-badge.status-pilot::before {
+  background: #b45309;
+}
+.status-badge.status-ready {
+  background: rgba(8, 127, 107, .1);
+  color: #065f46;
+  border: 1px solid rgba(8, 127, 107, .22);
+}
+.status-badge.status-ready::before {
+  background: var(--ava-emerald, #087f6b);
+}
+
+/* ── Buttons ──────────────────────────────────────────────────── */
+.btn-teal {
+  background: var(--ava-emerald, #087f6b);
+  color: #ffffff;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 650;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all .18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(8, 127, 107, .2);
+}
+.btn-teal:hover {
+  background: var(--ava-emerald-dark, #056654);
+  box-shadow: 0 4px 14px rgba(8, 127, 107, .3);
+  transform: translateY(-1px);
+}
+.btn-teal:active {
+  transform: translateY(0);
+}
+
+/* ── Data Tables ──────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: left;
+}
+.data-table thead th {
+  background: #f1f6f4;
+  color: var(--ava-ink, #153c3d);
+  font-weight: 700;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--ava-line, #cbd8d4);
+  font-size: 11.5px;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+.data-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(21, 60, 61, .06);
+  color: var(--ava-ink, #153c3d);
+  vertical-align: middle;
+}
+.data-table tbody tr:hover td {
+  background: rgba(8, 127, 107, .03);
+}
+.data-table code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  padding: 2px 6px;
+  background: rgba(21, 60, 61, .06);
+  border-radius: 4px;
+  color: var(--ava-ink, #153c3d);
+}
+

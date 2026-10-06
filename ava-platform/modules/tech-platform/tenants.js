@@ -198,64 +198,67 @@ function tntForm(id) {
   const v = (k, d) => (t && t[k] != null ? String(t[k]) : (d || ''));
 
   tntShowEditor(`
-    <h3 style="margin:0 0 4px">${t ? 'Ubah Tenant' : 'Tenant Faskes Baru'}</h3>
-    <p style="font-size:12px;color:var(--text3);margin:0 0 14px">
-      Data klien yang membeli lisensi sistem ini.</p>
+    <div class="card" style="padding:24px;max-width:760px;margin:0 auto">
+      <div style="border-bottom:1px solid var(--ava-line,#cbd8d4);padding-bottom:12px;margin-bottom:18px">
+        <h2 style="margin:0 0 4px;font-size:18px;font-weight:750">${t ? 'Ubah Tenant' : 'Tenant Faskes Baru'}</h2>
+        <p style="font-size:12.5px;color:var(--ava-muted,#60706c);margin:0">
+          Data klien yang membeli lisensi sistem ini.</p>
+      </div>
 
-    <div class="input-group"><label>Nama faskes *</label>
-      <input id="tnt-nama" value="${tntEsc(v('nama'))}" placeholder="mis. Klinik Pratama Sehat Mandiri"></div>
+      <div class="form-group"><label class="field-label" for="tnt-nama">Nama Faskes *</label>
+        <input id="tnt-nama" value="${tntEsc(v('nama'))}" placeholder="mis. Klinik Pratama Sehat Mandiri"></div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="input-group"><label>Kode ${t ? '' : '*'}</label>
-        <input id="tnt-kode" value="${tntEsc(v('kode'))}" placeholder="huruf kecil, tanpa spasi"
-          ${t ? 'disabled title="Kode dipakai sebagai kunci relasi dan tidak bisa diubah"' : ''}></div>
-      <div class="input-group"><label>Kota</label>
-        <input id="tnt-kota" value="${tntEsc(v('kota'))}"></div>
-    </div>
+      <div class="grid two">
+        <div class="form-group"><label class="field-label" for="tnt-kode">Kode Tenant ${t ? '' : '*'}</label>
+          <input id="tnt-kode" value="${tntEsc(v('kode'))}" placeholder="huruf kecil, tanpa spasi"
+            ${t ? 'disabled title="Kode dipakai sebagai kunci relasi dan tidak bisa diubah"' : ''}></div>
+        <div class="form-group"><label class="field-label" for="tnt-kota">Kota</label>
+          <input id="tnt-kota" value="${tntEsc(v('kota'))}" placeholder="mis. Jakarta Selatan"></div>
+      </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="input-group"><label>Paket lisensi</label>
-        <select id="tnt-paket" onchange="tntIsiKuota()">
-          <option value="">— pilih —</option>
-          ${Object.entries(TNT_PAKET).map(([k, p]) =>
-            `<option value="${k}" ${v('paket') === k ? 'selected' : ''}>${p.label}</option>`).join('')}
-        </select></div>
-      <div class="input-group"><label>Subdomain klien</label>
-        <input id="tnt-subdomain" value="${tntEsc(v('subdomain'))}" placeholder="mis. sehatmandiri.avahealth.sbs"></div>
-    </div>
+      <div class="grid two">
+        <div class="form-group"><label class="field-label" for="tnt-paket">Paket Lisensi</label>
+          <select id="tnt-paket" onchange="tntIsiKuota()">
+            <option value="">— Pilih Paket —</option>
+            ${Object.entries(TNT_PAKET).map(([k, p]) =>
+              `<option value="${k}" ${v('paket') === k ? 'selected' : ''}>${p.label}</option>`).join('')}
+          </select></div>
+        <div class="form-group"><label class="field-label" for="tnt-subdomain">Subdomain Klien</label>
+          <input id="tnt-subdomain" value="${tntEsc(v('subdomain'))}" placeholder="mis. sehatmandiri.avahealth.sbs"></div>
+      </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="input-group"><label>Mulai langganan</label>
-        <input id="tnt-mulai" type="date" value="${v('mulai_langganan').slice(0, 10)}"></div>
-      <div class="input-group"><label>Habis langganan</label>
-        <input id="tnt-habis" type="date" value="${v('habis_langganan').slice(0, 10)}"></div>
-    </div>
+      <div class="grid two">
+        <div class="form-group"><label class="field-label" for="tnt-mulai">Mulai Langganan</label>
+          <input id="tnt-mulai" type="date" value="${v('mulai_langganan').slice(0, 10)}"></div>
+        <div class="form-group"><label class="field-label" for="tnt-habis">Habis Langganan</label>
+          <input id="tnt-habis" type="date" value="${v('habis_langganan').slice(0, 10)}"></div>
+      </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div class="input-group"><label>Kuota tes/bulan</label>
-        <input id="tnt-kuota-tes" type="number" min="0" value="${v('kuota_tes', '0')}"></div>
-      <div class="input-group"><label>Kuota kunjungan</label>
-        <input id="tnt-kuota-kunj" type="number" min="0" value="${v('kuota_kunjungan', '0')}"></div>
-      <div class="input-group"><label>Nilai langganan</label>
-        <input id="tnt-nilai" type="number" min="0" value="${v('nilai_langganan', '0')}"></div>
-    </div>
+      <div class="grid three">
+        <div class="form-group"><label class="field-label" for="tnt-kuota-tes">Kuota Tes / Bulan</label>
+          <input id="tnt-kuota-tes" type="number" min="0" value="${v('kuota_tes', '0')}"></div>
+        <div class="form-group"><label class="field-label" for="tnt-kuota-kunj">Kuota Kunjungan</label>
+          <input id="tnt-kuota-kunj" type="number" min="0" value="${v('kuota_kunjungan', '0')}"></div>
+        <div class="form-group"><label class="field-label" for="tnt-nilai">Nilai Langganan (Rp)</label>
+          <input id="tnt-nilai" type="number" min="0" value="${v('nilai_langganan', '0')}"></div>
+      </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="input-group"><label>PIC</label>
-        <input id="tnt-pic" value="${tntEsc(v('pic_nama'))}"></div>
-      <div class="input-group"><label>Kontak PIC</label>
-        <input id="tnt-kontak" value="${tntEsc(v('pic_kontak'))}"></div>
-    </div>
+      <div class="grid two">
+        <div class="form-group"><label class="field-label" for="tnt-pic">Nama PIC</label>
+          <input id="tnt-pic" value="${tntEsc(v('pic_nama'))}" placeholder="Nama kontak utama"></div>
+        <div class="form-group"><label class="field-label" for="tnt-kontak">Kontak PIC (No. Telp / Email)</label>
+          <input id="tnt-kontak" value="${tntEsc(v('pic_kontak'))}" placeholder="08xxxxxxxxxx atau pic@faskes.id"></div>
+      </div>
 
-    <p style="font-size:11.5px;color:var(--text3);line-height:1.6;margin:2px 0 0">
-      Kuota <strong>0</strong> berarti tanpa batas. Lisensi tidak mengunci aplikasi —
-      status berakhir hanya ditampilkan, penagihan diselesaikan antar manusia.
-    </p>
+      <p style="font-size:11.5px;color:var(--ava-muted,#60706c);line-height:1.6;margin:4px 0 16px;padding:8px 12px;background:rgba(21,60,61,0.03);border-radius:6px">
+        💡 Kuota <strong>0</strong> berarti tanpa batas. Lisensi tidak mengunci aplikasi — status berakhir hanya ditampilkan, penagihan diselesaikan antar manusia.
+      </p>
 
-    <div style="display:flex;gap:10px;margin-top:16px">
-      <button class="btn btn-close" onclick="tntCancelEditor()">Batal</button>
-      <button class="btn btn-primary" style="margin-top:0"
-        onclick="tntSimpan(${t ? `'${t.id}'` : 'null'})">Simpan</button>
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button class="btn btn-ghost" onclick="tntCancelEditor()">Batal</button>
+        <button class="btn btn-teal"
+          onclick="tntSimpan(${t ? `'${t.id}'` : 'null'})">Simpan Data Tenant</button>
+      </div>
     </div>`);
 }
 
@@ -358,7 +361,43 @@ function tntDetail(id){
   if(window.TechNavigation?.enabled()&&!window.TechNavigation.canLeave())return;
   const t=(tntData||[]).find(row=>String(row.id)===String(id));
   const main=document.getElementById('main-content');
-  main.innerHTML='<section class="tech-directory"><button class="btn btn-ghost" id="tnt-back">← Daftar tenant</button><h1>'+tntEsc(t?.nama||'Tenant tidak tersedia')+'</h1>'+(t?'<dl>'+[['Kode',t.kode],['Kota',t.kota],['Paket',t.paket],['Status',t.status_langganan],['Mulai',tntTgl(t.mulai_langganan)],['Berakhir',tntTgl(t.habis_langganan)],['PIC',t.pic_nama]].map(([label,value])=>'<dt>'+label+'</dt><dd>'+tntEsc(value||'—')+'</dd>').join('')+'</dl><button class="btn btn-teal" id="tnt-edit">Ubah tenant</button>':'<p>Data tidak ditemukan atau tidak tersedia untuk akses akun ini.</p>')+'</section>';
+  const details = t ? [
+    ['Kode Tenant', `<code>${tntEsc(t.kode)}</code>`],
+    ['Kota', tntEsc(t.kota || '—')],
+    ['Paket Lisensi', `<span class="badge">${tntEsc(TNT_PAKET[t.paket]?.label || t.paket || '—')}</span>`],
+    ['Subdomain', t.subdomain ? `<code>${tntEsc(t.subdomain)}</code>` : '—'],
+    ['Status Langganan', `<span class="status-badge ${t.status_langganan === 'aktif' ? 'status-ready' : 'status-pilot'}">${tntEsc(t.status_langganan || '—')}</span>`],
+    ['Periode Mulai', tntTgl(t.mulai_langganan)],
+    ['Periode Berakhir', tntTgl(t.habis_langganan)],
+    ['Kuota Tes / Bln', Number(t.kuota_tes || 0).toLocaleString('id-ID')],
+    ['Kuota Kunjungan', Number(t.kuota_kunjungan || 0).toLocaleString('id-ID')],
+    ['Nilai Kontrak', tntRp(t.nilai_langganan)],
+    ['Nama PIC', tntEsc(t.pic_nama || '—')],
+    ['Kontak PIC', tntEsc(t.pic_kontak || '—')]
+  ] : [];
+
+  main.innerHTML=`<section class="tech-directory" style="max-width:860px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <button class="btn btn-ghost btn-sm" id="tnt-back">← Kembali ke Daftar Tenant</button>
+      ${t ? `<div style="display:flex;gap:8px">
+        <button class="btn btn-teal btn-sm" id="tnt-edit">Ubah Data Tenant</button>
+        <button class="btn btn-ghost btn-sm" onclick="tntBukaDeployment('${t.id}')">Buka Deployment</button>
+      </div>` : ''}
+    </div>
+    <div class="card" style="padding:24px">
+      <div style="border-bottom:1px solid var(--ava-line,#cbd8d4);padding-bottom:14px;margin-bottom:18px">
+        <span class="cat-eyebrow" style="margin-bottom:6px">DETAIL TENANT FASKES</span>
+        <h1 style="font-size:22px;margin:4px 0 2px">${tntEsc(t?.nama||'Tenant Tidak Ditemukan')}</h1>
+        <p style="font-size:12.5px;color:var(--ava-muted,#60706c);margin:0">${t ? (t.subdomain || t.kode) : 'Data tenant tidak tersedia untuk akses akun ini.'}</p>
+      </div>
+      ${t ? `<div class="grid two" style="gap:16px">
+        ${details.map(([label, val]) => `<div style="padding:10px 14px;background:rgba(21,60,61,0.02);border:1px solid rgba(21,60,61,0.06);border-radius:8px">
+          <div style="font-size:11px;font-weight:700;color:var(--ava-muted,#60706c);text-transform:uppercase;letter-spacing:.04em">${label}</div>
+          <div style="font-size:13.5px;font-weight:600;color:var(--ava-ink,#153c3d);margin-top:3px">${val}</div>
+        </div>`).join('')}
+      </div>` : '<p style="color:var(--ava-muted)">Data tidak ditemukan atau tidak tersedia untuk akses akun ini.</p>'}
+    </div>
+  </section>`;
   main.querySelector('#tnt-back').onclick=()=>renderTenants();
   if(t)main.querySelector('#tnt-edit').onclick=()=>tntForm(t.id);
   window.TechNavigation?.onPage('tenants');

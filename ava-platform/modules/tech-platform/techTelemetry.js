@@ -95,18 +95,20 @@ function ttGambar() {
       </div>
     </div>
 
-    <div class="card" style="padding:12px 16px; margin-bottom:12px; display:flex;
-                             gap:12px; align-items:center; flex-wrap:wrap">
-      <label style="font-size:13px">Periode</label>
-      <select onchange="ttGantiPeriode(this.value)"
-              style="padding:6px 10px; border:1px solid var(--border); border-radius:6px">
-        ${periodeAda.length
-          ? periodeAda.map(p => `<option value="${ttEsc(p)}"
-              ${p === ttPeriode ? 'selected' : ''}>${ttEsc(p)}</option>`).join('')
-          : `<option>${ttEsc(ttPeriode)}</option>`}
-      </select>
-      <span style="font-size:12px; color:var(--text3)">
-        ${per.size} dari ${T.length} tenant mengirim data
+    <div class="card" style="padding:12px 16px; margin-bottom:14px; display:flex;
+                             gap:12px; align-items:center; flex-wrap:wrap; border-radius:10px">
+      <span class="field-label" style="margin:0; font-size:12px">Pilih Periode:</span>
+      <div style="width:160px">
+        <select onchange="ttGantiPeriode(this.value)"
+                style="height:36px; min-height:36px; padding:6px 28px 6px 10px; font-size:12.5px">
+          ${periodeAda.length
+            ? periodeAda.map(p => `<option value="${ttEsc(p)}"
+                ${p === ttPeriode ? 'selected' : ''}>${ttEsc(p)}</option>`).join('')
+            : `<option>${ttEsc(ttPeriode)}</option>`}
+        </select>
+      </div>
+      <span style="font-size:12px; color:var(--ava-muted,#60706c); margin-left:auto">
+        <b>${per.size}</b> dari ${T.length} tenant mengirim telemetri
       </span>
     </div>
 

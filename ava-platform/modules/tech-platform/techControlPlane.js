@@ -105,33 +105,34 @@ async function renderTechControlPlane() {
         <div class="label">${label}</div><div style="font-size:25px;font-weight:800">${tcpEsc(value)}</div>
         <div class="mini">${tcpEsc(note)}</div></div>`).join('')}
     </div>
-    <div class="card tcp-panel" data-tcp-panel="tiket" style="padding:16px;margin-bottom:16px;border-left:4px solid var(--warning,#b45309)">
+    <div class="card tcp-panel" data-tcp-panel="tiket" style="padding:18px;margin-bottom:16px;border-left:4px solid var(--warning,#b45309)">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
-        <div><h2 style="font-size:20px;margin:0">Meja penyelesaian kendala</h2>
-          <p class="muted" style="margin:4px 0 0">Setiap laporan harus punya tenant, waktu, bukti, owner, correlation ID, dan hasil verifikasi.</p></div>
+        <div><h2 style="font-size:18px;margin:0;font-weight:750">Meja Penyelesaian Kendala</h2>
+          <p class="muted" style="margin:4px 0 0;font-size:12.5px">Setiap laporan harus punya tenant, waktu, bukti, owner, correlation ID, dan hasil verifikasi.</p></div>
         <span class="status-badge status-pilot">ALUR: CATAT → TRIAGE → TINDAK LANJUT</span>
       </div>
-      <div class="tcp-ticket-form" style="display:grid;grid-template-columns:1fr 1fr 120px auto;gap:10px;align-items:end;margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-subtle,#f8fafc)">
-        <label class="form-group"><span class="field-label">Ringkasan kendala</span><input id="tcp-ticket-title" placeholder="Contoh: Data hasil tidak tersimpan"></label>
-        <label class="form-group"><span class="field-label">Detail & waktu kejadian</span><input id="tcp-ticket-description" placeholder="Gejala, langkah terakhir, waktu"></label>
-        <label class="form-group"><span class="field-label">Prioritas</span><select id="tcp-ticket-priority"><option value="P1">P1 kritis</option><option value="P2" selected>P2 tinggi</option><option value="P3">P3 normal</option></select></label>
-        <button class="btn btn-teal btn-sm" onclick="tcpBuatTiket()">Catat tiket</button>
+      <div class="tcp-ticket-form">
+        <div class="form-group"><label class="field-label" for="tcp-ticket-title">Ringkasan Kendala</label><input id="tcp-ticket-title" placeholder="Contoh: Data hasil tidak tersimpan"></div>
+        <div class="form-group"><label class="field-label" for="tcp-ticket-description">Detail &amp; Waktu Kejadian</label><input id="tcp-ticket-description" placeholder="Gejala, langkah terakhir, waktu"></div>
+        <div class="form-group"><label class="field-label" for="tcp-ticket-priority">Prioritas</label><select id="tcp-ticket-priority"><option value="P1">P1 Kritis</option><option value="P2" selected>P2 Tinggi</option><option value="P3">P3 Normal</option></select></div>
+        <button class="btn btn-teal" onclick="tcpBuatTiket()">Catat Tiket</button>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px">
         ${[
           ['Alert terbuka', alerts, 'tech_alerts', 'OPEN / ACKNOWLEDGED'],
           ['Incident berjalan', incidents, 'tech_incidents', 'OPEN / MITIGATING / MONITORING'],
           ['Problem preventif', problems, 'tech_problems', 'analisis dan tindakan'],
           ['Backup terakhir', backups, 'tech_backup_runs', 'freshness dan restore drill'],
           ['Perubahan menunggu', changes, 'tech_changes', 'review / approval / running'],
-        ].map(([label, source, table, note]) => `<div style="padding:12px;border:1px solid var(--border);border-radius:10px">
-          <strong>${label}</strong><div style="font-size:22px;font-weight:800;margin-top:3px">${source.ok ? source.value.length : '—'}</div>
-          <div class="mini">${source.ok ? note : `Sumber ${table} belum terbaca`}</div></div>`).join('')}
+        ].map(([label, source, table, note]) => `<div style="padding:14px;border:1px solid var(--ava-line,#cbd8d4);border-radius:10px;background:#fff">
+          <div style="font-size:11.5px;color:var(--ava-muted,#60706c);font-weight:650">${label}</div>
+          <div style="font-size:22px;font-weight:800;margin-top:4px;color:var(--ava-ink,#153c3d)">${source.ok ? source.value.length : '—'}</div>
+          <div class="mini" style="font-size:11px;color:var(--ava-muted,#60706c);margin-top:2px">${source.ok ? note : `Sumber ${table} belum terbaca`}</div></div>`).join('')}
       </div>
-      ${tickets.ok && tickets.value.length ? `<div style="overflow:auto;margin-top:14px"><table class="data-table"><thead><tr><th>Ticket</th><th>Tenant</th><th>Masalah</th><th>Prioritas</th><th>Status</th><th>Correlation</th></tr></thead><tbody>
-        ${tickets.value.slice(0, 10).map(t => `<tr><td><b>${tcpEsc(t.ticket_no)}</b></td><td>${tcpEsc(t.tenant_id || 'platform')}</td><td>${tcpEsc(t.title)}</td><td>${tcpEsc(t.priority)}</td><td>${tcpEsc(t.status)}</td><td><code>${tcpEsc(t.correlation_id || '—')}</code></td></tr>`).join('')}</tbody></table></div>` : '<div class="mini" style="margin-top:14px">Belum ada tiket support aktif.</div>'}
+      ${tickets.ok && tickets.value.length ? `<div style="overflow:auto;margin-top:16px;border-radius:8px;border:1px solid var(--ava-line,#cbd8d4)"><table class="data-table"><thead><tr><th>Ticket</th><th>Tenant</th><th>Masalah</th><th>Prioritas</th><th>Status</th><th>Correlation</th></tr></thead><tbody>
+        ${tickets.value.slice(0, 10).map(t => `<tr><td><b>${tcpEsc(t.ticket_no)}</b></td><td>${tcpEsc(t.tenant_id || 'platform')}</td><td>${tcpEsc(t.title)}</td><td><span class="status-badge ${t.priority === 'P1' ? 'status-pilot' : 'status-ready'}">${tcpEsc(t.priority)}</span></td><td>${tcpEsc(t.status)}</td><td><code>${tcpEsc(t.correlation_id || '—')}</code></td></tr>`).join('')}</tbody></table></div>` : '<div class="mini" style="margin-top:16px;color:var(--ava-muted,#60706c)">Belum ada tiket support aktif.</div>'}
     </div>
-    ${heartbeats.ok && heartbeats.value.length ? `<div class="card tcp-panel" data-tcp-panel="kesehatan" style="padding:0;overflow:auto;margin-bottom:16px">
+    ${heartbeats.ok && heartbeats.value.length ? `<div class="card tcp-panel" data-tcp-panel="kesehatan" style="padding:0;overflow:auto;margin-bottom:16px;border-radius:10px">
       <table class="data-table"><thead><tr><th>Instalasi</th><th>Tenant</th><th>Terakhir melapor</th><th>Status monitor</th></tr></thead><tbody>
       ${heartbeats.value.map((h, i) => { const s = tcpHeartbeatState(h); return `<tr>
         <td>${tcpEsc(h.installation_name || h.installation_id || `Instalasi ${i + 1}`)}</td>
@@ -139,46 +140,56 @@ async function renderTechControlPlane() {
         <td>${h.last_seen ? tcpEsc(new Date(h.last_seen).toLocaleString('id-ID')) : '—'}</td>
         <td><span style="font-weight:700;color:${s.color}">${s.label}</span>${s.age == null ? '' : ` <span class="mini">(${s.age} menit lalu)</span>`}</td>
       </tr>`; }).join('')}</tbody></table>
-      <div class="mini" style="padding:10px 14px">HEALTHY ≤ 10 menit · STALE 11–30 menit · OFFLINE &gt; 30 menit. Unknown berarti data tidak cukup.</div>
+      <div class="mini" style="padding:10px 14px;color:var(--ava-muted,#60706c)">HEALTHY ≤ 10 menit · STALE 11–30 menit · OFFLINE &gt; 30 menit. Unknown berarti data tidak cukup.</div>
     </div>` : ''}
     <div class="grid two tcp-panel" data-tcp-panel="pengaturan">
-      <section class="card"><h2 style="font-size:22px">Pengaturan terpusat</h2>
-        <p class="muted">Semua perubahan produksi—termasuk API, webhook, tenant, modul, lisensi, dan integrasi—harus dikelola dari AVA Tech. Secret hanya dirujuk melalui secret manager, tidak disimpan di browser.</p>
-        <div class="links">
+      <section class="card" style="padding:18px"><h2 style="font-size:18px;font-weight:750;margin:0 0 6px">Pengaturan terpusat</h2>
+        <p class="muted" style="font-size:12.5px;line-height:1.6">Semua perubahan produksi—termasuk API, webhook, tenant, modul, lisensi, dan integrasi—harus dikelola dari AVA Tech. Secret hanya dirujuk melalui secret manager, tidak disimpan di browser.</p>
+        <div class="links" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
           <button class="btn btn-ghost btn-sm" onclick="navigate('tenants')">Tenant &amp; klien</button>
           <button class="btn btn-ghost btn-sm" onclick="navigate('tech-aktivasi')">Lisensi &amp; aktivasi</button>
           <button class="btn btn-ghost btn-sm" onclick="navigate('config',{focus:'integration'})">API &amp; konektor</button>
         </div>
       </section>
-      <section class="card"><h2 style="font-size:22px">Signing desktop</h2>
-        <p class="muted">Microsoft Trusted Signing dikonfigurasi saat tenant/client siap. Tidak ada credential atau secret default yang dibuat sekarang.</p>
-        <div class="card" style="padding:10px 12px;margin-top:12px;border-left:4px solid var(--warning, #b45309)">
-          <strong>NOT_CONFIGURED</strong>
-          <div class="mini">Pengisian nanti wajib melalui jalur release terotorisasi dan tidak menampilkan secret di browser.</div>
+      <section class="card" style="padding:18px"><h2 style="font-size:18px;font-weight:750;margin:0 0 6px">Signing desktop</h2>
+        <p class="muted" style="font-size:12.5px;line-height:1.6">Microsoft Trusted Signing dikonfigurasi saat tenant/client siap. Tidak ada credential atau secret default yang dibuat sekarang.</p>
+        <div class="card" style="padding:10px 12px;margin-top:12px;border-left:4px solid var(--warning, #b45309);background:rgba(254,243,199,0.2)">
+          <strong style="font-size:12px;color:#92400e">NOT_CONFIGURED</strong>
+          <div class="mini" style="font-size:11px;color:var(--ava-muted,#60706c);margin-top:2px">Pengisian nanti wajib melalui jalur release terotorisasi dan tidak menampilkan secret di browser.</div>
         </div>
       </section>
-      <section class="card"><h2 style="font-size:22px">Trace &amp; diagnosis</h2>
-        <p class="muted">Gunakan telemetry untuk kesehatan instalasi dan audit untuk menelusuri actor, waktu, tenant, serta perubahan.</p>
-        <div class="links">
+      <section class="card" style="padding:18px"><h2 style="font-size:18px;font-weight:750;margin:0 0 6px">Trace &amp; diagnosis</h2>
+        <p class="muted" style="font-size:12.5px;line-height:1.6">Gunakan telemetry untuk kesehatan instalasi dan audit untuk menelusuri actor, waktu, tenant, serta perubahan.</p>
+        <div class="links" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
           <button class="btn btn-ghost btn-sm" onclick="navigate('tech-telemetri')">Telemetri instalasi</button>
           <button class="btn btn-ghost btn-sm" onclick="navigate('audit')">Jejak audit</button>
           <button class="btn btn-ghost btn-sm" onclick="navigate('tech-isu')">Lacak bug &amp; permintaan</button>
         </div>
       </section>
     </div>
-    <section class="card tech-deployment-center tcp-panel" data-tcp-panel="deployment" style="padding:16px;margin-top:16px">
-      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap"><div><h2 style="font-size:18px;margin:0">Pengaturan deployment tenant</h2><p class="muted" style="margin:4px 0 0">Domain, project hosting, repository, dan branch diatur dari sini. Perubahan masuk antrean sinkronisasi.</p></div><span class="status-badge status-pilot">CHANGE CONTROL</span></div>
-      <div class="grid three" style="margin-top:14px">
-        <label class="form-group"><span class="field-label">Tenant ID</span><input id="tcp-deploy-tenant" placeholder="UUID tenant"></label>
-        <label class="form-group"><span class="field-label">Environment</span><select id="tcp-deploy-env"><option value="staging">Staging</option><option value="production">Production</option><option value="dr">Disaster recovery</option></select></label>
-        <label class="form-group"><span class="field-label">Provider</span><input id="tcp-deploy-provider" value="vercel"></label>
-        <label class="form-group"><span class="field-label">Nama project</span><input id="tcp-deploy-project" placeholder="moksa-web"></label>
-        <label class="form-group"><span class="field-label">Domain</span><input id="tcp-deploy-domain" placeholder="moksa.avahealth.sbs"></label>
-        <label class="form-group"><span class="field-label">Branch</span><input id="tcp-deploy-branch" value="main"></label>
+    <section class="card tech-deployment-center tcp-panel" data-tcp-panel="deployment" style="padding:20px;margin-top:16px">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+        <div><h2 style="font-size:18px;margin:0;font-weight:750">Pengaturan Deployment Tenant</h2>
+          <p class="muted" style="margin:4px 0 0;font-size:12.5px">Domain, project hosting, repository, dan branch diatur dari sini. Perubahan masuk antrean sinkronisasi.</p></div>
+        <span class="status-badge status-pilot">CHANGE CONTROL</span>
       </div>
-      <label class="form-group" style="display:block;margin-top:10px"><span class="field-label">Repository URL</span><input id="tcp-deploy-repo" placeholder="https://github.com/organisasi/repository"></label>
-      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-teal btn-sm" onclick="tcpSimpanDeployment()">Simpan & antrekan sinkronisasi</button></div>
-    </section>    <div class="card" style="padding:14px 16px;margin-top:16px;font-size:12px;line-height:1.7">
+      <div class="grid three" style="margin-top:16px">
+        <div class="form-group"><label class="field-label" for="tcp-deploy-tenant">Tenant ID</label><input id="tcp-deploy-tenant" placeholder="UUID tenant"></div>
+        <div class="form-group"><label class="field-label" for="tcp-deploy-env">Environment</label><select id="tcp-deploy-env"><option value="staging">Staging</option><option value="production">Production</option><option value="dr">Disaster recovery</option></select></div>
+        <div class="form-group"><label class="field-label" for="tcp-deploy-provider">Provider</label><input id="tcp-deploy-provider" value="vercel"></div>
+        <div class="form-group"><label class="field-label" for="tcp-deploy-project">Nama Project</label><input id="tcp-deploy-project" placeholder="moksa-web"></div>
+        <div class="form-group"><label class="field-label" for="tcp-deploy-domain">Domain</label><input id="tcp-deploy-domain" placeholder="moksa.avahealth.sbs"></div>
+        <div class="form-group"><label class="field-label" for="tcp-deploy-branch">Branch</label><input id="tcp-deploy-branch" value="main"></div>
+      </div>
+      <div class="form-group" style="margin-top:8px">
+        <label class="field-label" for="tcp-deploy-repo">Repository URL</label>
+        <input id="tcp-deploy-repo" placeholder="https://github.com/organisasi/repository">
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-teal" onclick="tcpSimpanDeployment()">Simpan &amp; Antrekan Sinkronisasi</button>
+      </div>
+    </section>
+    <div class="card" style="padding:14px 16px;margin-top:16px;font-size:12px;line-height:1.7;color:var(--ava-muted,#60706c)">
       Control plane tidak menampilkan secret, token, atau data pasien. Status <b>unknown</b>
       berarti koneksi/konfigurasi perlu diperbaiki; bukan bukti bahwa sistem sehat.
     </div>`;

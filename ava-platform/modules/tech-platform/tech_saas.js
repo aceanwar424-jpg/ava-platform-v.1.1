@@ -106,16 +106,16 @@ async function renderTechSaas(params = {}) {
   main.innerHTML =
     '<div class="tech-saas-dashboard" style="padding:16px; font-family:\'Plus Jakarta Sans\',sans-serif;">' +
 
-      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:16px; background:linear-gradient(135deg,#0F172A,#1E293B); padding:14px 18px; border-radius:6px; border:1px solid #cbd8d4; box-shadow:none;">' +
+      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:16px; background:linear-gradient(135deg, #102e30 0%, #153c3d 100%); padding:20px 24px; border-radius:14px; border:1px solid rgba(184,145,43,.3); box-shadow:0 8px 24px rgba(16,46,48,.12);">' +
         '<div>' +
-          '<div style="display:inline-flex; align-items:center; gap:8px; background:rgba(14,165,233,0.15); border:1px solid rgba(14,165,233,0.3); padding:3px 10px; border-radius:999px; font-size:11px; font-weight:800; color:#38BDF8; margin-bottom:8px;">' +
+          '<div style="display:inline-flex; align-items:center; gap:8px; background:rgba(8,127,107,0.25); border:1px solid rgba(142,224,193,0.3); padding:4px 12px; border-radius:999px; font-size:11px; font-weight:800; color:#8fe0c1; margin-bottom:10px;">' +
             '<span>&#128187;</span> PILAR 3 &bull; AVA TECH (tech.avahealth.sbs)</div>' +
-          '<h1 style="font-size:16px; font-weight:750; color:#fff; margin:0 0 6px 0; letter-spacing:-0.02em;">Pembangun &amp; Penjual Sistem</h1>' +
-          '<p style="font-size:11px; color:#b8c7d5; margin:0; max-width:660px; line-height:1.45;">' +
+          '<h1 style="font-size:22px; font-weight:780; color:#fff; margin:0 0 6px 0; letter-spacing:-0.02em;">Pembangun &amp; Penjual Sistem</h1>' +
+          '<p style="font-size:12.5px; color:#d2e5df; margin:0; max-width:680px; line-height:1.55;">' +
             'Unit yang membangun platform ini dan melisensikannya ke faskes lain: mesin multi-tenant, ' +
             'interoperabilitas SATUSEHAT &amp; analyzer, katalog LOINC, serta pengelolaan langganan klien.</p>' +
         '</div>' +
-        '<div class="tech-hero-callout"><strong>✦ Platform siap berkembang</strong><span>Kelola tenant, integrasi, dan operasional dalam satu dashboard terpusat.</span><button class="tech-callout-arrow" onclick="navigate(&#39;tech-control-plane&#39;)" aria-label="Buka pusat kendali operasi">→</button></div>' +
+        '<div class="tech-hero-callout" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:10px;padding:12px 14px;color:#fff"><strong style="color:#f4d98b">✦ Platform Siap Berkembang</strong><span style="color:#d2e5df">Kelola tenant, integrasi, dan operasional dalam satu dashboard terpusat.</span><button class="tech-callout-arrow" onclick="navigate(&#39;tech-control-plane&#39;)" aria-label="Buka pusat kendali operasi">→</button></div>' +
         '<div class="tech-hero-actions"><button class="btn btn-teal" onclick="navigate(\'tenants\')">Kelola Platform <span>→</span></button></div>' +
       '</div>' +
 
