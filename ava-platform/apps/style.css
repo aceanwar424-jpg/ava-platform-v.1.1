@@ -2208,3 +2208,255 @@ th {
 .wellness-preflight{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}.wellness-preflight>div{padding:14px;border-radius:11px;background:#f0fdfa;border:1px solid #99f6e4;text-align:center}.wellness-preflight>div.bad{background:#fff7ed;border-color:#fed7aa}.wellness-preflight strong{display:block;font-size:20px;color:#0f172a}.wellness-preflight span{font-size:10px;color:#64748b}.wellness-error-list{max-height:150px;overflow:auto;padding:10px 12px;border:1px solid #fecaca;border-radius:9px;background:#fff7f7}.wellness-error-list p{margin:3px 0;font-size:10.5px;color:#b91c1c}.wellness-table-wrap{overflow:auto;margin:12px 0}.wellness-table-wrap table{width:100%;border-collapse:collapse;font-size:11px}.wellness-table-wrap th,.wellness-table-wrap td{padding:8px 9px;text-align:left;border-bottom:1px solid #e2e8f0;white-space:nowrap}.wellness-table-wrap th{color:#64748b;background:#f8fafc}.wellness-import-history{display:flex;flex-direction:column;gap:8px}.wellness-import-history article{display:flex;justify-content:space-between;gap:14px;padding:11px 12px;background:#f8fafc;border-radius:9px}.wellness-import-history article>div{display:flex;flex-direction:column}.wellness-import-history strong,.wellness-import-history b{font-size:11.5px;color:#0f172a}.wellness-import-history span{font-size:10px;color:#64748b}
 @media(max-width:1100px){.wellness-kpi-grid{grid-template-columns:repeat(3,1fr)}.wellness-admin-programs>article{grid-template-columns:1fr}.wellness-row-actions{justify-content:flex-start}}
 @media(max-width:760px){.wellness-heading{flex-direction:column;padding:18px}.wellness-heading h2{font-size:20px}.wellness-layout-two,.wellness-fields.two,.wellness-fields.three,.wellness-aggregate-grid{grid-template-columns:1fr}.wellness-kpi-grid{grid-template-columns:repeat(2,1fr)}.wellness-reading{align-items:flex-start;flex-direction:column}.wellness-reading-meta{text-align:left;align-items:flex-start}.wellness-task-list article,.wellness-import-history article{flex-direction:column}.wellness-notice{flex-direction:column}.wellness-notice strong{white-space:normal}}
+
+/* ══════════ Modern Toast & Wellness Interactivity System ══════════ */
+#ava-toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.ava-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: #0f2963;
+  box-shadow: 0 10px 30px rgba(15, 41, 99, 0.25);
+  animation: toastSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s ease;
+  max-width: 380px;
+}
+.ava-toast.success { background: #059669; box-shadow: 0 10px 30px rgba(5, 150, 105, 0.25); }
+.ava-toast.reward { background: linear-gradient(135deg, #d97706, #b45309); box-shadow: 0 10px 30px rgba(217, 119, 6, 0.3); }
+.ava-toast.info { background: #0284c7; box-shadow: 0 10px 30px rgba(2, 132, 199, 0.25); }
+.ava-toast.fade-out { opacity: 0; transform: translateY(-10px) scale(0.95); }
+
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Breathing exercise animation */
+.breath-circle {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  margin: 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: radial-gradient(circle, #ddd6fe 0%, #c4b5fd 60%, #8b5cf6 100%);
+  color: #4c1d95;
+  font-weight: 800;
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.35);
+  transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+}
+.breath-circle.inhale {
+  transform: scale(1.3);
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.55);
+  transition-duration: 4s;
+}
+.breath-circle.hold {
+  transform: scale(1.3);
+  transition-duration: 7s;
+}
+.breath-circle.exhale {
+  transform: scale(0.92);
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+  transition-duration: 8s;
+}
+
+/* NutriCo meal card */
+.nutrico-meal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.18s ease;
+}
+.nutrico-meal-item:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.nutrico-del-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1;
+  transition: color 0.15s, background 0.15s;
+}
+.nutrico-del-btn:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* Quick chips */
+.chip-btn {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.chip-btn:hover {
+  background: #0f2963;
+  color: #ffffff;
+  border-color: #0f2963;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .view-panel div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  .view-panel div[style*="grid-template-columns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ──────── Corporate Attention & Assigned Program Card ──────── */
+.corporate-attention-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 60%, #eff6ff 100%);
+  border: 1.5px solid #86efac;
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+.corporate-attention-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, #10b981, #0284c7);
+}
+.corp-attn-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dcfce7;
+}
+.corp-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 10px;
+  font-size: 20px;
+}
+.corp-attn-eyebrow {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+}
+.corp-attn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.corp-attn-item {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+.corp-attn-item:hover {
+  border-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(16, 185, 129, 0.12);
+  background: #f0fdf4;
+}
+.corp-attn-item .c-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+.corp-attn-item strong {
+  display: block;
+  font-size: 12.5px;
+  color: #0f2963;
+  margin-bottom: 2px;
+}
+.corp-attn-item small {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  line-height: 1.35;
+}
+.corp-attn-item .c-arrow {
+  font-size: 11px;
+  font-weight: 800;
+  color: #059669;
+  padding: 4px 8px;
+  background: #dcfce7;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .corp-attn-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ──────── Audio Waveform & AI Scribe ──────── */
+.audio-wave-bar {
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: #8b5cf6;
+  border-radius: 2px;
+  margin: 0 2px;
+  animation: wavePulse 1s ease-in-out infinite alternate;
+}
+.audio-wave-bar:nth-child(2) { animation-delay: 0.2s; height: 28px; }
+.audio-wave-bar:nth-child(3) { animation-delay: 0.4s; height: 14px; }
+.audio-wave-bar:nth-child(4) { animation-delay: 0.1s; height: 32px; }
+.audio-wave-bar:nth-child(5) { animation-delay: 0.5s; height: 20px; }
+@keyframes wavePulse {
+  0% { transform: scaleY(0.4); opacity: 0.6; }
+  100% { transform: scaleY(1.3); opacity: 1; }
+}

@@ -29,6 +29,7 @@
   <link rel="stylesheet" href="login.css?v=20260929-contrast">
   <link rel="stylesheet" href="../css/wellness-flow.css?v=20260925">
 <link rel="stylesheet" href="corporate-dashboard.css?v=20261006d">
+<link rel="stylesheet" href="workspace-design.css?v=20261006a">
 </head>
 <body>
   <div class="app-container">
@@ -555,8 +556,7 @@
             </div>
           </div>
         </div>
-
-      </div>
+      </div> <!-- close patient-view -->
 
       <!-- ──────── VIEW: MEDREC (EHR PORTAL) ──────── -->
       <div id="medrec-view" class="view-panel">
@@ -1327,6 +1327,114 @@
       </div>
 
       <!-- ──────── VIEW: CORPORATE MCU ──────── -->
+      <!-- ──────── VIEW: PROGRAM KHUSUS PERUSAHAAN (EMPLOYEE ASSIGNED) ──────── -->
+      <div id="corporate-assigned-program-view" class="view-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+          <div>
+            <div class="section-title" style="margin-bottom:4px; color:#0f2963;">🏢 Program Khusus &amp; Benefit Kesehatan Karyawan</div>
+            <p style="color:#64748b; font-size:12px; margin:0;" id="corp-program-subhead">Program pemeriksaan klinis, kebugaran &amp; subsidi dari perusahaan mitra terhubung.</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal" onclick="showView('patient-view', 'Beranda')" style="padding:8px 14px; font-size:12px; background:#e2e8f0; color:#334155; border-color:#cbd5e1;">&larr; Kembali ke Beranda</button>
+            <button class="btn" onclick="unlinkCorporateFromPersonal()" style="padding:8px 12px; font-size:11px; background:#fef2f2; color:#dc2626; border:1px solid #fecaca; border-radius:8px;">Putus Tautan</button>
+          </div>
+        </div>
+
+        <!-- Corporate Employee ID Card -->
+        <div class="glass-card" style="padding:22px; background:linear-gradient(135deg, #0f2963 0%, #1e3a8a 100%); border-radius:14px; color:#ffffff; margin-bottom:20px; box-shadow:0 6px 20px rgba(15, 41, 99, 0.2);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+              <span style="font-size:11px; font-weight:800; color:#93c5fd; text-transform:uppercase; letter-spacing:0.8px;">KARTU DIGITAL KARYAWAN MITRA</span>
+              <h2 style="font-size:24px; font-weight:900; margin:6px 0 2px 0; color:#ffffff;" id="corp-card-emp-name">Ace Darojatun Anwar</h2>
+              <div style="font-size:13px; color:#bfdbfe; font-weight:600;" id="corp-card-comp-name">PT Astra Honda Motor (AHM)</div>
+            </div>
+            <div style="text-align:right;">
+              <span class="badge" style="background:#22c55e; color:#ffffff; font-weight:800; font-size:11px; padding:4px 12px; border-radius:20px;">AKTIF 2026</span>
+              <div style="font-size:11px; color:#93c5fd; margin-top:6px;" id="corp-card-nip">NIP: AHM-9902-ENG</div>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:18px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.15);">
+            <div>
+              <span style="font-size:10px; color:#93c5fd; display:block;">DEPARTEMEN</span>
+              <strong style="font-size:12.5px; color:#ffffff;" id="corp-card-dept">Engineering &amp; Production</strong>
+            </div>
+            <div>
+              <span style="font-size:10px; color:#93c5fd; display:block;">STATUS BENEFIT</span>
+              <strong style="font-size:12.5px; color:#4ade80;">Full Coverage 100%</strong>
+            </div>
+            <div>
+              <span style="font-size:10px; color:#93c5fd; display:block;">KANTOR / PABRIK</span>
+              <strong style="font-size:12.5px; color:#ffffff;">Plant Karawang / Sunter</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Programs Grid -->
+        <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin-bottom:12px;">📋 4 Program Khusus Yang Ditugaskan Perusahaan</h4>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px;">
+          <!-- Program 1 -->
+          <div class="glass-card" style="padding:18px; background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge" style="background:#e0f2fe; color:#0369a1; font-weight:800; font-size:10.5px;">WELLNESS CLUB</span>
+                <span style="font-size:11px; color:#059669; font-weight:700;">Progress: 8.450 / 10.000</span>
+              </div>
+              <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0 0 6px 0;">🏃 AHM Inter-Division 10K Step Challenge</h4>
+              <p style="font-size:11.5px; color:#64748b; line-height:1.45; margin:0 0 12px 0;">
+                Tantangan kebugaran langkah harian antar-divisi. Capai 10.000 langkah untuk membawa Divisi Engineering memuncaki leaderboard pabrik dan mengklaim koin AVA.
+              </p>
+            </div>
+            <button class="btn btn-teal" onclick="showView('wellness-run-challenge-view', 'Step &amp; Run Challenge')" style="width:100%; padding:9px; font-size:12px; font-weight:700;">Buka Step Challenge &gt;</button>
+          </div>
+
+          <!-- Program 2 -->
+          <div class="glass-card" style="padding:18px; background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge" style="background:#fef3c7; color:#b45309; font-weight:800; font-size:10.5px;">MEDICAL CHECK-UP</span>
+                <span style="font-size:11px; color:#166534; font-weight:700;">Subsidi 100% Ditanggung</span>
+              </div>
+              <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0 0 6px 0;">🩺 Medical Check-Up (MCU) Tahunan 2026</h4>
+              <p style="font-size:11.5px; color:#64748b; line-height:1.45; margin:0 0 12px 0;">
+                Skrining kesehatan berkala: Darah Lengkap, HbA1c, Profil Lipid, Audiometri, EKG Jantung &amp; Rontgen Toraks. Tersedia on-site maupun di klinik cabang rekanan.
+              </p>
+            </div>
+            <button class="btn btn-teal" onclick="showView('examination-history-view', 'Riwayat MCU')" style="width:100%; padding:9px; font-size:12px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">Lihat Jadwal &amp; Hasil MCU &gt;</button>
+          </div>
+
+          <!-- Program 3 -->
+          <div class="glass-card" style="padding:18px; background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge" style="background:#dcfce7; color:#15803d; font-weight:800; font-size:10.5px;">WORKPLACE DIET</span>
+                <span style="font-size:11px; color:#d97706; font-weight:700;">Target: 2.100 kcal</span>
+              </div>
+              <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0 0 6px 0;">🥗 NutriCo Workplace Nutrition &amp; Shift Diet</h4>
+              <p style="font-size:11.5px; color:#64748b; line-height:1.45; margin:0 0 12px 0;">
+                Panduan nutrisi makanan kantin &amp; suplemen shift kerja malam berdasarkan hasil tes laboratorium biokimia darah Anda.
+              </p>
+            </div>
+            <button class="btn btn-teal" onclick="showView('wellness-nutrico-view', 'NutriCo Planner')" style="width:100%; padding:9px; font-size:12px; font-weight:700; background:#f59e0b; border-color:#f59e0b; color:white;">Buka NutriCo Workplace &gt;</button>
+          </div>
+
+          <!-- Program 4 -->
+          <div class="glass-card" style="padding:18px; background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <span class="badge" style="background:#f3e8ff; color:#7e22ce; font-weight:800; font-size:10.5px;">MENTAL &amp; ERGONOMIC</span>
+                <span style="font-size:11px; color:#7e22ce; font-weight:700;">HRV 24 ms (Stabil)</span>
+              </div>
+              <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0 0 6px 0;">🧘 Relaksasi Otonom &amp; Pencegahan Kelelahan</h4>
+              <p style="font-size:11.5px; color:#64748b; line-height:1.45; margin:0 0 12px 0;">
+                Sesi audio napas ritmik 4-7-8 untuk menstabilkan detak jantung sebelum rapat krusial atau seusai jam kerja intensif.
+              </p>
+            </div>
+            <button class="btn btn-teal" onclick="showView('wellness-hrv-stress-view', 'Mindfulness &amp; HRV')" style="width:100%; padding:9px; font-size:12px; font-weight:700; background:#8b5cf6; border-color:#8b5cf6; color:white;">Mulai Sesi Relaksasi &gt;</button>
+          </div>
+        </div>
+      </div>
+
       <div id="corporate-view" class="view-panel">
         
         <!-- C - HOME: CORPORATE INFO (DIGILAB style) -->
@@ -1676,8 +1784,6 @@
       <div id="wellness-admin-view" class="view-panel"></div>
       <div id="wellness-import-view" class="view-panel"></div>
 
-    </div>
-
     <!-- ════════════════════════ MODAL: PROGRAM MEMBER & AFILIASI ════════════════════════ -->
     <div id="member-modal" class="modal-overlay">
       <div class="modal-box" style="max-width: 440px; text-align:left; padding: 24px;">
@@ -1764,6 +1870,7 @@
         </div>
 
       </div>
+    </div>
 
       <!-- ──────── VIEW: AVA BIO-TWIN & LONGEVITY INDEX ──────── -->
       <div id="ava-biotwin-view" class="view-panel">
@@ -2071,7 +2178,7 @@
       <div id="corporate-analytics-view" class="view-panel">
         <div class="section-title" style="margin-bottom:16px; color:#0f2963; display:flex; justify-content:space-between; align-items:center;">
           <span>📊 Analytics Epidemiologi &amp; Sertifikat Fit-to-Work Massal</span>
-          <button class="btn btn-sm btn-teal" onclick="alert('Mengunduh Paket Sertifikat Fit-to-Work Massal (ZIP/PDF)...')" style="font-size:11px;">📥 Unduh Zip Fit-to-Work Massal</button>
+          <button class="btn btn-sm btn-teal" onclick="downloadMassFitToWorkZip()" style="font-size:11px;">📥 Unduh Zip Fit-to-Work Massal</button>
         </div>
         
         <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:14px; margin-bottom:20px;">
@@ -2164,7 +2271,7 @@
             <h5 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">Belum ada hasil pasien rujukan</h5>
             <p style="font-size:11px; color:#64748b; margin-top:2px;">Data akan muncul setelah order referral dan validasi hasil diterima dari LIS.</p>
             </div>
-            <button class="btn btn-sm btn-teal" onclick="alert('Mengunduh Sertifikat PDF E-Hasil Lab Terverifikasi...')" style="font-size:11px;">📄 Unduh Sertifikat PDF E-Hasil</button>
+            <button class="btn btn-sm btn-teal" onclick="avaToast('📄 Mengunduh Sertifikat PDF E-Hasil Lab Terverifikasi ISO 15189...', 'success')" style="font-size:11px;">📄 Unduh Sertifikat PDF E-Hasil</button>
           </div>
 
           <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; font-size:11.5px; color:#334155; line-height:1.5;">
@@ -2180,7 +2287,7 @@
         <div class="glass-card" style="padding:20px; background:#ffffff; border:1px solid var(--border);">
           <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin-bottom:12px;">Formulir Digital Handover Spesimen (Flebotomis ➔ Analis Lab)</h4>
           
-          <form onsubmit="event.preventDefault(); alert('Serah Terima Spesimen Berhasil Dicatat dalam Chain-of-Custody ISO 15189!');">
+          <form onsubmit="event.preventDefault(); avaToast('📦 Serah Terima Spesimen Berhasil Dicatat dalam Chain-of-Custody ISO 15189!', 'success');">
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px; margin-bottom:14px;">
               <div class="input-group" style="margin:0;">
                 <label style="font-size:11px; font-weight:700; color:#475569;">No. Barcode Cooler Box Transport</label>
@@ -2219,7 +2326,7 @@
             <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#0f172a; cursor:pointer;"><input type="checkbox" checked> Ice Gel Pack Medis Tersusun Sesuai SOP Cold-Chain (2-8°C)</label>
           </div>
 
-          <button class="btn btn-teal" onclick="alert('Kalibrasi & Check Pre-Departure Valid! Armada Siap Berangkat.')" style="width:100%; padding:12px; font-size:13px; font-weight:800;">✅ Konfirmasi Armada Cold-Chain Siap En-Route</button>
+          <button class="btn btn-teal" onclick="avaToast('✅ Kalibrasi & Check Pre-Departure Valid! Armada Cold-Chain Siap En-Route.', 'success')" style="width:100%; padding:12px; font-size:13px; font-weight:800;">✅ Konfirmasi Armada Cold-Chain Siap En-Route</button>
         </div>
       </div>
 
@@ -2239,7 +2346,7 @@
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <span class="badge" style="background:#065f46; color:#34d399; border:1px solid #059669; font-weight:800; padding:8px 14px; border-radius:20px; font-size:11.5px;">🟢 SYSTEM STATUS: ALL 12 SITES ONLINE</span>
-              <button class="btn btn-teal" onclick="alert('Inisiator backup darurat dipicu untuk seluruh 12 site cabang!')" style="padding:8px 14px; font-size:12px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">💾 Run System-Wide Backup</button>
+              <button class="btn btn-teal" onclick="avaToast('💾 Inisiasi backup darurat dipicu untuk seluruh 12 site cabang!', 'info')" style="padding:8px 14px; font-size:12px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">💾 Run System-Wide Backup</button>
             </div>
           </div>
 
@@ -2286,7 +2393,7 @@
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
               <h4 style="font-size:15px; font-weight:800; color:#0f2963; margin:0;">🏢 Daftar Site Branch &amp; Cabang Faskes Terdaftar</h4>
-              <button class="btn btn-teal" onclick="alert('Modal Tambah Site Branch Baru Aktif!')" style="padding:8px 14px; font-size:12px; font-weight:700;">+ Registrasi Cabang / Site Baru</button>
+              <button class="btn btn-teal" onclick="avaToast('📋 Form registrasi cabang/site baru dibuka.', 'info')" style="padding:8px 14px; font-size:12px; font-weight:700;">+ Registrasi Cabang / Site Baru</button>
             </div>
 
             <div style="overflow-x:auto;">
@@ -2310,7 +2417,7 @@
                     <td><span class="badge" style="background:#dcfce7; color:#166534; font-weight:700;">🟢 ONLINE (14ms)</span></td>
                     <td>42 Staf Aktif</td>
                     <td>Enterprise RS</td>
-                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px;" onclick="alert('Kelola konfigurasi Site Jakarta Pusat')">Kelola</button></td>
+                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px;" onclick="avaToast('⚙️ Membuka konfigurasi Site Jakarta Pusat...', 'info')">Kelola</button></td>
                   </tr>
 
                   <tr style="border-bottom:1px solid #f1f5f9;">
@@ -2320,7 +2427,7 @@
                     <td><span class="badge" style="background:#dcfce7; color:#166534; font-weight:700;">🟢 ONLINE (18ms)</span></td>
                     <td>28 Staf Aktif</td>
                     <td>Starter LIS</td>
-                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px;" onclick="alert('Kelola konfigurasi Site Surabaya')">Kelola</button></td>
+                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px;" onclick="avaToast('⚙️ Membuka konfigurasi Site Surabaya...', 'info')">Kelola</button></td>
                   </tr>
 
                   <tr style="border-bottom:1px solid #f1f5f9;">
@@ -2330,7 +2437,7 @@
                     <td><span class="badge" style="background:#fef3c7; color:#b45309; font-weight:700;">🟡 DEGRADED (+140ms)</span></td>
                     <td>15 Staf Aktif</td>
                     <td>Custom VIP Spa</td>
-                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px; background:#f59e0b; border-color:#f59e0b; color:white;" onclick="alert('Patch Hotfix dikirim ke Site Bali!')">Push Hotfix</button></td>
+                    <td style="text-align:right; padding-right:14px;"><button class="btn btn-teal" style="padding:4px 10px; font-size:11px; background:#f59e0b; border-color:#f59e0b; color:white;" onclick="avaToast('🚀 Patch Hotfix v2.4.1 berhasil di-push ke Site Bali!', 'success')">Push Hotfix</button></td>
                   </tr>
                 </tbody>
               </table>
@@ -2348,7 +2455,7 @@
               <div style="padding:16px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                   <strong style="font-size:13px; color:#0f172a;">🏥 Modul HIS Rawat Jalan &amp; Rawat Inap</strong>
-                  <input type="checkbox" checked onchange="alert('Status Modul HIS Diperbarui!')" style="width:18px; height:18px; cursor:pointer;">
+                  <input type="checkbox" checked onchange="avaToast('Status Modul HIS Diperbarui!', 'info')" style="width:18px; height:18px; cursor:pointer;">
                 </div>
                 <span style="font-size:11px; color:#64748b; display:block;">Rekam Medis EMR, Registrasi Admission, Antrean Kiosk, Billing Kasir.</span>
               </div>
@@ -2356,7 +2463,7 @@
               <div style="padding:16px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                   <strong style="font-size:13px; color:#0f172a;">🧪 Modul LIS Lab (530+ Parameter &amp; ISO 15189)</strong>
-                  <input type="checkbox" checked onchange="alert('Status Modul LIS Diperbarui!')" style="width:18px; height:18px; cursor:pointer;">
+                  <input type="checkbox" checked onchange="avaToast('Status Modul LIS Diperbarui!', 'info')" style="width:18px; height:18px; cursor:pointer;">
                 </div>
                 <span style="font-size:11px; color:#64748b; display:block;">Katalog LOINC/UCUM, Chain-of-Custody Flebotomi, Cold-Chain Telemetry.</span>
               </div>
@@ -2364,7 +2471,7 @@
               <div style="padding:16px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                   <strong style="font-size:13px; color:#0f172a;">🌿 Modul Wellness &amp; 7 Lifestyle Suite</strong>
-                  <input type="checkbox" checked onchange="alert('Status Modul Wellness Diperbarui!')" style="width:18px; height:18px; cursor:pointer;">
+                  <input type="checkbox" checked onchange="avaToast('Status Modul Wellness Diperbarui!', 'info')" style="width:18px; height:18px; cursor:pointer;">
                 </div>
                 <span style="font-size:11px; color:#64748b; display:block;">Run Challenge + Wearables Sync, NutriCo Planner, HRV Stress, Bio-Age.</span>
               </div>
@@ -2372,7 +2479,7 @@
               <div style="padding:16px; border:1px solid #cbd5e1; border-radius:12px; background:#f8fafc;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                   <strong style="font-size:13px; color:#0f172a;">🏢 Modul Corporate MCU &amp; Burnout Index</strong>
-                  <input type="checkbox" checked onchange="alert('Status Modul Corporate Diperbarui!')" style="width:18px; height:18px; cursor:pointer;">
+                  <input type="checkbox" checked onchange="avaToast('Status Modul Corporate Diperbarui!', 'info')" style="width:18px; height:18px; cursor:pointer;">
                 </div>
                 <span style="font-size:11px; color:#64748b; display:block;">Dasbor MCU Karyawan Massal, Approval Maker/Approver, Epidemiologi.</span>
               </div>
@@ -2400,7 +2507,7 @@
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
               <h4 style="font-size:15px; font-weight:800; color:#0f2963; margin:0;">🐞 Bug, Problem &amp; Incident SLA Ticketing</h4>
-              <button class="btn btn-teal" onclick="alert('Form Laporkan Bug/Incident Baru Aktif!')" style="padding:6px 12px; font-size:11px; background:#ef4444; border-color:#ef4444; color:white;">+ Laporkan Bug / Outage Baru</button>
+              <button class="btn btn-teal" onclick="avaToast('🚨 Form pelaporan incident / bug baru dibuka.', 'warning')" style="padding:6px 12px; font-size:11px; background:#ef4444; border-color:#ef4444; color:white;">+ Laporkan Bug / Outage Baru</button>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:10px;">
@@ -2410,7 +2517,7 @@
                   <strong style="font-size:12.5px; color:#991b1b; display:block; margin-top:2px;">Printer POS ESC/POS Disconnect at Site Bali</strong>
                   <span style="font-size:11px; color:#7f1d1d;">Dilaporkan: 2 Jam lalu &bull; Assigned to: Dev Hardware Team</span>
                 </div>
-                <button class="btn btn-teal" onclick="alert('Tiket Bug P2 Diselesaikan!')" style="padding:6px 12px; font-size:11px; font-weight:700;">✅ Mark Resolved</button>
+                <button class="btn btn-teal" onclick="avaToast('✅ Tiket Bug P2 berhasil diselesaikan!', 'success'); this.disabled=true; this.textContent='Selesai';" style="padding:6px 12px; font-size:11px; font-weight:700;">✅ Mark Resolved</button>
               </div>
 
               <div style="padding:12px 16px; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
@@ -2419,7 +2526,7 @@
                   <strong style="font-size:12.5px; color:#92400e; display:block; margin-top:2px;">Header Kuitansi Kasir Tergeser 2 Pixel</strong>
                   <span style="font-size:11px; color:#78350f;">Dilaporkan: 1 Hari lalu &bull; Assigned to: Frontend UI Team</span>
                 </div>
-                <button class="btn btn-teal" onclick="alert('Tiket Bug P3 Diselesaikan!')" style="padding:6px 12px; font-size:11px; font-weight:700;">✅ Mark Resolved</button>
+                <button class="btn btn-teal" onclick="avaToast('✅ Tiket Bug P3 berhasil diselesaikan!', 'success'); this.disabled=true; this.textContent='Selesai';" style="padding:6px 12px; font-size:11px; font-weight:700;">✅ Mark Resolved</button>
               </div>
             </div>
           </div>
@@ -2434,13 +2541,13 @@
               <div style="padding:16px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:12px;">
                 <strong style="font-size:13px; color:#166534; display:block; margin-bottom:4px;">🟢 Automated Daily Snapshot Status</strong>
                 <p style="font-size:11.5px; color:#14532d; margin:0 0 10px 0;">Terakhir dieksekusi: Hari ini 04:00 WIB (Ukuran: 4.2 GB, Checksum Valid SHA-256).</p>
-                <button class="btn btn-teal" onclick="alert('Inisiasi Pemulihan Data PITR (Point-In-Time Restore) Sukses!')" style="padding:6px 12px; font-size:11px; font-weight:700;">🔄 Point-In-Time Restore (PITR)</button>
+                <button class="btn btn-teal" onclick="avaToast('🔄 Inisiasi Pemulihan Data PITR (Point-In-Time Restore) berhasil dimulai.', 'info')" style="padding:6px 12px; font-size:11px; font-weight:700;">🔄 Point-In-Time Restore (PITR)</button>
               </div>
 
               <div style="padding:16px; background:#e0f2fe; border:1px solid #bae6fd; border-radius:12px;">
                 <strong style="font-size:13px; color:#0369a1; display:block; margin-bottom:4px;">⏰ Maintenance Window Update Schedule</strong>
                 <p style="font-size:11.5px; color:#0c4a6e; margin:0 0 10px 0;">Jadwal Update Selanjutnya: Minggu 02:00 WIB (Pemberitahuan otomatis dikirim ke 12 site).</p>
-                <button class="btn btn-teal" onclick="alert('Broadcast Pengumuman Maintenance Dikirim!')" style="padding:6px 12px; font-size:11px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">📢 Broadcast Advance Notice</button>
+                <button class="btn btn-teal" onclick="avaToast('📢 Broadcast advance maintenance notice terkirim ke seluruh tenant!', 'info')" style="padding:6px 12px; font-size:11px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">📢 Broadcast Advance Notice</button>
               </div>
             </div>
           </div>
@@ -2465,7 +2572,7 @@
                   <strong style="font-size:12.5px; color:#0f172a; display:block;">🤖 AI Gateway LLM Key Pool (Gemini / Claude / OpenAI)</strong>
                   <span style="font-size:11px; color:#64748b;">12 Kunci Aktif Terpasang dalam Key Pool Rotation</span>
                 </div>
-                <button class="btn btn-teal" onclick="alert('Kunci API Rotasi Baru Berhasil Ditambahkan ke Pool!')" style="padding:6px 12px; font-size:11px; font-weight:700;">+ Rotasi Key Pool</button>
+                <button class="btn btn-teal" onclick="avaToast('🔑 Rotasi pool API Key selesai diterbitkan.', 'success')" style="padding:6px 12px; font-size:11px; font-weight:700;">+ Rotasi Key Pool</button>
               </div>
             </div>
           </div>
@@ -2730,7 +2837,22 @@
               </div>
             </div>
 
-            <button class="btn btn-teal" onclick="simulateWearableAddSteps()" disabled style="margin-top:16px; width:100%; padding:10px; font-size:12px; font-weight:800; opacity:.6;">Wearable belum tersambung</button>
+            <!-- Interactive Step Logger & Wearable Sim -->
+            <div style="margin-top:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+              <div style="font-size:11px; font-weight:700; color:#475569; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                <span>⚡ Sinkronisasi & Tambah Langkah Cepat:</span>
+                <button type="button" class="btn" onclick="updateStepChallengeUI(0)" style="padding:2px 8px; font-size:10px; background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">Reset</button>
+              </div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                <button type="button" class="btn btn-teal" onclick="simulateWearableAddSteps(1000)" style="padding:6px 10px; font-size:11px; font-weight:700;">+1.000 Steps</button>
+                <button type="button" class="btn btn-teal" onclick="simulateWearableAddSteps(2500)" style="padding:6px 10px; font-size:11px; font-weight:700;">+2.500 Steps</button>
+                <button type="button" class="btn" onclick="simulateWearableAddSteps(5000)" style="padding:6px 10px; font-size:11px; font-weight:700; background:#0f2963; color:white; border-color:#0f2963;">🏃 Lari 5K (+5.000)</button>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <input type="number" id="custom-steps-input" placeholder="Input langkah manual..." style="flex:1; padding:6px 10px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px;">
+                <button type="button" class="btn btn-teal" onclick="submitCustomSteps()" style="padding:6px 12px; font-size:11px; font-weight:700;">+ Catat</button>
+              </div>
+            </div>
           </div>
 
           <!-- Active Challenges & Leaderboard -->
@@ -2794,11 +2916,11 @@
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
             <span style="font-size:11px; font-weight:800; color:#d97706; text-transform:uppercase; letter-spacing:0.5px;">Ringkasan Kalori Harian</span>
             <div style="display:flex; justify-content:space-between; align-items:baseline; margin:12px 0 8px 0;">
-              <h2 style="font-size:32px; font-weight:900; color:#0f2963; margin:0;">1.420 <span style="font-size:14px; font-weight:600; color:#64748b;">/ 2.100 kcal</span></h2>
-              <span style="font-size:13px; font-weight:700; color:#059669;">Sisa: 680 kcal</span>
+              <h2 style="font-size:32px; font-weight:900; color:#0f2963; margin:0;"><span id="nutrico-total-kcal">1.420</span> <span style="font-size:14px; font-weight:600; color:#64748b;">/ <span id="nutrico-target-kcal">2.100</span> kcal</span></h2>
+              <span style="font-size:13px; font-weight:700; color:#059669;" id="nutrico-remain-wrap">Sisa: <span id="nutrico-remain-kcal">680</span> kcal</span>
             </div>
             <div style="width:100%; height:10px; background:#e2e8f0; border-radius:5px; overflow:hidden; margin-bottom:20px;">
-              <div style="width:67.6%; height:100%; background:linear-gradient(90deg, #f59e0b, #d97706); border-radius:5px;"></div>
+              <div id="nutrico-kcal-bar" style="width:67.6%; height:100%; background:linear-gradient(90deg, #f59e0b, #d97706); border-radius:5px; transition:width 0.4s ease;"></div>
             </div>
 
             <!-- Lab Recommendation Box -->
@@ -2813,31 +2935,31 @@
             <div style="display:flex; flex-direction:column; gap:10px;">
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-                  <span style="color:#4338ca; font-weight:700;">Protein (120g / 150g)</span>
+                  <span id="nutrico-p-text" style="color:#4338ca; font-weight:700;">Protein (120g / 150g)</span>
                   <strong style="color:#1e1b4b;">80% Target</strong>
                 </div>
                 <div style="width:100%; height:6px; background:#e0e7ff; border-radius:3px; overflow:hidden;">
-                  <div style="width:80%; height:100%; background:#4338ca;"></div>
+                  <div id="nutrico-p-bar" style="width:80%; height:100%; background:#4338ca; transition:width 0.4s ease;"></div>
                 </div>
               </div>
 
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-                  <span style="color:#b45309; font-weight:700;">Karbohidrat (160g / 210g)</span>
+                  <span id="nutrico-c-text" style="color:#b45309; font-weight:700;">Karbohidrat (160g / 210g)</span>
                   <strong style="color:#78350f;">76% Target</strong>
                 </div>
                 <div style="width:100%; height:6px; background:#fef3c7; border-radius:3px; overflow:hidden;">
-                  <div style="width:76%; height:100%; background:#d97706;"></div>
+                  <div id="nutrico-c-bar" style="width:76%; height:100%; background:#d97706; transition:width 0.4s ease;"></div>
                 </div>
               </div>
 
               <div>
                 <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-                  <span style="color:#b91c1c; font-weight:700;">Lemak Sehat (42g / 60g)</span>
+                  <span id="nutrico-f-text" style="color:#b91c1c; font-weight:700;">Lemak Sehat (42g / 60g)</span>
                   <strong style="color:#7f1d1d;">70% Target</strong>
                 </div>
                 <div style="width:100%; height:6px; background:#fee2e2; border-radius:3px; overflow:hidden;">
-                  <div style="width:70%; height:100%; background:#dc2626;"></div>
+                  <div id="nutrico-f-bar" style="width:70%; height:100%; background:#dc2626; transition:width 0.4s ease;"></div>
                 </div>
               </div>
             </div>
@@ -2845,40 +2967,28 @@
 
           <!-- Right: Meal Log & AI Scanner -->
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0;">🍽️ Catatan Makanan Hari Ini</h4>
-              <button class="btn btn-teal" onclick="alert('Fitur AI Meal Scanner Camera Aktif! Foto piring Anda untuk hitung kalori otomatis.')" style="padding:6px 12px; font-size:11px; font-weight:700; background:#f59e0b; border-color:#f59e0b; color:white;">📸 AI Scan Makanan</button>
+              <button type="button" class="btn btn-teal" onclick="simulateAiFoodScan()" style="padding:6px 12px; font-size:11px; font-weight:700; background:#f59e0b; border-color:#f59e0b; color:white; display:flex; align-items:center; gap:5px;">📸 AI Scan Makanan</button>
             </div>
 
-            <div style="display:flex; flex-direction:column; gap:10px;">
-              <div style="padding:10px 14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <strong style="font-size:12px; color:#0f172a; display:block;">🥞 Sarapan: Avocado Toast &amp; Telur Rebus</strong>
-                  <span style="font-size:10.5px; color:#64748b;">Protein 24g &bull; Karbo 35g &bull; Lemak 14g</span>
-                </div>
-                <span style="font-size:12px; font-weight:800; color:#d97706;">450 kcal</span>
-              </div>
-
-              <div style="padding:10px 14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <strong style="font-size:12px; color:#0f172a; display:block;">🥗 Makan Siang: Salmon Bowl &amp; Quinoa</strong>
-                  <span style="font-size:10.5px; color:#64748b;">Protein 48g &bull; Karbo 65g &bull; Lemak 18g</span>
-                </div>
-                <span style="font-size:12px; font-weight:800; color:#d97706;">680 kcal</span>
-              </div>
-
-              <div style="padding:10px 14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <strong style="font-size:12px; color:#0f172a; display:block;">🥜 Camilan: Greek Yogurt &amp; Kacang Almond</strong>
-                  <span style="font-size:10.5px; color:#64748b;">Protein 18g &bull; Karbo 15g &bull; Lemak 10g</span>
-                </div>
-                <span style="font-size:12px; font-weight:800; color:#d97706;">290 kcal</span>
-              </div>
+            <!-- Quick Preset Chips -->
+            <div style="margin-bottom:12px; display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="chip-btn" onclick="quickAddNutricoPreset('oat')">+🥣 Oatmeal Chia (320 kcal)</button>
+              <button type="button" class="chip-btn" onclick="quickAddNutricoPreset('salad')">+🥗 Salad Ayam (450 kcal)</button>
+              <button type="button" class="chip-btn" onclick="quickAddNutricoPreset('salmon')">+🐟 Salmon Quinoa (620 kcal)</button>
+              <button type="button" class="chip-btn" onclick="quickAddNutricoPreset('snack')">+🥜 Greek Yogurt (210 kcal)</button>
             </div>
 
-            <div style="margin-top:16px; padding-top:14px; border-top:1px dashed #cbd5e1; display:flex; gap:8px;">
-              <input type="text" placeholder="Tambah nama makanan manual..." style="flex:1; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
-              <button class="btn btn-teal" onclick="alert('Makanan berhasil dicatat ke NutriCo Planner!')" style="padding:8px 14px; font-size:12px; font-weight:700;">+ Catat</button>
+            <!-- Dynamic Meals Container -->
+            <div id="nutrico-meal-list" style="display:flex; flex-direction:column; gap:8px; max-height:260px; overflow-y:auto; padding-right:4px;">
+              <!-- rendered via app.js -->
+            </div>
+
+            <div style="margin-top:14px; padding-top:12px; border-top:1px dashed #cbd5e1; display:flex; gap:8px;">
+              <input type="text" id="nutrico-input-name" placeholder="Tambah nama makanan manual..." style="flex:2; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+              <input type="number" id="nutrico-input-kcal" placeholder="Kcal" style="width:75px; padding:8px 10px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+              <button type="button" class="btn btn-teal" onclick="submitManualMeal()" style="padding:8px 14px; font-size:12px; font-weight:700;">+ Catat</button>
             </div>
           </div>
         </div>
@@ -2919,7 +3029,7 @@
               </div>
             </div>
 
-            <button class="btn btn-teal" onclick="alert('Perangkat Wearable Sleep Tracker Telah Terhubung!')" style="width:100%; padding:10px; font-size:12px; font-weight:800; background:#6366f1; border-color:#6366f1; color:white;">🔄 Re-sync Sleep Sensor Data</button>
+            <button class="btn btn-teal" onclick="avaToast('🔄 Sinkronisasi perangkat sleep tracker berhasil! Pola tidur deep/REM diperbarui.', 'success')" style="width:100%; padding:10px; font-size:12px; font-weight:800; background:#6366f1; border-color:#6366f1; color:white;">🔄 Re-sync Sleep Sensor Data</button>
           </div>
 
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
@@ -3009,9 +3119,13 @@
               <div id="water-log-bar" style="width:70%; height:100%; background:linear-gradient(90deg, #06b6d4, #0891b2); border-radius:6px;"></div>
             </div>
 
-            <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-              <button class="btn btn-teal" onclick="addWaterIntake(250)" style="padding:10px 16px; font-size:12px; font-weight:700; background:#06b6d4; border-color:#06b6d4; color:white;">+ 250 ml Air Putih</button>
-              <button class="btn btn-teal" onclick="addWaterIntake(350)" style="padding:10px 16px; font-size:12px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">+ 350 ml Elektrolit</button>
+            <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:10px;">
+              <button type="button" class="btn btn-teal" onclick="addWaterIntake(250)" style="padding:8px 14px; font-size:12px; font-weight:700; background:#06b6d4; border-color:#06b6d4; color:white;">+ 250 ml Air</button>
+              <button type="button" class="btn btn-teal" onclick="addWaterIntake(350)" style="padding:8px 14px; font-size:12px; font-weight:700; background:#0284c7; border-color:#0284c7; color:white;">+ 350 ml Elektrolit</button>
+              <button type="button" class="btn btn-teal" onclick="addWaterIntake(500)" style="padding:8px 14px; font-size:12px; font-weight:700; background:#0369a1; border-color:#0369a1; color:white;">+ 500 ml Botol Sport</button>
+            </div>
+            <div style="text-align:center;">
+              <button type="button" class="btn" onclick="resetWaterIntake()" style="padding:4px 10px; font-size:11px; background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1;">Reset Asupan Air</button>
             </div>
           </div>
 
@@ -3103,7 +3217,7 @@
               </div>
             </div>
 
-            <button class="btn btn-teal" onclick="alert('Selamat! Misi Bio-Age Quest Hari Ini Selesai.')" style="width:100%; padding:12px; font-size:13px; font-weight:800;">✅ Klaim Daily Quest Rewards (+100 Coins)</button>
+            <button type="button" class="btn btn-teal" onclick="claimDailyBioageReward()" style="width:100%; padding:12px; font-size:13px; font-weight:800;">✅ Klaim Daily Quest Rewards (+100 Coins)</button>
           </div>
 
           <div class="glass-card" style="padding:24px; background:#ffffff; border:1px solid var(--border); border-radius:14px;">
@@ -3133,7 +3247,6 @@
           </div>
         </div>
       </div>
-
     </main>
   </div>
 
@@ -3715,6 +3828,7 @@
 <script src="app.js?v=20260925-orchestration"></script>
   <script src="../js/wellness-flow.js?v=20260925"></script>
   <script src="wellness.js?v=20260925-orchestration"></script>
+  <script src="workspace-design.js?v=20261006a"></script>
   <script>
     if ('serviceWorker' in navigator && !window.location.hostname.includes('localhost')) {
       window.addEventListener('load', () => {

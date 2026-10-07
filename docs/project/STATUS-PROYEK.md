@@ -1,6 +1,75 @@
-﻿# STATUS PROYEK AVAQUEEN PLATFORM
+# STATUS PROYEK AVAQUEEN PLATFORM
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
+
+## Implementasi Program Khusus Korporat (AHM), Attention Spotlight, dan Audit 52 Menu Apps — 6 Oktober 2026
+
+### Rencana dan checklist
+- [x] Mendukung program khusus karyawan saat terhubung ke korporat (misal PT Astra Honda Motor / AHM): Attention Spotlight Card muncul mencolok di Beranda Pasien dan grup teratas di sidebar.
+- [x] Memastikan Menu Basic reguler (5 kelompok menu: Layanan Utama, Wellness & Kebugaran, Riwayat & Pesanan, Belanja & Farmasi, Fitur AI & Bio-Twin) tetap 100% muncul dan dapat diakses semua orang tanpa tersembunyi.
+- [x] Portal Program Khusus Karyawan (`corporate-assigned-program-view`): Kartu Karyawan Digital (Ace Anwar, NIP AHM-9902-ENG, Engineering & Production, Benefit 100% Full Coverage) dengan 4 program penugasan (Step & Run Challenge, MCU Tahunan Terjadwal, NutriCo Workplace Diet, Relaksasi Otonom & HRV).
+- [x] Audit dan penuntasan seluruh 52 menu `APPS_PAGES`: Menghubungkan seluruh routing `showView` dan memperbaiki rendering interaktif.
+- [x] Perbaikan kritis struktur DOM HTML `ava-platform/apps/index.html`: Memperbaiki tag penutup `patient-view` dan `member-modal` yang sebelumnya menelan seluruh 51 view lainnya ke dalam `patient-view`, kini seluruh 52 view menjadi sibling mandiri di dalam `.view-panels-wrapper` dengan balance div netral (0).
+- [x] Penghapusan 20+ pemanggilan `alert()` native usang dan migrasi penuh ke sistem floating toast modern `avaToast()`.
+- [x] Implementasi Transkripsi Konsultasi AI / Ambient Clinical Scribe (`ava-ambient-scribe-view`): Speech-to-SOAP otomatis, equalizer audio wave, tombol e-Order dan Simpan ke EMR.
+- [x] Implementasi Katalog Pemeriksaan Rujukan LIS (`referral-catalog-view`) berstandar ISO 15189:2022, kode LOINC, TAT, dan e-referral.
+- [x] Pembersihan data dummy: Seluruh data uji direset dan dihapus dari localStorage setelah pengujian, tidak ada mock data yang bocor ke file rilis.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Mekanisme corporate linking bersifat netral multi-tenant (`tenant.config` / `AVA_LINKED_CORP_NAME`), tidak mengunci vendor atau hardcode nama perusahaan tunggal.
+- Tidak ada data PII pasien atau data rahasia komersial perusahaan yang diekspos; data uji sintetis dan dibersihkan otomatis.
+- Katalog rujukan mematuhi standar LOINC (OBX-3) dan penjaminan mutu ISO 15189:2022.
+
+### Bukti Verifikasi
+- Automated E2E Playwright Suite: `scripts/test-all-52-views.cjs` menguji seluruh 52 menu di `APPS_PAGES` — 52 PASSED, 0 FAILED.
+- Alur corporate linking (AHM) terverifikasi: Attention banner aktif, NIP terhubung, basic shortcuts tetap 28 buah (100% utuh), unlinking mengembalikan ke mode personal reguler.
+- Scribe Speech-to-SOAP terverifikasi live audio recording dan perumusan draf SOAP.
+- DOM Tree Balance: `find_vpw_close.cjs` membuktikan `openDivs = 0` (sempurna).
+- Regresi Playwright sebelumnya tetap lulus: `scripts/qa-wellness-interactive.cjs` (0 errors) & `scripts/qa-corporate-dashboard.cjs` (PASS).
+- Screenshot bukti visual tersimpan di `docs/audit-evidence/2026-10-06/`:
+  - `corp-linked-attention-spotlight.png` (Tampilan Beranda Personal terhubung AHM dengan Attention Spotlight Banner + Menu Dasar Lengkap)
+  - `corp-assigned-programs-portal.png` (Portal Kartu Karyawan Digital & 4 Program Khusus Penugasan)
+  - `ambient-scribe-live-soap.png` (Live Audio Waveform Speech-to-SOAP Ambient Clinical Scribe)
+  - `referral-catalog-loinc.png` (Katalog Pemeriksaan Rujukan LOINC/UCUM ISO 15189)
+
+---
+
+## Penyempurnaan UI Portal Apps & Implementasi Suite Wellness Interaktif — 6 Oktober 2026
+
+### Rencana dan checklist
+- [x] Audit komprehensif seluruh menu portal aplikasi (`ava-platform/apps/`) dan sinkronisasi `navigation.js`.
+- [x] Mengaktifkan semua rute menu yang sebelumnya terblokir (`planned`) pada seluruh peran pengguna (Pasien, Member, Corporate, Staff, Referral, IHC, Tech).
+- [x] Perbaikan arsitektur DOM HTML: Menemukan dan memperbaiki tag yang tidak tertutup (`#member-modal` dan wrapper `view-panels-wrapper`) yang sebelumnya menutupi dan menyembunyikan view-view penting.
+- [x] Implementasi Modul 1: Step & Run Club Challenge dengan integrasi wearable sync (Apple Health, Google Fit, Garmin, Fitbit), live step counter, quick-add steps, sesi lari 5K, leaderboard komunitas, dan reward AVA Coins.
+- [x] Implementasi Modul 2: NutriCo Calorie & Diet Planner berbasis lab (HbA1c & profil lipid), distribusi makronutrisi real-time (protein, karbohidrat, lemak sehat), preset makanan sehat, input manual, dan simulasi AI Food Vision Scanner.
+- [x] Implementasi Modul 3: Smart Hydration Tracker presisi seluler dengan logging air, elektrolit, botol sport, reset, dan integrasi faktor cuaca/suhu.
+- [x] Implementasi Modul 4: Mindfulness & HRV Stress Biofeedback dengan animasi pernapasan terbimbing (Guided Box Breathing 4-7-8) interaktif countdown timer dan pelacakan siklus.
+- [x] Implementasi Modul 5: Bio-Age 90-Day Quest dengan checklist misi harian bio-hacking dan klaim koin/rejuvenasi usia biologis.
+- [x] Sistem notifikasi floating toast non-intrusif (`.ava-toast`) menggantikan alert standar browser.
+- [x] Responsivitas mobile penuh (viewport 390px) tanpa overflow horizontal (`document.documentElement.scrollWidth <= innerWidth`).
+- [x] Menjalankan automated QA Playwright untuk Corporate Health Dashboard dan Wellness Suite — lulus 100% tanpa error.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Tidak ada data pasien nyata atau data sensitif yang digunakan (patuh UU PDP No. 27/2022).
+- Data gizi, rekomendasi aktivitas fisik, dan biomarker metabolik selaras dengan standar preventif ISO 15189:2022.
+- Logika state disimpan di memory client dan localStorage terisolasi, siap dihubungkan ke API / backend tanpa merusak skema master.
+
+### Bukti Verifikasi
+- Script QA otomatis: `scripts/qa-wellness-interactive.cjs` lulus (0 exit code).
+- Script QA Corporate Dashboard: `scripts/qa-corporate-dashboard.cjs` lulus (PASS).
+- Script Verifikasi Wellness Database: `scripts/verify-wellness-orchestration.cjs` lulus (46 checks passed).
+- Screenshot bukti visual tersimpan di:
+  - `artifacts/wellness/01-wellness-hub.png` (Tampilan Hub Wellness & Bio-Hacking modular)
+  - `artifacts/wellness/02-wellness-step-challenge.png` (Interaksi Step & Run Challenge)
+  - `artifacts/wellness/03-wellness-nutrico.png` (NutriCo Meal Planner & AI Scanner)
+  - `artifacts/wellness/04-wellness-hydration.png` (Smart Hydration Tracker)
+  - `artifacts/wellness/05-wellness-breathing.png` (Guided Box Breathing Animation & Timer)
+  - `artifacts/wellness/06-wellness-bioage-quest.png` (Bio-Age 90-Day Quest & Checklist)
+  - `artifacts/wellness/07-mobile-wellness-run.png` (Tampilan responsif mobile 390px)
+
+---
 
 ## Penyempurnaan visual website publik — 23 September 2026
 
@@ -2892,6 +2961,29 @@ Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
 - [x] Uji simulasi database/UI sintetis, kegagalan dan isolasi; catat batas operasional.
 - [x] Jalankan gate repo, commit selektif dan git push.
 
+## Inventaris cleanup ava-platform — 6 Oktober 2026
+### Rencana dan checklist
+- [x] Catat struktur, file besar, duplikat identik, dan file bernama sementara/backup; `.env` dan isi seed SQL tidak dibaca.
+- [x] Telusuri referensi runtime dan catatan housekeeping sebelum menandai kandidat.
+- [x] Ganti identitas pada fixture seed yang disetujui pengguna dengan data sintetis; jangan jalankan terhadap database.
+- [ ] Tunggu persetujuan pemilik sebelum menghapus atau memindahkan arsip, script SQL, seed, atau data.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: ava. Pengguna menyetujui penggantian identitas fixture seed dengan nilai sintetis. Tidak menjalankan seed, menulis database, mengubah skema, atau menyentuh data produksi. `.env` dan isi seed SQL tidak dibaca. Arsip dan script database tidak dihapus karena dapat menjadi bukti audit atau dibutuhkan untuk pemulihan/operasional; penghapusan memerlukan inventaris lanjutan dan persetujuan eksplisit.
+
+### Temuan dan batas
+- Tidak ditemukan file `.bak`, `.tmp`, `.old`, `.orig`, `.swp`, atau duplikat identik baru yang aman dihapus. Logo di `ava-platform/logo-ava-global.png` dan `ava-platform/css/logo-ava-global.png` identik tetapi digunakan oleh dua root deployment; keduanya dipertahankan.
+- `ava-platform/database.sql` dibaca oleh `desktop-app/electron/local-engine.js` dan dirujuk oleh skrip audit; bukan kandidat penghapusan.
+- `ava-platform/downloads/ava-lis-connector-1.1.0.zip` ditautkan oleh `ava-platform/modules/lab/settings.js`; dipertahankan.
+- `ava-platform/sql_arsip/` (91 file, sekitar 10 MB) dan `ava-platform/docs_arsip/` adalah arsip historis yang disebut eksplisit dalam `docs/project/REPO-HOUSEKEEPING.md`; keduanya kandidat untuk keputusan pemilik, bukan sampah terbukti.
+- README di kedua folder arsip secara eksplisit melarang penghapusan: arsip SQL disebut satu-satunya catatan pembangunan database manual. Ada 90 file SQL arsip (50 nama file ditemukan pada berkas lain; 40 tidak ditemukan melalui pencarian nama) dan 9 dokumen arsip (4 nama ditemukan di berkas lain). Pencarian nama bukan bukti bahwa file aman dihapus; beberapa referensi hanya berupa komentar atau dokumentasi.
+- Script SQL root `ava-platform/supabase_corp_*.sql` tampak sebagai script setup/manual dan mayoritas tidak memiliki referensi pemanggil dalam repo. Status penerapan database tidak dapat disimpulkan dari kode; jangan hapus atau pindahkan sebelum diverifikasi pemilik database.
+- `ava-platform/supabase_create_user_rpc.sql` disebut sebagai blocker keamanan pada status proyek, sedangkan `ava-platform/supabase_no_show_autocancel.sql` dirujuk oleh modul admission; keduanya harus dipertahankan.
+- `ava-platform/seed_ace_console.js` tidak ditemukan pemanggil repo. Fixture yang semula memuat identitas yang dapat mengidentifikasi seseorang diganti dengan nilai sintetis; prompt konfirmasi mengingatkan bahwa record akan ditulis ke tenant pada sesi aktif dan skrip hanya boleh dipakai di lingkungan uji.
+- Perubahan lokal yang sudah ada di modul HIS, migrasi database, script uji, dan bukti simulasi tidak disentuh.
+- Tidak ada file aplikasi yang dihapus/dipindah. Penggantian fixture seed dilakukan setelah rencana ini dicatat; cleanup arsip/legacy tetap menunggu persetujuan terpisah.
+- `node --check ava-platform/seed_ace_console.js` dan `git diff --check` — lulus. Seed tidak dijalankan dan tidak ada database yang diakses.
+
 
 ### Bukti operasional RS lokal
 - 21 menu/route RS, 18 workflow operasional dengan siklus permintaan → penugasan → bukti per tahap → penutupan dan audit; status menu tetap parsial untuk membedakan koordinasi dari mesin klinis/stock ledger khusus.
@@ -2906,3 +2998,125 @@ Rencana rinci per subtask <= 1 jam: `docs/project/RENCANA-OPERASIONAL-RS.md`.
 - Batas: tidak apply migrasi/menulis DB produksi. Sink audit/jurnal existing adalah fixture sintetis; bukan validasi akuntansi. Kompetisi bed diuji berurutan dan constraint, belum konkurensi beberapa sesi PostgreSQL. Unit khusus belum punya mesin klinis/stock ledger/kapasitas booking serta otomatisasi billing lengkap; rinci di rencana dan backlog. UAT RS dan pemetaan tenant bed lama wajib sebelum penggunaan nyata.
 
 - Push terverifikasi: commit implementasi 5c4da7d didorong ke origin/main, dari 9c669ed; tidak menyertakan perubahan Apps/cleanup lokal milik pekerjaan lain. Tidak menjalankan migrasi produksi.
+
+## Desain workspace lintas domain — 6 Oktober 2026
+### Plan → Execute → Verify
+Persetujuan desain: palet C, kartu B, sidebar terbuka/ringkas/sembunyi, panah membuka tujuan anak. Subtask masing-masing <= 1 jam.
+- [x] Inventaris domain dan shell; terapkan token warna/komponen netral bersama.
+- [x] Header menyatu, sidebar responsif persisten, direktori kartu dan tujuan anak berbasis menu berotorisasi.
+- [x] Selaraskan Apps dan website publik; verifikasi browser desktop/mobile, navigasi dan gate repo.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk komponen visual baru; identitas brand tetap konfigurasi/aset situs yang ada. Ditinjau terhadap batas repo sebelum implementasi. Perubahan UI saja, tanpa data pasien nyata, perubahan katalog/kunci relasional, skema, integrasi vendor atau akses database produksi. Tujuan submenu hanya memakai route/panel yang sudah ada dan menu hasil penyaringan role; tidak menciptakan kemampuan baru atau mengubah kewenangan. Perubahan RS/Apps yang sudah ada dipertahankan. Implementasi dan bukti lokal diselesaikan sebelum keputusan publikasi.
+
+## Audit keseluruhan menu — 6 Oktober 2026
+### Plan → Execute → Verify
+- [x] Inventaris seluruh kategori dan status menu; cocokkan route, judul, manifest, sumber tabel/RPC secara statis.
+- [x] Telusuri menu parsial, halaman kesiapan, BPJS, PACS dan batas workflow RS; bedakan implementasi dari integrasi yang belum terbukti.
+- [x] Simpan laporan dan inventaris per menu. Audit kode lokal; tidak menjalankan transaksi pasien/DB produksi.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk laporan audit. Ditinjau sebelum penulisan laporan: tanpa data pasien, nilai kredensial, harga/kontrak privat, perubahan skema atau koneksi eksternal. Perubahan pekerjaan lain dipertahankan. Temuan konfigurasi sensitif dicatat tanpa menyalin nilainya.
+### Bukti dan batas verifikasi
+251 entri kategori: 218 ada, 32 parsial, 1 belum. Delapan menu ada merender readiness tanpa event sumber. Pemeriksaan bangun-menu --periksa, audit-menu-hidup dan audit_all_menus lulus pemeriksaan statis; pesan 100% pada skrip terakhir hanya berarti route/judul cocok. Bukan sertifikasi fungsi end-to-end. Laporan: docs/project/AUDIT-SELURUH-MENU-2026-10-06.md; inventaris: docs/audit-evidence/2026-10-06/menu-inventory.json. Portal konsumen 19 entri dan perangkat pendukung 5 dicatat terpisah, belum diuji ulang end-to-end pada audit ini.
+
+## Audit flow per domain — 6 Oktober 2026
+### Rencana dan checklist
+- [x] Petakan setiap situs/subdomain dalam `config/domain.json` ke entry point, workspace, serta kelompok menu.
+- [x] Tinjau handoff dan kekurangan alur tiap domain dengan menggabungkan inventaris menu dan audit subdomain terdahulu; verifikasi titik readiness langsung di kode.
+- [x] Pisahkan gap fitur/menu dari kebutuhan integrasi, data source, UAT, dan keputusan arsitektur; urutkan tindak lanjut berdasarkan risiko proses.
+- [x] Buat matriks domain dan ringkasan lintas-domain di `docs/project/AUDIT-FLOW-SELURUH-DOMAIN-2026-10-06.md`.
+- [x] Jalankan pemeriksaan sinkronisasi menu dan handler statis; dokumentasikan batas bukti non-produksi.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk analisis arsitektur; kepemilikan implementasi dan data tenant tidak berubah. Audit read-only terhadap kode, manifest, dokumen audit sebelumnya, serta pemeriksaan statis lokal. Tidak mengakses data pasien, secret, database/API/akun produksi, mengubah skema/master, atau mengaktifkan integrasi eksternal. Tidak menyatakan kesiapan klinis/akreditasi berdasarkan keberadaan menu saja.
+
+### Bukti dan batas verifikasi
+- `config/domain.json`: 17 site key, 44 hostname unik. Lima workspace menu memiliki cakupan yang bertumpang tindih.
+- `config/menu.json`: 251 entri — 218 ada, 32 parsial, 1 belum. Delapan route `ada` menuju readiness checklist tanpa pembacaan event sumber.
+- `node scripts/bangun-menu.js --periksa`, `node scripts/audit-menu-hidup.js`, dan `node scripts/uji/audit_all_menus.js` — lulus statis; tidak membuktikan seluruh flow/runtime/produksi.
+- Laporan per-host, flow lintas sistem, prioritas, temuan checkout/BPJS/PACS dan batas uji: `docs/project/AUDIT-FLOW-SELURUH-DOMAIN-2026-10-06.md`.
+- Temuan RS dibatasi bukti simulasi lokal; tidak ada UAT produksi, koneksi eksternal, atau perubahan aplikasi pada audit ini.
+
+## Penutupan readiness dan klaim handoff Apps — 6 Oktober 2026
+### Rencana dan checklist
+- [x] Turunkan status delapan menu yang hanya merender readiness ke `parsial`; bangkitkan ulang menu dan perbarui inventaris/laporan hitungan.
+- [x] Hentikan checkout lokal yang mengklaim order terkirim ke HIS tanpa pemanggilan backend/ACK; pertahankan cart dan tampilkan error yang dapat ditindaklanjuti.
+- [x] Perbarui regresi checkout agar memastikan kegagalan fail-closed, cart tidak hilang, dan order tidak masuk riwayat.
+- [x] Verifikasi generator menu, audit handler, regresi Apps yang relevan, syntax, serta diff.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk koreksi status/klaim yang netral; data harga, fee, master, dan integrasi tidak diubah. Ini perubahan label dan fail-closed UI berdasarkan implementasi lokal yang tidak memanggil HIS. Tidak mengirim/menyimpan transaksi, menerbitkan pembayaran/resi, mengubah skema, menghubungi produksi, atau mengasumsikan kontrak API. Checkout hanya boleh dinyatakan berhasil setelah kontrak dan ACK backend disetujui serta diuji.
+
+### Bukti dan batas verifikasi
+- Delapan readiness-only menu kini `parsial`; manifest hasil generate konsisten. Ringkasan diperbarui menjadi 210 ada, 40 parsial, 1 belum.
+- Checker `bangun-menu.js` kini menerima `tech-sprint` berstatus belum karena rutenya hanya halaman penjelasan yang tetap nonaktif; generator tidak lagi memberi peringatan palsu.
+- Checkout Apps mengembalikan `HANDOFF_UNAVAILABLE`, tidak membuat order/resi palsu, dan mempertahankan cart sampai HIS handoff tersedia.
+- `test_expansion_super_suite.js` lulus 16/16; `test_apps_navigation.cjs` lulus 6/6; `test_apps_auth.cjs` lulus 14/14.
+- `bangun-menu.js --periksa`, `audit-menu-hidup.js` (207 menu ada), `audit_all_menus.js` (251 rute/judul), `node --check` untuk file JS yang diubah, dan pemeriksaan diff file non-App — lulus.
+- Pemeriksaan `git diff --check` untuk keseluruhan `ava-platform/apps/app.js` tetap melaporkan trailing whitespace pada perubahan wellness yang sudah ada sebelum perubahan checkout; bagian itu tidak disentuh karena di luar scope.
+- Tidak ada koneksi atau perubahan data produksi. Handoff HIS tetap belum tersedia; implementasi hanya mencegah klaim sukses palsu.
+
+## Penuntasan kandidat menu parsial — 6 Oktober 2026
+### Rencana dan checklist
+- [x] Kelompokkan 40 menu parsial dan 1 menu belum menurut jenis: hub existing/source data, workflow RS terkoordinasi, master/config, domain integration-gated, dan backlog yang belum memiliki kebutuhan terverifikasi. Rincian dan blocker ada di laporan audit menu/domain.
+- [x] Sambungkan delapan hub readiness ke sumber lokal yang tersedia. Query tabel dibatasi maksimal 200 baris per sumber; RPC menampilkan agregat server. UI tidak menampilkan identitas pasien, setiap sumber menampilkan error sendiri, status workflow tetap belum terverifikasi, dan tombol mengarah ke modul pemilik.
+- [x] Uji semua delapan hub memakai record sintetis in-memory. Harness tidak menulis database, file fixture, atau bukti; proses berakhir tanpa data dummy persisten. Uji juga error sumber, panel tidak dikenal, dan navigasi.
+- [x] Pertahankan status parsial/belum dan dokumentasikan blocker flow klinis, integrasi vendor, acceptance/UAT dan kebutuhan sprint yang belum dikonfirmasi. Tidak ada skema master atau integrasi eksternal yang diubah.
+- [x] Laporan audit dan bukti uji diperbarui; uji SQL/UI workflow RS terdahulu tidak dijalankan ulang agar artefak evidence tetap utuh.
+
+### Bukti dan hasil
+- `node scripts/uji/test_readiness_sources.cjs` — PASS untuk 8 panel, error eksplisit dan navigasi sumber.
+- `node --check ava-platform/modules/system/readiness.js` dan `node --check scripts/uji/test_readiness_sources.cjs` — PASS.
+- `node scripts/verify-master-registry-contract.js` — PASS, 20 menu/domain.
+- `node scripts/audit-menu-hidup.js` — PASS, tidak ada rute/handler/table/RPC yang hilang pada cakupan checker.
+- `node scripts/uji/audit_all_menus.js` — PASS, 251 menu dan tanpa route/title yang hilang.
+- `hospital-operations-simulation.json` (21 skenario SQL) dan `hospital-ui-simulation.json` (27 skenario UI) tetap utuh dan tidak ditimpa; keduanya adalah bukti uji yang sudah tercatat sebelumnya, bukan rerun pekerjaan ini.
+- `tech-sprint` tetap belum tersedia; implementasi planner persisten memerlukan kebutuhan/otorisasi alur kerja yang tervalidasi. Tidak dibuat planner dummy atau localStorage yang menyamar sebagai fitur operasional.
+- Delapan hub tetap `parsial`: agregat baca bukan pemantauan event berkorelasi dan tidak membuktikan handoff, approval, retry, rekonsiliasi atau penerimaan klinis.
+
+## Perbaikan lanjutan setelah review batas penuntasan — 6 Oktober 2026
+### Rencana dan checklist
+- [x] Audit ulang kandidat Tech dan hub master untuk mencari false success atau konflik transaksi yang dapat dibuktikan tanpa akses produksi.
+- [x] Tolak pesan sukses pada create/archive master kecuali RPC mengembalikan record dengan ID; jika tidak, tampilkan error dan biarkan pengguna mencoba kembali.
+- [x] Gunakan correlation ID sebagai nomor tiket support, menghindari benturan `ticket_no` ketika beberapa tiket dibuat pada detik yang sama.
+- [x] Tambahkan uji in-memory untuk respons gagal/tidak lengkap dan tiket serentak; sinkronkan laporan domain/menu.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: perubahan berada pada modul generic control plane/master milik aplikasi; tidak menyalin aset/dokumen AVA atau data tenant. Uji menggunakan payload sintetis, tanpa pasien, database produksi, atau kredensial. Tidak ada perubahan skema, nilai master, tenant scope, integrasi eksternal, atau perilaku klinis. Record ID diperlukan sebagai ACK sumber kebenaran agar audit dan UI tidak menyatakan transaksi berhasil tanpa bukti.
+
+### Bukti dan hasil
+- `node --test scripts/uji/test_master_registry_ack.cjs scripts/uji/test_tech_ticket_number.cjs scripts/uji/test_tech_ops_control_plane.cjs scripts/uji/test_tech_ops_transitions.cjs` — PASS 14/14.
+- `tech_support_tickets.ticket_no` unik di database; tes membekukan waktu untuk memastikan dua tiket pada detik yang sama tetap memperoleh nomor berbeda.
+- `his_master_upsert_record` dan `his_master_archive_record` menghasilkan composite record; UI kini mensyaratkan record ID sebelum menampilkan sukses.
+- Lifecycle ticket masih belum memiliki action triage/assign/resolve yang terpadu di daftar isu. Sprint tetap belum tersedia tanpa kebutuhan yang disepakati. 40 parsial dan 1 belum tidak dinaikkan berdasarkan uji UI saja.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: mengikuti kepemilikan tiap modul/tenant; fixture uji baru bersifat sintetis/generic. Persetujuan pengguna hanya untuk memakai data dummy pada pemeriksaan, bukan mengubah master/kunci relational, mengaktifkan integrasi eksternal, atau menerapkan skema di produksi. Tidak memakai identitas pasien nyata. Data fixture wajib scoped ke test database/temp state dan dibersihkan dalam teardown/finally. Workflow klinis, bank darah, critical care, persalinan, obat, klaim, payment, dan mutu produk tidak boleh dinaikkan menjadi `ada` hanya karena mock/UI dapat didemonstrasikan; perlu aturan pemilik domain dan acceptance/UAT.
+
+## Tindak lanjut audit menu — 7 Oktober 2026
+### Plan → Execute → Verify
+- [ ] Pertahankan perubahan readiness/master/desain dari pekerjaan lain; perbaiki deskripsi BPJS dan dependensi migrasi bed.
+- [ ] Hentikan respons sukses palsu BPJS legacy dan penyimpanan rahasia di browser; pertahankan API global agar kegagalan jelas.
+- [ ] Uji bridge tanpa jaringan dan regenerasi/verifikasi peta menu.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Ditinjau sebelum coding; tanpa skema baru, data pasien, panggilan BPJS atau database produksi. Bridge belum terintegrasi; operasi harus gagal eksplisit, tanpa SEP/identitas sintetis yang menyerupai transaksi nyata. Tidak menyalin nilai konfigurasi lama ke bukti.
+### Hasil tindak lanjut
+- Bridge BPJS legacy kini fail-closed dengan BPJS_NOT_CONNECTED; tidak mengembalikan peserta, SEP, signature atau header palsu. Cache konfigurasi browser lama dihapus tanpa membaca nilainya.
+- Deskripsi menu klaim menjelaskan input manual; reservasi bed merujuk migrasi 0070–0073. Regenerasi menu mempertahankan perubahan readiness pekerjaan lain.
+- node --test scripts/uji/test_bpjs_unavailable.cjs: 2/2 lulus; node --check bridge dan bangun-menu --periksa lulus. Tidak memanggil BPJS atau DB produksi.
+- File menu/generated/status memiliki perubahan bersama pekerjaan lain; tidak dimasukkan commit bridge agar tidak mengikutsertakan implementasi yang belum direview tugas ini.
+
+### Implementasi dan bukti — 7 Oktober 2026
+- [x] Inventaris 17 situs / 44 hostname. Sembilan workspace menggunakan shell bersama; Apps/Corporate, publik dan lima halaman layanan memiliki styling sesuai fungsi masing-masing.
+- [x] Palet putih/abu dingin/teal C, header flush 60px, sidebar 224px/ringkas 64px/sembunyi, drawer mobile dan preferensi ringkas tersimpan.
+- [x] Kartu tiga kolom B (dua pada tablet, satu pada ponsel); tujuan anak dari menu hasil RBAC. HIS memakai layanan → route; Tech Pusat Kendali membuka panel yang tersedia. Leaf tanpa anak membuka route langsung. Tidak menambahkan submenu query/riwayat fiktif dari mockup.
+- [x] Apps mengelompokkan shortcut yang ada menjadi kartu dropdown, mempertahankan informasi lain dari renderer sebelumnya. Klik luar/Escape menutup dropdown; pilihan anak memakai showView yang ada.
+- [x] Tema terang dan gelap pada shell; ikon garis untuk navigasi/kiosk; warna status klinis tetap mengikuti makna semantiknya.
+- [x] Kiosk, Nakes, pelacakan dan monitor memakai palet yang sama; target sentuh dan nomor antrean tetap besar. CSS layanan terdaftar sebagai aset bersama di config/domain.json; generator domain sinkron.
+
+Bukti: `docs/audit-evidence/2026-10-06/workspace-design/verification.json` (34 kombinasi 17 situs × desktop/mobile), screenshot per situs, `tech-expanded-menu.png`, `tech-dark.png`, `app-desktop.png` dan `corporate-desktop.png`. Pengujian memenuhi semua request dari file lokal; login/transaksi produksi tidak dilakukan. Fixture Ops/HIS memakai inventaris workspace asli, tanpa fallback ke menu Tech.
+
+Validasi: qa-workspace-design.cjs lulus 34 viewport tanpa overflow horizontal; posisi header/main 224px, ringkas 64px dan tersembunyi 0px; tinggi header 60px. test_workspace_navigation.cjs lulus: grup tidak dikenal ditolak, Escape/focus, tujuan panel Deployment aktual, target sekali pakai dan empat inventaris role terbatas. test_tech_navigation.cjs lulus lima role, dirty guard dan respons simpan sintetis; selektor tombol test yang sudah usang diselaraskan dengan tombol Tenant yang ada. test_apps_navigation.cjs 6/6; tech_ops_control_plane 5/5; tech_ops_transitions 4/4. Application boundaries 17/17, deploy readiness, generator domain/menu dan parsing 10 skrip HTML inline lulus. Diff check file lingkup pekerjaan bersih; whitespace pada perubahan Apps lain tidak ditimpa.
+
+Batas: implementasi lokal dan fixture browser, belum commit/push/deploy. Tidak mengklaim seluruh halaman modul legacy telah diaudit secara interaktif. Perubahan lain yang berjalan bersamaan (RS, Apps, katalog/readiness) dipertahankan; tidak digabung atau dipublikasikan otomatis. Rollback UI: lepas pemuatan workspace-design/service-design dan pulihkan handler navigasi; skema dan data tidak berubah.
+
+Verifikasi akhir tambahan: `qa-workspace-design.cjs --apps-only` lulus 4 viewport Apps/Corporate setelah penutupan dropdown pada klik tujuan dan Escape ditambahkan; hasil `verification-apps.json`. `test_workspace_navigation.cjs` diulang setelah penjagaan perubahan belum tersimpan di klik tujuan, tetap lulus. Preview Tech dibuka di panel Codex. Service worker Apps yang ada sudah menghentikan cache offline lama; tidak perlu perubahan cache untuk aset desain baru.

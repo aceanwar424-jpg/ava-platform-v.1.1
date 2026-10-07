@@ -11,8 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css?v=20261002-kioskqa">
   <link rel="stylesheet" href="../css/ava-ops-polish.css?v=20261002-kioskqa">
+<link rel="stylesheet" href="../css/service-design.css?v=20261007a">
 </head>
-<body class="ava-kiosk-shell">
+<body class="ava-kiosk-shell ava-service-shell">
   <div class="kiosk-container">
     <!-- Header -->
     <header class="kiosk-header">
@@ -39,7 +40,8 @@
       <div class="kiosk-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(360px, 1fr));gap:18px;">
         <!-- Button 1: Pendaftaran Klinik -->
         <button class="kiosk-card card-primary" onclick="ambilAntrian('Umum')">
-          <div class="card-icon" aria-hidden="true">🏥</div>
+          <div class="card-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v15"/><path d="M12 8v5M9.5 10.5h5"/><path d="M10 21v-4h4v4"/></svg></div>
           <div class="card-content">
             <h3>Pendaftaran Poliklinik</h3>
             <p>Pemeriksaan Dokter Umum, Dokter Gigi, Rekam Medis &amp; Rawat Jalan</p>
@@ -49,7 +51,8 @@
 
         <!-- Button 2: Check-in Lab -->
         <button class="kiosk-card card-success" onclick="ambilAntrian('Laboratorium')">
-          <div class="card-icon" aria-hidden="true">🧪</div>
+          <div class="card-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6"/><path d="M10 3v6.5L4.6 18a2 2 0 0 0 1.7 3h11.4a2 2 0 0 0 1.7-3L14 9.5V3"/><path d="M7.5 15h9"/></svg></div>
           <div class="card-content">
             <h3>Laboratorium Diagnostik</h3>
             <p>Pengambilan Sampel Darah/Urin, Tes Patologi &amp; Pengambilan Hasil</p>
@@ -59,7 +62,8 @@
 
         <!-- Button 3: Medical Check Up (MCU) -->
         <button class="kiosk-card card-warning" onclick="ambilAntrian('MCU')">
-          <div class="card-icon" aria-hidden="true">💼</div>
+          <div class="card-icon" aria-hidden="true"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M2 12h20"/></svg></div>
           <div class="card-content">
             <h3>Medical Check Up (MCU)</h3>
             <p>Pemeriksaan Berkala Mandiri, Karyawan Korporat &amp; Surat Sehat</p>
@@ -69,7 +73,8 @@
 
         <!-- Button 4: Queen Sanctuary VIP -->
         <button class="kiosk-card card-gold" onclick="ambilAntrian('Sanctuary')" style="border-left:5px solid #D4AF37;">
-          <div class="card-icon" aria-hidden="true" style="background:rgba(212,175,55,0.12);color:#D4AF37;">👑</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(212,175,55,0.12);color:#D4AF37;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.5-7-9.5A4 4 0 0 1 12 8a4 4 0 0 1 7 2.5c0 5-7 9.5-7 9.5Z"/></svg></div>
           <div class="card-content">
             <h3 style="color:#B45309;">Queen Sanctuary VIP</h3>
             <p>Wellness Spa, Terapi Pelvic Floor, Biosensor Scan &amp; VIP Lounge</p>
@@ -79,7 +84,8 @@
 
         <!-- Button 5: Spesialis & Telehealth -->
         <button class="kiosk-card card-purple" onclick="ambilAntrian('Spesialis')" style="border-left:5px solid #7C3AED;">
-          <div class="card-icon" aria-hidden="true" style="background:rgba(124,58,237,0.1);color:#7C3AED;">🩺</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(124,58,237,0.1);color:#7C3AED;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3v5a4 4 0 0 0 8 0V3"/><path d="M5 3H3.5M13 3h1.5"/><path d="M9 12v3a5 5 0 0 0 5 5 4 4 0 0 0 4-4v-2"/><circle cx="18" cy="12" r="2"/></svg></div>
           <div class="card-content">
             <h3 style="color:#6D28D9;">Dokter Spesialis</h3>
             <p>Spesialis Penyakit Dalam (Sp.PD), Jantung, Anak, Obgyn &amp; Konsultasi</p>
@@ -89,7 +95,8 @@
 
         <!-- Button 6: Farmasi & Kasir -->
         <button class="kiosk-card card-teal" onclick="ambilAntrian('Farmasi')" style="border-left:5px solid #0E7C86;">
-          <div class="card-icon" aria-hidden="true" style="background:rgba(14,124,134,0.1);color:#0E7C86;">💊</div>
+          <div class="card-icon" aria-hidden="true" style="background:rgba(14,124,134,0.1);color:#0E7C86;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 20.5a5 5 0 0 1-7-7l6-6a5 5 0 0 1 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></div>
           <div class="card-content">
             <h3 style="color:#0E7C86;">Farmasi &amp; Kasir</h3>
             <p>Pengambilan Resep Obat, Pelunasan Tagihan Kasir POS &amp; Asuransi</p>

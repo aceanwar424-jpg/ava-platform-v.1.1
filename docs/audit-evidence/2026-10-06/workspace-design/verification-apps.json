@@ -1,0 +1,22 @@
+[
+  {
+    "domain": "app",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "domain": "app",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "domain": "corporate",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "domain": "corporate",
+    "width": 390,
+    "overflow": false
+  }
+]

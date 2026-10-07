@@ -22,6 +22,8 @@
 <script defer src="js/core/moduleManager.js"></script>
 <link rel="stylesheet" href="css/tech-navigation.css?v=20261006c">
 <script defer src="js/core/tech-navigation.js?v=20261006c"></script>
+<link rel="stylesheet" href="css/workspace-design.css?v=20261006a">
+<script defer src="js/core/workspace-navigation.js?v=20261006a"></script>
 </head>
 <body class="ava-ops-shell">
 <!-- ═══ SIDEBAR VERTIKAL PENUH AVA GLOBAL ═══ -->
@@ -111,7 +113,7 @@
 
 <!-- ═══ TOPBAR — BERSIH, MINIMAL & ELEGAN ═══ -->
 <div class="topbar" id="topbar">
-  <button class="hamburger" onclick="toggleSidebar()" style="display:inline-flex; font-size:18px;">☰</button>
+  <button class="hamburger" type="button" aria-label="Sembunyikan atau tampilkan sidebar" aria-controls="sidebar-rail" onclick="toggleSidebarVisibility()" style="display:inline-flex; font-size:18px;">☰</button>
   <div class="topbar-breadcrumb" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
     <span class="breadcrumb-root">SISTEM</span>
     <span class="breadcrumb-separator" aria-hidden="true">/</span>
@@ -278,6 +280,7 @@ window.setSidebarOpen = setSidebarOpen;
 
 function setSidebarExpanded(isExpanded, persist = true) {
   const rail = document.getElementById('sidebar-rail');
+  document.body.classList.remove('sidebar-hidden');
   // Desktop dimulai dengan label terlihat. Class legacy dipakai sebagai mode
   // ringkas (ikon saja), sehingga tombol panah tetap menjadi sakelar yang
   // mudah dipahami tanpa menghilangkan panel konteks layanan.
@@ -286,6 +289,8 @@ function setSidebarExpanded(isExpanded, persist = true) {
   document.querySelectorAll('.sidebar-expand-control').forEach((btn) => {
     btn.setAttribute('aria-label', isExpanded ? 'Tampilkan nama menu' : 'Ringkas sidebar');
     btn.setAttribute('title', isExpanded ? 'Tampilkan nama menu' : 'Ringkas sidebar');
+    btn.textContent = isExpanded ? '›' : '‹';
+    btn.setAttribute('aria-expanded', String(!isExpanded));
   });
   if (persist) {
     if (isExpanded) localStorage.setItem('ava_sidebar_expanded', '1');
@@ -303,6 +308,13 @@ function toggleSidebar() {
   setSidebarOpen(!rail?.classList.contains('open'));
 }
 window.toggleSidebar = toggleSidebar;
+
+function toggleSidebarVisibility() {
+  if (innerWidth < 769) { toggleSidebar(); return; }
+  const hidden = document.body.classList.toggle('sidebar-hidden');
+  document.querySelector('.hamburger')?.setAttribute('aria-expanded', String(!hidden));
+}
+window.toggleSidebarVisibility = toggleSidebarVisibility;
 
 // ── Date display ─────────────────────────
 function updateDate() {
@@ -1025,7 +1037,7 @@ function gambarRail(ruang) {
   const addService = (namaGroup, namaLayanan, items, iconKategori) => {
     let group = railByName.get(namaGroup);
     if (!group) {
-      group = { name: namaGroup, icon: GROUP_ICONS[namaGroup] || iconKategori || '📁', services: [] };
+      group = { name: namaGroup, icon: iconKategori || (typeof icon === 'function' ? icon('folder', 19) : ''), services: [] };
       railByName.set(namaGroup, group);
       railGroups.push(group);
     }
@@ -1262,6 +1274,7 @@ function renderNavigationContext(groupId, preferredServiceIndex) {
 }
 
 function openNavigationContext(groupId) {
+  if (window.WorkspaceNavigation) { window.WorkspaceNavigation.directory(groupId); return; }
   if (window.TechNavigation?.enabled()) { window.TechNavigation.directory(groupId); return; }
   const group = findNavigationGroup(groupId);
   if (!group) return;
@@ -1334,7 +1347,8 @@ function setActiveFlyoutItem(page) {
     renderNavigationContext(activeGroup.id, activeNavigationServiceIndex(activeGroup));
   }
   updateBreadcrumb(page);
-  window.TechNavigation?.onPage(page);
+  if (window.WorkspaceNavigation) window.WorkspaceNavigation.onPage(page);
+  else window.TechNavigation?.onPage(page);
 }
 
 // Menyelaraskan penanda aktif saat berpindah halaman via navigate().

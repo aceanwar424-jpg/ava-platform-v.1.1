@@ -6,6 +6,9 @@
 // ═══════════════════════════════════════════════════════════════
 
 const ICON_PATHS = {
+  // Generic navigation additions; no tenant-specific symbols.
+  database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
   // — Umum & navigasi —
   home:        '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M9 21v-6h6v6"/>',
   'home-heart':'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"/><path d="M12 18s-2.6-1.7-2.6-3.4a1.5 1.5 0 0 1 2.6-.9 1.5 1.5 0 0 1 2.6.9C14.6 16.3 12 18 12 18Z"/>',

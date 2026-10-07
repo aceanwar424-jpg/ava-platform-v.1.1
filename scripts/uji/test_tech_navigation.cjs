@@ -42,11 +42,11 @@ const between=(a,b)=>html.slice(html.indexOf(a),html.indexOf(b,html.indexOf(a)))
  await page.evaluate(()=>{window.sbGetStrict=async()=>[{id:'synthetic-tenant',kode:'synthetic',nama:'Tenant Sintetis',kota:'Jakarta',is_active:true}];window.toast=(message,type)=>{window.lastToast={message,type}};window.closeModalForce=()=>{};window.openModal=()=>{throw Error('Unexpected modal')};});
  await page.evaluate(()=>renderTenants());
  await page.getByRole('button',{name:'Detail',exact:true}).click();assert(await page.getByRole('heading',{name:'Tenant Sintetis'}).isVisible());
- await page.getByRole('button',{name:'Ubah tenant',exact:true}).click();assert(await page.locator('.tnt-page-editor').isVisible());
+ await page.locator('#tnt-edit').click();assert(await page.locator('.tnt-page-editor').isVisible());
  await page.locator('#tnt-nama').fill('Tenant Diubah');
  page.once('dialog',d=>d.dismiss());await page.getByRole('button',{name:'Batal',exact:true}).click();assert(await page.locator('.tnt-page-editor').isVisible());
- await page.evaluate(()=>{window.sbPatch=async()=>[]});await page.getByRole('button',{name:'Simpan',exact:true}).click();assert.equal(await page.evaluate(()=>lastToast.type),'err');assert(await page.locator('.tnt-page-editor').isVisible());
- await page.evaluate(()=>{window.sbPatch=async()=>[{id:'synthetic-tenant'}]});await page.getByRole('button',{name:'Simpan',exact:true}).click();await page.waitForSelector('#tnt-isi');assert.equal(await page.evaluate(()=>lastToast.type),'ok');
+ await page.evaluate(()=>{window.sbPatch=async()=>[]});await page.getByRole('button',{name:'Simpan Data Tenant',exact:true}).click();assert.equal(await page.evaluate(()=>lastToast.type),'err');assert(await page.locator('.tnt-page-editor').isVisible());
+ await page.evaluate(()=>{window.sbPatch=async()=>[{id:'synthetic-tenant'}]});await page.getByRole('button',{name:'Simpan Data Tenant',exact:true}).click();await page.waitForSelector('#tnt-isi');assert.equal(await page.evaluate(()=>lastToast.type),'ok');
  await page.evaluate(()=>tntDetail('missing'));assert((await page.locator('#main-content').textContent()).includes('tidak ditemukan'));
  await page.goto('https://his.avahealth.sbs');await page.addScriptTag({path:'ava-platform/js/core/tech-navigation.js'});assert.equal(await page.evaluate(()=>TechNavigation.enabled()),false);
  await browser.close();console.log('PASS: five role inventories, directory targets, mobile, invalid group, initial panel, tenant deployment prefill, non-Tech isolation, tenant detail/edit/dirty guard/save validation');

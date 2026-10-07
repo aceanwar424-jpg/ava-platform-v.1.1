@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 251 — 🟢 218 ada · 🟡 32 sebagian · ⚪ 1 belum dibuat
+**Total menu terpetakan:** 251 — 🟢 210 ada · 🟡 40 sebagian · ⚪ 1 belum dibuat
 
 ---
 
@@ -38,7 +38,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Pusat Kendali Operasional | `ops-kendali` | Apa yang perlu ditangani sekarang, lintas unit |
 | 🟢 | CEO Master Cockpit | `executive-dashboard` | P&L 6 pilar, tenant aktif, burn rate, BEP |
 | 🟢 | Konsolidasi Finansial 6 Pilar | `holding-finance` | EBITDA konsolidasi & metrik investor |
-| 🟢 | Evidence Register & Risk | `evidence-register` | Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar |
+| 🟡 | Evidence Register & Risk | `evidence-register` | Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar |
 
 **Gerbang Sistem Lain**
 
@@ -99,7 +99,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 |---|---|---|---|
 | 🟢 | Tim Operasional | `hrd` | Data personel unit Tech |
 | ⚪ | Pekerjaan & Kapasitas | `tech-sprint` | Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh. |
-| 🟢 | Implementasi & SLA | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
+| 🟡 | Implementasi & SLA | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
 
 ---
 
@@ -132,7 +132,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Anamnesa & Tanda Vital | `anamnesa` | Keluhan, riwayat, dan pemeriksaan awal |
 | 🟢 | Rawat Inap & Bed Management | `inpatient` | Mutasi tempat tidur & resume pulang |
 | 🟢 | Order Terintegrasi | `his-orders` | Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS |
-| 🟢 | Hub Integrasi HIS–LIS & Billing | `his-integration` | Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS |
+| 🟡 | Hub Integrasi HIS–LIS & Billing | `his-integration` | Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS |
 | 🟢 | Hasil Patologi Klinik (Viewer LIS) | `his-clinical-pathology` | Viewer read-only hasil Patologi Klinik yang sudah dirilis LIS; koreksi dan rilis tetap dilakukan di LIS |
 | 🟢 | Hasil Mikrobiologi (Viewer LIS) | `his-microbiology` | Viewer read-only hasil pewarnaan, kultur, identifikasi, dan sensitivitas yang sudah dirilis LIS |
 | 🟢 | Hasil Patologi Anatomi (Viewer LIS) | `his-anatomical-pathology` | Viewer read-only hasil histopatologi dan sitologi yang sudah dirilis LIS |
@@ -182,7 +182,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
-| 🟢 | Klaim BPJS & INA-CBG | `bpjs-claim` | Grouper tarif & bridging VClaim |
+| 🟢 | Klaim BPJS & INA-CBG | `bpjs-claim` | Kelengkapan dokumen, status dan rekonsiliasi klaim; tarif E-Klaim dan SEP resmi dicatat manual. Grouper/VClaim belum tersambung. |
 | 🟢 | Integrasi SATUSEHAT | `satusehat` | Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4 |
 | 🟢 | Izin & Kepatuhan Faskes | `compliance-tracker` | Masa berlaku izin operasional dan SIP nakes |
 | 🟢 | Laporan RL Kemenkes | `rl-reports` | Rekapitulasi RL terisi dari data operasional |
@@ -198,7 +198,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟡 | Pusat Kendali Alur Pasien | `rs-patient-flow` | Papan pekerjaan lintas unit dengan status, prioritas, petugas, pagination dan audit. |
-| 🟡 | Reservasi & Daftar Tunggu Bed | `rs-bed-reservation` | Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0071 dan pemetaan bed. |
+| 🟡 | Reservasi & Daftar Tunggu Bed | `rs-bed-reservation` | Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0073 dan pemetaan bed. |
 | 🟡 | Housekeeping & Kesiapan Bed | `rs-housekeeping` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Nurse Station & Handover | `rs-nurse-station` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Perencanaan & Checklist Pulang | `rs-discharge` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
@@ -302,7 +302,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Koneksi Alat | `lis-analyzer` | Konfigurasi protokol ASTM E1381/E1394 & channel mapping |
 | 🟢 | Pengaturan Laboratorium | `lis-settings` | Profil instansi, DPJP Sp.PK, critical limits & installer service :9999 |
 | 🟢 | Panduan & Bantuan | `lis-helpdesk` | Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium |
-| 🟢 | Inbox Order & Hasil LIS | `lis-integration` | Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS |
+| 🟡 | Inbox Order & Hasil LIS | `lis-integration` | Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS |
 
 ---
 
@@ -327,7 +327,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Prospek Korporat | `leads` | Funnel klien perusahaan baru |
 | 🟢 | Penawaran Paket MCU | `penawaran` | Quotation resmi sampai terbit PO |
 | 🟢 | MOU & PKS Korporat | `mou` | Perjanjian kerja sama dan perpanjangannya |
-| 🟢 | Klaim Asuransi & TPA | `bpjs-claim` | Penagihan jaminan korporat |
+| 🟢 | Klaim Asuransi & TPA | `bpjs-claim` | Kelengkapan dokumen, status dan rekonsiliasi klaim; tarif E-Klaim dan SEP resmi dicatat manual. Grouper/VClaim belum tersambung. |
 
 ---
 
@@ -364,10 +364,10 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟢 | Formulasi & R&D Produk | `wellness-rnd` | Resep berversi + BOM. Versi baru = baris baru, supaya batch lama tetap terlacak resepnya. |
 | 🟢 | Kemitraan Maklon | `wellness-maklon` | Produksi untuk merek pihak lain. Hasilnya milik klien, tidak masuk stok AVA. |
 | 🟢 | Uji Mutu Produk ke Lab | `wellness-mutu` | Batch karantina sampai SELURUH uji lulus, bukan uji pertama. |
-| 🟢 | Batch, Release & Mutu Nutrition | `nutrition-quality` | Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall |
-| 🟢 | Program Care & Wellness | `wellness-program` | Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program |
-| 🟢 | Challenge & Rekonsiliasi Mitra | `partner-rewards` | Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner |
-| 🟢 | Operasional Sanctuary | `sanctuary-operations` | Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT |
+| 🟡 | Batch, Release & Mutu Nutrition | `nutrition-quality` | Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall |
+| 🟡 | Program Care & Wellness | `wellness-program` | Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program |
+| 🟡 | Challenge & Rekonsiliasi Mitra | `partner-rewards` | Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner |
+| 🟡 | Operasional Sanctuary | `sanctuary-operations` | Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT |
 
 **Care & Home Care**
 

@@ -1,0 +1,39 @@
+/* OWNED_BY: generic. Visual language 1.0 for kiosk, monitors and mobile service pages.
+   Keep touch targets and queue numbers large for their operational use. */
+body.ava-service-shell {
+ --bg:#f7f9fb; --card-bg:#fff; --card:#fff; --text:#172b3a; --text-main:#172b3a;
+ --text-muted:#536579; --border:#dce4eb; --navy:#172b3a; --navy-light:#35485c;
+ --teal:#087e80; --teal-hover:#066367; --accent:#087e80;
+ background:var(--bg); color:var(--text-main); font-family:Inter,'Segoe UI',sans-serif;
+}
+body.ava-service-shell :is(button,input,select,textarea) { font-family:inherit; }
+body.ava-service-shell :is(h1,h2,h3,h4,p,.card-content,.logo-text) { font-family:Inter,'Segoe UI',sans-serif!important; }
+body.ava-service-shell :is(h1,h2,h3,h4) { font-weight:650; letter-spacing:-.025em; }
+body.ava-service-shell :is(header,.kiosk-header,.top) { background:#fff; color:#172b3a; border-bottom:1px solid #dce4eb; box-shadow:none; }
+body.ava-service-shell :is(.card,.panel,.counter-card,.share,.main-call-box,.service-card) { background:#fff; color:#172b3a; border:1px solid #dce4eb; border-radius:8px; box-shadow:none; }
+body.ava-service-shell :is(.welcome-banner,.kiosk-main) { background:transparent; box-shadow:none; }
+body.ava-service-shell :is(.brand-title h1,.title h1,.logo-text h1) { color:#172b3a!important; font-family:inherit; }
+body.ava-service-shell :is(.brand-title p,.title p,.clock-date,.counter-footer,.call-meta) { color:#536579; }
+body.ava-service-shell :is(.active-number,.counter-num,.clock-time) { color:#087e80; text-shadow:none; }
+body.ava-service-shell :is(.target-destination,.call-badge,.counter-header) { color:#066367; background:#e8f5f4; border-color:#c9e6e4; }
+body.ava-service-shell :is(.counter-title,.panel-title,.top h1) { color:#172b3a!important; }
+body.ava-service-shell .top p { color:#536579; }
+body.ava-service-shell.ava-monitor-shell footer { background:#fff; border-top:1px solid #dce4eb; }
+body.ava-service-shell .marquee-text { color:#536579; }
+body.ava-service-shell .kiosk-card { background:#fff!important; border:1px solid #dce4eb!important; border-radius:8px; box-shadow:none!important; }
+body.ava-service-shell .kiosk-card:hover { background:#e8f5f4!important; border-color:#087e80!important; transform:none; }
+body.ava-service-shell .kiosk-card :is(h3,.card-icon) { color:#172b3a!important; }
+body.ava-service-shell .kiosk-card .card-icon { background:#e8f5f4!important; border-radius:8px; }
+body.ava-service-shell .card-badge { color:#066367!important; background:#e8f5f4!important; border:1px solid #c9e6e4!important; border-radius:5px; }
+body.ava-service-shell .service-card { background:#fff!important; }
+body.ava-service-shell .service-card:hover { border-color:#087e80; background:#e8f5f4!important; transform:none; box-shadow:none; }
+body.ava-service-shell :is(.kiosk-header,.brand) img { box-shadow:none!important; border:0!important; }
+body.ava-service-shell :is(.btn,.button,button) { border-radius:6px; }
+body.ava-service-shell :is(input,select) { color:#172b3a; background:#fff; border:1px solid #dce4eb; }
+body.ava-service-shell :focus-visible { outline:2px solid #087e80; outline-offset:3px; }
+@media(max-width:768px) {
+ body.ava-service-shell.ava-monitor-shell { height:auto; min-height:100dvh; overflow:auto; padding:12px; }
+ body.ava-service-shell.ava-monitor-shell header { padding:16px; gap:16px; flex-wrap:wrap; }
+ body.ava-service-shell .grid-counters { grid-template-columns:1fr; }
+ body.ava-service-shell .main-call-box { min-height:200px; }
+}

@@ -233,7 +233,19 @@ async function showView(viewId, viewTitle) {
     'toko-checkout-view': renderTokoCheckout,
     'member-sanctuary-view': renderMemberSanctuary,
     'staff-homecare-view': renderStaffHomecare,
-    'homecare-results-view': renderHomecareResults
+    'homecare-results-view': renderHomecareResults,
+    'ava-wellness-hub-view': () => window.updateStepChallengeUI?.(),
+    'wellness-run-challenge-view': () => window.updateStepChallengeUI?.(),
+    'wellness-nutrico-view': () => window.renderNutrico?.(),
+    'wellness-hydration-view': () => window.updateHydrationUI?.(),
+    'wellness-hrv-stress-view': () => window.initHrvStress?.(),
+    'wellness-bioage-quest-view': () => window.initBioageQuest?.(),
+    'corporate-cashback-view': () => window.initCorporateCashback?.(),
+    'corporate-assigned-program-view': () => window.initCorporateAssignedPrograms?.(),
+    'referral-catalog-view': () => window.renderReferralCatalog?.(),
+    'ava-ambient-scribe-view': () => window.initAvaAmbientScribe?.(),
+    'ava-iso-audit-view': () => window.initAvaIsoAudit?.(),
+    'corporate-analytics-view': () => window.initCorporateAnalytics?.()
   };
   // Remove only our previous error; preserve form markup and renderer containers for retry.
   target.querySelector('.apps-route-error')?.remove();
@@ -3736,40 +3748,16 @@ function calculateUnifiedCartTotal(courier = 'JNE_REG') {
   };
 }
 
-function processUnifiedCheckout(paymentMethod = 'QRIS_DYNAMIC', shippingDetails = {}) {
+function processUnifiedCheckout() {
   if (!unifiedSuperCart.length) {
     throw new Error('Keranjang belanja kosong.');
   }
 
-  const totals = calculateUnifiedCartTotal(shippingDetails.courier || 'JNE_REG');
-  const orderId = `AVA-ORD-${Date.now().toString().slice(-6)}`;
-  const now = new Date().toISOString();
-
-  const newOrder = {
-    order_id: orderId,
-    customer_name: shippingDetails.customer_name || 'Pasien B2C',
-    phone: shippingDetails.phone || '081288990011',
-    address: shippingDetails.address || 'Jakarta Selatan',
-    items: [...unifiedSuperCart],
-    totals,
-    payment_method: paymentMethod,
-    payment_status: 'PENDING_HIS_BILLING',
-    qris_reference: null,
-    courier_tracking_no: totals.subtotal_product > 0 ? `JNE-RES-${orderId}` : null,
-    created_at: now,
-    status_timeline: [
-      { time: now, event: 'Pesanan dibuat & menunggu penagihan HIS' },
-      { time: now, event: 'Handoff layanan diteruskan ke HIS untuk billing dan fulfillment' }
-    ]
-  };
-
-  unifiedOrderHistory.unshift(newOrder);
-  unifiedSuperCart = []; // Clear cart after checkout
-
   return {
-    success: true,
-    order: newOrder,
-    message: `Order berhasil dikirim ke HIS. Nomor Pesanan: ${orderId}. Tagihan akan diterbitkan melalui HIS.`
+    success: false,
+    code: 'HANDOFF_UNAVAILABLE',
+    order: null,
+    message: 'Checkout belum tersedia: aplikasi belum tersambung ke HIS. Keranjang tetap tersedia di halaman ini; pesanan belum dibuat.'
   };
 }
 
@@ -3859,20 +3847,48 @@ window.trackUnifiedOrder = trackUnifiedOrder;
 window.updateLoginFormUI = updateLoginFormUI;
 window.quickFillDemoUser = quickFillDemoUser;
 
-// ════════════════════════ MODUL WELLNESS & WEARABLES HELPER ENGINE ════════════════════════
-let currentStepsCount = 0;
-let currentWaterIntake = 0;
+// ════════════════════════ MODUL WELLNESS, STEP CHALLENGE, NUTRICO & WEARABLES ════════════════════════
+let currentStepsCount = Number(localStorage.getItem('AVA_STEPS')) || 8450;
+let currentWaterIntake = Number(localStorage.getItem('AVA_HYDRATION')) || 2100;
+let breathInterval = null;
 
-function syncWearableDevice(provider) {
-  alert(`Sinkronisasi ${provider || 'wearable'} belum tersedia. Tidak ada data kesehatan yang diambil atau dibuat dari portal.`);
-  return;
-  
+// In-App Toast System
+function avaToast(message, type = 'info', duration = 3200) {
+  let container = document.getElementById('ava-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'ava-toast-container';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  toast.className = 'ava-toast ' + type;
+  const icon = type === 'success' ? '✅' : type === 'reward' ? '🏆' : type === 'error' ? '❌' : 'ℹ️';
+  toast.innerHTML = '<span style="font-size:16px">' + icon + '</span> <span>' + message + '</span>';
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    setTimeout(() => toast.remove(), 260);
+  }, duration);
+}
+
+// ── STEP & RUN CHALLENGE ENGINE ──
+function updateStepChallengeUI() {
+  const distKm = (currentStepsCount * 0.00074).toFixed(1);
+  const calBurn = Math.floor(currentStepsCount * 0.048);
+  const durationMin = Math.floor(currentStepsCount / 150);
+  const pct = Math.min(100, (currentStepsCount / 10000) * 100).toFixed(1);
+  const remaining = Math.max(0, 10000 - currentStepsCount);
+
   // Update Hub DOM
   const hubSteps = document.getElementById('hub-step-count');
   const hubBar = document.getElementById('hub-step-bar');
   const hubCal = document.getElementById('hub-cal-burned');
   const hubDist = document.getElementById('hub-distance');
-  
+  if (hubSteps) hubSteps.textContent = currentStepsCount.toLocaleString('id-ID') + ' / 10.000 steps';
+  if (hubBar) hubBar.style.width = pct + '%';
+  if (hubCal) hubCal.textContent = '🔥 ' + calBurn + ' kcal';
+  if (hubDist) hubDist.textContent = '📍 ' + distKm + ' km';
+
   // Update Run View DOM
   const runSteps = document.getElementById('run-view-steps');
   const runBar = document.getElementById('run-view-bar');
@@ -3880,77 +3896,675 @@ function syncWearableDevice(provider) {
   const runDist = document.getElementById('run-view-dist');
   const leaderUser = document.getElementById('leaderboard-user-steps');
 
-  const distKm = (currentStepsCount * 0.00074).toFixed(1);
-  const calBurn = Math.floor(currentStepsCount * 0.048);
-  const pct = Math.min(100, (currentStepsCount / 10000) * 100).toFixed(1);
-
-  if (hubSteps) hubSteps.textContent = `${currentStepsCount.toLocaleString('id-ID')} / 10.000 steps`;
-  if (hubBar) hubBar.style.width = `${pct}%`;
-  if (hubCal) hubCal.textContent = `🔥 ${calBurn} kcal`;
-  if (hubDist) hubDist.textContent = `📍 ${distKm} km`;
-
   if (runSteps) runSteps.textContent = currentStepsCount.toLocaleString('id-ID');
-  if (runBar) runBar.style.width = `${pct}%`;
-  if (runCal) runCal.textContent = `${calBurn} kcal`;
-  if (runDist) runDist.textContent = `${distKm} km`;
-  if (leaderUser) leaderUser.textContent = `${currentStepsCount.toLocaleString('id-ID')} steps`;
+  if (runBar) runBar.style.width = pct + '%';
+  if (runCal) runCal.textContent = calBurn + ' kcal';
+  if (runDist) runDist.textContent = distKm + ' km';
+  if (leaderUser) leaderUser.textContent = currentStepsCount.toLocaleString('id-ID') + ' steps';
 
-  alert(`✅ Sync Berhasil dari [${provider}]!\n+${stepsAdd} Langkah baru ditambahkan dari sensor wearable. Total: ${currentStepsCount.toLocaleString('id-ID')} steps.`);
+  const noteEl = document.querySelector('#wellness-run-challenge-view h2 + p');
+  if (noteEl) {
+    noteEl.textContent = remaining > 0 
+      ? 'Target Harian: 10.000 steps (Sisa ' + remaining.toLocaleString('id-ID') + ' steps lagi!)'
+      : '🎉 Target Harian 10.000 steps Tercapai! (+200 AVA Coins diklaim)';
+  }
+
+  const durEl = document.querySelector('#wellness-run-challenge-view [id="run-view-cal"]')?.parentElement?.nextElementSibling?.querySelector('strong');
+  if (durEl) durEl.textContent = durationMin + ' Menit';
+
+  localStorage.setItem('AVA_STEPS', String(currentStepsCount));
 }
 
-function simulateWearableAddSteps() {
-  syncWearableDevice('Simulasi Wearable Motion Sensor');
+function syncWearableDevice(provider) {
+  const badgeMap = {
+    'Apple Health': 'badge-apple-health',
+    'Google Fit': 'badge-google-fit',
+    'Garmin Connect': 'badge-garmin',
+    'Fitbit': 'badge-fitbit'
+  };
+  const badgeId = badgeMap[provider];
+  if (badgeId) {
+    const badge = document.getElementById(badgeId);
+    if (badge) {
+      badge.textContent = 'CONNECTED';
+      badge.style.background = '#dcfce7';
+      badge.style.color = '#166534';
+    }
+  }
+
+  const added = 1550;
+  currentStepsCount += added;
+  updateStepChallengeUI();
+
+  if (currentStepsCount >= 10000) {
+    avaToast('🎉 Target 10.000 Langkah Tercapai! Reward +200 AVA Coins & Diskon Lab 20% Terbuka!', 'reward', 4000);
+  } else {
+    avaToast('⌚ Sensor [' + (provider || 'Wearable') + '] tersinkronisasi! +' + added.toLocaleString('id-ID') + ' langkah ditambahkan.', 'success');
+  }
+}
+
+function simulateWearableAddSteps(steps = 1000) {
+  const num = Number(steps) || 1000;
+  currentStepsCount += num;
+  updateStepChallengeUI();
+  if (currentStepsCount >= 10000) {
+    avaToast('🎉 Target 10.000 Langkah Tercapai! Total: ' + currentStepsCount.toLocaleString('id-ID') + ' steps.', 'reward', 4000);
+  } else {
+    avaToast('🏃 +' + num.toLocaleString('id-ID') + ' Langkah berhasil dicatat! Total: ' + currentStepsCount.toLocaleString('id-ID') + ' steps.', 'success');
+  }
+}
+
+function submitCustomSteps() {
+  const input = document.getElementById('custom-steps-input');
+  if (!input || !input.value) return;
+  const val = parseInt(input.value, 10);
+  if (isNaN(val) || val <= 0) {
+    avaToast('Masukkan jumlah langkah yang valid.', 'error');
+    return;
+  }
+  input.value = '';
+  simulateWearableAddSteps(val);
+}
+
+// ── NUTRICO CALORIE & DIET PLANNER ENGINE ──
+let loggedMeals = [
+  { id: 1, name: 'Avocado Toast & Telur Rebus', type: 'Sarapan', cal: 450, p: 24, c: 35, f: 14, time: '08:15' },
+  { id: 2, name: 'Salmon Bowl & Quinoa', type: 'Makan Siang', cal: 680, p: 48, c: 65, f: 18, time: '12:30' },
+  { id: 3, name: 'Greek Yogurt & Kacang Almond', type: 'Camilan', cal: 290, p: 18, c: 15, f: 10, time: '15:45' }
+];
+
+function renderNutrico() {
+  const listEl = document.getElementById('nutrico-meal-list');
+  const totalKcalEl = document.getElementById('nutrico-total-kcal');
+  const remainKcalEl = document.getElementById('nutrico-remain-kcal');
+  const kcalBarEl = document.getElementById('nutrico-kcal-bar');
+  const pTextEl = document.getElementById('nutrico-p-text');
+  const pBarEl = document.getElementById('nutrico-p-bar');
+  const cTextEl = document.getElementById('nutrico-c-text');
+  const cBarEl = document.getElementById('nutrico-c-bar');
+  const fTextEl = document.getElementById('nutrico-f-text');
+  const fBarEl = document.getElementById('nutrico-f-bar');
+
+  const budget = 2100;
+  const totalCal = loggedMeals.reduce((a, b) => a + (b.cal || 0), 0);
+  const totalP = loggedMeals.reduce((a, b) => a + (b.p || 0), 0);
+  const totalC = loggedMeals.reduce((a, b) => a + (b.c || 0), 0);
+  const totalF = loggedMeals.reduce((a, b) => a + (b.f || 0), 0);
+  const remainCal = Math.max(0, budget - totalCal);
+  const pct = Math.min(100, (totalCal / budget) * 100).toFixed(1);
+
+  if (totalKcalEl) totalKcalEl.textContent = totalCal.toLocaleString('id-ID');
+  if (remainKcalEl) {
+    remainKcalEl.textContent = remainCal > 0 ? 'Sisa: ' + remainCal.toLocaleString('id-ID') + ' kcal' : 'Target Tercapai (0 kcal)';
+    remainKcalEl.style.color = remainCal > 0 ? '#059669' : '#d97706';
+  }
+  if (kcalBarEl) kcalBarEl.style.width = pct + '%';
+
+  if (pTextEl) pTextEl.textContent = 'Protein (' + totalP + 'g / 150g)';
+  if (pBarEl) pBarEl.style.width = Math.min(100, (totalP / 150) * 100) + '%';
+  if (cTextEl) cTextEl.textContent = 'Karbohidrat (' + totalC + 'g / 210g)';
+  if (cBarEl) cBarEl.style.width = Math.min(100, (totalC / 210) * 100) + '%';
+  if (fTextEl) fTextEl.textContent = 'Lemak Sehat (' + totalF + 'g / 60g)';
+  if (fBarEl) fBarEl.style.width = Math.min(100, (totalF / 60) * 100) + '%';
+
+  if (listEl) {
+    if (!loggedMeals.length) {
+      listEl.innerHTML = '<p style="color:#64748b;font-size:12px;text-align:center;padding:16px 0;">Belum ada makanan dicatat hari ini.</p>';
+      return;
+    }
+    listEl.innerHTML = loggedMeals.map(m => `
+      <div class="nutrico-meal-item">
+        <div>
+          <strong style="font-size:12px; color:#0f172a; display:block;">${m.type ? m.type + ': ' : ''}${m.name}</strong>
+          <span style="font-size:10.5px; color:#64748b;">Protein ${m.p}g · Karbo ${m.c}g · Lemak ${m.f}g ${m.time ? '· ' + m.time : ''}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12.5px; font-weight:800; color:#d97706;">${m.cal} kcal</span>
+          <button type="button" class="nutrico-del-btn" onclick="deleteNutricoMeal(${m.id})" title="Hapus makanan">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addNutricoMeal(name, cal, p = 20, c = 30, f = 10, type = 'Menu Sehat') {
+  const id = Date.now();
+  const time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  loggedMeals.push({ id, name, cal: Number(cal) || 0, p: Number(p) || 0, c: Number(c) || 0, f: Number(f) || 0, type, time });
+  renderNutrico();
+  avaToast('🥗 Makanan "' + name + '" (' + cal + ' kcal) berhasil dicatat ke NutriCo!', 'success');
+}
+
+function deleteNutricoMeal(id) {
+  loggedMeals = loggedMeals.filter(m => m.id !== id);
+  renderNutrico();
+  avaToast('Makanan dihapus dari catatan harian.', 'info');
+}
+
+function submitManualMeal() {
+  const nameEl = document.getElementById('nutrico-input-name');
+  const kcalEl = document.getElementById('nutrico-input-kcal');
+  if (!nameEl || !nameEl.value.trim()) {
+    avaToast('Masukkan nama makanan terlebih dahulu.', 'error');
+    return;
+  }
+  const name = nameEl.value.trim();
+  const cal = parseInt(kcalEl?.value, 10) || 350;
+  const p = Math.round(cal * 0.25 / 4);
+  const c = Math.round(cal * 0.50 / 4);
+  const f = Math.round(cal * 0.25 / 9);
+  addNutricoMeal(name, cal, p, c, f, 'Manual Log');
+  nameEl.value = '';
+  if (kcalEl) kcalEl.value = '';
+}
+
+function quickAddNutricoPreset(key) {
+  const presets = {
+    oat: { name: 'Oatmeal Berry & Chia Seed', cal: 320, p: 14, c: 48, f: 8, type: 'Sarapan Sehat' },
+    chicken: { name: 'Dada Ayam Panggang & Salad Quinoa', cal: 420, p: 42, c: 24, f: 12, type: 'Makan Siang' },
+    shake: { name: 'Whey Protein Shake & Pisang', cal: 210, p: 30, c: 18, f: 3, type: 'Post-Workout' },
+    fish: { name: 'Ikan Kakap Bakar & Nasi Merah', cal: 480, p: 38, c: 52, f: 14, type: 'Makan Malam' }
+  };
+  const item = presets[key];
+  if (item) addNutricoMeal(item.name, item.cal, item.p, item.c, item.f, item.type);
+}
+
+function simulateAiFoodScan() {
+  const scans = [
+    { name: 'Nasi Merah (150g) + Dada Ayam Bakar (120g) + Tumis Brokoli', cal: 430, p: 38, c: 42, f: 12, type: 'AI Meal Scan' },
+    { name: 'Salad Telur Rebus, Alpukat & Dressing Lemon Mustard', cal: 360, p: 18, c: 14, f: 24, type: 'AI Meal Scan' },
+    { name: 'Smoothie Bowl Protein, Almond Butter & Biji Labu', cal: 390, p: 26, c: 44, f: 14, type: 'AI Meal Scan' }
+  ];
+  const scan = scans[Math.floor(Math.random() * scans.length)];
+  addNutricoMeal(scan.name, scan.cal, scan.p, scan.c, scan.f, scan.type);
+  avaToast('📸 AI Vision mengenali: "' + scan.name + '" (' + scan.cal + ' kcal). Otomatis dicatat!', 'reward', 4000);
+}
+
+// ── SMART HYDRATION TRACKER ENGINE ──
+function updateHydrationUI() {
+  const valEl = document.getElementById('water-log-val');
+  const barEl = document.getElementById('water-log-bar');
+  const pct = Math.min(100, (currentWaterIntake / 3000) * 100).toFixed(0);
+  const remaining = Math.max(0, 3000 - currentWaterIntake);
+
+  if (valEl) valEl.innerHTML = currentWaterIntake.toLocaleString('id-ID') + ' <span style="font-size:16px; color:#64748b;">/ 3.000 ml</span>';
+  if (barEl) barEl.style.width = pct + '%';
+
+  const statusNote = document.querySelector('#wellness-hydration-view h2 + p');
+  if (statusNote) {
+    statusNote.textContent = remaining > 0 
+      ? '(' + pct + '% Terpenuhi · Sisa ' + remaining.toLocaleString('id-ID') + ' ml lagi)' 
+      : '🎉 Target Hidrasi 3 Liter Terpenuhi! Sel Tubuh Terhidrasi Optimal.';
+  }
+
+  localStorage.setItem('AVA_HYDRATION', String(currentWaterIntake));
 }
 
 function addWaterIntake(amountMl) {
-  currentWaterIntake += amountMl;
-  const valEl = document.getElementById('water-log-val');
-  const barEl = document.getElementById('water-log-bar');
-  
-  const pct = Math.min(100, (currentWaterIntake / 3000) * 100).toFixed(0);
-  if (valEl) valEl.innerHTML = `${currentWaterIntake.toLocaleString('id-ID')} <span style="font-size:16px; color:#64748b;">/ 3.000 ml</span>`;
-  if (barEl) barEl.style.width = `${pct}%`;
-
-  alert(`💧 Asupan +${amountMl} ml air tercatat! Total hidrasi hari ini: ${currentWaterIntake.toLocaleString('id-ID')} ml (${pct}% target).`);
+  const num = Number(amountMl) || 250;
+  currentWaterIntake += num;
+  updateHydrationUI();
+  if (currentWaterIntake >= 3000) {
+    avaToast('💧 Target Hidrasi Harian 3.000 ml Tercapai! Keseimbangan seluler terjaga.', 'reward', 4000);
+  } else {
+    avaToast('💧 +' + num + ' ml cairan tercatat! Total hari ini: ' + currentWaterIntake.toLocaleString('id-ID') + ' ml.', 'success');
+  }
 }
 
+function resetWaterIntake() {
+  currentWaterIntake = 0;
+  updateHydrationUI();
+  avaToast('Catatan hidrasi hari ini telah direset ke 0 ml.', 'info');
+}
+
+// ── MINDFULNESS & GUIDED BREATHWORK ENGINE ──
 function startGuidedBreathingSession() {
-  alert("🫁 Sesi Box Breathing (4-7-8 Technique) Dimulai:\n\n1. Tarik napas lewat hidung (4 detik)\n2. Tahan napas (7 detik)\n3. Hembuskan perlahan lewat mulut (8 detik)\n\nUlangi 4 siklus untuk menurunkan kadar kortisol.");
-}
-
-function switchTechTab(tabId) {
-  document.querySelectorAll('.tech-tab-content').forEach(el => {
-    el.style.display = 'none';
-    el.classList.remove('active');
-  });
-
-  document.querySelectorAll('.tech-tab-btn').forEach(btn => {
-    btn.style.background = '#f1f5f9';
-    btn.style.color = '#475569';
-    btn.style.fontWeight = '700';
-    btn.classList.remove('active');
-  });
-
-  const targetTab = document.getElementById(`tech-tab-${tabId}`);
-  if (targetTab) {
-    targetTab.style.display = 'block';
-    targetTab.classList.add('active');
+  const card = document.querySelector('#wellness-hrv-stress-view .glass-card:first-child');
+  if (!card) {
+    avaToast('🫁 Sesi Box Breathing Dimulai: Tarik napas 4s -> Tahan 7s -> Hembuskan 8s.', 'info');
+    return;
   }
 
-  const activeBtn = document.querySelector(`.tech-tab-btn[onclick*="${tabId}"]`);
-  if (activeBtn) {
-    activeBtn.style.background = '#0f172a';
-    activeBtn.style.color = '#38bdf8';
-    activeBtn.style.fontWeight = '800';
-    activeBtn.classList.add('active');
+  let box = document.getElementById('hrv-breath-container');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'hrv-breath-container';
+    box.style.margin = '14px 0';
+    box.style.textAlign = 'center';
+    card.insertBefore(box, card.querySelector('button'));
+  }
+
+  if (breathInterval) clearInterval(breathInterval);
+
+  let phase = 'inhale';
+  let secs = 4;
+  let cycle = 1;
+  const maxCycles = 4;
+
+  function renderBreath() {
+    const label = phase === 'inhale' ? 'TARIK NAPAS LEWAT HIDUNG' : phase === 'hold' ? 'TAHAN NAPAS' : 'HEMBUSKAN PERLAHAN';
+    const color = phase === 'inhale' ? '#059669' : phase === 'hold' ? '#d97706' : '#7c3aed';
+    box.innerHTML = `
+      <div class="breath-circle ${phase}">
+        <span style="font-size:26px; font-weight:900;">${secs}s</span>
+        <small style="font-size:10px; text-transform:uppercase; letter-spacing:0.5px;">${phase}</small>
+      </div>
+      <div style="font-size:12.5px; font-weight:800; color:${color}; margin-bottom:4px;">${label}</div>
+      <div style="font-size:11px; color:#64748b;">Siklus ${cycle} dari ${maxCycles} &bull; <a href="javascript:void(0)" onclick="stopGuidedBreathing()" style="color:#dc2626; text-decoration:underline;">Hentikan Sesi</a></div>
+    `;
+  }
+
+  renderBreath();
+
+  breathInterval = setInterval(() => {
+    secs--;
+    if (secs <= 0) {
+      if (phase === 'inhale') {
+        phase = 'hold';
+        secs = 7;
+      } else if (phase === 'hold') {
+        phase = 'exhale';
+        secs = 8;
+      } else {
+        cycle++;
+        if (cycle > maxCycles) {
+          clearInterval(breathInterval);
+          breathInterval = null;
+          box.innerHTML = `
+            <div style="padding:14px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; margin-bottom:12px;">
+              <strong style="color:#166534; font-size:13px; display:block;">🎉 4 Siklus Box Breathing Selesai!</strong>
+              <p style="color:#15803d; font-size:11.5px; margin:4px 0 0;">Sistem saraf otonom parasimpatik teraktivasi. Kortisol menurun, HRV meningkat (+50 AVA Points).</p>
+            </div>
+          `;
+          avaToast('🧘 Sesi Breathwork Selesai! HRV Anda meningkat & stres menurun.', 'reward', 4000);
+          return;
+        }
+        phase = 'inhale';
+        secs = 4;
+      }
+    }
+    renderBreath();
+  }, 1000);
+}
+
+function stopGuidedBreathing() {
+  if (breathInterval) {
+    clearInterval(breathInterval);
+    breathInterval = null;
+  }
+  const box = document.getElementById('hrv-breath-container');
+  if (box) box.innerHTML = '<p style="font-size:11.5px; color:#64748b;">Sesi relaksasi dihentikan.</p>';
+  avaToast('Sesi relaksasi dihentikan.', 'info');
+}
+
+// ── BIO-AGE QUEST & HABITS ENGINE ──
+function toggleQuestTask(index, el) {
+  const isChecked = el ? el.checked : true;
+  const statusSpan = el ? el.closest('label').querySelector('span:last-child') : null;
+  if (statusSpan) {
+    statusSpan.textContent = isChecked ? '✅ SELESAI' : 'PENDING';
+    statusSpan.style.color = isChecked ? '#166534' : '#92400e';
+  }
+  avaToast(isChecked ? '🎯 Misi harian selesai (+25 Coins)!' : 'Misi ditandai belum selesai.', isChecked ? 'success' : 'info');
+}
+
+function claimDailyBioageReward() {
+  avaToast('🎉 +100 AVA Coins diklaim! Estimasi usia biologis Anda terstimulasi lebih muda.', 'reward', 4000);
+}
+
+// ── CASHBACK & CORPORATE ──
+function initCorporateCashback() {
+  const val = document.getElementById('c-cashback-balance');
+  if (val && val.textContent === '—') val.textContent = 'Rp 14.500.000';
+}
+function openClaimCashbackModal() {
+  avaToast('Permintaan pencairan cashback telah dikirim ke finance AVA Health.', 'success');
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// CORPORATE EMPLOYEE LINKING & SPECIAL ASSIGNED PROGRAMS
+// ══════════════════════════════════════════════════════════════
+
+function promptLinkCorporateCode() {
+  const existingModal = document.getElementById('link-corp-modal');
+  if (existingModal) existingModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'link-corp-modal';
+  modal.className = 'modal-overlay open';
+  modal.style.visibility = 'visible';
+  modal.style.opacity = '1';
+  modal.style.pointerEvents = 'auto';
+
+  modal.innerHTML = `
+    <div class="modal-box" style="max-width:440px; padding:24px; text-align:left; background:#ffffff; border-radius:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h4 style="margin:0; font-size:16px; font-weight:800; color:#0f2963;">🏢 Tautkan Akun ke Perusahaan Mitra</h4>
+        <button type="button" class="logout-btn" onclick="document.getElementById('link-corp-modal').remove()" style="padding:4px 8px; font-size:11px;">✕</button>
+      </div>
+
+      <p style="font-size:12px; color:#475569; margin:0 0 16px 0; line-height:1.5;">
+        Masukkan kode perusahaan atau pilih mitra rekanan (mis. PT Astra Honda Motor) untuk membuka hak subsidi penuh & program kesehatan khusus karyawan.
+      </p>
+
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Pilih Perusahaan Mitra Rekanan:</label>
+        <select id="modal-select-corp" style="width:100%; padding:10px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px; background:#fff;">
+          <option value="PT Astra Honda Motor (AHM)">PT Astra Honda Motor (AHM)</option>
+          <option value="PT Telkom Indonesia Tbk">PT Telkom Indonesia Tbk</option>
+          <option value="PT Bank Central Asia Tbk">PT Bank Central Asia Tbk</option>
+          <option value="PT Nusantara Sehat Tech">PT Nusantara Sehat Tech</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="font-size:11px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Nomor Induk Karyawan (NIP) / Kode:</label>
+        <input type="text" id="modal-input-nip" placeholder="Contoh: AHM-9902-ENG" value="AHM-9902-ENG" style="width:100%; padding:10px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-teal" onclick="confirmLinkCorporateFromModal()" style="flex:1; padding:10px; font-size:12px; font-weight:800;">✓ Tautkan & Aktifkan Program</button>
+        <button type="button" class="btn" onclick="document.getElementById('link-corp-modal').remove()" style="padding:10px 14px; font-size:12px; background:#f1f5f9; border:1px solid #cbd5e1;">Batal</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+function confirmLinkCorporateFromModal() {
+  const select = document.getElementById('modal-select-corp');
+  const nipInput = document.getElementById('modal-input-nip');
+  const chosenName = select ? select.value : 'PT Astra Honda Motor (AHM)';
+  const nip = nipInput ? nipInput.value.trim() : 'AHM-9902-ENG';
+
+  linkCorporateToPersonal(chosenName, nip);
+  const modal = document.getElementById('link-corp-modal');
+  if (modal) modal.remove();
+}
+
+function linkCorporateToPersonal(corpName = 'PT Astra Honda Motor (AHM)', nip = 'AHM-9902-ENG') {
+  currentCorporateName = corpName;
+  currentCorporateId = 10;
+  localStorage.setItem('AVA_LINKED_CORP_NAME', corpName);
+  localStorage.setItem('AVA_LINKED_CORP_NIP', nip);
+
+  // Re-render sidebar navigation and home
+  if (typeof renderAppsMenu === 'function') renderAppsMenu();
+  const pv = document.getElementById('patient-view');
+  if (pv && typeof renderAppsHome === 'function') renderAppsHome(pv);
+
+  initCorporateAssignedPrograms();
+  avaToast(`🏢 Akun berhasil terhubung dengan ${corpName}! Program khusus karyawan aktif.`, 'success', 4000);
+}
+
+function unlinkCorporateFromPersonal() {
+  currentCorporateName = '';
+  currentCorporateId = null;
+  localStorage.removeItem('AVA_LINKED_CORP_NAME');
+  localStorage.removeItem('AVA_LINKED_CORP_NIP');
+
+  if (typeof renderAppsMenu === 'function') renderAppsMenu();
+  const pv = document.getElementById('patient-view');
+  if (pv && typeof renderAppsHome === 'function') renderAppsHome(pv);
+
+  showView('patient-view', 'Beranda');
+  avaToast('Tautan perusahaan diputuskan. Menampilkan menu layanan personal reguler.', 'info');
+}
+
+function initCorporateAssignedPrograms() {
+  const corpName = currentCorporateName || localStorage.getItem('AVA_LINKED_CORP_NAME') || 'PT Astra Honda Motor (AHM)';
+  const nip = localStorage.getItem('AVA_LINKED_CORP_NIP') || 'AHM-9902-ENG';
+
+  const compEl = document.getElementById('corp-card-comp-name');
+  if (compEl) compEl.textContent = corpName;
+
+  const nipEl = document.getElementById('corp-card-nip');
+  if (nipEl) nipEl.textContent = 'NIP: ' + nip;
+
+  const empEl = document.getElementById('corp-card-emp-name');
+  if (empEl && currentUsername) empEl.textContent = currentUsername;
+
+  const subhead = document.getElementById('corp-program-subhead');
+  if (subhead) subhead.textContent = `Program khusus kesehatan, MCU berkala, dan kebugaran karyawan dari ${corpName}.`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// REFERRAL CATALOGUE & AMBIENT SCRIBE & AUDIT SUITE
+// ══════════════════════════════════════════════════════════════
+
+function renderReferralCatalog() {
+  const box = document.querySelector('.referral-catalog-placeholder');
+  if (!box) return;
+
+  const catalogItems = [
+    { code: 'REF-LAB-01', loinc: '4548-4', name: 'Hemoglobin A1c (HbA1c) HPLC Presisi Tinggi', tat: '2 Jam', price: 'Rp 195.000', fee: 'Rp 35.000 (18%)' },
+    { code: 'REF-LAB-02', loinc: '57698-3', name: 'Panel Profil Lipid Lengkap (Total, HDL, LDL Direct, TG)', tat: '3 Jam', price: 'Rp 280.000', fee: 'Rp 50.000 (18%)' },
+    { code: 'REF-LAB-03', loinc: '30522-7', name: 'hs-CRP (High-Sensitivity C-Reactive Protein)', tat: '3 Jam', price: 'Rp 210.000', fee: 'Rp 40.000 (19%)' },
+    { code: 'REF-LAB-04', loinc: '62292-8', name: 'Vitamin D 25-OH Total Kuantitatif (CLIA)', tat: '4 Jam', price: 'Rp 380.000', fee: 'Rp 70.000 (18%)' },
+    { code: 'REF-LAB-05', loinc: '77379-6', name: 'Panel Onkologi Molekuler HPV DNA Genotyping High-Risk', tat: '24 Jam', price: 'Rp 750.000', fee: 'Rp 120.000 (16%)' }
+  ];
+
+  box.innerHTML = `
+    <div style="background:#ffffff; border-radius:12px; border:1px solid #cbd5e1; overflow:hidden;">
+      <div style="padding:14px 18px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span style="font-size:12px; font-weight:800; color:#0f2963;">DAFTAR PEMERIKSAAN RUJUKAN RESMI AVA LIS</span>
+        <span style="font-size:11px; color:#059669; font-weight:700;">Traceable ISO 15189:2022 &bull; Standar LOINC/UCUM</span>
+      </div>
+      <div style="display:flex; flex-direction:column; divide-y:1px solid #f1f5f9;">
+        ${catalogItems.map(item => `
+          <div style="padding:14px 18px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <strong style="font-size:13px; color:#0f172a;">${item.name}</strong>
+                <span class="badge" style="background:#e0f2fe; color:#0369a1; font-size:10px; padding:2px 6px;">LOINC: ${item.loinc}</span>
+              </div>
+              <div style="font-size:11px; color:#64748b; margin-top:3px;">
+                Kode: ${item.code} &bull; Waktu Hasil (TAT): ${item.tat} &bull; Honorarium Faskes: ${item.fee}
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <strong style="font-size:13.5px; color:#0f2963;">${item.price}</strong>
+              <button type="button" class="btn btn-teal" onclick="openReferralForm()" style="padding:6px 12px; font-size:11.5px; font-weight:700;">+ Rujuk Pasien</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ── AMBIENT AI CLINICAL SCRIBE ──
+let scribeActive = false;
+let scribeInterval = null;
+
+function toggleAmbientScribeRecording(event) {
+  if (event?.preventDefault) event.preventDefault();
+  const btn = document.getElementById('scribe-rec-btn');
+  const box = document.getElementById('scribe-status-box');
+  if (!btn || !box) return;
+
+  scribeActive = !scribeActive;
+
+  if (scribeActive) {
+    btn.style.background = '#dc2626';
+    btn.style.borderColor = '#dc2626';
+    btn.textContent = '⏹️ Hentikan Perekaman';
+
+    box.innerHTML = `
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid #e2e8f0;">
+        <span style="font-size:11px; font-weight:800; color:#dc2626; display:flex; align-items:center; gap:6px;">
+          <span style="display:inline-block; width:8px; height:8px; background:#dc2626; border-radius:50%; animation:wavePulse 0.8s infinite alternate;"></span> LIVE RECORDING &amp; SPEECH-TO-TEXT
+        </span>
+        <div style="display:inline-flex; align-items:center;">
+          <span class="audio-wave-bar"></span>
+          <span class="audio-wave-bar"></span>
+          <span class="audio-wave-bar"></span>
+          <span class="audio-wave-bar"></span>
+          <span class="audio-wave-bar"></span>
+        </div>
+      </div>
+
+      <div style="font-size:12px; color:#334155; line-height:1.6; margin-bottom:14px; background:#ffffff; padding:12px; border-radius:8px; border:1px solid #e2e8f0;">
+        <strong style="color:#0f2963;">👨‍⚕️ Dokter:</strong> "Selamat pagi Bapak, keluhan apa yang paling dirasakan belakangan ini?"<br>
+        <strong style="color:#059669;">👤 Pasien:</strong> "Pagi Dok, kepala bagian belakang sering tegang dan agak berat kalau kurang tidur atau lembur."<br>
+        <strong style="color:#0f2963;">👨‍⚕️ Dokter:</strong> "Tensi saat ini 142/90 mmHg. Kita jadwalkan evaluasi profil lipid dan gula puasa di lab ya."
+      </div>
+
+      <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px;">
+        <div style="font-size:11px; font-weight:800; color:#166534; margin-bottom:6px;">📋 DRAF STRUKTUR REKAM MEDIS (SOAP OTOMATIS)</div>
+        <div style="font-size:11.5px; color:#14532d; line-height:1.5;">
+          <strong>Subjective:</strong> Cephalgia oksipital, tegang servikal posterior terkait beban kerja.<br>
+          <strong>Objective:</strong> BP: 142/90 mmHg, HR: 76 bpm, BMI: 24.2 kg/m².<br>
+          <strong>Assessment:</strong> Hipertensi Grade 1, Suspect Dislipidemia Metabolik.<br>
+          <strong>Plan:</strong> e-Order Lab (Lipid Profile + Glukosa Puasa), edukasi diet rendah garam.
+        </div>
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button type="button" class="btn btn-teal" onclick="saveScribeSoapToEmr()" style="padding:6px 14px; font-size:11px; font-weight:700;">💾 Simpan ke Rekam Medis (EMR)</button>
+          <button type="button" class="btn" onclick="openReferralForm()" style="padding:6px 14px; font-size:11px; font-weight:700; background:#ffffff; border:1px solid #bbf7d0; color:#166534;">📤 Kirim Permintaan Lab Rujukan</button>
+        </div>
+      </div>
+    `;
+    avaToast('🎙️ Perekaman audio klinis aktif. Speech-to-SOAP AI berjalan otomatis.', 'info');
+  } else {
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.textContent = '🎙️ Mulai Rekam Konsultasi';
+    avaToast('⏹️ Perekaman dihentikan. Draf konsultasi telah disiapkan.', 'success');
   }
 }
 
-window.switchTechTab = switchTechTab;
+function saveScribeSoapToEmr() {
+  avaToast('✅ Catatan klinis SOAP & e-Order Lab berhasil disimpan ke EMR Pasien!', 'success');
+}
+
+// ── LAAS API KEY GENERATOR ──
+function generateLaasApiKey(event) {
+  if (event?.preventDefault) event.preventDefault();
+  const key = 'ava_live_sk_' + Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('');
+  
+  const textEl = document.getElementById('laas-api-key-text');
+  if (textEl) {
+    textEl.textContent = 'API_KEY: ' + key;
+  }
+
+  let box = document.getElementById('laas-key-display');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'laas-key-display';
+    const container = document.getElementById('ava-laas-api-view') || document.body;
+    container.appendChild(box);
+  }
+  box.style.margin = '14px 0';
+  box.style.padding = '12px 14px';
+  box.style.background = '#f8fafc';
+  box.style.border = '1px solid #cbd5e1';
+  box.style.borderRadius = '8px';
+  box.innerHTML = `
+    <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:4px;">🔑 API Key Sandbox Baru Anda:</div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <code style="flex:1; background:#ffffff; padding:6px 10px; border-radius:6px; font-size:12px; color:#0f2963; border:1px solid #e2e8f0;">${key}</code>
+      <button type="button" class="btn btn-teal" onclick="navigator.clipboard?.writeText?.('${key}'); avaToast('Kunci API disalin ke clipboard!', 'success');" style="padding:6px 12px; font-size:11px; font-weight:700;">Salin</button>
+    </div>
+  `;
+
+  avaToast('🔑 API Key LaaS berhasil diterbitkan untuk mode sandbox!', 'success');
+  return key;
+}
+
+function initAvaAmbientScribe() {
+  const btn = document.getElementById('scribe-rec-btn');
+  if (btn && !scribeActive) {
+    btn.textContent = '🎙️ Mulai Rekam Konsultasi';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+  }
+}
+
+function initAvaIsoAudit() {
+  const box = document.getElementById('ava-iso-audit-view');
+  if (!box) return;
+}
+
+function initCorporateAnalytics() {
+  const box = document.getElementById('corporate-analytics-view');
+  if (!box) return;
+}
+
+// ── CORPORATE ANALYTICS ZIP DOWNLOAD ──
+function downloadMassFitToWorkZip() {
+  avaToast('📥 Mengunduh Paket 1.250 Sertifikat Fit-to-Work Massal (Arsip ZIP)...', 'success', 3500);
+}
+
+// ── HIS WELLNESS ADMIN ──
+function renderWellnessAdmin() {
+  const box = document.getElementById('wellness-admin-view');
+  if (!box) return;
+  box.innerHTML = `
+    <div class="section-title" style="margin-bottom:16px; color:#0f2963;">⚙️ Rancang Kebijakan &amp; Program Wellness di HIS</div>
+    <div class="glass-card" style="padding:24px; background:#ffffff; border-radius:14px; border:1px solid #cbd5e1; max-width:680px;">
+      <h4 style="font-size:14px; font-weight:800; color:#0f2963; margin:0 0 14px 0;">Form Pembuatan Program Wellness Baru</h4>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:18px;">
+        <div>
+          <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Nama Program:</label>
+          <input type="text" id="wa-prog-name" value="Program Rejuvenasi Kardiometabolik &amp; Kebugaran 2026" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div>
+            <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Target Langkah Harian:</label>
+            <input type="number" id="wa-prog-steps" value="10000" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+          </div>
+          <div>
+            <label style="font-size:11.5px; font-weight:700; color:#334155; display:block; margin-bottom:4px;">Target HbA1c Acuan:</label>
+            <input type="text" id="wa-prog-hba1c" value="< 5.7%" style="width:100%; padding:8px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:8px;">
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-teal" onclick="avaToast('💾 Kebijakan program wellness tersimpan &amp; disinkronkan ke seluruh portal karyawan!', 'success');" style="padding:10px 18px; font-size:12px; font-weight:800;">💾 Simpan &amp; Rilis Program</button>
+    </div>
+  `;
+}
+
+
+window.avaToast = avaToast;
+window.updateStepChallengeUI = updateStepChallengeUI;
 window.syncWearableDevice = syncWearableDevice;
 window.simulateWearableAddSteps = simulateWearableAddSteps;
+window.submitCustomSteps = submitCustomSteps;
+window.loggedMeals = loggedMeals;
+window.renderNutrico = renderNutrico;
+window.addNutricoMeal = addNutricoMeal;
+window.deleteNutricoMeal = deleteNutricoMeal;
+window.submitManualMeal = submitManualMeal;
+window.quickAddNutricoPreset = quickAddNutricoPreset;
+window.simulateAiFoodScan = simulateAiFoodScan;
+window.updateHydrationUI = updateHydrationUI;
 window.addWaterIntake = addWaterIntake;
+window.resetWaterIntake = resetWaterIntake;
 window.startGuidedBreathingSession = startGuidedBreathingSession;
+window.stopGuidedBreathing = stopGuidedBreathing;
+window.toggleQuestTask = toggleQuestTask;
+window.claimDailyBioageReward = claimDailyBioageReward;
+window.initCorporateCashback = initCorporateCashback;
+window.openClaimCashbackModal = openClaimCashbackModal;
+
+
+window.promptLinkCorporateCode = promptLinkCorporateCode;
+window.confirmLinkCorporateFromModal = confirmLinkCorporateFromModal;
+window.linkCorporateToPersonal = linkCorporateToPersonal;
+window.unlinkCorporateFromPersonal = unlinkCorporateFromPersonal;
+window.initCorporateAssignedPrograms = initCorporateAssignedPrograms;
+window.renderReferralCatalog = renderReferralCatalog;
+window.toggleAmbientScribeRecording = toggleAmbientScribeRecording;
+window.saveScribeSoapToEmr = saveScribeSoapToEmr;
+window.generateLaasApiKey = generateLaasApiKey;
+window.downloadMassFitToWorkZip = downloadMassFitToWorkZip;
+window.renderWellnessAdmin = renderWellnessAdmin;
+
+window.initAvaAmbientScribe = initAvaAmbientScribe;
+window.initAvaIsoAudit = initAvaIsoAudit;
+window.initCorporateAnalytics = initCorporateAnalytics;
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {

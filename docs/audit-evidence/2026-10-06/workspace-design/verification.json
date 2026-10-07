@@ -1,0 +1,256 @@
+[
+  {
+    "domain": "his",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "his",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "lis",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "lis",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "ops",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "ops",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "care",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "care",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "nutri",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "nutri",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "sanctuary",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "sanctuary",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "tech",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "tech",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "console",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "console",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "wellness",
+    "width": 1440,
+    "rail": 224,
+    "headerLeft": 224,
+    "headerHeight": 60,
+    "mainLeft": 224,
+    "overflow": false
+  },
+  {
+    "domain": "wellness",
+    "width": 390,
+    "rail": 224,
+    "headerLeft": 0,
+    "headerHeight": 60,
+    "mainLeft": 0,
+    "overflow": false
+  },
+  {
+    "domain": "app",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "domain": "app",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "domain": "corporate",
+    "width": 1440,
+    "overflow": false
+  },
+  {
+    "domain": "corporate",
+    "width": 390,
+    "overflow": false
+  },
+  {
+    "domain": "web",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgba(0, 0, 0, 0)"
+  },
+  {
+    "domain": "web",
+    "width": 390,
+    "overflow": false,
+    "background": "rgba(0, 0, 0, 0)"
+  },
+  {
+    "domain": "kiosk",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "kiosk",
+    "width": 390,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "nakes",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "nakes",
+    "width": 390,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "lacak",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "lacak",
+    "width": 390,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "antrian",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "antrian",
+    "width": 390,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "crm",
+    "width": 1440,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  },
+  {
+    "domain": "crm",
+    "width": 390,
+    "overflow": false,
+    "background": "rgb(247, 249, 251)"
+  }
+]

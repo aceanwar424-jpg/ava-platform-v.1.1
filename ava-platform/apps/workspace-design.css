@@ -1,0 +1,66 @@
+/* OWNED_BY: generic. Shared visual language 1.0; portal-specific layout. */
+:root { --primary:#087e80; --primary-hover:#066367; --teal:#087e80; --teal-hover:#066367; --bg-main:#f7f9fb; --text-main:#172b3a; --text-muted:#536579; --border:#dce4eb; --radius-lg:8px; --radius-md:6px; }
+body { font-family:Inter,'Segoe UI',sans-serif; }
+#dashboard-screen .app-sidebar { width:224px; background:#fff!important; color:var(--text-main); border-right:1px solid var(--border); box-shadow:none; }
+#dashboard-screen .sidebar-brand { height:60px; min-height:60px; padding:0 12px!important; border-bottom:1px solid var(--border)!important; gap:8px!important; }
+#dashboard-screen .sidebar-brand > div:first-child { width:28px!important; height:28px!important; border:0!important; box-shadow:none!important; background:none!important; }
+#dashboard-screen .sidebar-brand > div:nth-child(2) > span { color:var(--text-main)!important; font:700 14px Inter,'Segoe UI',sans-serif!important; }
+#dashboard-screen .sidebar-brand > div:nth-child(2) > span span { color:var(--primary)!important; }
+#dashboard-screen .sidebar-brand small { display:none; }
+#dashboard-screen .sidebar-user-card { background:transparent; border-bottom:1px solid var(--border); border-radius:0; padding:14px 12px; margin:0; }
+#dashboard-screen .sidebar-user-details h5 { color:var(--text-main)!important; }
+#dashboard-screen #role-switcher-select { color:var(--text-main)!important; background:#f0f4f7!important; border-color:var(--border)!important; min-height:30px; font-size:11px!important; }
+#dashboard-screen .sidebar-nav { padding:12px 8px; }
+#dashboard-screen .apps-menu-group { border:0; background:none; margin-bottom:8px; }
+#dashboard-screen .apps-menu-group summary { color:var(--text-muted); font-size:11px; font-weight:600; padding:9px; }
+#dashboard-screen .sidebar-link { display:flex; align-items:center; gap:10px; color:var(--text-muted)!important; font-size:12px; font-weight:500; padding:10px; min-height:40px; border:0; border-radius:6px; background:none; }
+#dashboard-screen .sidebar-link:hover, #dashboard-screen .sidebar-link.active { background:#e8f5f4!important; color:var(--primary)!important; box-shadow:none; }
+.apps-nav-icon { width:18px; height:18px; flex-shrink:0; }
+#dashboard-screen .sidebar-footer { background:#fff; border-top:1px solid var(--border); }
+#dashboard-screen .app-main-content { min-width:0; background:var(--bg-main)!important; }
+#dashboard-screen .app-main-content > svg { display:none; }
+#dashboard-screen .app-content-header { order:-1; height:60px; min-height:60px; padding:0 20px!important; flex-direction:row; align-items:center; background:#fff; box-shadow:none; backdrop-filter:none; }
+#dashboard-screen #breadcrumb-active-view { color:var(--text-main)!important; font:600 14px Inter,'Segoe UI',sans-serif!important; }
+#dashboard-screen .menu-toggle-btn { display:inline-flex; align-items:center; justify-content:center; color:var(--text-muted); width:32px; height:32px; }
+.apps-collapse-btn { margin-left:auto; width:26px; height:28px; border:1px solid var(--border); border-radius:5px; color:var(--text-muted); background:#f7f9fb; cursor:pointer; }
+#dashboard-screen .portal-pilot-notice { margin:0; padding:9px 24px; font-size:11px; background:#f0f4f7; border-bottom:1px solid var(--border); }
+#dashboard-screen :is(.card,.apps-state,.apps-shortcuts button,.wellness-card,.corp-card) { border-radius:7px; box-shadow:none; }
+#dashboard-screen .apps-shortcuts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+#dashboard-screen .apps-shortcuts button { min-height:76px; font-size:13px; border:1px solid var(--border); }
+#dashboard-screen .apps-directory { align-items:start; }
+.apps-directory-group { position:relative; min-width:0; border:1px solid var(--border); border-radius:7px; background:#fff; }
+.apps-directory-group[open] { z-index:10; border-color:var(--primary); }
+.apps-directory-group summary { display:flex; align-items:center; gap:12px; min-height:100px; padding:16px; list-style:none; cursor:pointer; }
+.apps-directory-group summary::-webkit-details-marker { display:none; }
+.apps-directory-group strong { display:block; font-size:13px; font-weight:600; color:var(--text-main); }
+.apps-directory-group small { display:block; margin-top:5px; font-size:12px; color:var(--text-muted); }
+.apps-directory-icon { display:grid; place-items:center; width:36px; height:36px; background:#e8f5f4; color:var(--primary); border-radius:6px; flex-shrink:0; }
+.apps-directory-chevron { margin-left:auto; color:var(--text-muted); font-size:20px; }
+.apps-directory-group[open] .apps-directory-chevron { transform:rotate(90deg); }
+.apps-directory-children { position:absolute; top:calc(100% + 5px); left:-1px; right:-1px; max-height:340px; overflow:auto; border:1px solid var(--border); border-radius:7px; padding:6px; background:#fff; box-shadow:0 10px 24px #172b3a16; }
+#dashboard-screen .apps-directory-children button { display:flex; align-items:center; justify-content:space-between; text-align:left; width:100%; min-height:42px; padding:10px; border:0; background:none; color:var(--text-main); font-size:12px; }
+#dashboard-screen .apps-directory-children button:hover { background:#e8f5f4; color:var(--primary); }
+.apps-directory-group summary:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+#login-screen { background:var(--bg-main)!important; font-family:Inter,'Segoe UI',sans-serif!important; }
+#login-screen .login-box { border-color:var(--border)!important; border-radius:10px!important; box-shadow:0 6px 24px #172b3a0b!important; }
+#login-screen .role-pill-span { border-color:var(--border)!important; background:#fff!important; box-shadow:none!important; color:var(--text-main)!important; }
+#login-screen .role-pill-span.active { border-color:var(--primary)!important; background:#e8f5f4!important; color:var(--primary)!important; }
+@media(min-width:769px) {
+ body.apps-sidebar-compact #dashboard-screen .app-sidebar { width:64px; }
+ body.apps-sidebar-hidden #dashboard-screen .app-sidebar { display:none; }
+ body.apps-sidebar-compact #dashboard-screen :is(.sidebar-brand>div:nth-child(2),.sidebar-user-card,.sidebar-link>span:not(.apps-nav-icon),.sidebar-link>small,.apps-menu-group summary,.sidebar-footer .btn>span) { display:none; }
+ body.apps-sidebar-compact #dashboard-screen .sidebar-brand { padding:0 6px!important; gap:2px!important; }
+ body.apps-sidebar-compact #dashboard-screen .sidebar-link { justify-content:center; }
+ body.apps-sidebar-compact #dashboard-screen .apps-menu-group>div { display:block!important; }
+}
+@media(max-width:1100px) { #dashboard-screen .apps-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:768px) {
+ #dashboard-screen .app-sidebar { width:224px; }
+ #dashboard-screen .app-content-header { padding:0 12px!important; }
+ #dashboard-screen .apps-shortcuts { grid-template-columns:1fr; }
+ #dashboard-screen .portal-pilot-notice { padding:9px 14px; }
+ .apps-directory-children { position:static; box-shadow:none; border:0; border-top:1px solid var(--border); }
+ .apps-sidebar-scrim { position:fixed; inset:0; background:#172b3a50; z-index:99; }
+ .apps-sidebar-scrim[hidden] { display:none; }
+}
+@media(prefers-reduced-motion:reduce) { .app-sidebar { transition:none; } }

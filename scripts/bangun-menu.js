@@ -69,6 +69,10 @@ const TANPA_DATA_WAJAR = {
   'sanctuary-operations': 'Kerangka booking dan layanan sanctuary; kapasitas dan ledger tetap berasal dari sistem sumber',
 };
 
+const BELUM_DENGAN_HALAMAN_PENJELASAN = {
+  'tech-sprint': 'Halaman hanya menjelaskan bahwa perencanaan sprint belum tersedia; menu tetap nonaktif',
+};
+
 // Halaman → nama fungsi render, dibaca dari router.js:
 //   case 'pabrik': safeRun('renderPabrik', …)
 //
@@ -159,7 +163,8 @@ for (const [kunciKat, kat] of Object.entries(peta.kategori || {})) {
                  && !TANPA_DATA_WAJAR[m.id] && modulPunyaData(halaman) === false) {
         tanpaData.push(`"${m.id}" (${kat.label}) → ${halaman}`);
       }
-      if (m.status === 'belum' && rute.has(halaman)) {
+      if (m.status === 'belum' && rute.has(halaman)
+          && !BELUM_DENGAN_HALAMAN_PENJELASAN[m.id]) {
         peringatan.push(`"${m.id}" ditandai "belum" padahal rute "${halaman}" sudah ada — perbarui statusnya`);
       }
     }

@@ -104,8 +104,9 @@
     .deal-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .deal-val { font-size: 16px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--teal); }
   </style>
+<link rel="stylesheet" href="../css/service-design.css?v=20261007a">
 </head>
-<body class="ava-monitor-shell">
+<body class="ava-monitor-shell ava-service-shell">
 <header><div class="brand"><img src="../css/logo-ava-global.png" alt=""><div class="title"><h1>CRM &amp; Pipeline</h1><p>Ringkasan data terverifikasi dari workspace CRM</p></div></div><span id="crm-state" class="live-badge" role="status">Belum dimuat</span></header>
 <section class="panel"><form id="crm-period" style="display:flex;gap:16px;flex-wrap:wrap;align-items:end"><label>Dari tanggal<br><input id="crm-from" type="date" required></label><label>Sampai tanggal<br><input id="crm-to" type="date" required></label><button type="submit">Perbarui ringkasan</button><a href="https://ops.avahealth.sbs/#crm-pipeline">Buka workspace CRM ↗</a></form><p id="crm-message" role="status" style="margin-top:16px;line-height:1.6"></p></section>
 <main id="crm-results" hidden></main>

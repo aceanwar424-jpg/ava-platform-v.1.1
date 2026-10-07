@@ -24,7 +24,7 @@ require('../../ava-platform/modules/his/mpiManagement.js');
 require('../../ava-platform/modules/tech-platform/techLicenseActivation.js');
 require('../../ava-platform/modules/tech-platform/techTelemetry.js');
 require('../../ava-platform/modules/tech-platform/techPricingPlans.js');
-require('../../ava-platform/apps/app.js');
+const appState = require('../../ava-platform/apps/app.js');
 
 let passedTests = 0;
 let totalTests = 0;
@@ -142,23 +142,20 @@ assert(totals.subtotal_product > 0 && totals.subtotal_spa > 0 && totals.subtotal
 assert(totals.shipping_fee === 15000 && totals.grand_total > totals.subtotal_items,
   `Kalkulasi Grand Total (Termasuk Ongkir JNE Rp ${totals.shipping_fee} & Biaya Admin) = Rp ${Number(totals.grand_total).toLocaleString('id-ID')}`);
 
-// Apps hanya membuat handoff ke billing HIS. Payment/QRIS reference diterbitkan
-// oleh HIS setelah order diterima; Apps tidak boleh membuat kode pembayaran.
-const checkoutRes = window.processUnifiedCheckout('HIS_BILLING_HANDOFF', {
-  customer_name: 'Ny. Amanda Manopo',
-  phone: '081288990011',
-  address: 'Kebayoran Baru, Jakarta Selatan',
-  courier: 'JNE_REG'
-});
-assert(checkoutRes.success === true
-  && checkoutRes.order.payment_status === 'PENDING_HIS_BILLING'
-  && checkoutRes.order.qris_reference === null
-  && checkoutRes.order.courier_tracking_no,
-  'Checkout terpadu berhasil mengirim handoff billing ke HIS dan nomor resi kurir tanpa menerbitkan QRIS dari Apps');
+// Tanpa backend handoff dan ACK dari HIS, Apps harus menolak checkout tanpa
+// membuat order lokal atau menghilangkan isi keranjang.
+const checkoutRes = window.processUnifiedCheckout();
+assert(checkoutRes.success === false
+  && checkoutRes.code === 'HANDOFF_UNAVAILABLE'
+  && checkoutRes.order === null
+  && /belum tersambung ke HIS/i.test(checkoutRes.message),
+  'Checkout gagal secara eksplisit saat HIS handoff belum tersedia');
 
-const trackRes = window.trackUnifiedOrder(checkoutRes.order.order_id);
-assert(trackRes.found === true && trackRes.timeline.length >= 2,
-  'Pelacakan status pesanan & timeline riwayat pengiriman kurir berhasil terbaca');
+assert(window.unifiedSuperCart.length === 3 && appState.unifiedOrderHistory.length === 0,
+  'Checkout gagal tidak menghilangkan cart atau membuat riwayat order palsu');
+const trackRes = window.trackUnifiedOrder('ORDER-UJI-TIDAK-ADA');
+assert(trackRes.found === false,
+  'Pelacakan tidak menemukan order sebelum handoff backend terkonfirmasi');
 
 console.log('\n═══════════════════════════════════════════════════════════════');
 console.log(`📊 HASIL UJI 3 PAKET STRATEGIS: ${passedTests} DARI ${totalTests} SKENARIO LULUS (100%)`);

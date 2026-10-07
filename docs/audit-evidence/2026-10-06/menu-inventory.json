@@ -1,0 +1,2819 @@
+{
+  "date": "2026-10-06",
+  "scope": "Local static inventory; not production or full runtime verification",
+  "counts": {
+    "ada": 210,
+    "parsial": 40,
+    "belum": 1
+  },
+  "entries": [
+    {
+      "category": "utama",
+      "group": "Pemantauan",
+      "id": "dashboard",
+      "label": "Dashboard Operasional Holding",
+      "status": "ada",
+      "ket": "Ringkasan lintas 6 pilar dari kueri nyata",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "utama",
+      "group": "Pemantauan",
+      "id": "ops-kendali",
+      "label": "Pusat Kendali Operasional",
+      "status": "ada",
+      "ket": "Apa yang perlu ditangani sekarang, lintas unit",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "utama",
+      "group": "Pemantauan",
+      "id": "executive-dashboard",
+      "label": "CEO Master Cockpit",
+      "status": "ada",
+      "ket": "P&L 6 pilar, tenant aktif, burn rate, BEP",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "utama",
+      "group": "Pemantauan",
+      "id": "holding-finance",
+      "label": "Konsolidasi Finansial 6 Pilar",
+      "status": "ada",
+      "ket": "EBITDA konsolidasi & metrik investor",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "utama",
+      "group": "Pemantauan",
+      "id": "evidence-register",
+      "label": "Evidence Register & Risk",
+      "status": "parsial",
+      "ket": "Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "utama",
+      "group": "Gerbang Sistem Lain",
+      "id": "apps-hub",
+      "label": "Portal Konsumen",
+      "status": "ada",
+      "ket": "Pintasan ke portal pasien, korporat & wellness",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "utama",
+      "group": "Gerbang Sistem Lain",
+      "id": "support-hub",
+      "label": "Perangkat Pendukung",
+      "status": "ada",
+      "ket": "Pintasan ke kiosk, TV antrian, monitor CRM",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "saas-console",
+      "label": "Ringkasan Sistem",
+      "status": "ada",
+      "ket": "Kesehatan mesin platform & ringkasan klien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "tech-control-plane",
+      "label": "Pusat Kendali Operasi",
+      "status": "ada",
+      "ket": "Status sistem, tenant, alert, incident, backup, dan alur tindak lanjut",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "tech-roadmap",
+      "label": "Rilis & Perubahan",
+      "status": "parsial",
+      "ket": "Catatan perubahan dan versi dari change control; daftar baca-saja, bukan sinkronisasi Git.",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "tech-modul",
+      "label": "Modul & Versi",
+      "status": "parsial",
+      "ket": "Inventaris fungsi dari konfigurasi; bukan versi deployment tenant.",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "tech-isu",
+      "label": "Tiket & Tindak Lanjut",
+      "status": "parsial",
+      "ket": "Daftar tiket aktual sesuai akses; pengelolaan alur tindak lanjut masih terbatas.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "db-studio",
+      "label": "Studio Database",
+      "status": "ada",
+      "ket": "Inspeksi tabel Postgres & SQL editor",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Operasi Platform",
+      "id": "audit",
+      "label": "Riwayat Aktivitas",
+      "status": "ada",
+      "ket": "Log kronologis perubahan data sensitif",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tenant, Lisensi & Health",
+      "id": "tenants",
+      "label": "Tenant & Klien Faskes",
+      "status": "ada",
+      "ket": "Faskes pemakai sistem, paket, kuota & pemakaian",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tenant, Lisensi & Health",
+      "id": "lisensi",
+      "label": "Lisensi Instalasi",
+      "status": "ada",
+      "ket": "Status lisensi Ed25519 & sidik mesin",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tenant, Lisensi & Health",
+      "id": "tech-aktivasi",
+      "label": "Penerbitan & Aktivasi Lisensi",
+      "status": "ada",
+      "ket": "Buat berkas lisensi untuk mesin klien",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tenant, Lisensi & Health",
+      "id": "tech-telemetri",
+      "label": "Kesehatan Sistem",
+      "status": "ada",
+      "ket": "Heartbeat, synthetic check, latency, freshness, dan penggunaan tenant",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Customer Success & Komersial",
+      "id": "leads",
+      "label": "Prospek Klien SaaS",
+      "status": "ada",
+      "ket": "Faskes calon pengguna, dari perkenalan ke kontrak",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Customer Success & Komersial",
+      "id": "penawaran",
+      "label": "Penawaran Lisensi",
+      "status": "ada",
+      "ket": "Surat penawaran paket SaaS HIS/LIS",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Customer Success & Komersial",
+      "id": "mou",
+      "label": "Kontrak & PKS Lisensi",
+      "status": "ada",
+      "ket": "Perjanjian lisensi & pengingat perpanjangan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Customer Success & Komersial",
+      "id": "tech-harga",
+      "label": "Paket & Daftar Harga",
+      "status": "ada",
+      "ket": "Definisi paket lisensi beserta kuota dan tarifnya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Customer Success & Komersial",
+      "id": "finance",
+      "label": "Tagihan Langganan",
+      "status": "ada",
+      "ket": "Faktur langganan klien & status pelunasan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Integrasi & Konektor",
+      "id": "catalog-export",
+      "label": "Ekspor Katalog LOINC/UCUM",
+      "status": "ada",
+      "ket": "Aset utama yang dilisensikan ke klien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Integrasi & Konektor",
+      "id": "satusehat",
+      "label": "Jembatan SATUSEHAT",
+      "status": "ada",
+      "ket": "Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Integrasi & Konektor",
+      "id": "tech-analyzer",
+      "label": "Konektor Analyzer",
+      "status": "ada",
+      "ket": "ASTM E1381/E1394 di porta 9999; layar pengaturannya belum ada",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Integrasi & Konektor",
+      "id": "agentic-apimonitor",
+      "label": "Monitor Kuota AI Gateway",
+      "status": "ada",
+      "ket": "Pemakaian kunci API & rotasi terpusat",
+      "rute": "agentic",
+      "aksi": "AIGateway.renderMonitorUI()",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tim & Delivery",
+      "id": "hrd",
+      "label": "Tim Operasional",
+      "status": "ada",
+      "ket": "Data personel unit Tech",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tim & Delivery",
+      "id": "tech-sprint",
+      "label": "Pekerjaan & Kapasitas",
+      "status": "belum",
+      "ket": "Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "tech",
+      "group": "Tim & Delivery",
+      "id": "tech-delivery",
+      "label": "Implementasi & SLA",
+      "status": "parsial",
+      "ket": "Implementasi, acceptance, support, incident, adopsi dan renewal tenant",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission",
+      "label": "Registrasi Rawat Jalan (OPD)",
+      "status": "ada",
+      "ket": "Kunjungan poli: pasien, penjamin, jadwal/unit/dokter, layanan minimum, dan kasir",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-service",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'service'})",
+      "label": "Registrasi Layanan",
+      "status": "ada",
+      "ket": "Tindakan/layanan langsung dengan prioritas, line item, diskon, dan status dengan/tanpa kit",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-medical-kit",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'medical-kit'})",
+      "label": "Registrasi Medical Kit",
+      "status": "ada",
+      "ket": "Layanan berbasis kit/perangkat dengan tanggal layanan dan siklus status operasional sendiri",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-package",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'package'})",
+      "label": "Registrasi Paket Layanan",
+      "status": "ada",
+      "ket": "Paket/MCU: kategori, paket, produk paket, add-on, dan total net",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-subscription",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'subscription'})",
+      "label": "Langganan Paket",
+      "status": "ada",
+      "ket": "Hak penggunaan berulang: item, bonus, masa berlaku, pembayaran, dan kasir",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-package-usage",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'package-usage'})",
+      "label": "Pemakaian Langganan Paket",
+      "status": "ada",
+      "ket": "Penebusan hak paket aktif dengan masa berlaku dan sisa penggunaan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "admission-report",
+      "rute": "admission",
+      "aksi": "navigate('admission',{mode:'outpatient',view:'report'})",
+      "label": "Laporan Registrasi",
+      "status": "ada",
+      "ket": "Ringkasan registrasi, status kunjungan, dan penerimaan pada periode terpilih",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "queue",
+      "label": "Antrian Poli",
+      "status": "ada",
+      "ket": "Pemanggilan bersuara & layar ruang tunggu",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "queue-outpatient",
+      "rute": "queue",
+      "aksi": "navigate('queue',{scope:'outpatient'})",
+      "label": "Antrean Poli Umum & Spesialis",
+      "status": "ada",
+      "ket": "Daftar dan pemanggilan antrean rawat jalan dokter umum maupun spesialis",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "queue-console",
+      "label": "Konsol Panggilan Antrean",
+      "status": "ada",
+      "ket": "Panggil berikutnya, panggil ulang, tandai tidak hadir, dan pindah loket — dengan pemanggilan bersuara",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "queue-kiosk",
+      "label": "Kiosk Mandiri Pasien",
+      "status": "ada",
+      "ket": "Ambil nomor sendiri di lobi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Alur Pasien",
+      "id": "appointments",
+      "label": "Jadwal Dokter & Perjanjian",
+      "status": "ada",
+      "ket": "Reservasi konsultasi & pengingat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "emr-soap",
+      "label": "EMR SOAP & CPPT",
+      "status": "ada",
+      "ket": "Rekam medis elektronik dokter, ICD-10/9CM",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "anamnesa",
+      "label": "Anamnesa & Tanda Vital",
+      "status": "ada",
+      "ket": "Keluhan, riwayat, dan pemeriksaan awal",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "inpatient",
+      "label": "Rawat Inap & Bed Management",
+      "status": "ada",
+      "ket": "Mutasi tempat tidur & resume pulang",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-orders",
+      "label": "Order Terintegrasi",
+      "status": "ada",
+      "ket": "Satu layar untuk memesan lab, radiologi, obat, dan tindakan sekaligus; order lab langsung membuat order di LIS",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-integration",
+      "label": "Hub Integrasi HIS–LIS & Billing",
+      "status": "parsial",
+      "ket": "Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-clinical-pathology",
+      "label": "Hasil Patologi Klinik (Viewer LIS)",
+      "status": "ada",
+      "ket": "Viewer read-only hasil Patologi Klinik yang sudah dirilis LIS; koreksi dan rilis tetap dilakukan di LIS",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-microbiology",
+      "label": "Hasil Mikrobiologi (Viewer LIS)",
+      "status": "ada",
+      "ket": "Viewer read-only hasil pewarnaan, kultur, identifikasi, dan sensitivitas yang sudah dirilis LIS",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-anatomical-pathology",
+      "label": "Hasil Patologi Anatomi (Viewer LIS)",
+      "status": "ada",
+      "ket": "Viewer read-only hasil histopatologi dan sitologi yang sudah dirilis LIS",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-procedures",
+      "label": "Tindakan & Prosedur",
+      "status": "ada",
+      "ket": "Katalog tindakan, informed consent digital, catatan tindakan, dan biayanya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Pelayanan Klinis",
+      "id": "his-immunization",
+      "label": "Vaksinasi & Imunisasi",
+      "status": "ada",
+      "ket": "Jadwal, stok vaksin per lot, pelaporan KIPI, sertifikat, dan push ke SATUSEHAT",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Rekam Medis & Privasi",
+      "id": "medrecord",
+      "label": "Arsip Rekam Medis",
+      "status": "ada",
+      "ket": "Riwayat kunjungan terpadu, anamnesa, hasil penunjang, dan berkas pasien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Rekam Medis & Privasi",
+      "id": "his-mpi",
+      "label": "Master Rekam Medis (MPI)",
+      "status": "ada",
+      "ket": "Identitas pasien, penggabungan duplikasi, dan penomoran rekam medis",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Rekam Medis & Privasi",
+      "id": "his-mr-governance",
+      "label": "Kelengkapan, Retensi & Salinan RM",
+      "status": "ada",
+      "ket": "Audit kelengkapan, retensi/pemusnahan, serta permintaan salinan yang terjejak",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Paket & Membership",
+      "id": "package-service",
+      "label": "Operasional Paket & Membership",
+      "status": "ada",
+      "ket": "Hub registrasi paket, langganan, pemakaian hak, dan pemisahan master paket",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Gawat Darurat & Keselamatan Pasien",
+      "id": "igd-triase",
+      "label": "Triase IGD",
+      "status": "ada",
+      "ket": "Level kegawatan, target waktu tunggu, EWS, dan triase ulang",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Gawat Darurat & Keselamatan Pasien",
+      "id": "skrining-risiko",
+      "label": "Skrining Risiko",
+      "status": "ada",
+      "ket": "Jatuh, nyeri, dan gizi — wajib saat admisi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Gawat Darurat & Keselamatan Pasien",
+      "id": "mar",
+      "label": "Catatan Pemberian Obat",
+      "status": "ada",
+      "ket": "Siapa memberikan obat apa, jam berapa; dosis terlewat ikut tercatat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Farmasi",
+      "id": "farmasi",
+      "label": "Farmasi & E-Prescription",
+      "status": "ada",
+      "ket": "Resep elektronik, skrining interaksi, stok FEFO",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "homecare",
+      "label": "Order Kunjungan Rumah",
+      "status": "ada",
+      "ket": "Sampling, infus, perawatan luka ke rumah",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "hc-schedule",
+      "label": "Penjadwalan & Dispatch Nakes",
+      "status": "ada",
+      "ket": "Plotting nakes dan pelacakan keberangkatan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "hc-staff",
+      "label": "Master Tenaga Kesehatan",
+      "status": "ada",
+      "ket": "STR/SIP, kompetensi, zona layanan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "hc-tariff",
+      "label": "Tarif & Komisi Home Care",
+      "status": "ada",
+      "ket": "Tarif tindakan, zonasi, bagi hasil",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "hc-billing",
+      "label": "Penagihan & Fee Nakes",
+      "status": "ada",
+      "ket": "Rekap fee kunjungan dan pencairan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Home Care",
+      "id": "hc-report",
+      "label": "Laporan Kinerja & CSAT",
+      "status": "ada",
+      "ket": "Volume kunjungan, ketepatan waktu, kepuasan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kepatuhan & Klaim",
+      "id": "bpjs-claim",
+      "label": "Klaim BPJS & INA-CBG",
+      "status": "ada",
+      "ket": "Grouper tarif & bridging VClaim",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kepatuhan & Klaim",
+      "id": "satusehat",
+      "label": "Integrasi SATUSEHAT",
+      "status": "ada",
+      "ket": "Kirim Patient, Encounter, Condition, Observation ke Kemenkes lewat FHIR R4",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kepatuhan & Klaim",
+      "id": "compliance-tracker",
+      "label": "Izin & Kepatuhan Faskes",
+      "status": "ada",
+      "ket": "Masa berlaku izin operasional dan SIP nakes",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kepatuhan & Klaim",
+      "id": "rl-reports",
+      "label": "Laporan RL Kemenkes",
+      "status": "ada",
+      "ket": "Rekapitulasi RL terisi dari data operasional",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Program Kesehatan Korporat",
+      "id": "his-wellness",
+      "label": "Orkestrasi Wellness",
+      "status": "ada",
+      "ket": "Program, roster, risiko terbaru, request treatment, sesi, kehadiran dan laporan evaluasi HR",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-patient-flow",
+      "label": "Pusat Kendali Alur Pasien",
+      "status": "parsial",
+      "ket": "Papan pekerjaan lintas unit dengan status, prioritas, petugas, pagination dan audit.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-bed-reservation",
+      "label": "Reservasi & Daftar Tunggu Bed",
+      "status": "parsial",
+      "ket": "Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0071 dan pemetaan bed.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-housekeeping",
+      "label": "Housekeeping & Kesiapan Bed",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-nurse-station",
+      "label": "Nurse Station & Handover",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-discharge",
+      "label": "Perencanaan & Checklist Pulang",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-igd-flow",
+      "label": "Tracking Pelayanan IGD",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-inpatient-billing",
+      "label": "Rekonsiliasi Billing Rawat Inap",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Kendali Operasional RS",
+      "id": "rs-capacity",
+      "label": "Kapasitas & Indikator Rawat Inap",
+      "status": "parsial",
+      "ket": "Kapasitas dan okupansi saat ini; indikator historis belum tersedia.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-operating-room",
+      "label": "Kamar Operasi & Anestesi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-cssd",
+      "label": "CSSD & Sterilisasi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-diet",
+      "label": "Gizi & Dapur Pasien",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-transfusion",
+      "label": "Bank Darah & Transfusi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-ppi",
+      "label": "PPI & Surveilans Infeksi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-ward-pharmacy",
+      "label": "Farmasi Bangsal & Unit Dose",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Pelayanan RS",
+      "id": "rs-transport",
+      "label": "Transport Pasien & Ambulans",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-critical-care",
+      "label": "ICU, HCU & Perawatan Neonatal",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-maternity",
+      "label": "Persalinan & Perinatologi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-day-care",
+      "label": "Hemodialisis & Kemoterapi",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-linen",
+      "label": "Laundry & Linen",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-facility",
+      "label": "Fasilitas & Utilitas RS",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "his",
+      "group": "Unit Khusus & Pendukung RS",
+      "id": "rs-mortuary",
+      "label": "Pelayanan & Serah Terima Jenazah",
+      "status": "parsial",
+      "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pendaftaran & Sampel",
+      "id": "lis-admission",
+      "label": "Permintaan Pemeriksaan",
+      "status": "ada",
+      "ket": "Pendaftaran order spesimen & auto-split tabung",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pendaftaran & Sampel",
+      "id": "lis-phlebotomy",
+      "label": "Pengambilan Sampel",
+      "status": "ada",
+      "ket": "Verifikasi tabung, lokasi flebotomi & timestamp sampling",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pendaftaran & Sampel",
+      "id": "lab",
+      "label": "Penerimaan Sampel",
+      "status": "ada",
+      "ket": "Check-in spesimen dan cetak barcode tabung CLSI",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pendaftaran & Sampel",
+      "id": "lis-kelayakan",
+      "label": "Kelayakan Sampel",
+      "status": "ada",
+      "ket": "Verifikasi penerimaan/penolakan spesimen (hemolisis/lipemik/clot)",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Konteks Klinis & Penunjang",
+      "id": "lis-anamnesa",
+      "rute": "anamnesa",
+      "label": "Anamnesis & Observasi",
+      "status": "ada",
+      "ket": "Konteks klinis pra-pemeriksaan: verifikasi pasien, tanda vital, observasi, catatan, dan ICD sebelum spesimen diproses",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Konteks Klinis & Penunjang",
+      "id": "lis-audiometry",
+      "rute": "audiometry",
+      "label": "Audiometri",
+      "status": "ada",
+      "ket": "Worklist pemeriksaan pendengaran; hasil tetap mengikuti validasi dan rilis klinis yang terpisah",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Konteks Klinis & Penunjang",
+      "id": "lis-spirometry",
+      "rute": "spirometry",
+      "label": "Spirometri",
+      "status": "ada",
+      "ket": "Worklist fungsi paru dengan hasil terstruktur dan alur validasi bertahap",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Konteks Klinis & Penunjang",
+      "id": "lis-supportive",
+      "rute": "supportive",
+      "label": "EKG & Pemeriksaan Penunjang",
+      "status": "ada",
+      "ket": "Pusat worklist EKG, treadmill, audiometri, dan spirometri tanpa mencampurkan proses laboratorium analitik",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pemeriksaan",
+      "id": "worklist",
+      "label": "Antrean Pemeriksaan",
+      "status": "ada",
+      "ket": "Daftar antrean kerja batch analyzer per instrumen",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pemeriksaan",
+      "id": "lab-result",
+      "label": "Input & Tinjau Hasil",
+      "status": "ada",
+      "ket": "Input hasil, kalkulator pengenceran & deteksi delta check",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pemeriksaan",
+      "id": "referral",
+      "label": "Rujukan Laboratorium",
+      "status": "ada",
+      "ket": "Outsource spesimen ke lab rujukan & rekonsiliasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Validasi & Hasil",
+      "id": "lis-critical-value",
+      "label": "Pelaporan Nilai Kritis",
+      "status": "ada",
+      "ket": "Pencatatan eskalasi nilai kritis SLA < 15 menit & TBaK",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Validasi & Hasil",
+      "id": "lab-validation",
+      "label": "Verifikasi Teknis",
+      "status": "ada",
+      "ket": "Peninjauan hasil oleh analis sebelum otorisasi dokter",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Validasi & Hasil",
+      "id": "lab-approval",
+      "label": "Otorisasi & Rilis",
+      "status": "ada",
+      "ket": "Otorisasi dokter dan rilis hasil dengan jejak transaksi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Validasi & Hasil",
+      "id": "lab-tat",
+      "label": "Kinerja & TAT",
+      "status": "ada",
+      "ket": "Turnaround time pra-analitik, analitik, dan pasca-analitik",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Mutu Laboratorium",
+      "id": "lab-qc",
+      "label": "Kendali Mutu Harian (QC)",
+      "status": "ada",
+      "ket": "Plot Levey-Jennings, evaluasi 6 multi-rules Westgard & Six Sigma",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Mutu Laboratorium",
+      "id": "lis-lot-verification",
+      "label": "Lot Kontrol",
+      "status": "ada",
+      "ket": "Pencatatan dan evaluasi lot bahan kontrol QC",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Mutu Laboratorium",
+      "id": "lis-pme",
+      "label": "Uji Profisiensi (PME)",
+      "status": "ada",
+      "ket": "Kalkulasi Z-Score uji profisiensi eksternal ISO 15189",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Riwayat & Arsip",
+      "id": "lab-report",
+      "label": "Riwayat & Tren Hasil",
+      "status": "ada",
+      "ket": "Tren analit longitudinal & riwayat kumulatif pasien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Riwayat & Arsip",
+      "id": "lis-sample-archive",
+      "label": "Penyimpanan Sampel",
+      "status": "ada",
+      "ket": "Manajemen slot freezer -20°C & retrieval add-on test",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Katalog & Persediaan",
+      "id": "product",
+      "label": "Katalog Pemeriksaan",
+      "status": "ada",
+      "ket": "Master analit & pemetaan standar LOINC OBX-3 / UCUM OBX-6",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Katalog & Persediaan",
+      "id": "package",
+      "label": "Panel & Paket",
+      "status": "ada",
+      "ket": "Konfigurasi profil panel organ, hemostasis, dan MCU",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Katalog & Persediaan",
+      "id": "refrange",
+      "label": "Nilai Rujukan",
+      "status": "ada",
+      "ket": "Nilai rujukan multi-tier per usia, gender, dan metode",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Katalog & Persediaan",
+      "id": "inventory",
+      "label": "Stok Reagen & Bahan",
+      "status": "ada",
+      "ket": "Logistik reagen, lot number, expired date & suhu simpan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Katalog & Persediaan",
+      "id": "catalog-export",
+      "label": "Ekspor Katalog",
+      "status": "ada",
+      "ket": "Generator dataset LIS-ready dalam format CSV/TSV",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pengaturan & Bantuan",
+      "id": "lis-analyzer",
+      "label": "Koneksi Alat",
+      "status": "ada",
+      "ket": "Konfigurasi protokol ASTM E1381/E1394 & channel mapping",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pengaturan & Bantuan",
+      "id": "lis-settings",
+      "label": "Pengaturan Laboratorium",
+      "status": "ada",
+      "ket": "Profil instansi, DPJP Sp.PK, critical limits & installer service :9999",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pengaturan & Bantuan",
+      "id": "lis-helpdesk",
+      "label": "Panduan & Bantuan",
+      "status": "ada",
+      "ket": "Panduan interaktif end-to-end, SOP tiap menu & troubleshooting laboratorium",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "lis",
+      "group": "Pengaturan & Bantuan",
+      "id": "lis-integration",
+      "label": "Inbox Order & Hasil LIS",
+      "status": "parsial",
+      "ket": "Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "korporat",
+      "group": "Klien & Proyek",
+      "id": "corporate",
+      "label": "Database Klien Korporat",
+      "status": "ada",
+      "ket": "Perusahaan klien, PIC, dan kontraknya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Klien & Proyek",
+      "id": "mcu",
+      "label": "Proyek MCU & Roster",
+      "status": "ada",
+      "ket": "MCU massal, import roster, sertifikat sehat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Klien & Proyek",
+      "id": "portal-akses",
+      "label": "Akses Portal Korporat",
+      "status": "ada",
+      "ket": "Tautan bertoken; izin kelola roster per tautan",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Komersial B2B",
+      "id": "leads",
+      "label": "Prospek Korporat",
+      "status": "ada",
+      "ket": "Funnel klien perusahaan baru",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Komersial B2B",
+      "id": "penawaran",
+      "label": "Penawaran Paket MCU",
+      "status": "ada",
+      "ket": "Quotation resmi sampai terbit PO",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Komersial B2B",
+      "id": "mou",
+      "label": "MOU & PKS Korporat",
+      "status": "ada",
+      "ket": "Perjanjian kerja sama dan perpanjangannya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "korporat",
+      "group": "Komersial B2B",
+      "id": "bpjs-claim",
+      "label": "Klaim Asuransi & TPA",
+      "status": "ada",
+      "ket": "Penagihan jaminan korporat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Produk & Penjualan",
+      "id": "ecommerce-oms",
+      "label": "Pesanan Multi-Channel D2C",
+      "status": "ada",
+      "ket": "Shopee, TikTok Shop, Tokopedia, web sendiri",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Produk & Penjualan",
+      "id": "ecommerce-oms-apotek",
+      "label": "Konsinyasi Apotek Mitra",
+      "status": "ada",
+      "ket": "Stok titipan di jaringan apotek",
+      "rute": "ecommerce-oms",
+      "aksi": "navigate('ecommerce-oms',{tab:'apotek'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Produk & Penjualan",
+      "id": "ecommerce-oms-batch",
+      "label": "Batch & Stok FEFO",
+      "status": "ada",
+      "ket": "Lot produksi dan peringatan kedaluwarsa",
+      "rute": "ecommerce-oms",
+      "aksi": "navigate('ecommerce-oms',{tab:'batch'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Produk & Penjualan",
+      "id": "ecommerce-oms-shipping",
+      "label": "Ekspedisi & Resi",
+      "status": "ada",
+      "ket": "Ongkir multi-kurir dan cetak label",
+      "rute": "ecommerce-oms",
+      "aksi": "navigate('ecommerce-oms',{tab:'shipping'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Produk & Penjualan",
+      "id": "subscription",
+      "label": "Langganan & Auto-Refill",
+      "status": "ada",
+      "ket": "Pengiriman rutin bulanan member",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Layanan Wellness",
+      "id": "sanctuary-booking",
+      "label": "Reservasi Treatment",
+      "status": "ada",
+      "ket": "Jadwal sesi terapi dan alokasi terapis",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Layanan Wellness",
+      "id": "sanctuary-members",
+      "label": "Member VIP & Saldo Sesi",
+      "status": "ada",
+      "ket": "Tier member dan kuota sesi tersisa",
+      "rute": "sanctuary-booking",
+      "aksi": "navigate('sanctuary-booking',{tab:'members'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Layanan Wellness",
+      "id": "sanctuary-rooms",
+      "label": "Okupansi Ruangan",
+      "status": "ada",
+      "ket": "Status suite dan waktu sanitasi",
+      "rute": "sanctuary-booking",
+      "aksi": "navigate('sanctuary-booking',{tab:'rooms'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Layanan Wellness",
+      "id": "sanctuary-menu",
+      "label": "Katalog Paket Terapi",
+      "status": "ada",
+      "ket": "Paket pemulihan dan perawatan",
+      "rute": "sanctuary-booking",
+      "aksi": "navigate('sanctuary-booking',{tab:'menu'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "pabrik",
+      "label": "Perintah Produksi",
+      "status": "ada",
+      "ket": "Work order, pemakaian bahan baku, rendemen, dan hasil batch",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "wellness-rnd",
+      "label": "Formulasi & R&D Produk",
+      "status": "ada",
+      "ket": "Resep berversi + BOM. Versi baru = baris baru, supaya batch lama tetap terlacak resepnya.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "wellness-maklon",
+      "label": "Kemitraan Maklon",
+      "status": "ada",
+      "ket": "Produksi untuk merek pihak lain. Hasilnya milik klien, tidak masuk stok AVA.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "wellness-mutu",
+      "label": "Uji Mutu Produk ke Lab",
+      "status": "ada",
+      "ket": "Batch karantina sampai SELURUH uji lulus, bukan uji pertama.",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "nutrition-quality",
+      "label": "Batch, Release & Mutu Nutrition",
+      "status": "parsial",
+      "ket": "Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "wellness-program",
+      "label": "Program Care & Wellness",
+      "status": "parsial",
+      "ket": "Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "partner-rewards",
+      "label": "Challenge & Rekonsiliasi Mitra",
+      "status": "parsial",
+      "ket": "Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "wellness",
+      "group": "Formulasi & Produksi",
+      "id": "sanctuary-operations",
+      "label": "Operasional Sanctuary",
+      "status": "parsial",
+      "ket": "Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT",
+      "routePresent": true,
+      "readinessOnly": true
+    },
+    {
+      "category": "wellness",
+      "group": "Care & Home Care",
+      "id": "homecare",
+      "label": "Order Kunjungan Rumah",
+      "status": "ada",
+      "ket": "Sampling, infus, perawatan luka dan layanan promotif-preventif di rumah",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Care & Home Care",
+      "id": "hc-schedule",
+      "label": "Jadwal & Dispatch Nakes",
+      "status": "ada",
+      "ket": "Penugasan, zona layanan, keberangkatan dan status kunjungan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "wellness",
+      "group": "Care & Home Care",
+      "id": "hc-staff",
+      "label": "Tenaga Kesehatan & Kompetensi",
+      "status": "ada",
+      "ket": "STR/SIP, kompetensi, zona layanan dan masa berlaku dokumen",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Kasir",
+      "id": "cashier",
+      "label": "Kasir POS Multi-Payment",
+      "status": "ada",
+      "ket": "Tunai, QRIS, kartu, split bill",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Kasir",
+      "id": "cashier-shift",
+      "label": "Shift Kasir & Berita Acara",
+      "status": "ada",
+      "ket": "Buka/tutup shift dengan rekonsiliasi",
+      "rute": "cashier",
+      "aksi": "navigate('cashier',{buka:'shift'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Piutang & Tagihan",
+      "id": "finance",
+      "label": "Invoice & Tagihan",
+      "status": "ada",
+      "ket": "Faktur resmi dan monitoring pelunasan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Piutang & Tagihan",
+      "id": "ar-aging",
+      "label": "Umur Piutang",
+      "status": "ada",
+      "ket": "Tagihan lewat tempo per kelompok umur",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Piutang & Tagihan",
+      "id": "payables",
+      "label": "Hutang Usaha",
+      "status": "ada",
+      "ket": "Jadwal pembayaran supplier",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Pembukuan",
+      "id": "accounting",
+      "label": "Buku Besar & Akuntansi",
+      "status": "ada",
+      "ket": "Jurnal otomatis terintegrasi COA",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Pembukuan",
+      "id": "finance-report",
+      "label": "Laporan Laba Rugi",
+      "status": "ada",
+      "ket": "Pendapatan, HPP, beban, net margin",
+      "rute": "finance",
+      "aksi": "navigate('finance',{tab:'report'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Pembukuan",
+      "id": "assets",
+      "label": "Aset Tetap & Kalibrasi",
+      "status": "ada",
+      "ket": "Inventaris alat, penyusutan, kalibrasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Remunerasi",
+      "id": "remuneration",
+      "label": "Hub Remunerasi",
+      "status": "ada",
+      "ket": "Keterkaitan roster, presensi, komisi, fee layanan, dan payroll per periode",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "keuangan",
+      "group": "Remunerasi",
+      "id": "payroll",
+      "label": "Penggajian & Slip",
+      "status": "ada",
+      "ket": "Perhitungan, review, finalisasi payroll, jurnal, dan slip gaji",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Persediaan",
+      "id": "inventory",
+      "label": "Stok Barang",
+      "status": "ada",
+      "ket": "Saldo stok dan batas minimum",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Persediaan",
+      "id": "inventory-issue",
+      "label": "Pengeluaran Barang",
+      "status": "ada",
+      "ket": "Bon mutasi ke unit pemakai",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'issue'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Persediaan",
+      "id": "inventory-opname",
+      "label": "Stock Opname",
+      "status": "ada",
+      "ket": "Hitung fisik dan berita acara selisih",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'opname'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Persediaan",
+      "id": "inventory-ledger",
+      "label": "Kartu Stok",
+      "status": "ada",
+      "ket": "Mutasi per lot/batch",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'ledger'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Pengadaan",
+      "id": "inventory-pr",
+      "label": "Permintaan Pembelian",
+      "status": "ada",
+      "ket": "Pengajuan berjenjang",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'pr'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Pengadaan",
+      "id": "inventory-po",
+      "label": "Pesanan Pembelian",
+      "status": "ada",
+      "ket": "PO, penerimaan, retur",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'po'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Pengadaan",
+      "id": "inventory-supplier",
+      "label": "Master Supplier",
+      "status": "ada",
+      "ket": "Data pemasok dan kategorinya",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'supplier'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "logistik",
+      "group": "Pengadaan",
+      "id": "inventory-mrp",
+      "label": "Perencanaan MRP",
+      "status": "ada",
+      "ket": "Reorder point dan rekomendasi beli",
+      "rute": "inventory",
+      "aksi": "navigate('inventory',{tab:'mrp'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Ikhtisar Workforce",
+      "id": "workforce",
+      "label": "Hub Workforce",
+      "status": "ada",
+      "ket": "Ringkasan personalia, kapasitas roster, kehadiran, dan produktivitas",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Personalia",
+      "id": "hrd",
+      "label": "Database Karyawan",
+      "status": "ada",
+      "ket": "Biodata staf seluruh unit",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Personalia",
+      "id": "org-structure",
+      "label": "Struktur Organisasi",
+      "status": "ada",
+      "ket": "Bagan hierarki departemen",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Kehadiran",
+      "id": "work-schedule",
+      "label": "Jadwal Kerja & Roster",
+      "status": "ada",
+      "ket": "Shift jaga dan jadwal fleksibel",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Kehadiran",
+      "id": "shift-calendar",
+      "label": "Kalender Shift",
+      "status": "ada",
+      "ket": "Kalender bulanan staf bertugas",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Kehadiran",
+      "id": "attendance",
+      "label": "Presensi GPS",
+      "status": "ada",
+      "ket": "Log kehadiran dengan validasi lokasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "sdm",
+      "group": "Produktivitas",
+      "id": "tasks",
+      "label": "Manajemen Tugas",
+      "status": "ada",
+      "ket": "Penugasan, tenggat, dan status pekerjaan tim",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Kepatuhan",
+      "id": "keselamatan-ikp",
+      "label": "Insiden Keselamatan Pasien",
+      "status": "ada",
+      "ket": "Pelaporan boleh anonim; grading dihitung, RCA ditegakkan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Kepatuhan",
+      "id": "mutu-indikator",
+      "label": "Indikator Mutu",
+      "status": "ada",
+      "ket": "Capaian per periode; yang di bawah target wajib punya rencana perbaikan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Kepatuhan",
+      "id": "compliance-tracker",
+      "label": "Compliance & Legal Tracker",
+      "status": "ada",
+      "ket": "Izin operasional, SIP, BPOM, Halal",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Kepatuhan",
+      "id": "regulatory",
+      "label": "Pelaporan & Audit Regulator",
+      "status": "ada",
+      "ket": "Laporan wajib ke regulator",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Kepatuhan",
+      "id": "audit",
+      "label": "Jejak Audit",
+      "status": "ada",
+      "ket": "Log perubahan data sensitif",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Dokumen",
+      "id": "wiki",
+      "label": "Dokumen Mutu & SOP",
+      "status": "ada",
+      "ket": "SOP, instruksi kerja, formulir mutu",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Dokumen",
+      "id": "surat",
+      "label": "Surat Keluar & Penomoran",
+      "status": "ada",
+      "ket": "Korespondensi resmi bernomor",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "mutu",
+      "group": "Dokumen",
+      "id": "partners",
+      "label": "Master Rekanan & Vendor",
+      "status": "ada",
+      "ket": "Mitra bisnis dan supplier",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "agentic",
+      "group": "Orkestrasi",
+      "id": "agentic",
+      "label": "Agentic Orchestrator",
+      "status": "ada",
+      "ket": "Pusat orkestrasi multi-agent",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "agentic",
+      "group": "Orkestrasi",
+      "id": "agentic-apimonitor",
+      "label": "Monitor Kuota API",
+      "status": "ada",
+      "ket": "Sisa kuota dan rotasi kunci",
+      "rute": "agentic",
+      "aksi": "AIGateway.renderMonitorUI()",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "agentic",
+      "group": "Orkestrasi",
+      "id": "agentic-inbox",
+      "label": "Approval Inbox",
+      "status": "ada",
+      "ket": "Mandat R1-R3 yang menunggu persetujuan",
+      "rute": "agentic",
+      "aksi": "navigate('agentic',{tab:'inbox'})",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konsumen",
+      "group": "Portal",
+      "id": "portal-pasien",
+      "label": "Portal Pasien Individual",
+      "status": "ada",
+      "ket": "apps.avahealth.sbs — booking, hasil, telekonsul",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konsumen",
+      "group": "Portal",
+      "id": "portal-korporat",
+      "label": "Portal Klien Korporat",
+      "status": "ada",
+      "ket": "corp.avahealth.sbs — kelola karyawan, requestor & approver",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konsumen",
+      "group": "Portal",
+      "id": "portal-wellness",
+      "label": "Portal Wellness",
+      "status": "ada",
+      "ket": "wellness.avahealth.sbs — nutrition & personal care",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Sistem",
+      "id": "settings",
+      "label": "Pusat Pengaturan",
+      "status": "ada",
+      "ket": "Profil faskes, kop surat, format PDF",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Sistem",
+      "id": "users",
+      "label": "Pengguna & Hak Akses",
+      "status": "ada",
+      "ket": "RBAC per peran dan per halaman",
+      "rute": "settings",
+      "aksi": "navigate('settings',{tab:'users'})",
+      "admin": true,
+      "superAdminOnly": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Sistem",
+      "id": "import",
+      "label": "Impor & Ekspor Data",
+      "status": "ada",
+      "ket": "Unggah data awal via XLSX/CSV",
+      "admin": true,
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Sistem",
+      "id": "family",
+      "label": "Registri Keluarga",
+      "status": "ada",
+      "ket": "Relasi antar pasien satu keluarga",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-facility",
+      "label": "Fasilitas, Cabang & Unit",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'facility'})",
+      "ket": "Cabang, lokasi, unit, ruang, kelas layanan, dan alat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-practitioner",
+      "label": "Praktisi, Jadwal & Fee",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'practitioner'})",
+      "ket": "Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-patient",
+      "label": "Pasien, Penjamin & Keluarga",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'patient'})",
+      "ket": "Identitas pasien, asuransi, alergi, kondisi, dan relasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-corporate",
+      "label": "Korporat & Kontrak",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'corporate'})",
+      "ket": "Perusahaan, kontrak, jabatan, dan penjamin layanan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-mcu",
+      "label": "Parameter MCU",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'mcu'})",
+      "ket": "Exposure, hasil, rekomendasi, audiometri, spirometri, dan visus",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-payment",
+      "label": "Bank, EDC & Pembayaran",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'payment'})",
+      "ket": "Metode bayar, bank, EDC, dan mapping akun",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-queue",
+      "label": "Flow, Display & Perangkat Antrean",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'queue'})",
+      "ket": "Flow layanan, outlet, ruang, display, kiosk, dan device",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Konfigurasi HIS",
+      "id": "cfg-medicine",
+      "label": "Master Obat & Aturan Pakai",
+      "status": "parsial",
+      "rute": "config",
+      "aksi": "navigate('config',{focus:'medicine'})",
+      "ket": "Kategori, bentuk sediaan, dosis, instruksi, dan waktu konsumsi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Fasilitas & Sumber Daya",
+      "id": "cfg-branch",
+      "label": "Master Cabang / Plant",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'branch'})",
+      "ket": "Kode, identitas, alamat, status dan jam operasional cabang",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Fasilitas & Sumber Daya",
+      "id": "cfg-unit-room",
+      "label": "Unit, Ruang & Kelas Layanan",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'unit_room'})",
+      "ket": "Struktur unit, ruang, kapasitas, lokasi dan kelas layanan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Fasilitas & Sumber Daya",
+      "id": "cfg-equipment",
+      "label": "Peralatan & Modalitas",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'equipment'})",
+      "ket": "Alat, modalitas, lokasi, status dan jadwal pemeliharaan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Fasilitas & Sumber Daya",
+      "id": "cfg-service-class",
+      "label": "Kelas & Kapasitas Layanan",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'service_capacity'})",
+      "ket": "Kelas layanan, kapasitas, tarif dasar dan status aktif",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-specialty",
+      "label": "Spesialisasi Praktisi",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'specialty'})",
+      "ket": "Kategori dan spesialisasi tenaga medis",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-practitioner-fee",
+      "label": "Jasa Praktisi & Fee Rujukan",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'practitioner_fee'})",
+      "ket": "Jasa layanan, fee praktisi, rujukan, dan periode berlaku",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-patient-reference",
+      "label": "Penjamin, Kondisi & Alergi Pasien",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'patient_reference'})",
+      "ket": "Master penjamin, kondisi klinis, alergi, gelar dan relasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-diagnosis-reference",
+      "label": "Referensi Diagnosis & Prosedur",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'diagnosis_reference'})",
+      "ket": "Referensi ICD-10 dan ICD-9-CM dengan versi dan status aktif",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-mcu-parameter",
+      "label": "Parameter & Hasil MCU",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'mcu_parameter'})",
+      "ket": "Exposure, hasil, status akhir, rekomendasi dan parameter fisik",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-mcu-assessment",
+      "label": "Ambang Audiometri, Spirometri & Visus",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'mcu_threshold'})",
+      "ket": "Ambang, klasifikasi, metode, nilai dan interpretasi MCU",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Master Klinis & SDM",
+      "id": "cfg-medicine-reference",
+      "label": "Kategori, Bentuk & Aturan Obat",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'medicine_reference'})",
+      "ket": "Kategori, bentuk sediaan, aturan pakai, instruksi dan waktu konsumsi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Korporat, Keuangan & Promo",
+      "id": "cfg-corporate-contract",
+      "label": "Kontrak & Benefit Korporat",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'corporate_contract'})",
+      "ket": "Periode kontrak, paket, plafon, PIC dan fasilitas cakupan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Korporat, Keuangan & Promo",
+      "id": "cfg-job-master",
+      "label": "Level & Posisi Jabatan",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'job_master'})",
+      "ket": "Struktur jabatan untuk benefit, kontrak dan MCU korporat",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Korporat, Keuangan & Promo",
+      "id": "cfg-bank-edc",
+      "label": "Bank & Terminal EDC",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'bank_edc'})",
+      "ket": "Bank, merchant, terminal, settlement dan biaya MDR",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Korporat, Keuangan & Promo",
+      "id": "cfg-payment-account",
+      "label": "Mapping Pembayaran ke Akun",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'payment_mapping'})",
+      "ket": "Metode penerimaan, akun pendapatan/biaya dan status aktif",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Korporat, Keuangan & Promo",
+      "id": "cfg-promotion",
+      "label": "Deal, Voucher & Diskon",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'promotion'})",
+      "ket": "Periode, target layanan, kuota, syarat dan status promo",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Antrean & Integrasi",
+      "id": "queue-config",
+      "label": "Konfigurasi Antrean",
+      "status": "ada",
+      "ket": "Loket, prefiks nomor, kuota harian dan urutan prioritas panggilan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Antrean & Integrasi",
+      "id": "cfg-queue-flow",
+      "label": "Flow, Display & Outlet Antrean",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'queue_flow'})",
+      "ket": "Flow per layanan, ruang, display, outlet dan prioritas",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Antrean & Integrasi",
+      "id": "cfg-queue-device",
+      "label": "Registry Kiosk & Display",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'queue_device'})",
+      "ket": "Perangkat, lokasi, layanan, origin dan status terakhir aktif",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Antrean & Integrasi",
+      "id": "cfg-telemedicine",
+      "label": "Setup Telemedicine",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'telemedicine'})",
+      "ket": "Jadwal, provider, webhook dan status koneksi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "konfigurasi",
+      "group": "Antrean & Integrasi",
+      "id": "cfg-satusehat",
+      "label": "SATUSEHAT — Setup & Status",
+      "status": "ada",
+      "rute": "master-records",
+      "aksi": "navigate('master-records',{domain:'satusehat_setup'})",
+      "ket": "Status konfigurasi dan sinkronisasi FHIR; aktivasi melalui staging/UAT",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Prospecting",
+      "id": "maps",
+      "label": "Maps Prospecting",
+      "status": "ada",
+      "ket": "Pencarian faskes/apotek calon klien di peta, radius overlay & seleksi massal",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Prospecting",
+      "id": "leads",
+      "label": "Leads & Pipeline CRM",
+      "status": "ada",
+      "ket": "Prospek masuk, tahap tindak lanjut, dan penanggung jawabnya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Prospecting",
+      "id": "crm-pipeline",
+      "label": "Papan Pipeline CRM",
+      "status": "ada",
+      "ket": "Papan kanban tahap penjualan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Prospecting",
+      "id": "sales-corong",
+      "label": "Corong Penjualan",
+      "status": "ada",
+      "ket": "Konversi per tahap: inquiry, presentasi, penawaran, closing",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kampanye & Promo",
+      "id": "marketing",
+      "label": "Pusat Marketing",
+      "status": "ada",
+      "ket": "Ringkasan kanal, materi promosi, dan aktivitas kampanye",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kampanye & Promo",
+      "id": "campaigns",
+      "label": "Campaign & Voucher",
+      "status": "ada",
+      "rute": "voucher",
+      "aksi": "navigate('voucher')",
+      "ket": "Kupon diskon, promo musiman, dan broadcast voucher",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kampanye & Promo",
+      "id": "penawaran",
+      "label": "Penawaran Harga",
+      "status": "ada",
+      "ket": "Quotation resmi sampai terbit PO",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kemitraan & Kinerja",
+      "id": "perujuk",
+      "label": "Dokter & Klinik Perujuk",
+      "status": "ada",
+      "admin": true,
+      "ket": "Tarif komisi rujukan dan pencairannya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kemitraan & Kinerja",
+      "id": "okr",
+      "label": "Target & OKR Tim",
+      "status": "ada",
+      "ket": "Sasaran kuartal dan capaiannya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "marketing",
+      "group": "Kemitraan & Kinerja",
+      "id": "mkt-crmtv",
+      "label": "Monitor CRM Layar Besar",
+      "status": "ada",
+      "rute": "leads",
+      "aksi": "window.open('monitor/crm.html','_blank')",
+      "ket": "Layar target omzet & closing rate harian",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Layanan Jarak Jauh",
+      "id": "ava-consult",
+      "label": "Telekonsultasi Dokter",
+      "status": "ada",
+      "ket": "Konsultasi jarak jauh pasien-dokter",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Layanan Jarak Jauh",
+      "id": "ava-caregiver",
+      "label": "Caregiver & Pendamping",
+      "status": "ada",
+      "ket": "Penugasan pendamping perawatan di rumah",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Perangkat & Kalibrasi",
+      "id": "ava-devices",
+      "label": "Alat Medis & Wearables",
+      "status": "ada",
+      "ket": "Telemetri IoT perangkat pasien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Perangkat & Kalibrasi",
+      "id": "ava-calibration",
+      "label": "Badge AVA Verified",
+      "status": "ada",
+      "ket": "Sertifikasi kalibrasi alat oleh lab",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Perangkat & Kalibrasi",
+      "id": "ava-marketplace",
+      "label": "Marketplace Alkes",
+      "status": "ada",
+      "ket": "Katalog alat kesehatan dan portal vendor",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Kanal & Mitra",
+      "id": "ava-corporate",
+      "label": "Kanal Korporat B2B",
+      "status": "ada",
+      "ket": "Paket telehealth untuk perusahaan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "avahealth",
+      "group": "Kanal & Mitra",
+      "id": "ava-portals",
+      "label": "Portal Multi-Peran",
+      "status": "ada",
+      "ket": "Tampilan admin, pelanggan, dokter, dan vendor",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Alur Pemeriksaan",
+      "id": "radiology",
+      "label": "Order & Worklist Radiologi",
+      "status": "ada",
+      "ket": "Permintaan foto dari poli, antrean kerja per modalitas, dan status pengerjaan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Alur Pemeriksaan",
+      "id": "pacs-viewer",
+      "label": "PACS & DICOM Viewer",
+      "status": "ada",
+      "ket": "Viewer siap dengan preset windowing & ukur CTR; sumber citra DICOM belum tersambung",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Alur Pemeriksaan",
+      "id": "rad-unggah",
+      "label": "Unggah Citra & Studi",
+      "status": "ada",
+      "ket": "Unggah manual berkas DICOM/JPEG untuk modalitas yang belum terhubung jaringan",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Alur Pemeriksaan",
+      "id": "rad-ekspertise",
+      "label": "Bacaan & Ekspertise Radiolog",
+      "status": "ada",
+      "ket": "Lembar bacaan dokter Sp.Rad, tanda tangan elektronik, dan rilis hasil ke pengirim order",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Master & Alat",
+      "id": "rad-modalitas",
+      "label": "Modalitas & Jadwal Alat",
+      "status": "ada",
+      "ket": "Daftar alat (rontgen, USG, CT), DICOM Modality Worklist, dan jadwal pemakaian",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Master & Alat",
+      "id": "rad-katalog",
+      "label": "Katalog Pemeriksaan Radiologi",
+      "status": "ada",
+      "ket": "Jenis pemeriksaan, persiapan pasien, dosis radiasi, dan tarifnya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "radiologi",
+      "group": "Master & Alat",
+      "id": "assets",
+      "label": "Kalibrasi & Perawatan Alat",
+      "status": "ada",
+      "ket": "Jadwal kalibrasi alat radiologi dan riwayat perawatannya",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Jantung, Paru & Indera",
+      "id": "supportive",
+      "label": "Dashboard Pemeriksaan Penunjang",
+      "status": "ada",
+      "ket": "Ringkasan kerja EKG, treadmill, audiometri, dan spirometri dengan interpretasi terstruktur",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Jantung, Paru & Indera",
+      "id": "ekg-treadmill",
+      "label": "EKG & Treadmill",
+      "status": "ada",
+      "ket": "Input dan tinjau pemeriksaan elektrokardiografi serta uji latih jantung",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Jantung, Paru & Indera",
+      "id": "audiometry",
+      "label": "Audiometri",
+      "status": "ada",
+      "ket": "Input ambang pendengaran, PTA, klasifikasi telinga kanan-kiri, dan rekomendasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Jantung, Paru & Indera",
+      "id": "spirometry",
+      "label": "Spirometri",
+      "status": "ada",
+      "ket": "Input fungsi paru, pola gangguan, grafik pendukung, dan interpretasi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Jantung, Paru & Indera",
+      "id": "sm-usg",
+      "label": "USG Non-Radiologi",
+      "status": "ada",
+      "ket": "USG yang dikerjakan dokter poli sendiri (obgyn, abdomen) di luar alur radiologi",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Rehabilitasi & Tindakan",
+      "id": "sm-fisioterapi",
+      "label": "Fisioterapi & Rehabilitasi Medik",
+      "status": "ada",
+      "ket": "Program terapi, jadwal sesi, dan catatan perkembangan pasien",
+      "routePresent": true,
+      "readinessOnly": false
+    },
+    {
+      "category": "support-medical",
+      "group": "Rehabilitasi & Tindakan",
+      "id": "sm-endoskopi",
+      "label": "Endoskopi",
+      "status": "ada",
+      "ket": "Jadwal, persiapan pasien, dan laporan temuan",
+      "routePresent": true,
+      "readinessOnly": false
+    }
+  ],
+  "consumerPortals": {
+    "_catatan": "Aplikasi konsumen berdiri sendiri di luar rel menu internal. Struktur menunya dicatat di sini supaya pemetaannya lengkap.",
+    "pasien": {
+      "nama": "Portal Pasien Individual",
+      "subdomain": "apps.avahealth.sbs",
+      "masuk": "akun pasien",
+      "menu": [
+        {
+          "id": "pasien-beranda",
+          "label": "Beranda & Riwayat",
+          "status": "ada"
+        },
+        {
+          "id": "pasien-booking",
+          "label": "Booking Pemeriksaan",
+          "status": "ada"
+        },
+        {
+          "id": "pasien-hasil",
+          "label": "Hasil & Unduh PDF",
+          "status": "ada",
+          "ket": "Tersedia setelah hasil dirilis dokter"
+        },
+        {
+          "id": "pasien-telekonsul",
+          "label": "Telekonsultasi",
+          "status": "ada"
+        },
+        {
+          "id": "pasien-homecare",
+          "label": "Pesan Home Care",
+          "status": "ada"
+        },
+        {
+          "id": "pasien-tagihan",
+          "label": "Tagihan & Pembayaran",
+          "status": "ada"
+        }
+      ]
+    },
+    "korporat": {
+      "nama": "Portal Klien Korporat",
+      "subdomain": "corp.avahealth.sbs",
+      "masuk": "akun korporat — peran requestor / approver diatur di HIS",
+      "integrasi": "Terintegrasi utamanya ke HIS: peserta MCU masuk sebagai pasien klinik.",
+      "menu": [
+        {
+          "id": "korp-beranda",
+          "label": "Beranda Perusahaan",
+          "status": "ada"
+        },
+        {
+          "id": "korp-karyawan",
+          "label": "Master Karyawan",
+          "status": "ada",
+          "ket": "Tambah, ubah, dan keluarkan karyawan"
+        },
+        {
+          "id": "korp-assign",
+          "label": "Assign Paket MCU",
+          "status": "ada",
+          "ket": "Tetapkan paket per karyawan, kuota kontrak ditegakkan"
+        },
+        {
+          "id": "korp-booking",
+          "label": "Ajukan Jadwal MCU",
+          "status": "ada",
+          "ket": "Peran requestor"
+        },
+        {
+          "id": "korp-approval",
+          "label": "Persetujuan Pengajuan",
+          "status": "ada",
+          "ket": "Peran approver"
+        },
+        {
+          "id": "korp-riwayat",
+          "label": "Riwayat Pemeriksaan",
+          "status": "ada",
+          "ket": "Status saja, tanpa hasil klinis"
+        },
+        {
+          "id": "korp-tagihan",
+          "label": "Tagihan & Kwitansi",
+          "status": "ada"
+        },
+        {
+          "id": "korp-kontrak",
+          "label": "Kontrak & Kuota",
+          "status": "ada"
+        }
+      ]
+    },
+    "wellness": {
+      "nama": "Portal Wellness (Nutrition & Care)",
+      "subdomain": "wellness.avahealth.sbs",
+      "masuk": "akun pasien / member",
+      "catatan": "Menggantikan nutri. dan care. yang sebelumnya terpisah dengan isi sama.",
+      "menu": [
+        {
+          "id": "wl-katalog",
+          "label": "Katalog Produk",
+          "status": "ada"
+        },
+        {
+          "id": "wl-langganan",
+          "label": "Langganan & Auto-Refill",
+          "status": "ada"
+        },
+        {
+          "id": "wl-program",
+          "label": "Program Wellness Saya",
+          "status": "ada"
+        },
+        {
+          "id": "wl-sanctuary",
+          "label": "Reservasi Sanctuary",
+          "status": "ada"
+        },
+        {
+          "id": "wl-pesanan",
+          "label": "Lacak Pesanan",
+          "status": "ada"
+        }
+      ]
+    }
+  },
+  "supportingSurfaces": {
+    "_catatan": "Perangkat dan layar pendukung. Bukan aplikasi bermenu — satu layar, satu tugas.",
+    "daftar": [
+      {
+        "id": "kiosk",
+        "nama": "Kiosk Antrian Mandiri",
+        "subdomain": "kiosk.avahealth.sbs",
+        "status": "ada",
+        "ket": "Layar sentuh lobi: ambil nomor, cetak tiket"
+      },
+      {
+        "id": "antrian",
+        "nama": "Display TV Ruang Tunggu",
+        "subdomain": "antrian.avahealth.sbs",
+        "status": "ada",
+        "ket": "Nomor antrian dan panggilan suara"
+      },
+      {
+        "id": "crm",
+        "nama": "Monitor CRM Penjualan",
+        "subdomain": "crm.avahealth.sbs",
+        "status": "ada",
+        "ket": "Layar target omzet dan pipeline harian"
+      },
+      {
+        "id": "nakes",
+        "nama": "Aplikasi Nakes Lapangan",
+        "subdomain": "nakes.avahealth.sbs",
+        "status": "ada",
+        "ket": "Kunjungan home care, GPS, checklist tindakan"
+      },
+      {
+        "id": "lacak",
+        "nama": "Pelacakan Kunjungan Publik",
+        "subdomain": "lacak.avahealth.sbs",
+        "status": "ada",
+        "ket": "Pasien memantau posisi nakes, bertoken"
+      }
+    ]
+  }
+}

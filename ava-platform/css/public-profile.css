@@ -131,3 +131,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,te
 /* Readable metadata and restrained, higher-contrast gold on light surfaces. */
 .identity small,.status-badge{font-size:12px}
 .trust-list>a>span{color:#876a25}
+
+/* OWNED_BY: generic. Visual language 1.0 — aligned with application workspaces. */
+:root{--green:#087e80;--navy:#172b3a;--ink:#172b3a;--muted:#536579;--line:#dce4eb;--pale:#f7f9fb;--gold:#087e80}
+body{font-family:Inter,'Segoe UI',Arial,sans-serif}
+.header{background:#fff;border-bottom:1px solid var(--line);box-shadow:none;backdrop-filter:none}
+.header .login,.button{border-radius:6px;box-shadow:none}
+.header nav a:hover,.header nav a[aria-current=page]{color:var(--green)}
+:is(.service-card,.ecosystem-card,.insight-card,.contact-card){border-radius:8px;box-shadow:none;border-color:var(--line)}

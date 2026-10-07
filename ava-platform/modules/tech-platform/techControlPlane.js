@@ -38,7 +38,7 @@ async function tcpBuatTiket() {
   const correlation = tcpNewCorrelation();
   try {
     const result = await sbPost('tech_support_tickets', {
-      ticket_no: `CS-${new Date().toISOString().replace(/[-:TZ.]/g, '').slice(0, 14)}`,
+      ticket_no: correlation,
       tenant_id: tenantId, title, description, priority, channel: 'internal', status: 'TRIAGED', correlation_id: correlation,
     });
     if (!result || result.error || (Array.isArray(result) && !result.length)) { toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return; }
@@ -195,6 +195,12 @@ async function renderTechControlPlane() {
     </div>`;
     tcpGantiPanel('ringkasan', document.querySelector('[data-panel="ringkasan"]'));
     tcpApplyDeploymentPrefill();
+    const target = window.workspacePanelTarget;
+    if (target?.page === 'tech-control-plane') {
+      window.workspacePanelTarget = null;
+      const button = [...document.querySelectorAll('.tcp-workspace-nav [data-panel]')].find(b => b.dataset.panel === target.panel);
+      if (button) tcpGantiPanel(target.panel, button);
+    }
 }
 
 function tcpGantiPanel(panel, button) {
@@ -247,6 +253,5 @@ async function tcpSimpanDeployment() {
   } catch (e) { toast(`Konfigurasi gagal disimpan: ${e.message || e}`, 'error'); }
 }
 window.tcpSimpanDeployment = tcpSimpanDeployment;
-
 
 

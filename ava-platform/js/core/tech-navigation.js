@@ -64,6 +64,7 @@
 
   /* ── Main directory renderer ─────────────────────────────────── */
   function directory(groupId) {
+    if (window.WorkspaceNavigation) return window.WorkspaceNavigation.directory(groupId);
     if(!enabled())return false;
     if(!canLeave())return false;
     const group=groups().find(g=>g.id===groupId);

@@ -121,7 +121,7 @@ window.PETA_MENU = {
             {
               "id": "evidence-register",
               "label": "Evidence Register & Risk",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Bukti mutu, izin, audit, CAPA, risiko dan masa berlaku lintas pilar"
             }
           ]
@@ -318,7 +318,7 @@ window.PETA_MENU = {
             {
               "id": "tech-delivery",
               "label": "Implementasi & SLA",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Implementasi, acceptance, support, incident, adopsi dan renewal tenant"
             }
           ]
@@ -451,7 +451,7 @@ window.PETA_MENU = {
             {
               "id": "his-integration",
               "label": "Hub Integrasi HIS–LIS & Billing",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Status order, hasil, retry, exception dan rekonsiliasi; billing tetap dikelola HIS"
             },
             {
@@ -602,7 +602,7 @@ window.PETA_MENU = {
               "id": "bpjs-claim",
               "label": "Klaim BPJS & INA-CBG",
               "status": "ada",
-              "ket": "Grouper tarif & bridging VClaim"
+              "ket": "Kelengkapan dokumen, status dan rekonsiliasi klaim; tarif E-Klaim dan SEP resmi dicatat manual. Grouper/VClaim belum tersambung."
             },
             {
               "id": "satusehat",
@@ -648,7 +648,7 @@ window.PETA_MENU = {
               "id": "rs-bed-reservation",
               "label": "Reservasi & Daftar Tunggu Bed",
               "status": "parsial",
-              "ket": "Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0071 dan pemetaan bed."
+              "ket": "Daftar tunggu, reservasi, pembatalan, expiry dan proteksi alokasi; memerlukan migrasi 0070–0073 dan pemetaan bed."
             },
             {
               "id": "rs-housekeeping",
@@ -996,7 +996,7 @@ window.PETA_MENU = {
             {
               "id": "lis-integration",
               "label": "Inbox Order & Hasil LIS",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Order HIS, chain of custody, koreksi, retry dan callback hasil ke HIS"
             }
           ]
@@ -1058,7 +1058,7 @@ window.PETA_MENU = {
               "id": "bpjs-claim",
               "label": "Klaim Asuransi & TPA",
               "status": "ada",
-              "ket": "Penagihan jaminan korporat"
+              "ket": "Kelengkapan dokumen, status dan rekonsiliasi klaim; tarif E-Klaim dan SEP resmi dicatat manual. Grouper/VClaim belum tersambung."
             }
           ]
         }
@@ -1176,25 +1176,25 @@ window.PETA_MENU = {
             {
               "id": "nutrition-quality",
               "label": "Batch, Release & Mutu Nutrition",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Formula, genealogy bahan, batch record, karantina, release, deviasi, complaint dan recall"
             },
             {
               "id": "wellness-program",
               "label": "Program Care & Wellness",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Peserta, consent, sesi, tindak lanjut dan evaluasi mutu program"
             },
             {
               "id": "partner-rewards",
               "label": "Challenge & Rekonsiliasi Mitra",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Challenge, kuota voucher, verifikasi, penukaran dan rekonsiliasi partner"
             },
             {
               "id": "sanctuary-operations",
               "label": "Operasional Sanctuary",
-              "status": "ada",
+              "status": "parsial",
               "ket": "Screening, consent, therapist, hygiene, package ledger, no-show dan CSAT"
             }
           ]

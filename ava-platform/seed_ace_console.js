@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════════════
-// DATA UJI — Ace Darojatun Anwar
+// DATA UJI SINTETIS — Pasien Uji Sintetis
 // Tempel SELURUH isi ini di Console peramban (F12 → Console) SAAT SUDAH LOGIN
 // di AVA, lalu tekan Enter. Berjalan memakai sesi Anda sehingga RLS terhormat
 // persis seperti input manual dari layar.
@@ -11,6 +11,7 @@
 // ════════════════════════════════════════════════════════════════════════
 (async () => {
   if (typeof sbPost !== 'function') { alert('Buka AVA & login dulu, baru tempel skrip ini.'); return; }
+  if (!confirm('Skrip ini membuat record sintetis pada tenant sesi aktif. Jalankan hanya di lingkungan uji. Lanjutkan?')) return;
   const nowISO = () => new Date().toISOString();
   const stamp  = Date.now().toString().slice(-6);
   const one = r => Array.isArray(r) ? r[0] : r;
@@ -43,9 +44,9 @@
   async function admission(mr, label, status) {
     const visit = `VISIT-${new Date().toISOString().slice(0,10).replace(/-/g,'')}-${stamp}-${label}`;
     return one(await sbPost('admissions', {
-      mr_number:mr, visit_number:visit, patient_name:'Ace Darojatun Anwar',
-      patient_gender:'Male', patient_age:41, patient_dob:'1985-03-12', patient_blood_type:'O',
-      patient_phone:'081200000041', patient_category:'WNI', discount_scheme:'umum',
+      mr_number:mr, visit_number:visit, patient_name:'Pasien Uji Sintetis',
+      patient_gender:'Male', patient_age:36, patient_dob:'1990-01-01', patient_blood_type:'O',
+      patient_phone:'00000000000', patient_category:'WNI', discount_scheme:'umum',
       payment_status:'Paid', status, registered_by:'DATA UJI',
       visit_date:nowISO(), created_at:nowISO(), updated_at:nowISO(),
     }));
@@ -79,7 +80,7 @@
 
   try {
     let mr;
-    const ex = await sbGet('admissions', `select=mr_number&patient_name=ilike.*ace*darojatun*&mr_number=not.is.null&limit=1`);
+    const ex = await sbGet('admissions', `select=mr_number&patient_name=ilike.*pasien uji sintetis*&mr_number=not.is.null&limit=1`);
     mr = ex?.[0]?.mr_number || `MR-${stamp}41`;
 
     const log = [];
@@ -97,8 +98,8 @@
     let ri=0;
     for (const r of rads) {
       const acc = `ACC-${stamp}-${++ri}`;
-      const b = { accession_no:acc, mr_number:mr, patient_name:'Ace Darojatun Anwar',
-        patient_gender:'Male', patient_dob:'1985-03-12', modality_id:r.mod, modality_code:r.code,
+      const b = { accession_no:acc, mr_number:mr, patient_name:'Pasien Uji Sintetis',
+        patient_gender:'Male', patient_dob:'1990-01-01', modality_id:r.mod, modality_code:r.code,
         procedure_name:r.proc, clinical_info:'Data uji — rutin', referring_doctor:'dr. Seed',
         priority:'Rutin', status:r.st, scheduled_at:nowISO(),
         created_by:'DATA UJI', created_at:nowISO(), updated_at:nowISO() };
@@ -107,9 +108,9 @@
       log.push(`RIS ${r.st.padEnd(12)} ${acc} — ${r.proc}`);
     }
 
-    console.log('%c✅ DATA UJI DIBUAT — MR '+mr, 'color:#0E7C86;font-weight:800;font-size:14px');
+    console.log('%c✅ DATA UJI SINTETIS DIBUAT — MR '+mr, 'color:#0E7C86;font-weight:800;font-size:14px');
     log.forEach(l => console.log('  • '+l));
-    if (typeof toast==='function') toast('✅ Data uji Ace dibuat — buka menu Lab','ok',5000);
+    if (typeof toast==='function') toast('✅ Data uji sintetis dibuat — buka menu Lab','ok',5000);
     if (typeof labRefresh==='function') await labRefresh();
   } catch (e) {
     console.error('GAGAL:', e.message);

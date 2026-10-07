@@ -366,11 +366,14 @@ async function saveMasterRecord(event, id=null) {
   const submit = form.querySelector('button[type="submit"]');
   if (submit) { submit.disabled = true; submit.textContent = 'Menyimpan…'; }
   try {
-    await sbRpc('his_master_upsert_record', {
+    const result = await sbRpc('his_master_upsert_record', {
       p_id:id, p_domain_key:masterRegistryState.domain, p_code:String(data.get('code') || '').trim(),
       p_name:String(data.get('name') || '').trim(), p_status:String(data.get('status') || 'draft'),
       p_effective_from:start || null, p_effective_to:end || null, p_payload:payload, p_reason:reason || null,
     });
+    if (!result || !Number.isFinite(Number(result.id)) || Number(result.id) <= 0) {
+      throw new Error('Server tidak mengonfirmasi penyimpanan master.');
+    }
     closeModalForce();
     toast(`Master ${id == null ? 'ditambahkan' : 'diperbarui'} dan tercatat pada audit.`, 'ok');
     await renderMasterRegistry(masterRegistryState.domain);
@@ -387,7 +390,10 @@ async function archiveMasterRecord(id) {
   if (reason === null) return;
   if (!reason.trim()) { toast('Alasan pengarsipan wajib diisi.', 'warn'); return; }
   try {
-    await sbRpc('his_master_archive_record', {p_id:Number(id), p_reason:reason.trim()});
+    const result = await sbRpc('his_master_archive_record', {p_id:Number(id), p_reason:reason.trim()});
+    if (!result || !Number.isFinite(Number(result.id)) || Number(result.id) <= 0) {
+      throw new Error('Server tidak mengonfirmasi pengarsipan master.');
+    }
     toast('Master diarsipkan; riwayatnya tetap tersedia.', 'ok');
     await renderMasterRegistry(masterRegistryState.domain);
   } catch (err) { toast(err.message || 'Master gagal diarsipkan.', 'err', 6000); }

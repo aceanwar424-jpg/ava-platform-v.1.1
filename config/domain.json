@@ -258,7 +258,9 @@
       "berkas": [
         "kiosk/"
       ],
-      "bersama": []
+      "bersama": [
+        "css/service-design.css"
+      ]
     },
     {
       "kunci": "nakes",
@@ -274,7 +276,9 @@
       "berkas": [
         "nakes.html"
       ],
-      "bersama": []
+      "bersama": [
+        "css/service-design.css"
+      ]
     },
     {
       "kunci": "corporate",
@@ -312,7 +316,9 @@
       "berkas": [
         "track.html"
       ],
-      "bersama": []
+      "bersama": [
+        "css/service-design.css"
+      ]
     },
     {
       "kunci": "antrian",
@@ -328,7 +334,9 @@
       "berkas": [
         "monitor/"
       ],
-      "bersama": []
+      "bersama": [
+        "css/service-design.css"
+      ]
     },
     {
       "kunci": "crm",
@@ -344,7 +352,9 @@
       "berkas": [
         "monitor/"
       ],
-      "bersama": []
+      "bersama": [
+        "css/service-design.css"
+      ]
     },
     {
       "kunci": "wellness",
