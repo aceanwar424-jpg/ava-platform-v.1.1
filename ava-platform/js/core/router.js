@@ -123,6 +123,8 @@ const PAGE_TITLES = {
   'tech-sprint':'Sprint & Beban Kerja',
   'cfg-rs-policy':'Kebijakan Operasional',
   'rs-clinical-forms':'Formulir Klinis',
+  'rs-resource-booking':'Booking Sumber Daya',
+  'rs-shared-stock':'Stok Antarunit RS',
   'his-clinical-pathology':'Hasil Patologi Klinik (Viewer LIS)',
   'his-microbiology':'Hasil Mikrobiologi (Viewer LIS)',
   'his-anatomical-pathology':'Hasil Patologi Anatomi (Viewer LIS)',
@@ -520,6 +522,8 @@ async function navigate(page, params={}) {
     case 'tech-sprint':  safeRun('renderTeamSprint');                break;
     case 'cfg-rs-policy': safeRun('renderOperationalPolicies');      break;
     case 'rs-clinical-forms': safeRun('renderClinicalForms');        break;
+    case 'rs-resource-booking': safeRun('renderResourceBooking');    break;
+    case 'rs-shared-stock': safeRun('renderSharedStock');    break;
     case 'apps-hub':     safeRun('renderPortalAkses');              break;
     case 'support-hub':  safeRun('renderSupportive');               break;
     case 'portal-wellness': safeRun('renderAVAHealth', 'wellness');  break;

@@ -61,3 +61,8 @@ Verifikasi: `node scripts/uji/test_hospital_operations.cjs` memakai RPC/trigger 
 - 0075: membership tim, backlog/estimasi, planning, DoD, koreksi sebelum close, snapshot selesai, carry-over dan velocity historis.
 - 0076: catatan klinis tenant-scoped ke admissions existing, template aktif, pengesahan profesi dan authority, RLS scope, amendment tanpa overwrite.
 Prasyarat: baseline tenant/auth/RBAC/admissions dan 0070–0073. Preflight: db/preflight/0074_policy_sprint_clinical.sql. Runbook: db/runbooks/0074_policy_sprint_clinical.md. Tidak diterapkan produksi. Policy administratif belum menjadi kalkulator billing, authority belum menggantikan seluruh RBAC legacy, form engine belum menggantikan mesin klinis khusus. STR/SIP/privilege individual belum otomatis diverifikasi oleh form engine.
+
+## Booking dan persediaan antarunit — 0077–0078 (9 Oktober 2026)
+- 0077: policy sumber daya/master existing, peak overlap kapasitas, booking multi-resource atomik, buffer, expiry, service/order/admission, transisi version/idempotency, perlindungan penggunaan melewati jadwal dan RLS.
+- 0078: ledger stok existing, posisi lot, opening/reconcile approved, pemetaan ownership legacy approved, receive/issue/return/transfer/quarantine/release/waste, quality-order references, proteksi saldo dan ledger RS.
+Prasyarat/source contract dan batas berada di db/runbooks/0077_resource_stock.md; preflight db/preflight/0077_resource_stock.sql. Tidak diterapkan produksi. Source farmasi terpisah dan blood component/crossmatch belum diadaptasi; pharmacy activation dan blood patient issue diblokir. Fixture source inventory minimal tidak menggantikan validasi baseline legacy lengkap atau PostgreSQL multi-koneksi.

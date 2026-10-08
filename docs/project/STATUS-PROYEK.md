@@ -3179,3 +3179,23 @@ OWNED_BY: generic untuk kode/fixture baru. Persetujuan skema lokal dari sesi ber
 - Billing/stock/booking/unit klinis khusus/STR-SIP/privilege/simulator vendor/UAT masih pekerjaan lanjutan; tidak apply DB produksi atau koneksi eksternal. Rincian: IMPLEMENTASI-RS-TERPADU-2026-10-08.md dan runbook.
 - Checklist fondasi governance/Sprint lokal selesai; seluruh mesin operasional lanjutan belum selesai.
 - Pemeriksaan akhir SQL sempat gagal kehabisan memori Node saat tes paralel; tidak dihitung lulus. Pengulangan berurutan dengan --max-old-space-size=4096 lulus 13/13; UI final 5/5 lulus. Perubahan Apps pekerjaan lain tidak masuk commit ini.
+
+## Penuntasan mesin operasional RS — 9 Oktober 2026
+### Plan → Execute → Verify
+Pengguna meminta penuntasan dengan dummy dan cleanup. Persetujuan skema/uji lokal dan keputusan desain sebelumnya tetap berlaku. Subtask <= 1 jam: inventaris kontrak sumber; booking; episode/transfer; ledger stok; billing; clinical/workforce; adapter simulator; UI per modul; simulasi negatif/positif/konkurensi; cleanup; regresi; commit/push. Perubahan Apps/artifact milik pekerjaan lain dipertahankan.
+- [ ] Booking multi-resource atomik, buffer, kapasitas, expiry, transisi dan audit dengan master existing.
+- [ ] Integrasi episode, stok, billing dan unit khusus sesuai rancangan; jangan menggandakan master/sumber utama.
+- [ ] Uji isolated synthetic DB/UI, pastikan cleanup pada success/failure dan tidak menulis tenant nyata.
+- [ ] Bukti coverage per menu, runbook/preflight, commit/push; status sesuai kemampuan yang benar-benar diverifikasi.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Tidak menyalin data AVA/pasien nyata, mengubah nilai kunci katalog, mengaktifkan terapi/protokol atau koneksi vendor/produksi. Dummy hanya test DB terisolasi/temporary state; teardown wajib dalam finally. Bukti log/screenshot sintetis dipertahankan sebagai evidence, record dummy dibuang. Schema operasional lokal telah diotorisasi; aktivasi kebijakan nyata dan produksi tetap memerlukan pengesahan yang sesuai.
+
+### Bukti booking/stok lokal
+- [x] Booking multi-resource 0077 + UI, kapasitas master aktif, buffer/expiry, source order, version/idempotency dan penahanan overrun. SQL 7 skenario dan UI 5 kelompok lulus.
+- [x] Stok sumber inventory 0078 + UI, approved opening/reconciliation per lot, approved ownership mapping legacy, pergerakan batch/master/lokasi/ledger atomik, retur sumber, karantina maker-checker termasuk beberapa pembuat, dan RLS/ledger guard. SQL 8 skenario + UI 6 kelompok lulus.
+- [x] Dummy berada pada DB in-memory yang ditutup dalam finally pada success/failure; tidak ada record tenant nyata. Cleanup tersimpan pada empat JSON evidence 2026-10-09. Screenshot sintetis dan fixture tetap sebagai bukti/reproduksi.
+- [x] Regresi: governance/Sprint/form SQL 13 + UI 5; rawat inap/workflow SQL 21 + UI 27 lulus. Audit statis menu/manifest sinkron; audit ini bukan bukti semua alur fungsional.
+- [x] Preflight/runbook 0077_resource_stock dan implementasi 2026-10-09 tersedia. Tidak apply produksi/vendor.
+- [ ] Seluruh gap operasional RS belum tertutup: billing kamar/penjamin/deposit, unit episode/ibu-bayi, MAR/flowsheet/unit klinis, privilege/STR-SIP, indikator historis dan integrasi/simulator/readiness.
+- Katalog 255: 211 ada, 44 parsial, 0 belum; dua menu baru tetap parsial. Pharmacy memakai sumber sendiri; aktivasi adapter inventory pharmacy ditolak. Blood patient issue diblokir hingga komponen individual/crossmatch source terhubung. Ini belum memenuhi penuntasan seluruh menu.
+- Fixture kontrak inventory minimal; belum memvalidasi seluruh skema legacy/penerapan DB nyata atau konkurensi server PostgreSQL dua koneksi. Perubahan Apps dan evidence pekerjaan lain tetap di workspace.

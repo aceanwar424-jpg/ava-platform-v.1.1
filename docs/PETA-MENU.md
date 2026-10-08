@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 253 — 🟢 211 ada · 🟡 42 sebagian · ⚪ 0 belum dibuat
+**Total menu terpetakan:** 255 — 🟢 211 ada · 🟡 44 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -218,6 +218,8 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟡 | PPI & Surveilans Infeksi | `rs-ppi` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Farmasi Bangsal & Unit Dose | `rs-ward-pharmacy` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Transport Pasien & Ambulans | `rs-transport` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
+| 🟡 | Booking Sumber Daya | `rs-resource-booking` | Booking ruang/mesin atomik, kapasitas, buffer dan expiry; memerlukan 0077 dan policy disahkan. |
+| 🟡 | Stok Antarunit RS | `rs-shared-stock` | Lot, transfer, karantina, retur bersumber ledger persediaan existing; adaptor farmasi dan validasi khusus unit masih diperlukan. |
 
 **Unit Khusus & Pendukung RS**
 

@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "UI opening draft uses existing batch and requires approval",
+      "status": "passed"
+    },
+    {
+      "name": "approved opening and receive update actual source balances",
+      "status": "passed"
+    },
+    {
+      "name": "UI transfer→patient issue preserves ledger and physical balance",
+      "status": "passed"
+    },
+    {
+      "name": "insufficient stock error leaves source unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "UI legacy ownership draft and approved binding preserve master IDs",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile layout and browser errors",
+      "status": "passed"
+    }
+  ]
+}

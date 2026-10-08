@@ -1,0 +1,42 @@
+{
+  "synthetic": true,
+  "backend": "isolated in-memory PGlite",
+  "cleanup": {
+    "database_closed": true,
+    "no_production_records_created": true
+  },
+  "results": [
+    {
+      "name": "approved opening required and tenant ownership enforced",
+      "status": "passed"
+    },
+    {
+      "name": "receive synchronizes batch, master, location and source ledger once",
+      "status": "passed"
+    },
+    {
+      "name": "transfer preserves total; issue and referenced return preserve traceability",
+      "status": "passed"
+    },
+    {
+      "name": "quarantine blocks issue and requires separate release verifier",
+      "status": "passed"
+    },
+    {
+      "name": "invalid quantities, expiry, destinations and foreign admissions roll back",
+      "status": "passed"
+    },
+    {
+      "name": "legacy source drift blocks use and approved reconciliation preserves history",
+      "status": "passed"
+    },
+    {
+      "name": "legacy ownership binds only approved existing source IDs without changing master keys",
+      "status": "passed"
+    },
+    {
+      "name": "viewer, direct mutation and cross-tenant reads denied",
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "synthetic": true,
+  "backend": "isolated temporary PGlite",
+  "cleanup": {
+    "database_closed": true,
+    "no_production_records_created": true
+  },
+  "results": [
+    {
+      "name": "invalid physical capacity, foreign resource and missing policy denied",
+      "status": "passed"
+    },
+    {
+      "name": "exact interval peak allows disjoint reservations under shared capacity",
+      "status": "passed"
+    },
+    {
+      "name": "multi-resource booking rolls back completely on conflict",
+      "status": "passed"
+    },
+    {
+      "name": "retry stable, changed input rejected, service source and tenant enforced",
+      "status": "passed"
+    },
+    {
+      "name": "expired holds free capacity and stale/invalid transitions fail",
+      "status": "passed"
+    },
+    {
+      "name": "active overruns keep resources blocked until completion and recovery buffer",
+      "status": "passed"
+    },
+    {
+      "name": "viewer denied, authenticated mutation denied and tenant RLS isolated",
+      "status": "passed"
+    }
+  ]
+}

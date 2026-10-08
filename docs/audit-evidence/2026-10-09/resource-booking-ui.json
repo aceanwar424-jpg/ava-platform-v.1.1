@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "backend": "isolated temporary PGlite",
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "UI resources policy uses real master capacity and approval lifecycle",
+      "status": "passed"
+    },
+    {
+      "name": "multi-resource UI booking and conflict rollback",
+      "status": "passed"
+    },
+    {
+      "name": "confirm→start→complete persists actual SQL state",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile no overflow",
+      "status": "passed"
+    },
+    {
+      "name": "backend failure/retry and no browser errors",
+      "status": "passed"
+    }
+  ]
+}

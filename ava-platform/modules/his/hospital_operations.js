@@ -55,6 +55,7 @@ function rsOpsPaint() {
   </section>`;
   document.getElementById('rs-refresh').onclick=rsOpsLoad;
   document.getElementById('rs-source').onclick=()=>navigate('inpatient');
+  if(type){const links=[['Booking ruang / alat','rs-resource-booking'],['Stok antarunit','rs-shared-stock'],['Formulir klinis','rs-clinical-forms']];const target=rsOpsMain().querySelector('header .rs-actions');links.forEach(([label,page])=>{const button=document.createElement('button');button.textContent=label;button.onclick=()=>navigate(page);target.appendChild(button);});}
   document.getElementById('rs-status')?.addEventListener('change',e=>{rsOpsStatus=e.target.value;rsOpsOffset=0;rsOpsLoad();});
   document.getElementById('rs-new')?.addEventListener('click',rsOpsNew);
   document.getElementById('rs-new-bed')?.addEventListener('click',rsOpsNewBed);

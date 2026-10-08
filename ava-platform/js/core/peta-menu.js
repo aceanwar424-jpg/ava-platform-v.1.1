@@ -738,6 +738,18 @@ window.PETA_MENU = {
               "label": "Transport Pasien & Ambulans",
               "status": "parsial",
               "ket": "Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber."
+            },
+            {
+              "id": "rs-resource-booking",
+              "label": "Booking Sumber Daya",
+              "status": "parsial",
+              "ket": "Booking ruang/mesin atomik, kapasitas, buffer dan expiry; memerlukan 0077 dan policy disahkan."
+            },
+            {
+              "id": "rs-shared-stock",
+              "label": "Stok Antarunit RS",
+              "status": "parsial",
+              "ket": "Lot, transfer, karantina, retur bersumber ledger persediaan existing; adaptor farmasi dan validasi khusus unit masih diperlukan."
             }
           ]
         },

@@ -1,0 +1,8 @@
+-- Read-only. Run only in an authorized environment. No automatic backfill.
+SELECT name,to_regclass('public.'||name) IS NOT NULL AS available FROM unnest(ARRAY['tenants','user_profiles','roles','role_pages','admissions','his_master_records','ops_policy_versions','rs_work_orders','rs_clinical_records','inventory_items','inventory_batches','warehouses','stock_by_location','stock_ledger']) name;
+SELECT table_name,column_name,data_type FROM information_schema.columns WHERE table_schema='public' AND table_name IN ('inventory_items','inventory_batches','warehouses','stock_by_location','stock_ledger') ORDER BY table_name,ordinal_position;
+SELECT b.id,b.item_id,b.qty_remaining,i.stock_qty FROM inventory_batches b LEFT JOIN inventory_items i ON i.id=b.item_id WHERE i.id IS NULL OR b.qty_remaining IS NULL OR b.qty_remaining<0 OR i.stock_qty IS NULL OR i.stock_qty<0;
+SELECT item_id,warehouse_id,count(*) FROM stock_by_location GROUP BY item_id,warehouse_id HAVING count(*)>1;
+SELECT domain_key,id,code,name,payload FROM his_master_records WHERE domain_key IN ('unit_room','equipment','service_capacity') AND status='active';
+SELECT tablename,policyname,roles,cmd,qual,with_check FROM pg_policies WHERE schemaname='public' AND tablename IN ('inventory_items','inventory_batches','warehouses','stock_by_location','stock_ledger');
+SELECT p.proname,pg_get_function_identity_arguments(p.oid) AS signature,p.prosecdef,r.rolname AS owner FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace JOIN pg_roles r ON r.oid=p.proowner WHERE n.nspname='public' AND p.proname IN ('ops_actor','ops_active_policy','ops_assert_permission','rs_can_read','rs_stock_command','rs_booking_command');
