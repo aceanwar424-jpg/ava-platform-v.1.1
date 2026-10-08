@@ -327,7 +327,7 @@ async function renderTechModul() {
     groups.map(g=>'<h2>'+tsEsc(g.nama)+'</h2><ul>'+g.menu.map(m=>'<li>'+tsEsc(m.label)+' · '+tsEsc(m.status)+'</li>').join('')+'</ul>').join('')+'</section>';
 }
 async function renderTechSprint() {
-  document.getElementById('main-content').innerHTML='<section class="tech-directory"><h1>Pekerjaan & Kapasitas</h1><p role="status">Perencanaan sprint dan perhitungan kapasitas belum tersedia. Tidak ada angka sprint atau velocity terverifikasi untuk ditampilkan.</p><p>Gunakan direktori Tim & Delivery untuk membuka fungsi tim yang tersedia.</p></section>';
+  return window.renderTeamSprint();
 }
 
 window.renderTechSaas = renderTechSaas;

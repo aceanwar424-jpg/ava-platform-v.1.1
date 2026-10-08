@@ -311,9 +311,9 @@ window.PETA_MENU = {
             },
             {
               "id": "tech-sprint",
-              "label": "Pekerjaan & Kapasitas",
-              "status": "belum",
-              "ket": "Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh."
+              "label": "Sprint & Velocity",
+              "status": "ada",
+              "ket": "Konfigurasi per tim, membership, backlog, planning, DoD, snapshot/carry-over dan velocity. Memerlukan migrasi 0074–0075 serta setup disahkan."
             },
             {
               "id": "tech-delivery",
@@ -685,6 +685,12 @@ window.PETA_MENU = {
               "label": "Kapasitas & Indikator Rawat Inap",
               "status": "parsial",
               "ket": "Kapasitas dan okupansi saat ini; indikator historis belum tersedia."
+            },
+            {
+              "id": "rs-clinical-forms",
+              "label": "Formulir Klinis",
+              "status": "parsial",
+              "ket": "Template disahkan, catatan terstruktur dan amendment; mesin flowsheet/unit khusus masih bertahap."
             }
           ]
         },
@@ -1637,6 +1643,12 @@ window.PETA_MENU = {
         {
           "nama": "Master Konfigurasi HIS",
           "menu": [
+            {
+              "id": "cfg-rs-policy",
+              "label": "Kebijakan Operasional",
+              "status": "parsial",
+              "ket": "Versi, review dan aktivasi konfigurasi; penerapan ke billing/ledger/unit masih bertahap."
+            },
             {
               "id": "cfg-facility",
               "label": "Fasilitas, Cabang & Unit",

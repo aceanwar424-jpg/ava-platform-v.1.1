@@ -1,0 +1,26 @@
+{
+  "synthetic": true,
+  "backend": "isolated PGlite SQL",
+  "steps": [
+    {
+      "name": "UI policy creation, maker-checker rejection, review and activation",
+      "status": "passed"
+    },
+    {
+      "name": "UI backlog→planning→active→DoD→close and real velocity; escaped title",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile no overflow",
+      "status": "passed"
+    },
+    {
+      "name": "clinical form required boolean false, nurse record, doctor sign, amendment retains original",
+      "status": "passed"
+    },
+    {
+      "name": "backend failure and retry",
+      "status": "passed"
+    }
+  ]
+}

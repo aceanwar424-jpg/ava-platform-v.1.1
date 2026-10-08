@@ -121,6 +121,8 @@ const PAGE_TITLES = {
   'tech-roadmap':'Roadmap & Rilis', 'tech-modul':'Katalog Modul & Versi',
   'tech-isu':'Lacak Bug & Permintaan', 'tech-analyzer':'Konektor Analyzer',
   'tech-sprint':'Sprint & Beban Kerja',
+  'cfg-rs-policy':'Kebijakan Operasional',
+  'rs-clinical-forms':'Formulir Klinis',
   'his-clinical-pathology':'Hasil Patologi Klinik (Viewer LIS)',
   'his-microbiology':'Hasil Mikrobiologi (Viewer LIS)',
   'his-anatomical-pathology':'Hasil Patologi Anatomi (Viewer LIS)',
@@ -515,7 +517,9 @@ async function navigate(page, params={}) {
     case 'tech-roadmap': safeRun('renderTechRoadmap');               break;
     case 'tech-modul':   safeRun('renderTechModul');                 break;
     case 'tech-isu':     safeRun('renderTechIsu');                   break;
-    case 'tech-sprint':  safeRun('renderTechSprint');                break;
+    case 'tech-sprint':  safeRun('renderTeamSprint');                break;
+    case 'cfg-rs-policy': safeRun('renderOperationalPolicies');      break;
+    case 'rs-clinical-forms': safeRun('renderClinicalForms');        break;
     case 'apps-hub':     safeRun('renderPortalAkses');              break;
     case 'support-hub':  safeRun('renderSupportive');               break;
     case 'portal-wellness': safeRun('renderAVAHealth', 'wellness');  break;

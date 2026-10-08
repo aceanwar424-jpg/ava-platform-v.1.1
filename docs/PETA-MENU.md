@@ -20,7 +20,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | `lis.avahealth.sbs` | LIS — Laboratorium Diagnostik | Operasional diagnostik laboratorium: pra-analitik, analitik, pasca-analitik, QC, katalog tes, analyzer, reagen, integrasi HIS, dan audit mutu lab. | lis, mutu |
 | `wellness.avahealth.sbs` | Wellness — Nutrition & Personal Care | Operasional Nutrition, Care, Home Care, Sanctuary, pabrik, produk, program wellness, partner, penjualan, mutu, SDM, keuangan, dan logistik dalam satu payung. | wellness, marketing, keuangan, logistik, sdm, mutu |
 
-**Total menu terpetakan:** 251 — 🟢 210 ada · 🟡 40 sebagian · ⚪ 1 belum dibuat
+**Total menu terpetakan:** 253 — 🟢 211 ada · 🟡 42 sebagian · ⚪ 0 belum dibuat
 
 ---
 
@@ -98,7 +98,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
 | 🟢 | Tim Operasional | `hrd` | Data personel unit Tech |
-| ⚪ | Pekerjaan & Kapasitas | `tech-sprint` | Perencanaan sprint dan kapasitas belum tersedia; tidak menampilkan metrik contoh. |
+| 🟢 | Sprint & Velocity | `tech-sprint` | Konfigurasi per tim, membership, backlog, planning, DoD, snapshot/carry-over dan velocity. Memerlukan migrasi 0074–0075 serta setup disahkan. |
 | 🟡 | Implementasi & SLA | `tech-delivery` | Implementasi, acceptance, support, incident, adopsi dan renewal tenant |
 
 ---
@@ -205,6 +205,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 | 🟡 | Tracking Pelayanan IGD | `rs-igd-flow` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Rekonsiliasi Billing Rawat Inap | `rs-inpatient-billing` | Workflow operasional bertahap, peran, penugasan dan bukti; catatan klinis/stok/billing tetap di modul sumber. |
 | 🟡 | Kapasitas & Indikator Rawat Inap | `rs-capacity` | Kapasitas dan okupansi saat ini; indikator historis belum tersedia. |
+| 🟡 | Formulir Klinis | `rs-clinical-forms` | Template disahkan, catatan terstruktur dan amendment; mesin flowsheet/unit khusus masih bertahap. |
 
 **Unit Pelayanan RS**
 
@@ -543,6 +544,7 @@ Keterangan status: 🟢 ada · 🟡 sebagian · ⚪ struktur saja, belum dibuat
 
 | | Menu | Halaman | Keterangan |
 |---|---|---|---|
+| 🟡 | Kebijakan Operasional | `cfg-rs-policy` | Versi, review dan aktivasi konfigurasi; penerapan ke billing/ledger/unit masih bertahap. |
 | 🟡 | Fasilitas, Cabang & Unit | `config` › cfg-facility | Cabang, lokasi, unit, ruang, kelas layanan, dan alat |
 | 🟡 | Praktisi, Jadwal & Fee | `config` › cfg-practitioner | Dokter, spesialisasi, jadwal, cuti, jasa, dan fee rujukan |
 | 🟡 | Pasien, Penjamin & Keluarga | `config` › cfg-patient | Identitas pasien, asuransi, alergi, kondisi, dan relasi |

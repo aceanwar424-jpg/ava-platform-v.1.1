@@ -1,0 +1,58 @@
+{
+  "environment": "isolated PGlite SQL; synthetic only",
+  "production": false,
+  "results": [
+    {
+      "name": "missing policy fails closed; invalid configuration rejected",
+      "status": "passed"
+    },
+    {
+      "name": "administrative policy requires timezone, cutoff and bounded deposit percentage",
+      "status": "passed"
+    },
+    {
+      "name": "versioned draft, retries and maker-checker approval",
+      "status": "passed"
+    },
+    {
+      "name": "clinical template cannot be approved by administrator",
+      "status": "passed"
+    },
+    {
+      "name": "cross tenant and viewer cannot mutate or activate policies",
+      "status": "passed"
+    },
+    {
+      "name": "team scale, planning, assignment and active sprint gates",
+      "status": "passed"
+    },
+    {
+      "name": "DoD evidence, retry and stale version protection",
+      "status": "passed"
+    },
+    {
+      "name": "backlog re-estimation and correction of Done preserve before-events",
+      "status": "passed"
+    },
+    {
+      "name": "closing snapshots completed points and moves unfinished work without duplication",
+      "status": "passed"
+    },
+    {
+      "name": "second sprint velocity uses only closed Done snapshots",
+      "status": "passed"
+    },
+    {
+      "name": "new policy revision preserves closed velocity and next-planning carry-over history",
+      "status": "passed"
+    },
+    {
+      "name": "clinical templates, authority, role signing and immutable amendment",
+      "status": "passed"
+    },
+    {
+      "name": "RLS and direct mutation denied for authenticated session",
+      "status": "passed"
+    }
+  ]
+}

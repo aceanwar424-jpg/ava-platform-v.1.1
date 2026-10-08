@@ -55,3 +55,9 @@ database. Tabel tanpa primary key dilewati karena tidak aman untuk di-upsert.
 Prasyarat: baseline rawat inap existing dan migrasi tenant/auth/RBAC. Preflight: `db/preflight/0070_hospital_operations_preflight.sql`. Runbook: `db/runbooks/0070_hospital_operations.md`. Pemetaan tenant bed lama wajib ditinjau; jangan backfill seluruh bed ke satu tenant. Persetujuan chat hanya skema repo/uji lokal. Tidak ada instruksi apply produksi pada pekerjaan ini.
 
 Verifikasi: `node scripts/uji/test_hospital_operations.cjs` memakai RPC/trigger SQL nyata dan fixture sintetis; `node scripts/qa-hospital-operations.cjs` menghubungkan browser ke PGlite. Sink jurnal/audit lama adalah fixture, bukan validasi akuntansi/produksi. Unit khusus memakai workflow koordinasi dan referensi sumber; tidak mengklaim mesin klinis/stock ledger baru.
+
+## Governance, Sprint dan formulir — 0074–0076 (8 Oktober 2026)
+- 0074: versi konfigurasi administratif/template/authority/Sprint, maker-checker, gate aktivasi, effective date, idempotensi, tenant/RBAC dan event audit. Tidak seeded ke tenant nyata.
+- 0075: membership tim, backlog/estimasi, planning, DoD, koreksi sebelum close, snapshot selesai, carry-over dan velocity historis.
+- 0076: catatan klinis tenant-scoped ke admissions existing, template aktif, pengesahan profesi dan authority, RLS scope, amendment tanpa overwrite.
+Prasyarat: baseline tenant/auth/RBAC/admissions dan 0070–0073. Preflight: db/preflight/0074_policy_sprint_clinical.sql. Runbook: db/runbooks/0074_policy_sprint_clinical.md. Tidak diterapkan produksi. Policy administratif belum menjadi kalkulator billing, authority belum menggantikan seluruh RBAC legacy, form engine belum menggantikan mesin klinis khusus. STR/SIP/privilege individual belum otomatis diverifikasi oleh form engine.

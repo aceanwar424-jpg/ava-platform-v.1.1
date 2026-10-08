@@ -3120,3 +3120,62 @@ Validasi: qa-workspace-design.cjs lulus 34 viewport tanpa overflow horizontal; p
 Batas: implementasi lokal dan fixture browser, belum commit/push/deploy. Tidak mengklaim seluruh halaman modul legacy telah diaudit secara interaktif. Perubahan lain yang berjalan bersamaan (RS, Apps, katalog/readiness) dipertahankan; tidak digabung atau dipublikasikan otomatis. Rollback UI: lepas pemuatan workspace-design/service-design dan pulihkan handler navigasi; skema dan data tidak berubah.
 
 Verifikasi akhir tambahan: `qa-workspace-design.cjs --apps-only` lulus 4 viewport Apps/Corporate setelah penutupan dropdown pada klik tujuan dan Escape ditambahkan; hasil `verification-apps.json`. `test_workspace_navigation.cjs` diulang setelah penjagaan perubahan belum tersimpan di klik tujuan, tetap lulus. Preview Tech dibuka di panel Codex. Service worker Apps yang ada sudah menghentikan cache offline lama; tidak perlu perubahan cache untuk aset desain baru.
+
+## Rancangan operasional RS terpadu — 8 Oktober 2026
+### Plan → Execute → Verify
+- [x] Konfirmasi: semua pintu masuk/keluar memakai operasi terpadu; SOP existing belum tersedia; pengguna meminta rancangan.
+- [ ] Susun kontrak alur, formulir, peran, billing, stok, unit khusus dan matriks simulasi dalam satu dokumen review.
+- [ ] Periksa cakupan gap audit dan keputusan yang belum disetujui; tampilkan rancangan untuk review.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Ditinjau sebelum penulisan. Rancangan operasional konfigurabel per tenant, tanpa pasien nyata, data privat, tarif riil, protokol dosis/terapi atau klaim kepatuhan klinis. Rancangan belum menjadi SOP RS yang berlaku. Persetujuan skema/uji lokal sebelumnya tetap berlaku; kebijakan klinis, perubahan master/kunci relasional, integrasi eksternal dan penerapan produksi memerlukan checkpoint yang sesuai. Pada tahap ini hanya dokumentasi; tidak mengubah perilaku aplikasi.
+### Bukti rancangan
+- RANCANGAN-SOP-RS-TERPADU.md versi 0.1 mencakup semua pintu masuk/keluar, model status terpisah, peran, formulir, billing/penjamin, booking, 15 area khusus/pendukung, stok, SDM/evidence/integrasi, Tech Sprint dan 10 skenario acceptance.
+- Cakupan dicocokkan dengan gap audit menu dan rencana RS. Tidak menetapkan dosis/ambang klinis, tarif, cutoff, deposit atau izin override tanpa review.
+- Dokumen dibuka untuk review; tidak mengubah aplikasi/skema atau menjalankan transaksi. Tidak perlu uji aplikasi untuk perubahan dokumentasi ini.
+- Checklist penyusunan dan pemeriksaan selesai; pengesahan kebijakan oleh pengguna/pemilik profesi masih pending.
+
+### Keputusan review RS — 8 Oktober 2026: biaya kamar
+Pengguna memilih opsi 4: metode perhitungan kamar konfigurabel per RS/tenant dan kelas kamar. Dicatat dalam RANCANGAN-SOP-RS-TERPADU.md §4. Tarif/metode default, cutoff, pembulatan, minimum charge dan pindah kelas belum disetujui. Tidak mengubah skema/master atau perilaku billing pada tahap review ini.
+
+### Keputusan review RS: biaya pindah kelas
+Pengguna memilih opsi 4: konfigurabel per RS/tenant dan penjamin. Metode prorata/kelas tertinggi/kelas saat cutoff merupakan pilihan konfigurasi, bukan default yang sudah disahkan. Prioritas kontrak penjamin terhadap kebijakan RS dan alokasi biaya masih perlu review. Dokumentasi saja; tidak mengubah billing/master/skema.
+
+### Keputusan review RS: deposit
+Pengguna memilih opsi 4: konfigurabel per RS/tenant, kelas dan penjamin termasuk pengecualian. Dicatat pada rancangan §4. Nominal/persentase/default, waktu penagihan, prioritas aturan dan otorisasi pengecualian masih pending; tidak mengubah aplikasi/skema/master.
+
+### Keputusan review RS: seluruh aturan administratif
+Pengguna menjawab ya: refund, paket, penjamin, booking, kapasitas dan kewenangan override, serta aturan kamar/pindah kelas/deposit sebelumnya, dibuat konfigurabel per RS dengan versi/tanggal berlaku/persetujuan/audit. Nilai dan role ditetapkan saat setup. Dicatat di rancangan §9; bukan persetujuan default, SOP klinis, integrasi atau migrasi produksi. Tidak mengubah kode/skema/master.
+
+### Keputusan review RS: template klinis
+Pengguna menyetujui template generik konfigurabel untuk IGD/rawat inap/OK/ICU/persalinan/transfusi/day care, dengan pengisian/pengesahan sesuai profesi dan review penanggung jawab klinis sebelum aktivasi. Dicatat pada rancangan §3. Persetujuan penyusunan template bukan pengesahan protokol/parameter klinis. Tidak mengubah aplikasi atau menerapkan migrasi.
+
+### Keputusan review RS: matriks kewenangan
+Pengguna menyetujui matriks generik konfigurabel per tenant untuk role/persetujuan/pemisahan pelaksana-verifikator; petugas dan batas kewenangan ditentukan saat setup. Admin tidak menggantikan pengesahan klinis. Dicatat pada rancangan §2; detail aksi, batas nominal dan privilege tetap memerlukan setup/review. Dokumentasi saja.
+
+### Keputusan review RS: integrasi tanpa sandbox
+Pengguna memilih opsi 1: dokumentasi API/sandbox eksternal belum ada. Siapkan adapter dan simulator lokal sintetis; koneksi eksternal nonaktif. Dicatat di rancangan §7. HIS–LIS internal existing tidak dinonaktifkan; tidak dianggap bukti integrasi vendor. Simulasi wajib ditandai dan tidak menghasilkan transaksi resmi.
+
+### Keputusan review: Tech Sprint
+Pengguna memilih opsi 2: ikut dituntaskan dengan story point dan velocity. Dicatat pada rancangan §7. Tidak mengasumsikan konversi jam atau produktivitas individu; velocity dari item Done pada sprint tertutup. Durasi/skala/jendela/role/carry-over masih pending. Dokumentasi saja.
+
+### Keputusan review: konfigurasi Tech Sprint
+Pengguna memilih opsi 1: pengaturan per tim dalam tenant untuk durasi, skala poin, Definition of Done, jendela velocity dan carry-over. Dicatat dalam RANCANGAN-SOP-RS-TERPADU.md. Tidak menetapkan default diam-diam atau mengubah metrik historis. Pengumpulan keputusan desain utama selesai; konfigurasi operasional dan pengesahan klinis dilakukan sebelum aktivasi. Implementasi belum dianggap selesai berdasarkan persetujuan rancangan.
+
+## Implementasi keputusan RS terpadu — 8 Oktober 2026
+### Plan → Execute → Verify
+Persetujuan pengguna 1–9: semua A. Sumber existing; konfigurasi draft/review/approve/activate; kontrak penjamin mengungguli RS hanya pada bagian eksplisit; encounter/episode; ledger terpadu; amendment; fixture sintetis; review operasional pengguna/klinis profesi; lokal, dokumentasi, commit/push tanpa produksi/vendor.
+Subtask <= 1 jam: inventaris sumber; governance konfigurasi; template/role; Tech Sprint; booking/transfer; ledger stok; billing; unit khusus; simulator; regresi/UAT evidence. Tidak menaikkan semua menu hanya karena kerangka tersedia.
+- [ ] Fondasi konfigurasi versi, review terpisah, gate aktivasi dan UI setup.
+- [ ] Tech Sprint konfigurabel, lifecycle backlog/sprint/item, snapshot velocity.
+- [ ] Mesin operasional lanjutan sesuai kontrak dan sumber existing; audit scope per tahap.
+- [ ] Uji SQL/UI negatif/positif; runbook; commit/push lingkup sendiri.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk kode/fixture baru. Persetujuan skema lokal dari sesi berlaku; tambahan operasional tenant-scoped tidak mengubah nilai kunci katalog atau identitas pasien/master existing. Tanpa tarif/data privat, terapi otomatis, secret browser, integrasi/vendor atau DB produksi. Template klinis dan kebijakan tenant nyata tidak aktif sebelum review profesi. Rancangan setup memakai synthetic preset hanya pada test; tidak seeded otomatis untuk tenant nyata. Perubahan workspace lain dipertahankan.
+
+### Bukti implementasi fondasi RS terpadu
+- Governance 0074, Sprint 0075 dan form engine 0076 selesai implementasi lokal; UI dan runbook/preflight tersedia.
+- SQL 13 skenario dan UI 5 kelompok alur lulus; regresi RS SQL 21 dan UI 27 lulus. Keanggotaan tim, maker-checker, persetujuan authority klinis oleh profesi, RLS scope, DoD, snapshot/carry-over, amendment dan error/retry diuji.
+- Katalog 253: 211 ada, 42 parsial, 0 belum. Tech Sprint menjadi ada untuk fungsi yang diuji; cfg-rs-policy/rs-clinical-forms baru masih parsial. Ini tidak berarti 40 gap original selesai.
+- Billing/stock/booking/unit klinis khusus/STR-SIP/privilege/simulator vendor/UAT masih pekerjaan lanjutan; tidak apply DB produksi atau koneksi eksternal. Rincian: IMPLEMENTASI-RS-TERPADU-2026-10-08.md dan runbook.
+- Checklist fondasi governance/Sprint lokal selesai; seluruh mesin operasional lanjutan belum selesai.
+- Pemeriksaan akhir SQL sempat gagal kehabisan memori Node saat tes paralel; tidak dihitung lulus. Pengulangan berurutan dengan --max-old-space-size=4096 lulus 13/13; UI final 5/5 lulus. Perubahan Apps pekerjaan lain tidak masuk commit ini.
