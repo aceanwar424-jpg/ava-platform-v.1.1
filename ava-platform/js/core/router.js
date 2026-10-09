@@ -529,7 +529,7 @@ async function navigate(page, params={}) {
     case 'portal-wellness': safeRun('renderAVAHealth', 'wellness');  break;
     case 'cfg-facility':
     case 'cfg-branch':   safeRun('renderMasterRegistry', 'facility');break;
-    case 'cfg-practitioner': safeRun('renderMasterRegistry', 'practitioner'); break;
+    case 'cfg-practitioner': safeRun('renderPractitionerWorkspace'); break;
     case 'cfg-specialty':safeRun('renderMasterRegistry', 'specialty');break;
     case 'cfg-practitioner-fee': safeRun('renderMasterRegistry', 'fee'); break;
     case 'cfg-unit-room':safeRun('renderMasterRegistry', 'unit');    break;

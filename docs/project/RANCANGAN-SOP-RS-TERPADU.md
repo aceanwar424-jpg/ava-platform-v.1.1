@@ -173,3 +173,7 @@ Review awal: (1) setujui model encounter/transfer/keluar dan pemisahan klinis–
 Urutan implementasi mencakup semua unit: fondasi shared → bed/transfer/keluar → transaksi layanan/stok/billing → booking dan unit khusus → indikator/bukti/SDM → integrasi berizin dan UAT. Setiap work item dipecah menjadi subtask maksimum satu jam: inventaris sumber; kontrak; implementasi; simulasi negatif/positif; UI; bukti. Gap operasional tidak ditutup hanya dengan checklist generik.
 
 Rujukan internal: [audit menu](AUDIT-SELURUH-MENU-2026-10-06.md), [rencana operasional RS](RENCANA-OPERASIONAL-RS.md), [status proyek](STATUS-PROYEK.md).
+
+### Keputusan lanjutan 9 Oktober 2026 — 1A, 2A, 3A
+
+Histori lama dipertahankan: cutover eksplisit, opening ditinjau, koreksi melalui adjustment/amendment beralasan, tanpa rekonstruksi fiktif. SOP Nutrition/Wellness/Rewards/Sanctuary/Tech Delivery generik konfigurabel per tenant dan direview sebelum aktif. Reviewer klinis individu ditunjuk saat setup; aktivasi nyata menunggu petugas berwenang, pengembangan dan tes sintetis tetap berjalan. Keputusan ini tidak memberi izin produksi atau koneksi vendor.

@@ -1,0 +1,42 @@
+{
+  "synthetic": true,
+  "backend": "native PostgreSQL 17.10, loopback only",
+  "runtime_package": "@embedded-postgres/windows-x64@17.10.0-beta.17",
+  "cleanup": {
+    "server_stopped": true,
+    "cluster_removed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "two patients cannot reserve the same physical bed",
+      "status": "passed",
+      "independent_sessions": true,
+      "second_waited_for_lock": true
+    },
+    {
+      "name": "exclusive resource capacity is enforced across sessions",
+      "status": "passed",
+      "independent_sessions": true,
+      "second_waited_for_lock": true
+    },
+    {
+      "name": "simultaneous identical retries return one source transaction",
+      "status": "passed",
+      "independent_sessions": true,
+      "second_waited_for_lock": true
+    },
+    {
+      "name": "concurrent stock issues cannot overspend a source lot",
+      "status": "passed",
+      "independent_sessions": true,
+      "second_waited_for_lock": true
+    },
+    {
+      "name": "concurrent handover receivers cannot overwrite episode version",
+      "status": "passed",
+      "independent_sessions": true,
+      "second_waited_for_lock": true
+    }
+  ]
+}

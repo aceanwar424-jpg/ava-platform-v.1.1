@@ -1,0 +1,29 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "UI credential create→review→independent verification; self verification rejected",
+      "status": "passed"
+    },
+    {
+      "name": "UI explicit per-person scope/actions/credential IDs and separate approval",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile layout",
+      "status": "passed"
+    },
+    {
+      "name": "UI source credential revocation blocks linked privilege without deleting history",
+      "status": "passed"
+    },
+    {
+      "name": "backend error/retry without browser exceptions",
+      "status": "passed"
+    }
+  ]
+}

@@ -48,7 +48,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "mou": [
   "modules/crm/crm_pipeline.js",
@@ -342,7 +343,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "sales-corong": [
   "modules/crm/crm_pipeline.js",
@@ -369,7 +371,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "portal-korporat": [
   "modules/system/config/config_family.js",
@@ -387,7 +390,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "portal-akses": [
   "modules/system/config/config_family.js",
@@ -405,7 +409,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "perujuk": [
   "modules/crm/crm_pipeline.js",
@@ -562,7 +567,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "hc-schedule": [
   "modules/his/admission.js",
@@ -1322,7 +1328,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "config": [
   "modules/system/config/config_family.js",
@@ -1330,7 +1337,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "master-records": [
   "modules/system/config/config_family.js",
@@ -1338,7 +1346,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "refrange": [
   "modules/system/config/config_family.js",
@@ -1346,7 +1355,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "labreport": [
   "modules/system/config/config_family.js",
@@ -1364,7 +1374,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "corporate": [
   "modules/system/config/config_family.js",
@@ -1372,7 +1383,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "radiology": [
   "modules/radiology/dicomViewer.js",
@@ -1398,7 +1410,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "ekg-treadmill": [
   "modules/system/config/config_family.js",
@@ -1416,7 +1429,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "audiometry": [
   "modules/system/config/config_family.js",
@@ -1434,7 +1448,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "spirometry": [
   "modules/system/config/config_family.js",
@@ -1452,7 +1467,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "medrecord": [
   "modules/his/admission.js",
@@ -2547,7 +2563,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "family": [
   "modules/system/config/config_family.js",
@@ -2555,7 +2572,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "anamnesa": [
   "modules/his/admission.js",
@@ -2599,7 +2617,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "settings": [
   "modules/system/config/config_family.js",
@@ -2617,7 +2636,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "tech": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3611,7 +3631,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "tech-roadmap": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3669,7 +3690,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "rs-clinical-forms": [
   "modules/his/admission.js",
@@ -3765,7 +3787,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "support-hub": [
   "modules/system/config/config_family.js",
@@ -3783,7 +3806,8 @@ window.MODUL_HALAMAN = {
   "modules/system/timeline.js",
   "modules/system/config/master_registry.js",
   "modules/system/readiness.js",
-  "modules/system/operational_policies.js"
+  "modules/system/operational_policies.js",
+  "modules/system/config/workforce.js"
  ],
  "portal-wellness": [
   "modules/business_units/ava_health.js",
@@ -3797,7 +3821,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-branch": [
   "modules/system/config/config_family.js",
@@ -3805,7 +3830,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-practitioner": [
   "modules/system/config/config_family.js",
@@ -3813,7 +3839,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-specialty": [
   "modules/system/config/config_family.js",
@@ -3821,7 +3848,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-practitioner-fee": [
   "modules/system/config/config_family.js",
@@ -3829,7 +3857,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-unit-room": [
   "modules/system/config/config_family.js",
@@ -3837,7 +3866,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-diagnosis-reference": [
   "modules/system/config/config_family.js",
@@ -3845,7 +3875,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-patient": [
   "modules/system/config/config_family.js",
@@ -3853,7 +3884,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-patient-reference": [
   "modules/system/config/config_family.js",
@@ -3861,7 +3893,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-corporate": [
   "modules/system/config/config_family.js",
@@ -3869,7 +3902,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-corporate-contract": [
   "modules/system/config/config_family.js",
@@ -3877,7 +3911,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-mcu": [
   "modules/his/admission.js",
@@ -4079,7 +4114,8 @@ window.MODUL_HALAMAN = {
   "modules/system/config/config_labreport.js",
   "modules/system/config/config_package.js",
   "modules/system/config/config_product.js",
-  "modules/system/config/master_registry.js"
+  "modules/system/config/master_registry.js",
+  "modules/system/config/workforce.js"
  ],
  "cfg-job-master": [
   "modules/hrd/attendance.js",
@@ -4351,5 +4387,6 @@ window.MODUL_SEMUA = [
  "modules/his/resource_booking.js",
  "modules/his/shared_stock.js",
  "modules/tech-platform/operational_lifecycle.js",
- "modules/his/care_episodes.js"
+ "modules/his/care_episodes.js",
+ "modules/system/config/workforce.js"
 ];

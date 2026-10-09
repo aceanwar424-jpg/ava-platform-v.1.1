@@ -1,7 +1,7 @@
 // OWNED_BY: generic. Temporary in-memory database only; always close in finally.
 const fs=require('node:fs'),path=require('node:path'),base=require('./hospital-fixture.cjs');
-async function createEngineFixture(){
- const pg=await base.createHospitalFixture();
+async function createEngineFixture(providedPg){
+ const pg=await base.createHospitalFixture(providedPg);
  try{
   // Master fixture contract matches 0050. No real master is modified or seeded.
   await pg.exec(`CREATE TABLE his_master_records(id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,tenant_id uuid NOT NULL REFERENCES tenants(id),domain_key text NOT NULL,code text NOT NULL,name text NOT NULL,status text NOT NULL,effective_from date,effective_to date,payload jsonb NOT NULL DEFAULT '{}');`);

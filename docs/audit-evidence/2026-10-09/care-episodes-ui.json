@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "UI explicit cutover and professional handover; admin rejection preserves state",
+      "status": "passed"
+    },
+    {
+      "name": "UI observation links signed source to current episode",
+      "status": "passed"
+    },
+    {
+      "name": "UI signed transfer and separate receiving professional retain single encounter",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile layout",
+      "status": "passed"
+    },
+    {
+      "name": "UI professional exit closes encounter with retained episode history",
+      "status": "passed"
+    },
+    {
+      "name": "backend error/retry without browser exceptions",
+      "status": "passed"
+    }
+  ]
+}

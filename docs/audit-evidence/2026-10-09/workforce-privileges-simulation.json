@@ -1,0 +1,45 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "credential maker-checker, role, dates and retry",
+      "status": "passed"
+    },
+    {
+      "name": "explicit credential IDs and bounded grant period required",
+      "status": "passed"
+    },
+    {
+      "name": "named individual reviewer is required for clinical configuration activation",
+      "status": "passed"
+    },
+    {
+      "name": "clinical execution checks individual authority; admin and ungranted doctor denied",
+      "status": "passed"
+    },
+    {
+      "name": "episode handover requires both role authority and individual grant",
+      "status": "passed"
+    },
+    {
+      "name": "expired credential and changed professional role fail closed",
+      "status": "passed"
+    },
+    {
+      "name": "credential revocation immediately denies new clinical actions while signed history survives",
+      "status": "passed"
+    },
+    {
+      "name": "non-governance professional board exposes only own credentials and privileges",
+      "status": "passed"
+    },
+    {
+      "name": "cross-tenant and direct mutation denied; old policy core cannot bypass gate",
+      "status": "passed"
+    }
+  ]
+}

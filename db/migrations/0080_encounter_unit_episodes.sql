@@ -19,6 +19,7 @@ BEGIN
   admission_value:=(p_data->>'admission_id')::bigint;unit_value:=p_data->>'unit';physical_value:=(p_data->>'physical_unit_id')::bigint;cutover_value:=(p_data->>'cutover_at')::timestamptz;
   PERFORM 1 FROM admissions WHERE id=admission_value AND tenant_id=t FOR UPDATE;IF NOT FOUND THEN RAISE EXCEPTION 'Kunjungan bukan milik tenant';END IF;
   IF EXISTS(SELECT 1 FROM rs_encounter_lifecycle WHERE admission_id=admission_value AND state='closed') THEN RAISE EXCEPTION 'Encounter tertutup; kunjungan ulang wajib admission baru';END IF;
+  IF EXISTS(SELECT 1 FROM inpatient_stays WHERE admission_id=admission_value AND status<>'Dirawat') AND NOT EXISTS(SELECT 1 FROM inpatient_stays WHERE admission_id=admission_value AND status='Dirawat') THEN RAISE EXCEPTION 'Kunjungan rawat inap sumber sudah selesai; kunjungan ulang wajib admission baru';END IF;
   PERFORM ops_assert_permission(unit_value,'episode.open');
   IF cutover_value IS NULL OR cutover_value<now()-interval '1 minute' OR cutover_value>now()+interval '1 minute' THEN RAISE EXCEPTION 'Cutover eksplisit saat ini wajib; histori lama tidak direkonstruksi';END IF;
   IF unit_value NOT IN ('rs-igd-flow','rs-critical-care','rs-operating-room','rs-maternity','rs-day-care','rs-nurse-station') OR NOT EXISTS(SELECT 1 FROM rs_workflow_types WHERE code=unit_value) THEN RAISE EXCEPTION 'Unit pelayanan tidak valid';END IF;
@@ -68,7 +69,7 @@ BEGIN
    END IF;
   ELSIF p_action='attach' AND ep.state='active' THEN
    SELECT * INTO decision FROM rs_clinical_records WHERE id=(p_data->>'clinical_record_id')::bigint AND tenant_id=t AND admission_id=ep.admission_id AND signed_at IS NOT NULL;
-   IF NOT FOUND OR NOT EXISTS(SELECT 1 FROM ops_policy_versions WHERE id=decision.policy_id AND scope=ep.unit_code) THEN RAISE EXCEPTION 'Catatan sah pada kunjungan/scope episode wajib';END IF;
+   IF NOT FOUND OR NOT EXISTS(SELECT 1 FROM ops_policy_versions WHERE id=decision.policy_id AND scope=ep.unit_code) OR EXISTS(SELECT 1 FROM rs_clinical_records WHERE amendment_of=decision.id AND signed_at IS NOT NULL) THEN RAISE EXCEPTION 'Catatan sah terkini pada kunjungan/scope episode wajib';END IF;
    IF (p_data->>'observed_at')::timestamptz IS NULL OR (p_data->>'observed_at')::timestamptz<ep.started_at OR (p_data->>'observed_at')::timestamptz>now() THEN RAISE EXCEPTION 'Waktu observasi harus berada dalam episode';END IF;
    INSERT INTO rs_episode_clinical_links VALUES(ep.id,decision.id,t,(p_data->>'observed_at')::timestamptz,a,now());result_value:=jsonb_build_object('ok',true,'episode_id',ep.id,'clinical_record_id',decision.id);
   ELSE RAISE EXCEPTION 'Transisi episode tidak sah';END IF;

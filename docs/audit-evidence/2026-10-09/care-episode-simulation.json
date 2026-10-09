@@ -30,6 +30,14 @@
       "status": "passed"
     },
     {
+      "name": "birth relationship correction requires signed amendment and preserves original",
+      "status": "passed"
+    },
+    {
+      "name": "historical discharged source encounter cannot acquire a new active episode",
+      "status": "passed"
+    },
+    {
       "name": "tenant, viewer and direct mutation denied",
       "status": "passed"
     }

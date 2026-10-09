@@ -3356,3 +3356,18 @@ Subtask <= 1 jam per paket: kontrak source, model/transaksi, UI, skenario positi
 Keputusan D1–D3 lengkap; pengembangan lokal seluruh scope dapat dilanjutkan. Konfirmasi desain administratif konfigurabel, template klinis direview, source existing, koreksi append-only dan simulator eksternal nonaktif tidak ditanyakan ulang.
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic untuk implementasi baru; data/kode sumber existing mempertahankan kepemilikannya. Data uji sintetis dan DB temporary dengan finally cleanup. Tidak menyalin data privat AVA/pasien, menulis produksi, menghubungkan vendor, menetapkan dosis/protokol, mengesahkan kompatibilitas otomatis atau membuat klaim penerimaan klinis/vendor. Kode lengkap dan simulasi berbeda dari pengesahan SOP klinis tenant. Perubahan Apps pekerjaan lain dipertahankan.
+
+## Bukti penuntasan parsial — episode, privilege dan konkurensi 9 Oktober 2026
+### Plan → Execute → Verify
+Lanjutan rencana 44 menu dan keputusan 1A/2A/3A; tidak ada keputusan baru yang perlu ditanyakan. Subtask sumber, model/API, UI, tes, cleanup dan runbook diselesaikan per paket.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Referensi user/admission/master existing dipertahankan. Bukti kredensial manual tidak dianggap verifikasi vendor atau ketentuan hukum otomatis. Tidak ada pasien/kredensial nyata, tarif/protokol otomatis, deploy atau DB produksi. Paket test native dipasang hanya pada temporary prefix dengan scripts npm dinonaktifkan. Pekerjaan Tech/navigation/Apps lain tetap dipertahankan.
+### Bukti
+- [x] 0079 lifecycle tiket/rilis/instalasi: SQL6/UI6, sumber existing dan maker-checker; manual evidence, tidak menjalankan deployment. Implementasi masuk baseline commit 13a1720 oleh pekerjaan bersamaan; tes ulang lulus.
+- [x] 0080 episode: SQL9/UI6; satu admission, cutover, handover/transfer, signed observations, exit, relasi ibu-bayi/amendment dan source visit pulang tidak dibuka ulang.
+- [x] 0081 privilege individu: SQL9/UI5; credential/grant maker-checker, named reviewer, record/sign serta episode handover, expiry/revoke/role change, privacy/RLS dan core bypass ditolak. UI di Konfigurasi Praktisi.
+- [x] PostgreSQL native17.10 dua backend PID: lima race lulus (bed/resource/retry/stok/handover), contender menunggu lock. Server berhenti, cluster dan semua record dummy terhapus dalam finally.
+- [x] Regresi RS SQL21/UI27 lulus; manifest dibangun. Screenshot mobile episode/workforce diperiksa, tidak overflow. Total bukti tahap ini 46 skenario baru/ulang +63 regresi (termasuk booking SQL7/stok SQL8), tidak setara acceptance semua 44 menu.
+- [x] Preflight/runbook 0079–0081 dan ACCEPTANCE-44-MENU-2026-10-09.md mencatat gap tiap menu.
+- [ ] Runtime binary temporary belum terhapus: penghapusan direktori ditolak kebijakan tool; tidak dipaksakan. Direktori tidak berisi cluster atau record dummy.
+- [ ] Seluruh 44 masih membutuhkan acceptance lintas sumber sesuai matriks, terutama billing/penjamin/deposit, farmasi/MAR, komponen darah, set CSSD, klinis/indikator, integrasi, non-RS/Delivery dan configuration downstream. Tidak mengubah status menjadi selesai hanya dari kerangka.

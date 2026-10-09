@@ -3,8 +3,10 @@ const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'../..');
 const A='10000000-0000-0000-0000-000000000001',B='10000000-0000-0000-0000-000000000002';
 const admin='20000000-0000-0000-0000-000000000001',receiver='20000000-0000-0000-0000-000000000002',worker='20000000-0000-0000-0000-000000000003',foreign='20000000-0000-0000-0000-000000000004';
-async function createHospitalFixture(){
- const {PGlite}=await import('file://'+path.join(root,'desktop-app/node_modules/@electric-sql/pglite/dist/index.js').replace(/\\/g,'/'));const pg=new PGlite();
+async function createHospitalFixture(providedPg){
+ let pg=providedPg;
+ if(!pg){const {PGlite}=await import('file://'+path.join(root,'desktop-app/node_modules/@electric-sql/pglite/dist/index.js').replace(/\\/g,'/'));pg=new PGlite();}
+ try{
  await pg.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;
  CREATE SCHEMA auth;
  CREATE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$SELECT nullif(current_setting('app.user_id',true),'')::uuid$$;
@@ -33,5 +35,6 @@ async function createHospitalFixture(){
  await pg.exec(fs.readFileSync(path.join(root,'ava-platform/sql_arsip/05_modul_baru/supabase_inpatient.sql'),'utf8'));
  for(const name of ['0070_hospital_operations.sql','0071_hospital_bed_flow.sql','0072_hospital_staff_roles.sql','0073_hospital_operations_hardening.sql'])await pg.exec(fs.readFileSync(path.join(root,'db/migrations',name),'utf8'));
  return pg;
+ }catch(error){await pg.close();throw error;}
 }
 module.exports={createHospitalFixture,A,B,admin,receiver,worker,foreign};
