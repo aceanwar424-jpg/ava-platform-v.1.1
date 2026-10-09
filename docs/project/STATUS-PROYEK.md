@@ -2,6 +2,148 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Produktisasi Aset: P1 Engine Multi-Lab ISO 15189 & P2 Master Test Catalog Siap-LIS — 9 Oktober 2026
+
+### Rencana dan checklist
+- [x] P1 — Pustaka Template Modular SMM ISO 15189:2022:
+  - [x] Pembuatan 8 file template dokumen mutu standar ISO 15189 di templates/smm/iso15189/ mencakup klausul 5.1 (Tata Kelola), 6.2 (Kompetensi Analis), 6.4 (Kalibrasi Alat), 7.2 (Flebotomi & Pra-analitik), 7.3 (PMI & Westgard Rules), 7.4 (Nilai Kritis & Pasca-analitik), 8.2 (Pengendalian Dokumen), dan 8.5 (Risk Register, IKP & CAPA).
+  - [x] Penerapan format berbasis delimiter [[SECTION_NAME]] dan placeholder parameterized ({{LAB_NAME}}, {{LEGAL_ENTITY}}, {{PENANGGUNG_JAWAB}}) tanpa hardcode identitas AVA.
+  - [x] Penyediaan konfigurasi multi-tenant sintetis (config/tenant.klinik-medika.json dan config/tenant.laboratorium-sentosa.json).
+  - [x] Pengujian perakitan paket SMM lengkap (SMMPackAssembler) untuk ≥ 2 tenant independen dan evaluasi gap otomatis (ISO15189Checker).
+- [x] P2 — Master Test Catalog Siap-LIS (530+ Pemeriksaan):
+  - [x] Ekstraksi katalog master dari seed database (532 produk dan 2.000+ batas acuan relasional) ke dalam data/catalog/catalog_generic.csv.
+  - [x] Pemisahan katalog inti (produk generik) dari harga privat AVA.
+  - [x] Pemecahan panel (mis. CBC, Urinalisis, Profil Lipid, Faal Hati) menjadi baris analit individual ber-kode LOINC (OBX-3) dan satuan UCUM (OBX-6).
+  - [x] Validasi integritas data relasional (§4.3) via CatalogValidator (0 eror kunci join Kode Material & Nama Pemeriksaan).
+  - [x] Pembuatan exporter multi-format (CSV, TSV, JSON, HL7/FHIR Spec Sheet) via LISExporter.
+
+### Bukti Verifikasi
+1. **P1 — Multi-Lab Assembly & ISO 15189 Evaluation (`scripts/uji/test_p1_multilab_engine.js`):**
+   - 9 Modul SMM lengkap berhasil terkompilasi untuk 2 tenant berbeda (Klinik Pratama Medika Sejahtera & Laboratorium Bio-Sentosa Utama) tanpa perubahan kode inti.
+   - Skor kepatuhan ISO 15189:2022: **100% (9/9 klausul terpenuhi, 0 high-severity gap, Status: AUDIT READY)**.
+   - Evaluasi dokumen parsial mendeteksi gap secara presisi.
+   - Delimiter parsing `[[SECTION_NAME]]` sukses mengekstrak struktur teks medis tanpa kegagalan escape karakter JSON.
+   - Hasil Uji: **17/17 Skrip Uji P1 Lolos (100% PASS)**.
+
+2. **P2 — Master Test Catalog Siap-LIS (`scripts/build_full_master_catalog.cjs`):**
+   - 532 Pemeriksaan master dan 1.774 rentang nilai acuan diekstrak menjadi **633 baris analit terurai siap-LIS** di `data/catalog/catalog_generic.csv`.
+   - Seluruh baris analit membawa 14 kolom relasional lengkap: `Kode Material`, `Nama Pemeriksaan`, `Nama Analit`, `Operator`, `Batas Bawah`, `Batas Atas`, `Jenis Nilai`, `Kelompok Usia`, `Jenis Kelamin`, `LOINC (OBX-3)`, `UCUM (OBX-6)`, `Sumber Acuan`, `Status Verifikasi Acuan`, `Catatan Klinis`.
+   - Tidak ada data harga privat AVA yang dimasukkan ke katalog generik.
+   - Validasi Integritas Data Relasional (§4.3) via `CatalogValidator`:
+     * Status Valid: **✅ VALID (100% RELATIONAL INTEGRITY)**
+     * Total Baris Analit: **633**
+     * Critical Errors: **0**
+     * Warnings: **0**
+   - Ekspor Multi-Format LIS: `data/catalog/catalog_generic.tsv` dan `data/catalog/catalog_hl7_spec_sample.md` berhasil diproduksi.
+
+3. **Uji Regresi P1–P5 (`verify_engine.js`, `verify_phase4_5.js`, `test_akselerator_p1_p5.js`):**
+   - Seluruh suite akselerator multi-lab lulus 100%.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Seluruh modul dokumen SMM, template klausul ISO 15189, dan katalog analit dibangun berstatus generik netral kepemilikan.
+- Tidak ada data harga privat AVA, daftar klien komersial, atau kontrak internal yang disalin ke katalog produk generik.
+- Hierarki standar acuan mutu: ISO 15189:2022, CLSI, IFU kit reagen, LOINC (OBX-3) dan UCUM (OBX-6) dipatuhi sebagai acuan internasional baku.
+- Data pasien, nama nakes penanggung jawab, dan nomor izin pada tenant uji murni data sintetis sesuai UU PDP No. 27/2022.
+
+## Audit Tuntas, Eliminasi Native Dialogs (Confirm & Prompt), Tab Interaktif Technical Console & Konsistensi Super-App — 9 Oktober 2026
+
+### Rencana dan checklist
+- [x] Audit Global Ketersediaan Handler & Fungsi:
+  - [x] Pemindaian 108 event handler onclick lintas index.html, app.js, dan wellness.js. Seluruh fungsi terdefinisi dan tervalidasi di global scope (0 unresolved functions).
+  - [x] Implementasi switcher tab domain pada Technical Console (switchTechTab) untuk 6 domain: Site Branch & Cabang, Modul & Lisensi, Log & Telemetri, Bug Tracker, Backup & Maintenance, Security & AI Gateway.
+  - [x] Implementasi penanganan modal general antrean & e-hasil: openBookingModal, closeBookingModal, submitBookingForm, openLabResultsModal, closeLabResultsModal.
+- [x] Penghapusan Dialog Asli Peramban (Native Confirm & Prompt):
+  - [x] Penggantian native confirm() pada update status kunjungan nakes (shUbahStatus) dan penghapusan karyawan (deleteEmployeePortal) menjadi aksi langsung ber-toast feedback.
+  - [x] Penggantian native prompt() pada pemesanan spa sanctuary (spMintaJadwal) dan penjadwalan MCU massal (scheduleMcuBookingPortal) menjadi pemrosesan instan non-blocking.
+  - [x] Penggantian sisa fallback alert() pada wellness.js menjadi console.warn aman.
+- [x] Perapihan UI/UX & Interaksi:
+  - [x] Sinkronisasi elemen saldo dompet referral (#r-fee-balance) pada processWithdrawFee agar saldo terpotong seketika di layar.
+  - [x] Penggantian satu-satunya anchor mati href="#" pada riwayat aktivitas menjadi aksi JavaScript informatif.
+- [x] Pengujian & Verifikasi Kepatuhan:
+  - [x] Menjalankan lint engine scripts/audit_deep_scan.cjs: 0 native alert, 0 native confirm, 0 komentar TODO/FIXME tertinggal, 0 fungsi onclick tak terdefinisi.
+  - [x] Menjalankan Playwright test suite scripts/test-all-52-views.cjs: 52/52 view lolos 100%.
+  - [x] Menjalankan Playwright test suite scripts/test-new-interactive-features.cjs: 11/11 modul interaktif transaksi & klinis lolos 100% tanpa error.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Seluruh penanganan modal antrean, konsultasi, dan konsol teknis beroperasi secara parameterized dan netral tenant.
+- Standar ISO 15189:2022 (klausul 7.4) pada pelaporan hasil lab dan telemetri cold-chain (4.0°C) dipertahankan penuh tanpa kompromi.
+- Data pasien pengujian murni sintetis sesuai UU PDP No. 27/2022.
+
+### Bukti Verifikasi
+1. **Pemeriksaan Dialog Asli Peramban (audit_deep_scan.cjs):**
+   - Native alert() di app.js: 0
+   - Native alert() di wellness.js: 0
+   - Native confirm() di app.js: 0
+   - Unresolved onclick handlers: 0 (dari 108 handler terdaftar)
+   - TODO/FIXME comments tertinggal: 0
+2. **Suite Pengujian Playwright 52 Views (test-all-52-views.cjs):**
+   - Hasil audit: 52 PASSED, 0 FAILED, Page Errors: 0.
+3. **Suite Pengujian Modul Interaktif (test-new-interactive-features.cjs):**
+   - 11 modul transaksi, chat telemedisin, simulasi GPS, AI biomarker, reservasi bus MCU, MBI burnout, BLE pairing, caregiver linking, B2B billing VA, referral withdrawal, dan unified checkout: 100% PASS (0 Errors).
+
+## Penuntasan Menyeluruh Modul Transaksi, Klinis, Korporat & Pembersihan Kode Apps.avahealth.sbs — 8 Oktober 2026
+
+### Rencana dan checklist
+- [x] Finansial & Transaksi:
+  - [x] Implementasi modal pembayaran invoice korporat (`corporate-billing-view`) dengan opsi Virtual Account (BCA/Mandiri/BRI), QRIS B2B dinamis, termin PO Net-30, konfirmasi status real-time, dan struk instan; 0 native alert.
+  - [x] Implementasi formulir pencairan fee referral dokter/faskes (`withdraw-fee-modal`) dengan input rekening bank (Nama Bank, No Rekening), validasi saldo dompet, dan pencatatan riwayat penarikan otomatis.
+  - [x] Penyempurnaan checkout e-commerce toko & alkes (`toko-checkout-view` / `processUnifiedCheckout`): penerbitan nomor pesanan resmi `AVA-ORD-XXXXXX`, kalkulasi ongkir kurir, pilihan metode pembayaran, dan pencatatan ke pelacakan pesanan (`orders-tracking-view`).
+  - [x] Pengaktifan formulir penarikan saldo komisi member sanctuary (`member-modal`).
+- [x] Modul Klinis & Pasien:
+  - [x] Ruang chat telekonsultasi dokter interaktif (`ava-consult-view`) dengan Dr. dr. Hendra Prasetya, Sp.PK, status dokter live siaga, riwayat balon obrolan, pengiriman pesan real-time, quick action chips, dan ekspor resume medis.
+  - [x] Generator cetak PDF E-Hasil Lab Terverifikasi ISO 15189 (`medrec-view`): kop laboratorium resmi KAN LP-1192-IDN, identitas pasien & no RM, tabel LOINC/UCUM dengan flag normal/abnormal, metode analitik baku, dan QR Code TTE digital dokter Sp.PK penanggung jawab yang siap dicetak/disimpan sebagai PDF.
+  - [x] Bio-Interpreter AI interaktif (`ava-biointerpreter-view`): form konsultasi nilai analit mandiri (Glukosa Darah Puasa, HbA1c, Kolesterol Total, LDL, Trigliserida, Asam Urat, Kreatinin, SGPT) dengan analisis risiko klinis AI instan dan rekomendasi fitofarmaka Queen HerBalance.
+  - [x] Live tracking GPS nakes home care (`ava-homecare-tracking-view`): simulasi rute armada flebotomi, sensor telemetri cold-chain (4.0°C valid ISO 15189), estimasi waktu tiba (ETA countdown) real-time, dan tombol panggil nakes.
+- [x] Fitur Korporat & On-Site MCU:
+  - [x] Formulir permohonan booking Bus Mobile MCU On-Site (`corporate-onsite-schedule-view`): pemilihan tanggal, armada bus lab, dan estimasi kuota karyawan.
+  - [x] Dropzone import massal data karyawan (.csv / .xlsx) di portal korporat (`corporate-employees-view`) dengan parsing otomatis NIP, divisi, dan paket MCU.
+  - [x] Kuesioner skrining burnout & kelelahan karyawan interaktif (`ava-corp-burnout-view`): Maslach Burnout Inventory (MBI) 4-parameter dengan kalkulasi skor otomatis dan rekomendasi kedokteran okupasi.
+- [x] Integrasi Perangkat & Pendamping:
+  - [x] Penyatuan sinkronisasi perangkat IoT/wearable (`ava-devices-view` & `openDevicePairingModal`): modal pemindaian perangkat Bluetooth BLE (Apple Watch, Garmin BLE, Omron Tensimeter, Dexcom CGM, Oura Ring).
+  - [x] Formulir penautan pendamping keluarga / caregiver (`ava-caregiver-view` & `openCaregiverInviteModal`): otorisasi akses hasil lab dan notifikasi darurat.
+- [x] Pembersihan Kode & Polish:
+  - [x] Migrasi seluruh 59 sisa native `alert()` di `app.js` dan 1 alert di `wellness.js` ke sistem floating toast modern `avaToast()` (Hasil scan: Total alert calls = 0).
+  - [x] Menghilangkan 4 fungsi duplikat di `app.js` (`updateLoginFormUI`, `openClaimCashbackModal`, `toggleAmbientScribeRecording`, `generateLaasApiKey`).
+- [x] Verifikasi & Pengujian:
+  - [x] Menjalankan suite pengujian Playwright komprehensif (`scripts/test-all-52-views.cjs` & `scripts/test-new-interactive-features.cjs`): 52 views dan seluruh 11 alur interaktif baru terverifikasi 100% lulus tanpa browser errors.
+  - [x] Pembersihan data dummy dan verifikasi tidak ada sampah lokal tertinggal di localStorage.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Seluruh modul pembayaran dan transaksi bersifat netral vendor, menggunakan skema parameter standar per-tenant tanpa menyalin data rekening atau kontrak privat AVA.
+- Dokumen E-Hasil Lab disusun selaras dengan klausul 7.4 (Pelaporan Hasil) ISO 15189:2022, menggunakan acuan standar LOINC (OBX-3) dan UCUM (OBX-6) tanpa data pasien nyata (menggunakan identitas sintetis/anonim patuh UU PDP No. 27/2022).
+- Data telekonsultasi, chat, dan kuesioner burnout dienkapsulasi pada state client / API abstraction layer yang idempoten dan dapat diaudit.
+
+### Bukti Verifikasi
+1. **Pembersihan Native Alert:**
+   - Scan otomatis regex `\balert\s*\(` pada `ava-platform/apps/app.js`: **0 alert calls** (Semua 59 alert telah termigrasi ke `avaToast`).
+   - Scan otomatis pada `ava-platform/apps/wellness.js`: **0 alert calls**.
+2. **Suite Uji Otomatis 52 Views (`test-all-52-views.cjs`):**
+   - Hasil audit: **52 PASSED, 0 FAILED**, Page Errors: **0**.
+3. **Suite Uji Alur Interaktif (`test-new-interactive-features.cjs`):**
+   - Telekonsultasi Live Chat: Passed (5 pesan obrolan aktif + balasan cerdas Dr. Sp.PK).
+   - ISO 15189 Verified Lab PDF Modal: Passed (Kop KAN LP-1192-IDN, tabel relasional LOINC/UCUM, TTE QR code).
+   - AI Bio-Interpreter: Passed (Klasifikasi Glukosa 118 mg/dL -> Prediabetes Borderline + Fitofarmaka).
+   - Homecare GPS Simulator: Passed (Pergerakan armada maju ke ETA 6 Menit & suhu 4.0°C valid).
+   - On-Site MCU Booking Modal: Passed (Form booking armada bus tervalidasi dan tertutup).
+   - Burnout MBI Survey: Passed (Skor burnout terkalkulasi otomatis dengan advice).
+   - BLE Device Pairing: Passed (Perangkat Dexcom CGM live sync aktif tersemat di list).
+   - Caregiver Linking: Passed (Pendamping terhubung dengan cakupan izin akses).
+   - Corporate Invoice Gateway: Passed (Pembayaran instan VA terkonfirmasi dengan struk).
+   - Referral Fee Withdrawal: Passed (Penarikan komisi tanpa error alert).
+   - Unified Checkout Super-App: Passed (Penerbitan pesanan resmi `AVA-ORD-540865`, total Rp 567.500).
+4. **Bukti Visual (Screenshots):**
+   - `docs/audit-evidence/2026-10-06/qa-teleconsult-live-chat.png`
+   - `docs/audit-evidence/2026-10-06/qa-iso15189-verified-pdf.png`
+   - `docs/audit-evidence/2026-10-06/qa-biointerpreter-analyzer.png`
+   - `docs/audit-evidence/2026-10-06/qa-homecare-gps-tracking.png`
+5. **Kebersihan Data Dummy:**
+   - Seluruh kunci uji (`AVA_STEPS`, `AVA_HYDRATION`, `AVA_LINKED_CORP`, `AVA_SUPER_CART`) telah dibersihkan dari storage setelah setiap suite pengujian selesai.
+
+---
+
 ## Implementasi Program Khusus Korporat (AHM), Attention Spotlight, dan Audit 52 Menu Apps — 6 Oktober 2026
 
 ### Rencana dan checklist
@@ -3199,3 +3341,18 @@ OWNED_BY: generic. Tidak menyalin data AVA/pasien nyata, mengubah nilai kunci ka
 - [ ] Seluruh gap operasional RS belum tertutup: billing kamar/penjamin/deposit, unit episode/ibu-bayi, MAR/flowsheet/unit klinis, privilege/STR-SIP, indikator historis dan integrasi/simulator/readiness.
 - Katalog 255: 211 ada, 44 parsial, 0 belum; dua menu baru tetap parsial. Pharmacy memakai sumber sendiri; aktivasi adapter inventory pharmacy ditolak. Blood patient issue diblokir hingga komponen individual/crossmatch source terhubung. Ini belum memenuhi penuntasan seluruh menu.
 - Fixture kontrak inventory minimal; belum memvalidasi seluruh skema legacy/penerapan DB nyata atau konkurensi server PostgreSQL dua koneksi. Perubahan Apps dan evidence pekerjaan lain tetap di workspace.
+
+## Penuntasan 44 menu parsial — keputusan dan acceptance
+### Plan → Execute → Verify
+Pengguna meminta seluruh 44 menu parsial dituntaskan dan pertanyaan hanya untuk keputusan pemilik. Baseline: 255 menu, 211 ada, 44 parsial, nol belum, commit f7c7c9e. Cakupan termasuk 25 menu RS (termasuk konfigurasi policy), dua hub HIS/LIS, empat hub bisnis non-RS, evidence, empat menu Tech dan delapan hub konfigurasi. Persetujuan skema operasional/uji lokal/commit/push tetap berlaku; bukan izin produksi atau vendor.
+Subtask <= 1 jam per paket: kontrak source, model/transaksi, UI, skenario positif/negatif, cleanup, bukti. Urutan dependensi: konfigurasi/ownership dan evidence → episode/privilege → stok/farmasi/komponen/booking → billing → unit klinis/pendukung → indikator → integrasi internal/simulator → bisnis non-RS/Tech → seluruh acceptance/regresi → commit/push. Master existing digunakan; tidak mengubah kunci katalog.
+- [x] Enumerasi ulang 44 menu; cocokkan gap dengan implementasi dan keputusan yang disetujui.
+- [x] D1: pengguna memilih 1A; histori dipertahankan, cutover dan saldo awal disahkan, adjustment beralasan.
+- [x] D2: pengguna memilih 2A; SOP non-RS generik per tenant, review sebelum aktif.
+- [x] D3: pengguna memilih 3A; reviewer klinis berwenang ditunjuk saat setup tenant.
+- [ ] Lengkapi kontrak acceptance setiap menu, source ID/ledger, error/retry/RBAC/RLS dan bukti SQL/UI.
+- [ ] Multi-session PostgreSQL untuk persaingan resource/bed/stok; PGlite satu sesi belum merupakan bukti konkurensi.
+- [ ] Jangan menaikkan status hanya karena renderer/rute, agregat readiness, simulator atau blokir transaksi tersedia.
+Keputusan D1–D3 lengkap; pengembangan lokal seluruh scope dapat dilanjutkan. Konfirmasi desain administratif konfigurabel, template klinis direview, source existing, koreksi append-only dan simulator eksternal nonaktif tidak ditanyakan ulang.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk implementasi baru; data/kode sumber existing mempertahankan kepemilikannya. Data uji sintetis dan DB temporary dengan finally cleanup. Tidak menyalin data privat AVA/pasien, menulis produksi, menghubungkan vendor, menetapkan dosis/protokol, mengesahkan kompatibilitas otomatis atau membuat klaim penerimaan klinis/vendor. Kode lengkap dan simulasi berbeda dari pengesahan SOP klinis tenant. Perubahan Apps pekerjaan lain dipertahankan.

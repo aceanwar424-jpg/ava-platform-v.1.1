@@ -21,7 +21,7 @@
     if (busy) { button.dataset.label = button.textContent; button.disabled = true; button.textContent = label || 'Memproses…'; }
     else { button.disabled = false; button.textContent = button.dataset.label || button.textContent; }
   };
-  const notify = message => typeof alert === 'function' && alert(message);
+  const notify = message => (typeof window.avaToast === 'function' ? window.avaToast(message, 'info') : (console.warn('[Wellness Alert]', message)));
   const state = (title, message, type = '') => `<section class="wellness-state ${safe(type)}"><h3>${safe(title)}</h3><p>${safe(message)}</p></section>`;
   const sourceName = source => ({
     self_reported: 'Input mandiri', ihc_bulk: 'IHC · Bulk upload', ihc_api: 'IHC · API',

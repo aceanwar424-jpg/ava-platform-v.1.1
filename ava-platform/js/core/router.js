@@ -383,7 +383,7 @@ async function navigate(page, params={}) {
     case 'audiometry':  safeRun('renderSupportive', { type: 'Audiometri' }); break;
     case 'spirometry':  safeRun('renderSupportive', { type: 'Spirometri' }); break;
     case 'medrecord':   safeRun('renderMedRecord');              break;
-    case 'rs-patient-flow': safeRun('renderHospitalOperations', {page:'rs-patient-flow'}); break;
+    case 'rs-patient-flow': safeRun('renderCareEpisodes'); break;
     case 'rs-bed-reservation': safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
     case 'rs-housekeeping': safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
     case 'rs-nurse-station': safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
@@ -516,9 +516,9 @@ async function navigate(page, params={}) {
     case 'tech-harga':  safeRun('renderTechPricingPlans');           break;
     case 'tenants':     safeRun('renderTenants');                    break;
     case 'db-studio':    safeRun('renderDatabaseStudio');           break;
-    case 'tech-roadmap': safeRun('renderTechRoadmap');               break;
-    case 'tech-modul':   safeRun('renderTechModul');                 break;
-    case 'tech-isu':     safeRun('renderTechIsu');                   break;
+    case 'tech-roadmap': safeRun('renderTechOperations',{page});     break;
+    case 'tech-modul':   safeRun('renderTechOperations',{page});     break;
+    case 'tech-isu':     safeRun('renderTechOperations',{page});     break;
     case 'tech-sprint':  safeRun('renderTeamSprint');                break;
     case 'cfg-rs-policy': safeRun('renderOperationalPolicies');      break;
     case 'rs-clinical-forms': safeRun('renderClinicalForms');        break;

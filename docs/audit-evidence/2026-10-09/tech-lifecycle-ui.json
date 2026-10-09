@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "UI ticket create→triage→work→wait→resolve→independent close",
+      "status": "passed"
+    },
+    {
+      "name": "UI change approval→preflight→completion records source release",
+      "status": "passed"
+    },
+    {
+      "name": "UI source-backed installation report and independent verification",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile layout",
+      "status": "passed"
+    },
+    {
+      "name": "UI rollback revokes source deployment verification",
+      "status": "passed"
+    },
+    {
+      "name": "backend failure/retry and no browser errors",
+      "status": "passed"
+    }
+  ]
+}

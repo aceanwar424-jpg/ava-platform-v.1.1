@@ -1,0 +1,37 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "explicit cutover, ownership, duplicate current episode and retry",
+      "status": "passed"
+    },
+    {
+      "name": "professional recipient, separate handover receiver and stale version",
+      "status": "passed"
+    },
+    {
+      "name": "observations require signed source with matching scope and episode time",
+      "status": "passed"
+    },
+    {
+      "name": "unit transfer is atomic and references professional decision without a new encounter",
+      "status": "passed"
+    },
+    {
+      "name": "mother and newborn link retains separate encounters and independent exit",
+      "status": "passed"
+    },
+    {
+      "name": "exit requires current decision and completion of pending work; closed visit cannot reopen",
+      "status": "passed"
+    },
+    {
+      "name": "tenant, viewer and direct mutation denied",
+      "status": "passed"
+    }
+  ]
+}

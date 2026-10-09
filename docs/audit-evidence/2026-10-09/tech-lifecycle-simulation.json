@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "ticket create retry and changed input rejected",
+      "status": "passed"
+    },
+    {
+      "name": "triage, assignment, waiting, resolution and independent close",
+      "status": "passed"
+    },
+    {
+      "name": "release maker-checker, preflight/result and stale version enforced",
+      "status": "passed"
+    },
+    {
+      "name": "deployment requires succeeded source, same version and independent verifier",
+      "status": "passed"
+    },
+    {
+      "name": "rollback revokes deployment; source history survives",
+      "status": "passed"
+    },
+    {
+      "name": "tenant and role isolation, pagination and direct writes denied",
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "tenant_id": "TEN-MEDIKA-01",
+  "lab_info": {
+    "name": "Klinik Pratama Medika Sejahtera",
+    "short_name": "Medika Lab",
+    "legal_entity": "PT Medika Sejahtera Utama",
+    "license_number": "445/098/SIP-KLINIK/2026",
+    "city": "Surabaya",
+    "address": "Jl. Darmo Sejahtera No. 45, Surabaya",
+    "phone": "+62 31 555-0123",
+    "email": "laboratorium@medikasejahtera.co.id",
+    "website": "https://medikasejahtera.co.id"
+  },
+  "accreditation": {
+    "iso_version": "ISO 15189:2022",
+    "target_body": "KAN (Komite Akreditasi Nasional)",
+    "accreditation_number": "LP-881-IDN"
+  },
+  "qms_headers": {
+    "doc_code_prefix": "SOP-MEDIKA",
+    "effective_date": "2026-10-01",
+    "lab_director_name": "dr. Budi Setiawan, Sp.PK",
+    "lab_director_sip": "SIP.503/4421/Sp.PK/2026"
+  },
+  "lis_integration": {
+    "provider_type": "GENERIC_REST",
+    "hl7_version": "v2.5.1",
+    "fhir_version": "R4",
+    "obx3_loinc_required": true,
+    "obx6_ucum_required": true
+  },
+  "ip_ownership": {
+    "tag": "generic",
+    "statement": "Konfigurasi terparameterisasi netral - Tidak mengandung data proprietary AVA."
+  }
+}

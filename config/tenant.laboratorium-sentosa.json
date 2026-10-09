@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "tenant_id": "TEN-SENTOSA-02",
+  "lab_info": {
+    "name": "Laboratorium Bio-Sentosa Utama",
+    "short_name": "BioSentosa",
+    "legal_entity": "PT Sentosa Diagnostika Prima",
+    "license_number": "440/112/LAB-PRATAMA/2026",
+    "city": "Bandung",
+    "address": "Jl. Ir. H. Juanda No. 88, Bandung",
+    "phone": "+62 22 720-9988",
+    "email": "qms@biosentosa.com",
+    "website": "https://biosentosa.com"
+  },
+  "accreditation": {
+    "iso_version": "ISO 15189:2022",
+    "target_body": "KAN (Komite Akreditasi Nasional)",
+    "accreditation_number": "LP-742-IDN"
+  },
+  "qms_headers": {
+    "doc_code_prefix": "SOP-SENTOSA",
+    "effective_date": "2026-09-15",
+    "lab_director_name": "dr. Ratna Dewi Sartika, Sp.PK, M.Kes",
+    "lab_director_sip": "SIP.440/8812/Sp.PK/2026"
+  },
+  "lis_integration": {
+    "provider_type": "GENERIC_REST",
+    "hl7_version": "v2.5.1",
+    "fhir_version": "R4",
+    "obx3_loinc_required": true,
+    "obx6_ucum_required": true
+  },
+  "ip_ownership": {
+    "tag": "generic",
+    "statement": "Konfigurasi terparameterisasi netral - Tidak mengandung data proprietary AVA."
+  }
+}

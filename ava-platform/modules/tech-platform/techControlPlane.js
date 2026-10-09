@@ -37,10 +37,7 @@ async function tcpBuatTiket() {
   if (!title || !description) { toast('Ringkasan dan detail kendala wajib diisi.', 'error'); return; }
   const correlation = tcpNewCorrelation();
   try {
-    const result = await sbPost('tech_support_tickets', {
-      ticket_no: correlation,
-      tenant_id: tenantId, title, description, priority, channel: 'internal', status: 'TRIAGED', correlation_id: correlation,
-    });
+    const result = await sbRpc('tech_ops_command', {p_kind:'ticket',p_action:'create',p_data:{tenant_id:tenantId,title,description,priority,reason:'Tiket dari control plane'},p_key:correlation});
     if (!result || result.error || (Array.isArray(result) && !result.length)) { toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return; }
     toast(`Tiket tercatat dengan correlation ID ${correlation}`, 'ok');
     await renderTechControlPlane();
