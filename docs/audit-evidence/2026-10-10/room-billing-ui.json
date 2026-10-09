@@ -1,0 +1,33 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "source opening form and independent review; self approval rejected",
+      "status": "passed"
+    },
+    {
+      "name": "UI cumulative calculation → details → separate review → actual source charge",
+      "status": "passed"
+    },
+    {
+      "name": "UI clinical source exit → final room reconcile → invoice review → real balanced journal",
+      "status": "passed"
+    },
+    {
+      "name": "desktop and mobile layout",
+      "status": "passed"
+    },
+    {
+      "name": "UI reasoned void preserves invoice and creates source reversal",
+      "status": "passed"
+    },
+    {
+      "name": "backend failure/retry without browser errors",
+      "status": "passed"
+    }
+  ]
+}

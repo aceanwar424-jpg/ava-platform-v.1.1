@@ -3371,3 +3371,28 @@ OWNED_BY: generic. Referensi user/admission/master existing dipertahankan. Bukti
 - [x] Preflight/runbook 0079–0081 dan ACCEPTANCE-44-MENU-2026-10-09.md mencatat gap tiap menu.
 - [ ] Runtime binary temporary belum terhapus: penghapusan direktori ditolak kebijakan tool; tidak dipaksakan. Direktori tidak berisi cluster atau record dummy.
 - [ ] Seluruh 44 masih membutuhkan acceptance lintas sumber sesuai matriks, terutama billing/penjamin/deposit, farmasi/MAR, komponen darah, set CSSD, klinis/indikator, integrasi, non-RS/Delivery dan configuration downstream. Tidak mengubah status menjadi selesai hanya dari kerangka.
+
+## Penuntasan billing sumber — rencana lanjutan 9 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: kalkulator periode/pindah kelas dan property cases; enrolment cutover/opening; snapshot segmen dari rawat inap; posting/adjustment ke inpatient_charges; kontrak penjamin eksplisit; deposit/refund ke cashier_transactions; UI/reconcile/invoice; simulasi source end-to-end dan race. Sumber 0044, inpatient RPC dan cashier existing dipakai, bukan ledger biaya/pembayaran kedua. Histori tetap dipertahankan.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Persetujuan skema operasional/uji lokal/commit/push berlaku. Hanya tarif sintetis pada test; tidak memasukkan tarif privat, memodifikasi identitas master atau menetapkan tarif/default tenant nyata. Kebijakan timezone/cutoff/unit/amount rounding/minimum/payer harus eksplisit dan disahkan. Tidak ada perubahan DB produksi/vendor. Clinical discharge dan penerimaan finance dibedakan; audit/jurnal sumber tidak boleh digandakan.
+- [ ] Kalkulator terverifikasi bukan bukti seluruh billing selesai; lanjutkan source, deposit, finance dan UI acceptance.
+
+## Bukti billing kamar dan invoice — 10 Oktober 2026
+### Plan → Execute → Verify
+Melaksanakan paket calculator, opening, source segments, reviewed adjustment, invoice/reversal dan UI dari rencana billing 9 Oktober. Tugas penjamin/deposit/settlement dan menu lain tetap berlanjut.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Sumber charge/cashier/master tetap; tarif, pasien, reviewer dan mapping tes sintetis. Tidak ada DB/vendor/produksi. Accounting fase4 dipakai sebagai source existing dengan provenance semula; tidak mengklaim kepemilikan generik atas kode sumber existing. Approval skema lokal sebelumnya berlaku.
+- [x] 0082 pure calculator: 8 kasus (calendar/24h/hourly, DST, prorata/highest/cutoff, rounding/minimum, continuity dan invariance).
+- [x] 0083 source cutover/opening dan actual bed transfer; maker-checker, delta nol/negatif append-only; source discharge/housekeeping dipertahankan. Legacy view tagihan dan RPC dibatasi sebelum lookup retry.
+- [x] 0084 final invoice dengan actual post_journal/reverse_journal, bukan mock sink; source/mapping snapshot, closed-period rollback, charge freeze, reasoned void, journal privacy/RLS dan agregat. SQL source 9 dan UI 6 lulus.
+- [x] Mobile screenshot diperiksa; UI error/retry lulus. Isolated native DB ditutup/dihapus dalam finally. PGlite sempat native OOM karena memori host rendah; pengujian dipindah ke PostgreSQL native loopback disposable. Tidak mematikan proses pengguna.
+- [ ] Penjamin, deposit/refund/settlement sumber cashier, acceptance lintas 44 menu belum selesai. Status menu tetap parsial. Runbook 0082–0084 melarang memasang 0083 sendiri untuk operasi.
+- [x] Regresi task board RS: 27 skenario UI lulus, termasuk route billing khusus, tenancy/RBAC, paginasi dan retry. Generator menu/domain tetap konsisten. Rincian quote dibaca sesuai tenant ketika dibuka; board tidak memuat seluruh baris kalkulasi atau source snapshot lama.
+
+## Penjamin dan deposit sumber — rencana 10 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: binding eligibility ke guarantor/admission dan kontrak master aktif yang dipilih; reviewer/snapshot/expiry serta override kontrak eksplisit; alokasi payer/patient dalam invoice dan jurnal sumber; receipt/refund/settlement metadata yang mereferensikan cashier_transactions; hentikan posting GL legacy hanya untuk source intent yang terverifikasi; UI dan simulasi SQL/browser, negative/retry/concurrency; cleanup dan commit/push. Tidak membuat ledger pembayaran kedua atau mengubah key master.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Hanya referensi master existing dan metadata operasional baru sesuai persetujuan skema/uji lokal. Kontrak/plafon/coverage/accounting mapping dipilih eksplisit dan direview, tidak dianggap verifikasi penjamin eksternal. Tidak ada kontrak AVA, pasien nyata atau koneksi produksi/vendor. Source kasir/invoice/GL harus atomik, idempoten dan append-only; refund tidak melebihi sumber receipt dan alokasi tidak melebihi invoice/benefit. Invoice komersial tetap membutuhkan persetujuan/config tenant nyata sebelum live.

@@ -1,0 +1,47 @@
+{
+  "synthetic": true,
+  "final_invoice_and_payer_deposit_complete": false,
+  "accounting_source": "actual post_journal/reverse_journal source with synthetic mappings; no production acceptance",
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "opening preserves source history, explicit coverage and maker-checker",
+      "status": "passed"
+    },
+    {
+      "name": "enrolled legacy auto charge stops; source proposal posts only after independent approval",
+      "status": "passed"
+    },
+    {
+      "name": "repeated cumulative quote adds no duplicate charge and stale version is rejected",
+      "status": "passed"
+    },
+    {
+      "name": "actual bed transfer captures new tariff and invalidates an earlier quote",
+      "status": "passed"
+    },
+    {
+      "name": "approved negative adjustment appends a credit without deleting source history",
+      "status": "passed"
+    },
+    {
+      "name": "clinical discharge retains actual source flow and defers enrolled journal",
+      "status": "passed"
+    },
+    {
+      "name": "final invoice posts real balanced journal atomically; closed period and stale source fail",
+      "status": "passed"
+    },
+    {
+      "name": "source RPC cannot bypass tenant, amount consistency or reviewed adjustment",
+      "status": "passed"
+    },
+    {
+      "name": "tenant, role, direct mutation and private calculator boundaries",
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "synthetic": true,
+  "backend": "native PostgreSQL 17.10 loopback; actual RPCs with synthetic baseline and explicit legacy accounting sinks",
+  "steps": [
+    {
+      "name": "UI → SQL complete rs-housekeeping",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-nurse-station",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-discharge",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-igd-flow",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-inpatient-billing",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-operating-room",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-cssd",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-diet",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-transfusion",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-ppi",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-ward-pharmacy",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-transport",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-critical-care",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-maternity",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-day-care",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-linen",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-facility",
+      "status": "passed"
+    },
+    {
+      "name": "UI → SQL complete rs-mortuary",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile no overflow",
+      "status": "passed"
+    },
+    {
+      "name": "UI bed request allocation cancellation",
+      "status": "passed"
+    },
+    {
+      "name": "capacity actual bed and source navigation",
+      "status": "passed"
+    },
+    {
+      "name": "hostile title escaped",
+      "status": "passed"
+    },
+    {
+      "name": "save/read failure and retry without false success",
+      "status": "passed"
+    },
+    {
+      "name": "empty status filter",
+      "status": "passed"
+    },
+    {
+      "name": "pagination next previous with 56 actual SQL records",
+      "status": "passed"
+    },
+    {
+      "name": "21 RS routes use dedicated episode renderer or task board with honest partial status",
+      "status": "passed"
+    },
+    {
+      "name": "RS route guard effective page allowlist and denied unrelated routes",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

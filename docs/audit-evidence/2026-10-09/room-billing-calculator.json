@@ -1,0 +1,43 @@
+{
+  "synthetic": true,
+  "calculator_only": true,
+  "source_posting_complete": false,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "24h prorata class transfer preserves weighted tariff",
+      "status": "passed"
+    },
+    {
+      "name": "highest and cutoff use distinct approved rules",
+      "status": "passed"
+    },
+    {
+      "name": "hourly rounding and minimum are explicit and line sums equal total",
+      "status": "passed"
+    },
+    {
+      "name": "calendar cutoff uses half-open occupied periods without midnight extra day",
+      "status": "passed"
+    },
+    {
+      "name": "local calendar DST is based on local day rather than fixed 24 hours",
+      "status": "passed"
+    },
+    {
+      "name": "gaps, overlap, negative rates and incomplete policy are rejected",
+      "status": "passed"
+    },
+    {
+      "name": "constant tariff is invariant under source segmentation and cutoff reference is explicit",
+      "status": "passed"
+    },
+    {
+      "name": "no charge source mutation and no authenticated calculator exposure",
+      "status": "passed"
+    }
+  ]
+}

@@ -389,7 +389,7 @@ async function navigate(page, params={}) {
     case 'rs-nurse-station': safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
     case 'rs-discharge': safeRun('renderHospitalOperations', {page:'rs-discharge'}); break;
     case 'rs-igd-flow': safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
-    case 'rs-inpatient-billing': safeRun('renderHospitalOperations', {page:'rs-inpatient-billing'}); break;
+    case 'rs-inpatient-billing': safeRun('renderRoomBilling'); break;
     case 'rs-capacity': safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
     case 'rs-operating-room': safeRun('renderHospitalOperations', {page:'rs-operating-room'}); break;
     case 'rs-cssd': safeRun('renderHospitalOperations', {page:'rs-cssd'}); break;

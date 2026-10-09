@@ -5,6 +5,7 @@ const A='10000000-0000-0000-0000-000000000001',B='10000000-0000-0000-0000-000000
 const admin='20000000-0000-0000-0000-000000000001',receiver='20000000-0000-0000-0000-000000000002',worker='20000000-0000-0000-0000-000000000003',foreign='20000000-0000-0000-0000-000000000004';
 async function createHospitalFixture(providedPg){
  let pg=providedPg;
+ if(!pg&&process.env.RS_TEST_RUNTIME)pg=await require('./native-disposable-db.cjs').createNativeDb();
  if(!pg){const {PGlite}=await import('file://'+path.join(root,'desktop-app/node_modules/@electric-sql/pglite/dist/index.js').replace(/\\/g,'/'));pg=new PGlite();}
  try{
  await pg.exec(`CREATE ROLE anon; CREATE ROLE authenticated; CREATE ROLE service_role;
