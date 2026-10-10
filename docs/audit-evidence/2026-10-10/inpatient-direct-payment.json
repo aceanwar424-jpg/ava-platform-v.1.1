@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "results": [
+    "none policy directly settles invoice with one cash/receivable journal",
+    "invoice reversal cannot abandon an active cash payment",
+    "payment refund restores receivable and cannot exceed original net receipt",
+    "replenishment reconciles source cash 200, receivable zero and deposit zero"
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

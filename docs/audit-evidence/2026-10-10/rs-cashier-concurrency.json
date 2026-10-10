@@ -1,0 +1,40 @@
+{
+  "synthetic": true,
+  "backend": "native PostgreSQL 17.10, separate loopback sessions",
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "concurrent refunds cannot overspend the same actual cash receipt",
+      "status": "passed",
+      "different_backend_pids": true,
+      "second_waited_for_source_lock": true
+    },
+    {
+      "name": "different receipts cannot concurrently overpay the same source invoice",
+      "status": "passed",
+      "different_backend_pids": true,
+      "second_waited_for_source_lock": true
+    },
+    {
+      "name": "concurrent direct payments cannot overpay the remaining invoice",
+      "status": "passed",
+      "different_backend_pids": true,
+      "second_waited_for_source_lock": true
+    },
+    {
+      "name": "concurrent payment refunds cannot exceed the source payment",
+      "status": "passed",
+      "different_backend_pids": true,
+      "second_waited_for_source_lock": true
+    },
+    {
+      "name": "simultaneous identical approval retries post one actual cashier transaction",
+      "status": "passed",
+      "different_backend_pids": true,
+      "second_waited_for_source_lock": true
+    }
+  ]
+}

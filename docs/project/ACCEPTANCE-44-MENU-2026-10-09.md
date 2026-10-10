@@ -18,7 +18,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-nurse-station | episode/form/work orders | handover, flowsheet, MAR sumber farmasi, tugas dan eskalasi |
 | rs-discharge | checklist source + inpatient discharge | obat/penjamin/tagihan/status keluar end-to-end terintegrasi |
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
-| rs-inpatient-billing | inpatient_charges + 0082–84; calculator8/sourceSQL9/UI6 | kontrak/eligibility penjamin, deposit/refund/payment sumber cashier dan settlement; invoice/jurnal balik sumber sudah diuji |
+| rs-inpatient-billing | inpatient_charges + 0082–85; invoice/jurnal sumber; cashier deposit/refund/application dan direct payment/refund, saldo dan review sumber | kontrak/eligibility penjamin, pembagian manfaat payer/patient dan settlement penjamin; belum acceptance penuh |
 | rs-capacity | kapasitas bed + resources | BOR/ALOS/TOI/BTO historis dari interval sah, cutover dan denominator |
 | rs-clinical-forms | 0076 + reviewer/privilege 0081 | formulir spesifik/MAR/flowsheet dan seluruh jalur legacy terkait |
 | rs-operating-room | resource booking + work orders | checklist/source klinis/anestesi/recovery/CSSD/billing terpadu |

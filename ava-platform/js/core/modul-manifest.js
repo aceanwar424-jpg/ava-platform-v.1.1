@@ -103,7 +103,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
@@ -187,7 +188,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "inventory": [
   "modules/logistics/assets.js",
@@ -235,7 +237,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "shift-calendar": [
   "modules/hrd/attendance.js",
@@ -598,7 +601,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -625,7 +629,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -652,7 +657,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -679,7 +685,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -706,7 +713,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -791,7 +799,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "homecare-order": [
   "modules/his/admission.js",
@@ -818,7 +827,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "homecare": [
   "modules/his/admission.js",
@@ -845,7 +855,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his": [
   "modules/his/admission.js",
@@ -872,7 +883,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "klinik": [
   "modules/his/admission.js",
@@ -899,7 +911,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "poliklinik": [
   "modules/his/admission.js",
@@ -926,7 +939,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "clinic": [
   "modules/his/admission.js",
@@ -953,7 +967,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "fmcg": [
   "modules/crm/crm_pipeline.js",
@@ -998,7 +1013,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "regis": [
   "modules/his/admission.js",
@@ -1025,7 +1041,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "registrasi": [
   "modules/his/admission.js",
@@ -1052,7 +1069,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "registration": [
   "modules/his/admission.js",
@@ -1079,7 +1097,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -1106,7 +1125,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "laboratorium": [
   "modules/lab/qcEngine.js",
@@ -1515,7 +1535,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-patient-flow": [
   "modules/his/admission.js",
@@ -1542,7 +1563,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-bed-reservation": [
   "modules/his/admission.js",
@@ -1569,7 +1591,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-housekeeping": [
   "modules/his/admission.js",
@@ -1596,7 +1619,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-nurse-station": [
   "modules/his/admission.js",
@@ -1623,7 +1647,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-discharge": [
   "modules/his/admission.js",
@@ -1650,7 +1675,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-igd-flow": [
   "modules/his/admission.js",
@@ -1677,7 +1703,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-inpatient-billing": [
   "modules/his/admission.js",
@@ -1704,7 +1731,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-capacity": [
   "modules/his/admission.js",
@@ -1731,7 +1759,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-operating-room": [
   "modules/his/admission.js",
@@ -1758,7 +1787,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-cssd": [
   "modules/his/admission.js",
@@ -1785,7 +1815,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-diet": [
   "modules/his/admission.js",
@@ -1812,7 +1843,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-transfusion": [
   "modules/his/admission.js",
@@ -1839,7 +1871,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-ppi": [
   "modules/his/admission.js",
@@ -1866,7 +1899,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-ward-pharmacy": [
   "modules/his/admission.js",
@@ -1893,7 +1927,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-transport": [
   "modules/his/admission.js",
@@ -1920,7 +1955,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-critical-care": [
   "modules/his/admission.js",
@@ -1947,7 +1983,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-maternity": [
   "modules/his/admission.js",
@@ -1974,7 +2011,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-day-care": [
   "modules/his/admission.js",
@@ -2001,7 +2039,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-linen": [
   "modules/his/admission.js",
@@ -2028,7 +2067,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-facility": [
   "modules/his/admission.js",
@@ -2055,7 +2095,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-mortuary": [
   "modules/his/admission.js",
@@ -2082,7 +2123,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -2109,7 +2151,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "pharmacy": [
   "modules/pharmacy/pharmacy.js"
@@ -2142,7 +2185,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "emr_soap": [
   "modules/his/admission.js",
@@ -2169,7 +2213,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "emr-soap": [
   "modules/his/admission.js",
@@ -2196,7 +2241,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -2414,7 +2460,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "queue-console": [
   "modules/his/admission.js",
@@ -2441,7 +2488,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "queue-config": [
   "modules/his/admission.js",
@@ -2468,7 +2516,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -2495,7 +2544,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -2522,7 +2572,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "kasir": [
   "modules/finance/accounting.js",
@@ -2651,7 +2702,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -3182,7 +3234,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-orders": [
   "modules/his/admission.js",
@@ -3209,7 +3262,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "package-service": [
   "modules/his/admission.js",
@@ -3236,7 +3290,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-clinical-pathology": [
   "modules/his/admission.js",
@@ -3263,7 +3318,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-microbiology": [
   "modules/his/admission.js",
@@ -3290,7 +3346,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-anatomical-pathology": [
   "modules/his/admission.js",
@@ -3317,7 +3374,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rad-ekspertise": [
   "modules/radiology/dicomViewer.js",
@@ -3352,7 +3410,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-procedures": [
   "modules/his/admission.js",
@@ -3379,7 +3438,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "sm-usg": [
   "modules/his/admission.js",
@@ -3406,7 +3466,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "sm-endoskopi": [
   "modules/his/admission.js",
@@ -3433,7 +3494,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "sm-fisioterapi": [
   "modules/his/admission.js",
@@ -3460,7 +3522,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-immunization": [
   "modules/his/admission.js",
@@ -3487,7 +3550,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "his-mr-governance": [
   "modules/his/admission.js",
@@ -3514,7 +3578,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "igd-triase": [
   "modules/his/admission.js",
@@ -3541,7 +3606,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "skrining-risiko": [
   "modules/his/admission.js",
@@ -3568,7 +3634,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "mar": [
   "modules/his/admission.js",
@@ -3595,7 +3662,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "keselamatan-ikp": [
   "modules/compliance/audit.js",
@@ -3786,7 +3854,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-resource-booking": [
   "modules/his/admission.js",
@@ -3813,7 +3882,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "rs-shared-stock": [
   "modules/his/admission.js",
@@ -3840,7 +3910,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "apps-hub": [
   "modules/system/config/config_family.js",
@@ -4010,7 +4081,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-mcu-parameter": [
   "modules/his/admission.js",
@@ -4037,7 +4109,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-mcu-assessment": [
   "modules/his/admission.js",
@@ -4064,7 +4137,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-payment": [
   "modules/finance/accounting.js",
@@ -4118,7 +4192,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-queue-flow": [
   "modules/his/admission.js",
@@ -4145,7 +4220,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-queue-device": [
   "modules/his/admission.js",
@@ -4172,7 +4248,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "cfg-medicine": [
   "modules/pharmacy/pharmacy.js"
@@ -4253,7 +4330,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "admission-medical-kit": [
   "modules/his/admission.js",
@@ -4280,7 +4358,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "admission-package": [
   "modules/his/admission.js",
@@ -4307,7 +4386,8 @@ window.MODUL_HALAMAN = {
   "modules/his/resource_booking.js",
   "modules/his/shared_stock.js",
   "modules/his/care_episodes.js",
-  "modules/his/room_billing.js"
+  "modules/his/room_billing.js",
+  "modules/his/inpatient_deposits.js"
  ],
  "admission-subscription": [
   "modules/finance/accounting.js",
@@ -4469,5 +4549,6 @@ window.MODUL_SEMUA = [
  "modules/tech-platform/operational_lifecycle.js",
  "modules/his/care_episodes.js",
  "modules/system/config/workforce.js",
- "modules/his/room_billing.js"
+ "modules/his/room_billing.js",
+ "modules/his/inpatient_deposits.js"
 ];

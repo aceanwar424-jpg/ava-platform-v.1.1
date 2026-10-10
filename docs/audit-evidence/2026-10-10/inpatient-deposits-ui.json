@@ -1,0 +1,41 @@
+{
+  "synthetic": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "billing menu→deposit receipt→separate reviewer→one actual cash/GL source; self review denied",
+      "status": "passed"
+    },
+    {
+      "name": "UI excess refund rejected; valid refund posts actual source and retains history",
+      "status": "passed"
+    },
+    {
+      "name": "clinical source exit→invoice→UI deposit allocation without another cash receipt",
+      "status": "passed"
+    },
+    {
+      "name": "full patient settlement reconciles invoice, cash, deposit liability and receivable",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile layouts with actual source balances",
+      "status": "passed"
+    },
+    {
+      "name": "UI allocation reversal restores source budget; invoice void blocked until allocations released",
+      "status": "passed"
+    },
+    {
+      "name": "UI direct invoice payment and source refund restore the actual receivable",
+      "status": "passed"
+    },
+    {
+      "name": "backend retry and delayed deposit response cannot overwrite invoice workspace",
+      "status": "passed"
+    }
+  ]
+}

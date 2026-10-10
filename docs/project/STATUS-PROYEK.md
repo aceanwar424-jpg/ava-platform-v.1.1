@@ -3396,3 +3396,20 @@ OWNED_BY: generic. Sumber charge/cashier/master tetap; tarif, pasien, reviewer d
 Subtask <=1 jam: binding eligibility ke guarantor/admission dan kontrak master aktif yang dipilih; reviewer/snapshot/expiry serta override kontrak eksplisit; alokasi payer/patient dalam invoice dan jurnal sumber; receipt/refund/settlement metadata yang mereferensikan cashier_transactions; hentikan posting GL legacy hanya untuk source intent yang terverifikasi; UI dan simulasi SQL/browser, negative/retry/concurrency; cleanup dan commit/push. Tidak membuat ledger pembayaran kedua atau mengubah key master.
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic. Hanya referensi master existing dan metadata operasional baru sesuai persetujuan skema/uji lokal. Kontrak/plafon/coverage/accounting mapping dipilih eksplisit dan direview, tidak dianggap verifikasi penjamin eksternal. Tidak ada kontrak AVA, pasien nyata atau koneksi produksi/vendor. Source kasir/invoice/GL harus atomik, idempoten dan append-only; refund tidak melebihi sumber receipt dan alokasi tidak melebihi invoice/benefit. Invoice komersial tetap membutuhkan persetujuan/config tenant nyata sebelum live.
+
+## Validasi semantik akun deposit — 10 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: validasi akun titipan dan daftar akun kas eksplisit dari policy yang disahkan; cocokkan akun piutang aplikasi dengan snapshot invoice; uji penolakan mapping pendapatan/salah piutang dan ulangi SQL/browser/concurrency.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Parameter akun tenant tanpa kode akun produksi hardcoded. Tidak mengubah master/riwayat; konfigurasi belum lengkap menolak posting. Seluruh simulasi memakai sumber sintetis disposable, tanpa koneksi produksi.
+### Pelunasan tanpa deposit — rencana lanjutan
+Subtask <=1 jam: pembayaran invoice langsung dan refund pembayaran dengan receipt/GL sumber; saldo piutang netto mengikutkan refund; pembatalan invoice ditahan selama penerimaan kas belum dikembalikan. Metode deposit none tetap bisa melunasi invoice tanpa mengubahnya menjadi titipan. Implikasi IP & Kepatuhan: generik, akun kas eksplisit policy dan piutang snapshot invoice, histori append-only, data sintetis dan tanpa produksi.
+
+## Bukti kasir sumber 0085 — 10 Oktober 2026
+### Plan → Execute → Verify
+Selesai: deposit fixed/percentage/none eksplisit; receipt/refund sumber aktual; alokasi tanpa penerimaan kas kedua; pembayaran invoice langsung/refund asal; review terpisah; mapping titipan/kas/piutang tervalidasi; saldo, reversal, retry, tenant/RBAC, periode tutup, immutable history; UI menu billing dan pagination intent; shared view nonce mencegah respons lama menimpa halaman.
+Bukti: 9 SQL deposit/source, 4 direct-payment, 8 browser, 5 concurrency native PostgreSQL dengan PID berbeda dan lock wait aktual = 26 skenario. Browser mencakup pembayaran dan refund langsung; mobile 390px tanpa overflow diperiksa. Lihat docs/audit-evidence/2026-10-10/inpatient-cashier-source.json, inpatient-direct-payment.json, inpatient-deposits-ui.json, rs-cashier-concurrency.json. Setup, pemulangan, invoice, cashier dan GL memakai fungsi sumber aktual dengan data sintetis; semua cluster/dummy ditutup/dihapus di finally.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Tidak ada perubahan master key, data pasien nyata, integrasi penjamin/produksi atau pemetaan akun tenant implisit. Akun sumber dipilih dari policy yang disahkan. Runtime binary cache sementara tetap tersisa karena penghapusan folder runtime ditolak automatic review (blocked by policy); cache tidak mengandung database/dummy aktif. Penjamin dan acceptance lintas 44 menu masih belum tuntas; matriks tetap jujur partial.
+
+Regresi halaman billing kamar: 6 skenario browser lulus setelah integrasi kasir (total paket + regresi: 32).

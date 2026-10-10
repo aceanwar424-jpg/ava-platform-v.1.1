@@ -1,0 +1,48 @@
+{
+  "synthetic": true,
+  "source": "actual cashier_transactions, legacy GL trigger and post_journal/reverse_journal",
+  "payer_complete": false,
+  "patient_settlement_complete": true,
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  },
+  "results": [
+    {
+      "name": "receipt review writes one actual cashier row and one explicit liability journal",
+      "status": "passed"
+    },
+    {
+      "name": "wrong revenue and invoice mappings cannot disguise a deposit or allocation",
+      "status": "passed"
+    },
+    {
+      "name": "refund cannot overspend its receipt; closed-period rollback leaves no source money row",
+      "status": "passed"
+    },
+    {
+      "name": "actual clinical discharge and final invoice accept deposit application without a second cash receipt",
+      "status": "passed"
+    },
+    {
+      "name": "reasoned allocation reversal restores receipt availability and keeps cash/source history",
+      "status": "passed"
+    },
+    {
+      "name": "full patient settlement, invoice cap and excess refund reconcile actual cash and GL balances",
+      "status": "passed"
+    },
+    {
+      "name": "fixed, percentage with explicit basis/rounding, and none/voluntary policies are actually consumed",
+      "status": "passed"
+    },
+    {
+      "name": "source immutability, nonfinite amounts, direct reserved posting and private-core bypass are rejected",
+      "status": "passed"
+    },
+    {
+      "name": "foreign tenant, spoofed tenant header and viewer cannot read or consume receipt/cash/journal",
+      "status": "passed"
+    }
+  ]
+}
