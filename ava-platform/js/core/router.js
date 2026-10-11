@@ -152,6 +152,10 @@ const PAGE_TITLES = {
   'nutrition-quality':'Batch, Release & Mutu Nutrition', 'sanctuary-operations':'Operasional Sanctuary',
   'tech-delivery':'Delivery, SLA & Customer Success', 'evidence-register':'Evidence Register & Risk',
   'lis-settings':'Konfigurasi LIS & Gateway (:9999)',
+  'lis-anamnesa':'Anamnesis & Observasi Klinis (LIS)',
+  'lis-audiometry':'Audiometri (LIS Penunjang)',
+  'lis-spirometry':'Spirometri (LIS Penunjang)',
+  'lis-supportive':'EKG & Pemeriksaan Penunjang (LIS)',
   anamnesa:'Anamnesa & Tanda Vital (HIS)',
   'lis-admission':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
   'order-lab':'Order Pemeriksaan Lab & Pendaftaran (LIS)',
@@ -203,6 +207,7 @@ async function navigate(page, params={}) {
   if (window.TechNavigation?.enabled() && !window.TechNavigation.canLeave()) return;
   // Resolusi 3-segmen rute ke target handler (Strangler Fig)
   const resolvedPage = ROUTE_ALIASES_3SEG[page] || page;
+  params=window.TechRoutes?.paramsFor(resolvedPage,params)||params;
   const isAdmissionWorkspace = ['admission', 'pendaftaran', 'regis', 'registrasi', 'registration'].includes(resolvedPage);
   const host = window.location.hostname.toLowerCase();
   const isHisWorkspace = host.startsWith('his.') || new URLSearchParams(window.location.search).get('app') === 'his';
@@ -268,308 +273,316 @@ async function navigate(page, params={}) {
     }
   }
 
+  if(window.TechNavigation?.enabled())window.TechRoutes?.commit(resolvedPage,params);
   switch(resolvedPage) {
-    case 'dashboard':   safeRun('renderDashboard');              break;
-    case 'partners':    safeRun('renderPartners', params);         break;
-    case 'maps':        safeRun('renderMaps');                   break;
-    case 'marketing':   safeRun('renderMarketing');              break;
-    case 'voucher':     safeRun('renderVoucher');                break;
-    case 'surat':       safeRun('renderSurat');                  break;
-    case 'mou':         safeRun('renderMOU');                    break;
+    case 'dashboard':   await safeRun('renderDashboard');              break;
+    case 'partners':    await safeRun('renderPartners', params);         break;
+    case 'maps':        await safeRun('renderMaps');                   break;
+    case 'marketing':   await safeRun('renderMarketing');              break;
+    case 'voucher':     await safeRun('renderVoucher');                break;
+    case 'surat':       await safeRun('renderSurat');                  break;
+    case 'mou':         await safeRun('renderMOU');                    break;
     case 'administration': if (typeof openCategory === 'function') openCategory('administration'); break;
-    case 'leads':       safeRun('renderLeads');                  break;
-    case 'okr':         safeRun('renderOKR');                    break;
-    case 'mcu':         safeRun('renderMCU', params);              break;
-    case 'avahealth':       safeRun('renderAVAHealth', 'consult');     break;
-    case 'ava-consult':     safeRun('renderAVAHealth', 'consult');     break;
-    case 'ava-devices':     safeRun('renderAVAHealth', 'devices');     break;
-    case 'ava-calibration': safeRun('renderAVAHealth', 'calibration'); break;
-    case 'ava-marketplace': safeRun('renderAVAHealth', 'marketplace'); break;
-    case 'ava-caregiver':   safeRun('renderAVAHealth', 'caregiver');   break;
-    case 'ava-corporate':   safeRun('renderAVAHealth', 'corporate');   break;
-    case 'ava-portals':     safeRun('renderAVAHealth', 'portals');     break;
-    case 'finance':     safeRun('renderFinance', params.tab);      break;
-    case 'remuneration': safeRun('renderRemunerationHub');          break;
-    case 'inventory':   safeRun('renderInventory', params.tab||'stock'); break;
-    case 'hrd':         safeRun('renderHRD');                    break;
-    case 'work-schedule': safeRun('renderWorkSchedule');          break;
-    case 'workforce':   safeRun('renderWorkforceHub');             break;
-    case 'shift-calendar':safeRun('renderShiftCalendar');         break;
-    case 'tasks':       safeRun('renderTaskManagement');          break;
-    case 'wiki':        safeRun('renderWiki');                   break;
-    case 'agentic':     safeRun('renderAgentic', params.tab);     break;
-    case 'satusehat':   safeRun('renderSatuSehat');              break;
-    case 'ar-aging':    safeRun('renderArAging');                break;
-    case 'lab-tat':     safeRun('renderLabTat');                 break;
-    case 'penawaran':   safeRun('renderPenawaran');              break;
-    case 'ops-kendali': safeRun('renderOpsKendali');             break;
-    case 'sales-corong':safeRun('renderSalesCorong');            break;
+    case 'leads':       await safeRun('renderLeads');                  break;
+    case 'okr':         await safeRun('renderOKR');                    break;
+    case 'mcu':         await safeRun('renderMCU', params);              break;
+    case 'avahealth':       await safeRun('renderAVAHealth', 'consult');     break;
+    case 'ava-consult':     await safeRun('renderAVAHealth', 'consult');     break;
+    case 'ava-devices':     await safeRun('renderAVAHealth', 'devices');     break;
+    case 'ava-calibration': await safeRun('renderAVAHealth', 'calibration'); break;
+    case 'ava-marketplace': await safeRun('renderAVAHealth', 'marketplace'); break;
+    case 'ava-caregiver':   await safeRun('renderAVAHealth', 'caregiver');   break;
+    case 'ava-corporate':   await safeRun('renderAVAHealth', 'corporate');   break;
+    case 'ava-portals':     await safeRun('renderAVAHealth', 'portals');     break;
+    case 'finance':     await safeRun('renderFinance', params.tab);      break;
+    case 'remuneration': await safeRun('renderRemunerationHub');          break;
+    case 'inventory':   await safeRun('renderInventory', params.tab||'stock'); break;
+    case 'hrd':         await safeRun('renderHRD');                    break;
+    case 'work-schedule': await safeRun('renderWorkSchedule');          break;
+    case 'workforce':   await safeRun('renderWorkforceHub');             break;
+    case 'shift-calendar':await safeRun('renderShiftCalendar');         break;
+    case 'tasks':       await safeRun('renderTaskManagement');          break;
+    case 'wiki':        await safeRun('renderWiki');                   break;
+    case 'agentic':     await safeRun('renderAgentic', params.tab);     break;
+    case 'satusehat':   await safeRun('renderSatuSehat');              break;
+    case 'ar-aging':    await safeRun('renderArAging');                break;
+    case 'lab-tat':     await safeRun('renderLabTat');                 break;
+    case 'penawaran':   await safeRun('renderPenawaran');              break;
+    case 'ops-kendali': await safeRun('renderOpsKendali');             break;
+    case 'sales-corong':await safeRun('renderSalesCorong');            break;
     case 'portal-pasien':
     case 'portal-korporat':
-    case 'portal-akses':safeRun('renderPortalAkses');            break;
-    case 'perujuk':     safeRun('renderPerujuk');                break;
-    case 'lis-settings':safeRun('renderLisSettings');            break;
-    case 'lis-helpdesk':safeRun('renderLisHelpDesk');            break;
+    case 'portal-akses':await safeRun('renderPortalAkses');            break;
+    case 'perujuk':     await safeRun('renderPerujuk');                break;
+    case 'lis-settings':await safeRun('renderLisSettings');            break;
+    case 'lis-helpdesk':await safeRun('renderLisHelpDesk');            break;
     case 'lis-admission':
     case 'lis-regis':
-    case 'order-lab':   safeRun('renderLisAdmission', params);   break;
-    case 'lisensi':     safeRun('renderLisensi');                break;
+    case 'order-lab':   await safeRun('renderLisAdmission', params);   break;
+    case 'lisensi':     await safeRun('renderLisensi');                break;
     case 'executive_dashboard':
-    case 'executive-dashboard': safeRun('renderExecutiveDashboard');     break;
-    case 'hc-schedule': safeRun('renderHCSchedule');              break;
-    case 'hc-staff':    safeRun('renderHCStaff');                 break;
-    case 'hc-tariff':   safeRun('renderHCTariff');                break;
-    case 'hc-billing':  safeRun('renderHCBilling');               break;
-    case 'hc-report':   safeRun('renderHCFullReport');            break;
-    case 'attendance':   safeRun('renderAttendance');               break;
-    case 'org-structure':safeRun('renderOrgStructure');             break;
-    case 'regulatory':   safeRun('renderRegulatoryReports');        break;
+    case 'executive-dashboard': await safeRun('renderExecutiveDashboard');     break;
+    case 'hc-schedule': await safeRun('renderHCSchedule');              break;
+    case 'hc-staff':    await safeRun('renderHCStaff');                 break;
+    case 'hc-tariff':   await safeRun('renderHCTariff');                break;
+    case 'hc-billing':  await safeRun('renderHCBilling');               break;
+    case 'hc-report':   await safeRun('renderHCFullReport');            break;
+    case 'attendance':   await safeRun('renderAttendance');               break;
+    case 'org-structure':await safeRun('renderOrgStructure');             break;
+    case 'regulatory':   await safeRun('renderRegulatoryReports');        break;
     // Dua menu berikut sudah lama ada di rel navigasi tapi tidak punya case
     // di sini, sehingga kliknya tidak melakukan apa pun. Fungsi rendernya
     // sendiri sudah ada dan berfungsi — yang hilang cuma sambungannya.
-    case 'audit':        safeRun('renderAuditTrail');               break;
-    case 'campaigns':    safeRun('renderVoucher');                  break;
-    case 'rl-reports':   safeRun('renderRLReports');                break;
+    case 'audit':        await safeRun('renderAuditTrail');               break;
+    case 'campaigns':    await safeRun('renderVoucher');                  break;
+    case 'rl-reports':   await safeRun('renderRLReports');                break;
     case 'homecare_order':
     case 'homecare-order':
-    case 'homecare':    safeRun('renderHomeCare');               break;
+    case 'homecare':    await safeRun('renderHomeCare');               break;
     case 'his':
     case 'klinik':
     case 'poliklinik':
     case 'clinic':
       if (typeof openCategory === 'function') openCategory('klinik');
-      else safeRun('renderAdmission');
+      else await safeRun('renderAdmission');
       break;
     case 'utama':
       if (typeof openCategory === 'function') openCategory('utama');
-      else safeRun('renderDashboard');
+      else await safeRun('renderDashboard');
       break;
     case 'fmcg':
     case 'marketing_cat':
       if (typeof openCategory === 'function') openCategory('marketing');
-      else safeRun('renderMarketing');
+      else await safeRun('renderMarketing');
       break;
     case 'cockpit':
     case 'ceo_cockpit':
-      safeRun('renderExecutiveDashboard');
+      await safeRun('renderExecutiveDashboard');
       break;
     case 'pendaftaran':
     case 'regis':
     case 'registrasi':
     case 'registration':
-    case 'admission':   safeRun('renderAdmission', params);      break;
+    case 'admission':   await safeRun('renderAdmission', params);      break;
     case 'laboratorium':
-    case 'lab':         safeRun('renderLab', params.tab || 'checkin'); break;
-    case 'worklist':    safeRun('renderLab', 'worklist'); break;
+    case 'lab':         await safeRun('renderLab', params.tab || 'checkin'); break;
+    case 'worklist':    await safeRun('renderLab', 'worklist'); break;
     // Menu LIS granular memakai shell yang sama dengan tab operasionalnya.
     // Tanpa mapping ini, menu terlihat aktif tetapi jatuh ke halaman kosong.
-    case 'lab-result':     safeRun('renderLab', 'result');     break;
-    case 'lab-validation': safeRun('renderLab', 'validation'); break;
-    case 'lab-approval':   safeRun('renderLab', 'approval');   break;
-    case 'lab-qc':         safeRun('renderLab', 'qc');         break;
-    case 'lab-report':     safeRun('renderLab', 'report');     break;
-    case 'validasi':    safeRun('renderLab', 'validation'); break;
-    case 'product':     safeRun('renderConfigProduct');          break;
+    case 'lab-result':     await safeRun('renderLab', 'result');     break;
+    case 'lab-validation': await safeRun('renderLab', 'validation'); break;
+    case 'lab-approval':   await safeRun('renderLab', 'approval');   break;
+    case 'lab-qc':         await safeRun('renderLab', 'qc');         break;
+    case 'lab-report':     await safeRun('renderLab', 'report');     break;
+    case 'validasi':    await safeRun('renderLab', 'validation'); break;
+    case 'product':     await safeRun('renderConfigProduct');          break;
     // Hub konfigurasi menerima fokus dari menu, sehingga master data tidak
     // lagi semuanya jatuh ke satu halaman yang sama.
-    case 'config':      safeRun('renderConfigHub', params.focus || 'overview'); break;
-    case 'master-records': safeRun('renderMasterRegistry', params.domain); break;
-    case 'refrange':    safeRun('renderConfigRefRange');          break;
-    case 'labreport':   safeRun('renderSettings', 'pdf');          break;
-    case 'corporate':   safeRun('renderConfigCorporate');        break;
-    case 'radiology':   safeRun('renderRIS');                    break;
-    case 'supportive':  safeRun('renderSupportive');             break;
-    case 'ekg-treadmill': safeRun('renderSupportive', { type: 'EKG 12 Lead' }); break;
-    case 'audiometry':  safeRun('renderSupportive', { type: 'Audiometri' }); break;
-    case 'spirometry':  safeRun('renderSupportive', { type: 'Spirometri' }); break;
-    case 'medrecord':   safeRun('renderMedRecord');              break;
-    case 'rs-patient-flow': safeRun('renderCareEpisodes'); break;
-    case 'rs-bed-reservation': safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
-    case 'rs-housekeeping': safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
-    case 'rs-nurse-station': safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
-    case 'rs-discharge': safeRun('renderHospitalOperations', {page:'rs-discharge'}); break;
-    case 'rs-igd-flow': safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
-    case 'rs-inpatient-billing': safeRun('renderRoomBilling'); break;
-    case 'rs-capacity': safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
-    case 'rs-operating-room': safeRun('renderHospitalOperations', {page:'rs-operating-room'}); break;
-    case 'rs-cssd': safeRun('renderHospitalOperations', {page:'rs-cssd'}); break;
-    case 'rs-diet': safeRun('renderHospitalOperations', {page:'rs-diet'}); break;
-    case 'rs-transfusion': safeRun('renderHospitalOperations', {page:'rs-transfusion'}); break;
-    case 'rs-ppi': safeRun('renderHospitalOperations', {page:'rs-ppi'}); break;
-    case 'rs-ward-pharmacy': safeRun('renderHospitalOperations', {page:'rs-ward-pharmacy'}); break;
-    case 'rs-transport': safeRun('renderHospitalOperations', {page:'rs-transport'}); break;
-    case 'rs-critical-care': safeRun('renderHospitalOperations', {page:'rs-critical-care'}); break;
-    case 'rs-maternity': safeRun('renderHospitalOperations', {page:'rs-maternity'}); break;
-    case 'rs-day-care': safeRun('renderHospitalOperations', {page:'rs-day-care'}); break;
-    case 'rs-linen': safeRun('renderHospitalOperations', {page:'rs-linen'}); break;
-    case 'rs-facility': safeRun('renderHospitalOperations', {page:'rs-facility'}); break;
-    case 'rs-mortuary': safeRun('renderHospitalOperations', {page:'rs-mortuary'}); break;
-    case 'inpatient':   safeRun('renderInpatient');              break;
+    case 'config':      await safeRun('renderConfigHub', params.focus || 'overview'); break;
+    case 'master-records': await safeRun('renderMasterRegistry', params.domain); break;
+    case 'refrange':    await safeRun('renderConfigRefRange');          break;
+    case 'labreport':   await safeRun('renderSettings', 'pdf');          break;
+    case 'corporate':   await safeRun('renderConfigCorporate');        break;
+    case 'radiology':   await safeRun('renderRIS');                    break;
+    case 'lis-supportive':
+    case 'supportive':  await safeRun('renderSupportive');             break;
+    case 'ekg-treadmill': await safeRun('renderSupportive', { type: 'EKG 12 Lead' }); break;
+    case 'lis-audiometry':
+    case 'audiometry':  await safeRun('renderSupportive', { type: 'Audiometri' }); break;
+    case 'lis-spirometry':
+    case 'spirometry':  await safeRun('renderSupportive', { type: 'Spirometri' }); break;
+    case 'medrecord':   await safeRun('renderMedRecord');              break;
+    case 'rs-patient-flow': await safeRun('renderCareEpisodes'); break;
+    case 'rs-bed-reservation': await safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
+    case 'rs-housekeeping': await safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
+    case 'rs-nurse-station': await safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
+    case 'rs-discharge': await safeRun('renderHospitalOperations', {page:'rs-discharge'}); break;
+    case 'rs-igd-flow': await safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
+    case 'rs-inpatient-billing': await safeRun('renderRoomBilling'); break;
+    case 'rs-capacity': await safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
+    case 'rs-operating-room': await safeRun('renderHospitalOperations', {page:'rs-operating-room'}); break;
+    case 'rs-cssd': await safeRun('renderHospitalOperations', {page:'rs-cssd'}); break;
+    case 'rs-diet': await safeRun('renderHospitalOperations', {page:'rs-diet'}); break;
+    case 'rs-transfusion': await safeRun('renderHospitalOperations', {page:'rs-transfusion'}); break;
+    case 'rs-ppi': await safeRun('renderHospitalOperations', {page:'rs-ppi'}); break;
+    case 'rs-ward-pharmacy': await safeRun('renderHospitalOperations', {page:'rs-ward-pharmacy'}); break;
+    case 'rs-transport': await safeRun('renderHospitalOperations', {page:'rs-transport'}); break;
+    case 'rs-critical-care': await safeRun('renderHospitalOperations', {page:'rs-critical-care'}); break;
+    case 'rs-maternity': await safeRun('renderHospitalOperations', {page:'rs-maternity'}); break;
+    case 'rs-day-care': await safeRun('renderHospitalOperations', {page:'rs-day-care'}); break;
+    case 'rs-linen': await safeRun('renderHospitalOperations', {page:'rs-linen'}); break;
+    case 'rs-facility': await safeRun('renderHospitalOperations', {page:'rs-facility'}); break;
+    case 'rs-mortuary': await safeRun('renderHospitalOperations', {page:'rs-mortuary'}); break;
+    case 'inpatient':   await safeRun('renderInpatient');              break;
     // Dulu menunjuk renderFarmasi di farmasi_eprescription.js — 367 baris
     // tanpa satu pun panggilan data. Sementara itu pharmacy.js yang nyata
     // (6 tabel, 6 RPC, termasuk skrining interaksi obat dan alergi) tidak
     // punya rute sama sekali, jadi tidak pernah bisa dibuka. Yang tampil
     // di layar justru yang karangan.
     case 'pharmacy':
-    case 'farmasi':     safeRun('renderPharmacy', params);       break;
+    case 'farmasi':     await safeRun('renderPharmacy', params);       break;
     case 'emr':
     case 'emr_soap':
-    case 'emr-soap':    safeRun('renderEmrSoap', params);        break;
-    case 'subscription':safeRun('renderSubscription', params);   break;
+    case 'emr-soap':    await safeRun('renderEmrSoap', params);        break;
+    case 'subscription':await safeRun('renderSubscription', params);   break;
     case 'sanctuary':
     case 'sanctuary_booking':
-    case 'sanctuary-booking': safeRun('renderSanctuaryBooking', params); break;
+    case 'sanctuary-booking': await safeRun('renderSanctuaryBooking', params); break;
     case 'holding_finance':
-    case 'holding-finance':   safeRun('renderHoldingFinance', params);   break;
+    case 'holding-finance':   await safeRun('renderHoldingFinance', params);   break;
     case 'oms':
     case 'd2c':
     case 'ecommerce_oms':
-    case 'ecommerce-oms':     safeRun('renderEcommerceOms', params);     break;
+    case 'ecommerce-oms':     await safeRun('renderEcommerceOms', params);     break;
     case 'pabrik':
-    case 'wellness-rnd':      safeRun('renderPabrik', { tab: 'formula' });  break;
-    case 'wellness-maklon':   safeRun('renderPabrik', { tab: 'maklon' });   break;
-    case 'wellness-mutu':     safeRun('renderPabrik', { tab: 'mutu' });     break;
+    case 'wellness-rnd':      await safeRun('renderPabrik', { tab: 'formula' });  break;
+    case 'wellness-maklon':   await safeRun('renderPabrik', { tab: 'maklon' });   break;
+    case 'wellness-mutu':     await safeRun('renderPabrik', { tab: 'mutu' });     break;
     case 'bpjs':
     case 'bpjs_claim':
-    case 'bpjs-claim':        safeRun('renderBpjsClaim', params);        break;
+    case 'bpjs-claim':        await safeRun('renderBpjsClaim', params);        break;
     case 'compliance_tracker':
-    case 'compliance-tracker':safeRun('renderComplianceTracker', params);break;
+    case 'compliance-tracker':await safeRun('renderComplianceTracker', params);break;
     case 'pacs':
     case 'pacs_viewer':
-    case 'pacs-viewer':       safeRun('renderPacsViewer', params);       break;
+    case 'pacs-viewer':       await safeRun('renderPacsViewer', params);       break;
     case 'catalog_export':
-    case 'catalog-export':    safeRun('renderCatalogExport', params);    break;
-    case 'crm-pipeline':safeRun('renderCrmPipeline');            break;
-    case 'queue':       safeRun('renderQueuePage', params);          break;
-    case 'queue-console': safeRun('renderQueueConsole');          break;
-    case 'queue-config':  safeRun('renderQueueConfig');           break;
-    case 'queue-kiosk': safeRun('renderQueueKiosk');                 break;
-    case 'appointments':safeRun('renderAppointments');           break;
+    case 'catalog-export':    await safeRun('renderCatalogExport', params);    break;
+    case 'crm-pipeline':await safeRun('renderCrmPipeline');            break;
+    case 'queue':       await safeRun('renderQueuePage', params);          break;
+    case 'queue-console': await safeRun('renderQueueConsole');          break;
+    case 'queue-config':  await safeRun('renderQueueConfig');           break;
+    case 'queue-kiosk': await safeRun('renderQueueKiosk');                 break;
+    case 'appointments':await safeRun('renderAppointments');           break;
     case 'kasir':
     case 'billing':
-    case 'cashier':     safeRun('renderCashier', params.buka);     break;
-    case 'accounting':  safeRun('renderAccounting');             break;
-    case 'payables':    safeRun('renderPayables');               break;
-    case 'assets':      safeRun('renderAssets', params.tab||'list'); break;
-    case 'referral':    safeRun('renderReferral');               break;
-    case 'payroll':     safeRun('renderPayroll');                break;
-    case 'package':     safeRun('renderConfigPackage');          break;
-    case 'family':      safeRun('renderConfigFamily');            break;
-    case 'anamnesa':    safeRun('renderAnamnesa');               break;
-    case 'import':      safeRun('renderSettings', 'data');         break;
-    case 'settings':    safeRun('renderSettings', params.tab || 'general'); break;
+    case 'cashier':     await safeRun('renderCashier', params.buka);     break;
+    case 'accounting':  await safeRun('renderAccounting');             break;
+    case 'payables':    await safeRun('renderPayables');               break;
+    case 'assets':      await safeRun('renderAssets', params.tab||'list'); break;
+    case 'referral':    await safeRun('renderReferral');               break;
+    case 'payroll':     await safeRun('renderPayroll');                break;
+    case 'package':     await safeRun('renderConfigPackage');          break;
+    case 'family':      await safeRun('renderConfigFamily');            break;
+    case 'lis-anamnesa':
+    case 'anamnesa':    await safeRun('renderAnamnesa');               break;
+    case 'import':      await safeRun('renderSettings', 'data');         break;
+    case 'settings':    await safeRun('renderSettings', params.tab || 'general'); break;
     case 'tech':
     case 'tech_saas':
     case 'license-manager':
-    case 'saas-console':safeRun('renderTechSaas', params);           break;
-    case 'tech-control-plane': safeRun('renderTechControlPlane');    break;
+    case 'saas-console':await safeRun('renderTechSaas', params);           break;
+    case 'tech-control-plane': await safeRun('renderTechControlPlane');    break;
     case 'lis-phlebotomy':
-    case 'phlebotomy':  safeRun('renderPhlebotomy');                 break;
+    case 'phlebotomy':  await safeRun('renderPhlebotomy');                 break;
     case 'lis-kelayakan':
-    case 'specimen-verification': safeRun('renderSpecimenVerification'); break;
+    case 'specimen-verification': await safeRun('renderSpecimenVerification'); break;
     case 'lis-analyzer':
     case 'analyzer-interfacing':
-    case 'tech-analyzer': safeRun('renderAnalyzerInterfacing'); break;
+    case 'tech-analyzer': await safeRun('renderAnalyzerInterfacing'); break;
     case 'lis-lot-verification':
-    case 'lot-verification': safeRun('renderLotVerification');       break;
+    case 'lot-verification': await safeRun('renderLotVerification');       break;
     case 'lis-pme':
     case 'pme':
-    case 'proficiency-testing': safeRun('renderPmeProficiency');      break;
+    case 'proficiency-testing': await safeRun('renderPmeProficiency');      break;
     case 'lis-critical-value':
-    case 'critical-value': safeRun('renderCriticalValue');           break;
+    case 'critical-value': await safeRun('renderCriticalValue');           break;
     case 'lis-sample-archive':
-    case 'sample-archiving': safeRun('renderSampleArchiving');       break;
-    case 'his-wellness': safeRun('renderHisWellness'); break;
-    case 'his-orders':  safeRun('renderIntegratedOrders');           break;
-    case 'package-service': safeRun('renderPackageServiceHub');      break;
+    case 'sample-archiving': await safeRun('renderSampleArchiving');       break;
+    case 'his-wellness': await safeRun('renderHisWellness'); break;
+    case 'his-orders':  await safeRun('renderIntegratedOrders');           break;
+    case 'package-service': await safeRun('renderPackageServiceHub');      break;
     // Hasil LIS pada HIS hanya untuk dibaca. Fungsi workflow/otorisasi tetap
     // berada di LIS agar tidak ada dua sumber kebenaran klinis.
-    case 'his-clinical-pathology': safeRun('renderHisLisResultViewer', { discipline: 'clinical-pathology' }); break;
-    case 'his-microbiology': safeRun('renderHisLisResultViewer', { discipline: 'microbiology' }); break;
-    case 'his-anatomical-pathology': safeRun('renderHisLisResultViewer', { discipline: 'anatomical-pathology' }); break;
-    case 'rad-ekspertise': safeRun('renderRadiologyExpertise');      break;
-    case 'his-mpi':     safeRun('renderMpiManagement');              break;
+    case 'his-clinical-pathology': await safeRun('renderHisLisResultViewer', { discipline: 'clinical-pathology' }); break;
+    case 'his-microbiology': await safeRun('renderHisLisResultViewer', { discipline: 'microbiology' }); break;
+    case 'his-anatomical-pathology': await safeRun('renderHisLisResultViewer', { discipline: 'anatomical-pathology' }); break;
+    case 'rad-ekspertise': await safeRun('renderRadiologyExpertise');      break;
+    case 'his-mpi':     await safeRun('renderMpiManagement');              break;
 
     // Tindakan: satu modul, empat menu. Yang membedakan hanya penyaring
     // kategorinya — alur persetujuannya sama, dan itu bagian yang paling
     // tidak boleh berbeda antar layar.
-    case 'his-procedures': safeRun('renderTindakan', { kategori: null });        break;
-    case 'sm-usg':         safeRun('renderTindakan', { kategori: 'USG' });       break;
-    case 'sm-endoskopi':   safeRun('renderTindakan', { kategori: 'Endoskopi' }); break;
-    case 'sm-fisioterapi': safeRun('renderTindakan', { kategori: 'Fisioterapi' }); break;
+    case 'his-procedures': await safeRun('renderTindakan', { kategori: null });        break;
+    case 'sm-usg':         await safeRun('renderTindakan', { kategori: 'USG' });       break;
+    case 'sm-endoskopi':   await safeRun('renderTindakan', { kategori: 'Endoskopi' }); break;
+    case 'sm-fisioterapi': await safeRun('renderTindakan', { kategori: 'Fisioterapi' }); break;
 
-    case 'his-immunization': safeRun('renderImunisasi');                 break;
-    case 'his-mr-governance': safeRun('renderRmGovernance');             break;
+    case 'his-immunization': await safeRun('renderImunisasi');                 break;
+    case 'his-mr-governance': await safeRun('renderRmGovernance');             break;
 
     // Keselamatan pasien
-    case 'igd-triase':      safeRun('renderTriase', { tab: 'triase' });   break;
-    case 'skrining-risiko': safeRun('renderTriase', { tab: 'skrining' }); break;
-    case 'mar':             safeRun('renderTriase', { tab: 'mar' });      break;
-    case 'keselamatan-ikp': safeRun('renderIkp', { tab: 'insiden' });     break;
-    case 'mutu-indikator':  safeRun('renderIkp', { tab: 'mutu' });        break;
+    case 'igd-triase':      await safeRun('renderTriase', { tab: 'triase' });   break;
+    case 'skrining-risiko': await safeRun('renderTriase', { tab: 'skrining' }); break;
+    case 'mar':             await safeRun('renderTriase', { tab: 'mar' });      break;
+    case 'keselamatan-ikp': await safeRun('renderIkp', { tab: 'insiden' });     break;
+    case 'mutu-indikator':  await safeRun('renderIkp', { tab: 'mutu' });        break;
 
-    case 'rad-modalitas':  safeRun('renderRadMaster', { tab: 'modalitas' }); break;
-    case 'rad-katalog':    safeRun('renderRadMaster', { tab: 'katalog' });   break;
-    case 'rad-unggah':     safeRun('renderRadMaster', { tab: 'unggah' });    break;
-    case 'tech-aktivasi': safeRun('renderTechLicenseActivation');    break;
-    case 'tech-telemetri': safeRun('renderTechTelemetry');           break;
-    case 'tech-harga':  safeRun('renderTechPricingPlans');           break;
-    case 'tenants':     safeRun('renderTenants');                    break;
-    case 'db-studio':    safeRun('renderDatabaseStudio');           break;
-    case 'tech-roadmap': safeRun('renderTechOperations',{page});     break;
-    case 'tech-modul':   safeRun('renderTechOperations',{page});     break;
-    case 'tech-isu':     safeRun('renderTechOperations',{page});     break;
-    case 'tech-sprint':  safeRun('renderTeamSprint');                break;
-    case 'cfg-rs-policy': safeRun('renderOperationalPolicies');      break;
-    case 'rs-clinical-forms': safeRun('renderClinicalForms');        break;
-    case 'rs-resource-booking': safeRun('renderResourceBooking');    break;
-    case 'rs-shared-stock': safeRun('renderSharedStock');    break;
-    case 'apps-hub':     safeRun('renderPortalAkses');              break;
-    case 'support-hub':  safeRun('renderSupportive');               break;
-    case 'portal-wellness': safeRun('renderAVAHealth', 'wellness');  break;
+    case 'rad-modalitas':  await safeRun('renderRadMaster', { tab: 'modalitas' }); break;
+    case 'rad-katalog':    await safeRun('renderRadMaster', { tab: 'katalog' });   break;
+    case 'rad-unggah':     await safeRun('renderRadMaster', { tab: 'unggah' });    break;
+    case 'tech-aktivasi': await safeRun('renderTechLicenseActivation');    break;
+    case 'tech-telemetri': await safeRun('renderTechTelemetry');           break;
+    case 'tech-harga':  await safeRun('renderTechPricingPlans');           break;
+    case 'tenants':     await safeRun('renderTenants');                    break;
+    case 'db-studio':    await safeRun('renderDatabaseStudio');           break;
+    case 'tech-roadmap': await safeRun('renderTechOperations',{page});     break;
+    case 'tech-modul':   await safeRun('renderTechOperations',{page});     break;
+    case 'tech-isu':     await safeRun('renderTechOperations',{page});     break;
+    case 'tech-sprint':  await safeRun('renderTeamSprint');                break;
+    case 'cfg-rs-policy': await safeRun('renderOperationalPolicies');      break;
+    case 'rs-clinical-forms': await safeRun('renderClinicalForms');        break;
+    case 'rs-resource-booking': await safeRun('renderResourceBooking');    break;
+    case 'rs-shared-stock': await safeRun('renderSharedStock');    break;
+    case 'apps-hub':     await safeRun('renderPortalAkses');              break;
+    case 'support-hub':  await safeRun('renderSupportive');               break;
+    case 'portal-wellness': await safeRun('renderAVAHealth', 'wellness');  break;
     case 'cfg-facility':
-    case 'cfg-branch':   safeRun('renderMasterRegistry', 'facility');break;
-    case 'cfg-practitioner': safeRun('renderPractitionerWorkspace'); break;
-    case 'cfg-specialty':safeRun('renderMasterRegistry', 'specialty');break;
-    case 'cfg-practitioner-fee': safeRun('renderMasterRegistry', 'fee'); break;
-    case 'cfg-unit-room':safeRun('renderMasterRegistry', 'unit');    break;
-    case 'cfg-diagnosis-reference': safeRun('renderMasterRegistry', 'icd10'); break;
+    case 'cfg-branch':   await safeRun('renderMasterRegistry', 'facility');break;
+    case 'cfg-practitioner': await safeRun('renderPractitionerWorkspace'); break;
+    case 'cfg-specialty':await safeRun('renderMasterRegistry', 'specialty');break;
+    case 'cfg-practitioner-fee': await safeRun('renderMasterRegistry', 'fee'); break;
+    case 'cfg-unit-room':await safeRun('renderMasterRegistry', 'unit');    break;
+    case 'cfg-diagnosis-reference': await safeRun('renderMasterRegistry', 'icd10'); break;
     case 'cfg-patient':
-    case 'cfg-patient-reference': safeRun('renderConfigFamily');     break;
+    case 'cfg-patient-reference': await safeRun('renderConfigFamily');     break;
     case 'cfg-corporate':
-    case 'cfg-corporate-contract': safeRun('renderConfigCorporate');  break;
+    case 'cfg-corporate-contract': await safeRun('renderConfigCorporate');  break;
     case 'cfg-mcu':
     case 'cfg-mcu-parameter':
-    case 'cfg-mcu-assessment': safeRun('renderMCU');                 break;
+    case 'cfg-mcu-assessment': await safeRun('renderMCU');                 break;
     case 'cfg-payment':
-    case 'cfg-bank-edc': safeRun('renderCashier');                   break;
-    case 'cfg-payment-account': safeRun('renderAccounting');         break;
+    case 'cfg-bank-edc': await safeRun('renderCashier');                   break;
+    case 'cfg-payment-account': await safeRun('renderAccounting');         break;
     case 'cfg-queue':
     case 'cfg-queue-flow':
-    case 'cfg-queue-device': safeRun('renderQueueConfig');           break;
+    case 'cfg-queue-device': await safeRun('renderQueueConfig');           break;
     case 'cfg-medicine':
-    case 'cfg-medicine-reference': safeRun('renderPharmacy');        break;
-    case 'cfg-equipment': safeRun('renderAssets');                   break;
-    case 'cfg-service-class': safeRun('renderConfigPackage');        break;
-    case 'cfg-job-master': safeRun('renderOrgStructure');            break;
-    case 'cfg-promotion': safeRun('renderVoucher');                  break;
-    case 'cfg-telemedicine': safeRun('renderAVAHealth', 'consult');  break;
-    case 'cfg-satusehat': safeRun('renderSatuSehat');                break;
-    case 'admission-service': safeRun('renderAdmission', { tab: 'service' }); break;
-    case 'admission-medical-kit': safeRun('renderAdmission', { tab: 'kit' }); break;
-    case 'admission-package': safeRun('renderAdmission', { tab: 'package' }); break;
+    case 'cfg-medicine-reference': await safeRun('renderPharmacy');        break;
+    case 'cfg-equipment': await safeRun('renderAssets');                   break;
+    case 'cfg-service-class': await safeRun('renderConfigPackage');        break;
+    case 'cfg-job-master': await safeRun('renderOrgStructure');            break;
+    case 'cfg-promotion': await safeRun('renderVoucher');                  break;
+    case 'cfg-telemedicine': await safeRun('renderAVAHealth', 'consult');  break;
+    case 'cfg-satusehat': await safeRun('renderSatuSehat');                break;
+    case 'admission-service': await safeRun('renderAdmission', { tab: 'service' }); break;
+    case 'admission-medical-kit': await safeRun('renderAdmission', { tab: 'kit' }); break;
+    case 'admission-package': await safeRun('renderAdmission', { tab: 'package' }); break;
     case 'admission-subscription':
-    case 'admission-package-usage': safeRun('renderSubscription');    break;
-    case 'his-integration': safeRun('renderReadiness', { panel: 'his-integration' }); break;
-    case 'lis-integration': safeRun('renderReadiness', { panel: 'lis-integration' }); break;
-    case 'wellness-program': safeRun('renderReadiness', { panel: 'wellness-program' }); break;
-    case 'partner-rewards': safeRun('renderReadiness', { panel: 'partner-rewards' }); break;
-    case 'nutrition-quality': safeRun('renderReadiness', { panel: 'nutrition-quality' }); break;
-    case 'sanctuary-operations': safeRun('renderReadiness', { panel: 'sanctuary-operations' }); break;
-    case 'tech-delivery': safeRun('renderReadiness', { panel: 'tech-delivery' }); break;
-    case 'evidence-register': safeRun('renderReadiness', { panel: 'evidence-register' }); break;
+    case 'admission-package-usage': await safeRun('renderSubscription');    break;
+    case 'his-integration': await safeRun('renderReadiness', { panel: 'his-integration' }); break;
+    case 'lis-integration': await safeRun('renderReadiness', { panel: 'lis-integration' }); break;
+    case 'wellness-program': await safeRun('renderReadiness', { panel: 'wellness-program' }); break;
+    case 'partner-rewards': await safeRun('renderReadiness', { panel: 'partner-rewards' }); break;
+    case 'nutrition-quality': await safeRun('renderReadiness', { panel: 'nutrition-quality' }); break;
+    case 'sanctuary-operations': await safeRun('renderReadiness', { panel: 'sanctuary-operations' }); break;
+    case 'tech-delivery': await safeRun('renderReadiness', { panel: 'tech-delivery' }); break;
+    case 'evidence-register': await safeRun('renderReadiness', { panel: 'evidence-register' }); break;
     default:
       renderRouterError(page, 'Halaman ini belum tersedia.');
+  }
+  if(currentPage===resolvedPage&&window.TechNavigation?.enabled()){
+    try{await window.TechRoutes?.restore(resolvedPage,params);}catch(error){if(currentPage===resolvedPage)renderRouterError(resolvedPage,error.message);}
   }
 }
 

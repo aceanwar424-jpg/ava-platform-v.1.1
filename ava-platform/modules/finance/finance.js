@@ -6,6 +6,7 @@ const FIN_TABS = ['invoice','payment','report','commission'];
 let finInvoices=[], finPayments=[];
 
 async function renderFinance(tabAwal) {
+  if(window.TechPages?.enabled()) tabAwal=TechPages.selection('finance',tabAwal||'invoice',!!tabAwal);
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>Finance & Billing</h1>
@@ -90,6 +91,10 @@ async function renderFinance(tabAwal) {
   // di layar yang persis sama — menu yang menjanjikan tiga tujuan berbeda
   // tetapi memberi satu. Kini tab awalnya ikut ditentukan.
   if (tabAwal && tabAwal !== 'invoice') switchFinTab(tabAwal);
+  if(window.TechPages?.enabled()) {
+    document.getElementById('fin-tabs')?.remove();
+    document.querySelector('#main-content h1').textContent=TechPages.sections.finance.find(x=>x[1]===tabAwal)?.[0]||'Finance';
+  }
 }
 
 async function loadInvoices() {
@@ -172,6 +177,7 @@ function switchFinTab(tab, btn) {
 }
 
 async function openInvoiceForm(id=null) {
+  window.TechRoutes?.intent('invoice-edit',[id]);
   let inv={};
   if(id){ const d=await sbGet('invoices',`select=*&id=eq.${id}`); inv=d[0]||{}; }
   let partnerOpts='<option value="">-- Pilih Partner --</option>';
@@ -317,6 +323,7 @@ async function deleteInvoice(id) {
 // Approved & belum ditagih → 1 invoice. Tautkan corp_exam_requests.invoice_id.
 // ══════════════════════════════════════════════════════════════
 async function openCorpMcuInvoicing() {
+  window.TechRoutes?.intent('corporate-invoice',[]);
   openModal(`<div class="modal-header"><div class="modal-title">Invoice MCU Korporat — per Batch</div>
     <button class="modal-close" onclick="closeModalForce()" style="font-size:10.5px;font-weight:700"></button></div>
     <div id="cmi-body" style="padding:6px 0;max-height:60vh;overflow:auto"><div class="loading-row"><div class="spinner"></div></div></div>`, 'wide');

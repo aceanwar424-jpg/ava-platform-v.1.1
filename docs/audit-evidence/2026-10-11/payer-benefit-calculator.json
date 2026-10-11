@@ -1,0 +1,39 @@
+{
+  "synthetic": true,
+  "calculator_only": true,
+  "payer_workflow_complete": false,
+  "results": [
+    {
+      "name": "category coverage and stay ceiling preserve payer plus patient equals source total",
+      "status": "passed"
+    },
+    {
+      "name": "zero and full coverage use explicit contractual percentage",
+      "status": "passed"
+    },
+    {
+      "name": "signed credit adjusts original source category without rewriting it",
+      "status": "passed"
+    },
+    {
+      "name": "rounding variants are explicit and deterministic",
+      "status": "passed"
+    },
+    {
+      "name": "incomplete contract, unsupported cap scope and out-of-range benefits fail closed",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate source ID, invalid numeric precision and unreconciled credits are rejected",
+      "status": "passed"
+    },
+    {
+      "name": "private calculator cannot bypass the authenticated source workflow",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

@@ -184,6 +184,7 @@ function tlKartu(label, angka, kunci, warna) {
 function tlSaring(k) { tlLicenseFilter = k; tlGambar(); }
 
 async function tlAktivasi(kodeAwal) {
+  window.TechRoutes?.intent('license-activate',[]);
   if (typeof openModal === 'function') {
     openModal(`
       <div style="padding:16px;max-width:480px">
@@ -216,8 +217,8 @@ async function tlEksekusiAktivasi() {
   const kode = document.getElementById('tl-modal-kode')?.value.trim();
   const sidik = document.getElementById('tl-modal-sidik')?.value.trim();
   if (!kode) { toast?.('Kode lisensi wajib diisi', 'warn') || alert('Kode lisensi wajib diisi'); return; }
-  closeModal?.();
-  await tlKirimAktivasi(kode, sidik);
+  const button=document.querySelector('[onclick^="tlEksekusiAktivasi"]');if(button?.disabled)return;if(button)button.disabled=true;
+  try{await tlKirimAktivasi(kode, sidik);}finally{if(button?.isConnected)button.disabled=false;}
 }
 
 async function tlKirimAktivasi(kode, sidik) {
@@ -226,13 +227,15 @@ async function tlKirimAktivasi(kode, sidik) {
       p_kode: kode, p_sidik_kunci: sidik || null,
       p_oleh: (window.currentUsername || 'admin'),
     });
-    if (r && r.error) { toast?.(r.error, 'err') || alert(r.error); return; }
+    if (!r || r.error) { toast?.(r?.error || 'Server belum mengonfirmasi perubahan lisensi.', 'err'); return; }
     toast?.(`Lisensi aktif untuk ${r.tenant || 'tenant'}. Berlaku sampai: ${r.berlaku_sampai || '—'}`, 'ok') || alert(`Lisensi aktif.\n\nTenant: ${r.tenant}\nPaket: ${r.paket}\nBerlaku sampai: ${r.berlaku_sampai || '—'}`);
+    closeModalForce();
     await renderTechLicenseActivation();
   } catch (e) { toast?.('Gagal mengaktifkan lisensi: ' + e.message, 'err') || alert('Gagal mengaktifkan lisensi: ' + e.message); }
 }
 
 async function tlCabut(id) {
+  window.TechRoutes?.intent('license-revoke',[id]);
   if (typeof openModal === 'function') {
     openModal(`
       <div style="padding:16px;max-width:480px">
@@ -258,8 +261,8 @@ async function tlCabut(id) {
 async function tlEksekusiCabut(id) {
   const alasan = document.getElementById('tl-modal-alasan')?.value.trim();
   if (!alasan) { toast?.('Alasan pencabutan wajib diisi', 'warn') || alert('Alasan pencabutan wajib diisi'); return; }
-  closeModal?.();
-  await tlKirimCabut(id, alasan);
+  const button=document.querySelector('[onclick^="tlEksekusiCabut"]');if(button?.disabled)return;if(button)button.disabled=true;
+  try{await tlKirimCabut(id, alasan);}finally{if(button?.isConnected)button.disabled=false;}
 }
 
 async function tlKirimCabut(id, alasan) {
@@ -268,8 +271,9 @@ async function tlKirimCabut(id, alasan) {
       p_lisensi_id: id, p_alasan: alasan,
       p_oleh: (window.currentUsername || 'admin'),
     });
-    if (r && r.error) { toast?.(r.error, 'err') || alert(r.error); return; }
+    if (!r || r.ok !== true || r.error) { toast(r?.error || 'Server belum mengonfirmasi perubahan lisensi.', 'err'); return; }
     toast?.(r.catatan || 'Lisensi berhasil dicabut.', 'ok') || alert(r.catatan || 'Lisensi dicabut.');
+    closeModalForce();
     await renderTechLicenseActivation();
   } catch (e) { toast?.('Gagal mencabut lisensi: ' + e.message, 'err') || alert('Gagal mencabut lisensi: ' + e.message); }
 }

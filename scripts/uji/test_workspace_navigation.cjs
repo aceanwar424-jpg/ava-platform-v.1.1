@@ -10,7 +10,7 @@ const start=html.indexOf('let FLYOUT_MENUS = {};'),end=html.indexOf('function up
   await p.addScriptTag({path:'ava-platform/js/core/peta-menu.js'});await p.addScriptTag({path:'ava-platform/js/core/icons.js'});
   await p.evaluate(()=>{window.testRole='super_admin';window.getUserRole=()=>testRole;window.roleConfig={};window.kategoriRuang=()=>['tech'];window.currentPage='';window.syncFlyoutToPage=()=>{};});
   await p.addScriptTag({content:html.slice(start,end)});
-  await p.addScriptTag({path:'ava-platform/js/core/tech-navigation.js'});await p.addScriptTag({path:'ava-platform/js/core/workspace-navigation.js'});await p.addStyleTag({path:'ava-platform/css/workspace-design.css'});
+  await p.addScriptTag({path:'ava-platform/js/core/tech-navigation.js'});await p.addScriptTag({path:'ava-platform/js/core/workspace-navigation.js'});await p.addScriptTag({path:'ava-platform/js/core/tech-pages.js'});await p.addStyleTag({path:'ava-platform/css/workspace-design.css'});
   await p.evaluate(()=>{gambarRail('tech');window.navigateFromContext=(g,s,i)=>{window.selected=navigationMenuGroups.find(x=>x.id===g).services[s].items[i].page;};WorkspaceNavigation.directory(navigationMenuGroups[0].id);});
   assert.equal(await p.evaluate(()=>WorkspaceNavigation.directory('invalid')),false);
   const opener=p.getByRole('button',{name:'Tampilkan submenu Pusat Kendali Operasi'});await opener.click();assert.equal(await opener.getAttribute('aria-expanded'),'true');

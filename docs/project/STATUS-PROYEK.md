@@ -2,6 +2,166 @@
 
 > Dokumen gabungan dari rencana, checklist, dan bukti verifikasi. Detail historis dipertahankan di bawah setiap bagian.
 
+## Audit End-to-End Ekosistem Lab, 12 Klausul Penuh ISO 15189:2022, Sistem Contekan (Skills) & E-Hasil Deklaratif — 11 Oktober 2026
+
+### Rencana dan checklist
+- [x] Audit Regulasi Lab Terkini (ISO 15189:2022, CLSI, Kemenkes PMK 24/2022 & PMK 411/2010):
+  - [x] Evaluasi kesenjangan 12 klausul utama: Mengidentifikasi perlunya 3 SOP operasional krusial yang kerap menjadi temuan ketidaksesuaian (KTS) KAN LP/LK.
+  - [x] Pembuatan Dokumen Mutu SMM Baru:
+    * `templates/smm/iso15189/SMM_L2_007_SOP_Pengelolaan_Reagen_Bahan_Habis_Pakai.md` (Klausul 6.6, CLSI EP26-A, Cold Chain 2-8°C / -20°C, FEFO, MSDS).
+    * `templates/smm/iso15189/SMM_L2_008_SOP_Autoverifikasi_Delta_Check.md` (Klausul 7.3.7, CLSI AUTO10-A, batasan delta check Hb/K/Plt/Kreatinin, eskalasi Sp.PK).
+    * `templates/smm/iso15189/SMM_L2_009_SOP_Penyimpanan_Retensi_Pemusnahan_Spesimen_Limbah_B3.md` (Klausul 7.5, Permenkes 2/2023, PP 22/2021 B3, Festronik KLHK).
+  - [x] Registrasi 3 modul baru ke `templates/smm/iso15189_modules_manifest.json` (`MOD-ISO-6.6-001`, `MOD-ISO-7.3-002`, `MOD-ISO-7.5-001`).
+  - [x] Perluasan `lib/compliance/iso15189_checker.js` dari 9 menjadi 12 klausul evaluasi terakreditasi KAN LP/LK.
+- [x] Audit & Ekspansi "System Contekan" (.agents/skills/):
+  - [x] `assemble-smm-pack`: Prosedur perakitan paket SMM ber-kop instansi.
+  - [x] `configure-template`: Prosedur kustomisasi tata letak dokumen deklaratif.
+  - [x] `validate-catalog`: Prosedur validasi integritas relasional katalog LIS.
+  - [x] `audit-lis-workflow`: Prosedur audit otomatis siklus pra-analitik, analitik ASTM :9999 & Westgard QC, serta pasca-analitik SLA Nilai Kritis.
+  - [x] `verify-iso15189-readiness`: Prosedur penilaian kesiapan audit akreditasi KAN LP/LK lintas 12 klausul standar.
+  - [x] `map-satusehat-fhir`: Panduan dan transformer pemetaan order & hasil ke Kemenkes SATUSEHAT HL7 FHIR R4 (PMK 24/2022).
+- [x] Penyempurnaan Konfigurasi E-Hasil Deklaratif (`template.default.config.json` & `template_manager.js`):
+  - [x] Dukungan banner peringatan Nilai Kritis (*Critical Panic Alert Banner*) sesuai ISO 15189 cl. 7.4.1.6.
+  - [x] Pencatatan jejak waktu audit spesimen (Waktu Pengambilan, Penerimaan, Validasi) sesuai PMK 24/2022 & CLSI GP44-A4.
+  - [x] Kolom Metode Uji per baris analit terintegrasi.
+- [x] Verifikasi Regresi Menyeluruh:
+  - [x] `scripts/uji/test_akselerator_p1_p5.js`: 7/7 Skenario PASS (100%).
+  - [x] `scripts/uji/test_p1_multilab_engine.js`: 17/17 Skenario PASS (100% — Skor Kepatuhan Medika & Sentosa: 100% AUDIT READY).
+  - [x] `scripts/uji/test_template_configuration.cjs`: 13/13 Skenario PASS (100%).
+  - [x] `scripts/uji/test_p3_p4_p5_all.js`: 9/9 Skenario PASS (100%).
+  - [x] `scripts/audit_lis_subdomain.cjs`: 56/56 Skenario PASS (100%).
+
+### Bukti Verifikasi
+1. **Pustaka Dokumen Mutu SMM ISO 15189:2022 (12 Modul Penuh):**
+   - 12/12 Modul SMM terkompilasi bersih tanpa kegagalan placeholder dan tanpa string hardcode AVA.
+   - Evaluasi kesiapan audit: **100% (12/12 klausul terpenuhi, Status: AUDIT READY)**.
+2. **System Contekan Lengkap (6 Skills Terdaftar):**
+   - `.agents/skills/assemble-smm-pack/SKILL.md`
+   - `.agents/skills/audit-lis-workflow/SKILL.md`
+   - `.agents/skills/configure-template/SKILL.md`
+   - `.agents/skills/map-satusehat-fhir/SKILL.md`
+   - `.agents/skills/validate-catalog/SKILL.md`
+   - `.agents/skills/verify-iso15189-readiness/SKILL.md`
+3. **Konfigurasi Deklaratif E-Hasil & Tata Letak:**
+   - Preset tata letak, banner panic alert, kolom metode uji, dan QR TTE tervalidasi via unit tests.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Seluruh 12 modul dokumen SMM, template hasil lab, dan skill operasional netral terhadap brand AVA.
+- Sesuai standar ISO 15189:2022, CLSI EP26-A, CLSI AUTO10-A, Kemenkes Permenkes 24/2022 (RME/FHIR), Permenkes 411/2010, Permenkes 2/2023 & PP 22/2021 (Limbah B3).
+- Seluruh pengujian menggunakan data sintetis murni sesuai UU No. 27 Tahun 2022 (Pelindungan Data Pribadi).
+
+## Audit Komprehensif Sistem Laboratorium (lis.avahealth.sbs) & Kepatuhan ISO 15189:2022 — 10 Oktober 2026
+
+### Rencana dan checklist
+- [x] Audit Arsitektur Subdomain & Workspace Routing:
+  - [x] Verifikasi pemetaan kanonik `config/domain.json`: host `lis.avahealth.sbs` & `lab.avahealth.sbs` terkonfigurasi ke workspace `'lis'` dan rute awal `'lab'`.
+  - [x] Verifikasi isolasi chrome workspace LIS: class `.lis-workspace-page`, title `'AVA Lab — Laboratorium'`, sidebar header `'AVA LAB'`, dan tag `'ISO 15189:2022'`.
+- [x] Audit Struktur Menu & Kategori LIS (`config/menu.json`):
+  - [x] Validasi seluruh 29 menu LIS modular dalam 8 grup fungsional:
+    * *Pendaftaran & Sampel*: `lis-admission`, `lis-phlebotomy`, `lab`, `lis-kelayakan`.
+    * *Konteks Klinis & Penunjang*: `lis-anamnesa`, `lis-audiometry`, `lis-spirometry`, `lis-supportive`.
+    * *Pemeriksaan*: `worklist`, `lab-result`, `referral`.
+    * *Validasi & Hasil*: `lis-critical-value`, `lab-validation`, `lab-approval`, `lab-tat`.
+    * *Mutu Laboratorium*: `lab-qc`, `lis-lot-verification`, `lis-pme`.
+    * *Riwayat & Arsip*: `lab-report`, `lis-sample-archive`.
+    * *Katalog & Persediaan*: `product`, `package`, `refrange`, `inventory`, `catalog-export`.
+    * *Pengaturan & Bantuan*: `lis-analyzer`, `lis-settings`, `lis-helpdesk`, `lis-integration`.
+- [x] Audit Kontrak Integritas Klinis & ISO 15189:2022 / CLSI:
+  - [x] Pra-analitik: Pencatatan sampling flebotomi (nama nakes + lokasi tusukan vena).
+  - [x] Kriteria Penolakan: Penolakan mutlak spesimen hemolisis 3+ dan micro-clot tabung EDTA.
+  - [x] Deteksi Nilai Kritis: Pemicu otomatis Kalium (>= 6.2 mmol/L) & Glukosa (<= 45 mg/dL).
+  - [x] Eskalasi Nilai Kritis: Logbook pelaporan SLA < 15 menit dan mandatory read-back (TBaK) sebelum rilis hasil.
+  - [x] Kendali Mutu Internal (PMI): Evaluasi Westgard multi-rules (10x trigger REJECT, nilai non-numerik status INVALID).
+  - [x] Uji Profisiensi Eksternal (PME): Kalkulasi Z-score standar ISO 15189 (|Z| <= 2 Satisfactory, |Z| > 3 Unsatisfactory dengan tindakan perbaikan).
+  - [x] Verifikasi Reagen Baru: Uji paralel CLSI EP26-A dengan ambang bias <= 5.0%.
+  - [x] Interfacing Analyzer: Protokol ASTM E1381/E1394 parsing frame transmisi hasil instrumen otomatis.
+  - [x] Penyimpanan Spesimen: Pengarsipan freezer -20°C dengan koordinat rack/box/grid.
+- [x] Pengujian Interaktif Headless Browser di `lis.avahealth.sbs`:
+  - [x] Simulasi sesi analis & dokter lab terotentikasi.
+  - [x] Verifikasi live render seluruh 29 modul LIS tanpa error (0 Page Errors).
+  - [x] Penyimpanan artefak bukti audit di `docs/audit-evidence/lis-subdomain-audit-report.json`.
+
+### Bukti Verifikasi
+1. **Audit Suite Komprehensif LIS (`scripts/audit_lis_subdomain.cjs`):**
+   - **56 DARI 56 UJI LULUS (100.0% PASS, 0 FAILURES)**.
+   - Entri domain, host alias, workspace `'lis'`, dan default landing `'lab'` terverifikasi valid.
+   - Seluruh 29 modul LIS granular terdaftar di `config/menu.json` dengan ID dan label lengkap.
+   - Seluruh 13 kontrak klinis ISO 15189:2022, CLSI EP26-A, dan ASTM lulus pengujian unit.
+   - Body class `.lis-workspace-page`, title `'AVA Lab — Laboratorium'`, dan badge `'ISO 15189:2022'` aktif secara deterministik.
+   - Seluruh 29 modul LIS berhasil ter-render pada browser Chromium/Edge headless dengan 0 page error.
+2. **File Bukti Audit Tersimpan:**
+   - `docs/audit-evidence/lis-subdomain-audit-report.json`: Laporan terstruktur mencakup 56 check points beserta status PASS dan timestamp.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Tidak ada data privat AVA (harga komersial, kontrak lab, atau identitas pasien nyata) yang ter-hardcode di modul LIS.
+- Seluruh spesimen dan identitas nakes pada audit menggunakan data sintetis sesuai UU PDP No. 27/2022.
+- Standar penamaan parameter dan satuan sepenuhnya merujuk standar interoperabilitas global: LOINC (OBX-3) dan UCUM (OBX-6) sesuai klausul HL7 v2 / FHIR.
+- Alur pelaporan nilai kritis memenuhi ISO 15189:2022 Klausul 7.4.1.6 (Pemberitahuan Segera untuk Hasil Kritis) dan kewajiban verifikasi ulang lisan (Tulis-Baca-Konfirmasi / TBaK).
+
+## Penuntasan Menyeluruh: P3 Configurable Template Engine, P4 Batch Content Pipeline & P5 Compounding System — 10 Oktober 2026
+
+### Rencana dan checklist
+- [x] P3 — Configurable Template Engine (SMM Dokumen & E-Hasil Lab):
+  - [x] Pembuatan skema konfigurasi deklaratif (`config/template.default.config.json` & `config/template.presets.json`) untuk penyesuaian tata letak dokumen tanpa koding:
+    * Posisi & ukuran logo kop (kiri, tengah, kanan, dual-logo/ganda).
+    * Spasi, padding baris tabel, margin cetak A4 (mm), divider line style (ganda, tunggal, tanpa garis), dan watermark status terkendali.
+    * Pengaturan kolom tabel hasil (toggle aktif/nonaktif per kolom, lebar %, perataan teks, badge status abnormal, switch LOINC OBX-3 & spesimen).
+    * Kotak kendali dokumen mutu standar ISO 15189 (Header Box SOP: No Dokumen, Revisi, Tgl Berlaku, Halaman) di setiap prosedur.
+    * Kotak tanda tangan & TTE QR Code (posisi kiri/tengah/kanan, barcode sertifikasi BSrE, gelar Sp.PK, nomor SIP).
+  - [x] Implementasi `TemplateManager` (`lib/template_engine/template_manager.js`) dengan 5 preset bawaan:
+    * `standard_navy`: Standar modern lab swasta (Logo Kiri, biru navy, border ganda).
+    * `formal_center`: Resmi instansi / RSUD (Logo Tengah, perataan tengah, border tebal).
+    * `dual_logo_partnership`: Kemitraan ganda (Logo Faskes di kiri + Logo Akreditasi KAN di kanan).
+    * `compact_slip`: Format hemat kertas rawat jalan (Margin 12mm, padding rapat).
+    * `emerald_wellness`: Format check-up & longevity premium (Aksen hijau emerald).
+  - [x] Implementasi `ConfigurableDocGenerator` (`lib/template_engine/configurable_doc_generator.js`) untuk menghasilkan dokumen cetak HTML/PDF resmi ber-kop tenant:
+    * Bundel Dokumen SMM ISO 15189: Halaman sampul resmi, daftar isi modul terverifikasi, SOP control header box.
+    * Sertifikat E-Hasil Lab Pasien: Kop resmi, data pasien & No RM, tabel analit LOINC/UCUM, flag abnormal merah, QR TTE dokter penanggung jawab.
+  - [x] Implementasi alat bantu interaktif visual (`tools/template_configurator.html`): UI split-view responsif dengan live preview instan, slider margin/spasi, toggle kolom, pemilih preset, tombol salin JSON, dan cetak PDF.
+  - [x] Dokumentasi manual pengguna lengkap di `docs/manual/PANDUAN-KONFIGURASI-TEMPLATE.md`.
+- [x] P4 — Batch Content Engine (633 Analit & Kalender Otoritas LinkedIn):
+  - [x] Peningkatan `tools/content_pipeline.js` dengan fungsi batch processing memproses seluruh 633 analit katalog.
+  - [x] Pembuatan kamus panduan pasien lengkap (`data/content/patient_facing_catalog.json` - 531 pemeriksaan terurai) dengan penjelasan bahasa awam, persiapan puasa/obat, dan waktu selesai standar (TAT).
+  - [x] Pembuatan draf kalender editorial LinkedIn 4 minggu (`data/content/linkedin_content_calendar.md`) berbasis regulasi ISO 15189, pre-analitik flebotomi, dan pelaporan nilai kritis.
+- [x] P5 — Lapisan Compounding & Sistem Bukti (Case Study Generator):
+  - [x] Implementasi `CaseStudyGenerator` (`lib/compounding/case_study_generator.js`) menghasilkan studi kasus otomatis Before vs After kuantitatif (waktu penyusunan dari 90 hari menjadi 2 jam, gap kritis tertutup dari 6 menjadi 0, kepatuhan 100%).
+  - [x] Ekspor ke format Markdown (`artifacts/case_studies/case_study_iso15189_transformation.md`) dan Card HTML responsif (`case_study_iso15189_transformation.html`).
+- [x] Pengujian Otomatis & Verifikasi Menyeluruh:
+  - [x] Pengujian suite template engine (`scripts/uji/test_template_configuration.cjs`): 13/13 Pass (100%).
+  - [x] Pengujian integritas artefak P3, P4, P5 (`scripts/uji/test_p3_p4_p5_all.js`): 9/9 Pass (100%).
+  - [x] Pengujian engine akselerator P1–P5 (`scripts/uji/test_akselerator_p1_p5.js`): 7/7 Pass (100%).
+  - [x] Verifikasi regresi 52 views Apps (`scripts/test-all-52-views.cjs`): 52/52 Pass (0 Page Errors).
+
+### Bukti Verifikasi
+1. **P3 — Template Engine & Presets (`scripts/uji/test_template_configuration.cjs`):**
+   - 5 Preset tata letak terverifikasi dan dapat dimuat via `TemplateManager.getPreset()`.
+   - Override deklaratif instan via `TemplateManager.createQuickConfig()` memvalidasi pergeseran logo (kiri, tengah, kanan, dual-logo) dan toggle kolom.
+   - Validasi struktur config mendeteksi konfigurasi yang tidak valid (kurang kolom wajib / format salah).
+   - Render Kop, E-Hasil, dan Bundel SMM ISO 15189 sukses menghasilkan HTML valid dengan 0 kesalahan: **13/13 Uji Lulus (100% PASS)**.
+2. **P3 — Artefak Bundel SMM & E-Hasil Ber-Kop Multi-Tenant:**
+   - `artifacts/smm_bundles/smm_bundle_medika.html`: 56.2 KB (9 Prosedur Mutu Ber-Kop Medika).
+   - `artifacts/smm_bundles/smm_bundle_sentosa.html`: 56.4 KB (9 Prosedur Mutu Ber-Kop Sentosa dengan logo tengah).
+   - `artifacts/lab_results/e_hasil_sample_medika_default.html`: Lembar E-Hasil Pasien terstandarisasi LOINC/UCUM.
+   - `artifacts/lab_results/e_hasil_sample_sentosa_custom.html`: Lembar E-Hasil Pasien kustom ber-kop kanan.
+3. **P4 — Batch Content Engine (`data/content/`):**
+   - `data/content/patient_facing_catalog.json`: **531 Pemeriksaan Klinis Terurai** (601 KB) berisi kamus edukasi awam lengkap dengan persiapan pra-analitik.
+   - `data/content/linkedin_content_calendar.md`: Kalender konten otoritas 4 minggu lengkap dengan hook, topik ISO 15189, dan CTA terarah.
+4. **P5 — Compounding Case Study Generator (`artifacts/case_studies/`):**
+   - `artifacts/case_studies/case_study_iso15189_transformation.md` & `.html`: Ringkasan metrik kuantitatif Before (Skor 42%, 6 Major Gap, 90 Hari) vs After (Skor 100%, 0 Gap, 2 Jam).
+5. **Integritas Artefak Komprehensif (`scripts/uji/test_p3_p4_p5_all.js`):**
+   - Seluruh 9 uji validasi file dan konten lulus 100%.
+6. **Frontend & Apps Web Regression (`scripts/test-all-52-views.cjs`):**
+   - Seluruh 52 views di `apps/index.html` diaudit secara headless: **52 PASSED, 0 FAILED, 0 Page Errors**.
+
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic / parameterized.
+- Seluruh konfigurasi template (kop, logo, kolom, spasi) bersifat netral-tenant dan dapat diparameterisasi untuk faskes mana pun tanpa mengubah kode inti.
+- Format sertifikat hasil lab memenuhi ISO 15189:2022 Klausul 7.4 (Pelaporan Hasil) dan standar HL7/FHIR (LOINC = OBX-3, UCUM = OBX-6).
+- Seluruh konten patient-facing dan kalender LinkedIn menggunakan acuan klinis umum (CLSI/PMK) tanpa membocorkan rahasia dagang, data pasien (UU PDP No. 27/2022), atau tarif privat.
+- Data pasien, nama nakes penanggung jawab, dan nomor izin pada tenant uji murni data sintetis sesuai UU PDP No. 27/2022.
+
 ## Produktisasi Aset: P1 Engine Multi-Lab ISO 15189 & P2 Master Test Catalog Siap-LIS — 9 Oktober 2026
 
 ### Rencana dan checklist
@@ -3357,6 +3517,24 @@ Keputusan D1–D3 lengkap; pengembangan lokal seluruh scope dapat dilanjutkan. K
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic untuk implementasi baru; data/kode sumber existing mempertahankan kepemilikannya. Data uji sintetis dan DB temporary dengan finally cleanup. Tidak menyalin data privat AVA/pasien, menulis produksi, menghubungkan vendor, menetapkan dosis/protokol, mengesahkan kompatibilitas otomatis atau membuat klaim penerimaan klinis/vendor. Kode lengkap dan simulasi berbeda dari pengesahan SOP klinis tenant. Perubahan Apps pekerjaan lain dipertahankan.
 
+## Penyederhanaan halaman internal Tech — 9 Oktober 2026
+### Plan → Execute → Verify
+Permintaan disetujui: navigasi utama → kartu submenu → dropdown tujuan; halaman tujuan tanpa tab navigasi berulang. Alur data daftar → tambah/detail/edit sebagai halaman, bukan popup.
+- [x] Inventaris tujuan Tech, tab internal dan editor lintas modul (<= 1 jam).
+- [x] Pusat Kendali sebagai halaman terpilih langsung; dropdown depan menampung tujuan internal, daftar deployment/tiket sebelum formulir (<= 1 jam).
+- [x] Editor halaman bersama khusus Tech, adaptasi paket/lisensi/master dan operasi; pelihara kontrak API/role (<= 1 jam).
+- [x] Ratakan tujuan modul bersama yang tampil di Tech; uji alur sintetis, error/simpan/batal, desktop/mobile dan bukti (<= 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk komponen navigasi/editor baru. Hanya presentasi/alur frontend; tidak mengubah skema master, kunci katalog, RPC/database, isi acuan, dependensi LLM atau integrasi produksi. Form memakai kontrak dan kewenangan yang sudah ada. Fixture sintetis dan request diblokir dari produksi. Identitas/aset situs tetap memakai konfigurasi yang tersedia, bukan disalin ke produk generik. Tidak melakukan operasi sync/deploy nyata saat verifikasi. Pekerjaan khusus Tech/Console; perilaku workspace lain dipertahankan.
+### Execute & bukti verifikasi
+- Front directory tetap menggunakan kartu/dropdown. Tujuan Pusat Kendali (termasuk tenant, lisensi, SATUSEHAT setup, signing, telemetri, audit), Finance dan HRD membuka tujuan langsung. Tab internal Pusat Kendali/Finance/HRD/Agentic dihilangkan khusus Tech; hub master memakai dropdown dengan link langsung dan mempertahankan seluruh data tools yang tersedia.
+- Komponen TechPages mengubah formulir/detail modal bersama menjadi halaman main-content; daftar DOM dipertahankan agar listener/filter kembali utuh. Form memakai dirty guard, batal/kembali dan tampil tetap saat gagal. Paket/lisensi menutup halaman hanya setelah penyimpanan berhasil; tombol simpan diblokir selama request.
+- Form inline operasi dan sprint dipindah ke halaman. Deployment membaca daftar tech_deployments sebelum tambah/edit, memakai RPC/sinkronisasi existing hanya pada tindakan simpan. Master tambah/edit/audit/arsip memakai halaman. Studio Database khusus Tech memakai layout terang dan halaman kueri baca-saja sesuai kemampuan adapter existing.
+- Lulus: test_tech_record_pages.cjs (lima tujuan Pusat Kendali; dirty cancel, listener kembali, deployment gagal/refresh, master tambah/edit berhasil, empat Finance/tiga HRD, paket/lisensi/operasi/sprint gagal, mobile, isolasi domain lain), test_workspace_navigation.cjs, test_tech_navigation.cjs. Tes navigasi lama diperbarui untuk Sprint yang kini operasional dan RBAC existing; tidak melonggarkan akses.
+- Lulus 9 skenario unit control plane/transisi; bangun-menu --periksa, bangun-vercel --periksa, verify-application-boundaries, verify-deploy-readiness, periksa-html-inline, parse JS dan diff --check. Pemeriksaan readiness statis bukan pengesahan deployment produksi.
+- Bukti sintetis: docs/audit-evidence/2026-10-09/tech-config-mobile.png, tech-deployment-list.png, tech-master-list.png, tech-master-edit.png. Screenshot diperiksa secara visual; input tanpa type distandarkan, tombol tutup modal dihapus dari halaman, form master satu kolom pada mobile.
+- Implikasi IP & Kepatuhan ditinjau: perubahan ini tidak mengubah master/schema/RPC atau menjalankan sinkronisasi/deploy produksi. Perubahan paralel care episodes/hospital milik pekerjaan lain dipertahankan. Implementasi tersedia di working tree; belum dipublikasikan ke domain live.
+
 ## Bukti penuntasan parsial — episode, privilege dan konkurensi 9 Oktober 2026
 ### Plan → Execute → Verify
 Lanjutan rencana 44 menu dan keputusan 1A/2A/3A; tidak ada keputusan baru yang perlu ditanyakan. Subtask sumber, model/API, UI, tes, cleanup dan runbook diselesaikan per paket.
@@ -3397,6 +3575,31 @@ Subtask <=1 jam: binding eligibility ke guarantor/admission dan kontrak master a
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic. Hanya referensi master existing dan metadata operasional baru sesuai persetujuan skema/uji lokal. Kontrak/plafon/coverage/accounting mapping dipilih eksplisit dan direview, tidak dianggap verifikasi penjamin eksternal. Tidak ada kontrak AVA, pasien nyata atau koneksi produksi/vendor. Source kasir/invoice/GL harus atomik, idempoten dan append-only; refund tidak melebihi sumber receipt dan alokasi tidak melebihi invoice/benefit. Invoice komersial tetap membutuhkan persetujuan/config tenant nyata sebelum live.
 
+## Penuntasan kualitas halaman Tech — 10 Oktober 2026
+### Plan → Execute → Verify
+Persetujuan pengguna: perbaiki seluruh enam temuan review, uji, review ulang dan bereskan.
+- [x] Rute URL, reload, Back/Forward, guard dan rekonstruksi halaman/form melalui router (<= 1 jam).
+- [x] Daftar/detail/edit deployment, pencarian/pagination, validasi dan status sinkronisasi permanen (<= 1 jam).
+- [x] Seragamkan struktur halaman; perkuat konfirmasi simpan serta alur modul bersama (<= 1 jam).
+- [x] Uji router lengkap dengan API sintetis, role, kegagalan/race, desktop/mobile; review perbaikan dan bukti (<= 1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Tidak mengubah skema master, katalog, kunci relasional maupun acuan medis. Perbaikan policy/fungsi deployment operasional dijelaskan di ajuste berikut. URL berisi identitas rute/record saja, bukan isi form/secret. API existing tetap dipakai dengan tenant/RBAC existing; tidak membuat fallback lintas tenant. Uji melalui aplikasi lokal terisolasi dan fixture sintetis; tidak menjalankan deployment/sinkronisasi produksi. Publikasi dan uji terhadap DB staging nyata membutuhkan lingkungan yang teridentifikasi; verifikasi lokal tidak diklaim sebagai penerimaan produksi.
+### Ajuste hasil review (sebelum implementasi lanjutan)
+Ditemukan table operasional tech_deployments belum memiliki policy SELECT dan adapter sinkronisasi belum mencatat hasil ke status/last_error existing. Perbaikan mencakup migration policy/RPC status operasional (bukan perubahan struktur/skema master), guard actor/tenant, dan pencatatan hasil adapter existing. Tidak membuka integrasi vendor baru dan tidak menerapkan migrasi ke DB produksi; acceptance SQL/adapter memakai DB sementara dan fetch mock. Status confirmed hanya ditampilkan jika database mengonfirmasi, dengan pemeriksaan versi konfigurasi untuk respons sinkronisasi lama.
+### Verify — 11 Oktober 2026
+- URL memakai registry tujuan yang diizinkan dan guard rute existing; reload, Back/Forward, halaman detail baca-saja, konfirmasi isian belum tersimpan, serta navigasi ditahan selama simpan. Penawaran dan Agentic ikut memakai halaman rekonstruktif; render Agentic ditunggu sebelum restore.
+- Deployment: daftar 25 baris per halaman, pencarian, detail → edit, identitas edit dikunci, request key tetap selama retry, revisi stale ditolak, tanpa fallback tenant null. Status vendor hanya diklaim tersimpan bila ACK database sesuai. Domain konflik dilaporkan DRIFT dan membutuhkan pemeriksaan kepemilikan.
+- Review ulang memperbaiki ACK master/arsip/penawaran/lisensi/paket/sprint, selector tombol simpan stabil, asosiasi label form, pemulihan fokus, respons terlambat, sidebar mobile, serta panel deployment ganda. Cache asset/module ditingkatkan ke 20261011.
+- Bukti inti: `docs/audit-evidence/2026-10-11/tech-router-app.json` (16 skenario aplikasi/index/router asli dengan REST sintetis, tanpa pageerror), `tech-deployment-sql.json` (11 skenario SQL migrasi asli dalam PGlite sementara), `tech-deployment-adapter.json` (8 skenario adapter dengan fetch mock). Regresi lifecycle 6 dan policy/sprint 13 skenario lulus; smoke record-pages, Tech navigation, workspace navigation lulus.
+- Pemeriksaan statis: syntax 27 JS dan inline index, batas aplikasi 6/17 domain, generator menu/domain dan static deploy readiness lulus; diff whitespace untuk file pekerjaan ini bersih. Hasil readiness adalah pemeriksaan statis, bukan bukti domain live.
+- Visual: `docs/audit-evidence/2026-10-11/tech-router-desktop.png` dan `tech-router-mobile.png`; mobile 390px tanpa overflow, drawer tertutup keluar sepenuhnya dan buka/tutup diuji. Semua fixture sintetis, browser/DB ditutup di finally. Tidak mengirim request vendor atau menulis data produksi.
+### Urutan penerapan dan batas acceptance
+1. Review/apply `db/migrations/0086_tech_deployment_access_status.sql` pada lingkungan uji teridentifikasi sesudah 0065/0068, lalu ulangi pemeriksaan role/tenant dan status; migrasi memakai kolom operasional existing.
+2. Publikasikan frontend bersama adapter dan migrasi yang cocok, dengan konfigurasi runtime serta credential server existing. UI edit mengharuskan ACK id/revisi baru.
+3. Uji login role nyata, satu record tenant uji, reload/Back, gagal simpan dan hasil sinkronisasi pada staging sebelum rollout live. Uji vendor nyata dan konkurensi PostgreSQL multi-session belum dilakukan; PGlite bukan bukti konkurensi production.
+4. Jika rollout gagal, hentikan sinkronisasi dan kembali ke versi aplikasi yang kompatibel; jangan hapus record atau histori audit.
+Implementasi dan verifikasi lokal selesai untuk scope review ini. Penerapan migrasi, deployment dan acceptance staging/live masih belum dilakukan.
+
 ## Validasi semantik akun deposit — 10 Oktober 2026
 ### Plan → Execute → Verify
 Subtask <=1 jam: validasi akun titipan dan daftar akun kas eksplisit dari policy yang disahkan; cocokkan akun piutang aplikasi dengan snapshot invoice; uji penolakan mapping pendapatan/salah piutang dan ulangi SQL/browser/concurrency.
@@ -3404,7 +3607,6 @@ Subtask <=1 jam: validasi akun titipan dan daftar akun kas eksplisit dari policy
 OWNED_BY: generic. Parameter akun tenant tanpa kode akun produksi hardcoded. Tidak mengubah master/riwayat; konfigurasi belum lengkap menolak posting. Seluruh simulasi memakai sumber sintetis disposable, tanpa koneksi produksi.
 ### Pelunasan tanpa deposit — rencana lanjutan
 Subtask <=1 jam: pembayaran invoice langsung dan refund pembayaran dengan receipt/GL sumber; saldo piutang netto mengikutkan refund; pembatalan invoice ditahan selama penerimaan kas belum dikembalikan. Metode deposit none tetap bisa melunasi invoice tanpa mengubahnya menjadi titipan. Implikasi IP & Kepatuhan: generik, akun kas eksplisit policy dan piutang snapshot invoice, histori append-only, data sintetis dan tanpa produksi.
-
 ## Bukti kasir sumber 0085 — 10 Oktober 2026
 ### Plan → Execute → Verify
 Selesai: deposit fixed/percentage/none eksplisit; receipt/refund sumber aktual; alokasi tanpa penerimaan kas kedua; pembayaran invoice langsung/refund asal; review terpisah; mapping titipan/kas/piutang tervalidasi; saldo, reversal, retry, tenant/RBAC, periode tutup, immutable history; UI menu billing dan pagination intent; shared view nonce mencegah respons lama menimpa halaman.
@@ -3413,3 +3615,21 @@ Bukti: 9 SQL deposit/source, 4 direct-payment, 8 browser, 5 concurrency native P
 OWNED_BY: generic. Tidak ada perubahan master key, data pasien nyata, integrasi penjamin/produksi atau pemetaan akun tenant implisit. Akun sumber dipilih dari policy yang disahkan. Runtime binary cache sementara tetap tersisa karena penghapusan folder runtime ditolak automatic review (blocked by policy); cache tidak mengandung database/dummy aktif. Penjamin dan acceptance lintas 44 menu masih belum tuntas; matriks tetap jujur partial.
 
 Regresi halaman billing kamar: 6 skenario browser lulus setelah integrasi kasir (total paket + regresi: 32).
+## Finalisasi 44 menu — 11 Oktober 2026
+### Plan → Execute → Verify
+Scope pengguna: tutup seluruh acceptance lokal, hapus data/output uji sementara, cek ulang, validasi dan push seluruh perubahan yang telah diperiksa. Bukti minimal berupa ringkasan hasil tetap diperlukan AGENTS.md; fixture/DB/payload sementara dibersihkan.
+Subtask <=1 jam: kontrak/eligibility dan quote manfaat; review alokasi serta piutang/settlement penjamin; adapter resep/dispense/MAR; alur pasien-unit dan source clinical gates; CSSD/component/diet/linen/facility/mortuary; indikator kapasitas/PPI; inbox/outbox integrations; lifecycle non-RS/Tech/evidence; konfigurasi downstream; regresi source SQL/browser/race; review seluruh diff sebelum commit/push. Tiap kelompok memiliki bukti acceptance terpisah; status tidak dinaikkan hanya dari adanya menu atau form.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Persetujuan skema operasional dan simulasi lokal sebelumnya berlaku. Master key dan data privat tidak diubah/disalin. Tarif, coverage, SOP dan akun harus parameter eksplisit yang direview; tidak mengarang hasil vendor atau persetujuan klinis. DB produksi/vendor tetap tidak dihubungkan. Perubahan workspace lain diperiksa sesuai provenance sebelum ikut finalisasi; tidak mempublikasikan data privat tanpa hak. Output sementara dibersihkan dalam finally dan hasil ringkas dipertahankan untuk audit.
+## Penjamin sumber — bukti lokal 11 Oktober 2026
+### Plan → Execute → Verify
+0087–0091: kalkulasi kategori/persentase/plafon/rounding eksplisit; binding kontrak aktif dan periode/evidence; reviewer terpisah/version/retry; alokasi piutang pasien→penjamin dengan actual post_journal; receipt/refund penjamin melalui cashier_transactions aktual; batas saldo patient/payer; pembatalan tertahan selama uang belum dikembalikan; source immutability dan journal visibility tenant; UI dari menu billing, kasir dan konfigurasi kontrak.
+Bukti lokal: calculator 7; eligibility 5; allocation/cash/refund/privacy 7; browser 5 (dua piutang nol, kas aktual200); race 2 sesi native dengan Lock wait aktual; tiga kontrak form master diperiksa (kategori, nilai nol, pecahan). Regresi kasir lama SQL9/UI8 lulus; master runner 17/17 suite lama lulus; validator katalog 633 baris, 0 error/0 warning. Hasil suite lama tidak dipakai untuk menyatakan acceptance source 44 menu selesai. Screenshot mobile390px diperiksa; semua browser/cluster/dummy ditutup/dihapus dalam finally.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Kontrak dummy, tidak ada pasien/harga/kontrak privat. Tidak ada verifikasi vendor/SEP/ACK eksternal palsu. Plafon implementasi per-stay dinyatakan eksplisit; lingkup lain ditolak. Kategori Kamar konfigurasi adalah tipe adjustment source existing dan harus dicantumkan eksplisit bila ditanggung. Kontrak/identity snapshot lama tetap tersedia; alokasi tidak menambah revenue kedua. Produksi/vendor belum diterapkan. Output uji sementara dihapus setelah ringkasan bukti disimpan; tidak menghapus artefak pekerjaan lain.
+
+## Farmasi–MAR sumber — rencana 11 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: binding formulary/harga generik per tenant dan ownership batch operasional (tanpa mengubah join key/master); explicit cutover/opening direview; wrapper Rx/FEFO/ledger aktual dan resep dengan identitas admission sumber; verifikasi apoteker berprivilege individu; jadwal dokter dan MAR unit-dose terkait item dispensing aktual; retur ke batch/ledger setelah verifikasi sealed/expiry dan kuantitas; rekonsiliasi/stop/pulang; UI/API/source gates; SQL/browser/negative/race/retry dan cleanup.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic untuk adapter baru. Sumber pharmacy_drugs/batches/prescriptions/dispenses/ledger dan mar_jadwal/pemberian tetap dengan provenance asli. Tidak mengubah Kode Material/Nama Pemeriksaan maupun schema master. Master obat dapat generik bersama; harga/formulary dan batch tenant memakai metadata operasional terpisah. Tidak membuat dosis/interaksi atau SOP klinis otomatis; dokter/apoteker/perawat kompeten dan berprivilege individual memasukkan/menandatangani instruksi, kuantitas serta jadwal eksplisit. Histori lama dan koreksi append-only; no patient real/vendor/prod.

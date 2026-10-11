@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "template_version": "1.0.0",
+  "name": "Default Flexible Lab & QMS Template",
+  "description": "Konfigurasi tata letak deklaratif untuk kop, logo, spasi, kolom tabel, dan tanda tangan digital dokumen SMM & hasil lab.",
+  
+  "layout": {
+    "page_size": "A4",
+    "orientation": "portrait",
+    "page_margin_mm": {
+      "top": 18,
+      "bottom": 18,
+      "left": 18,
+      "right": 18
+    },
+    "font_family": "'Outfit', 'Segoe UI', Arial, sans-serif",
+    "font_size_pt": 10,
+    "line_height": 1.45,
+    "primary_color": "#0f2963",
+    "accent_color": "#0284c7",
+    "text_color": "#1e293b",
+    "watermark": {
+      "enabled": true,
+      "text": "SALINAN TERKENDALI",
+      "color": "rgba(15, 41, 99, 0.04)",
+      "angle_deg": -30
+    }
+  },
+
+  "header_kop": {
+    "logo_position": "left",
+    "logo_url": "assets/logo-lab-default.png",
+    "logo_secondary_url": null,
+    "logo_width_px": 80,
+    "logo_height_px": 80,
+    "logo_margin_px": {
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 18
+    },
+    "kop_text_align": "left",
+    "institution_name_size_pt": 15,
+    "institution_name_weight": "800",
+    "show_accreditation_kan": true,
+    "accreditation_kan_text": "TERAKREDITASI KAN LP-1192-IDN • SNI ISO 15189:2022",
+    "show_address_contact": true,
+    "show_divider_line": true,
+    "divider_line_style": "double",
+    "divider_line_color": "#0f2963",
+    "divider_line_thickness_px": 3,
+    "kop_spacing_bottom_px": 16
+  },
+
+  "lab_results_table": {
+    "header_bg_color": "#f8fafc",
+    "header_text_color": "#0f2963",
+    "header_border_color": "#cbd5e1",
+    "row_padding_vertical_px": 6,
+    "row_padding_horizontal_px": 8,
+    "alternate_row_bg": true,
+    "alternate_row_bg_color": "#fbfcfe",
+    "highlight_abnormal": true,
+    "abnormal_badge_color": "#fee2e2",
+    "abnormal_text_color": "#dc2626",
+    
+    "columns": [
+      {
+        "id": "analyte",
+        "label": "PEMERIKSAAN / PARAMETER ANALIT",
+        "width_pct": 30,
+        "align": "left",
+        "enabled": true,
+        "show_loinc": true
+      },
+      {
+        "id": "result",
+        "label": "HASIL UJI",
+        "width_pct": 16,
+        "align": "right",
+        "enabled": true,
+        "bold": true
+      },
+      {
+        "id": "flag",
+        "label": "STATUS",
+        "width_pct": 8,
+        "align": "center",
+        "enabled": true,
+        "badge": true
+      },
+      {
+        "id": "unit",
+        "label": "SATUAN (UCUM)",
+        "width_pct": 14,
+        "align": "left",
+        "enabled": true
+      },
+      {
+        "id": "ref_range",
+        "label": "RENTANG ACUAN",
+        "width_pct": 18,
+        "align": "left",
+        "enabled": true
+      },
+      {
+        "id": "method",
+        "label": "METODE UJI",
+        "width_pct": 14,
+        "align": "left",
+        "enabled": true
+      },
+      {
+        "id": "specimen",
+        "label": "SPESIMEN",
+        "width_pct": 10,
+        "align": "left",
+        "enabled": false
+      }
+    ]
+  },
+
+  "smm_document_layout": {
+    "cover_page": {
+      "enabled": true,
+      "title_size_pt": 22,
+      "subtitle": "SISTEM MANAJEMEN MUTU LABORATORIUM KLINIK",
+      "border_accent": true
+    },
+    "table_of_contents": {
+      "enabled": true,
+      "title": "DAFTAR ISI DOKUMEN MUTU"
+    },
+    "document_control_header": {
+      "enabled": true,
+      "show_revision_history": true,
+      "show_confidential_notice": true
+    }
+  },
+
+  "signature_box": {
+    "position": "right",
+    "spacing_top_px": 24,
+    "width_pct": 45,
+    "show_qr_tte": true,
+    "qr_size_px": 72,
+    "qr_caption": "BSrE TTE Tersertifikasi",
+    "doctor_role_title": "Dokter Spesialis Patologi Klinik",
+    "doctor_signature_type": "qr_plus_name",
+    "show_date_stamp": true
+  },
+
+  "footer": {
+    "show_page_number": true,
+    "page_number_format": "Halaman {PAGE} dari {TOTAL_PAGES}",
+    "footer_note": "Dokumen ini diterbitkan secara elektronik dan sah sesuai regulasi UU ITE & ISO 15189:2022.",
+    "show_border_top": true,
+    "border_color": "#e2e8f0"
+  },
+
+  "critical_alert_banner": {
+    "enabled": true,
+    "bg_color": "#fef2f2",
+    "border_color": "#dc2626",
+    "text_color": "#991b1b",
+    "title": "PERINGATAN NILAI KRITIS (CRITICAL / PANIC VALUE ALERT)",
+    "description": "Hasil pemeriksaan di atas memuat analit di luar batas keselamatan biologis. Prosedur pelaporan kritis (SLA < 30 menit) dan konfirmasi TBaK telah diaktivasi.",
+    "show_sla_timestamp": true
+  },
+
+  "specimen_timing_audit": {
+    "show_collection_time": true,
+    "show_received_time": true,
+    "show_validated_time": true,
+    "compliance_ref": "PMK 24/2022 & CLSI GP44-A4"
+  }
+}

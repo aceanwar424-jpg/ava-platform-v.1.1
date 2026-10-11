@@ -20,7 +20,7 @@
 // buruk daripada perilaku lama.
 // ═══════════════════════════════════════════════════════════════
 
-const MODUL_VER = '20261002-readability-flow';
+const MODUL_VER = '20261011-tech-record-routes';
 const _modulDimuat = new Map();   // src → Promise
 
 function muatSkrip(src) {

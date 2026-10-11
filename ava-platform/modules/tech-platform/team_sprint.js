@@ -2,9 +2,10 @@
 let teamSprintName='',teamSprintData=null,teamSprintEpoch=0;
 const teamSprintEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function renderTeamSprint(){
+ if(window.techSprintRouteTeam!==undefined){teamSprintName=window.techSprintRouteTeam;delete window.techSprintRouteTeam;}
  const epoch=++teamSprintEpoch,main=document.getElementById('main-content');
  main.innerHTML=`<section class="team-sprint"><style>.team-sprint{padding:16px;max-width:1100px;margin:auto}.team-sprint article,.team-sprint form{border:1px solid #bfccd5;padding:16px;margin:12px 0;border-radius:8px}.team-sprint label{display:block;margin:10px 0}.team-sprint input,.team-sprint select,.team-sprint textarea{padding:9px;max-width:100%;box-sizing:border-box}.team-sprint button{padding:9px;margin:4px}.team-sprint .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}</style><h1>Sprint & Velocity</h1><form id="ts-team"><label>Nama tim<input name="team" maxlength="100" value="${teamSprintEscape(teamSprintName)}" required></label><button>Buka tim</button></form><p role="alert" id="ts-error"></p><button id="ts-policy">Setup kebijakan tim</button><div id="ts-editor"></div><div id="ts-board"></div></section>`;
- document.getElementById('ts-team').onsubmit=e=>{e.preventDefault();teamSprintName=new FormData(e.target).get('team').trim();renderTeamSprint();};
+ document.getElementById('ts-team').onsubmit=e=>{e.preventDefault();teamSprintName=new FormData(e.target).get('team').trim();const route=window.TechRoutes?.active();if(route)TechRoutes.commit('tech-sprint',{team:teamSprintName});renderTeamSprint();};
  document.getElementById('ts-policy').onclick=()=>navigate('cfg-rs-policy');
  if(!teamSprintName)return;
  try{
@@ -20,15 +21,15 @@ async function renderTeamSprint(){
  }catch(e){if(epoch===teamSprintEpoch&&document.getElementById('ts-error'))document.getElementById('ts-error').textContent=e.message;}
 }
 function teamSprintForm(html,save){
- const editor=document.getElementById('ts-editor');editor.innerHTML=`<form>${html}<label>Alasan<textarea name="reason" minlength="3" required></textarea></label><button type="submit">Simpan</button><button type="button" id="ts-cancel">Tutup</button></form>`;
- const form=editor.querySelector('form'),key=crypto.randomUUID();document.getElementById('ts-cancel').onclick=()=>editor.replaceChildren();
- form.onsubmit=async e=>{e.preventDefault();const b=form.querySelector('[type=submit]');if(b.disabled)return;b.disabled=true;try{await save(new FormData(form),key);if(form.isConnected)await renderTeamSprint();}catch(err){const error=document.getElementById('ts-error');if(error)error.textContent=err.message;}finally{if(b.isConnected)b.disabled=false;}};editor.scrollIntoView({block:'start'});
+ const pageForm=window.TechPages?.enabled();if(pageForm)TechPages.open('<div id="ts-editor" class="team-sprint"></div><p id="ts-error" role="alert"></p>');const editor=document.getElementById('ts-editor');editor.innerHTML=`<form>${html}<label>Alasan<textarea name="reason" minlength="3" required></textarea></label><button type="submit">Simpan</button><button type="button" id="ts-cancel">Tutup</button></form>`;
+ const form=editor.querySelector('form'),key=crypto.randomUUID();document.getElementById('ts-cancel').onclick=()=>pageForm?TechPages.back():editor.replaceChildren();
+ form.onsubmit=async e=>{e.preventDefault();const b=form.querySelector('[type=submit]');if(b.disabled)return;b.disabled=true;try{await save(new FormData(form),key);if(form.isConnected){if(pageForm)TechPages.finish();await renderTeamSprint();}}catch(err){const error=document.getElementById('ts-error');if(error)error.textContent=err.message;}finally{if(b.isConnected)b.disabled=false;}};editor.scrollIntoView({block:'start'});
 }
-function teamSprintSend(action,data,key){return sbRpc('tech_sprint_command',{p_action:action,p_data:{team:teamSprintName,...data},p_request_key:key});}
-function teamSprintNew(action){
+async function teamSprintSend(action,data,key){const ack=await sbRpc('tech_sprint_command',{p_action:action,p_data:{team:teamSprintName,...data},p_request_key:key});if(!ack||ack.error||!Number.isSafeInteger(Number(ack.id))||Number(ack.id)<=0)throw Error('Server tidak mengonfirmasi data sprint.');return ack;}
+function teamSprintNew(action){window.TechRoutes?.intent('sprint-edit',[action,null]);
  teamSprintForm(`<h2>${action==='create_item'?'Tambah backlog':'Buat sprint'}</h2><label>Judul<input name="title" minlength="3" maxlength="150" required></label>${action==='create_item'?`<label>Poin<select name="points">${teamSprintData.policy.payload.points.map(p=>`<option>${teamSprintEscape(p)}</option>`).join('')}</select></label>`:''}`,async(d,k)=>teamSprintSend(action,{title:d.get('title'),...(action==='create_item'?{points:Number(d.get('points'))}:{}),reason:d.get('reason')},k));
 }
-function teamSprintAction(action,row){
+function teamSprintAction(action,row){window.TechRoutes?.intent('sprint-edit',[action,row.id]);
  let checks=[];
  if(action==='done')checks=teamSprintData.policy.payload.done_checks;
  // DoD belongs to the sprint's pinned version, not the latest team policy.
@@ -49,3 +50,6 @@ function teamSprintActionForm(action,row,checks){
  });
 }
 window.renderTeamSprint=renderTeamSprint;
+
+function teamSprintRestore(action,id){if(['create_sprint','create_item'].includes(action)&&id==null)return teamSprintNew(action);const rows=['start','close'].includes(action)?teamSprintData?.sprints:teamSprintData?.items;const row=rows?.find(r=>Number(r.id)===Number(id));if(!row)throw Error('Data sprint tidak ditemukan atau akses dibatasi.');if(!['start','close','edit_item','assign','doing','done','return','reopen'].includes(action))throw Error('Aksi sprint tidak valid');teamSprintAction(action,row);}
+window.teamSprintRestore=teamSprintRestore;

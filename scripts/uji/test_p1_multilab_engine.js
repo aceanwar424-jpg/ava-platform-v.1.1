@@ -30,7 +30,7 @@ const assembler = new SMMPackAssembler();
 
 // Assembly Tenant A
 const packMedika = assembler.assemble(configMedika);
-assert(packMedika.total_modules === 9, 'Tenant A (Medika) menghasilkan 9 modul SMM lengkap');
+assert(packMedika.total_modules === 12, 'Tenant A (Medika) menghasilkan 12 modul SMM lengkap');
 assert(packMedika.combined_bundle.includes('Klinik Pratama Medika Sejahtera'), 'Tenant A menyematkan nama lab Medika');
 assert(packMedika.combined_bundle.includes('dr. Budi Setiawan, Sp.PK'), 'Tenant A menyematkan nama penanggung jawab Medika');
 assert(!packMedika.combined_bundle.includes('{{'), 'Tenant A tidak menyisakan placeholder kurung kurawal');
@@ -38,7 +38,7 @@ assert(!packMedika.combined_bundle.toLowerCase().includes('ava queen') && !packM
 
 // Assembly Tenant B
 const packSentosa = assembler.assemble(configSentosa);
-assert(packSentosa.total_modules === 9, 'Tenant B (Sentosa) menghasilkan 9 modul SMM lengkap');
+assert(packSentosa.total_modules === 12, 'Tenant B (Sentosa) menghasilkan 12 modul SMM lengkap');
 assert(packSentosa.combined_bundle.includes('Laboratorium Bio-Sentosa Utama'), 'Tenant B menyematkan nama lab Sentosa');
 assert(packSentosa.combined_bundle.includes('dr. Ratna Dewi Sartika, Sp.PK, M.Kes'), 'Tenant B menyematkan nama penanggung jawab Sentosa');
 assert(!packSentosa.combined_bundle.includes('{{'), 'Tenant B tidak menyisakan placeholder kurung kurawal');
@@ -52,14 +52,14 @@ const evalMedika = checker.evaluateDocument(packMedika.combined_bundle, {
   title: 'Paket SMM - Klinik Medika Sejahtera'
 });
 console.log(`Evaluasi Medika: Score ${evalMedika.compliance_score}%, Status: ${evalMedika.is_compliant ? 'AUDIT READY' : 'NEEDS REVISION'}`);
-assert(evalMedika.compliance_score === 100, 'Tenant A memenuhi 100% klausul ISO 15189:2022 (9/9 Klausul terpenuhi)');
+assert(evalMedika.compliance_score === 100, 'Tenant A memenuhi 100% klausul ISO 15189:2022 (12/12 Klausul terpenuhi)');
 assert(evalMedika.is_compliant === true, 'Tenant A dinyatakan lolos audit kesiapan ISO 15189');
 
 const evalSentosa = checker.evaluateDocument(packSentosa.combined_bundle, {
   title: 'Paket SMM - Bio-Sentosa'
 });
 console.log(`Evaluasi Sentosa: Score ${evalSentosa.compliance_score}%, Status: ${evalSentosa.is_compliant ? 'AUDIT READY' : 'NEEDS REVISION'}`);
-assert(evalSentosa.compliance_score === 100, 'Tenant B memenuhi 100% klausul ISO 15189:2022 (9/9 Klausul terpenuhi)');
+assert(evalSentosa.compliance_score === 100, 'Tenant B memenuhi 100% klausul ISO 15189:2022 (12/12 Klausul terpenuhi)');
 assert(evalSentosa.is_compliant === true, 'Tenant B dinyatakan lolos audit kesiapan ISO 15189');
 
 // Uji Gap Report pada dokumen yang tidak lengkap (Sengaja tidak memuat flebotomi/PMI)

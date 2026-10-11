@@ -3832,6 +3832,18 @@ function processUnifiedCheckout(customerInfo = {}) {
     throw new Error('Keranjang belanja kosong.');
   }
 
+  // Pesanan klinis/spa wajib memiliki handoff terverifikasi ke HIS
+  const hasClinicalOrExternal = unifiedSuperCart.some(it => it.type === 'CLINICAL' || it.type === 'SPA');
+  const hisConnected = Boolean(customerInfo.his_connected || (typeof window !== 'undefined' && window.hisConnected));
+  if (hasClinicalOrExternal && !hisConnected) {
+    return {
+      success: false,
+      code: 'HANDOFF_UNAVAILABLE',
+      order: null,
+      message: 'Checkout ditolak: Layanan klinis dan reservasi belum tersambung ke HIS untuk verifikasi antrean.'
+    };
+  }
+
   const totals = calculateUnifiedCartTotal();
   const newOrder = {
     order_id: 'AVA-ORD-' + Math.floor(100000 + Math.random() * 900000),
@@ -3957,6 +3969,10 @@ let breathInterval = null;
 
 // In-App Toast System
 function avaToast(message, type = 'info', duration = 3200) {
+  if (typeof document === 'undefined') {
+    if (typeof console !== 'undefined') console.log(`[Toast ${type}] ${message}`);
+    return;
+  }
   let container = document.getElementById('ava-toast-container');
   if (!container) {
     container = document.createElement('div');

@@ -80,6 +80,10 @@ async function renderHRD() {
     </div>`;
 
   await Promise.all([loadEmployees(), loadLeaves()]);
+  if(window.TechPages?.enabled()){
+    const selected=TechPages.selection('hrd','emp');switchHRDTab(selected);document.getElementById('hrd-tabs')?.remove();
+    document.querySelector('#main-content h1').textContent=TechPages.sections.hrd.find(x=>x[1]===selected)?.[0]||'HRD';
+  }
 }
 
 let linkedEmployeeIds = new Set();
@@ -199,7 +203,7 @@ function renderEmpTable(data) {
 
 function switchHRDTab(tab, btn) {
   document.querySelectorAll('#hrd-tabs .tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  btn?.classList.add('active');
   ['emp','leave','payroll'].forEach(t=>{
     const el=document.getElementById(`hrd-${t}`);
     if (el) el.style.display=t===tab?'block':'none';
@@ -208,6 +212,7 @@ function switchHRDTab(tab, btn) {
 }
 
 async function openEmpForm(id=null) {
+  window.TechRoutes?.intent('employee-edit',[id]);
   let e={};
   if (id) { const d=await sbGet('employees',`select=*&id=eq.${id}`); e=d[0]||{}; }
   const today=new Date().toISOString().split('T')[0];
@@ -515,6 +520,7 @@ function renderLeaveTable(data) {
 }
 
 async function openLeaveForm(empId=null, empName='') {
+  window.TechRoutes?.intent('leave-add',[empId]);
   let empOpts='<option value="">-- Pilih Karyawan --</option>';
   try {
     const emps=await sbGet('employees','select=id,full_name&status=eq.Aktif&order=full_name');
@@ -652,6 +658,7 @@ function renderPayrollTab() {
 }
 
 function openPayrollModal() {
+  window.TechRoutes?.intent('payroll',[]);
   switchHRDTab('payroll', document.querySelector('#hrd-tabs .tab-btn:nth-child(3)'));
 }
 

@@ -105,6 +105,39 @@
       "category": "Management Requirements",
       "version": "1.0",
       "last_audit_date": "2026-08-06"
+    },
+    {
+      "module_id": "MOD-ISO-6.6-001",
+      "clause": "6.6",
+      "clause_title": "Reagents and Consumables Management",
+      "level": "L2",
+      "title": "SOP Pengelolaan Reagen dan Bahan Habis Pakai Laboratorium",
+      "filename": "SMM_L2_007_SOP_Pengelolaan_Reagen_Bahan_Habis_Pakai.md",
+      "category": "Resource Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-10-10"
+    },
+    {
+      "module_id": "MOD-ISO-7.3-002",
+      "clause": "7.3.7",
+      "clause_title": "Autoverification & Delta Check System",
+      "level": "L2",
+      "title": "SOP Autoverifikasi Hasil Laboratorium dan Sistem Uji Delta (Delta Check)",
+      "filename": "SMM_L2_008_SOP_Autoverifikasi_Delta_Check.md",
+      "category": "Process Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-10-10"
+    },
+    {
+      "module_id": "MOD-ISO-7.5-001",
+      "clause": "7.5",
+      "clause_title": "Post-examination Sample Retention & Waste Disposal",
+      "level": "L2",
+      "title": "SOP Penyimpanan, Retensi Spesimen Pasca-Analitik dan Pemusnahan Limbah B3 Medis",
+      "filename": "SMM_L2_009_SOP_Penyimpanan_Retensi_Pemusnahan_Spesimen_Limbah_B3.md",
+      "category": "Process Requirements",
+      "version": "1.0",
+      "last_audit_date": "2026-10-10"
     }
   ]
 }

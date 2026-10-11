@@ -1,0 +1,23 @@
+{
+  "synthetic": true,
+  "realBoot": true,
+  "results": [
+    "real app boot and guarded master route",
+    "master read-only detail reload and return to list",
+    "edit URL reload reconstructs from authorized data",
+    "browser Back and Forward restore list/form",
+    "cancelled Back preserves URL and unsaved fields",
+    "navigation blocked while save remains pending",
+    "save failure/retry returns acknowledged row to list",
+    "server pagination beyond first 25 rows",
+    "search, read-only detail and explicit edit",
+    "deployment edit deep link reload",
+    "deployment save opens acknowledged detail with persisted sync status",
+    "mobile page without overflow and sidebar show/hide",
+    "quotation creation page URL reload",
+    "Agentic selected destination and form reload without internal tabs",
+    "late deployment response cannot overwrite newer master page",
+    "deep record route still passes parent RBAC"
+  ],
+  "errors": []
+}

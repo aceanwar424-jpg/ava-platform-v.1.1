@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "results": [
+    {
+      "name": "two payer receipts cannot overpay source claim",
+      "status": "passed",
+      "native_source_lock": true
+    },
+    {
+      "name": "two payer refunds cannot overspend source receipt",
+      "status": "passed",
+      "native_source_lock": true
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

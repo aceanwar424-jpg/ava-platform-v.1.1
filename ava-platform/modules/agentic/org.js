@@ -240,6 +240,7 @@ async function agRenderComplaints(){
 }
 let _agCxRows = [];
 async function agComplaintEdit(id){
+  window.TechRoutes?.intent('agent-complaint',[id||null]);
   try{ _agCxRows = await sbGet('agentic_complaints_v','select=*') || []; }catch(e){ _agCxRows = []; }
   const r = id ? _agCxRows.find(x=>x.id===id) : null;
   const kanal = ['WA','Telepon','Email','Langsung','Google','Lainnya'];
@@ -327,6 +328,7 @@ async function agRenderCreds(){
 }
 let _agCredRows = [];
 async function agCredEdit(id){
+  window.TechRoutes?.intent('agent-credential',[id||null]);
   try{ _agCredRows = await sbGet('agentic_credentials_v','select=*') || []; }catch(e){ _agCredRows = []; }
   const r = id ? _agCredRows.find(x=>x.id===id) : null;
   const prof = ['Dokter','Dokter Spesialis','Perawat','ATLM (Analis)','Radiografer','Apoteker','Bidan','Lainnya'];
@@ -461,6 +463,7 @@ async function agRenderTemplates(){
 let _agTplRows = [];
 let _agTplEditOrig = null;   // baris asli yang sedang disunting (untuk deteksi kunci berubah)
 async function agTemplateEdit(id){
+  window.TechRoutes?.intent('agent-template',[id||null]);
   try{ _agTplRows = await sbGet('agentic_templates_v','select=*') || []; }catch(e){ _agTplRows = []; }
   const r = id ? _agTplRows.find(x=>x.id===id) : null;
   _agTplEditOrig = r || null;
@@ -680,6 +683,7 @@ async function agCronToggle(jobname, active){
 
 // ── Modal: edit job desc / charter organ ─────────────────────────
 function agOrgEditAgent(code){
+  window.TechRoutes?.intent('agent-charter',[code]);
   const a = agOrgAgents.find(x=>x.code===code); if(!a) return;
   openModal(`
     <div style="max-width:560px">
@@ -728,6 +732,7 @@ async function agOrgSaveAgent(code){
 
 // ── Modal: edit mandat (decision rights) ─────────────────────────
 function agOrgEditRight(taskType){
+  window.TechRoutes?.intent('agent-right',[taskType]);
   const r = agOrgRights.find(x=>x.task_type===taskType); if(!r) return;
   const qaOpts = agOrgAgents.filter(a=>a.code.startsWith('QA')).map(a=>a.code);
   openModal(`

@@ -1,0 +1,24 @@
+// OWNED_BY: generic. Disposable SQL fixture, real migrations, no production writes.
+const fs=require('node:fs'),assert=require('node:assert/strict'),f=require('../lib/rs-engine-fixture.cjs');
+(async()=>{let pg;const results=[];try{
+ pg=await f.createEngineFixture();for(const name of ['0065_tech_operations_control_plane.sql','0068_tech_deployment_center.sql','0086_tech_deployment_access_status.sql'])await pg.exec(fs.readFileSync('db/migrations/'+name,'utf8'));
+ const q=async(sql,args=[])=>(await pg.query(sql,args)).rows;
+ const actor=async(id,tenant,role)=>{await q('UPDATE user_profiles SET role=$1 WHERE id=$2',[role,id]);await q("SELECT set_config('app.user_id',$1,false),set_config('app.tenant_id',$2,false)",[id,tenant]);};
+ const save=async(tenant=f.A,domain='synthetic.example')=>(await q("SELECT tech_ops_save_deployment($1,'staging','synthetic-project',$2) result",[tenant,domain]))[0].result;
+ const sync=async(row,status='SYNCED')=>(await q('SELECT tech_ops_deployment_sync_result($1,$2,$3,$4) result',[row.deployment_id,status,status==='SYNCED'?null:'SYNTHETIC_FAILURE',row.updated_at]))[0].result;
+ await actor(f.admin,f.A,'super_admin');const first=await save();assert(first.updated_at);results.push('save acknowledgement has id and revision');
+ await assert.rejects(()=>save(f.B),/tenant context/);await assert.rejects(()=>save(null),/tenant context/);results.push('foreign/null tenant fallback rejected');
+ await pg.exec('SET ROLE authenticated');assert.equal((await q('SELECT id FROM tech_deployments')).length,1);await assert.rejects(()=>q('UPDATE tech_deployments SET status=\'SYNCED\''),/permission denied/);await pg.exec('RESET ROLE');results.push('authorized list and direct write denied');
+ await actor(f.foreign,f.B,'super_admin');await pg.exec('SET ROLE authenticated');assert.equal((await q('SELECT id FROM tech_deployments')).length,0);await pg.exec('RESET ROLE');await assert.rejects(()=>sync(first),/tidak tersedia/);results.push('read and status tenant isolation');
+ await actor(f.worker,f.A,'viewer');await assert.rejects(()=>save(),/Peran/);await pg.exec('SET ROLE authenticated');assert.equal((await q('SELECT id FROM tech_deployments')).length,0);await pg.exec('RESET ROLE');results.push('viewer denied read and command');
+ await actor(f.admin,f.A,'super_admin');assert.equal((await sync(first)).status,'SYNCED');assert((await q('SELECT last_synced_at FROM tech_deployments'))[0].last_synced_at);results.push('synced persisted with timestamp');
+ await assert.rejects(()=>sync(first),/hasil lama/);const second=await save(f.A,'changed.example');await assert.rejects(()=>sync(first),/hasil lama/);assert.equal((await sync(second,'FAILED')).status,'FAILED');assert.equal((await q('SELECT last_error FROM tech_deployments'))[0].last_error,'SYNTHETIC_FAILURE');results.push('stale result denied and failure persisted');
+ const third=await save();await assert.rejects(()=>sync(third,'UNKNOWN'),/Status/);assert.equal((await sync(third,'DRIFT')).status,'DRIFT');assert((await q("SELECT count(*)::int n FROM tech_operational_events WHERE event_type='deployment.sync_result'"))[0].n>=3);results.push('drift and audit persist, invalid status rejected');
+ const withMeta=async(meta,domain='unique.example')=>(await q("SELECT tech_ops_save_deployment($1,'staging','unique-project',$2,null,'main','vercel',$3) result",[f.A,domain,JSON.stringify(meta)]))[0].result;
+ const create={mode:'create',request_key:'synthetic-create-key'};const created=await withMeta(create);assert.deepEqual(await withMeta(create),created);await assert.rejects(()=>withMeta({...create,request_key:'different-key'}),/Project sudah ada/);await assert.rejects(()=>withMeta(create,'different.example'),/Retry berbeda/);results.push('create retry idempotent and duplicate cannot overwrite');
+ const edit={mode:'edit',record_id:created.deployment_id,expected_updated_at:created.updated_at,request_key:'synthetic-edit-key'};const changed=await withMeta(edit,'changed.example');assert.deepEqual(await withMeta(edit,'changed.example'),changed);await assert.rejects(()=>withMeta({...edit,request_key:'stale-edit-key'},'stale.example'),/Konfigurasi sudah berubah/);results.push('edit retry idempotent and stale edit rejected');
+ await assert.rejects(()=>save(f.A,'bad..example'),/input tidak valid/);await assert.rejects(()=>save(f.A,null),/input tidak valid/);results.push('invalid domain and missing fields rejected on server');
+ for(const message of results)console.log('PASS '+message);
+ fs.mkdirSync('docs/audit-evidence/2026-10-11',{recursive:true});fs.writeFileSync('docs/audit-evidence/2026-10-11/tech-deployment-sql.json',JSON.stringify({synthetic:true,results,cleanup:'database closed in finally'},null,2));
+ }finally{if(pg)await pg.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

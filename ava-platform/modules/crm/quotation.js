@@ -110,6 +110,7 @@ function pnwGambar() {
 function pnwSaring(s) { pnwFilter = s; pnwGambar(); }
 
 async function pnwBaru() {
+  window.TechRoutes?.intent('quotation-add',[]);
   let nomor = '';
   try { nomor = await sbRpc('quotation_nomor_baru', {}); } catch (e) {}
   openModal(`
@@ -154,6 +155,7 @@ async function pnwSimpanBaru(nomor) {
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const baru = (await res.json())[0];
+    if(!baru || !Number.isSafeInteger(Number(baru.id)) || Number(baru.id)<=0)throw new Error('Server belum mengonfirmasi penawaran.');
     closeModalForce();
     toast('Penawaran dibuat', 'ok');
     await pnwMuat();
@@ -162,6 +164,7 @@ async function pnwSimpanBaru(nomor) {
 }
 
 async function pnwBuka(id) {
+  window.TechRoutes?.intent('quotation-detail',[id]);
   pnwAktif = pnwDaftar.find(q => q.id === id) || null;
   if (!pnwAktif) { await pnwMuat(); pnwAktif = pnwDaftar.find(q => q.id === id); }
   if (!pnwAktif) return;
@@ -170,6 +173,7 @@ async function pnwBuka(id) {
     if (!Array.isArray(pnwBaris)) pnwBaris = [];
   } catch (e) { pnwBaris = []; }
   pnwGambarDetail();
+  window.TechRoutes?.openRecord();
 }
 
 function pnwGambarDetail() {
@@ -180,7 +184,7 @@ function pnwGambarDetail() {
       <div><h1>${q.nomor || 'Penawaran'}</h1>
         <p style="color:var(--text3);font-size:13px">${q.partner_name || ''} · ${q.judul || ''}</p></div>
       <div class="btn-row">
-        <button class="btn btn-ghost btn-sm" onclick="renderPenawaran()">← Daftar</button>
+        <button class="btn btn-ghost btn-sm" onclick="navigate('penawaran')">← Daftar</button>
         ${!terkunci ? `<button class="btn btn-ghost btn-sm" onclick="pnwTambahBaris()">+ Tambah Item</button>` : ''}
         ${pnwTombolStatus(q)}
       </div>
@@ -255,6 +259,7 @@ async function pnwJadiInvoice() {
 }
 
 async function pnwTambahBaris() {
+  window.TechRoutes?.intent('quotation-item',[pnwAktif.id]);
   if (!pnwKatalog.length) {
     try {
       pnwKatalog = await sbGet('products',
@@ -330,3 +335,6 @@ window.pnwPilihItem = pnwPilihItem;
 window.pnwHapusBaris = pnwHapusBaris;
 window.pnwUbahStatus = pnwUbahStatus;
 window.pnwJadiInvoice = pnwJadiInvoice;
+
+async function pnwRestoreItem(id){await pnwBuka(id);await pnwTambahBaris();}
+window.pnwRestoreItem=pnwRestoreItem;

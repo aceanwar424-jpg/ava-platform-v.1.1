@@ -41,7 +41,7 @@ testSuites.forEach((suite, idx) => {
   const scriptPath = path.join(__dirname, suite.file);
   console.log(`▶ Menjalankan [${idx + 1}/${testSuites.length}]: ${suite.name}...`);
   try {
-    const output = execSync(`node "${scriptPath}"`, { encoding: 'utf-8' });
+    const output = execSync(`node --max-old-space-size=1024 "${scriptPath}"`, { encoding: 'utf-8' });
     const match = output.match(/(\d+)\s+DARI\s+(\d+)\s+SKENARIO\s+LULUS/i);
     const passedCount = match ? match[1] : 'ALL';
     const totalCount = match ? match[2] : 'ALL';

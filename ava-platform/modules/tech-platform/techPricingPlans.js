@@ -154,6 +154,7 @@ function tpGambar() {
 }
 
 async function tpTambah() {
+  window.TechRoutes?.intent('package-add',[]);
   if (typeof openModal === 'function') {
     openModal(`
       <div style="padding:18px;max-width:560px">
@@ -248,13 +249,13 @@ async function tpEksekusiTambah() {
     toast?.('Kode dan nama paket wajib diisi', 'warn') || alert('Kode dan nama paket wajib diisi');
     return;
   }
-  closeModal?.();
-  await tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb });
+  const button=document.querySelector('[onclick^="tpEksekusiTambah"]');if(button?.disabled)return;if(button)button.disabled=true;
+  try{await tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb });}finally{if(button?.isConnected)button.disabled=false;}
 }
 
 async function tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb }) {
   try {
-    await sbPost('tech_paket', {
+    const result=await sbPost('tech_paket', {
       kode: kode.trim().toUpperCase(), nama: nama.trim(),
       untuk: untuk || null,
       harga_bulanan: parseFloat(bln) || 0,
@@ -263,7 +264,9 @@ async function tpKirimPaket({ kode, nama, untuk, bln, thn, pengguna, trx, gb }) 
       batas_transaksi_bln: trx === '' ? null : parseInt(trx, 10),
       batas_penyimpanan_gb: gb === '' ? null : parseFloat(gb),
     });
+    const row=Array.isArray(result)?result[0]:result;if(!row||row.error||!row.id)throw Error('Server tidak mengonfirmasi paket tersimpan.');
     toast?.(`Paket ${nama} berhasil disimpan`, 'ok') || alert('Paket berhasil disimpan.');
+    closeModalForce();
     await renderTechPricingPlans();
   } catch (e) { toast?.('Gagal menyimpan paket: ' + e.message, 'err') || alert('Gagal menyimpan paket: ' + e.message); }
 }

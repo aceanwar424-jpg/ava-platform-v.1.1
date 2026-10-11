@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "vendorCalls": 0,
+  "results": [
+    "success persisted through existing authenticated context",
+    "denied record never reaches vendor",
+    "stale request never reaches vendor",
+    "malformed body rejected",
+    "occupied domain requires ownership review, never false success",
+    "connection failure persisted",
+    "missing DB acknowledgement never reported persisted",
+    "unconfigured adapter recorded without vendor request"
+  ]
+}

@@ -4498,9 +4498,15 @@ async function agSyncLiveState() {
 }
 
 
-function initAgenticModule() {
+async function initAgenticModule() {
   const main = document.getElementById('main-content');
   if (!main) return;
+  if(window.TechPages?.enabled()){
+    const title=AG_TABS_2026.find(tab=>tab.id===_agTabActive)?.label.replace(/^[^a-zA-Z]+/,'')||'Agentic';
+    main.innerHTML='<header class="page-header"><div><h1>'+agEsc(title)+'</h1><p>Ruang kerja Agentic</p></div></header><div id="ag-tab-content" class="tech-agentic-content"></div>';
+    await renderActiveAgTabContent();return;
+  }
+
 
   main.innerHTML = `
     <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
@@ -4531,8 +4537,8 @@ function initAgenticModule() {
       </div>
 
       <!-- 2026 TAB NAVIGATION -->
-      <div style="display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:20px; overflow-x:auto;">
-        ${AG_TABS_2026.map(tab => `
+      <div class="ag-module-tabs" style="display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:12px; margin-bottom:20px; overflow-x:auto;">
+        ${(window.TechPages?.enabled()?[]:AG_TABS_2026).map(tab => `
           <button 
             onclick="switchAgTab('${tab.id}')"
             style="
@@ -4556,16 +4562,17 @@ function initAgenticModule() {
     </div>
   `;
 
+  if(window.TechPages?.enabled())main.querySelector('.ag-module-tabs')?.remove();
   // Render active tab safely
-  renderActiveAgTabContent();
+  await renderActiveAgTabContent();
 }
 
 function switchAgTab(tabId) {
   _agTabActive = tabId;
-  initAgenticModule();
+  return initAgenticModule();
 }
 
-function renderActiveAgTabContent() {
+async function renderActiveAgTabContent() {
   const container = document.getElementById('ag-tab-content');
   if (!container) return;
 
@@ -4575,23 +4582,23 @@ function renderActiveAgTabContent() {
     // di kode — dipertahankan hanya sebagai cadangan bila kanvas belum bisa
     // dimuat, supaya tidak ada layar yang kosong tanpa penjelasan.
     if (_agTabActive === 'canvas' && typeof renderAgCanvasTab === 'function') {
-      renderAgCanvasTab(container);
+      await renderAgCanvasTab(container);
     } else if (_agTabActive === 'orchestrator' && typeof renderAgOrchestratorTab === 'function') {
-      renderAgOrchestratorTab(container);
+      await renderAgOrchestratorTab(container);
     } else if (_agTabActive === 'org' && typeof renderAgOrgTab === 'function') {
-      renderAgOrgTab(container);
+      await renderAgOrgTab(container);
     } else if (_agTabActive === 'docs' && typeof renderAgDocsTab === 'function') {
-      renderAgDocsTab(container);
+      await renderAgDocsTab(container);
     } else if (_agTabActive === 'inbox' && typeof renderAgInboxTab === 'function') {
-      renderAgInboxTab(container);
+      await renderAgInboxTab(container);
     } else if (_agTabActive === 'clinical' && typeof renderAgClinicalTab === 'function') {
-      renderAgClinicalTab(container);
+      await renderAgClinicalTab(container);
     } else if (_agTabActive === 'mcp' && typeof renderAgMcpTab === 'function') {
-      renderAgMcpTab(container);
+      await renderAgMcpTab(container);
     } else if (_agTabActive === 'studio' && typeof renderAgStudioTab === 'function') {
-      renderAgStudioTab(container);
+      await renderAgStudioTab(container);
     } else if (_agTabActive === 'rag' && typeof renderAgRagTab === 'function') {
-      renderAgRagTab(container);
+      await renderAgRagTab(container);
     } else {
       container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text3);">Memuat modul ${_agTabActive}...</div>`;
     }
@@ -4625,7 +4632,7 @@ async function renderAgentic(tab) {
     _agTabActive = tab;
   }
   await agSyncLiveState();
-  initAgenticModule();
+  return initAgenticModule();
 }
 
 // Router hooks

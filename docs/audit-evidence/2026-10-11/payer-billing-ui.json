@@ -1,0 +1,30 @@
+{
+  "synthetic": true,
+  "vendor_verified": false,
+  "results": [
+    {
+      "name": "billing navigation→contract/evidence eligibility→separate approval; self review denied",
+      "status": "passed"
+    },
+    {
+      "name": "clinical discharge/invoice source→UI allocation→payer receivable, patient balance 100",
+      "status": "passed"
+    },
+    {
+      "name": "patient and payer receipts reconcile both receivables zero and actual cash 200",
+      "status": "passed"
+    },
+    {
+      "name": "UI claim reversal cannot abandon source payer cash",
+      "status": "passed"
+    },
+    {
+      "name": "desktop/mobile source boards without overflow or page errors",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

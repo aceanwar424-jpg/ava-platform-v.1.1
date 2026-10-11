@@ -139,6 +139,7 @@ function configDomainTabs(active){
 function renderConfigHub(focus = 'overview', targetId = 'main-content'){
   const root = document.getElementById(targetId);
   if (!root) return;
+  if(window.TechPages?.enabled() && targetId==='main-content'){renderConfigHome(targetId,focus);return;}
   const isSettingsSub = targetId !== 'main-content';
   const domain = CONFIG_DOMAINS[focus];
 
@@ -162,7 +163,7 @@ function renderConfigHub(focus = 'overview', targetId = 'main-content'){
   renderConfigHome(targetId);
 }
 
-function renderConfigHome(targetId = 'main-content'){
+function renderConfigHome(targetId = 'main-content',selectedDomain='overview'){
   const isSettingsSub = targetId !== 'main-content';
 
   const headerHtml = isSettingsSub ? `
@@ -176,6 +177,11 @@ function renderConfigHome(targetId = 'main-content'){
 
   const root = document.getElementById(targetId);
   if (!root) return;
+  if(window.TechPages?.enabled() && targetId==='main-content'){
+    const tools=CONFIG_GROUPS.map(group=>({...group,items:group.items.filter(item=>!item.action?.includes("focus:"))})).filter(group=>group.items.length);
+    const extra=tools.map(group=>'<details class="workspace-tile tech-config-tile"><summary><strong>'+group.title+'</strong><p>'+group.desc+'</p></summary><div class="workspace-children">'+group.items.map(item=>'<button class="workspace-child" onclick="'+(item.action||"navigate('"+item.page+"')")+'"><span>'+item.label+'</span><span>→</span></button>').join('')+'</div></details>').join('');
+    root.innerHTML=headerHtml+'<div class="workspace-directory-grid">'+Object.entries(CONFIG_DOMAINS).map(([key,domain])=>'<details name="tech-master-directory" data-domain="'+key+'" '+(key===selectedDomain?'open':'')+' class="workspace-tile tech-config-tile"><summary><strong>'+domain.title+'</strong><p>'+domain.desc+'</p></summary><div class="workspace-children">'+domain.items.map(item=>{const master=CONFIG_MASTER_DOMAIN_BY_LABEL[item.label];const action=master?"navigate('master-records',{domain:'"+master+"'})":item.page?"navigate('"+item.page+"')":'';return '<button class="workspace-child" '+(action?'onclick="'+action+'"':'disabled')+'><span>'+item.label+(action?'':' · Belum tersedia')+'</span><span>→</span></button>';}).join('')+'</div></details>').join('')+extra+'</div>';return;
+  }
   root.innerHTML = `
     ${headerHtml}
     <div class="config-overview-grid">

@@ -26,6 +26,12 @@ const DB_TABLES = [
 function renderDatabaseStudio() {
   const main = document.getElementById('main-content');
   if (!main) return;
+  if(window.TechPages?.enabled()){
+    main.innerHTML=`<div class="page-header"><div><h1>Penjelajah Data</h1><p>Inspeksi tabel sesuai akses operator.</p></div><button class="btn btn-ghost" onclick="dbRefreshTableData()">Muat ulang</button></div><div class="table-wrap"><div class="table-toolbar"><select aria-label="Tabel" onchange="dbSelectTable(this.value)">${DB_TABLES.map(t=>`<option value="${t.name}" ${t.name===_dbSelectedTable?'selected':''}>${dbEsc(t.label)}</option>`).join('')}</select><input id="db-search-input" aria-label="Cari data" placeholder="Cari dalam tabel…" oninput="dbFilterTableRows(this.value)"></div><p id="db-row-count" class="muted" style="padding:0 16px"></p><div id="db-grid-wrapper" style="overflow:auto"></div></div>`;
+    dbFetchTableData(_dbSelectedTable);
+    if(TechPages.selection('db-studio','tables')==='query')dbOpenSQLEditorModal();
+    return;
+  }
 
   main.innerHTML = `
     <div style="min-height:85vh; background:#020617; color:var(--bg); padding:24px; font-family:'Plus Jakarta Sans', sans-serif;">
@@ -119,6 +125,7 @@ function renderDatabaseStudio() {
 }
 
 function dbSelectTable(tableName) {
+  if(window.TechPages?.enabled())window.workspacePanelTarget={page:'db-studio',panel:'tables'};
   _dbSelectedTable = tableName;
   renderDatabaseStudio();
 }
@@ -213,6 +220,10 @@ function dbEsc(s) {
 
 // ── SQL EDITOR MODAL (EQUAL TO SUPABASE SQL EDITOR) ──────────────────
 function dbOpenSQLEditorModal() {
+  window.TechRoutes?.intent('query',[]);
+  if(window.TechPages?.enabled()){
+    TechPages.open(`<h2>Editor kueri</h2><p class="muted">Penelusuran baca-saja. Adapter saat ini membaca maksimal 20 baris dari tabel pada klausa FROM; filter SQL belum dieksekusi oleh server.</p><label for="sql-query-input">Kueri</label><textarea id="sql-query-input" rows="6">SELECT * FROM user_profiles LIMIT 20;</textarea><div style="margin:16px 0"><button class="btn btn-teal" onclick="dbExecuteSQLQuery()">Baca tabel</button></div><div id="sql-result-container" style="overflow:auto"></div>`);return;
+  }
   const modalId = 'modal-sql-editor';
   let existing = document.getElementById(modalId);
   if (existing) existing.remove();
@@ -248,7 +259,9 @@ function dbOpenSQLEditorModal() {
       </div>
     </div>
   `;
-  document.body.appendChild(modal);
+  if(window.TechPages?.enabled()){
+    TechPages.open(modal.innerHTML.replace(/document\.getElementById\('modal-sql-editor'\)\.remove\(\)/g,'TechPages.back()'));
+  }else document.body.appendChild(modal);
 }
 
 async function dbExecuteSQLQuery() {

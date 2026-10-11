@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "settlement_complete": false,
+  "results": [
+    "reviewed claim transfers 100 receivable and leaves patient balance 100 without duplicating revenue",
+    "patient payment cannot consume the payer share",
+    "direct posting and reversal bypass are rejected",
+    "payer receipt settles only payer receivable and prevents abandoning received cash",
+    "payer refund restores source claim balance without touching patient balance",
+    "reasoned reversal preserves original journal and restores patient receivable",
+    "foreign tenant cannot read payer eligibility, claim, cash or journal sources"
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

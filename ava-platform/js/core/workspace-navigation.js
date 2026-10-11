@@ -45,7 +45,8 @@
     else cards=group.services.map((service,s)=>{
       if(service.name&&service.items.length>1) return tile(service.name,`${service.items.length} fungsi tersedia`,service.items.map((item,i)=>child(group,s,i)).join(''),'');
       return service.items.map((item,i)=>{
-        const children=panels[item.page]?.map(([label,panel])=>child(group,s,i,panel,label)).join('');
+        const destinations=window.TechNavigation?.enabled() ? (window.TechPages?.sections[item.page] || panels[item.page]) : panels[item.page];
+        const children=destinations?.map(([label,panel])=>child(group,s,i,panel,label)).join('');
         const unavailable=item.soon||item.status==='belum';
         return tile(item.label,item.desc||'Buka halaman kerja',children,children?'':`data-service="${s}" data-item="${i}" ${unavailable?'disabled':''}`,unavailable?'Belum tersedia':item.status==='parsial'?'Fungsi terbatas':'');
       }).join('');
@@ -69,7 +70,12 @@
       if(b.dataset.item!==undefined) {
         if(window.TechNavigation?.enabled()&&!window.TechNavigation.canLeave())return;
         // Only existing panel names; no arbitrary actions or query execution.
-        if(b.dataset.panel)window.workspacePanelTarget={page:group.services[+b.dataset.service].items[+b.dataset.item].page,panel:b.dataset.panel};
+        if(b.dataset.panel){
+          const page=group.services[+b.dataset.service].items[+b.dataset.item].page;
+          const target=window.TechNavigation?.enabled()&&window.TechPages?.sections[page]?.find(entry=>entry[1]===b.dataset.panel)?.[2];
+          if(target){window.workspacePanelTarget=null;window.navigate(target.page,target.params||{});return;}
+          window.workspacePanelTarget={page,panel:b.dataset.panel};
+        }
         window.navigateFromContext(group.id,+b.dataset.service,+b.dataset.item);
       }
     };

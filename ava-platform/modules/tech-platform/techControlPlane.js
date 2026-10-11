@@ -35,18 +35,23 @@ async function tcpBuatTiket() {
   const tenantId = document.getElementById('tcp-ticket-tenant')?.value.trim() || null;
   const priority = document.getElementById('tcp-ticket-priority')?.value || 'P2';
   if (!title || !description) { toast('Ringkasan dan detail kendala wajib diisi.', 'error'); return; }
-  const correlation = tcpNewCorrelation();
+  const button=document.getElementById('tcp-ticket-save');if(button?.disabled)return;if(button)button.disabled=true;
+  const correlation = tcpTicketKey || (tcpTicketKey=tcpNewCorrelation());
   try {
     const result = await sbRpc('tech_ops_command', {p_kind:'ticket',p_action:'create',p_data:{tenant_id:tenantId,title,description,priority,reason:'Tiket dari control plane'},p_key:correlation});
-    if (!result || result.error || (Array.isArray(result) && !result.length)) { toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return; }
+    if (!result || result.error || !Number.isSafeInteger(Number(result.id)) || Number(result.id)<=0) { toast('Tiket gagal disimpan; tidak dibuat seolah-olah berhasil.', 'error'); return; }
     toast(`Tiket tercatat dengan correlation ID ${correlation}`, 'ok');
+    window.TechPages?.finish();
     await renderTechControlPlane();
-  } catch (e) { toast(`Tiket gagal disimpan: ${e.message || e}`, 'error'); }
+  } catch (e) { tcpFormError('Tiket gagal disimpan: '+(e.message||e)); }finally{if(button?.isConnected)button.disabled=false;}
 }
 window.tcpBuatTiket = tcpBuatTiket;
 
+let tcpSelectedPanel='ringkasan',tcpDeploymentRows=[],tcpDeploymentForm='',tcpEpoch=0,tcpListEpoch=0,tcpDeployOffset=0,tcpDeploySearch='',tcpEditing=null,tcpNotice='',tcpTicketKey='',tcpDeploymentKey='';
 async function renderTechControlPlane() {
-  const main = document.getElementById('main-content');
+  if(window.TechPages?.enabled()) tcpSelectedPanel=TechPages.selection('tech-control-plane',tcpSelectedPanel);
+  if(window.TechPages?.enabled() && sessionStorage.getItem('avaTechDeploymentPrefill'))tcpSelectedPanel='deployment';
+  const epoch=++tcpEpoch;const main = document.getElementById('main-content');
   main.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
   const [tenants, heartbeats, audit, alerts, incidents, problems, tickets, backups, changes] = await Promise.all([
     tcpRead('tenant_ringkasan', 'select=*&order=nama'),
@@ -59,6 +64,7 @@ async function renderTechControlPlane() {
     tcpRead('tech_backup_runs', 'select=*&order=finished_at.desc&limit=50'),
     tcpRead('tech_changes', 'select=*&status=in.(REVIEW,APPROVED,RUNNING)&order=created_at.desc&limit=20'),
   ]);
+  if(epoch!==tcpEpoch||(typeof currentPage==='string'&&currentPage&&currentPage!=='tech-control-plane'))return;
   const tenantCount = tenants.ok ? tenants.value.filter(t => t.kode !== 'lokal').length : null;
   const heartbeatStates = heartbeats.ok
     ? heartbeats.value.map(h => tcpHeartbeatState(h)) : [];
@@ -112,7 +118,7 @@ async function renderTechControlPlane() {
         <div class="form-group"><label class="field-label" for="tcp-ticket-title">Ringkasan Kendala</label><input id="tcp-ticket-title" placeholder="Contoh: Data hasil tidak tersimpan"></div>
         <div class="form-group"><label class="field-label" for="tcp-ticket-description">Detail &amp; Waktu Kejadian</label><input id="tcp-ticket-description" placeholder="Gejala, langkah terakhir, waktu"></div>
         <div class="form-group"><label class="field-label" for="tcp-ticket-priority">Prioritas</label><select id="tcp-ticket-priority"><option value="P1">P1 Kritis</option><option value="P2" selected>P2 Tinggi</option><option value="P3">P3 Normal</option></select></div>
-        <button class="btn btn-teal" onclick="tcpBuatTiket()">Catat Tiket</button>
+        <button id="tcp-ticket-save" class="btn btn-teal" onclick="tcpBuatTiket()">Catat Tiket</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px">
         ${[
@@ -183,21 +189,33 @@ async function renderTechControlPlane() {
         <input id="tcp-deploy-repo" placeholder="https://github.com/organisasi/repository">
       </div>
       <div style="display:flex;justify-content:flex-end;margin-top:16px">
-        <button class="btn btn-teal" onclick="tcpSimpanDeployment()">Simpan &amp; Antrekan Sinkronisasi</button>
+        <button id="tcp-deployment-save" class="btn btn-teal" onclick="tcpSimpanDeployment()">Simpan &amp; Antrekan Sinkronisasi</button>
       </div>
     </section>
     <div class="card" style="padding:14px 16px;margin-top:16px;font-size:12px;line-height:1.7;color:var(--ava-muted,#60706c)">
       Control plane tidak menampilkan secret, token, atau data pasien. Status <b>unknown</b>
       berarti koneksi/konfigurasi perlu diperbaiki; bukan bukti bahwa sistem sehat.
     </div>`;
-    tcpGantiPanel('ringkasan', document.querySelector('[data-panel="ringkasan"]'));
-    tcpApplyDeploymentPrefill();
-    const target = window.workspacePanelTarget;
-    if (target?.page === 'tech-control-plane') {
-      window.workspacePanelTarget = null;
-      const button = [...document.querySelectorAll('.tcp-workspace-nav [data-panel]')].find(b => b.dataset.panel === target.panel);
-      if (button) tcpGantiPanel(target.panel, button);
-    }
+    if(window.TechPages?.enabled()) {
+      const titles=TechPages.sections['tech-control-plane'];
+      main.querySelector('.tcp-workspace-nav')?.remove();
+      main.querySelectorAll('.tcp-panel').forEach(el=>{if(el.dataset.tcpPanel!==tcpSelectedPanel)el.remove();else el.hidden=false;});
+      main.querySelector('h1').textContent=titles.find(x=>x[1]===tcpSelectedPanel)?.[0]||'Pusat Kendali Operasi';
+      if(tcpSelectedPanel==='pengaturan'){
+        const sections=main.querySelectorAll('[data-tcp-panel="pengaturan"] > section');
+        sections.forEach(section=>{if(!section.textContent.includes('Signing desktop'))section.remove();});
+      }
+      const ticketForm=main.querySelector('.tcp-ticket-form');
+      if(ticketForm){const html=ticketForm.outerHTML;ticketForm.outerHTML='<button class="btn btn-teal" id="tcp-add-ticket">+ Tambah tiket</button>';window.tcpTicketForm=html;main.querySelector('#tcp-add-ticket').onclick=tcpOpenTicket;}
+      if(tcpSelectedPanel==='kesehatan'&&!main.querySelector('.tcp-panel')) main.insertAdjacentHTML('beforeend','<p role="status">'+(heartbeats.ok?'Belum ada instalasi yang melaporkan kesehatan.':'Data kesehatan belum dapat dibaca. Silakan periksa ulang.')+'</p>');
+      const deployment=main.querySelector('[data-tcp-panel="deployment"]');
+      if(deployment){
+        tcpDeploymentForm=deployment.outerHTML;
+        await tcpRenderDeploymentList(deployment);
+        if(sessionStorage.getItem('avaTechDeploymentPrefill')){tcpOpenDeployment();tcpApplyDeploymentPrefill();}
+      }
+    } else { tcpGantiPanel('ringkasan',document.querySelector('[data-panel="ringkasan"]'));tcpApplyDeploymentPrefill(); }
+
 }
 
 function tcpGantiPanel(panel, button) {
@@ -221,34 +239,76 @@ function tcpApplyDeploymentPrefill() {
 window.renderTechControlPlane = renderTechControlPlane;
 
 async function tcpSimpanDeployment() {
-  const tenant = document.getElementById('tcp-deploy-tenant')?.value.trim();
-  const env = document.getElementById('tcp-deploy-env')?.value;
-  const project = document.getElementById('tcp-deploy-project')?.value.trim();
-  const domain = document.getElementById('tcp-deploy-domain')?.value.trim();
-  const provider = document.getElementById('tcp-deploy-provider')?.value.trim() || 'vercel';
-  const branch = document.getElementById('tcp-deploy-branch')?.value.trim() || 'main';
-  const repo = document.getElementById('tcp-deploy-repo')?.value.trim() || null;
-  if (!tenant || !project || !domain) { toast('Tenant, project, dan domain wajib diisi.', 'error'); return; }
-  try {
-    let result;
-    try {
-      result = await sbRpc('tech_ops_save_deployment', { p_tenant: tenant, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center' } });
-    } catch (saveError) {
-      const detail = saveError?.message || String(saveError);
-      if (/tenant context mismatch/i.test(detail)) {
-        result = await sbRpc('tech_ops_save_deployment', { p_tenant: null, p_environment: env, p_project_name: project, p_domain: domain, p_repository_url: repo, p_branch_name: branch, p_provider: provider, p_metadata: { source: 'tech-deployment-center', original_tenant: tenant } });
-      } else throw new Error('Konfigurasi belum tersimpan: ' + detail);
+  const button=document.getElementById('tcp-deployment-save');if(button?.disabled)return;
+  const value=id=>document.getElementById('tcp-deploy-'+id)?.value.trim()||'';
+  const tenant=value('tenant'),env=value('env'),project=value('project'),domain=value('domain').toLowerCase(),provider=value('provider')||'vercel',branch=value('branch')||'main',repo=value('repo')||null;
+  const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const domainOK=domain.length<=253&&domain.includes('.')&&domain.split('.').every(part=>/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(part));
+  if(!uuid.test(tenant)||!/^[a-z0-9][a-z0-9_-]{1,98}$/.test(project)||!domainOK||!['staging','production','dr'].includes(env)){tcpFormError('Isi UUID tenant, nama project, environment, dan domain yang valid.');return;}
+  if(repo){try{const url=new URL(repo);if(url.protocol!=='https:'||url.username||url.password)throw Error();}catch{tcpFormError('Repository harus berupa URL HTTPS tanpa credential.');return;}}
+  if(!/^[a-z0-9-]{1,40}$/i.test(provider)||!branch||branch.length>100){tcpFormError('Provider atau branch tidak valid.');return;}
+  if(button)button.disabled=true;
+  let saved=null;
+  try{
+    saved=await sbRpc('tech_ops_save_deployment',{p_tenant:tenant,p_environment:env,p_project_name:project,p_domain:domain,p_repository_url:repo,p_branch_name:branch,p_provider:provider,p_metadata:{source:'tech-deployment-center',mode:tcpEditing?'edit':'create',record_id:tcpEditing?.id,expected_updated_at:tcpEditing?.updated_at,request_key:tcpDeploymentKey}});
+    if(!saved?.ok||!Number.isSafeInteger(Number(saved.deployment_id))||Number(saved.deployment_id)<=0)throw Error('Server tidak mengonfirmasi identitas deployment.');
+    tcpNotice='Konfigurasi tersimpan. Sinkronisasi masih menunggu.';
+    const auth=sessionStorage.getItem('ol_token');
+    if(auth){
+      try{
+        const response=await fetch('/api/tech-deployment-sync',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth},body:JSON.stringify({deployment_id:saved.deployment_id,expected_updated_at:saved.updated_at,project_name:project,domain}),signal:AbortSignal.timeout(20000)});
+        const result=await response.json();
+        tcpNotice=result.persisted===true?(result.ok?'Konfigurasi tersimpan dan sinkronisasi terkonfirmasi.':'Konfigurasi tersimpan; sinkronisasi gagal/tertunda. Lihat status dan alasan di detail.'):'Konfigurasi tersimpan; hasil sinkronisasi belum terkonfirmasi di database. Periksa status sebelum mengulang.';
+      }catch{tcpNotice='Konfigurasi tersimpan; koneksi sinkronisasi terputus. Periksa status di detail sebelum mengulang.';}
     }
-    if (!result?.ok) throw new Error('Perubahan tidak dikonfirmasi server.');
-    const auth = sessionStorage.getItem('ol_token') || '';
-    if (!auth) { toast('Konfigurasi tersimpan. Sinkronisasi Vercel menunggu sesi operator.', 'warn'); await renderTechControlPlane(); return; }
-    const sync = await fetch('/api/tech-deployment-sync', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + auth }, body: JSON.stringify({ project_name: project, domain, repository_url: repo, environment: env }) });
-    const syncData = await sync.json().catch(() => ({}));
-    if (!sync.ok || !syncData.ok) { toast('Konfigurasi tersimpan. Sinkronisasi hosting tertunda: ' + (syncData.message || syncData.detail || syncData.code || 'adapter belum siap'), 'warn'); await renderTechControlPlane(); return; }
-    toast('Project dan domain berhasil disinkronkan ke Vercel.', 'ok');
+    window.TechPages?.finish();tcpSelectedPanel='deployment';tcpDeployOffset=0;
     await renderTechControlPlane();
-  } catch (e) { toast(`Konfigurasi gagal disimpan: ${e.message || e}`, 'error'); }
+    const row=await tcpRead('tech_deployments','select=*&id=eq.'+Number(saved.deployment_id)+'&limit=1');
+    if(row.ok&&row.value[0]){tcpDeploymentRows.push(row.value[0]);await tcpDetailDeployment(saved.deployment_id);}
+  }catch(error){tcpFormError(error.message||'Konfigurasi belum tersimpan.');}
+  finally{if(button?.isConnected)button.disabled=false;}
 }
-window.tcpSimpanDeployment = tcpSimpanDeployment;
-
-
+function tcpFormError(message){
+  let out=document.getElementById('tcp-form-error');if(!out){out=document.createElement('p');out.id='tcp-form-error';out.setAttribute('role','alert');document.querySelector('.tech-record-content')?.prepend(out);}out.textContent=message;out.focus();
+}
+function tcpStatus(row){const labels={PENDING_SYNC:'Menunggu sinkronisasi',SYNCED:'Tersinkron',FAILED:'Sinkronisasi gagal',DRIFT:'Konfigurasi berbeda',DISABLED:'Dinonaktifkan'};return labels[row.status]||'Status belum diketahui';}
+async function tcpRenderDeploymentList(container){
+  const epoch=++tcpListEpoch;
+  const params=window.TechRoutes?.active()?.params;
+  if(params?.query!==undefined)tcpDeploySearch=params.query;
+  if(params?.offset!==undefined)tcpDeployOffset=Math.max(0,Number(params.offset)||0);
+  container.innerHTML='<div class="page-header"><h2>Daftar deployment</h2><button class="btn btn-teal" onclick="tcpEditDeployment()">+ Tambah deployment</button></div><div class="table-toolbar"><input id="tcp-deployment-search" aria-label="Cari deployment" placeholder="Cari project atau domain" value="'+tcpEsc(tcpDeploySearch)+'"><button class="btn btn-ghost" id="tcp-search-submit">Cari</button></div><p id="tcp-deployment-notice" role="status">'+tcpEsc(tcpNotice)+'</p><div id="tcp-deployment-table">Memuat…</div>';
+  const search=()=>{tcpDeploySearch=document.getElementById('tcp-deployment-search').value;tcpDeployOffset=0;tcpListURL();tcpRenderDeploymentList(container);};
+  document.getElementById('tcp-search-submit').onclick=search;document.getElementById('tcp-deployment-search').onkeydown=e=>{if(e.key==='Enter')search();};
+  const query=new URLSearchParams({select:'*',order:'updated_at.desc,id.desc',limit:'26',offset:String(tcpDeployOffset)});
+  const term=tcpDeploySearch.replace(/[^a-zA-Z0-9 ._-]/g,'').trim();if(term)query.set('or','(project_name.ilike.*'+term+'*,domain.ilike.*'+term+'*)');
+  const result=await tcpRead('tech_deployments',query.toString());
+  if(epoch!==tcpListEpoch||!container.isConnected)return;
+  const target=container.querySelector('#tcp-deployment-table');
+  if(!result.ok){target.innerHTML='<p role="alert">Daftar belum dapat dibaca. '+tcpEsc(result.error)+'</p><button class="btn btn-ghost" id="tcp-list-retry">Coba lagi</button>';target.querySelector('button').onclick=()=>tcpRenderDeploymentList(container);return;}
+  const next=result.value.length>25;tcpDeploymentRows=result.value.slice(0,25);
+  target.innerHTML='<div class="table-wrap"><table class="data-table"><thead><tr><th>Project / domain</th><th>Environment</th><th>Status</th><th>Diperbarui</th></tr></thead><tbody>'+tcpDeploymentRows.map(row=>'<tr><td><button class="tech-record-link" onclick="tcpDetailDeployment('+Number(row.id)+')">'+tcpEsc(row.project_name)+'</button><div class="muted">'+tcpEsc(row.domain)+'</div></td><td>'+tcpEsc(row.environment)+'</td><td>'+tcpEsc(tcpStatus(row))+'</td><td>'+tcpEsc(row.updated_at?new Date(row.updated_at).toLocaleString('id-ID'):'—')+'</td></tr>').join('')+'</tbody></table>'+(tcpDeploymentRows.length?'':'<p>Belum ada deployment sesuai pencarian.</p>')+'</div><nav class="tech-list-pagination" aria-label="Halaman deployment"><button class="btn btn-ghost" id="tcp-prev" '+(tcpDeployOffset===0?'disabled':'')+'>Sebelumnya</button><span>Halaman '+(1+Math.floor(tcpDeployOffset/25))+'</span><button class="btn btn-ghost" id="tcp-next" '+(!next?'disabled':'')+'>Berikutnya</button></nav>';
+  target.querySelector('#tcp-prev').onclick=()=>{tcpDeployOffset=Math.max(0,tcpDeployOffset-25);tcpListURL();tcpRenderDeploymentList(container);};target.querySelector('#tcp-next').onclick=()=>{tcpDeployOffset+=25;tcpListURL();tcpRenderDeploymentList(container);};
+}
+function tcpListURL(){const route=window.TechRoutes?.active();if(route?.page==='tech-control-plane')TechRoutes.commit(route.page,{section:'deployment',query:tcpDeploySearch,offset:tcpDeployOffset},true);}
+async function tcpFindDeployment(id){
+  if(!Number.isSafeInteger(Number(id))||Number(id)<=0)throw Error('ID deployment tidak valid.');
+  const result=await tcpRead('tech_deployments','select=*&id=eq.'+Number(id)+'&limit=1');
+  if(!result.ok)throw Error(result.error);if(!result.value[0])throw Error('Deployment tidak ditemukan atau akses dibatasi.');return result.value[0];
+}
+async function tcpDetailDeployment(id){
+  const row=await tcpFindDeployment(id);window.TechRoutes?.intent('deployment-detail',[Number(id)]);
+  const entries=[['Domain',row.domain],['Tenant',row.tenant_id||'Platform'],['Environment',row.environment],['Provider',row.provider],['Repository',row.repository_url||'—'],['Branch',row.branch_name],['Status',tcpStatus(row)],['Terakhir sinkron',row.last_synced_at||'Belum tersedia'],['Alasan / error',row.last_error||'—']];
+  TechPages.open('<h1>'+tcpEsc(row.project_name)+'</h1><p class="muted">Detail konfigurasi deployment</p><dl class="tech-detail-grid">'+entries.map(([label,value])=>'<div><dt>'+tcpEsc(label)+'</dt><dd>'+tcpEsc(value)+'</dd></div>').join('')+'</dl>'+(row.tenant_id?'<button class="btn btn-teal" onclick="tcpEditDeployment('+Number(row.id)+')">Edit konfigurasi</button>':'<p>Konfigurasi platform ditampilkan baca-saja.</p>'));
+}
+async function tcpEditDeployment(id){
+  const row=id==null?null:await tcpFindDeployment(id);tcpEditing=row;tcpDeploymentKey=crypto.randomUUID();
+  window.TechRoutes?.intent('deployment-edit',[id==null?null:Number(id)]);
+  if(!TechPages.open(tcpDeploymentForm))return;
+  const heading=document.querySelector('.tech-record-content h1');if(heading)heading.textContent=row?'Edit konfigurasi deployment':'Tambah deployment';
+  if(row){for(const [field,key]of Object.entries({tenant:'tenant_id',env:'environment',provider:'provider',project:'project_name',domain:'domain',branch:'branch_name',repo:'repository_url'}))document.getElementById('tcp-deploy-'+field).value=row[key]||'';for(const field of ['tenant','env','provider','project'])document.getElementById('tcp-deploy-'+field).disabled=true;}
+}
+function tcpOpenDeployment(index){return tcpEditDeployment(index==null?null:tcpDeploymentRows[index]?.id);}
+function tcpOpenTicket(){window.TechRoutes?.intent('ticket-add');tcpTicketKey=tcpNewCorrelation();TechPages.open('<h2>Tambah tiket</h2>'+window.tcpTicketForm);}
+window.tcpSimpanDeployment=tcpSimpanDeployment;
+window.tcpEditDeployment=tcpEditDeployment;window.tcpDetailDeployment=tcpDetailDeployment;window.tcpOpenTicket=tcpOpenTicket;

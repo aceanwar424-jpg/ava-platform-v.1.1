@@ -192,6 +192,7 @@ function tntSetCari(v) {
 
 // ── Formulir tambah / ubah ──────────────────────────────────────
 function tntForm(id) {
+  window.TechRoutes?.intent('tenant-edit',[id||null]);
   if(window.TechNavigation?.enabled() && !window.TechNavigation.canLeave())return;
   const t = id ? (tntData || []).find(x => String(x.id) === String(id)) : null;
   if(id && !t){tntDetail(id);return;}
@@ -321,7 +322,7 @@ async function tntSimpan(id) {
       toast(`Tenant ${nama} terdaftar`, 'ok');
     }
     window.TechNavigation?.setDirty(false);
-    if(window.TechNavigation?.enabled()){await renderTenants();}else{closeModalForce();await tntMuat();tntGambar();}
+    if(window.TechNavigation?.enabled()){window.TechPages?.finish();window.TechRoutes?.list();await renderTenants();}else{closeModalForce();await tntMuat();tntGambar();}
   } catch (e) {
     toast('Gagal menyimpan: ' + e.message, 'err');
   }
@@ -344,11 +345,12 @@ function tntBukaDeployment(id) {
 window.tntBukaDeployment = tntBukaDeployment;
 
 function tntCancelEditor(){
-  if(window.TechNavigation?.enabled()){if(!window.TechNavigation.canLeave())return;renderTenants();}
+  if(window.TechNavigation?.enabled()){if(!window.TechNavigation.canLeave())return;window.TechPages?.finish();window.TechRoutes?.list();renderTenants();}
   else closeModalForce();
 }
 function tntShowEditor(content){
   if(!window.TechNavigation?.enabled()){openModal(content);return;}
+  if(window.TechPages?.enabled()){TechPages.open(content);return;}
   const main=document.getElementById('main-content');
   main.innerHTML='<section class="tech-directory tnt-page-editor">'+content+'</section>';
   main.querySelector('.tnt-page-editor').addEventListener('input',()=>window.TechNavigation.setDirty(true));
@@ -358,6 +360,7 @@ function tntShowEditor(content){
   if(trail){const label=document.createElement('span');label.textContent='› Formulir tenant';trail.append(label);}
 }
 function tntDetail(id){
+  window.TechRoutes?.intent('tenant-detail',[id]);
   if(window.TechNavigation?.enabled()&&!window.TechNavigation.canLeave())return;
   const t=(tntData||[]).find(row=>String(row.id)===String(id));
   const main=document.getElementById('main-content');
@@ -376,7 +379,7 @@ function tntDetail(id){
     ['Kontak PIC', tntEsc(t.pic_kontak || '—')]
   ] : [];
 
-  main.innerHTML=`<section class="tech-directory" style="max-width:860px">
+  const html=`<section class="tech-directory" style="max-width:860px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
       <button class="btn btn-ghost btn-sm" id="tnt-back">← Kembali ke Daftar Tenant</button>
       ${t ? `<div style="display:flex;gap:8px">
@@ -398,7 +401,8 @@ function tntDetail(id){
       </div>` : '<p style="color:var(--ava-muted)">Data tidak ditemukan atau tidak tersedia untuk akses akun ini.</p>'}
     </div>
   </section>`;
-  main.querySelector('#tnt-back').onclick=()=>renderTenants();
+  if(window.TechPages?.enabled())TechPages.open(html);else main.innerHTML=html;
+  main.querySelector('#tnt-back').onclick=()=>{window.TechPages?.finish();window.TechRoutes?.list();renderTenants();};
   if(t)main.querySelector('#tnt-edit').onclick=()=>tntForm(t.id);
   window.TechNavigation?.onPage('tenants');
 }

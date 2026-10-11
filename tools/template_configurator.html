@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konfigurator Template Dokumen & E-Hasil Laboratorium | AVA QMS Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0f2963;
+      --primary-light: #1e3a8a;
+      --accent: #0284c7;
+      --surface: #ffffff;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Top Navigation */
+    header.app-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      z-index: 10;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: linear-gradient(135deg, #0f2963, #0284c7);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800;
+    }
+    .brand-title { font-size: 16px; font-weight: 700; color: var(--primary); }
+    .brand-subtitle { font-size: 11px; color: var(--text-muted); }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+      transition: all 0.2s ease; border: 1px solid transparent; font-family: inherit;
+    }
+    .btn-secondary { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: #1e3a8a; }
+    .btn-accent { background: #0284c7; color: white; }
+    .btn-accent:hover { background: #0369a1; }
+
+    /* Main Workspace Split Layout */
+    .workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+    }
+
+    /* Left Sidebar: Controls */
+    .controls-panel {
+      width: 440px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      height: 100%;
+    }
+    .controls-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      background: #fafafa;
+    }
+    .preset-selector-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+    .select-input {
+      width: 100%; padding: 8px 12px; border: 1px solid var(--border);
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text);
+      background: white; outline: none; cursor: pointer; font-family: inherit;
+    }
+
+    /* Nav Tabs */
+    .tab-bar {
+      display: flex; border-bottom: 1px solid var(--border);
+      background: #f8fafc; overflow-x: auto;
+    }
+    .tab-btn {
+      padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted);
+      border: none; background: transparent; cursor: pointer; border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: all 0.2s; font-family: inherit;
+    }
+    .tab-btn.active {
+      color: var(--primary); border-bottom-color: var(--primary); background: white;
+    }
+
+    .tab-content {
+      flex: 1; overflow-y: auto; padding: 18px 20px; display: none;
+    }
+    .tab-content.active { display: block; }
+
+    .control-group { margin-bottom: 18px; }
+    .control-label {
+      font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .control-value-badge {
+      font-size: 11px; font-weight: 500; color: var(--accent); background: #f0f9ff;
+      padding: 1px 6px; border-radius: 4px;
+    }
+    .text-input {
+      width: 100%; padding: 7px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 12.5px; outline: none; font-family: inherit;
+    }
+    .range-input {
+      width: 100%; height: 6px; border-radius: 3px; background: #e2e8f0;
+      outline: none; -webkit-appearance: none; cursor: pointer;
+    }
+    .range-input::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--primary); cursor: pointer;
+    }
+
+    .btn-toggle-group {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+      background: #f1f5f9; padding: 4px; border-radius: 8px;
+    }
+    .btn-toggle {
+      padding: 6px; font-size: 11px; font-weight: 600; border: none;
+      background: transparent; border-radius: 6px; cursor: pointer; color: #64748b;
+      text-align: center; font-family: inherit;
+    }
+    .btn-toggle.active { background: white; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+    /* Columns Checkbox List */
+    .checkbox-list { display: flex; flex-direction: column; gap: 8px; }
+    .checkbox-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+      background: #fcfcfd; font-size: 12.5px; cursor: pointer;
+    }
+    .checkbox-item:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .checkbox-item input { margin-right: 8px; cursor: pointer; }
+
+    /* Right Preview Area */
+    .preview-container {
+      flex: 1; background: #e2e8f0; display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .preview-toolbar {
+      padding: 10px 20px; background: white; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    }
+    .view-mode-toggle {
+      display: flex; gap: 6px; background: #f1f5f9; padding: 3px; border-radius: 8px;
+    }
+    .view-mode-btn {
+      padding: 6px 14px; font-size: 12px; font-weight: 600; border: none;
+      background: transparent; border-radius: 6px; cursor: pointer; color: #64748b; font-family: inherit;
+    }
+    .view-mode-btn.active {
+      background: white; color: var(--primary); box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .preview-viewport {
+      flex: 1; overflow-y: auto; padding: 30px; display: flex;
+      justify-content: center; align-items: flex-start;
+    }
+    
+    /* Paper Simulation (A4) */
+    .paper-sheet {
+      background: white;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      width: 210mm;
+      min-height: 297mm;
+      padding: 18mm;
+      box-sizing: border-box;
+      position: relative;
+      transition: all 0.2s ease;
+      color: #1e293b;
+    }
+
+    /* JSON Modal / Drawer */
+    .json-drawer {
+      display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.6);
+      z-index: 100; align-items: center; justify-content: center;
+    }
+    .json-drawer.open { display: flex; }
+    .json-card {
+      background: white; width: 680px; max-height: 80vh; border-radius: 12px;
+      display: flex; flex-direction: column; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .json-card-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .json-card-title { font-size: 15px; font-weight: 700; color: var(--primary); }
+    .json-code-box {
+      flex: 1; padding: 16px; overflow: auto; background: #0f172a; color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5;
+    }
+    .json-card-footer {
+      padding: 12px 20px; border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-end; gap: 10px;
+    }
+
+    @media print {
+      header.app-header, .controls-panel, .preview-toolbar { display: none !important; }
+      .workspace { height: auto !important; }
+      .preview-container { background: white !important; padding: 0 !important; }
+      .preview-viewport { padding: 0 !important; }
+      .paper-sheet { box-shadow: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="brand-wrap">
+      <div class="brand-icon">⚙️</div>
+      <div>
+        <div class="brand-title">Konfigurator Template Dokumen & Lab Hasil</div>
+        <div class="brand-subtitle">Kendali Tata Letak Deklaratif • SNI ISO 15189:2022 • Multi-Tenant</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="openJsonModal()">📋 Lihat JSON</button>
+      <button class="btn btn-secondary" onclick="downloadJsonConfig()">💾 Unduh JSON</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak / Print PDF</button>
+    </div>
+  </header>
+
+  <!-- Split Workspace -->
+  <div class="workspace">
+    <!-- Left Controls Panel -->
+    <aside class="controls-panel">
+      <div class="controls-header">
+        <div class="preset-selector-label">Preset Tata Letak Cepat</div>
+        <select class="select-input" id="presetSelect" onchange="applyPreset(this.value)">
+          <option value="standard_navy">Standar Medika (Logo Kiri - Biru Navy)</option>
+          <option value="formal_center">Resmi Instansi (Logo Tengah - Border Ganda)</option>
+          <option value="dual_logo_partnership">Kemitraan Ganda (Logo Kiri & Kanan)</option>
+          <option value="compact_slip">Slip Ringkas (Margin Hemat 12mm)</option>
+          <option value="emerald_wellness">Wellness & Preventive (Hijau Emerald)</option>
+        </select>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('kop', this)">Kop & Logo</button>
+        <button class="tab-btn" onclick="switchTab('table', this)">Kolom Tabel</button>
+        <button class="tab-btn" onclick="switchTab('spacing', this)">Spasi & Margin</button>
+        <button class="tab-btn" onclick="switchTab('signature', this)">Tanda Tangan</button>
+      </div>
+
+      <!-- Tab 1: Kop & Logo -->
+      <div class="tab-content active" id="tab-kop">
+        <div class="control-group">
+          <label class="control-label">Posisi Logo</label>
+          <div class="btn-toggle-group">
+            <button class="btn-toggle active" id="btn-pos-left" onclick="setLogoPos('left')">Kiri</button>
+            <button class="btn-toggle" id="btn-pos-center" onclick="setLogoPos('center')">Tengah</button>
+            <button class="btn-toggle" id="btn-pos-right" onclick="setLogoPos('right')">Kanan</button>
+            <button class="btn-toggle" id="btn-pos-dual" onclick="setLogoPos('dual')">Ganda</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Ukuran Logo
+            <span class="control-value-badge" id="val-logo-size">80px</span>
+          </label>
+          <input type="range" class="range-input" id="input-logo-size" min="45" max="110" value="80" oninput="updateLogoSize(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Nama Laboratorium</label>
+          <input type="text" class="text-input" id="input-lab-name" value="LABORATORIUM KLINIK UTAMA MEDIKA" oninput="updateLabName(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Badan Hukum & Nomor Izin</label>
+          <input type="text" class="text-input" id="input-lab-legal" value="PT Medika Sehat Utama • Izin: 445/092/DINKES/2026" oninput="renderPreview()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Badge Akreditasi KAN</label>
+          <input type="text" class="text-input" id="input-accreditation" value="TERAKREDITASI KAN LP-1192-IDN • SNI ISO 15189:2022" oninput="renderPreview()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Garis Pembatas Kop</label>
+          <div class="btn-toggle-group">
+            <button class="btn-toggle active" id="btn-div-double" onclick="setDivider('double')">Ganda</button>
+            <button class="btn-toggle" id="btn-div-solid" onclick="setDivider('solid')">Tunggal</button>
+            <button class="btn-toggle" id="btn-div-none" onclick="setDivider('none')">Tanpa</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Spasi Bawah Kop
+            <span class="control-value-badge" id="val-kop-space">16px</span>
+          </label>
+          <input type="range" class="range-input" id="input-kop-space" min="6" max="36" value="16" oninput="updateKopSpace(this.value)">
+        </div>
+      </div>
+
+      <!-- Tab 2: Kolom Tabel -->
+      <div class="tab-content" id="tab-table">
+        <div class="control-group">
+          <label class="control-label">Pilih Kolom Aktif (Hasil Lab)</label>
+          <div class="checkbox-list">
+            <label class="checkbox-item">
+              <span><strong>Pemeriksaan / Analit</strong></span>
+              <input type="checkbox" id="col-analyte" checked disabled>
+            </label>
+            <label class="checkbox-item">
+              <span><strong>Hasil Pemeriksaan</strong></span>
+              <input type="checkbox" id="col-result" checked disabled>
+            </label>
+            <label class="checkbox-item">
+              <span>Status Flag (Normal / High / Low)</span>
+              <input type="checkbox" id="col-flag" checked onchange="toggleCol('flag', this.checked)">
+            </label>
+            <label class="checkbox-item">
+              <span>Satuan Ukur (UCUM)</span>
+              <input type="checkbox" id="col-unit" checked onchange="toggleCol('unit', this.checked)">
+            </label>
+            <label class="checkbox-item">
+              <span>Nilai Rujukan / Rentang Acuan</span>
+              <input type="checkbox" id="col-ref" checked onchange="toggleCol('ref_range', this.checked)">
+            </label>
+            <label class="checkbox-item">
+              <span>Metode Uji / Alat Analisis</span>
+              <input type="checkbox" id="col-method" checked onchange="toggleCol('method', this.checked)">
+            </label>
+            <label class="checkbox-item">
+              <span>Jenis Spesimen (Serum/EDTA)</span>
+              <input type="checkbox" id="col-specimen" onchange="toggleCol('specimen', this.checked)">
+            </label>
+            <label class="checkbox-item">
+              <span>Tampilkan Kode LOINC (OBX-3)</span>
+              <input type="checkbox" id="col-loinc" checked onchange="toggleLoinc(this.checked)">
+            </label>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Padding Baris Tabel
+            <span class="control-value-badge" id="val-row-padding">6px</span>
+          </label>
+          <input type="range" class="range-input" id="input-row-padding" min="3" max="14" value="6" oninput="updateRowPadding(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="checkbox-item">
+            <span>Sorot Hasil Abnormal (Highlight Merah)</span>
+            <input type="checkbox" id="chk-highlight-abnormal" checked onchange="toggleHighlightAbnormal(this.checked)">
+          </label>
+        </div>
+      </div>
+
+      <!-- Tab 3: Spasi & Margin -->
+      <div class="tab-content" id="tab-spacing">
+        <div class="control-group">
+          <label class="control-label">
+            Margin Halaman (mm)
+            <span class="control-value-badge" id="val-margin">18mm</span>
+          </label>
+          <input type="range" class="range-input" id="input-margin" min="8" max="30" value="18" oninput="updateMargin(this.value)">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Warna Utama (Primary Color)</label>
+          <input type="color" id="input-color-primary" value="#0f2963" style="width:100%; height:36px; border-radius:6px; cursor:pointer;" onchange="updateColors()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Warna Aksen (Accent Color)</label>
+          <input type="color" id="input-color-accent" value="#0284c7" style="width:100%; height:36px; border-radius:6px; cursor:pointer;" onchange="updateColors()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Watermark Latar Belakang</label>
+          <input type="text" class="text-input" id="input-watermark" value="SALINAN TERKENDALI" oninput="renderPreview()">
+        </div>
+      </div>
+
+      <!-- Tab 4: Tanda Tangan -->
+      <div class="tab-content" id="tab-signature">
+        <div class="control-group">
+          <label class="control-label">Posisi Blok Tanda Tangan</label>
+          <div class="btn-toggle-group">
+            <button class="btn-toggle" id="btn-sig-left" onclick="setSigPos('left')">Kiri</button>
+            <button class="btn-toggle" id="btn-sig-center" onclick="setSigPos('center')">Tengah</button>
+            <button class="btn-toggle active" id="btn-sig-right" onclick="setSigPos('right')">Kanan</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="checkbox-item">
+            <span>Tampilkan QR Code TTE (BSrE Verified)</span>
+            <input type="checkbox" id="chk-show-qr" checked onchange="toggleQr(this.checked)">
+          </label>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Dokter Penanggung Jawab</label>
+          <input type="text" class="text-input" id="input-doctor-name" value="dr. Linda Handayani, Sp.PK" oninput="renderPreview()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Nomor SIP</label>
+          <input type="text" class="text-input" id="input-doctor-sip" value="SIP: 503/1182/SIP-D/DPMPTSP/2026" oninput="renderPreview()">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">
+            Spasi Atas Tanda Tangan
+            <span class="control-value-badge" id="val-sig-space">24px</span>
+          </label>
+          <input type="range" class="range-input" id="input-sig-space" min="10" max="60" value="24" oninput="updateSigSpace(this.value)">
+        </div>
+      </div>
+    </aside>
+
+    <!-- Right Live Preview -->
+    <main class="preview-container">
+      <div class="preview-toolbar">
+        <div class="view-mode-toggle">
+          <button class="view-mode-btn active" id="btn-mode-hasil" onclick="setViewMode('hasil')">📊 E-Hasil Pasien</button>
+          <button class="view-mode-btn" id="btn-mode-smm" onclick="setViewMode('smm')">📄 Dokumen SMM ISO 15189</button>
+        </div>
+        <div style="font-size:12px; color:#64748b;">
+          Pratinjau Langsung A4 &bull; Responsive Layout Engine
+        </div>
+      </div>
+
+      <div class="preview-viewport">
+        <!-- Rendered Sheet -->
+        <div class="paper-sheet" id="paperPreview">
+          <!-- Dynamic injected HTML -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- JSON Modal -->
+  <div class="json-drawer" id="jsonModal">
+    <div class="json-card">
+      <div class="json-card-header">
+        <div class="json-card-title">Konfigurasi Template Deklaratif (JSON)</div>
+        <button class="btn btn-secondary" onclick="closeJsonModal()">✕ Tutup</button>
+      </div>
+      <pre class="json-code-box" id="jsonDisplay"></pre>
+      <div class="json-card-footer">
+        <button class="btn btn-primary" onclick="copyJsonToClipboard()">📋 Salin JSON ke Clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State Template Engine
+    const state = {
+      viewMode: 'hasil',
+      layout: {
+        page_size: 'A4',
+        page_margin_mm: 18,
+        primary_color: '#0f2963',
+        accent_color: '#0284c7',
+        watermark: 'SALINAN TERKENDALI'
+      },
+      header_kop: {
+        logo_position: 'left',
+        logo_size_px: 80,
+        lab_name: 'LABORATORIUM KLINIK UTAMA MEDIKA',
+        lab_legal: 'PT Medika Sehat Utama • Izin: 445/092/DINKES/2026',
+        accreditation: 'TERAKREDITASI KAN LP-1192-IDN • SNI ISO 15189:2022',
+        divider_style: 'double',
+        kop_spacing_bottom: 16
+      },
+      columns: {
+        analyte: true,
+        result: true,
+        flag: true,
+        unit: true,
+        ref_range: true,
+        method: true,
+        specimen: false,
+        show_loinc: true
+      },
+      table: {
+        row_padding_px: 6,
+        highlight_abnormal: true
+      },
+      signature: {
+        position: 'right',
+        show_qr: true,
+        doctor_name: 'dr. Linda Handayani, Sp.PK',
+        doctor_sip: 'SIP: 503/1182/SIP-D/DPMPTSP/2026',
+        spacing_top_px: 24
+      }
+    };
+
+    const presets = {
+      standard_navy: {
+        primary: '#0f2963', accent: '#0284c7', logo_pos: 'left', logo_size: 80,
+        divider: 'double', kop_space: 16, margin: 18, sig_pos: 'right'
+      },
+      formal_center: {
+        primary: '#1e3a8a', accent: '#2563eb', logo_pos: 'center', logo_size: 75,
+        divider: 'double', kop_space: 20, margin: 20, sig_pos: 'right'
+      },
+      dual_logo_partnership: {
+        primary: '#0369a1', accent: '#0284c7', logo_pos: 'dual', logo_size: 70,
+        divider: 'solid', kop_space: 14, margin: 16, sig_pos: 'right'
+      },
+      compact_slip: {
+        primary: '#334155', accent: '#475569', logo_pos: 'left', logo_size: 60,
+        divider: 'solid', kop_space: 10, margin: 12, sig_pos: 'right'
+      },
+      emerald_wellness: {
+        primary: '#065f46', accent: '#059669', logo_pos: 'left', logo_size: 75,
+        divider: 'double', kop_space: 16, margin: 18, sig_pos: 'right'
+      }
+    };
+
+    function applyPreset(key) {
+      const p = presets[key];
+      if (!p) return;
+      state.layout.primary_color = p.primary;
+      state.layout.accent_color = p.accent;
+      state.header_kop.logo_position = p.logo_pos;
+      state.header_kop.logo_size_px = p.logo_size;
+      state.header_kop.divider_style = p.divider;
+      state.header_kop.kop_spacing_bottom = p.kop_space;
+      state.layout.page_margin_mm = p.margin;
+      state.signature.position = p.sig_pos;
+
+      // Sync form fields
+      document.getElementById('input-color-primary').value = p.primary;
+      document.getElementById('input-color-accent').value = p.accent;
+      document.getElementById('input-logo-size').value = p.logo_size;
+      document.getElementById('val-logo-size').textContent = p.logo_size + 'px';
+      document.getElementById('input-kop-space').value = p.kop_space;
+      document.getElementById('val-kop-space').textContent = p.kop_space + 'px';
+      document.getElementById('input-margin').value = p.margin;
+      document.getElementById('val-margin').textContent = p.margin + 'mm';
+
+      syncPosButtons();
+      renderPreview();
+    }
+
+    function syncPosButtons() {
+      ['left', 'center', 'right', 'dual'].forEach(pos => {
+        const btn = document.getElementById('btn-pos-' + pos);
+        if (btn) btn.classList.toggle('active', state.header_kop.logo_position === pos);
+      });
+      ['double', 'solid', 'none'].forEach(div => {
+        const btn = document.getElementById('btn-div-' + div);
+        if (btn) btn.classList.toggle('active', state.header_kop.divider_style === div);
+      });
+      ['left', 'center', 'right'].forEach(sig => {
+        const btn = document.getElementById('btn-sig-' + sig);
+        if (btn) btn.classList.toggle('active', state.signature.position === sig);
+      });
+    }
+
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+    }
+
+    function setViewMode(mode) {
+      state.viewMode = mode;
+      document.getElementById('btn-mode-hasil').classList.toggle('active', mode === 'hasil');
+      document.getElementById('btn-mode-smm').classList.toggle('active', mode === 'smm');
+      renderPreview();
+    }
+
+    function setLogoPos(pos) {
+      state.header_kop.logo_position = pos;
+      syncPosButtons();
+      renderPreview();
+    }
+
+    function updateLogoSize(val) {
+      state.header_kop.logo_size_px = parseInt(val, 10);
+      document.getElementById('val-logo-size').textContent = val + 'px';
+      renderPreview();
+    }
+
+    function updateKopSpace(val) {
+      state.header_kop.kop_spacing_bottom = parseInt(val, 10);
+      document.getElementById('val-kop-space').textContent = val + 'px';
+      renderPreview();
+    }
+
+    function setDivider(style) {
+      state.header_kop.divider_style = style;
+      syncPosButtons();
+      renderPreview();
+    }
+
+    function updateLabName(val) {
+      state.header_kop.lab_name = val;
+      renderPreview();
+    }
+
+    function toggleCol(colId, checked) {
+      state.columns[colId] = checked;
+      renderPreview();
+    }
+
+    function toggleLoinc(checked) {
+      state.columns.show_loinc = checked;
+      renderPreview();
+    }
+
+    function updateRowPadding(val) {
+      state.table.row_padding_px = parseInt(val, 10);
+      document.getElementById('val-row-padding').textContent = val + 'px';
+      renderPreview();
+    }
+
+    function toggleHighlightAbnormal(checked) {
+      state.table.highlight_abnormal = checked;
+      renderPreview();
+    }
+
+    function updateMargin(val) {
+      state.layout.page_margin_mm = parseInt(val, 10);
+      document.getElementById('val-margin').textContent = val + 'mm';
+      renderPreview();
+    }
+
+    function updateColors() {
+      state.layout.primary_color = document.getElementById('input-color-primary').value;
+      state.layout.accent_color = document.getElementById('input-color-accent').value;
+      renderPreview();
+    }
+
+    function setSigPos(pos) {
+      state.signature.position = pos;
+      syncPosButtons();
+      renderPreview();
+    }
+
+    function toggleQr(checked) {
+      state.signature.show_qr = checked;
+      renderPreview();
+    }
+
+    function updateSigSpace(val) {
+      state.signature.spacing_top_px = parseInt(val, 10);
+      document.getElementById('val-sig-space').textContent = val + 'px';
+      renderPreview();
+    }
+
+    // Render HTML Preview
+    function renderPreview() {
+      const p = document.getElementById('paperPreview');
+      p.style.padding = state.layout.page_margin_mm + 'mm';
+
+      const kop = renderKopHtml();
+      let bodyHtml = '';
+
+      if (state.viewMode === 'hasil') {
+        bodyHtml = renderLabResultsHtml();
+      } else {
+        bodyHtml = renderSmmDocHtml();
+      }
+
+      const watermarkHtml = state.layout.watermark ? `
+        <div style="position:absolute; top:45%; left:50%; transform:translate(-50%, -50%) rotate(-30deg); font-size:48pt; font-weight:900; color:rgba(15,41,99,0.04); pointer-events:none; z-index:0; white-space:nowrap; text-transform:uppercase;">
+          ${document.getElementById('input-watermark').value || state.layout.watermark}
+        </div>
+      ` : '';
+
+      p.innerHTML = watermarkHtml + `
+        <div style="position:relative; z-index:1;">
+          ${kop}
+          ${bodyHtml}
+        </div>
+      `;
+    }
+
+    function renderKopHtml() {
+      const kop = state.header_kop;
+      const size = kop.logo_size_px;
+      const primary = state.layout.primary_color;
+
+      const logoHtml = `
+        <div style="flex-shrink:0; width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border-radius:10px; border:1px solid #cbd5e1; font-size:${size * 0.38}px; color:${primary};">
+          🔬
+        </div>
+      `;
+
+      const secondaryLogoHtml = `
+        <div style="flex-shrink:0; width:${size}px; height:${size}px; display:flex; align-items:center; justify-content:center; background:#eff6ff; border-radius:10px; border:1px solid #bfdbfe; font-size:12px; font-weight:800; color:#1d4ed8; text-align:center; padding:4px;">
+          🏅 KAN LP-1192
+        </div>
+      `;
+
+      const textAlign = kop.logo_position === 'center' ? 'center' : 'left';
+      const textHtml = `
+        <div style="flex:1; text-align:${textAlign}; line-height:1.35;">
+          <h1 style="margin:0; font-size:15pt; font-weight:800; color:${primary}; text-transform:uppercase;">
+            ${document.getElementById('input-lab-name')?.value || kop.lab_name}
+          </h1>
+          <div style="font-size:9.5pt; color:#475569; margin-top:2px;">
+            ${document.getElementById('input-lab-legal')?.value || kop.lab_legal}
+          </div>
+          <div style="font-size:8.5pt; color:#64748b; margin-top:2px;">
+            Jl. Raya Kesehatan No. 42 Jakarta Selatan &bull; Telp: (021) 7890123 &bull; info@medika.id
+          </div>
+          <div style="display:inline-block; margin-top:4px; padding:2px 8px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:4px; font-size:7.5pt; font-weight:700; color:#1d4ed8;">
+            🏅 ${document.getElementById('input-accreditation')?.value || kop.accreditation}
+          </div>
+        </div>
+      `;
+
+      let content = '';
+      if (kop.logo_position === 'center') {
+        content = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;">${logoHtml}${textHtml}</div>`;
+      } else if (kop.logo_position === 'right') {
+        content = `<div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">${textHtml}${logoHtml}</div>`;
+      } else if (kop.logo_position === 'dual') {
+        content = `<div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">${logoHtml}${textHtml}${secondaryLogoHtml}</div>`;
+      } else {
+        content = `<div style="display:flex; align-items:center; gap:16px;">${logoHtml}${textHtml}</div>`;
+      }
+
+      let border = '';
+      if (kop.divider_style === 'double') border = `3px double ${primary}`;
+      else if (kop.divider_style === 'solid') border = `2px solid ${primary}`;
+
+      return `
+        <header style="margin-bottom:${kop.kop_spacing_bottom}px; ${border ? 'border-bottom:' + border + '; padding-bottom:12px;' : ''}">
+          ${content}
+        </header>
+      `;
+    }
+
+    function renderLabResultsHtml() {
+      const pad = state.table.row_padding_px;
+      const primary = state.layout.primary_color;
+      const highlight = state.table.highlight_abnormal;
+
+      const patientBox = `
+        <div style="margin-bottom:16px; padding:10px 14px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; font-size:9pt; line-height:1.6;">
+          <table style="width:100%; border-collapse:collapse;">
+            <tr>
+              <td style="width:18%; color:#64748b;">Nama Pasien</td>
+              <td style="width:32%; font-weight:700;">: Ny. Linda Handayani</td>
+              <td style="width:18%; color:#64748b;">No. Rekam Medis</td>
+              <td style="width:32%; font-weight:700;">: MR-892401</td>
+            </tr>
+            <tr>
+              <td style="color:#64748b;">Umur / Kelamin</td>
+              <td>: 38 Th / Perempuan</td>
+              <td style="color:#64748b;">Tanggal Pemeriksaan</td>
+              <td>: 10 Oktober 2026</td>
+            </tr>
+          </table>
+        </div>
+      `;
+
+      const rows = [
+        { name: 'Glukosa Darah Puasa', loinc: '1558-6', val: '118', flag: 'High', unit: 'mg/dL', ref: '70 - 99', method: 'Hexokinase', spec: 'Serum' },
+        { name: 'HbA1c (Hemoglobin A1c)', loinc: '4548-4', val: '5.9', flag: 'High', unit: '%', ref: '< 5.7', method: 'HPLC Ion-Exchange', spec: 'Whole Blood EDTA' },
+        { name: 'Kolesterol Total', loinc: '2093-3', val: '228', flag: 'High', unit: 'mg/dL', ref: '< 200', method: 'CHOD-PAP', spec: 'Serum' },
+        { name: 'Trigliserida', loinc: '2571-8', val: '142', flag: 'Normal', unit: 'mg/dL', ref: '< 150', method: 'GPO-PAP', spec: 'Serum' },
+        { name: 'SGOT (AST)', loinc: '1920-8', val: '24', flag: 'Normal', unit: 'U/L', ref: '< 35', method: 'IFCC UV', spec: 'Serum' },
+        { name: 'SGPT (ALT)', loinc: '1742-6', val: '28', flag: 'Normal', unit: 'U/L', ref: '< 35', method: 'IFCC UV', spec: 'Serum' }
+      ];
+
+      let th = `<th style="padding:${pad}px 8px; text-align:left; width:30%;">PEMERIKSAAN</th>`;
+      th += `<th style="padding:${pad}px 8px; text-align:right; width:16%;">HASIL</th>`;
+      if (state.columns.flag) th += `<th style="padding:${pad}px 8px; text-align:center; width:10%;">STATUS</th>`;
+      if (state.columns.unit) th += `<th style="padding:${pad}px 8px; text-align:left; width:14%;">SATUAN</th>`;
+      if (state.columns.ref_range) th += `<th style="padding:${pad}px 8px; text-align:left; width:16%;">RENTANG RUJUKAN</th>`;
+      if (state.columns.method) th += `<th style="padding:${pad}px 8px; text-align:left; width:14%;">METODE</th>`;
+      if (state.columns.specimen) th += `<th style="padding:${pad}px 8px; text-align:left; width:12%;">SPESIMEN</th>`;
+
+      const trs = rows.map((r, i) => {
+        const isAbn = r.flag !== 'Normal';
+        const bg = i % 2 === 1 ? '#fbfcfe' : '#ffffff';
+        let cols = `<td style="padding:${pad}px 8px;"><strong style="color:${primary};">${r.name}</strong>${state.columns.show_loinc ? '<br><small style="color:#64748b; font-size:7.5pt;">LOINC: ' + r.loinc + '</small>' : ''}</td>`;
+        cols += `<td style="padding:${pad}px 8px; text-align:right; font-weight:700; ${isAbn && highlight ? 'color:#dc2626;' : ''}">${r.val}</td>`;
+        if (state.columns.flag) {
+          cols += `<td style="padding:${pad}px 8px; text-align:center;">${isAbn ? '<span style="background:#fee2e2; color:#dc2626; font-size:7.5pt; font-weight:800; padding:1px 6px; border-radius:4px;">' + r.flag + '</span>' : '<span style="color:#10b981; font-weight:700; font-size:7.5pt;">Normal</span>'}</td>`;
+        }
+        if (state.columns.unit) cols += `<td style="padding:${pad}px 8px; color:#475569;">${r.unit}</td>`;
+        if (state.columns.ref_range) cols += `<td style="padding:${pad}px 8px; color:#475569;">${r.ref}</td>`;
+        if (state.columns.method) cols += `<td style="padding:${pad}px 8px; color:#64748b; font-size:8pt;">${r.method}</td>`;
+        if (state.columns.specimen) cols += `<td style="padding:${pad}px 8px; color:#64748b; font-size:8pt;">${r.spec}</td>`;
+        return `<tr style="background:${bg}; border-bottom:1px solid #f1f5f9; font-size:9pt;">${cols}</tr>`;
+      }).join('');
+
+      const tableHtml = `
+        <table style="width:100%; border-collapse:collapse; margin-bottom:18px;">
+          <thead>
+            <tr style="background:#f8fafc; border-top:1.5px solid #cbd5e1; border-bottom:1.5px solid #cbd5e1; color:${primary}; font-size:8.5pt; font-weight:800;">
+              ${th}
+            </tr>
+          </thead>
+          <tbody>${trs}</tbody>
+        </table>
+      `;
+
+      // Signature Box
+      const sigPos = state.signature.position;
+      const justify = sigPos === 'left' ? 'flex-start' : (sigPos === 'center' ? 'center' : 'flex-end');
+      const sigHtml = `
+        <div style="display:flex; justify-content:${justify}; margin-top:${state.signature.spacing_top_px}px;">
+          <div style="width:42%; text-align:center; font-size:8.5pt;">
+            <div style="color:#64748b; margin-bottom:4px;">Jakarta, 10 Oktober 2026</div>
+            <div style="font-weight:700; color:${primary}; margin-bottom:6px;">Dokter Penanggung Jawab Laboratorium</div>
+            ${state.signature.show_qr ? `
+              <div style="margin:6px auto; width:64px; height:64px; border:1px solid #cbd5e1; border-radius:6px; display:flex; align-items:center; justify-content:center; background:#f8fafc; font-size:22px;">
+                📱
+              </div>
+              <div style="font-size:7pt; color:#64748b; margin-bottom:6px;">BSrE TTE Tersertifikasi</div>
+            ` : '<div style="height:40px;"></div>'}
+            <div style="font-weight:800; text-decoration:underline;">${document.getElementById('input-doctor-name')?.value || state.signature.doctor_name}</div>
+            <div style="color:#64748b; font-size:8pt;">${document.getElementById('input-doctor-sip')?.value || state.signature.doctor_sip}</div>
+          </div>
+        </div>
+      `;
+
+      return patientBox + tableHtml + sigHtml;
+    }
+
+    function renderSmmDocHtml() {
+      const primary = state.layout.primary_color;
+      const accent = state.layout.accent_color;
+
+      return `
+        <!-- ISO 15189 Standard Document Control Header -->
+        <table style="width:100%; border-collapse:collapse; margin-bottom:16px; border:1.5px solid ${primary}; font-size:8pt; line-height:1.35;">
+          <tr>
+            <td rowspan="2" style="width:18%; border:1px solid #cbd5e1; text-align:center; padding:6px; background:#f8fafc; font-weight:700; color:${primary};">
+              🔬 ${state.header_kop.lab_name}
+            </td>
+            <td rowspan="2" style="width:48%; border:1px solid #cbd5e1; padding:6px 10px; vertical-align:middle;">
+              <div style="font-size:7.5pt; color:#64748b; text-transform:uppercase; font-weight:600;">SISTEM MANAJEMEN MUTU ISO 15189:2022</div>
+              <div style="font-size:10.5pt; font-weight:800; color:${primary};">SOP EVALUASI DAN PELAPORAN HASIL KRITIS</div>
+              <div style="font-size:7.5pt; color:${accent};">Klausul Acuan: <strong>ISO 7.4.1 (Pelaporan Hasil Uji)</strong></div>
+            </td>
+            <td style="width:16%; border:1px solid #cbd5e1; padding:4px 6px; color:#475569;">No. Dokumen:</td>
+            <td style="width:18%; border:1px solid #cbd5e1; padding:4px 6px; font-weight:700;">SOP-LAB-07-004</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #cbd5e1; padding:4px 6px; color:#475569;">Edisi / Revisi:</td>
+            <td style="border:1px solid #cbd5e1; padding:4px 6px; font-weight:700;">02 / 2026</td>
+          </tr>
+          <tr style="background:#f8fafc;">
+            <td style="border:1px solid #cbd5e1; padding:4px 6px; text-align:center; color:#64748b;">Tanggal Berlaku:</td>
+            <td style="border:1px solid #cbd5e1; padding:4px 10px; font-weight:600;">01 Oktober 2026</td>
+            <td style="border:1px solid #cbd5e1; padding:4px 6px; color:#475569;">Halaman:</td>
+            <td style="border:1px solid #cbd5e1; padding:4px 6px; font-weight:700;">1 dari 4</td>
+          </tr>
+        </table>
+
+        <!-- Body SOP Content -->
+        <div style="font-size:9.5pt; line-height:1.6; color:#334155;">
+          <h2 style="color:${primary}; font-size:12pt; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:14px;">1. TUJUAN & RUANG LINGKUP</h2>
+          <p>Menetapkan tata laksana verifikasi teknis, validasi klinis, dan pelaporan segera untuk nilai kritis laboratorium demi keselamatan pasien (patient safety) sesuai standar SNI ISO 15189:2022 klausul 7.4.</p>
+
+          <h2 style="color:${primary}; font-size:12pt; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-top:14px;">2. PROSEDUR PELAPORAN HASIL KRITIS</h2>
+          <ol style="margin-left:20px; margin-top:6px;">
+            <li>Analis melakukan pemeriksaan ulang (duplo) untuk mengonfirmasi nilai abnormal kritis pada alat primer.</li>
+            <li>Laporkan nilai kritis ke Dokter Penanggung Jawab Teknis / Sp.PK dalam waktu maksimal <strong>≤ 15 menit</strong> sejak hasil tervalidasi.</li>
+            <li>Hubungi DPJP (Dokter Penanggung Jawab Pasien) melalui telepon resmi dan lakukan teknik komunikasi <strong>SBAR / TBAK (Tulis, Baca, Konfirmasi)</strong>.</li>
+            <li>Dokumentasikan nama penerima telepon, jam penyampaian, dan tanda tangan pelapor pada formulir logbook nilai kritis LIS.</li>
+          </ol>
+        </div>
+      `;
+    }
+
+    function buildCurrentJsonConfig() {
+      return {
+        $schema: "http://json-schema.org/draft-07/schema#",
+        template_name: "Kustomisasi Tata Letak Terkonfigurasi",
+        layout: {
+          page_size: state.layout.page_size,
+          orientation: "portrait",
+          page_margin_mm: {
+            top: state.layout.page_margin_mm,
+            bottom: state.layout.page_margin_mm,
+            left: state.layout.page_margin_mm,
+            right: state.layout.page_margin_mm
+          },
+          primary_color: state.layout.primary_color,
+          accent_color: state.layout.accent_color,
+          watermark: {
+            enabled: true,
+            text: document.getElementById('input-watermark')?.value || state.layout.watermark
+          }
+        },
+        header_kop: {
+          logo_position: state.header_kop.logo_position,
+          logo_width_px: state.header_kop.logo_size_px,
+          logo_height_px: state.header_kop.logo_size_px,
+          kop_text_align: state.header_kop.logo_position === 'center' ? 'center' : 'left',
+          institution_name: document.getElementById('input-lab-name')?.value || state.header_kop.lab_name,
+          legal_entity: document.getElementById('input-lab-legal')?.value || state.header_kop.lab_legal,
+          accreditation_kan_text: document.getElementById('input-accreditation')?.value || state.header_kop.accreditation,
+          divider_line_style: state.header_kop.divider_style,
+          kop_spacing_bottom_px: state.header_kop.kop_spacing_bottom
+        },
+        lab_results_table: {
+          row_padding_vertical_px: state.table.row_padding_px,
+          highlight_abnormal: state.table.highlight_abnormal,
+          columns: Object.entries(state.columns).map(([id, enabled]) => ({
+            id,
+            enabled: Boolean(enabled)
+          }))
+        },
+        signature_box: {
+          position: state.signature.position,
+          show_qr_tte: state.signature.show_qr,
+          spacing_top_px: state.signature.spacing_top_px,
+          doctor_name: document.getElementById('input-doctor-name')?.value || state.signature.doctor_name,
+          doctor_sip: document.getElementById('input-doctor-sip')?.value || state.signature.doctor_sip
+        }
+      };
+    }
+
+    function openJsonModal() {
+      const config = buildCurrentJsonConfig();
+      document.getElementById('jsonDisplay').textContent = JSON.stringify(config, null, 2);
+      document.getElementById('jsonModal').classList.add('open');
+    }
+
+    function closeJsonModal() {
+      document.getElementById('jsonModal').classList.remove('open');
+    }
+
+    function copyJsonToClipboard() {
+      const text = document.getElementById('jsonDisplay').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('✅ Konfigurasi JSON berhasil disalin ke clipboard!');
+      });
+    }
+
+    function downloadJsonConfig() {
+      const config = buildCurrentJsonConfig();
+      const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'template.custom.config.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Initial render
+    window.onload = () => {
+      renderPreview();
+    };
+  </script>
+</body>
+</html>

@@ -234,11 +234,15 @@ function buildFullCatalog() {
   fs.writeFileSync(outCsvPath, csvContent, 'utf8');
   console.log(`✓ File tersimpan: data/catalog/catalog_generic.csv (${(csvContent.length / 1024).toFixed(1)} KB)`);
 
-  // 7. Ekspor format TSV dan HL7/FHIR Spec
+  // 7. Ekspor format TSV, Excel XML (.xls), dan HL7/FHIR Spec
   const exporter = new LISExporter();
   const tsvContent = exporter.export(catalogRows, { format: 'tsv' });
   fs.writeFileSync(path.join(__dirname, '../data/catalog/catalog_generic.tsv'), tsvContent, 'utf8');
   console.log(`✓ File TSV tersimpan: data/catalog/catalog_generic.tsv`);
+
+  const excelContent = exporter.export(catalogRows, { format: 'excel_xml' });
+  fs.writeFileSync(path.join(__dirname, '../data/catalog/catalog_generic.xls'), excelContent, 'utf8');
+  console.log(`✓ File Excel Spreadsheet tersimpan: data/catalog/catalog_generic.xls (${(excelContent.length / 1024).toFixed(1)} KB)`);
 
   const hl7Spec = exporter.export(catalogRows.slice(0, 50), { format: 'hl7_spec' });
   fs.writeFileSync(path.join(__dirname, '../data/catalog/catalog_hl7_spec_sample.md'), hl7Spec, 'utf8');

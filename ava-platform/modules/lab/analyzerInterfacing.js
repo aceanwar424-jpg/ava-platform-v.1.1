@@ -203,6 +203,7 @@ function aiGambar() {
 }
 
 function openAstmSimulatorModal() {
+  window.TechRoutes?.intent('analyzer-simulator',[]);
   if (typeof openModal !== 'function') return;
   openModal(`
     <div class="modal-header">

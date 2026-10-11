@@ -21,9 +21,11 @@
 <script defer src="js/core/eventBus.js"></script>
 <script defer src="js/core/moduleManager.js"></script>
 <link rel="stylesheet" href="css/tech-navigation.css?v=20261006c">
-<script defer src="js/core/tech-navigation.js?v=20261006c"></script>
-<link rel="stylesheet" href="css/workspace-design.css?v=20261006a">
-<script defer src="js/core/workspace-navigation.js?v=20261006a"></script>
+<script defer src="js/core/tech-navigation.js?v=20261011a"></script>
+<link rel="stylesheet" href="css/workspace-design.css?v=20261011a">
+<script defer src="js/core/workspace-navigation.js?v=20261011a"></script>
+<script defer src="js/core/tech-pages.js?v=20261011a"></script>
+<script defer src="js/core/tech-routes.js?v=20261011a"></script>
 </head>
 <body class="ava-ops-shell">
 <!-- ═══ SIDEBAR VERTIKAL PENUH AVA GLOBAL ═══ -->
@@ -230,8 +232,8 @@
 <script defer src="js/core/peta-menu.js?v=20260925-orchestration"></script>
 <script defer src="js/core/icons.js?v=20260721g"></script>
 <script defer src="js/core/api.js?v=20260719s"></script>
-<script defer src="js/core/utils.js?v=20260723b"></script>
-<script defer src="js/core/router.js?v=20260925-orchestration"></script>
+<script defer src="js/core/utils.js?v=20261011a"></script>
+<script defer src="js/core/router.js?v=20261011a"></script>
 <script defer src="js/core/storage.js?v=20260719s"></script>
 <script defer src="js/core/barcode.js?v=20260725a"></script>
 <!-- Kunci API lokal (tidak masuk repo). Wajib sebelum aiGateway.js.
@@ -244,7 +246,7 @@
      Manifest di bawah memetakan halaman → berkas; router memuatnya saat dibuka.
      Empat modul tetap eager karena dipakai sebelum navigasi pertama. -->
 <script defer src="js/core/modul-manifest.js?v=20260925-orchestration"></script>
-<script defer src="js/core/lazy.js?v=20260907-lis-integrity-rc1"></script>
+<script defer src="js/core/lazy.js?v=20261011a"></script>
 <script defer src="modules/crm/mou.js?v=20260719s"></script>
 <script defer src="modules/dashboard/executive_dashboard.js?v=20260719s"></script>
 
@@ -325,6 +327,33 @@ function updateDate() {
   });
 }
 
+// ── Chrome Ruang Kerja Subdomain ───────────
+function sesuaikanChromeRuangKerja(ruang) {
+  const opsi = {
+    lis:      { halaman: 'lis-settings', label: 'Pengaturan Laboratorium', tag: 'ISO 15189:2022' },
+    his:      { halaman: 'settings',     label: 'Pengaturan Sistem HIS',     tag: 'HIS / RME' },
+    tech:     { halaman: 'settings',     label: 'Pengaturan Platform',       tag: 'AVA TECH' },
+    wellness: { halaman: 'settings',     label: 'Pengaturan Wellness',       tag: 'WELLNESS' },
+    ops:      { halaman: 'settings',     label: 'Pengaturan Holding',        tag: 'AVA GLOBAL' }
+  }[ruang] || { halaman: 'settings', label: 'Pengaturan Sistem', tag: 'AVA ENGINE' };
+
+  document.body.classList.toggle('lis-workspace-page', ruang === 'lis');
+  const contextLabel = document.querySelector('.navigation-context-heading p');
+  if (contextLabel) contextLabel.textContent = ruang === 'lis' ? 'RUANG KERJA LABORATORIUM' : 'NAVIGASI ' + (ruang || '').toUpperCase();
+  if (ruang === 'lis') document.title = 'AVA Lab — Laboratorium';
+  const tombol = document.getElementById('workspace-settings-btn');
+  const label = document.getElementById('workspace-settings-label');
+  const tag = document.getElementById('sidebar-brand-tag');
+
+  if (label) label.textContent = opsi.label;
+  if (tag) tag.textContent = opsi.tag;
+  if (tombol) {
+    tombol.title = opsi.label;
+    tombol.onclick = () => typeof navigate === 'function' && navigate(opsi.halaman, opsi.halaman === 'settings' ? { tab: 'general' } : {});
+  }
+}
+window.sesuaikanChromeRuangKerja = sesuaikanChromeRuangKerja;
+
 // ── Boot ─────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
   // Desktop dimulai hemat ruang (hanya ikon). Pilihan pengguna diingat di
@@ -379,37 +408,10 @@ window.addEventListener('DOMContentLoaded', async () => {
                       || (situsIni && situsIni.workspace)
                       || defaultSubdomainWorkspace;
 
-  // Tombol yang selalu tampak di bawah rail harus mengikuti ruang kerja.
-  // Sebelumnya HIS, Tech, Wellness, dan OPS sama-sama membawa pengguna ke
-  // konfigurasi connector LIS (:9999). Selain membingungkan, itu membuka
-  // konteks operasional yang tidak relevan bagi staf klinis. Konfigurasi
-  // umum tetap melewati router/RBAC; hanya target pintasannya yang berubah.
-  function sesuaikanChromeRuangKerja(ruang) {
-    const opsi = {
-      lis:      { halaman: 'lis-settings', label: 'Pengaturan Laboratorium', tag: 'AVA LAB / LIS' },
-      his:      { halaman: 'settings',     label: 'Pengaturan Sistem HIS',     tag: 'HIS / RME' },
-      tech:     { halaman: 'settings',     label: 'Pengaturan Platform',       tag: 'AVA TECH' },
-      wellness: { halaman: 'settings',     label: 'Pengaturan Wellness',       tag: 'WELLNESS' },
-      ops:      { halaman: 'settings',     label: 'Pengaturan Holding',        tag: 'AVA GLOBAL' }
-    }[ruang] || { halaman: 'settings', label: 'Pengaturan Sistem', tag: 'AVA ENGINE' };
 
-    document.body.classList.toggle('lis-workspace-page', ruang === 'lis');
-    const contextLabel = document.querySelector('.navigation-context-heading p');
-    if (contextLabel) contextLabel.textContent = ruang === 'lis' ? 'RUANG KERJA LABORATORIUM' : 'NAVIGASI ' + ruang.toUpperCase();
-    if (ruang === 'lis') document.title = 'AVA Lab — Laboratorium';
-    const tombol = document.getElementById('workspace-settings-btn');
-    const label = document.getElementById('workspace-settings-label');
-    const tag = document.getElementById('sidebar-brand-tag');
-
-    if (label) label.textContent = opsi.label;
-    if (tag) tag.textContent = opsi.tag;
-    if (tombol) {
-      tombol.title = opsi.label;
-      tombol.onclick = () => navigate(opsi.halaman, opsi.halaman === 'settings' ? { tab: 'general' } : {});
-    }
-  }
 
   function determineInitialPage() {
+    const techRoute=window.TechRoutes?.read();if(techRoute)return techRoute.page;
     if (customView) return customView;
     if (hash.startsWith('#')) return hash.substring(1);
     if (situsIni && situsIni.awal) return situsIni.awal;

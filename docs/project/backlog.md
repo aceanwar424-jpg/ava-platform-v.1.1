@@ -1,4 +1,4 @@
-﻿# Backlog
+# Backlog
 
 ## Audit LIS â€” 2026-09-06
 
@@ -32,3 +32,16 @@ OWNED_BY: generic. Menu RS berstatus parsial; simulator tidak menjadi validasi k
 - Rekonsiliasi biaya/deposit/penjamin otomatis dari transaksi sumber; validasi referensi bukti bertipe ID.
 - ALOS/BTO/TOI berbasis riwayat lengkap, definisi hari perawatan dan periode pelaporan yang disepakati.
 - UAT staging: dua sesi memperebutkan bed, tenant/role aktual, master bangsal/kelas lama, fresh baseline cloud melalui konsolidasi resmi dan upgrade mapping tenant yang ditinjau.
+
+## Akselerator Sistem Lab (Multi-Lab Productization) — 10 Oktober 2026
+OWNED_BY: generic.
+- [x] P1: Multi-Lab SMM Engine (9 template modular ISO 15189:2022, compliance checker, LLM provider-agnostic).
+- [x] P2: Master Test Catalog Siap-LIS (633 analit, LOINC/UCUM, format CSV/TSV/XLS/HL7).
+- [x] P3: Configurable Template Engine (5 Presets, kop/logo/kolom/spasi/TTE, SMM bundler & E-Hasil).
+- [x] P4: Batch Content Engine (531 panduan pasien, 4-minggu kalender LinkedIn).
+- [x] P5: Compounding Proof System (Case study generator Before vs After).
+- [ ] Fase Ekspansi Lanjutan (Scale-up & Pilot):
+  - [ ] Microservice headless Chromium/Puppeteer untuk ekspor biner PDF langsung dari command line/server tanpa interaksi browser manual.
+  - [ ] Adapter REST API SATUSEHAT Kemenkes RI untuk sinkronisasi otomatis Resource DiagnosticReport & Observation.
+  - [ ] Pilot onboarding 1 klinik eksternal nyata untuk uji coba deployment tenant baru.
+

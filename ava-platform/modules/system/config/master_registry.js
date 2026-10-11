@@ -130,7 +130,14 @@ const MASTER_REGISTRY = {
       {key:'corporate_code', label:'Kode korporat', required:true},
       {key:'branch_code', label:'Kode cabang'},
       {key:'package_code', label:'Kode paket'},
-      {key:'benefit_ceiling', label:'Plafon benefit', type:'number', min:0},
+      {key:'benefit_ceiling', label:'Plafon benefit', type:'number', min:0, step:'0.0001'},
+      {key:'payer_type', label:'Jenis penjamin rawat inap', type:'select', options:['BPJS','Asuransi','Korporat']},
+      {key:'coverage_percentage', label:'Persentase biaya ditanggung', type:'number', min:0, max:100, step:'0.0001'},
+      {key:'covered_categories', label:'Kategori biaya ditanggung (pisahkan koma)', type:'textarea', hint:'Gunakan kategori sumber: Kamar, Kamar konfigurasi, Visite, Tindakan, Obat & BHP, Penunjang, Lain-lain.'},
+      {key:'cap_scope', label:'Lingkup plafon', type:'select', options:['stay']},
+      {key:'unlisted_categories', label:'Kategori di luar daftar', type:'select', options:['excluded']},
+      {key:'benefit_rounding', label:'Pembulatan manfaat', type:'select', options:['up','down','nearest']},
+      {key:'payer_receivable_account', label:'Kode akun piutang penjamin'},
       {key:'payment_terms', label:'Termin pembayaran'},
       {key:'pic_contact', label:'PIC & kontak'},
     ]
@@ -226,6 +233,7 @@ const MASTER_REGISTRY = {
   },
 };
 
+let masterRegistryEpoch=0;
 let masterRegistryState = { domain:null, records:[], error:'', query:'', status:'' };
 
 function mrEsc(value) {
@@ -266,13 +274,17 @@ async function renderMasterRegistry(domain, targetId='main-content') {
     root.innerHTML = `<div class="empty-state"><div class="ico">⚠️</div><h3>Domain master tidak dikenal</h3><button class="btn btn-teal" onclick="navigate('config')">Kembali ke konfigurasi</button></div>`;
     return;
   }
+  const epoch=++masterRegistryEpoch;
   masterRegistryState = { domain, records:[], error:'', query:'', status:'' };
   root.innerHTML = `<div class="page-header"><div><h1>${definition.icon} ${mrEsc(definition.title)}</h1><p>${mrEsc(definition.desc)}</p></div><div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="navigate('config',{focus:'${definition.homeFocus}'})">← Hub konfigurasi</button><button class="btn btn-teal" onclick="openMasterRecordForm()">+ Tambah master</button></div></div><div class="loading-row"><div class="spinner"></div></div>`;
   try {
-    masterRegistryState.records = await mrReadRecords(domain);
+    const records=await mrReadRecords(domain);if(epoch!==masterRegistryEpoch||window.TechRoutes?.active()?.page&&TechRoutes.active().page!=='master-records')return;
+    masterRegistryState.records = records;
   } catch (err) {
+    if(epoch!==masterRegistryEpoch||window.TechRoutes?.active()?.page&&TechRoutes.active().page!=='master-records')return;
     masterRegistryState.error = err.message || 'Gagal membaca master.';
   }
+  if(epoch!==masterRegistryEpoch)return;
   renderMasterRegistryTable();
 }
 
@@ -296,7 +308,7 @@ function renderMasterRegistryTable() {
     </div>
     <div class="table-wrap">
       <div class="table-toolbar"><input class="table-search" value="${mrAttr(masterRegistryState.query)}" oninput="masterRegistryState.query=this.value;renderMasterRegistryTable()" placeholder="Cari kode atau nama..." style="flex:1"><select class="table-filter" onchange="masterRegistryState.status=this.value;renderMasterRegistryTable()"><option value="">Semua status</option><option value="active" ${activeFilter==='active'?'selected':''}>Aktif</option><option value="draft" ${activeFilter==='draft'?'selected':''}>Draft</option><option value="inactive" ${activeFilter==='inactive'?'selected':''}>Nonaktif</option><option value="archived" ${activeFilter==='archived'?'selected':''}>Diarsipkan</option></select><button class="btn btn-ghost btn-sm" onclick="renderMasterRegistry('${masterRegistryState.domain}')">↻ Muat ulang</button></div>
-      ${masterRegistryState.error ? '' : (shown.length ? `<table><thead><tr><th>Kode</th><th>Nama</th><th>Status</th><th>Periode berlaku</th><th>Versi</th><th>Diperbarui</th><th>Aksi</th></tr></thead><tbody>${shown.map(row => `<tr><td style="font-family:monospace;font-size:11px;font-weight:800;color:var(--teal)">${mrEsc(row.code)}</td><td><div style="font-weight:700;color:var(--navy)">${mrEsc(row.name)}</div><div style="font-size:10px;color:var(--text3)">${mrEsc(definition.fields.slice(0,2).map(field => mrValue(row, field.key)).filter(Boolean).join(' · ')) || '—'}</div></td><td>${mrStatus(row.status)}</td><td style="font-size:11px">${row.effective_from ? mrEsc(formatDateShort(row.effective_from)) : '—'}${row.effective_to ? ` – ${mrEsc(formatDateShort(row.effective_to))}` : ''}</td><td><span class="badge badge-gray">v${Number(row.version || 1)}</span></td><td style="font-size:10px;color:var(--text3)">${row.updated_at ? mrEsc(formatDateShort(row.updated_at)) : '—'}</td><td><div class="act-row"><button class="act-btn edit" title="Ubah" onclick="openMasterRecordForm(${Number(row.id)})">✎</button><button class="act-btn" title="Jejak audit" onclick="showMasterAudit(${Number(row.id)})">◷</button>${row.status !== 'archived' ? `<button class="act-btn del" title="Arsipkan" onclick="archiveMasterRecord(${Number(row.id)})">×</button>` : ''}</div></td></tr>`).join('')}</tbody></table>` : `<div class="empty-state"><div class="ico">${definition.icon}</div><h3>${all.length ? 'Tidak ada data sesuai filter' : 'Belum ada master'}</h3><p>${all.length ? 'Ubah kata kunci atau status pencarian.' : 'Tambahkan data pertama untuk domain ini.'}</p><button class="btn btn-teal" style="margin-top:10px" onclick="openMasterRecordForm()">+ Tambah master</button></div>`) }
+      ${masterRegistryState.error ? '' : (shown.length ? `<table><thead><tr><th>Kode</th><th>Nama</th><th>Status</th><th>Periode berlaku</th><th>Versi</th><th>Diperbarui</th><th>Aksi</th></tr></thead><tbody>${shown.map(row => `<tr><td style="font-family:monospace;font-size:11px;font-weight:800;color:var(--teal)">${mrEsc(row.code)}</td><td><button class="tech-record-link" onclick="showMasterDetail(${Number(row.id)})">${mrEsc(row.name)}</button><div style="font-size:10px;color:var(--text3)">${mrEsc(definition.fields.slice(0,2).map(field => mrValue(row, field.key)).filter(Boolean).join(' · ')) || '—'}</div></td><td>${mrStatus(row.status)}</td><td style="font-size:11px">${row.effective_from ? mrEsc(formatDateShort(row.effective_from)) : '—'}${row.effective_to ? ` – ${mrEsc(formatDateShort(row.effective_to))}` : ''}</td><td><span class="badge badge-gray">v${Number(row.version || 1)}</span></td><td style="font-size:10px;color:var(--text3)">${row.updated_at ? mrEsc(formatDateShort(row.updated_at)) : '—'}</td><td><div class="act-row"><button class="act-btn edit" title="Ubah" onclick="openMasterRecordForm(${Number(row.id)})">✎</button><button class="act-btn" title="Jejak audit" onclick="showMasterAudit(${Number(row.id)})">◷</button>${row.status !== 'archived' ? `<button class="act-btn del" title="Arsipkan" onclick="archiveMasterRecord(${Number(row.id)})">×</button>` : ''}</div></td></tr>`).join('')}</tbody></table>` : `<div class="empty-state"><div class="ico">${definition.icon}</div><h3>${all.length ? 'Tidak ada data sesuai filter' : 'Belum ada master'}</h3><p>${all.length ? 'Ubah kata kunci atau status pencarian.' : 'Tambahkan data pertama untuk domain ini.'}</p><button class="btn btn-teal" style="margin-top:10px" onclick="openMasterRecordForm()">+ Tambah master</button></div>`) }
     </div>`;
 }
 
@@ -307,14 +319,15 @@ function mrRenderField(field, payload) {
   const label = `${mrEsc(field.label)}${field.required ? ' <span style="color:var(--danger)">*</span>' : ''}`;
   if (field.type === 'textarea') return `<label style="grid-column:1/-1"><span>${label}</span><textarea name="${field.key}" rows="2" placeholder="${mrAttr(field.placeholder || '')}">${mrEsc(Array.isArray(value) ? value.join(', ') : value)}</textarea>${hint}</label>`;
   if (field.type === 'select') return `<label><span>${label}</span><select name="${field.key}" ${required}><option value="">— Pilih —</option>${(field.options || []).map(option => `<option value="${mrAttr(option)}" ${String(value)===option?'selected':''}>${mrEsc(option)}</option>`).join('')}</select>${hint}</label>`;
-  return `<label><span>${label}</span><input type="${field.type || 'text'}" name="${field.key}" value="${mrAttr(value)}" placeholder="${mrAttr(field.placeholder || '')}" ${field.min !== undefined ? `min="${field.min}"` : ''} ${field.max !== undefined ? `max="${field.max}"` : ''} ${required}>${hint}</label>`;
+  return `<label><span>${label}</span><input type="${field.type || 'text'}" name="${field.key}" value="${mrAttr(value)}" placeholder="${mrAttr(field.placeholder || '')}" ${field.min !== undefined ? `min="${field.min}"` : ''} ${field.max !== undefined ? `max="${field.max}"` : ''} ${field.step!==undefined?`step="${mrAttr(field.step)}"`:''} ${required}>${hint}</label>`;
 }
 
-function openMasterRecordForm(id=null) {
+async function openMasterRecordForm(id=null) {
+  window.TechRoutes?.intent('master-edit',[id]);
   const definition = mrDefinition(masterRegistryState.domain);
   if (!definition) return;
-  const record = id == null ? null : masterRegistryState.records.find(item => Number(item.id) === Number(id));
-  if (id != null && !record) { toast('Data master tidak ditemukan pada daftar ini.', 'err'); return; }
+  let record = id == null ? null : masterRegistryState.records.find(item => Number(item.id) === Number(id));
+  if(id!=null&&!record){record=await mrReadRecord(id);masterRegistryState.records.push(record);}
   const payload = record?.payload || {};
   const status = record?.status || 'draft';
   const reasonRequired = definition.approval ? '<span style="color:var(--danger)">*</span>' : '';
@@ -340,7 +353,7 @@ function openMasterRecordForm(id=null) {
 function mrNormalizeValue(field, raw) {
   const value = String(raw || '').trim();
   if (!value) return null;
-  if (field.key === 'allowed_services') return value.split(',').map(item => item.trim()).filter(Boolean);
+  if (['allowed_services','covered_categories'].includes(field.key)) return value.split(',').map(item => item.trim()).filter(Boolean);
   if (field.type === 'number') return Number(value);
   return value;
 }
@@ -371,7 +384,7 @@ async function saveMasterRecord(event, id=null) {
       p_name:String(data.get('name') || '').trim(), p_status:String(data.get('status') || 'draft'),
       p_effective_from:start || null, p_effective_to:end || null, p_payload:payload, p_reason:reason || null,
     });
-    if (!result || !Number.isFinite(Number(result.id)) || Number(result.id) <= 0) {
+    if (!result || !Number.isSafeInteger(Number(result.id)) || Number(result.id) <= 0 || (id != null && Number(result.id) !== Number(id))) {
       throw new Error('Server tidak mengonfirmasi penyimpanan master.');
     }
     closeModalForce();
@@ -383,23 +396,33 @@ async function saveMasterRecord(event, id=null) {
   }
 }
 
-async function archiveMasterRecord(id) {
+async function archiveMasterRecord(id, pageReason) {
+  window.TechRoutes?.intent('master-archive',[id]);
   const record = masterRegistryState.records.find(item => Number(item.id) === Number(id));
   if (!record) return;
-  const reason = window.prompt(`Arsipkan ${record.code} — ${record.name}?\nAlasan pengarsipan wajib diisi:`);
+  if(window.TechPages?.enabled() && pageReason === undefined){
+    TechPages.open(`<h2>Arsipkan ${mrEsc(record.code)} — ${mrEsc(record.name)}</h2><form id="master-archive-page"><label>Alasan pengarsipan<textarea name="reason" required></textarea></label><p id="master-archive-error" role="alert"></p><button class="btn btn-teal" type="submit">Arsipkan master</button></form>`);
+    document.getElementById('master-archive-page').onsubmit=async event=>{
+      event.preventDefault();const button=event.currentTarget.querySelector('button');if(button.disabled)return;button.disabled=true;
+      await archiveMasterRecord(id,new FormData(event.currentTarget).get('reason'));if(button.isConnected)button.disabled=false;
+    };return;
+  }
+  const reason = pageReason === undefined ? window.prompt(`Arsipkan ${record.code} — ${record.name}?\nAlasan pengarsipan wajib diisi:`) : pageReason;
   if (reason === null) return;
   if (!reason.trim()) { toast('Alasan pengarsipan wajib diisi.', 'warn'); return; }
   try {
     const result = await sbRpc('his_master_archive_record', {p_id:Number(id), p_reason:reason.trim()});
-    if (!result || !Number.isFinite(Number(result.id)) || Number(result.id) <= 0) {
+    if (!result || !Number.isSafeInteger(Number(result.id)) || Number(result.id) <= 0) {
       throw new Error('Server tidak mengonfirmasi pengarsipan master.');
     }
     toast('Master diarsipkan; riwayatnya tetap tersedia.', 'ok');
+    window.TechPages?.finish();
     await renderMasterRegistry(masterRegistryState.domain);
   } catch (err) { toast(err.message || 'Master gagal diarsipkan.', 'err', 6000); }
 }
 
 async function showMasterAudit(id) {
+  window.TechRoutes?.intent('master-audit',[id]);
   try {
     const query = new URLSearchParams({select:'id,action,reason,before_data,after_data,created_at,actor_user_id', record_id:`eq.${id}`, order:'created_at.desc'});
     const response = await sbFetch(`${SUPABASE_URL}/rest/v1/his_master_audit?${query.toString()}`);
@@ -415,3 +438,18 @@ window.openMasterRecordForm = openMasterRecordForm;
 window.saveMasterRecord = saveMasterRecord;
 window.archiveMasterRecord = archiveMasterRecord;
 window.showMasterAudit = showMasterAudit;
+
+async function mrReadRecord(id){
+  if(!Number.isSafeInteger(Number(id))||Number(id)<=0)throw Error('ID master tidak valid.');
+  const query=new URLSearchParams({select:'*',domain_key:'eq.'+masterRegistryState.domain,id:'eq.'+Number(id)});
+  const response=await sbFetch(SUPABASE_URL+'/rest/v1/his_master_records?'+query);const rows=await response.json();
+  if(!response.ok||!Array.isArray(rows)||!rows[0])throw Error('Master tidak ditemukan atau akses dibatasi.');return rows[0];
+}
+async function showMasterDetail(id){
+  const record=masterRegistryState.records.find(row=>Number(row.id)===Number(id))||await mrReadRecord(id),definition=mrDefinition(masterRegistryState.domain);
+  window.TechRoutes?.intent('master-detail',[Number(id)]);
+  const fields=[['Kode',record.code],['Nama',record.name],['Status',record.status],['Versi',record.version],...definition.fields.map(field=>[field.label,mrValue(record,field.key)])];
+  const html='<h1>'+mrEsc(record.name)+'</h1><p class="muted">'+mrEsc(definition.title)+'</p><dl class="tech-detail-grid">'+fields.map(([label,value])=>'<div><dt>'+mrEsc(label)+'</dt><dd>'+mrEsc(Array.isArray(value)?value.join(', '):value??'—')+'</dd></div>').join('')+'</dl><button class="btn btn-teal" onclick="openMasterRecordForm('+Number(id)+')">Edit master</button>';
+  if(window.TechPages?.enabled())TechPages.open(html);else openModal(html);
+}
+window.showMasterDetail=showMasterDetail;

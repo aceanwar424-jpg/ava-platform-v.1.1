@@ -1,0 +1,185 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "description": "Koleksi preset konfigurasi tata letak siap pakai untuk dokumen SMM & lembar hasil laboratorium klinik.",
+  "presets": {
+    "standard_navy": {
+      "name": "Standar Medika (Logo Kiri - Biru Navy)",
+      "description": "Format modern terpopuler untuk laboratorium klinik swasta dan rumah sakit modern.",
+      "layout": {
+        "page_size": "A4",
+        "orientation": "portrait",
+        "primary_color": "#0f2963",
+        "accent_color": "#0284c7",
+        "text_color": "#1e293b",
+        "page_margin_mm": { "top": 18, "bottom": 18, "left": 18, "right": 18 }
+      },
+      "header_kop": {
+        "logo_position": "left",
+        "logo_width_px": 80,
+        "logo_height_px": 80,
+        "kop_text_align": "left",
+        "divider_line_style": "double",
+        "divider_line_color": "#0f2963",
+        "divider_line_thickness_px": 3,
+        "kop_spacing_bottom_px": 16
+      },
+      "lab_results_table": {
+        "header_bg_color": "#f8fafc",
+        "header_text_color": "#0f2963",
+        "highlight_abnormal": true,
+        "row_padding_vertical_px": 6,
+        "row_padding_horizontal_px": 8
+      },
+      "signature_box": {
+        "position": "right",
+        "show_qr_tte": true,
+        "spacing_top_px": 24
+      }
+    },
+
+    "formal_center": {
+      "name": "Resmi Instansi (Logo Tengah - Border Ganda)",
+      "description": "Format formal klasik institusi pemerintah / RSUD / laboratorium rujukan daerah.",
+      "layout": {
+        "page_size": "A4",
+        "orientation": "portrait",
+        "primary_color": "#1e3a8a",
+        "accent_color": "#2563eb",
+        "text_color": "#0f172a",
+        "page_margin_mm": { "top": 20, "bottom": 20, "left": 20, "right": 20 }
+      },
+      "header_kop": {
+        "logo_position": "center",
+        "logo_width_px": 75,
+        "logo_height_px": 75,
+        "kop_text_align": "center",
+        "divider_line_style": "double",
+        "divider_line_color": "#1e3a8a",
+        "divider_line_thickness_px": 3.5,
+        "kop_spacing_bottom_px": 20
+      },
+      "lab_results_table": {
+        "header_bg_color": "#f1f5f9",
+        "header_text_color": "#1e3a8a",
+        "highlight_abnormal": true,
+        "row_padding_vertical_px": 7,
+        "row_padding_horizontal_px": 10
+      },
+      "signature_box": {
+        "position": "right",
+        "show_qr_tte": true,
+        "spacing_top_px": 28
+      }
+    },
+
+    "dual_logo_partnership": {
+      "name": "Kemitraan Ganda (Logo Kiri & Kanan)",
+      "description": "Ideal untuk laboratorium klinik yang bermitra dengan RS, FKTP, atau menyertakan akreditasi KAN di sudut kanan.",
+      "layout": {
+        "page_size": "A4",
+        "orientation": "portrait",
+        "primary_color": "#0369a1",
+        "accent_color": "#0284c7",
+        "text_color": "#334155",
+        "page_margin_mm": { "top": 16, "bottom": 16, "left": 16, "right": 16 }
+      },
+      "header_kop": {
+        "logo_position": "dual",
+        "logo_width_px": 70,
+        "logo_height_px": 70,
+        "secondary_logo_text": "🏅 KAN",
+        "kop_text_align": "center",
+        "divider_line_style": "solid",
+        "divider_line_color": "#0369a1",
+        "divider_line_thickness_px": 2,
+        "kop_spacing_bottom_px": 14
+      },
+      "lab_results_table": {
+        "header_bg_color": "#f0f9ff",
+        "header_text_color": "#0369a1",
+        "highlight_abnormal": true,
+        "row_padding_vertical_px": 6,
+        "row_padding_horizontal_px": 8
+      },
+      "signature_box": {
+        "position": "right",
+        "show_qr_tte": true,
+        "spacing_top_px": 22
+      }
+    },
+
+    "compact_slip": {
+      "name": "Slip Ringkas / Rawat Jalan (Margin Hemat)",
+      "description": "Tata letak hemat kertas dan ruang untuk layanan rawat jalan atau poli spesialis.",
+      "layout": {
+        "page_size": "A4",
+        "orientation": "portrait",
+        "primary_color": "#334155",
+        "accent_color": "#475569",
+        "text_color": "#1e293b",
+        "page_margin_mm": { "top": 12, "bottom": 12, "left": 12, "right": 12 }
+      },
+      "header_kop": {
+        "logo_position": "left",
+        "logo_width_px": 60,
+        "logo_height_px": 60,
+        "kop_text_align": "left",
+        "divider_line_style": "solid",
+        "divider_line_color": "#cbd5e1",
+        "divider_line_thickness_px": 1.5,
+        "kop_spacing_bottom_px": 10
+      },
+      "lab_results_table": {
+        "header_bg_color": "#f8fafc",
+        "header_text_color": "#1e293b",
+        "highlight_abnormal": true,
+        "row_padding_vertical_px": 4,
+        "row_padding_horizontal_px": 6
+      },
+      "signature_box": {
+        "position": "right",
+        "show_qr_tte": true,
+        "spacing_top_px": 16,
+        "qr_size_px": 56
+      }
+    },
+
+    "emerald_wellness": {
+      "name": "Wellness & Preventive (Aksen Hijau Emerald)",
+      "description": "Format premium untuk klinik preventif, check-up korporat, longevity, dan wellness center.",
+      "layout": {
+        "page_size": "A4",
+        "orientation": "portrait",
+        "primary_color": "#065f46",
+        "accent_color": "#059669",
+        "text_color": "#1e293b",
+        "page_margin_mm": { "top": 18, "bottom": 18, "left": 18, "right": 18 }
+      },
+      "header_kop": {
+        "logo_position": "left",
+        "logo_width_px": 75,
+        "logo_height_px": 75,
+        "kop_text_align": "left",
+        "divider_line_style": "double",
+        "divider_line_color": "#059669",
+        "divider_line_thickness_px": 2.5,
+        "kop_spacing_bottom_px": 16
+      },
+      "lab_results_table": {
+        "header_bg_color": "#ecfdf5",
+        "header_text_color": "#065f46",
+        "highlight_abnormal": true,
+        "abnormal_badge_color": "#fee2e2",
+        "abnormal_text_color": "#b91c1c",
+        "row_padding_vertical_px": 6,
+        "row_padding_horizontal_px": 8
+      },
+      "signature_box": {
+        "position": "right",
+        "show_qr_tte": true,
+        "spacing_top_px": 24
+      }
+    }
+  }
+}

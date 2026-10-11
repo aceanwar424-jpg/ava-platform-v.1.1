@@ -1,0 +1,31 @@
+{
+  "synthetic": true,
+  "vendor_verified": false,
+  "settlement_complete": false,
+  "results": [
+    {
+      "name": "source contract binding requires a separate reviewer and idempotent approval",
+      "status": "passed"
+    },
+    {
+      "name": "revocation preserves the original record and creates an audit transition",
+      "status": "passed"
+    },
+    {
+      "name": "changed contractual benefit invalidates a pending approval",
+      "status": "passed"
+    },
+    {
+      "name": "contract type, expiry and eligibility validity cannot be silently assumed",
+      "status": "passed"
+    },
+    {
+      "name": "foreign actor and direct table mutation cannot forge reviewed eligibility",
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

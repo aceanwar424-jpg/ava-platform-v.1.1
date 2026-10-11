@@ -1,0 +1,255 @@
+{
+  "timestamp": "2026-10-11T14:24:09.281Z",
+  "subdomain": "lis.avahealth.sbs",
+  "total_checks": 56,
+  "passed_checks": 56,
+  "failed_checks": 0,
+  "sections": {
+    "domain": [
+      {
+        "title": "Entri LIS terdefinisi di config/domain.json",
+        "status": "PASS"
+      },
+      {
+        "title": "Host mencakup lis.avahealth.sbs dan lab.avahealth.sbs",
+        "status": "PASS"
+      },
+      {
+        "title": "Workspace terkonfigurasi kanonik ke \"lis\"",
+        "status": "PASS"
+      },
+      {
+        "title": "Halaman awal terarah ke \"lab\" (Penerimaan Sampel)",
+        "status": "PASS"
+      }
+    ],
+    "menu": [
+      {
+        "title": "Ruang LIS terdaftar di peta menu ruang kerja",
+        "status": "PASS"
+      },
+      {
+        "title": "Kategori LIS mencakup [\"lis\", \"mutu\"]",
+        "status": "PASS"
+      },
+      {
+        "title": "Seluruh 24 menu LIS granular terdaftar (ditemukan: 29)",
+        "status": "PASS"
+      },
+      {
+        "title": "Seluruh menu LIS memiliki atribut id dan label valid",
+        "status": "PASS"
+      }
+    ],
+    "iso_pra_analitik": [
+      {
+        "title": "Pencatatan sampling flebotomi dengan nama nakes dan lokasi anatomi",
+        "status": "PASS"
+      },
+      {
+        "title": "Kriteria penolakan: Spesimen hemolisis berat (3+) mutlak DITOLAK",
+        "status": "PASS"
+      },
+      {
+        "title": "Kriteria penolakan: Tabung EDTA dengan micro-clot mutlak DITOLAK",
+        "status": "PASS"
+      }
+    ],
+    "iso_pasca_analitik": [
+      {
+        "title": "Deteksi otomatis nilai kritis Kalium 6.8 mmol/L (Hiperkalemia)",
+        "status": "PASS"
+      },
+      {
+        "title": "Deteksi otomatis nilai kritis Glukosa 35 mg/dL (Hipoglikemia)",
+        "status": "PASS"
+      },
+      {
+        "title": "Pencatatan eskalasi nilai kritis SLA < 15 menit & konfirmasi read-back (TBaK)",
+        "status": "PASS"
+      }
+    ],
+    "iso_kendali_mutu": [
+      {
+        "title": "QC Engine menolak nilai non-numerik dengan status INVALID",
+        "status": "PASS"
+      },
+      {
+        "title": "Aturan Westgard 10x (10 pengukuran beruntun di 1 sisi mean) memicu REJECT",
+        "status": "PASS"
+      }
+    ],
+    "iso_pme": [
+      {
+        "title": "Kalkulasi Z-Score PME: |Z| <= 2 dievaluasi SATISFACTORY",
+        "status": "PASS"
+      },
+      {
+        "title": "Kalkulasi Z-Score PME: |Z| > 3 dievaluasi UNSATISFACTORY",
+        "status": "PASS"
+      }
+    ],
+    "clsi_reagen": [
+      {
+        "title": "Verifikasi Lot-to-Lot CLSI EP26-A: Rerata bias 1.0% (<=5%) DISETUJUI",
+        "status": "PASS"
+      }
+    ],
+    "astm_interfacing": [
+      {
+        "title": "Parsing frame transmisi hasil ASTM E1394 mengekstrak analit instrumen",
+        "status": "PASS"
+      }
+    ],
+    "sample_archive": [
+      {
+        "title": "Pengarsipan spesimen ke freezer -20°C dengan koordinat rack/box/grid",
+        "status": "PASS"
+      }
+    ],
+    "browser": [
+      {
+        "title": "Body memuat class \"lis-workspace-page\"",
+        "status": "PASS"
+      },
+      {
+        "title": "Branding sidebar menampilkan \"AVA LAB\"",
+        "status": "PASS"
+      },
+      {
+        "title": "Tag branding menampilkan standar \"ISO 15189:2022\"",
+        "status": "PASS"
+      },
+      {
+        "title": "Document title terarah ke \"AVA Lab — Laboratorium\"",
+        "status": "PASS"
+      }
+    ],
+    "module_render": [
+      {
+        "title": "Render [lis-admission] Permintaan Pemeriksaan & Order Lab",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-phlebotomy] Pengambilan Sampel (Flebotomi)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab] Penerimaan Sampel (Check-in)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-kelayakan] Kelayakan & Penolakan Spesimen",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-anamnesa] Anamnesis & Observasi Klinis",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-audiometry] Audiometri (Penunjang)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-spirometry] Spirometri (Penunjang)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-supportive] EKG & Pemeriksaan Penunjang",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [worklist] Antrean Pemeriksaan Analyzer",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-result] Input & Tinjau Hasil Lab",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [referral] Rujukan Laboratorium",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-critical-value] Pelaporan Nilai Kritis SLA",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-validation] Verifikasi Teknis Analis",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-approval] Otorisasi & Rilis Dokter Sp.PK",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-tat] Kinerja & Waktu Tunggu (TAT)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-qc] Kendali Mutu Harian (QC Levey-Jennings)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-lot-verification] Verifikasi Lot Reagen",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-pme] Uji Profisiensi (PME)",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lab-report] Riwayat Hasil Kumulatif",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-sample-archive] Manajemen Rak Freezer -20°C",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [product] Katalog Pemeriksaan LOINC/UCUM",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [package] Panel & Paket Pemeriksaan",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [refrange] Rentang Nilai Rujukan",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [inventory] Persediaan Reagen & Bahan",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [catalog-export] Ekspor Katalog Siap-LIS",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-analyzer] Interfacing Alat ASTM :9999",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-settings] Pengaturan Laboratorium",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-helpdesk] Panduan & Bantuan LIS",
+        "status": "PASS"
+      },
+      {
+        "title": "Render [lis-integration] Inbox Integrasi HIS-LIS",
+        "status": "PASS"
+      },
+      {
+        "title": "Seluruh 29 modul LIS berhasil ter-render tanpa error",
+        "status": "PASS"
+      },
+      {
+        "title": "Page error durante audit = 0",
+        "status": "PASS"
+      }
+    ]
+  }
+}

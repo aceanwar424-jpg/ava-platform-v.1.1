@@ -571,6 +571,7 @@ async function agDocHash(text){
 }
 
 async function agOpenSignModal(docId){
+  window.TechRoutes?.intent('agent-sign',[docId]);
   const d = agRegistry.find(x => x.id === docId); if(!d) return;
   const namaKini = (typeof getUserName === 'function') ? getUserName() : '';
   openModal(`
@@ -1032,6 +1033,7 @@ function agDocSectionize(text){
 }
 
 async function agOpenFinalReview(docId){
+  window.TechRoutes?.intent('agent-review',[docId]);
   const d = agRegistry.find(x => x.id === docId);
   if(!d){ toast('Dokumen tak ditemukan','err'); return; }
   const content = d.extracted_meta && d.extracted_meta.full_text;

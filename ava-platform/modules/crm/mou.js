@@ -110,6 +110,7 @@ function renderMOUTable(data) {
 }
 
 async function openMOUForm(id=null) {
+  window.TechRoutes?.intent('mou-edit',[id]);
   let m = {};
   if (id) { const d = await sbGet('mous',`select=*&id=eq.${id}`); m=d[0]||{}; }
 

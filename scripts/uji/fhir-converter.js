@@ -1,8 +1,9 @@
 const fs = require('fs');
 const vm = require('vm');
 
+const path = require('path');
 const src = fs.readFileSync(
-  'D:/ava-platform-main/ava-platform/js/core/fhirConverter.js', 'utf8');
+  path.resolve(__dirname, '../../ava-platform/js/core/fhirConverter.js'), 'utf8');
 
 const sandbox = { console, fetch: async () => ({ ok: false }), JSON, Date, Math, Object, Array,
   String, Number, parseFloat, parseInt, isNaN, Set, Map, RegExp, Error };

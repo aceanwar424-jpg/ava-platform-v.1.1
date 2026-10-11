@@ -42,6 +42,7 @@ function _wadahModal() {
 }
 
 function openModal(html, size='') {
+  if (window.TechPages?.enabled()) { window.TechPages.open(html); return; }
   const { ov, box } = _wadahModal();
   if (!box) return;
   box.innerHTML = html;
@@ -49,6 +50,7 @@ function openModal(html, size='') {
   ov.classList.add('open');
 }
 function closeModalForce() {
+  if (window.TechPages?.enabled() && window.TechPages.finish()) return;
   const ov = document.getElementById('modal-overlay');
   const box = document.getElementById('modal-box');
   if (ov) ov.classList.remove('open');

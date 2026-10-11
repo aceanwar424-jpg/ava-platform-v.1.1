@@ -276,6 +276,7 @@ function renderLeadsTable(data) {
 
 // ── Lead Detail + Activity Tracker ────────
 async function openLeadDetail(id) {
+  window.TechRoutes?.intent('lead-detail',[id]);
   const d    = await sbGet('leads',`select=*&id=eq.${id}`);
   const lead = d[0]; if (!lead) return;
   const activities = await loadLeadActivities(id);
@@ -386,6 +387,7 @@ function renderActivitiesList(activities) {
 }
 
 function openAddActivity(leadId) {
+  window.TechRoutes?.intent('lead-activity',[leadId]);
   const types = [
     {key:'call',label:'Telepon'},{key:'whatsapp',label:'💬 WhatsApp'},
     {key:'email',label:'📧 Email'},{key:'meeting',label:'Meeting'},
@@ -507,6 +509,7 @@ function quickLeadStatus(id, current) {
 
 // ── Lead Form ─────────────────────────────
 async function openLeadForm(id=null) {
+  window.TechRoutes?.intent('lead-edit',[id]);
   let l = {};
   if (id) {
     const d = await sbGet('leads',`select=*&id=eq.${id}`);

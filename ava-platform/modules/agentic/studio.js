@@ -210,6 +210,7 @@ function agDownloadAssetDocx(id){
 
 // Form slot manual
 function agOpenSlotForm(){
+  window.TechRoutes?.intent('agent-slot',[]);
   const d = new Date(Date.now()+3*864e5).toISOString().slice(0,10);
   openModal(`
     <div style="max-width:460px">

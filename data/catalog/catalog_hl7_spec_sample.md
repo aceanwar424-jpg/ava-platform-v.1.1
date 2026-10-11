@@ -1,6 +1,6 @@
 # SPESIFIKASI INTEGRASI LIS / SIMRS (HL7 v2 & FHIR)
 
-Generated on: 2026-10-09T00:01:00.791Z
+Generated on: 2026-10-09T23:24:38.102Z
 Standard Mapping: OBX-3 = LOINC Code | OBX-6 = UCUM Unit
 
 | Material Code | Exam Name | Analyte Name | OBX-3 (LOINC) | OBX-6 (UCUM) | Ref Range (Min-Max) | Audit Status |

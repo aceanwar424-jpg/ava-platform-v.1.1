@@ -81,6 +81,117 @@ Katalog terstandardisasi adalah aset bernilai tinggi yang bisa dilisensikan dan 
 
 #LIS #HL7 #FHIR #LaboratoriumInformatika #HealthTech #SIMRS`;
   }
+
+  /**
+   * Generasi Massal (Batch) Kamus Deskripsi Pasien untuk Seluruh Katalog
+   * @param {Array<Object>} catalogRows - Seluruh baris katalog
+   * @returns {Object} Kamus edukasi pasien per pemeriksaan
+   */
+  generateBatchPatientCatalog(catalogRows) {
+    if (!catalogRows || !Array.isArray(catalogRows)) return { total_tests: 0, items: [] };
+
+    // Grouping analit per Nama Pemeriksaan
+    const testMap = new Map();
+
+    catalogRows.forEach(row => {
+      const examName = row['Nama Pemeriksaan'] || 'Pemeriksaan Klinis';
+      if (!testMap.has(examName)) {
+        testMap.set(examName, {
+          material_code: row['Kode Material'],
+          exam_name: examName,
+          analytes: [],
+          loinc_codes: new Set(),
+          specimen: 'Serum / Darah Vena'
+        });
+      }
+      const entry = testMap.get(examName);
+      if (row['Nama Analit'] && !entry.analytes.includes(row['Nama Analit'])) {
+        entry.analytes.push(row['Nama Analit']);
+      }
+      if (row['LOINC (OBX-3)']) {
+        entry.loinc_codes.add(row['LOINC (OBX-3)']);
+      }
+    });
+
+    const patientCatalog = [];
+
+    testMap.forEach((val, examName) => {
+      const isFasting = /glukosa|lipid|kolesterol|trigliserida|asam urat/i.test(examName);
+      const isUrinalysis = /urin|urine/i.test(examName);
+      const sampleType = isUrinalysis ? 'Urin Pagi Porsi Tengah (Clean-Catch Midstream)' : 'Darah Vena Steril (Tabung Vakum)';
+
+      patientCatalog.push({
+        kode_material: val.material_code,
+        nama_pemeriksaan: examName,
+        judul_panduan: `Panduan Pasien: ${examName}`,
+        penjelasan_awam: `Pemeriksaan ${examName} adalah tes laboratorium yang mengukur parameter ${val.analytes.slice(0, 4).join(', ')}${val.analytes.length > 4 ? ' dan parameter terkait lainnya' : ''} untuk mengevaluasi fungsi fisiologis tubuh.`,
+        tujuan_klinis: `Membantu dokter mengevaluasi kondisi kesehatan secara menyeluruh, skrining dini kelainan metabolisme atau organ, serta memantau efektivitas pengobatan.`,
+        persiapan_sebelum_tes: [
+          isFasting ? 'Wajib berpuasa 10–12 jam sebelum pengambilan sampel (hanya boleh minum air putih netral).' : 'Tidak diwajibkan puasa khusus kecuali diinstruksikan oleh dokter pengirim.',
+          'Hindari konsumsi alkohol, merokok, dan latihan fisik berat minimal 24 jam sebelum tes.',
+          'Beri tahu petugas laboratorium mengenai obat rutin atau suplemen yang sedang dikonsumsi.'
+        ],
+        jenis_spesimen: sampleType,
+        waktu_selesai_standar: '2–4 Jam Kerja',
+        loinc_references: Array.from(val.loinc_codes),
+        tags: [examName.toLowerCase(), 'edukasi-pasien', 'laboratorium-klinik', 'iso-15189']
+      });
+    });
+
+    return {
+      generated_at: new Date().toISOString(),
+      total_examinations: patientCatalog.length,
+      catalog: patientCatalog
+    };
+  }
+
+  /**
+   * Generasi Kalender Editorial Konten Otoritas LinkedIn (4 Minggu)
+   * @returns {string} Konten Kalender Markdown LinkedIn
+   */
+  generateLinkedInEditorialCalendar() {
+    let md = `# KALENDER EDITORIAL OTORITAS LINKEDIN (AKSELERATOR LAB)\n\n`;
+    md += `Diproduksi otomatis untuk membangun otoritas B2B klinik & laboratorium klinik.\n\n`;
+
+    const weeks = [
+      {
+        week: 'Minggu 1: Fondasi Mutu & Interoperabilitas LIS',
+        topic: 'LIS Tanpa Standar LOINC (OBX-3) & UCUM (OBX-6)',
+        hook: '🚨 Mengapa 80% Faskes Kesulitan Saat Diminta Mengirimkan Data Laboratorium ke Platform Interoperabilitas Nasional?',
+        cta: 'Konsultasi Katalog Siap-LIS'
+      },
+      {
+        week: 'Minggu 2: Audit Trail & Regulasi ISO 15189:2022',
+        topic: 'Salah Kutip Standar Akreditasi pada Dokumen Mutu',
+        hook: '⚠️ Banyak Lab Klinik Masih Mengutip Standar Akreditasi Rumah Sakit (KMK 1128/2022) pada SOP Internal Mereka.',
+        cta: 'Audit Gap Analysis Dokumen SMM'
+      },
+      {
+        week: 'Minggu 3: Tata Kelola Pra-Analitik & Kriteria Penolakan',
+        topic: 'Biaya Tersembunyi dari Penolakan Sampel Hemolisis & Lipemik',
+        hook: '🩸 70% Kesalahan Hasil Laboratorium Terjadi di Meja Flebotomi, Bukan di Mesin Analyzer.',
+        cta: 'SOP Flebotomi & Order of Draw Standar CLSI'
+      },
+      {
+        week: 'Minggu 4: Manajemen Nilai Kritis & Keselamatan Pasien',
+        topic: 'Waktu Tanggap Pelaporan Nilai Kritis < 15 Menit',
+        hook: '⏱️ Berapa Menit Waktu yang Dibutuhkan Lab Anda dari Pembacaan Glukosa 35 mg/dL Hingga Diterima Dokter Jaga?',
+        cta: 'Sistem Alert Nilai Kritis Berbasis LIS'
+      }
+    ];
+
+    weeks.forEach((w, idx) => {
+      md += `### 📅 ${w.week}\n`;
+      md += `- **Topik Utama:** ${w.topic}\n`;
+      md += `- **Hook Pembuka:** *${w.hook}*\n`;
+      md += `- **Inti Edukasi:** Menyajikan data komparatif operasional, klausul ISO 15189 terkait, dan solusi teknis terukur.\n`;
+      md += `- **Call To Action:** *${w.cta}*\n\n`;
+      md += `---\n\n`;
+    });
+
+    return md;
+  }
 }
 
 module.exports = { ContentPipeline };
+

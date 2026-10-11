@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "results": [
+    "save acknowledgement has id and revision",
+    "foreign/null tenant fallback rejected",
+    "authorized list and direct write denied",
+    "read and status tenant isolation",
+    "viewer denied read and command",
+    "synced persisted with timestamp",
+    "stale result denied and failure persisted",
+    "drift and audit persist, invalid status rejected",
+    "create retry idempotent and duplicate cannot overwrite",
+    "edit retry idempotent and stale edit rejected",
+    "invalid domain and missing fields rejected on server"
+  ],
+  "cleanup": "database closed in finally"
+}

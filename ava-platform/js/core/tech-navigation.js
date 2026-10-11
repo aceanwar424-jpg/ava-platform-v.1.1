@@ -3,8 +3,8 @@
   const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const enabled = () => /^(tech|console)\./.test(location.hostname) || new URLSearchParams(location.search).get('app') === 'tech';
   let dirty=false;
-  function canLeave(){if(!enabled()||!dirty)return true;if(!confirm('Perubahan belum disimpan. Tinggalkan halaman ini?'))return false;dirty=false;return true;}
-  window.addEventListener('beforeunload',e=>{if(enabled()&&dirty){e.preventDefault();e.returnValue='';}});
+  function canLeave(){if(!enabled())return true;if(window.TechPages?.isSaving()){window.toast?.('Sedang menyimpan. Tunggu hasilnya sebelum berpindah halaman.','info');return false;}if(!dirty)return true;if(!confirm('Perubahan belum disimpan. Tinggalkan halaman ini?'))return false;dirty=false;return true;}
+  window.addEventListener('beforeunload',e=>{if(enabled()&&(dirty||window.TechPages?.isSaving())){e.preventDefault();e.returnValue='';}});
   const groups = () => window.navigationMenuGroups || [];
 
   /* ── Default icon map for group areas ────────────────────────── */
