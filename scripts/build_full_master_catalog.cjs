@@ -227,7 +227,7 @@ function buildFullCatalog() {
                 'LOINC (OBX-3)': loincCode,
                 'UCUM (OBX-6)': formatUcum(rr.unit, ucomUnit),
                 'Sumber Acuan': resolvedDefaults.ref,
-                'Status Verifikasi Acuan': 'VERIFIED',
+                'Status Verifikasi Acuan': 'UNVERIFIED_GENERATED',
                 'Catatan Klinis': `Evaluasi parameter analitik ${cleanItemName} pada panel ${p.nama_singkat || p.nama_tes}.`
               });
             }
@@ -250,7 +250,7 @@ function buildFullCatalog() {
               'LOINC (OBX-3)': loincCode,
               'UCUM (OBX-6)': ucomUnit,
               'Sumber Acuan': resolvedDefaults.ref,
-              'Status Verifikasi Acuan': 'VERIFIED',
+              'Status Verifikasi Acuan': 'UNVERIFIED_GENERATED',
               'Catatan Klinis': `Pemeriksaan laboratorium ${cleanItemName} untuk diagnosis klinis.`
             });
           }
@@ -284,8 +284,8 @@ function buildFullCatalog() {
           'LOINC (OBX-3)': resolvedDefaults.loinc,
           'UCUM (OBX-6)': resolvedDefaults.uom,
           'Sumber Acuan': resolvedDefaults.ref,
-          'Status Verifikasi Acuan': 'VERIFIED',
-          'Catatan Klinis': `Penetapan analit kuantitatif ${analyteName} mengacu pada panduan baku ISO 15189.`
+          'Status Verifikasi Acuan': 'UNVERIFIED_GENERATED',
+          'Catatan Klinis': `Pemetaan/rentang otomatis ${analyteName}; wajib review klinis dari acuan/IFU yang sesuai sebelum digunakan.`
         });
       }
     }
@@ -356,7 +356,7 @@ function buildFullCatalog() {
   }
 
   console.log('\n═══════════════════════════════════════════════════════════════');
-  console.log('🎉 MASTER TEST CATALOG GENERIK SIAP-LIS BERHASIL DIBANGUN & TERVALIDASI!');
+  console.log('🎉 KATALOG REVIEW DIBANGUN; VALIDASI STRUKTUR TIDAK MENJADI VERIFIKASI KLINIS.');
   console.log('═══════════════════════════════════════════════════════════════');
 }
 

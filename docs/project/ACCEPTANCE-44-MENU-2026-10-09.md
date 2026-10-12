@@ -16,7 +16,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-bed-reservation | inpatient_beds + 0071/73 | alur booking/admisi/pindah/pulang terintegrasi episode; race native lulus |
 | rs-housekeeping | work orders + source bed | checklist riil/turnaround, pengaitan PPI dan indikator |
 | rs-nurse-station | episode/form/work orders | handover, flowsheet, MAR sumber farmasi, tugas dan eskalasi |
-| rs-discharge | checklist source + inpatient discharge | obat/penjamin/tagihan/status keluar end-to-end terintegrasi |
+| rs-discharge | 0092–0104: keputusan signed→rekonsiliasi obat→source resume/housekeeping→invoice/jurnal→episode closure | seluruh jalur legacy/cutover, penjamin/exception/clinical amendment dan pengaitan unit lain belum acceptance penuh |
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
 | rs-inpatient-billing | inpatient_charges + 0082–85; invoice/jurnal sumber; cashier deposit/refund/application dan direct payment/refund, saldo dan review sumber | kontrak/eligibility penjamin, pembagian manfaat payer/patient dan settlement penjamin; belum acceptance penuh |
 | rs-capacity | kapasitas bed + resources | BOR/ALOS/TOI/BTO historis dari interval sah, cutover dan denominator |
@@ -26,7 +26,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-diet | tugas gizi | asesmen diet, order kitchen, produksi/distribusi/retur, alergi dan stok |
 | rs-transfusion | quality work orders; patient issue diblokir | komponen individual, uji/crossmatch profesional, reservation/issue/reaction/return |
 | rs-ppi | work orders | surveillance sumber, denominator/version, HAIs/isolasi/CAPA |
-| rs-ward-pharmacy | source pharmacy berbeda | adapter pharmacy_drugs/ledger, resep/verifikasi/dispense/MAR/retur/reconcile |
+| rs-ward-pharmacy | 0092–0104: source pharmacy/ledger, Rx/verifikasi/FEFO/billing, MAR, custody/controlled register; SQL/browser/race aktual | master obat/ownership alergi legacy, formulary lifecycle/valuasi dan penerimaan unit terpadu masih terbuka |
 | rs-transport | source work orders | request berbasis pasien/unit, dispatch/receive, resource/safety/turnaround |
 | rs-resource-booking | 0077 SQL7/UI5; race native | pengaitan unit klinis dan actual legacy source penuh |
 | rs-shared-stock | 0078 SQL8/UI6; race native | adapters pharmacy/component/set; pengaitan transaksi unit end-to-end |
