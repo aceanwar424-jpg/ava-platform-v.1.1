@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "version": "1.0.0",
+  "version": "1.1-review-20261012",
   "title": "Matriks Batas Nilai Kritis (Critical / Panic Values) Laboratorium Klinik",
   "source_standard": "Konsensus Perhimpunan Dokter Spesialis Patologi Klinik (PDS PatKLIn) & ISO 15189:2022 Klausul 7.4.1.6",
   "owned_by": "generic",
@@ -11,8 +11,8 @@
       "analyte_name": "Glukosa Darah Dewasa",
       "loinc": "2345-7",
       "ucum": "mg/dL",
-      "panic_low": 45.0,
-      "panic_high": 450.0,
+      "panic_low": 45,
+      "panic_high": 450,
       "clinical_risk": "Hipoglikemia berat (risiko koma/kejang) atau Krisis Hiperglikemia / KAD",
       "action_required": "Laporkan segera ke DPJP/Perawat Ruangan < 15 menit, verifikasi gejala klinis"
     },
@@ -20,8 +20,8 @@
       "analyte_name": "Glukosa Darah Neonatus",
       "loinc": "2345-7",
       "ucum": "mg/dL",
-      "panic_low": 30.0,
-      "panic_high": 300.0,
+      "panic_low": 30,
+      "panic_high": 300,
       "clinical_risk": "Hipoglikemia neonatal berat (risiko kerusakan otak permanen)",
       "action_required": "Laporkan cito ke dokter spesialis anak / NICU < 15 menit"
     },
@@ -38,8 +38,8 @@
       "analyte_name": "Natrium Serum (Na+)",
       "loinc": "2951-2",
       "ucum": "mmol/L",
-      "panic_low": 120.0,
-      "panic_high": 160.0,
+      "panic_low": 120,
+      "panic_high": 160,
       "clinical_risk": "Edema serebri, herniasi unkus, ensefalopati metabolik",
       "action_required": "Laporkan DPJP, verifikasi status cairan dan infus pasien"
     },
@@ -48,7 +48,7 @@
       "loinc": "17861-6",
       "ucum": "mg/dL",
       "panic_low": 6.5,
-      "panic_high": 13.0,
+      "panic_high": 13,
       "clinical_risk": "Tetani laringeal, krisis hiperkalsemia, koma",
       "action_required": "Laporkan segera, periksa kadar albumin untuk koreksi kalsium"
     },
@@ -56,8 +56,8 @@
       "analyte_name": "Hemoglobin Dewasa (Hb)",
       "loinc": "718-7",
       "ucum": "g/dL",
-      "panic_low": 7.0,
-      "panic_high": 20.0,
+      "panic_low": 7,
+      "panic_high": 20,
       "clinical_risk": "Syok anoksik, dekompensasi kordis atau hiperviskositas berat",
       "action_required": "Konfirmasi ke dokter pengirim untuk persiapan transfusi PRC / phlebotomy terapeutik"
     },
@@ -65,8 +65,8 @@
       "analyte_name": "Trombosit (Platelet Count)",
       "loinc": "777-3",
       "ucum": "10*3/uL",
-      "panic_low": 20.0,
-      "panic_high": 1000.0,
+      "panic_low": 20,
+      "panic_high": 1000,
       "clinical_risk": "Perdarahan spontan intrakranial atau trombosis mikrovaskular",
       "action_required": "Periksa apusan darah tepi untuk menyingkirkan pseudotrombositopenia / clumping"
     },
@@ -74,8 +74,8 @@
       "analyte_name": "Leukosit (WBC Count)",
       "loinc": "6690-2",
       "ucum": "10*3/uL",
-      "panic_low": 2.0,
-      "panic_high": 50.0,
+      "panic_low": 2,
+      "panic_high": 50,
       "clinical_risk": "Agranulositosis berat (sepsis neutropenik) atau reaksi leukemoid / krisis leukemia",
       "action_required": "Evaluasi apusan darah tepi segera oleh analis & konfirmasi Sp.PK"
     },
@@ -84,7 +84,7 @@
       "loinc": "6301-6",
       "ucum": "{INR}",
       "panic_low": null,
-      "panic_high": 5.0,
+      "panic_high": 5,
       "clinical_risk": "Koagulopati fatal, perdarahan internal mayor",
       "action_required": "Laporkan segera, tanyakan riwayat terapi antikoagulan (warfarin)"
     },
@@ -101,8 +101,8 @@
       "analyte_name": "pH Darah Arteri (BGA)",
       "loinc": "2744-1",
       "ucum": "[pH]",
-      "panic_low": 7.20,
-      "panic_high": 7.60,
+      "panic_low": 7.2,
+      "panic_high": 7.6,
       "clinical_risk": "Asidosis / alkalosis metabolik/respiratorik mengancam jiwa",
       "action_required": "Laporkan segera ke ICU/IGD, periksa PaCO2 dan HCO3"
     },
@@ -111,9 +111,12 @@
       "loinc": "2524-7",
       "ucum": "mmol/L",
       "panic_low": null,
-      "panic_high": 4.0,
+      "panic_high": 4,
       "clinical_risk": "Syok septik, hipoperfusi jaringan berat, asidosis laktat",
       "action_required": "Laporkan segera sesuai protokol bundles syok sepsis Kemenkes"
     }
-  ]
+  ],
+  "verification_state": "UNVERIFIED_SOURCE",
+  "clinical_use": false,
+  "review_note": "Historical candidate thresholds and SLA only. Source editions/methods, critical criteria, escalation and reporting deadline must be reviewed and configured by tenant professionals before activation. Neither the source_standard string nor ISO clause label verifies the numeric limits."
 }

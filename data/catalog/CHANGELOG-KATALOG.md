@@ -1,36 +1,16 @@
-# Changelog & Riwayat Versi Master Test Catalog
+# Changelog Master Test Catalog
 
-> **Format Versi:** `vMAJOR.MINOR.PATCH-YYYYMMDD`  
-> **Status:** Siap-LIS / Siap Lisensi B2B • Terverifikasi ISO 15189:2022 & HL7/FHIR
+OWNED_BY: generic. Versi katalog review berbeda dari pengesahan klinis metode tenant. Tidak ada klaim sertifikasi ISO dari generator.
 
----
+## 2.0 — 12 Oktober 2026
+- Pemilik menyetujui reuse source dan penambahan analit/mapping tanpa mengubah Kode Material/Nama Pemeriksaan existing; referensi metode/IFU disahkan profesional saat setup tenant.
+- Generator membaca seluruh delapan bagian seed; perbaikan bug bagian 2 yang sebelumnya terlewat memulihkan 8 komponen CBC dan 14 komponen full CBC. 682 definisi komponen source, 4 master tanpa definisi, 686 record review. Placeholder composite masih diberi warning, bukan disebut analit individual selesai.
+- Seluruh 633 baris lama dipertanggungjawabkan melalui digest/disposition, 532 pasangan kunci existing tetap utuh. Kode analit AN deterministik dan tabel mapping source ditambahkan.
+- Hapus mapping/rentang fallback kategori dan klaim VERIFIED otomatis. Rentang numerik generik kosong sampai pengesahan metode, bukan nol atau batas hasil perkiraan.
+- 415 lookup primer pada https://clinicaltables.nlm.nih.gov/apidoc/loinc/v3/doc.html; 363 ditemukan/52 tidak dikembalikan. Lookup merupakan verifikasi keberadaan istilah, bukan matching analit atau pengesahan range. URL/tanggal akses/digest dan ketidaktersediaan distribution version dicatat. Lisensi/atribusi: https://loinc.org/license dan LOINC_short_license.txt.
+- 1.774 reference source dipisahkan sebagai review-only; 722 mempunyai kedua batas null dan 81 analit mempunyai conflicting source ranges. Tidak mengubah null menjadi 0/100 atau memilih satu konflik tanpa review.
+- 0105 menyediakan setup metode tenant berversi, maker/checker klinis berprivilege, activation/retirement dan ekspor source dengan bukti/reviewer/expiry/digest. Tidak menimpa global master/ref_ranges.
+- UI dummy hardcoded, false download alert dan penilaian siap berdasarkan isi range saja diganti workflow sumber. CSV/TSV/XLS generic konsisten dan clinical import pending diblokir.
 
-## [v1.0.0-20261010] — 10 Oktober 2026
-
-### 📌 Ringkasan Rilis
-- Ekstraksi dan restrukturisasi lengkap dari 532 produk pemeriksaan klinis menjadi **633 baris analit individual**.
-- Pemisahan mutlak seluruh data harga privat AVA; hanya dataset acuan klinis generik netral yang disertakan (`OWNED_BY: generic`).
-- Validasi kepatuhan 100% terhadap aturan integritas relasional data (§4.3 di `AGENTS.md`).
-
-### ✨ Fitur & Format yang Didukung
-1. **Pemisahan Kolom Rentang Rujukan**:
-   - Kolom `Operator`, `Batas Bawah`, `Batas Atas`, `Jenis Nilai`, `Kelompok Usia`, dan `Jenis Kelamin` terpisah secara atomik untuk integrasi LIS/SIMRS tanpa pembersihan manual.
-2. **Interoperabilitas Standar Internasional**:
-   - Pemetaan **LOINC = OBX-3** pada seluruh analit kuantitatif & kualitatif.
-   - Pemetaan **UCUM = OBX-6** untuk satuan ukur baku internasional (ISO/IEEE/HL7).
-3. **Ekspor Multi-Format**:
-   - `catalog_generic.csv` (146.3 KB)
-   - `catalog_generic.tsv` (146.3 KB)
-   - `catalog_generic.xls` (563.0 KB - Excel Spreadsheet XML resmi)
-   - `catalog_hl7_spec_sample.md` (Spesifikasi integrasi LIS/FHIR)
-
-### 📚 Hierarki Sumber Acuan Klinis (§4.2)
-1. **Pedoman Nasional**: KMK No. HK.01.07/MENKES/1983/2022 (Standar Akreditasi Lab Klinik).
-2. **Pedoman Klinis Internasional**:
-   - American Diabetes Association (ADA 2024) untuk Glukosa & HbA1c.
-   - National Kidney Foundation / KDIGO untuk Estimasi LFG & Kreatinin.
-   - NCEP ATP III untuk Profil Lipid (Kolesterol, Trigliserida, HDL, LDL).
-3. **Standar Konsensus Konsorsium**:
-   - CLSI H20 & C28-A3 untuk batas rujukan hematologi dan kimia klinis.
-4. **IFU Kit Reagen**:
-   - Petunjuk penggunaan kit reagen analitis sebagai standar operasional spesifik alat/metode.
+## 1.0 — 10 Oktober 2026 (histori klaim ditarik)
+Generator terdahulu menghasilkan 633 baris dari 532 pemeriksaan dengan fallback kategori/angka dan label VERIFIED otomatis. Kelulusan struktural waktu itu tidak membuktikan range, LOINC, pemecahan panel atau kesiapan klinis. Klaim siap lisensi/terverifikasi ISO pada changelog terdahulu ditarik. Pada 12 Oktober status awal dikoreksi menjadi UNVERIFIED_GENERATED sebelum rekonstruksi 2.0. Nilai/kunci original tetap terlacak dari histori Git dan baseline digest.

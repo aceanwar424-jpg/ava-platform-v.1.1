@@ -1,0 +1,1059 @@
+{
+  "owned_by": "generic",
+  "validator": "NLM @lhncbc/ucum-lhc 7.1.9",
+  "note": "Validation only; no patient-value conversions or clinical reference defaults.",
+  "units": [
+    {
+      "code": "%",
+      "validation": {
+        "ucumCode": "%",
+        "unit": {
+          "code": "%",
+          "name": "",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "/[HPF]",
+      "validation": {
+        "ucumCode": "/[HPF]",
+        "unit": {
+          "code": "/[HPF]",
+          "name": "per high power field",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "/uL",
+      "validation": {
+        "ucumCode": "/uL",
+        "unit": {
+          "code": "/uL",
+          "name": "per microliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "1",
+      "validation": {
+        "ucumCode": "1",
+        "unit": {
+          "code": 1,
+          "name": 1,
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "10*3/uL",
+      "validation": {
+        "ucumCode": "10*3/uL",
+        "unit": {
+          "code": "10*3/uL",
+          "name": "thousand per microliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "10*6/uL",
+      "validation": {
+        "ucumCode": "10*6/uL",
+        "unit": {
+          "code": "10*6/uL",
+          "name": "million per microliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "10*9/L",
+      "validation": {
+        "ucumCode": "10*9/L",
+        "unit": {
+          "code": "10*9/L",
+          "name": "billion per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "Cel",
+      "validation": {
+        "ucumCode": "Cel",
+        "unit": {
+          "code": "Cel",
+          "name": "degree Celsius",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "U/L",
+      "validation": {
+        "ucumCode": "U/L",
+        "unit": {
+          "code": "U/L",
+          "name": "enzyme unit per liter",
+          "guidance": "1 U is the standard enzyme unit which equals 1 micromole substrate catalyzed per minute (1 umol/min)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "U/g{Hb}",
+      "validation": {
+        "ucumCode": "U/g{Hb}",
+        "unit": {
+          "code": "U/g{Hb}",
+          "name": "[enzyme unit]/gram",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "U/mL",
+      "validation": {
+        "ucumCode": "U/mL",
+        "unit": {
+          "code": "U/mL",
+          "name": "enzyme unit per milliliter",
+          "guidance": "1 U is the standard enzyme unit which equals 1 micromole substrate catalyzed per minute (1 umol/min)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[IU]/L",
+      "validation": {
+        "ucumCode": "[IU]/L",
+        "unit": {
+          "code": "[IU]/L",
+          "name": "international unit per liter",
+          "guidance": "International units (IU) are analyte and reference specimen  specific arbitrary units (held at WHO)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[IU]/mL",
+      "validation": {
+        "ucumCode": "[IU]/mL",
+        "unit": {
+          "code": "[IU]/mL",
+          "name": "international unit per milliliter",
+          "guidance": "International units (IU) are analyte and reference specimen  specific arbitrary units (held at WHO)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[arb'U]",
+      "validation": {
+        "ucumCode": "[arb'U]",
+        "unit": {
+          "code": "[arb'U]",
+          "name": "arbitary unit",
+          "guidance": "relative unit of measurement to show the ratio of test measurement to reference measurement"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[arb'U]/L",
+      "validation": {
+        "ucumCode": "[arb'U]/L",
+        "unit": {
+          "code": "[arb'U]/L",
+          "name": "[arbitary unit]/Liters",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[arb'U]/mL",
+      "validation": {
+        "ucumCode": "[arb'U]/mL",
+        "unit": {
+          "code": "[arb'U]/mL",
+          "name": "arbitrary unit per milliliter",
+          "guidance": "relative unit of measurement to show the ratio of test measurement to reference measurement"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "[pH]",
+      "validation": {
+        "ucumCode": "[pH]",
+        "unit": {
+          "code": "[pH]",
+          "name": "pH",
+          "guidance": "Log concentration of H+"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "fL",
+      "validation": {
+        "ucumCode": "fL",
+        "unit": {
+          "code": "fL",
+          "name": "femtoliter",
+          "guidance": "equal to 10^-15 liters"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "g/(24.h)",
+      "validation": {
+        "ucumCode": "g/(24.h)",
+        "unit": {
+          "code": "g/(24.h)",
+          "name": "gram per 24 hour",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "g/L",
+      "validation": {
+        "ucumCode": "g/L",
+        "unit": {
+          "code": "g/L",
+          "name": "gram per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "g/dL",
+      "validation": {
+        "ucumCode": "g/dL",
+        "unit": {
+          "code": "g/dL",
+          "name": "gram per deciliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "kU/L",
+      "validation": {
+        "ucumCode": "kU/L",
+        "unit": {
+          "code": "kU/L",
+          "name": "kilo enzyme unit per liter",
+          "guidance": "1 U is the standard enzyme unit which equals 1 micromole substrate catalyzed per minute (1 umol/min); 1 kU = 1 mmol/min"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "k[IU]/mL",
+      "validation": {
+        "ucumCode": "k[IU]/mL",
+        "unit": {
+          "code": "k[IU]/mL",
+          "name": "kilo international unit per milliliter",
+          "guidance": "IgE has an WHO reference standard so IgE allergen testing can be reported as k[IU]/mL"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "k[arb'U]/L",
+      "validation": {
+        "ucumCode": "k[arb'U]/L",
+        "unit": {
+          "code": "k[arb'U]/L",
+          "name": "[kiloarbitary unit]/Liters",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "kg/m2",
+      "validation": {
+        "ucumCode": "kg/m2",
+        "unit": {
+          "code": "kg/m2",
+          "name": "kilogram per square meter",
+          "guidance": "units for body mass index (BMI)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mL",
+      "validation": {
+        "ucumCode": "mL",
+        "unit": {
+          "code": "mL",
+          "name": "milliliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mL/min",
+      "validation": {
+        "ucumCode": "mL/min",
+        "unit": {
+          "code": "mL/min",
+          "name": "milliliter per minute",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mL/min/{1.73_m2}",
+      "validation": {
+        "ucumCode": "mL/min/{1.73_m2}",
+        "unit": {
+          "code": "(mL/min)/({1.73_m2})",
+          "name": "[milliliter/minute]/[{1.73_m2}]",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "m[IU]/L",
+      "validation": {
+        "ucumCode": "m[IU]/L",
+        "unit": {
+          "code": "m[IU]/L",
+          "name": "milli international unit per liter",
+          "guidance": "International units (IU) are analyte and reference specimen  specific arbitrary units (held at WHO)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "m[IU]/mL",
+      "validation": {
+        "ucumCode": "m[IU]/mL",
+        "unit": {
+          "code": "m[IU]/mL",
+          "name": "milli  international unit per milliliter",
+          "guidance": "International units (IU) are analyte and reference specimen  specific arbitrary units (held at WHO)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mg/(24.h)",
+      "validation": {
+        "ucumCode": "mg/(24.h)",
+        "unit": {
+          "code": "mg/(24.h)",
+          "name": "milligram per 24 hour",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mg/L",
+      "validation": {
+        "ucumCode": "mg/L",
+        "unit": {
+          "code": "mg/L",
+          "name": "milligram per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mg/dL",
+      "validation": {
+        "ucumCode": "mg/dL",
+        "unit": {
+          "code": "mg/dL",
+          "name": "milligram per deciliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mg/g{creat}",
+      "validation": {
+        "ucumCode": "mg/g{creat}",
+        "unit": {
+          "code": "mg/g{creat}",
+          "name": "milligram/gram",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mg{FEU}/L",
+      "validation": {
+        "ucumCode": "mg{FEU}/L",
+        "unit": {
+          "code": "mg{FEU}/L",
+          "name": "milligram/Liters",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "min",
+      "validation": {
+        "ucumCode": "min",
+        "unit": {
+          "code": "min",
+          "name": "minute",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mm",
+      "validation": {
+        "ucumCode": "mm",
+        "unit": {
+          "code": "mm",
+          "name": "millimeter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mm/h",
+      "validation": {
+        "ucumCode": "mm/h",
+        "unit": {
+          "code": "mm/h",
+          "name": "millimeter per hour",
+          "guidance": "unit to measure sedimentation rate"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mm[Hg]",
+      "validation": {
+        "ucumCode": "mm[Hg]",
+        "unit": {
+          "code": "mm[Hg]",
+          "name": "millimeter of mercury",
+          "guidance": "1 mm[Hg] = 1 torr; unit to measure blood pressure"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mmol/(24.h)",
+      "validation": {
+        "ucumCode": "mmol/(24.h)",
+        "unit": {
+          "code": "mmol/(24.h)",
+          "name": "millimole per 24 hour",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mmol/L",
+      "validation": {
+        "ucumCode": "mmol/L",
+        "unit": {
+          "code": "mmol/L",
+          "name": "millimole per liter",
+          "guidance": "unit for tests related to doses"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mol/L",
+      "validation": {
+        "ucumCode": "mol/L",
+        "unit": {
+          "code": "mol/L",
+          "name": "mole per liter",
+          "guidance": "unit often used in tests measuring oxygen content"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "mosm/kg",
+      "validation": {
+        "ucumCode": "mosm/kg",
+        "unit": {
+          "code": "mosm/kg",
+          "name": "milliosmole per kilogram",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ms",
+      "validation": {
+        "ucumCode": "ms",
+        "unit": {
+          "code": "ms",
+          "name": "millisecond",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ng/(mL.h)",
+      "validation": {
+        "ucumCode": "ng/(mL.h)",
+        "unit": {
+          "code": "ng/(mL.h)",
+          "name": "nanogram/[milliliter*hour]",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ng/L",
+      "validation": {
+        "ucumCode": "ng/L",
+        "unit": {
+          "code": "ng/L",
+          "name": "nanogram per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ng/dL",
+      "validation": {
+        "ucumCode": "ng/dL",
+        "unit": {
+          "code": "ng/dL",
+          "name": "nanogram per deciliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ng/mL",
+      "validation": {
+        "ucumCode": "ng/mL",
+        "unit": {
+          "code": "ng/mL",
+          "name": "nanogram per millliiter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ng{FEU}/mL",
+      "validation": {
+        "ucumCode": "ng{FEU}/mL",
+        "unit": {
+          "code": "ng{FEU}/mL",
+          "name": "nanogram/milliliter",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "nmol/L",
+      "validation": {
+        "ucumCode": "nmol/L",
+        "unit": {
+          "code": "nmol/L",
+          "name": "nanomole per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "pg",
+      "validation": {
+        "ucumCode": "pg",
+        "unit": {
+          "code": "pg",
+          "name": "picogram",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "pg/mL",
+      "validation": {
+        "ucumCode": "pg/mL",
+        "unit": {
+          "code": "pg/mL",
+          "name": "picogram per milliliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "pmol/L",
+      "validation": {
+        "ucumCode": "pmol/L",
+        "unit": {
+          "code": "pmol/L",
+          "name": "picomole per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "s",
+      "validation": {
+        "ucumCode": "s",
+        "unit": {
+          "code": "s",
+          "name": "second - time",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "u[IU]/mL",
+      "validation": {
+        "ucumCode": "u[IU]/mL",
+        "unit": {
+          "code": "u[IU]/mL",
+          "name": "micro international unit per milliliter",
+          "guidance": "International units (IU) are analyte and reference specimen  specific arbitrary units (held at WHO)"
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/(24.h)",
+      "validation": {
+        "ucumCode": "ug/(24.h)",
+        "unit": {
+          "code": "ug/(24.h)",
+          "name": "microgram per 24 hour",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/L",
+      "validation": {
+        "ucumCode": "ug/L",
+        "unit": {
+          "code": "ug/L",
+          "name": "microgram per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/dL",
+      "validation": {
+        "ucumCode": "ug/dL",
+        "unit": {
+          "code": "ug/dL",
+          "name": "microgram per deciliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/g",
+      "validation": {
+        "ucumCode": "ug/g",
+        "unit": {
+          "code": "ug/g",
+          "name": "microgram per gram",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/mL",
+      "validation": {
+        "ucumCode": "ug/mL",
+        "unit": {
+          "code": "ug/mL",
+          "name": "microgram per milliliter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "ug/mg{creat}",
+      "validation": {
+        "ucumCode": "ug/mg{creat}",
+        "unit": {
+          "code": "ug/mg{creat}",
+          "name": "microgram/milligram",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "umol/L",
+      "validation": {
+        "ucumCode": "umol/L",
+        "unit": {
+          "code": "umol/L",
+          "name": "micromole per liter",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{INR}",
+      "validation": {
+        "ucumCode": "{INR}",
+        "unit": {
+          "code": "{INR}",
+          "name": "{INR}",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{Log_IU}/mL",
+      "validation": {
+        "ucumCode": "{Log_IU}/mL",
+        "unit": {
+          "code": "{Log_IU}/mL",
+          "name": "{Log_IU}/milliliter",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{Spec_grav}",
+      "validation": {
+        "ucumCode": "{Spec_grav}",
+        "unit": {
+          "code": "{Spec_grav}",
+          "name": "{Spec_grav}",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{beats}/min",
+      "validation": {
+        "ucumCode": "{beats}/min",
+        "unit": {
+          "code": "{beats}/min",
+          "name": "{beats}/minute",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{copies}/mL",
+      "validation": {
+        "ucumCode": "{copies}/mL",
+        "unit": {
+          "code": "{copies}/mL",
+          "name": "{copies}/milliliter",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{counts}/min",
+      "validation": {
+        "ucumCode": "{counts}/min",
+        "unit": {
+          "code": "{counts}/min",
+          "name": "{counts}/minute",
+          "guidance": ""
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{ratio}",
+      "validation": {
+        "ucumCode": "{ratio}",
+        "unit": {
+          "code": "{ratio}",
+          "name": "{ratio}",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    },
+    {
+      "code": "{titer}",
+      "validation": {
+        "ucumCode": "{titer}",
+        "unit": {
+          "code": "{titer}",
+          "name": "{titer}",
+          "guidance": null
+        },
+        "status": "valid",
+        "msg": [],
+        "validator": "NLM @lhncbc/ucum-lhc",
+        "validator_version": "7.1.9"
+      }
+    }
+  ],
+  "source_sha256": "e8b8f2fce93b05e0d34310b454486b6a83ceee5c70853641ae9c5e12bd9c76b8",
+  "license": "UCUM_LHC_LICENSE.md"
+}

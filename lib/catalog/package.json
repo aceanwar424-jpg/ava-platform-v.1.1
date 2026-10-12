@@ -1,0 +1,9 @@
+{
+  "name": "generic-catalog-validation-tools",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Deterministic standards validation, no clinical inference or unit conversion",
+  "dependencies": {
+    "@lhncbc/ucum-lhc": "7.1.9"
+  }
+}

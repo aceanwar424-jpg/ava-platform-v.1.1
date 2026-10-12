@@ -1,0 +1,3174 @@
+{
+  "owned_by": "generic",
+  "version": "1.0-20261012",
+  "source_sha256": "03f493785509e6f60a692bab1b5ddc3635823f5d37d8e7d7d1d2474f58a82c60",
+  "source_rows": 633,
+  "note": "Immutable join-key and original row digests only. Legacy generated clinical values retained in Git history, never imported as approved ranges.",
+  "rows": [
+    {
+      "Kode Material": "ODL1001-RGN-0001",
+      "Nama Pemeriksaan": "HITUNGAN DARAH LENGKAP (HB, HT, ER, LE, PLT, MCV, MCH, MCHC)",
+      "legacy_sha256": "cff193ba39a3a3b0992230888fc71b1dd8a78c79525f8f6b77b84f3b9abb7623"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0003",
+      "Nama Pemeriksaan": "PEMERIKSAAN DARAH LENGKAP (CBC + DIFF + LED)",
+      "legacy_sha256": "152ad03883db7885b539f73c0c7c9f8ec374686542b75794832b48b391f7f2d2"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0004",
+      "Nama Pemeriksaan": "JUMLAH RETIKULOSIT",
+      "legacy_sha256": "cebef18a8a8f65c371e876ecaeef9407fc10c23d3fd4a818520377008c05c2ef"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0005",
+      "Nama Pemeriksaan": "JUMLAH EOSINOFIL",
+      "legacy_sha256": "27522a96ddae63cec789d15e21b53947ec7b9115d1cee70ca6bb7bd02645ea73"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0006",
+      "Nama Pemeriksaan": "MORFOLOGI APUSAN DARAH",
+      "legacy_sha256": "8a75c95afe7f1021bda87364eabb1727d45f3a62e7644f02eb15f1efb231c1fa"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0007",
+      "Nama Pemeriksaan": "LED – LAJU SEDIMEN ERITROSIT (ESR)",
+      "legacy_sha256": "a9331cfd90f3a5e62fe9622d7fa5b95270ceff580b0aab8a7fc0246fdfda4bb2"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0008",
+      "Nama Pemeriksaan": "HEMOGLOBIN",
+      "legacy_sha256": "fc6ea1cd90cafd054db6b2c790845c1f575bb9b7c9deb208e24dab66cbf09d92"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0009",
+      "Nama Pemeriksaan": "IPF (FRAKSI PLATELET UMUM)",
+      "legacy_sha256": "af16e16425b808e7db8258bf544725533bfbc26dcb0a7106113d831c79ef5626"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0010",
+      "Nama Pemeriksaan": "LE CELL",
+      "legacy_sha256": "cc8fa8e40bc753d27171a0bcdb702e05fb86bdefa366ffe644c0e63621946722"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0011",
+      "Nama Pemeriksaan": "RESISTENSI OSMOTIK",
+      "legacy_sha256": "31fe8184c7f889a057bc00b30c2ca137045860e2bf49450c8e321394a0d74455"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0012",
+      "Nama Pemeriksaan": "RASIO TI",
+      "legacy_sha256": "9f35dc43592fefdf5432f314bdce4a48b2942e1f2862183338e09ae2f777a2f3"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0013",
+      "Nama Pemeriksaan": "BADAN INKLUSI HB H",
+      "legacy_sha256": "f23a09b9d7aff832e7d72d5cc387c91e81585a15ccb2eb7496bf6bf056de3e98"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0014",
+      "Nama Pemeriksaan": "LE REAKSI",
+      "legacy_sha256": "fe5e2f2b673ad6464003ad38a4ed814d7ca5f11aaad0e742a6f340c0d78d25cd"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0001",
+      "Nama Pemeriksaan": "MALARIA",
+      "legacy_sha256": "7656b8f325a7b03f5d99108c19a8e4d3ade832215a1d620ba22c8d765e61f287"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0002",
+      "Nama Pemeriksaan": "MALARIA CEPAT (ICT)",
+      "legacy_sha256": "0ab8af2bb0c7e7011192417867dab49224c7c764847eb106f488e45ecbc18001"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0003",
+      "Nama Pemeriksaan": "MIKROFILARIA",
+      "legacy_sha256": "06ffb3b1c4437972d66ef3abe872cd61df029b07498e335fee6a9c009350cd8d"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0004",
+      "Nama Pemeriksaan": "GOLONGAN DARAH & RHESUS",
+      "legacy_sha256": "f311dcee927e2ff7568d3846a4a9403abe96938c1dc46c5a06bc2ea06b1570f0"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0005",
+      "Nama Pemeriksaan": "TES COOMBS",
+      "legacy_sha256": "3e36611bf3d8f43cded29d92c80e1e72200e826316f7c1d523da0dc357fdd0e0"
+    },
+    {
+      "Kode Material": "ODL1001-SPI-0006",
+      "Nama Pemeriksaan": "ANTIKOAGULAN LUPUS",
+      "legacy_sha256": "33faae60e1a1ff0b37cecb308db64f13d0ed8d240118f538141fc68132765bc2"
+    },
+    {
+      "Kode Material": "ODL1001-THL-0001",
+      "Nama Pemeriksaan": "SKRINING G6PD (NEONATUS)",
+      "legacy_sha256": "142949d9fdeed882e6a805962bf86ec9546c0b0e54aff9af6fa96fac2d349860"
+    },
+    {
+      "Kode Material": "ODL1001-THL-0002",
+      "Nama Pemeriksaan": "G6PD (ERITROSIT) KUANTITATIF",
+      "legacy_sha256": "822382972c0a1fa873b56cb496fec4b8bc0990f4253b50b2d3904a1687ba867d"
+    },
+    {
+      "Kode Material": "ODL1001-THL-0003",
+      "Nama Pemeriksaan": "ELEKTROFORESIS HB / ANALISIS HB",
+      "legacy_sha256": "cb6cbeb71d3cbd97ee354b09b0385b71097390c993c6ce67d1326e20530fbc39"
+    },
+    {
+      "Kode Material": "ODL1001-THL-0004",
+      "Nama Pemeriksaan": "SKRINING PANEL TALASEMIA (FBC, GDT, HB EF, SI-TIBC, FERRITIN)",
+      "legacy_sha256": "652dc0a7d8e17fb3e9a0b6a24924b2041d5da06a976f68830b19096d84500c01"
+    },
+    {
+      "Kode Material": "ODL1001-THL-0005",
+      "Nama Pemeriksaan": "ERITROPOIETIN",
+      "legacy_sha256": "57c5a8b8ac224e1d78783e4b112f295b3597e92694893b5d1e35d954578a51bf"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0001",
+      "Nama Pemeriksaan": "WAKTU BERDARAH (BT)",
+      "legacy_sha256": "45b8b0a6e68c6eea399834bacb196ec4f25b00ba8553f7c32f84da94e8eb3b3e"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0002",
+      "Nama Pemeriksaan": "WAKTU PEMBEKUAN (CT)",
+      "legacy_sha256": "fa24f2bcf4d0b923a46bc6ac9d4a57312a269b65ff4371aadca27960145ee78b"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0003",
+      "Nama Pemeriksaan": "WAKTU PROTROMBIN (PT)-INR",
+      "legacy_sha256": "c2a8fe9d9af70c366a93031259cdb90c8be120fc75aae9cb48180b2e02719fdd"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0004",
+      "Nama Pemeriksaan": "WAKTU TROMBOPLASTIN PARSIAL TERAKTIFKAN (APTT)",
+      "legacy_sha256": "0f9ffe984b361f679e41f5ef528b0288f99804c4d9b79f05262f935358607469"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0005",
+      "Nama Pemeriksaan": "WAKTU TROMBIN (TT)",
+      "legacy_sha256": "4db148f8a756416c447529d4c05d98192bfdf0d5c7f233c80ad654ce2c08c8e5"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0006",
+      "Nama Pemeriksaan": "WAKTU TROMBIN SERIAL (STT)",
+      "legacy_sha256": "d5c94de27c058d73f6c3b240f5854452ddb1a36e89bb349795378d0c127e4d31"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0007",
+      "Nama Pemeriksaan": "TES AGREGASI TROMBOSIT TAT",
+      "legacy_sha256": "60c2cf8902a9fe274faf80ad3a3c251fa0fe80a3dc5a71c9c1ecb6f274ebea5d"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0008",
+      "Nama Pemeriksaan": "DI III",
+      "legacy_sha256": "071b55c46edf01709e54eb72eb5fff0a9e9d0525d127d00dbe46abd4a37b334a"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0009",
+      "Nama Pemeriksaan": "ANTI HA",
+      "legacy_sha256": "8201ad7d5d625efe4e910d0845874ef833eecfd61e08f50e27bf68c224aff0aa"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0010",
+      "Nama Pemeriksaan": "UJI FAKTOR VII",
+      "legacy_sha256": "d9519d86c6b5acbaee53d08cefd29c0d4c8be09fd4ffaa7e0bc6278e81af6cb5"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0011",
+      "Nama Pemeriksaan": "INHIBITOR FAKTOR VIII",
+      "legacy_sha256": "e76826766e90ad3fccc85c79cd25b8aeff7b56a4764215f1252c1947bb164e84"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0012",
+      "Nama Pemeriksaan": "UJI FAKTOR IX",
+      "legacy_sha256": "bf9ecd88d9fcb1375c5f3d523de94eb8627c609cbb411eb9cd407abd1ae1e358"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0013",
+      "Nama Pemeriksaan": "PROTEIN C",
+      "legacy_sha256": "6653d6bbfae5767b1b3c0efb6b4d6e57524975466e809e8df4011606ef59e55b"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0014",
+      "Nama Pemeriksaan": "PROTEIN S",
+      "legacy_sha256": "e53968d8b80b2b7f4950c3884b347f0d9d13055d7b74f37b7a0c143fda891c10"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0015",
+      "Nama Pemeriksaan": "FAKTOR VON WILLEBRAND",
+      "legacy_sha256": "8c48cd4f3eed05acf2e5db2a7a7baed224bbf201b808d55cbc9a301a963344e4"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0016",
+      "Nama Pemeriksaan": "FIBRINOGEN",
+      "legacy_sha256": "c20a5d2eb44d0de72a6ec5ab427a20ae8fa71e23400264e4afe582bfeeb51384"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0017",
+      "Nama Pemeriksaan": "D-DIMER",
+      "legacy_sha256": "261f5d3a30a4e74a4cbe805ae82144a202f66be88b21532c4a9d9703295ce581"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0018",
+      "Nama Pemeriksaan": "VISCOSITAS DARAH",
+      "legacy_sha256": "a9dc486502f2a984f0a321ba9fb7ff14e9214f7ca19dd2b62051be5fb25aa134"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0019",
+      "Nama Pemeriksaan": "VISCOSITAS PLASMA",
+      "legacy_sha256": "af4f1da5e903be07abacc11a8b34ed6576d33d3119d49e41207d68af9e5d3619"
+    },
+    {
+      "Kode Material": "ODL1001-COA-0020",
+      "Nama Pemeriksaan": "INHIBITOR AKTIVATOR PLASMINOGEN (PAI)",
+      "legacy_sha256": "8de4c27e0338cd80a99c0225f25ed871a34e6392aa2a82607ac64b83f1d70128"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0001",
+      "Nama Pemeriksaan": "LIMFOSIT T PEMBANTU (CD4)",
+      "legacy_sha256": "209b5c9cc6f7a6632916105f835fd57a60d77685a6e8e18f06c3f61a6e3b0c8b"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0002",
+      "Nama Pemeriksaan": "SUPPRESOR LIMFOSIT T (CD8)",
+      "legacy_sha256": "ac7aea2fb07c8ee8da6179d414f73262124f11353de3f3ad4b13a133e5628668"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0003",
+      "Nama Pemeriksaan": "SUBSET LIMFOIT",
+      "legacy_sha256": "fb64c22bea466a59799d008f06bffdf74613bd0d65e894f34669b9bf692a5f8c"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0004",
+      "Nama Pemeriksaan": "MORFOLOGI BMP",
+      "legacy_sha256": "eb8d09236115a03f1726e31e0fcfc90f8eb98b33c53517ff1a091dd6f2fd5434"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0005",
+      "Nama Pemeriksaan": "FENOTIPE LEUKEMIA",
+      "legacy_sha256": "c4e3dedde7e2465bd9f297cdac0e6e4bddee7e1b4ab6cdc080a1291f6ef30f97"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0006",
+      "Nama Pemeriksaan": "ANTIBODI TROMBOSITU (ANTIBODI TROMBOSIT)",
+      "legacy_sha256": "5bc59d7ac7b2d5276e58bdf6fb0aa5facbb36d3802a63c4e52c55eb9fd05fa20"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0007",
+      "Nama Pemeriksaan": "SUDAN BLACK B (SBB)",
+      "legacy_sha256": "fe2973ed4c04002398868a5fc425ad727c1011869fc2a25d27283af29827e068"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0008",
+      "Nama Pemeriksaan": "CD4-CD8",
+      "legacy_sha256": "f05e48073d10e2fa74420d9afcd7ea4b3ddc8276dd1680ff7bed2499f507241a"
+    },
+    {
+      "Kode Material": "ODL1001-ONC-0009",
+      "Nama Pemeriksaan": "PENYAKIT RESIDUAL MINIMAL (MRD)",
+      "legacy_sha256": "ab3ee2e15fdccc4aab62cef2d4c0a0caa5558e9fd3a2d442978beb3f0b986e33"
+    },
+    {
+      "Kode Material": "ODL1001-PLT-0001",
+      "Nama Pemeriksaan": "TES P2Y12",
+      "legacy_sha256": "3565b7808e0421db4e49bcf0c0795cb484e0bbc36094f4567f1501fbd83bb309"
+    },
+    {
+      "Kode Material": "ODL1001-PLT-0002",
+      "Nama Pemeriksaan": "TES ASPIRIN",
+      "legacy_sha256": "650762d878c0fff9ffc0326ec6d67d08f03bcedf16709381a868f65cad18e24b"
+    },
+    {
+      "Kode Material": "ODL1001-CMO-0001",
+      "Nama Pemeriksaan": "ANALISIS KROMOSOM (CAIRAN AMNIOTIK)",
+      "legacy_sha256": "5ef18e1844011118a4470779634471fe940b2a23411d031df4de2de8df96cc87"
+    },
+    {
+      "Kode Material": "ODL1001-CMO-0002",
+      "Nama Pemeriksaan": "ANALISIS KROMOSOM (DARAH)",
+      "legacy_sha256": "a96edb5b86c5cae49a5da340a90928f73b66371d56a86fdc2d4ba86e9e8672fe"
+    },
+    {
+      "Kode Material": "ODL1001-CMO-0003",
+      "Nama Pemeriksaan": "ANALISIS TES KEPATENAN (DARAH)",
+      "legacy_sha256": "2cd1ac22d999785eaf6c7251bee6c9027f9f29c69c5c2c35b970c17fe7b408c5"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0001",
+      "Nama Pemeriksaan": "TOTAL BILIRUBIN",
+      "legacy_sha256": "5ce1a8bbddc36b48706e0ce562e32013904adee741be715752f8015c03db44e7"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0002",
+      "Nama Pemeriksaan": "BILIRUBIN LANGSUNG",
+      "legacy_sha256": "b9bdc6b754b7a35f0f65be9fa2921582b60065f7149e63e087bdc7eeb3caa194"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0003",
+      "Nama Pemeriksaan": "BILIRUBIN TOTAL DIREK INDIREK",
+      "legacy_sha256": "d1f3a095485b8503df01fd944f84225a347b6e0efdc129a51b55fbacf01d896a"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0004",
+      "Nama Pemeriksaan": "SGOT / AST",
+      "legacy_sha256": "2cd96cb6743ce5c82fb623ab44774cdd866b26d4b5222cc8ae2315b543105f4d"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0005",
+      "Nama Pemeriksaan": "SGPT / ALT",
+      "legacy_sha256": "806c3bdd4fa586ea3e30d16cd8939352a0e5e8581b13b3d054740a215adb15eb"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0006",
+      "Nama Pemeriksaan": "FOSFATASE ALKALIN",
+      "legacy_sha256": "a0063e4eca7696439aefed20cb602ac6488eed3fe88cdab01e774a3276c28636"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0007",
+      "Nama Pemeriksaan": "GAMMA GT (GGT)",
+      "legacy_sha256": "dfcab5dff23a2e0dd5ee3eb639a50fe1cfde18c226dd0b316ba80987a5b7c613"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0008",
+      "Nama Pemeriksaan": "ALBUMIN",
+      "legacy_sha256": "9d6446d9bb4d38cb9c24433017de687edf9664af4ba2eeec615edb00bfa812e0"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0009",
+      "Nama Pemeriksaan": "PROTEIN TOTAL",
+      "legacy_sha256": "2a47dc0e6d279409c6118b98d3d0aa4d2a2e25dfe7405eaabebbed5e6fe16aff"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0010",
+      "Nama Pemeriksaan": "GLOBULIN",
+      "legacy_sha256": "a36564333748aea3d0754190571e87c04457b82694133787ac938cd32c0ec288"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0011",
+      "Nama Pemeriksaan": "KOLINESTERASE (CHE)",
+      "legacy_sha256": "ee36f9662efea37356b68a5ab599a22b71867fc57cfd1221b089f45028575d4b"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0012",
+      "Nama Pemeriksaan": "ASAM EMPEDU",
+      "legacy_sha256": "0da4f6a0c2f48e2cc28e00f11e44f04f3bcf7701596ab2419b2a7e99e6d788c2"
+    },
+    {
+      "Kode Material": "ODL1002-LVR-0013",
+      "Nama Pemeriksaan": "ELEKTROFORESIS PROTEIN",
+      "legacy_sha256": "79a0d1c41d5ef11bace73ec68a03b77a7ba8dffb9cbe43f38e9300d5e3212b45"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0001",
+      "Nama Pemeriksaan": "CK",
+      "legacy_sha256": "4df1cc8fe60f67512bfbf61a1edcc8ab06bf8e3da25e720390eee95c6c1fdaa3"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0002",
+      "Nama Pemeriksaan": "CK-MB",
+      "legacy_sha256": "1f3a35346fee9362de4d45ec2b0f27a6fdccb27b21daf6af81be7e94b4e6cec4"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0003",
+      "Nama Pemeriksaan": "LDH",
+      "legacy_sha256": "4a2ef7c516ba7730f9b8d7e22c01304ab66eb719fa85e62541d5982e64bdd3de"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0004",
+      "Nama Pemeriksaan": "TROPONIN T HS",
+      "legacy_sha256": "4e7da544b0bbdbba8c1b75a9ae66789aaae22e498f6b46e2d384ca8440f12c52"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0005",
+      "Nama Pemeriksaan": "TROPONIN I KUANTITATIF",
+      "legacy_sha256": "965d3a5cf9bcdb92f8d254f2b623ba348202b36283162ba29ddf57dcf3d08f61"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0006",
+      "Nama Pemeriksaan": "HOMOSISTEIN",
+      "legacy_sha256": "047479a2f28d330008a1483aa4f24c625bca6189c18edb0d65e5297d3218bd31"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0007",
+      "Nama Pemeriksaan": "NT-PROBNP",
+      "legacy_sha256": "804a501876fae41eeed4d3da090350dce1eb392b708802ee7f0c184c183d923a"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0008",
+      "Nama Pemeriksaan": "MIOGLOBIN",
+      "legacy_sha256": "439733979d66a8e8fe1205002d27cdfab6214fdc61948c6d387cf93b895f9003"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0009",
+      "Nama Pemeriksaan": "CRP SENSITIF TINGGI",
+      "legacy_sha256": "2b67f74d80f10a1fcc42adf3b6f52fd86c61637a205a5813898994f72f5d8b23"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0010",
+      "Nama Pemeriksaan": "TROPONIN I",
+      "legacy_sha256": "5ca9e173b169e1c65fb518fd558896644bf59c01632b9d7801c79a406185a74a"
+    },
+    {
+      "Kode Material": "ODL1002-HRT-0011",
+      "Nama Pemeriksaan": "TROPONIN T",
+      "legacy_sha256": "a85526331351be39b5122a0c5dee6f3791f4fb063ade45bdfa7892a3b846bbd5"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0001",
+      "Nama Pemeriksaan": "UREA",
+      "legacy_sha256": "9f819c969aa6c3ee962bcae0af082f3e301f6dd6cc564b705af5a89ce4f7d76e"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0002",
+      "Nama Pemeriksaan": "KREATININ",
+      "legacy_sha256": "03cd79e5e46386905b5fb46e97550a409ee9007a1fe2f8eaefbb535411a62ae3"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0003",
+      "Nama Pemeriksaan": "ASAM URAT",
+      "legacy_sha256": "6c4f5062c64c57ce35a32bd3156723a30c2f335d5cadeef98dfef5e311a1b8b7"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0004",
+      "Nama Pemeriksaan": "SISTATIN C",
+      "legacy_sha256": "7bd57d5f27d1bb281c2931dcd933a62a56156e307f9d794e05940b743a405ac4"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0005",
+      "Nama Pemeriksaan": "CREATININ CLEARENCE (CCT)",
+      "legacy_sha256": "cd646a5f915120ca9cc5500cddd6122d3d701152041a6f08acbdae0d6a7a5629"
+    },
+    {
+      "Kode Material": "ODL1002-RNL-0006",
+      "Nama Pemeriksaan": "KLIRISASI UREA (UCT)",
+      "legacy_sha256": "f963a51c0d6dabf69190f3d70f7fe7e312e081344e8b314e1e17d794a52a2340"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0001",
+      "Nama Pemeriksaan": "GLUKOSA IKLAN ACAK",
+      "legacy_sha256": "9137edb8f18828ef49b763666f13ae55a6f2bc0f45a685a7fbca409bee21ade4"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0002",
+      "Nama Pemeriksaan": "PUASA GLUKOSA",
+      "legacy_sha256": "75faedf97d9b6d735ea14333ad841e68b0cf2b15c323cb22c47767464d6dbbac"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0003",
+      "Nama Pemeriksaan": "KADAR GLUKOSA 2 JAM SETELAH MAKAN",
+      "legacy_sha256": "0e0fb59efdd7b2028ef5704e05a4abea065b59b527dce9b2a7ad432382bd8b15"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0004",
+      "Nama Pemeriksaan": "KURVA HARIAN GLUKOSA (GDC)",
+      "legacy_sha256": "07357fca1dec284b0fa8f727de078e97198bbdc474065e3cbbab8408200d34fe"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0005",
+      "Nama Pemeriksaan": "TES TOLERANSI GLUKOSA (GTT)",
+      "legacy_sha256": "eebedcc52a86ac189bb60c33ddcde8b9cfe7f5f35c6ef784ea9a652c07d5f2f1"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0006",
+      "Nama Pemeriksaan": "GLIKO HB (HBA1C)",
+      "legacy_sha256": "62bfd663669607411c70cb93af42904371295f153841974b12eb27cee15a8c08"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0007",
+      "Nama Pemeriksaan": "FRUKTOSAMIN",
+      "legacy_sha256": "8f28a217f0b8ea246f66ab06e3d40354759f5acd06894b399ea7b7b5319e2182"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0008",
+      "Nama Pemeriksaan": "ALBUMIN TERGLIKASI",
+      "legacy_sha256": "87527ac3a5db8786274cfeb0a1e390585c12d9e3883376eb2b948116b46b7752"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0009",
+      "Nama Pemeriksaan": "BLOOD KETON",
+      "legacy_sha256": "dba98ad3a13eea1ec561e7d4f4664c5a6a0e1779f1cb111086a6dbdb897d81ff"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0010",
+      "Nama Pemeriksaan": "GLUKOSA TOLERANSI TES 2X",
+      "legacy_sha256": "bc0924e794e8a4e92286d0494fcaae0a19336b7c34df25da45adc462f90f163c"
+    },
+    {
+      "Kode Material": "ODL1002-DBT-0011",
+      "Nama Pemeriksaan": "HOMA-IR",
+      "legacy_sha256": "18dfde91f0765535870afe27871cd7112f74bf5434f3ef74fbfb0a1626b35783"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0001",
+      "Nama Pemeriksaan": "AMILASE PANKREAS",
+      "legacy_sha256": "25ee6d2b2b83cf09cccc41214cd3603a02ba7e46a93cc08adf22f43fd636c086"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0002",
+      "Nama Pemeriksaan": "LIPASE",
+      "legacy_sha256": "c45060c6d98fd0cf1e423ce7e11b461fffcf5d4d6f7160bd5094e265434f9484"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0003",
+      "Nama Pemeriksaan": "INSULIN",
+      "legacy_sha256": "e1503521d32d896a05967aeb5bc944d5b25985d28de92dcca00495b6cbb67e83"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0004",
+      "Nama Pemeriksaan": "C-PEPTIDA",
+      "legacy_sha256": "ff5caa2868043573568113bb993860db7a031d16f749d130e1e05a31cf2d30f6"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0005",
+      "Nama Pemeriksaan": "INSULIN 2 JAM PP",
+      "legacy_sha256": "21a585492275923b7322303f8d523c6f4ed19a0f6d8a121be6a1f8156467dbd0"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0006",
+      "Nama Pemeriksaan": "INSULIN SEWAKTU",
+      "legacy_sha256": "bb2a375e46c69bcab21759ae7173bb697fe88ba75164fe75c2ecd7315da5acb1"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0007",
+      "Nama Pemeriksaan": "C-PEPTIDE SEWAKTU",
+      "legacy_sha256": "0f745ac31ef8c2a39094aeb3669b8c1c8efcca8cb7a52808169db7eb9d2fddf9"
+    },
+    {
+      "Kode Material": "ODL1002-PNC-0008",
+      "Nama Pemeriksaan": "C-PEPTIDE 2 JAM PP",
+      "legacy_sha256": "faa8dbd65778e26f61a01374e7ce356c0f745355d01c393233491f0e5e1dccfe"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0001",
+      "Nama Pemeriksaan": "TOTAL KOLESTEROL",
+      "legacy_sha256": "7881f623895dbba22b5ebead8f86a83d7eef7702cb4d47eed3570c49c7f43910"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0002",
+      "Nama Pemeriksaan": "LDL-KOLESTEROL LANGSUNG",
+      "legacy_sha256": "81499bbbac08642c295be73142e34d841e4b0d01bf17f6dae34b3d9422e59a50"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0003",
+      "Nama Pemeriksaan": "HDL-KOLESTEROL LANGSUNG",
+      "legacy_sha256": "59f2cf4187265277f92747a3dd37720255b9c6a06375cc37ac2a71910f5def71"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0004",
+      "Nama Pemeriksaan": "TRIGLISERIDA",
+      "legacy_sha256": "9ba9fa7bde5ea46232e4111bb584cb13a37fea210eff60283ee6f6226c65fe1e"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0005",
+      "Nama Pemeriksaan": "RASIO KOLESTEROL TOTAL / HDL",
+      "legacy_sha256": "2af553b28c44e478e116f3162abf0b1930866d325be30448ee382a0917f67a95"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0006",
+      "Nama Pemeriksaan": "TOTAL LIPID",
+      "legacy_sha256": "6578b4c53a9aa75e8dc61dfee1321ede3d907836fc544492b8f7db8cdef30beb"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0007",
+      "Nama Pemeriksaan": "APO-A",
+      "legacy_sha256": "44c15eb6c3ed3672938ec492dcaa74c3ae2638e49d17c23243cd9d87aa3427e7"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0008",
+      "Nama Pemeriksaan": "APO-B",
+      "legacy_sha256": "ddd8b6141bf750dfef1ec68bc068bb28975e930e2c0c69621100e0929b0e90fd"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0009",
+      "Nama Pemeriksaan": "LP (A)",
+      "legacy_sha256": "815c7e07ec6eb10edbfdce7c62f10777526c0ca7b8a3812bde60804dceb0481e"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0010",
+      "Nama Pemeriksaan": "LDL KECIL PADAT",
+      "legacy_sha256": "90e659e51ea7352e77f0b1dc57cff4bf8907d44454907fb1d859801a4ff96475"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0011",
+      "Nama Pemeriksaan": "ADIPONECTIN",
+      "legacy_sha256": "87bf69849c0e11699773e0508e5b118053ce7a9ae3acfc97dd996bdbcf7567d2"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0012",
+      "Nama Pemeriksaan": "VLDL",
+      "legacy_sha256": "b8831ee4c870e92110ef9120df74924b51d07ded2bb944faae0ee4d975eb3023"
+    },
+    {
+      "Kode Material": "ODL1002-PRL-0013",
+      "Nama Pemeriksaan": "ASAM LEMAK BEBAS",
+      "legacy_sha256": "573dc66866a429dbcc3171d0d49796c6902c97c27bfb7f40de4d9640ae643e53"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0001",
+      "Nama Pemeriksaan": "ANALISIS GAS DARAH",
+      "legacy_sha256": "29447448138b61489d47668140081732bd8a0f31f09ca14e36b2cff48d6e9f29"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0002",
+      "Nama Pemeriksaan": "PAKET ELEKTROLIT (NA, K, CL)",
+      "legacy_sha256": "ba20ed14dd37fe69089a7452e44aaec4b27a1a2c4f83b481392be784b73ce99b"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0003",
+      "Nama Pemeriksaan": "NATRIUM (NA)",
+      "legacy_sha256": "ca512a91c8f43047886540d086e618c4ce09b3f31de4befa8f3703aea5de9299"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0004",
+      "Nama Pemeriksaan": "KALIUM (K)",
+      "legacy_sha256": "52be9ed8abe2f71a716ecf2a60b56a6ef046969b7affb1594e7bd723f69aaee6"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0005",
+      "Nama Pemeriksaan": "KLORIDA (CL)",
+      "legacy_sha256": "554604ba92002f546d9b817b1d7cdb830b9b0eda94ed6b407b0b4b7218600b92"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0006",
+      "Nama Pemeriksaan": "KALSIUM TOTAL",
+      "legacy_sha256": "1daf9b37ad7a88cec1b26a3f939ec37bcafaeb2c6c7f29d42d38961042dc4c36"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0007",
+      "Nama Pemeriksaan": "ION KALSIUM",
+      "legacy_sha256": "53e04b840f5957a311337e59f759af376f840f44cbd6fb0be1dc1c63606f9833"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0008",
+      "Nama Pemeriksaan": "FOSFOR ANORGANIK",
+      "legacy_sha256": "57999397b0b2f47e521280b4b7653d29109c877af3e6c7bd8a3fc2992a0b6b08"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0009",
+      "Nama Pemeriksaan": "MAGNESIUM",
+      "legacy_sha256": "e36915b96202ac97acada75647f94606ae9ccbed88c684fab2efd8a37176186a"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0010",
+      "Nama Pemeriksaan": "OSMOLARITAS PLASMA",
+      "legacy_sha256": "fa1a89e7a727f358e6e10a75fa5b7303c9509c6428dee14d9752fddb5b9e291a"
+    },
+    {
+      "Kode Material": "ODL1002-ELC-0011",
+      "Nama Pemeriksaan": "BIKARBONAT",
+      "legacy_sha256": "78c7d8b3403a9502a2318acf483712b48a21355dd132a3009848d615de632174"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0001",
+      "Nama Pemeriksaan": "BIR II",
+      "legacy_sha256": "4404ca02c4285dc83296f08191d375175cd01dc5dabe849ec5bdb8417a5610b9"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0002",
+      "Nama Pemeriksaan": "ASAM LAKTAT",
+      "legacy_sha256": "30d3d2f498f8aa2f900edafa24100ea519d7716039c9a9daf4efb096c09a59b7"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0003",
+      "Nama Pemeriksaan": "AMONIA",
+      "legacy_sha256": "749952a64b156dd28c15f120d3f8ef37ae311949868e28849b7c58300dcbf148"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0004",
+      "Nama Pemeriksaan": "INTERLEUKIN 6 (IL6)",
+      "legacy_sha256": "f067676d2bd7f3f3056fdeb4386c5623fecfa91cb05de20b76723da8407a7a04"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0005",
+      "Nama Pemeriksaan": "SERUM BESI",
+      "legacy_sha256": "5294f57cc99a98c3599b5c9958da1eceb6bb68a41a215199f8a84392bc60fcad"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0006",
+      "Nama Pemeriksaan": "TIBC",
+      "legacy_sha256": "fafc88ab45a3ce4d66f44f800cb24410d4148dcf731b7cbb046747569890d008"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0007",
+      "Nama Pemeriksaan": "FERRITIN",
+      "legacy_sha256": "34a7f2ca2a326817d95e6d08c1c9c0b4ac95cb9fcb587ce53757b1890ec43af6"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0008",
+      "Nama Pemeriksaan": "TRANSFER",
+      "legacy_sha256": "95bf8f390f4a034fb6a35eb4e102add0ed005483c44b7e65c6327a67a8cb8047"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0009",
+      "Nama Pemeriksaan": "RANTAI LAMPU GRATIS",
+      "legacy_sha256": "f56486d1532a7986d0e6930b4d79c8c22d262a37f1f2e4a036082c68cc2885e7"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0010",
+      "Nama Pemeriksaan": "IMUNOFIKSASI DARAH",
+      "legacy_sha256": "40c93685f635f39098b5d0f837bbe7ba26cecfb43d9678ddc550ef9f4756aadb"
+    },
+    {
+      "Kode Material": "ODL1002-SPM-0011",
+      "Nama Pemeriksaan": "PERTANDINGAN YANG SUDAH DIREKAM",
+      "legacy_sha256": "8568e66f9284904d69fda6d9fc9a3b8ee128f63eaedaf15bc84a434980c98b0e"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0001",
+      "Nama Pemeriksaan": "AMIKACIN",
+      "legacy_sha256": "64583bd085931f0fee7a9d23fc97b9b3780fa3124eae0df6e31b5bbdf8a9e589"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0002",
+      "Nama Pemeriksaan": "KARBAZEPIN",
+      "legacy_sha256": "c81ac7129cdee7c18e7bfebb21ae525c4d165db1842b0c52c49620b07c250db6"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0003",
+      "Nama Pemeriksaan": "SIKLOSPORIN",
+      "legacy_sha256": "b756bcc62916c2711c532463a8c0a8da2d622ea1238934db68a16311a3988a4f"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0004",
+      "Nama Pemeriksaan": "DIGOKSIN",
+      "legacy_sha256": "044c0b3677595c0fce270c82e40555133936ad573c557714ac944d825f20c3ed"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0005",
+      "Nama Pemeriksaan": "FENITOIN",
+      "legacy_sha256": "0abd9de70b1803ba023192a994b0f10550659502177a837ac9b4eb99a9fc7547"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0006",
+      "Nama Pemeriksaan": "FENOBARBITAL",
+      "legacy_sha256": "072e64cd2eafd2a46bc8bc1730d43499e6c57cf43fed726cd62289a5f44cea8f"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0007",
+      "Nama Pemeriksaan": "ASAM VALPROAT",
+      "legacy_sha256": "5d3e32bfbae98566a921ff9d538f4c296cd8ae758a92d52c1f00e0810ca9a912"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0008",
+      "Nama Pemeriksaan": "TACROLYMUS",
+      "legacy_sha256": "4820430f415f2fe00b83f274c6fe69edc38a9821480fca03a589e375782d2208"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0009",
+      "Nama Pemeriksaan": "TEOFILIN",
+      "legacy_sha256": "5b3fac7c70174c4dcf530bbce5abd0c703c84c27efd0d8920806521385f537b0"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0010",
+      "Nama Pemeriksaan": "BARBITURAT",
+      "legacy_sha256": "bc36e3d99dca9b4a5a64523148728e51903831298817af751127be90ab1e82f2"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0011",
+      "Nama Pemeriksaan": "SIROLIMUS",
+      "legacy_sha256": "810daf70dfdd8f5b07eec8802e63c9fee4577a39511cadc672d0d8874a091309"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0012",
+      "Nama Pemeriksaan": "LEVETIRACETAM",
+      "legacy_sha256": "3e78e84aaef03d7d2da237bbacb28cb9181b5b672d071e1094b8ad8113756a54"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0013",
+      "Nama Pemeriksaan": "GANJA (GC/MS)",
+      "legacy_sha256": "a84b8c0238e92c500252edfebfbe06ba10f25b873714ac51cfd913be2311e379"
+    },
+    {
+      "Kode Material": "ODL1002-DRM-0014",
+      "Nama Pemeriksaan": "BENZODIAZEPIN ( GC/MS )",
+      "legacy_sha256": "0757a53916f686f517c93e1a96d45e455ec752a79d47982a0eb4d47ee16e1096"
+    },
+    {
+      "Kode Material": "ODL1010-PNL-0001",
+      "Nama Pemeriksaan": "13 JENIS PANEL LOGAM BERAT DAN MINERAL",
+      "legacy_sha256": "6ad1d64b218a4d50245514b9dab623f65b1b12744d3ebf03184fe070850e22c5"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0001",
+      "Nama Pemeriksaan": "ZN SENG",
+      "legacy_sha256": "8718d6204ab0f2a89264c400c1762ca719507073f40557dff68c7628486d93c8"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0002",
+      "Nama Pemeriksaan": "HG MERKURI",
+      "legacy_sha256": "c14b87ccb3ce2ca0e18ab4ee679112ce7f0a1706a4dbbb0ae647378c09ba8065"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0003",
+      "Nama Pemeriksaan": "DENGAN TEMBAGA",
+      "legacy_sha256": "3a77aa9c3bc462376f98b696ec08c2222e29bf1d30229884413f5d3c7530edb7"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0004",
+      "Nama Pemeriksaan": "PB PLUMBUM",
+      "legacy_sha256": "b402ed7f5815a20474f9f0e07571ad9116406620bbd3270be7bf41a0a6e9a76c"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0005",
+      "Nama Pemeriksaan": "AL ALUMUNIUM",
+      "legacy_sha256": "b9fcbe54f27ce95f401034b029422a13c8ce5348ccc2ad0f62e3b5c02e01afc4"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0006",
+      "Nama Pemeriksaan": "SEBAGAI ARSEN",
+      "legacy_sha256": "e2a55d2d34c88c63176262aa268040d2b323d339e264e2e78151bb61cc0253e5"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0007",
+      "Nama Pemeriksaan": "SE SELENIUM",
+      "legacy_sha256": "20df5d37d8d9d288ece1ae999eb0cfbac49b0ce6344d456b1011fc2c53f8cd8e"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0008",
+      "Nama Pemeriksaan": "MN EAT",
+      "legacy_sha256": "1ac6ffca5c459feb2c4cef59a5432ce51123c74ffa70139019da4e070af137b6"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0009",
+      "Nama Pemeriksaan": "CO COBALT",
+      "legacy_sha256": "31818f6bfa688c671f60f1de6ee319694be33fcc278bbcaca48db0d2f97f6c66"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0010",
+      "Nama Pemeriksaan": "CD KADMIUM",
+      "legacy_sha256": "1b3b1859eb80d7eef4c5a5a1b62dca0a34b480710da8db9f4f24d67a07e9c31d"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0011",
+      "Nama Pemeriksaan": "OLEH NICKEL",
+      "legacy_sha256": "6dba1d6803beea6b2fd8ff4904470601c83e4cfc04c08b90ee46f73948b97f87"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0012",
+      "Nama Pemeriksaan": "KROMIUM CR",
+      "legacy_sha256": "b119ba12b9ff8628317985ac0a41225eec186314fdd7c35e11fdb45f34dc803f"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0013",
+      "Nama Pemeriksaan": "MOLIBDENUM",
+      "legacy_sha256": "c550fab27df63cdfc430dc4d382c9d00ec517fc2e16d5da2872a760495a082a3"
+    },
+    {
+      "Kode Material": "ODL1010-HVY-0014",
+      "Nama Pemeriksaan": "NIKEL URIN",
+      "legacy_sha256": "3d81930de3429bc4af04fb5d750f85d137c0e62248bb68aa957f03498855c2b6"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0001",
+      "Nama Pemeriksaan": "VITAMIN A",
+      "legacy_sha256": "dd3258ddd9b980467650b16a863c1e2195def4e432dcc51b8838b2c38eed8cd6"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0002",
+      "Nama Pemeriksaan": "VITAMIN C",
+      "legacy_sha256": "330de2f9384f7f7576d65787ffaae3a8a8508f0cb44b1fa195d49d3646f70942"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0003",
+      "Nama Pemeriksaan": "VITAMIN K1 & K2",
+      "legacy_sha256": "779829f634d0e017a20133778a6c4b27f7871f06e803d1dcf0ceabb1acc1c943"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0004",
+      "Nama Pemeriksaan": "VITAMIN E",
+      "legacy_sha256": "aa6daac20275c7bcd6bcab5a7a5b376b60111321c53b8af3f33209ac3e5e5c3b"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0005",
+      "Nama Pemeriksaan": "VITAMIN B2",
+      "legacy_sha256": "7c43289991de4e16103ed5467f3a2b7ce40a9b7d7c1f2d3740446fb6fe200082"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0006",
+      "Nama Pemeriksaan": "VITAMIN B12",
+      "legacy_sha256": "a29012aaae69665f5b414612f4b1af8f8228312b40684a311d3bcecb7cf1dbe7"
+    },
+    {
+      "Kode Material": "ODL1010-VIT-0007",
+      "Nama Pemeriksaan": "ASAM FOLAT",
+      "legacy_sha256": "711e7f0a1494f57be87ba6d40535e1276224d1a58052351d01480d32874cde18"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0001",
+      "Nama Pemeriksaan": "BENZENA",
+      "legacy_sha256": "9c28f40369688d597890d3af26489980a181f5ca81af79451ae527518ebbada7"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0002",
+      "Nama Pemeriksaan": "XYLENE",
+      "legacy_sha256": "3ed777c5ee32ddad03e69106ab1a95c1ed6ce0643b6a78c8900dce3f2879cce7"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0003",
+      "Nama Pemeriksaan": "TOLUENA",
+      "legacy_sha256": "3207669a3ec36a7febf8ab6e2e1d8e06859a4f43054f2f6bc55bf883dace75a4"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0004",
+      "Nama Pemeriksaan": "HEKSANA",
+      "legacy_sha256": "59d3885ceb91cfe5e5ac9b7728bf8f40f8e2dc975c7377df4e13bbd78561d32e"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0005",
+      "Nama Pemeriksaan": "KADAR ALKOHOL DALAM DARAH",
+      "legacy_sha256": "ac8f5127f703580f83ce3f51e5a7e6a3852b2a0c77985fba4431e1bdfdef7925"
+    },
+    {
+      "Kode Material": "ODL1010-OSA-0006",
+      "Nama Pemeriksaan": "URIN ALKOHOL",
+      "legacy_sha256": "5a3d0c43be84683303c303dffe96325ded51674fbe511fed5c79e83fb5799123"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0001",
+      "Nama Pemeriksaan": "HBsAg KUALITATIF",
+      "legacy_sha256": "1ba740c870e1432bce4ae3cc2b535c2cdcd1eb5a09294b61a176ee48d0b9293f"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0002",
+      "Nama Pemeriksaan": "HBsAg KUANTITATIF",
+      "legacy_sha256": "5c81e7e2120c076aeaf6081db36d5ab5a02f3779c3f2ffe5b1d07d05ec0cf5b6"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0003",
+      "Nama Pemeriksaan": "KONFIRMATOR HBsAg",
+      "legacy_sha256": "0d349ad6e8eafa2d934842a79535b7044b474269487d8f1c2fa443f1a03f1a06"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0004",
+      "Nama Pemeriksaan": "ANTI HBs",
+      "legacy_sha256": "273830db6599f1c7eb1826789099b3be94ca2d5426e71d623628f2159a263c7d"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0005",
+      "Nama Pemeriksaan": "TOTAL ANTI HBc",
+      "legacy_sha256": "706dcb8be991cb2cd74673a280ac9359f4a8123010c7961c5bebf4755059c5dc"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0006",
+      "Nama Pemeriksaan": "Anti HBc IgM",
+      "legacy_sha256": "e9504b5a324947c0875dea00af271171be5819a1e974cbaba187d763b0681d12"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0007",
+      "Nama Pemeriksaan": "HBeAg",
+      "legacy_sha256": "aff87a1caa9723f28cfd807aa3bd71977bac7c3ca649891ac3ec9fcc73c28131"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0008",
+      "Nama Pemeriksaan": "ANTI-HBe",
+      "legacy_sha256": "03849d9261a5195a77baf83e1fdf0ac21a38eb71f80afb3d8307088876b8daff"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0009",
+      "Nama Pemeriksaan": "TOTAL ANTI HCV",
+      "legacy_sha256": "fbf9184c597595c95572aae1bc3520a0e05d350ecf1018540a8d9e625e7e9846"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0010",
+      "Nama Pemeriksaan": "Antibodi IgM HCV",
+      "legacy_sha256": "06264470e419d896c8d3b933413d97ba8b26066b45a5762352205e69ecf1db05"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0011",
+      "Nama Pemeriksaan": "ANTI HAV IgM",
+      "legacy_sha256": "8742cebfcf7b48a8bf9e1d3c05f35a31d1aee42caa608054b6ce05214efdf4ec"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0012",
+      "Nama Pemeriksaan": "ANTI HAV IgG",
+      "legacy_sha256": "d40e6490eb7d4b12ce7bf8a3ff7c2284a71d72993be961de9c6ca3913f99c30d"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0013",
+      "Nama Pemeriksaan": "ANTI HIV",
+      "legacy_sha256": "b73edec927183a6b77b52d5696f93ef30c577295e2f4e6a4db348cce7d3c1db1"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0014",
+      "Nama Pemeriksaan": "SKRINING ANTI HIV",
+      "legacy_sha256": "4f708d8720ae05153ffdf92f5889841ee021bd436079a807da960a92b8b03644"
+    },
+    {
+      "Kode Material": "ODL1004-HPT-0015",
+      "Nama Pemeriksaan": "KONFIRMASI ANTI HIV (WESTERN BLOT)",
+      "legacy_sha256": "1033386690c20cd2aad8d7450602ede82eb93c8bf5e4de641d4d8d7d8a3ef754"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0001",
+      "Nama Pemeriksaan": "ANTI DENGUE IgM-G",
+      "legacy_sha256": "1b7644cd71446d916b4abaefc25ecf4c48c6a082f820e9fbc29d9e53f74a94d4"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0002",
+      "Nama Pemeriksaan": "ANTIGEN DENGUE NS1",
+      "legacy_sha256": "d73ed586d70c24088de3bdb5dc7af97b994eb847f92fe708ea25aefef5c07a7b"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0003",
+      "Nama Pemeriksaan": "DEMAM DENGUE DUO ANTIGEN & ANTIBODI",
+      "legacy_sha256": "cd2f4b8c507d78a6787fe4c7a0b813fb1461bec0532e72ac5900667d3fc8d64c"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0004",
+      "Nama Pemeriksaan": "WIDAL",
+      "legacy_sha256": "07cd8dc0c7af99b47a004c74a1920a945611be903c1b39c4eb2b83d54a57eaf7"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0005",
+      "Nama Pemeriksaan": "IgM ANTI S. TYPHI",
+      "legacy_sha256": "193d6ac8d8db0af8ec4c505a12c3f56c9e3d57dd21fc955b0516dfe466973b60"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0006",
+      "Nama Pemeriksaan": "ANTI SALMONELLA TYPHI IGG",
+      "legacy_sha256": "3388a4831dbf9058cea6b295b57d6fe97f29af545f1bcdf683eba2859cbfe8d9"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0007",
+      "Nama Pemeriksaan": "ANTI SALMONELLA TUBEX",
+      "legacy_sha256": "63488ae089031169f2e990400e1a3e0821a7ff38673b5f41de5695dad58d9f00"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0008",
+      "Nama Pemeriksaan": "TPha",
+      "legacy_sha256": "c215c0edfea16bb74dd69613fe22337328dd3e0bc9359070ad87d2177efb148a"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0009",
+      "Nama Pemeriksaan": "VDRL / RPR",
+      "legacy_sha256": "a09b46a5c75e42a824205d3d285e3395d6cc91c8333fb80a20dd649369e95bd1"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0010",
+      "Nama Pemeriksaan": "LATEKS TREPONEMA PALLIDUM",
+      "legacy_sha256": "81432eeef1e30ce25d8d7e31afe8484fda5fbcb59425538242564543267a1836"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0011",
+      "Nama Pemeriksaan": "Antibodi IgG MIKOPLASMA",
+      "legacy_sha256": "f70807597e060e2f58ccf29bba5768e584c772b617fa20aedc3c25297e6e4b47"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0012",
+      "Nama Pemeriksaan": "IgM Anti-Mikoplasma",
+      "legacy_sha256": "3d12523c37c221b722ee8cccf8caa096d2f39a89c8c7dee39258ce0ad855ba6b"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0013",
+      "Nama Pemeriksaan": "Anti IgG Klamidia",
+      "legacy_sha256": "2d6d6c0eb147e94516eb98be9583deb10fd5bac19d7942fae48948911721c064"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0014",
+      "Nama Pemeriksaan": "IgM ANTI CHLAMYDIA",
+      "legacy_sha256": "3e0fc997d1a53dab0da407b26a71e2b50b6882f8f0faedeaf0a6100b3c53eb04"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0015",
+      "Nama Pemeriksaan": "CHLAMYDIA AG",
+      "legacy_sha256": "7810905e4e479e15b2d565b093a2140d7b2da7d50684454f0254358ef2ab832a"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0016",
+      "Nama Pemeriksaan": "ANTI H. PYLORI IGG",
+      "legacy_sha256": "7b32b5613dbb20c6cea3078147378d5ed81185cb0ec83096ed57f76697a3398e"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0017",
+      "Nama Pemeriksaan": "ANTI H. PYLORI IGM",
+      "legacy_sha256": "6fa88eb191b0ae08a98f0c4275194430b40fbf3979c7f6c9b17532e8b19d2c12"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0018",
+      "Nama Pemeriksaan": "TES NAPAS UREA (UBT)",
+      "legacy_sha256": "4adc49f6f83a72aa7f16ca341c4bb832cec249c9dfae6370cd77cd7cd3e44854"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0019",
+      "Nama Pemeriksaan": "IgG ANTI-MURAL",
+      "legacy_sha256": "d812eda36003bb3ec3340844a7a715a80828f45c15079501c6ccfcc2fe5fc0af"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0020",
+      "Nama Pemeriksaan": "ANTI CHIKUNGUNYA IGM",
+      "legacy_sha256": "a46f3e5a4de2613d028365b11b62c5c54faba496bfc74b34e443997edc40db1a"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0021",
+      "Nama Pemeriksaan": "SERAMOEBA",
+      "legacy_sha256": "cb29c8538f59ad33dc6609518177ba400b42188e63af3a8129be99fa7c9ac19e"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0022",
+      "Nama Pemeriksaan": "MONOTEST",
+      "legacy_sha256": "8276600d1dd3b9181a96899b4a1c0ebf8f737027bcd010b6f8d8eb008ea3548e"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0023",
+      "Nama Pemeriksaan": "PENYARINGAN INFLUENZA",
+      "legacy_sha256": "b178463a4dd7328585db8e455de64d60886ce3af6422e7a3d78056d984e9ec78"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0024",
+      "Nama Pemeriksaan": "EBV VIRAL CAPSID AG (VCA) AB IGM",
+      "legacy_sha256": "e7896134ac0f50d8ecd0e381ec966fc14416bceeb4a339d7cc4d1f0828fe6cc9"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0025",
+      "Nama Pemeriksaan": "VARICELLA ZOSTER IGG",
+      "legacy_sha256": "19886b653e56d3a6ee47ed41b948b4743641781a4d39f49e79447480de39ba22"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0026",
+      "Nama Pemeriksaan": "VARICELLA ZOSTER IGM",
+      "legacy_sha256": "05eff332ca7335b3cc4da1fa9461a9ad7e715ac1474c97b0ddd4869cc2e8389f"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0027",
+      "Nama Pemeriksaan": "ANTIBODI IGG CAMPAK",
+      "legacy_sha256": "a35a0c1be4e473b1fb22c2771cd6105950996269b5f82f3df8a2d685f3fcaa8c"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0028",
+      "Nama Pemeriksaan": "ANTIBODI IGM CAMPAK",
+      "legacy_sha256": "de116d55d48402364edd22c59aa193132cc2c80e37dd83580dadd6d7c69a1cf9"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0029",
+      "Nama Pemeriksaan": "ANTIBODI IGG GONDONG",
+      "legacy_sha256": "4734deb375b822c9981714ee9b57532ac0a7b9a876aca168ae72f94bbcfba047"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0030",
+      "Nama Pemeriksaan": "ANTIBODI IGM UNTUK GONDONGAN",
+      "legacy_sha256": "cdcc701f92ce120125b9466a333809517ce223591e9ed5be4153327a0adca8b2"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0031",
+      "Nama Pemeriksaan": "SEROLOGI JAMUR ASPERGILLUS",
+      "legacy_sha256": "c9f771570563741b712a5e1e0c3aadc0e4a174db24dd711c0a7b595342254fc0"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0032",
+      "Nama Pemeriksaan": "SEROLOGI JAMUR CRYTOCOCCUS",
+      "legacy_sha256": "bdb1fbead2209ca77d44664bb7fcc5a87634291e7efe8e0adaab8018698cd359"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0033",
+      "Nama Pemeriksaan": "ANTIGEN SARS COV-2 2019",
+      "legacy_sha256": "a5d45ae44055643e1fa55f27cf99bdcf053747cd5e5e7d8f2012dd635cc362f9"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0034",
+      "Nama Pemeriksaan": "ANTIBODI SARS COV- 2019 KUANTITATIF",
+      "legacy_sha256": "ef41194712f2530725cf60798c9a394f80b5da088839f8009b74af2b9a891f9f"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0035",
+      "Nama Pemeriksaan": "ANTI LEPTOSPIRA IGG",
+      "legacy_sha256": "5abd8aaf7baaa695e64438d170bbd2e67af0cf3044515aab85b055d3b2a29e2f"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0036",
+      "Nama Pemeriksaan": "ANTI LEPTOSPIRA IGM",
+      "legacy_sha256": "994f897849b916464d4cfff135e41ad466028404ba2f9f4eba035058006740c3"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0037",
+      "Nama Pemeriksaan": "GAME - T.SPOT TB",
+      "legacy_sha256": "db3233350d0d9b9e3caefa80b455b75981c40c7cc550f9e0b3d9dfbe8b69cb72"
+    },
+    {
+      "Kode Material": "ODL1004-INS-0038",
+      "Nama Pemeriksaan": "IGRA - QUANTIFERON",
+      "legacy_sha256": "7c5e9b5d231f40e03d4dbd98d8d8694688b89d418286074b450fe94be6973b09"
+    },
+    {
+      "Kode Material": "ODL1004-INF-0001",
+      "Nama Pemeriksaan": "CRP",
+      "legacy_sha256": "8e021ada227c3b658263ff7868bc7303230d3edad1a7497cb2fccf3fbd210e2f"
+    },
+    {
+      "Kode Material": "ODL1004-INF-0002",
+      "Nama Pemeriksaan": "PROKALSITONIN",
+      "legacy_sha256": "0c57e635407cd02d18bb113b8562b55afd4af04d1797ec43acd7f61c662d5761"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0001",
+      "Nama Pemeriksaan": "Anti Toxoplasma IgG",
+      "legacy_sha256": "e276d55ccc30ead1b01472a5e12a28c7dbc9459704a7c29cba405b7f7ffdb1c9"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0002",
+      "Nama Pemeriksaan": "Anti Toxoplasma IgM",
+      "legacy_sha256": "6d7a10fe5aba14f298652777f89894f1c284eaa5efb26111592d1a8d58bef138"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0003",
+      "Nama Pemeriksaan": "ANTI TOXOPLASMA IgG - AVIDITY",
+      "legacy_sha256": "12e8d494af1dafbe624da0762a3839f41db0c5866b857eae485009578e741c76"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0004",
+      "Nama Pemeriksaan": "Antibodi IgG anti rubella",
+      "legacy_sha256": "feb61416b3fa736601f4d9c66b14b66c77a5cc0a35bcfbe34b0c406ef8db9698"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0005",
+      "Nama Pemeriksaan": "IgM ANTI RUBELLA",
+      "legacy_sha256": "d1a796ec447220da5523b81c3a88e938dfd31e4c6f38e3c276e5623e19626989"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0006",
+      "Nama Pemeriksaan": "Anti CMV IgG",
+      "legacy_sha256": "793af9485a7b821929c8f679d2f352159c4b46b6f9eb801f8111e9c7f01e94d8"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0007",
+      "Nama Pemeriksaan": "Anti CMV IgM",
+      "legacy_sha256": "17481a65ee50dae8ec26249bf1df097b67c2bcbae24da38a3cf6df8036b681c8"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0008",
+      "Nama Pemeriksaan": "ANTI CMV IgG - AVIDITY",
+      "legacy_sha256": "8900ae960b27bd60cd5e3a9957c210d0eec327751f1967b7e0788e00d30aab2c"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0009",
+      "Nama Pemeriksaan": "Anti HSV I IgM",
+      "legacy_sha256": "6bdf61340d0cad200a57c728688c5f2aaeaa04a06c2c974bf2cd98373f914d44"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0010",
+      "Nama Pemeriksaan": "Antibodi IgG HSV I",
+      "legacy_sha256": "0be46532b99b654833f7bc30de0267279037a6c7c4e04e37c4faf84a476129b5"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0011",
+      "Nama Pemeriksaan": "Antibodi IgM Anti HSV II",
+      "legacy_sha256": "7553d212fb51e973e3690172579bdd89304475e1c12f3792cc5f77836887b4f4"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0012",
+      "Nama Pemeriksaan": "Antibodi IgG Anti HSV II",
+      "legacy_sha256": "9d1883964add93fe90cece2a028612b8fb229f8a523c9c905756ce1f1d29f808"
+    },
+    {
+      "Kode Material": "ODL1004-ITRC-0013",
+      "Nama Pemeriksaan": "Antibodi HSV-1/2 IGM",
+      "legacy_sha256": "c4063d83bce6f0500f184322ccb846800243dd8cec71a16d3bff98419674d3d6"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0001",
+      "Nama Pemeriksaan": "AFP",
+      "legacy_sha256": "3ecfff82b55214983d22831c126ddaf9f81306f45ffd944f9241f0964bb5f3e2"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0002",
+      "Nama Pemeriksaan": "CEA (USUS BESAR)",
+      "legacy_sha256": "1578c31e55e2400e2672064572fa97b91dd295f181af2e97407e06f380552806"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0003",
+      "Nama Pemeriksaan": "PSA (PROSTAT)",
+      "legacy_sha256": "c89a658bb427bd8598ee9f7c2627405c1b4677a0e8e52c42674eaf2b9c4e4c67"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0004",
+      "Nama Pemeriksaan": "PSA GRATIS + PSA TOTAL",
+      "legacy_sha256": "e8b1bfc234949a48f43e0f70259273b779ab1f2f2fe0b5d623e464bf1f6aa16c"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0005",
+      "Nama Pemeriksaan": "CA 125 (OVARIUM)",
+      "legacy_sha256": "a3a079ca6256063205f2b04529b1aced66ff14d0628cfe0a958661d59f2b886f"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0006",
+      "Nama Pemeriksaan": "CA 15-3 (PAYUDARA)",
+      "legacy_sha256": "f65b1e4e3d7f3fbf0b7551a69a50de37ce0d9faf7402c67e73ea4fe4f2fb6d3b"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0007",
+      "Nama Pemeriksaan": "CA 19-9 (PANKREAS)",
+      "legacy_sha256": "2415e2f8ed9716fe6dde29531176b738ed6e249d0f765d09c22452036f9eafa1"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0008",
+      "Nama Pemeriksaan": "CA 72-4 (GASTER)",
+      "legacy_sha256": "33e1f72e6176e4155b74945092dd1e4292e50dc99ba388ec6f121a978d6e87e6"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0009",
+      "Nama Pemeriksaan": "HUMAN EPIDIDIMIS 4 (HE4)",
+      "legacy_sha256": "fcd2edd440f290e478d75bbaac08219b9978be1ed3bb63e9c26343617b847f1d"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0010",
+      "Nama Pemeriksaan": "ROMA",
+      "legacy_sha256": "cb81787111b6f21143117c6ac12f79ddabd1fb0d2cfc5271ec71b1fe6d16d456"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0011",
+      "Nama Pemeriksaan": "MIKROGLOBULIN BETA-2",
+      "legacy_sha256": "c4731588ab76b8bbf059ee0738668784b5441dad2b4e071171b68c43a5f2b0a7"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0012",
+      "Nama Pemeriksaan": "NOMOR 21-1 (PARU-PARU)",
+      "legacy_sha256": "1c990cd3ff2d0dd738f61b151f3dba442cc40f802f5c649f50c364b130f107fc"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0013",
+      "Nama Pemeriksaan": "NSE (PARU-PARU)",
+      "legacy_sha256": "a7d7d86936eb1b48d2926cca1a37574645217e8eeb81ee38e297956bd899a645"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0014",
+      "Nama Pemeriksaan": "SCC (SERVIKS)",
+      "legacy_sha256": "4308a99b5528e4fe444fba3868132c10a265824ac73c5a65c94d402f68ce057f"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0015",
+      "Nama Pemeriksaan": "ASAM FOSFATASE (ACP)",
+      "legacy_sha256": "33163bbcc5adc0f26d21f6dc1c6154c78e85d67bc3f9623e11787d69ed23ac9a"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0016",
+      "Nama Pemeriksaan": "PROSTATIC ACID PHOSPHATASE (PAP)",
+      "legacy_sha256": "61baaafcf273c2dae65ccde45cb3997eeb5d31a6021ca2b6072f484a1ec5141b"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0017",
+      "Nama Pemeriksaan": "ANTI EBV EA IgA",
+      "legacy_sha256": "467ee25eff7d71eb5c4bdc0b56894f364b80126018312415edfcf88fab4bbfab"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0018",
+      "Nama Pemeriksaan": "Anti EBV VCA IgA",
+      "legacy_sha256": "9efb0f564293b99d432dd57c520e9c48a5a88a4f2042945bb2a4f62111ccafd1"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0019",
+      "Nama Pemeriksaan": "ANTI EBV EBNA IgA",
+      "legacy_sha256": "9fa76b0f938fec06659e2c9ee691cacd9842db7a06a0e0fbe9c999aa364c48b5"
+    },
+    {
+      "Kode Material": "ODL1004-ONC-0020",
+      "Nama Pemeriksaan": "INDEKS KESEHATAN PROSTAT (PHI)",
+      "legacy_sha256": "6021bd2177182f6332505c1429cc301bdcb85c2d5fb3fe286184ed00987040de"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0001",
+      "Nama Pemeriksaan": "ACA IgG",
+      "legacy_sha256": "7b2065b1cc1d1b15228c89ed2b0cbba66e8cabb1e49096665261a4d4a809c984"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0002",
+      "Nama Pemeriksaan": "ACA IgM",
+      "legacy_sha256": "1a38a497935239edad135b1b68b0756d410e02e1243d5af2507ce0a1f641f7be"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0003",
+      "Nama Pemeriksaan": "ANTI BETA2 GP1 IgM",
+      "legacy_sha256": "93b7682eb0b46e7e58fdd6f71038755ea9ba07c4b9e1000c78faaecc5e580c29"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0004",
+      "Nama Pemeriksaan": "ANTI BETA2 GP1 IgG",
+      "legacy_sha256": "1fb0e8fb6b5d7beb6ec85e9ebafc7df9cedbd0449085a87b7b37802be566ba7f"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0005",
+      "Nama Pemeriksaan": "ANA IgG (ELISA)",
+      "legacy_sha256": "0083fb2d193f96f0ec77981739d430bab357a51dac9e30b3398105adf8538ada"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0006",
+      "Nama Pemeriksaan": "ANA IF",
+      "legacy_sha256": "45a09cc86f564bef592eef40acd7e4e0ed402140c247430eee7908c438addb96"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0007",
+      "Nama Pemeriksaan": "PROFIL ANA",
+      "legacy_sha256": "5d81fe38ed46ed61f430fe325d22e979d2739a9431135fea56b6c28e4fda28e6"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0008",
+      "Nama Pemeriksaan": "ANTI ds-DNA NCx",
+      "legacy_sha256": "dc9d07b20e30d4135c2679fb3e00ed2ece8eaad2c440c839084f92cf854758ce"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0009",
+      "Nama Pemeriksaan": "ANTI OTOT POLOS (SMA)",
+      "legacy_sha256": "c224f7da5b320b981394541ffb8407c2818324b11fefab13620cbcf5b17ec6a1"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0010",
+      "Nama Pemeriksaan": "ANTIBODI MITOKONDRIAL (AMA)",
+      "legacy_sha256": "51e1eca6ce32afc3a0158319dc4404f75412b12f6c4e4af5453caa7ff4c6fe56"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0011",
+      "Nama Pemeriksaan": "AMA DAN ASMA JIKA",
+      "legacy_sha256": "22246c0c0ce53493b999d308370ee6520413e6344fd93e16d1c96ebd40595bcb"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0012",
+      "Nama Pemeriksaan": "ANCA IF",
+      "legacy_sha256": "58e6f45522aad94a8e83132f9b20d68c753664e7facf83d8a3bd1a91f7738764"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0013",
+      "Nama Pemeriksaan": "ANTI-PR3 AB",
+      "legacy_sha256": "d27d443a41bd18ccf5e4872f9312815bbc22bd67214be42a979aa7e1886fac2b"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0014",
+      "Nama Pemeriksaan": "ANTI-MPO AB",
+      "legacy_sha256": "30c7f7d1be9dd80beb08be15fec83546a65d0f7012a232488299362d54d35d35"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0015",
+      "Nama Pemeriksaan": "KUALITATIF RF",
+      "legacy_sha256": "139f058f27437391071cfec39f7694b5973922f25abce26a20779bb2e8513b54"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0016",
+      "Nama Pemeriksaan": "RF KUANTITATIF",
+      "legacy_sha256": "a360af6c67db1a020ae8871536bcabc9290ea3822d5db49a45a48b985a9cc1d5"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0017",
+      "Nama Pemeriksaan": "Anti CCP IgG",
+      "legacy_sha256": "6f53a42105cb4a0a19129731f17867f938a8c824dbe43438603335981bdc8182"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0018",
+      "Nama Pemeriksaan": "KUALITATIF ASTO",
+      "legacy_sha256": "c1a460aed398acea035cdea4fe0517dee83b8b3ac8f09713a0acf382f5848bcf"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0019",
+      "Nama Pemeriksaan": "ASTO KUANTITATIF",
+      "legacy_sha256": "a7c78d6b3c64c0c54b712ec6db8b63b43ed542fb196eb59185047c87c1d40aa1"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0019",
+      "Nama Pemeriksaan": "ASTO KUANTITATIF",
+      "legacy_sha256": "5b2b8d529be1e4b67723fa49eef34625a550cb58f38325e43c20c92f67f9d2a3"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0020",
+      "Nama Pemeriksaan": "ANTI GLUTAMIC ACID DECARBOXYLASE (ANTI - GAD)",
+      "legacy_sha256": "c3400c3212122e97e2b9af0d96ab5ba4c2e51755ab7d42e83e9301d14a6604e6"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0021",
+      "Nama Pemeriksaan": "TRANSGLUTAMINASE JARINGAN IGG",
+      "legacy_sha256": "cd1d7172fa97b2dc5f4f58dcfc8811f78835832572fcedd6dae86f665dac6d77"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0022",
+      "Nama Pemeriksaan": "USIA TRANSGLUTAMINASE JARINGAN",
+      "legacy_sha256": "157bb104e9cdc3460853e47b748006fc32231169f05e254814b87555f90d04f0"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0023",
+      "Nama Pemeriksaan": "ANTI GLIADIN IGA",
+      "legacy_sha256": "185ba3d11bd4e330e78a326702ba4448f01d6cafc89ec1a1eeb07358eb496590"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0024",
+      "Nama Pemeriksaan": "ANTI GLIADIN IGG",
+      "legacy_sha256": "94c7262bd00b73afff78f8e63904aa19e957a74303a9930483b333b0111be091"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0025",
+      "Nama Pemeriksaan": "ADA",
+      "legacy_sha256": "bb30aa222ef7e69f509dc9b4cba97272b22cc3f71146638e3554049c20ad7503"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0025",
+      "Nama Pemeriksaan": "ADA",
+      "legacy_sha256": "eb444ad75a93d7f374cc8f907f8543017f3aa12bae3f768f2c21879bc8382c0a"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0025",
+      "Nama Pemeriksaan": "ADA",
+      "legacy_sha256": "0d13d847bc3be3ce2c6d25a532e67c7e1ebd9a7e9e176c226eef605c41adef59"
+    },
+    {
+      "Kode Material": "ODL1004-AUT-0025",
+      "Nama Pemeriksaan": "ADA",
+      "legacy_sha256": "7576f53fe5dbe52366ebef6b5a2831a397527b9210245888892b1477ebea5ff5"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0001",
+      "Nama Pemeriksaan": "LH",
+      "legacy_sha256": "3cb6824db09536b40a2710902c7fa2c6ed3cff52654d7597f977e072e3ab1749"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0001",
+      "Nama Pemeriksaan": "LH",
+      "legacy_sha256": "fba25e0b689675fdf0d3f95d7b069e886e6e44941a6cc14c11dcd7d03b4d3b74"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0001",
+      "Nama Pemeriksaan": "LH",
+      "legacy_sha256": "153a877490db2f24f3096d5f2ee05342205033870a69419ded0475096d8fadab"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0002",
+      "Nama Pemeriksaan": "FSH",
+      "legacy_sha256": "39cb11924e90548b40483c08808333be6b770d4fdef4400da502e67bdb65ad2b"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0002",
+      "Nama Pemeriksaan": "FSH",
+      "legacy_sha256": "7e2fb2034c9a97efbf6091823b31e7de47451119e700d9dbc8b701d435bbbd88"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0003",
+      "Nama Pemeriksaan": "ESTRADIOL",
+      "legacy_sha256": "c9e2d740f25a49b336488f96e18684f5e613962ec7cac4eb0b7fcb2edd05f927"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0003",
+      "Nama Pemeriksaan": "ESTRADIOL",
+      "legacy_sha256": "fd4b0cadb8beee15159b393334fd86026bb09d345f81de20c371fb88facc97ae"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0003",
+      "Nama Pemeriksaan": "ESTRADIOL",
+      "legacy_sha256": "ab962a8b703dbf52f327e538782570760419331ef0c52ffd175412a5a595330a"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0004",
+      "Nama Pemeriksaan": "PROGESTERON",
+      "legacy_sha256": "f93ee0358e5f3f3e3643ac7fd6091b18216d6bb3c0fa4e4c66b2e9d8a703af01"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0004",
+      "Nama Pemeriksaan": "PROGESTERON",
+      "legacy_sha256": "e4c3d0957eebc388f5f0a2de133067e665a15c639a7963c7cb667cc73b34c8b6"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0005",
+      "Nama Pemeriksaan": "PROLAKTIN",
+      "legacy_sha256": "0e5dfa6690f3901c3da8b17c101888460650d4034159d3fe223a1cb0de06e9ce"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0005",
+      "Nama Pemeriksaan": "PROLAKTIN",
+      "legacy_sha256": "b3605c7b7222899a5b0900737223b3b8a94435176b14cfd36a1c9baf4326f316"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0005",
+      "Nama Pemeriksaan": "PROLAKTIN",
+      "legacy_sha256": "aff176fcb4df766ede98f84ed11d924abe0324dceba0e2f59d477579392df597"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0006",
+      "Nama Pemeriksaan": "TESTOSTERON",
+      "legacy_sha256": "e60ed357e125d5517aad8581e3e56c8f513e654cc10f10b975e5103f0d597a39"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0006",
+      "Nama Pemeriksaan": "TESTOSTERON",
+      "legacy_sha256": "ff28a5acc2b8eb8241d0b7552c890a37fc9d3207e6521711fe3dfd3233814288"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0006",
+      "Nama Pemeriksaan": "TESTOSTERON",
+      "legacy_sha256": "361682081ec5562dccff0d3714db3e032e8a5fffa7b3e7e6aa43fea2501fd732"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0007",
+      "Nama Pemeriksaan": "TESTOSTERON BEBAS",
+      "legacy_sha256": "9eed7c5dc6f706ea7c5bfd4dd9a4fe952f423998742688d9c917c68e3b2fa40d"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0007",
+      "Nama Pemeriksaan": "TESTOSTERON BEBAS",
+      "legacy_sha256": "ab75525a476a1396ed27ae1b6496a96b775e6f0ef726e064b78238d46dd8b605"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0008",
+      "Nama Pemeriksaan": "SHBG (GLOBULIN PENGIKAT HORMON SEKSUAL)",
+      "legacy_sha256": "8a7fa270a5a6a7df2d0bbf54d1f23a987608fe17ffb87118d7498005b9ec7054"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0008",
+      "Nama Pemeriksaan": "SHBG (GLOBULIN PENGIKAT HORMON SEKSUAL)",
+      "legacy_sha256": "0558a65288f4eceed247e10b0715dc4cd5378a22ca720d22ffaf9df64aa1acdc"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0009",
+      "Nama Pemeriksaan": "INDEKS ANDROGEN BEBAS",
+      "legacy_sha256": "4ebef12322f21d473381ea5eacfff2ae595cf6bf86562c26cdecb64a8d17b93d"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0009",
+      "Nama Pemeriksaan": "INDEKS ANDROGEN BEBAS",
+      "legacy_sha256": "f38f357fb56e474d7b93342fe6cdc84f99663b1548c0d1e4f53699818a372e89"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0010",
+      "Nama Pemeriksaan": "DEHIDROEPIANDROSTERON (DHEA-SO4)",
+      "legacy_sha256": "685c42d41e35d74f7ddd23eddda6088d6d15a51452e9239b5e2deb2156838656"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0010",
+      "Nama Pemeriksaan": "DEHIDROEPIANDROSTERON (DHEA-SO4)",
+      "legacy_sha256": "3d5ff48b36e6077e8a5004df4e9f872d7a790a76f9d0f74d15ff56352b938670"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0011",
+      "Nama Pemeriksaan": "DHT (DIHIDROTESTOSTERON)",
+      "legacy_sha256": "46050c6b71122b83e71d65a8803d40cf28c6f68ca03baefbfab08a00670b8f58"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0011",
+      "Nama Pemeriksaan": "DHT (DIHIDROTESTOSTERON)",
+      "legacy_sha256": "d3b41774a26d6cd964c240710e89cdf7dccd4bc124d729cb1fab4b9b9054dde6"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0012",
+      "Nama Pemeriksaan": "ANDROSTENEDIONE",
+      "legacy_sha256": "791eb6b3f2c9b29658dc4ab6b14b3d640733433bd2dde3ada6dbb97c044ce2a8"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0012",
+      "Nama Pemeriksaan": "ANDROSTENEDIONE",
+      "legacy_sha256": "f4d4be26d3e6abf4699558858b4571856aa28b0c719c806e491f4b65d1f2ecbb"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0012",
+      "Nama Pemeriksaan": "ANDROSTENEDIONE",
+      "legacy_sha256": "d2ede7f2557d8eb3ac97486c9a2dbdbd51bd9454706c95f3356ca57bbdb2c1e5"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0013",
+      "Nama Pemeriksaan": "17 HIDROKSIPROGESTERON",
+      "legacy_sha256": "d12ac6c1dc10890c1e076b63ee91d763198e32d34d0447c0bbd5eeceb2a3616c"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0013",
+      "Nama Pemeriksaan": "17 HIDROKSIPROGESTERON",
+      "legacy_sha256": "3b03489823a9cb4022a6d7aa16c63db778fb623700576fc0fccc04d3d39b905f"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0013",
+      "Nama Pemeriksaan": "17 HIDROKSIPROGESTERON",
+      "legacy_sha256": "18597310d653e4aacdd6bf6b900121cf97deb16b3910802f0c99a5e41e358331"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0014",
+      "Nama Pemeriksaan": "HORMON ANTI MULLERIAN (AMH)",
+      "legacy_sha256": "993fe08810ee5721e4c60a11195327e46326ca0a3c12ff2890a46d8c7ed43f61"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0015",
+      "Nama Pemeriksaan": "INHIBISI B",
+      "legacy_sha256": "dc1217109f11c236135fc9a51cf882038d71a9c8463def5ff31d555ec311accf"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0015",
+      "Nama Pemeriksaan": "INHIBISI B",
+      "legacy_sha256": "feacb4ce66fd0be22570df1df70a03e774de80ac322a2f482572741f6b43e3ee"
+    },
+    {
+      "Kode Material": "ODL1005-REP-0016",
+      "Nama Pemeriksaan": "BETA HCG KUANTITATIF",
+      "legacy_sha256": "8cf12161827c60d654c0d447ffc473cce79a2e022b59ad6c6fe642e2730e9415"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0001",
+      "Nama Pemeriksaan": "TOTAL T3",
+      "legacy_sha256": "60c01203c639db051d526567a15579b4ab45beb0443935114daf7aad7eebc6c8"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0001",
+      "Nama Pemeriksaan": "TOTAL T3",
+      "legacy_sha256": "c17b12cf61319b0133fccbf8c1fc537f1aaf19050a10dbe33974c16f273349e6"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0002",
+      "Nama Pemeriksaan": "TOTAL T4",
+      "legacy_sha256": "3df0751ddf8ca21b742c4124752e18f65a321f2cc57f00b28830b74b942337c1"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0002",
+      "Nama Pemeriksaan": "TOTAL T4",
+      "legacy_sha256": "2f8eff963fbe7101fb144fdab792a934cea1955d479f3d4579136420fd9a297b"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0002",
+      "Nama Pemeriksaan": "TOTAL T4",
+      "legacy_sha256": "f44afd5cf883d3cec3240be280489d5fc0233180097370c29e1f08839fd778e4"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0003",
+      "Nama Pemeriksaan": "T3 GRATIS",
+      "legacy_sha256": "84ee28af9c3c1523ee2c5430051447d8938531225a5a193f98371f21dc5c8480"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0003",
+      "Nama Pemeriksaan": "T3 GRATIS",
+      "legacy_sha256": "011c6aa30986a144f7a41706de8aec0fec9ca1c7dec34d42d7bb1712c21dc452"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0004",
+      "Nama Pemeriksaan": "T4 GRATIS",
+      "legacy_sha256": "173ef44214133865ef62a827051b2d5aa60dc0f9dde2250a94bef7d0fa0c454b"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0004",
+      "Nama Pemeriksaan": "T4 GRATIS",
+      "legacy_sha256": "3b1d54650f9f63983c32226f604a2b49701eab10802f6363554fe7ddb9405bd2"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0004",
+      "Nama Pemeriksaan": "T4 GRATIS",
+      "legacy_sha256": "57a9172f14f33fa4791c7d8f43de765c5d9933bb98a9375b91a336c29a974b98"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0004",
+      "Nama Pemeriksaan": "T4 GRATIS",
+      "legacy_sha256": "96acec6577b582fa48b232a81457fdb1884fecc81d418a60f1a22a2be76d69ff"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0005",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH",
+      "legacy_sha256": "d7c59daf85fdc9e471c40cfc19ae73d09b070589516d2a665cb6a62b1b01813f"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0005",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH",
+      "legacy_sha256": "86b2add7cc98427661390d3b0336542f2dcf48ddf185563d39179ee285f1980d"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0005",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH",
+      "legacy_sha256": "2b7e1f6bcd1ce07f7979d1d2d93b9ab32523987f3426ce35c1cb6d8e93b50821"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0005",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH",
+      "legacy_sha256": "936908f5380aeba3cd44a2a2cda3012d6d91624a2bb6b08a35472dc20d36f709"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0006",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH (Neonatus)",
+      "legacy_sha256": "c588b43fef489b45fd5e1101f0fcb96e74cb58375af532c9aa74ef9a8ff1e577"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0006",
+      "Nama Pemeriksaan": "Sensitif terhadap TSH (Neonatus)",
+      "legacy_sha256": "4f935aef06832d25b84ff5998f79926a9f9dac7223d1685c9492788fda918dfd"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0007",
+      "Nama Pemeriksaan": "PENGAMBILAN T3",
+      "legacy_sha256": "0cf1fea04873960d213cc32ed02e48cfeaea23692d3f56f0dcdcde40fa1d009f"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0007",
+      "Nama Pemeriksaan": "PENGAMBILAN T3",
+      "legacy_sha256": "52c34c2a38f5365be5cdddf3dd231fdb0e031c4d90e6e04ac0ceb8816fdf2450"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0008",
+      "Nama Pemeriksaan": "INDEKS TIROKSIN BEBAS (FTI)",
+      "legacy_sha256": "ea2f03434b0fbbbf54652e50c970a160b2e53c5ac24fe9837de14df8123345bf"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0008",
+      "Nama Pemeriksaan": "INDEKS TIROKSIN BEBAS (FTI)",
+      "legacy_sha256": "9d18067c6fad9ee13a23afaf43a8443fe5fb6f85493294fa9381eb10d309aa0e"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0009",
+      "Nama Pemeriksaan": "T3 TERBALIK (RT3)",
+      "legacy_sha256": "d2e4af7ab8ae18028014067e1c821c126a49f5c2ca08bd1139d865003639187f"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0009",
+      "Nama Pemeriksaan": "T3 TERBALIK (RT3)",
+      "legacy_sha256": "d9b00aa8918add14549112ccb268f89fd88200fced33640aff68b4a8260c2b35"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0010",
+      "Nama Pemeriksaan": "ANTIGEN TIROGLOBULI",
+      "legacy_sha256": "0ef5e3d4eb807f55ac5fa7f735e8249ea47a7324663f71bf833cdec3975cd742"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0010",
+      "Nama Pemeriksaan": "ANTIGEN TIROGLOBULI",
+      "legacy_sha256": "3c1d6418c98a4b783756113f0dfef07773fddcaa02761f131d2ec8ec7997dce9"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0010",
+      "Nama Pemeriksaan": "ANTIGEN TIROGLOBULI",
+      "legacy_sha256": "ef1e3831f4fd467c1a93745e5a078ef3df440d7c65a82d96964be53ec2f0afd2"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0011",
+      "Nama Pemeriksaan": "ANTIBODI TIROGLOBULI",
+      "legacy_sha256": "2448e7c3ef1a1049785a1a372ba6a6c496e1742f868f2defef816310818812c9"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0012",
+      "Nama Pemeriksaan": "ANTI TIROID PEROKSIDASE (ANTI TPO)",
+      "legacy_sha256": "ff25e7d89f0e2a84ba495ac2606db43e83fcc1c5e8b3710d18c43addde3f8ed8"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0013",
+      "Nama Pemeriksaan": "ANTIBODI RESEPTOR TSH (TRAB)",
+      "legacy_sha256": "167fa562a354dc30d12defad9547e01e64aa266854bb3fc60f5ab4658a82b4f6"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0014",
+      "Nama Pemeriksaan": "IMUNOGLOBULIN PERANGSANG TIROID",
+      "legacy_sha256": "388f56c20e1a227530f3f9fa397516dbff0bf17bc66a354c6f7924e38358fad3"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0015",
+      "Nama Pemeriksaan": "KALSITONIN",
+      "legacy_sha256": "42c9e48cb4ea73edd49e59fcf4db9a67541c6b2c20cf7c0a1a77ada0c131f53c"
+    },
+    {
+      "Kode Material": "ODL1005-THY-0015",
+      "Nama Pemeriksaan": "KALSITONIN",
+      "legacy_sha256": "6a402f0c4625f859c1d7a0205cf98fea21641ac42be92174db4c670f9c620f25"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0001",
+      "Nama Pemeriksaan": "TOTAL VITAMIN D (25-OH)",
+      "legacy_sha256": "d8fe5eb651cdb6a01f810c038e028694581c3cde826bfc784f8cf72765a14545"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0002",
+      "Nama Pemeriksaan": "Vitamin D2 & D3 25-OH",
+      "legacy_sha256": "5a683be4a0876ccab8e49e35341fed5a9af90fa01fefb7f52c3aa3d814708140"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0002",
+      "Nama Pemeriksaan": "Vitamin D2 & D3 25-OH",
+      "legacy_sha256": "ce6ee41ecfc001c16309a57dd591c2dfb712cc6e7b97c792f60a104842bf00de"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0002",
+      "Nama Pemeriksaan": "Vitamin D2 & D3 25-OH",
+      "legacy_sha256": "b39fd12a1c39898059d7d4167330e022579e1f4e23063f2db0485a52ca5638a7"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0003",
+      "Nama Pemeriksaan": "N-MID OSTEOKALSIN",
+      "legacy_sha256": "ec9aa5d7831b68c16aef5403fff292788a21babcba02be0068f586a8e2ce3284"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0003",
+      "Nama Pemeriksaan": "N-MID OSTEOKALSIN",
+      "legacy_sha256": "44d3595e919d9d637998c629d66cfcc14d6c1c78c4a583591362b5a81c42d3ec"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0004",
+      "Nama Pemeriksaan": "CTX BETA CROSSLAPS",
+      "legacy_sha256": "41f2854e04132dbd0a0844a8b5337e9a0ae7250e8cd6bd340f732e9e5efde774"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0005",
+      "Nama Pemeriksaan": "PTH UTUH",
+      "legacy_sha256": "47b9e23be9041a88c61850afdb063def4fb88dd9a4d0f9468042dd98ed9dddb9"
+    },
+    {
+      "Kode Material": "ODL1005-BMM-0005",
+      "Nama Pemeriksaan": "PTH UTUH",
+      "legacy_sha256": "728dede5f755a9699889f8951745546d75ee6935af02e5b11d538ec4b81c3891"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0001",
+      "Nama Pemeriksaan": "KORTISOL PAGI ¹",
+      "legacy_sha256": "a361c4d2dda82fd8f09ce1f20e983c851170eeacf39e501e7fc844c5057860ba"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0001",
+      "Nama Pemeriksaan": "KORTISOL PAGI ¹",
+      "legacy_sha256": "1eca512306b5671b48a32b9d66bab666e38cdec94df5d77643836436df93cae6"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0002",
+      "Nama Pemeriksaan": "KORTISOL SORE ²",
+      "legacy_sha256": "d643b8b46da015776c7e3b6fbfae1fd8f723575d2e007fdcfb2ad2a00c3d6910"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0002",
+      "Nama Pemeriksaan": "KORTISOL SORE ²",
+      "legacy_sha256": "40a6fa67bcc766212312a5e4ce22a2408cd1c989eb7dfff9bc5889243789c143"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0002",
+      "Nama Pemeriksaan": "KORTISOL SORE ²",
+      "legacy_sha256": "376ef0d28b127d70da6237367e125d1b2c6c26c375d9c6a418d387dc5cf8e65d"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0002",
+      "Nama Pemeriksaan": "KORTISOL SORE ²",
+      "legacy_sha256": "ceefffc6f7ff62a71b7550b1b01c27b1b2afebb46ad8385316ea507efb27ebc4"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0003",
+      "Nama Pemeriksaan": "ACTH",
+      "legacy_sha256": "a8030c7971ce81e25da602dd5db36f344a604cc62a962f125ce9b857ce1c3d26"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0003",
+      "Nama Pemeriksaan": "ACTH",
+      "legacy_sha256": "8422655203bd5009d4ac5c3d67f075246151b0e73c67c397727ac2bc2ea486d3"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0004",
+      "Nama Pemeriksaan": "HORMON PERTUMBUHAN",
+      "legacy_sha256": "2766a9def036635d8cc5fe9ea80fd502a378bb5818b43cfe8a9834798669b115"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0004",
+      "Nama Pemeriksaan": "HORMON PERTUMBUHAN",
+      "legacy_sha256": "a1365dc1898e0d122b4855ed1b031dcc68f328048dd486024e60ac2be40a122c"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0004",
+      "Nama Pemeriksaan": "HORMON PERTUMBUHAN",
+      "legacy_sha256": "c34c2ef4b2a1864c227b4c5dc552ef7367b17c1924532b4fd34c65a0a6e4fdc9"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0004",
+      "Nama Pemeriksaan": "HORMON PERTUMBUHAN",
+      "legacy_sha256": "acbd0a90245462dc71cd78ef33c5195c97ebff1d176667d60d2a3ab0e042048b"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0005",
+      "Nama Pemeriksaan": "IGF-1",
+      "legacy_sha256": "86294ea1906bb8b6ed950bcafb14be5d2d671120b5bae8a3b0c7df5f499355c1"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0006",
+      "Nama Pemeriksaan": "SERUM ALDOSTERON",
+      "legacy_sha256": "756537b75f884538ba87c1687470c9512db0801543e4fd05208e677c1e21430d"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0006",
+      "Nama Pemeriksaan": "SERUM ALDOSTERON",
+      "legacy_sha256": "23a75fc2365ace8af8bb83f4b6879d4df2e91f9adfc211ca3f77f99346b4c8a6"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0007",
+      "Nama Pemeriksaan": "AKTIVITAS RENIN PLASMA (PRA)",
+      "legacy_sha256": "e1fca7321bad4299bc688c7a86c9e4aa36f039adb907689846f3ab5a779b09fe"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0007",
+      "Nama Pemeriksaan": "AKTIVITAS RENIN PLASMA (PRA)",
+      "legacy_sha256": "06c0567f55b45839006d717ff431ceb72a73a465c849b4bbadcecf2d1add08ae"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0007",
+      "Nama Pemeriksaan": "AKTIVITAS RENIN PLASMA (PRA)",
+      "legacy_sha256": "dfc2edd8394529026c657884642ffa9dd628b86bbcbd97f82cd89a497c30aea7"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0007",
+      "Nama Pemeriksaan": "AKTIVITAS RENIN PLASMA (PRA)",
+      "legacy_sha256": "6c19f1ad04608f90da7a2b76c58d10eca98634483556c889b054b7850f959875"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0008",
+      "Nama Pemeriksaan": "HORMON ANTIDIURETIK (ADH, VASOPRESIN)",
+      "legacy_sha256": "9bee40dc5f90996116e4af84e4ba541fa9c66afbfc672c8862440951238dc1e6"
+    },
+    {
+      "Kode Material": "ODL1005-ADR-0008",
+      "Nama Pemeriksaan": "HORMON ANTIDIURETIK (ADH, VASOPRESIN)",
+      "legacy_sha256": "f3844503dae53dcd4e28333a36736269311f30ad881e5eabaff89893b3adcad4"
+    },
+    {
+      "Kode Material": "ODL1005-GUT-0001",
+      "Nama Pemeriksaan": "5 LATIHAN",
+      "legacy_sha256": "2604e95623d598a3c5e801faaff3acabdaf1e7a1d23532f51f5a2db512bc0bd7"
+    },
+    {
+      "Kode Material": "ODL1005-GUT-0001",
+      "Nama Pemeriksaan": "5 LATIHAN",
+      "legacy_sha256": "5159c33c36f70f6869cbf9fff7d508312a6ab89f9a09228438efb5443d618a04"
+    },
+    {
+      "Kode Material": "ODL1005-GUT-0001",
+      "Nama Pemeriksaan": "5 LATIHAN",
+      "legacy_sha256": "e707abc55efc03bf52daff7e367f229a7c763c45aba0469f9c4f0e1cc47dc62b"
+    },
+    {
+      "Kode Material": "ODL1005-GUT-0001",
+      "Nama Pemeriksaan": "5 LATIHAN",
+      "legacy_sha256": "8902b57e06235c3b3cb63254407507b75023f17ff0bf94873b4f3b95f85f1055"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0001",
+      "Nama Pemeriksaan": "TOTAL IGE",
+      "legacy_sha256": "ac5e194b94a60493c1e093e1db8a2836b68c8e9d90d76efbd7f6c37732ffa917"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0002",
+      "Nama Pemeriksaan": "PEDIATRIC ALERGI IGE",
+      "legacy_sha256": "912c5e24ea70e94f090c82dc42e25afed1585cdbc294b279a83e42ad3edf8de5"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0003",
+      "Nama Pemeriksaan": "PANEL ALERGI RJ (54 PARAMETER)",
+      "legacy_sha256": "11b89b224c32fed2fbd37a860098d099e41c98b8b8ea9bf5ef30d5752e340440"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0004",
+      "Nama Pemeriksaan": "PANEL ALERGI PEDIATRIK",
+      "legacy_sha256": "64f203301c93d39deda0cb0edd8735262f5d38620097598542004a92fa3d7b0e"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0005",
+      "Nama Pemeriksaan": "PANEL ALERGI UMUM I (INDONESIA)",
+      "legacy_sha256": "a4d4d6fde69d27b7f594c3cda4456939434755daf7174230cdd58f05d0caeb64"
+    },
+    {
+      "Kode Material": "ODL1003-ALR-0006",
+      "Nama Pemeriksaan": "PANEL ALERGI UMUM II (MAKANAN)",
+      "legacy_sha256": "ea2fb4defa39a29ed864e635c3e4f8d8ef1625eb3de1ed0a524e6026836e3a72"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0001",
+      "Nama Pemeriksaan": "SETIAP ORANG",
+      "legacy_sha256": "ba590269d3ae33f65db8f79712d06bfcff8c71b2a642ff0ae1a2e4ff9389259f"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0002",
+      "Nama Pemeriksaan": "IGG",
+      "legacy_sha256": "92d3dbf0534df0716de4b3c7b0c89786a6bafaad13f240cac7cd0fea677b4c89"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0003",
+      "Nama Pemeriksaan": "IGM",
+      "legacy_sha256": "ae37114eaa91533622395c25be99603c0e351079b52cf82c602352a72f731bb5"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0004",
+      "Nama Pemeriksaan": "IMUNOGLOBULI D",
+      "legacy_sha256": "a380351defc0d5e1993e7aca00cc6c27eb8adad73e8dc007e9ec84dfbe26997f"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0005",
+      "Nama Pemeriksaan": "KOMPLEMEN C3",
+      "legacy_sha256": "d2d8dff7dde0ae7a9d4599db5ea6e2102b80cf28cb699499ba5f61c789b0fecd"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0006",
+      "Nama Pemeriksaan": "KOMPLEMEN C4",
+      "legacy_sha256": "ea01968e8418e6ccaf46658d1eb6a2f19cb65fb8f826daf74ef79cd23b052fdf"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0007",
+      "Nama Pemeriksaan": "ALPHA 2-MAKROGLOBULIN",
+      "legacy_sha256": "b469490885c7b4287f03098469f6f069a86dc8cb88ff30ba11ca99e1882aef18"
+    },
+    {
+      "Kode Material": "ODL1003-IGC-0008",
+      "Nama Pemeriksaan": "HAPTOGLOBIN",
+      "legacy_sha256": "1553868103b4c1b3b874d333fa875ac93506cecb580c2892309f891a6bf97ecb"
+    },
+    {
+      "Kode Material": "ODL1003-ADA-0001",
+      "Nama Pemeriksaan": "ANTI-INSULIN AB",
+      "legacy_sha256": "36376d4c8f7d91a1e43623ece9cfc05ca9658d479f71bc9cad57eddf07939a44"
+    },
+    {
+      "Kode Material": "ODL1003-ADA-0002",
+      "Nama Pemeriksaan": "ISLET CELL AUTOANTOBODY (ICA)",
+      "legacy_sha256": "1da8fbd53685be4b32223f6bf133650fa9665c1459a7b29ec2aff6203b10c58b"
+    },
+    {
+      "Kode Material": "ODL1003-ADA-0003",
+      "Nama Pemeriksaan": "ANTIBODI SPESIFIK MIOSITIS",
+      "legacy_sha256": "9686fbd8dd587eb27ac508d7afc2fd8dc3b83951adfcd96a0448445fe409e52a"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0001",
+      "Nama Pemeriksaan": "URINE LENGKAP / COMPLETE URINALYSIS (CHEMSED)",
+      "legacy_sha256": "b16589f9a8e1282aac641bb890549c398f4b77c7de23a91569820f91dd9bec65"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0002",
+      "Nama Pemeriksaan": "TES RUTIN URIN / TES RUTIN (PROTEIN, GLUKOSA, SEDIKIT)",
+      "legacy_sha256": "9be26229d8ef09f7708393024cc9b546c3d8e1e2b474f69c34c399607c318030"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0003",
+      "Nama Pemeriksaan": "Saya pikir Protein Jones",
+      "legacy_sha256": "d7422f8d6bfe10488f18199077bbd603ddcfac36f5f5dbb829e9facb80f29d71"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0004",
+      "Nama Pemeriksaan": "PROTEIN ESBACH",
+      "legacy_sha256": "f67eb9d3f79a6846578e6d9a93dfa174629d59c562c17dfc26c6311851efba20"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0005",
+      "Nama Pemeriksaan": "PROTEIN URIN IKLAN ACAK",
+      "legacy_sha256": "531d5903de69b8a065a00e4730f11dfdd854ec93202dabf939f2957e422245ec"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0006",
+      "Nama Pemeriksaan": "RASIO PROTEIN KREATININ",
+      "legacy_sha256": "53d222f0375050b0cc7440afe6818c2cf20a3b3e57b4475824e0fcd1a48cea63"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0007",
+      "Nama Pemeriksaan": "RASIO ALBUMIN KREATININ",
+      "legacy_sha256": "4c007d171419bcc3604e803cc844700f3951a8bd36f3f98f4d5e6fe08cbde74f"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0008",
+      "Nama Pemeriksaan": "OSMOLARITAS URINE",
+      "legacy_sha256": "4365088635421107c7fb75e69b571e9cc45d50a8fee2209e7447a7e79f76ed22"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0009",
+      "Nama Pemeriksaan": "AMYLASE URINE",
+      "legacy_sha256": "dead4458f2b5642f70985db7d61905e40c0cd22e5e73fecbba31f41b4786c0a8"
+    },
+    {
+      "Kode Material": "ODL1006-UGN-0010",
+      "Nama Pemeriksaan": "DISMORFIK ERITROSIT",
+      "legacy_sha256": "76a2bb8b8812ece379f1d47dcb2f602728d22e222a6044bed82fefdfa1152d36"
+    },
+    {
+      "Kode Material": "ODL1006-PRG-0001",
+      "Nama Pemeriksaan": "TES STRIP KEHAMILAN (β-HCG)",
+      "legacy_sha256": "38909576d5819f6c77eda8003dc66a619982196d074aac784e6f8743d44c124a"
+    },
+    {
+      "Kode Material": "ODL1006-PRG-0002",
+      "Nama Pemeriksaan": "TES KEHAMILAN (β-HCG) 25 mIU",
+      "legacy_sha256": "b73e0ee59432578b2deccfebf62c84c97d499c7685fba07d5e48d07d3dc4e908"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0001",
+      "Nama Pemeriksaan": "FAECES LENGKAP (FEME FAECES)",
+      "legacy_sha256": "f885ffe5927c2e1ea75ff2c78c53567c78fa5b8abd61f1c805fc2e8f96e182a1"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0002",
+      "Nama Pemeriksaan": "TINJA RUTIN (TINJA RUTIN)",
+      "legacy_sha256": "b6b795e0b70e6111d190438697f43c62c466a72af828061b7fb5c9fed7f68d8d"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0003",
+      "Nama Pemeriksaan": "WAJAH GASTROFISIK",
+      "legacy_sha256": "5ff515877c351848c850f3e2eee2ec762b3ec35c34330216e94869ef97bf1d9c"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0004",
+      "Nama Pemeriksaan": "DARAH TERSEMBUNYI (TINJA)",
+      "legacy_sha256": "d2c75fa7dcbd482a50bca1c7c0651d3b58b5028b740c7cd70a36415263bfca66"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0005",
+      "Nama Pemeriksaan": "M2PK",
+      "legacy_sha256": "8887a3105c69190a56ea6f84555c21aa842e53566339860027ceba738c635458"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0006",
+      "Nama Pemeriksaan": "ANTIGEN TINJA H. PYLORI (HpSA)",
+      "legacy_sha256": "811d27c777ffe230c73bf4b7a4ebef704d48ce1c3b9828bcdc55d96778209b02"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0007",
+      "Nama Pemeriksaan": "ANTIGEN ROTAVIRUS",
+      "legacy_sha256": "9e076f67b8c99e18d93fd3722e1d3a3e9c6d76ee66b4d8db7f4eedb5ccccc9e8"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0008",
+      "Nama Pemeriksaan": "ANTIGEN CLOSTRIDIUM DIFFICIL",
+      "legacy_sha256": "3254263f45dab7dcacd84b924ddb4c7856efe2bdcf98fe4554799e54bc308238"
+    },
+    {
+      "Kode Material": "ODL1006-FCL-0009",
+      "Nama Pemeriksaan": "KALPROTEKTIN",
+      "legacy_sha256": "9fb68ed7b3c3671920181a640ed0858c0551eb71682485c38b5a8eed0774d81a"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0001",
+      "Nama Pemeriksaan": "ANALISA CAIRAN TUBUH LAIN",
+      "legacy_sha256": "2a868b4651ebe8e8b03b17c71e31c76e2539d9c18e14423b4f710db6b69e7a84"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0002",
+      "Nama Pemeriksaan": "CSF - RUTIN (JUMLAH SEL TOTAL, JUMLAH DIFERENSIAL, NONNE-PANDY)",
+      "legacy_sha256": "a66e87c1b15994618e68b737dbfbd300fad6fcd34cb2c1d5d923c4cda1a102b1"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0003",
+      "Nama Pemeriksaan": "GASTRIC FLUID ANALYSIS / ANALISIS CAIRAN LAMBUNG",
+      "legacy_sha256": "bce7c6d79962b685a14c6e5895105248b9b26d2b9f0ef36efa41bf8d9d427fe4"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0004",
+      "Nama Pemeriksaan": "ANALISIS CAIRAN ABDOMINAL / ANALISIS CAIRAN ASCITES",
+      "legacy_sha256": "c8eb4d11eda19c3c527ba54540d7b84dc43609d7f9e61e48c0c0660c189fb2be"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0005",
+      "Nama Pemeriksaan": "JOINT FLUID ANALYSIS / ANALISIS CAIRAN SENDI",
+      "legacy_sha256": "82c690561d88ac4176c50afa10de3a4c3bd94b099824cfd45871428f8e340181"
+    },
+    {
+      "Kode Material": "ODL1006-BFA-0006",
+      "Nama Pemeriksaan": "PLEURAL FLUID ANALYSIS / ANALISIS CAIRAN PLEURA",
+      "legacy_sha256": "7eaa593ca0421b1d45d4cb02a17977c19b5fd6a308c3d4dfb6f683bbdb30124a"
+    },
+    {
+      "Kode Material": "ODL1006-OBG-0001",
+      "Nama Pemeriksaan": "SPERM ANALYSIS / ANALISIS SPERMA",
+      "legacy_sha256": "9dc5200b24b9b84c9b2fecee4f65ef634add8a386c29298ad7ff1466be054727"
+    },
+    {
+      "Kode Material": "ODL1006-OBG-0002",
+      "Nama Pemeriksaan": "TES CEPAT AMNIOTIK (LAKMUS)",
+      "legacy_sha256": "1bdd350482a5b7823d73406b7d2791fc0ed2a3d9b54041d0506f59d49be5efcf"
+    },
+    {
+      "Kode Material": "ODL1006-STN-0001",
+      "Nama Pemeriksaan": "ANALISA BATU EMPEDU",
+      "legacy_sha256": "05f424160eac9a087bd0467255b5763652aa4819c25cda0554feb2bbecce7531"
+    },
+    {
+      "Kode Material": "ODL1006-STN-0002",
+      "Nama Pemeriksaan": "RENAL STONE ANALYSIS / ANALISIS BATU GINJAL",
+      "legacy_sha256": "7daaa140c93a6e1a4911b36122fca0c0256eb5d21c0007c4a34598e5b8f2b0b2"
+    },
+    {
+      "Kode Material": "ODL1006-STN-0003",
+      "Nama Pemeriksaan": "URETHER STONE ANALYSIS / ANALISA BATU URETER",
+      "legacy_sha256": "d6617639e63f5d0b875103c02532fb1e9bd2fa59ae280adc5872fe574984471d"
+    },
+    {
+      "Kode Material": "ODL1006-STN-0004",
+      "Nama Pemeriksaan": "VESICAL STONE ANALYSIS / ANALISIS BATU KANDUNG KEMIH",
+      "legacy_sha256": "28e029c8c6e8b647690e8af06c13516eb662c0e325b0f35acf31fbe361f0c5b9"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0001",
+      "Nama Pemeriksaan": "AMFETAMIN",
+      "legacy_sha256": "ae650054655cb6154d8d9efadd643c20138dd209a813b48230b92a19f121f1b8"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0002",
+      "Nama Pemeriksaan": "METAMFETAMIN",
+      "legacy_sha256": "7211c1d0b1aad0f7a071ae3c35bd315b4c91b8996c0b669e73b5c519612024f6"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0003",
+      "Nama Pemeriksaan": "SARUNG TANGAN AP/LAT",
+      "legacy_sha256": "f4e10edfc94c386fdd5df1c38fdce3ace69a3d7b3b9092af5a080b601bcb75ef"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0004",
+      "Nama Pemeriksaan": "BENZODIAZEPIN",
+      "legacy_sha256": "4cdd828b68276706997fef5e361f1e66bc61276b2dd107cecfe706db73ff4369"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0005",
+      "Nama Pemeriksaan": "KOKAIN",
+      "legacy_sha256": "0420687340dcaaef4adcedc16e7d2dab14247e996492a9c9a1f236ad7902fc7c"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0006",
+      "Nama Pemeriksaan": "MORFIN",
+      "legacy_sha256": "6d3ad13c737ed454893ed0a791e0b06679688f2b41d91cc015bc778e8cfe4b6c"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0007",
+      "Nama Pemeriksaan": "GANJA/THC",
+      "legacy_sha256": "bcf26ef0fac7703d00bd8391a5dfc292936df0bbda832ef3dfc0d24f9fd345fd"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0008",
+      "Nama Pemeriksaan": "PCP (FENSIKLIDIN)",
+      "legacy_sha256": "730c228fb6ff4fc0c5af11db86e7bfa479f7897e1af13e62ba26b4bfd8fcd09c"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0009",
+      "Nama Pemeriksaan": "METADON",
+      "legacy_sha256": "7c1c9668ecd38f3323bd783bb7c7a715ee3e609de2c984f64bcc2cc43cba6557"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0010",
+      "Nama Pemeriksaan": "SOMADRIL/CARISOPRODOL",
+      "legacy_sha256": "bc82e8804e399db866b95e9ad4100466772bfaf3c46912e682cb12b56eb6cd27"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0011",
+      "Nama Pemeriksaan": "KOTININ",
+      "legacy_sha256": "951fee02e44a84756ad9657452583d1cb0abd4cc29439bd47884a388a4e1b588"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0012",
+      "Nama Pemeriksaan": "PENYALAHGUNAAN NARKOBA 3 PARAMETER",
+      "legacy_sha256": "b74d0f318fcb2ed44711c9d8c422f249082a4959e266eefc4bf1d95399e35630"
+    },
+    {
+      "Kode Material": "ODL1006-DRG-0013",
+      "Nama Pemeriksaan": "PENYALAHGUNAAN NARKOBA: 6 PARAMETER",
+      "legacy_sha256": "bae98041992860c7dcd96028c2d501e4645f9bc1422ced645d6097688b0a9f2c"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0001",
+      "Nama Pemeriksaan": "UREUM URIN",
+      "legacy_sha256": "4de9e27354beab74875b4014e28b88a50467a456afb78759f53db1fed4d93aa1"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0002",
+      "Nama Pemeriksaan": "KREATININ URIN",
+      "legacy_sha256": "faea94a0999b74ba406318d7c0d8ca63ebdfc80bbe62b4e9e6ed4d0d2d2f78e8"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0003",
+      "Nama Pemeriksaan": "ASAM URAT URIN",
+      "legacy_sha256": "8b6970b81f64979bf202c2b7ec2528d820ba6d253671f1d908730ed38d1e8b3f"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0004",
+      "Nama Pemeriksaan": "NATRIUM URIN",
+      "legacy_sha256": "21efeaf6185660317e77b8041db725c747623823d13e636d0ab9f5b3e6b2c4e3"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0005",
+      "Nama Pemeriksaan": "KALIUM URIN",
+      "legacy_sha256": "ddee4451248a4d2051fd32c5cdd0ebac06b4b0ad5f921845dde7ab6b5961fbb3"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0006",
+      "Nama Pemeriksaan": "URIN KLORIDA",
+      "legacy_sha256": "3b76cd31d0733ab01c9a23bd50e38c5bc1105db734fbca6ee980ac18083c5e47"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0007",
+      "Nama Pemeriksaan": "KALSIUM URIN",
+      "legacy_sha256": "a62bc628cf00867c29440714333ed41c2a1382b3f10ac816bcb2624eb1f0f397"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0008",
+      "Nama Pemeriksaan": "URIN ANORGANIK FOSFOR",
+      "legacy_sha256": "90040294fc594943e973dc57eb822e99e63dce60987e73afc81ba10930644831"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0009",
+      "Nama Pemeriksaan": "URIN VMA",
+      "legacy_sha256": "c74226a461af85f5f65209a5e7dc2e76b867843b18e2dd0f5eef4c9363ef602a"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0010",
+      "Nama Pemeriksaan": "PROTEIN URIN KUANTITATIF",
+      "legacy_sha256": "84db222260c28fe981e5b3291634f4ed278e48fe34b066229eb43160845de5d9"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0011",
+      "Nama Pemeriksaan": "MIKROALBUMIN URIN",
+      "legacy_sha256": "753b4bf61ea8f57798021c02013a10e1976c5c39f6f61af3d89e14c63b562b22"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0012",
+      "Nama Pemeriksaan": "URIN MAGNESIUM",
+      "legacy_sha256": "bd48755a302c75b8fa752400ed352e9cab86de2209ed75ef842477d8f7b6790c"
+    },
+    {
+      "Kode Material": "ODL1006-QNT-0013",
+      "Nama Pemeriksaan": "Klirens Kreatinin",
+      "legacy_sha256": "3b0073284e4e92bc0c204f932992671380b06ab19ca4449ab570eec7709a95ee"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0001",
+      "Nama Pemeriksaan": "Budaya BTA",
+      "legacy_sha256": "50b8b3d2af61ddf551c317ce7eafe64d5cdc5c18934b9d5e82b1258009248e1b"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0001",
+      "Nama Pemeriksaan": "Budaya BTA",
+      "legacy_sha256": "4e2f343093bcdbdd3b4d72047bfcc81cb926130a55b7a237cf93556ce36b64ee"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0002",
+      "Nama Pemeriksaan": "KEBERSIHAN BUDAYA",
+      "legacy_sha256": "729ffd94b37d869e0dcbeefbabf5f654164a95af63c2959025192fa203a44abe"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0003",
+      "Nama Pemeriksaan": "SWAB REKTAL",
+      "legacy_sha256": "53815ba5f1a03a0595dedfbfcfe8ac72dd5daac2c0b1fb63cc01467f51b1c252"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0004",
+      "Nama Pemeriksaan": "KULTUR USAP TENGGOROK",
+      "legacy_sha256": "774df2efdeee1da29399939d735d3a4ef51bced2731b44c675904f6dcbee6ef0"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0005",
+      "Nama Pemeriksaan": "KULTUR DARAH",
+      "legacy_sha256": "0ca937f38f14b6b36ddf8e71ebe3c34c4505432cd62b4d7f8a7e09b877a9bd05"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0005",
+      "Nama Pemeriksaan": "KULTUR DARAH",
+      "legacy_sha256": "604e1d1644d0c826d92f85c82f8f8e00175e93fa204788527bc4fa7a16fddeb0"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0006",
+      "Nama Pemeriksaan": "KULTUR TINJA",
+      "legacy_sha256": "6d17b3219eba1947d461111eec7cd81cdb1c3b112e6819c87d5dd453d8d335b0"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0007",
+      "Nama Pemeriksaan": "KULTUR URIN",
+      "legacy_sha256": "d8024f4d7fd557ec9bbfefb448c6f6a67c77e585deef40a63b5fd8fc41f7cf23"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0007",
+      "Nama Pemeriksaan": "KULTUR URIN",
+      "legacy_sha256": "3267e620d4f50145537444f1fdae9a7aac15ed55ae65c3e88a62f7d28aa04f79"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0008",
+      "Nama Pemeriksaan": "BUDAYA NUS",
+      "legacy_sha256": "5425a815147133b5659b3045f9c981637cd0f4bf105df6ff83ef9b1bc9e10a75"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0009",
+      "Nama Pemeriksaan": "BUDAYA MELUDAH",
+      "legacy_sha256": "bff9ea236518aa8fff2f725741eda1acc2c20a2bd2bb1d1092f335c034d43358"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0010",
+      "Nama Pemeriksaan": "KULTUR SPERMA",
+      "legacy_sha256": "24ebc7fd257173d47013bda1c9e2b26b445271dd70c094e98b237a6826663f18"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0011",
+      "Nama Pemeriksaan": "BUDAYA PERGI",
+      "legacy_sha256": "4025be0309e54538fa2c93fe5d45b7d7c475e67e8142149d407153c29376f09d"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0012",
+      "Nama Pemeriksaan": "KULTUR JAMUR",
+      "legacy_sha256": "ce4325e03b8d4647cad5145330be9dc093e228d2f0f8672c08033ab2acf32bbc"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0013",
+      "Nama Pemeriksaan": "KULTUR MRSA",
+      "legacy_sha256": "a5aef90712c9b2cc831e3d4883adcf99401b9c08b2decad2345f0dd1a4a34cbb"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0014",
+      "Nama Pemeriksaan": "KULTUR ANAEROBIK",
+      "legacy_sha256": "ca4eb0cb6130ef4b6803a545554cd0304ce443906730f18a3ab0b469bb0d64a8"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0015",
+      "Nama Pemeriksaan": "KULTUR CAIRAN PLEURA",
+      "legacy_sha256": "53635fc2d24b1e34037ddc3db1dd91c1a92b83b1c62296ca7753409322587894"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0016",
+      "Nama Pemeriksaan": "KULTUR CAIRAN TUBUH LAIN",
+      "legacy_sha256": "3b9ecc6328a9be7f83ed25ba752e09425fa356e235deadf3e024e853d5675b7d"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0017",
+      "Nama Pemeriksaan": "KULTUR LAIN LAIN",
+      "legacy_sha256": "cdb6641f08022addd0a6dd2eea07e0807c9379a14001b9cabc1cae9f2ae201d9"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0018",
+      "Nama Pemeriksaan": "ENDOTOKSIN",
+      "legacy_sha256": "b7f8284f003051a26ddc6ffde6534aa6a86f3afdc7daa66bf2b9a98071b2d53d"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0019",
+      "Nama Pemeriksaan": "KULTUR UDARA RUANGAN",
+      "legacy_sha256": "b212d7859e25d4a7d02143b5ced4c2b8069873c61456bc3c80eefd33be3284c5"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0020",
+      "Nama Pemeriksaan": "KULTUR SWAB LINGKUNGAN",
+      "legacy_sha256": "5f09a50a27abbabf0b07a0b2c507dd8cb99ab441b66b1ca485dc31ee54faaf42"
+    },
+    {
+      "Kode Material": "ODL2001-CTR-0021",
+      "Nama Pemeriksaan": "KULTUR MAKANAN",
+      "legacy_sha256": "e93409b7d57630c54545e082c39aabea892a1ed6159406520822cefa1056416a"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0001",
+      "Nama Pemeriksaan": "PEWARNAAN BTA",
+      "legacy_sha256": "29f87b049a1e2f476f8c9160ddb75f1bd4127c4dbbbcfbe4a34624b08ec33012"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0002",
+      "Nama Pemeriksaan": "SEDIAAN KOH",
+      "legacy_sha256": "e589bdfe8437180a2ac4a4dd714a0fd0e1e66eeda1491675bd8a99ee3582fd22"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0003",
+      "Nama Pemeriksaan": "PEWARNAAN BTA 2X",
+      "legacy_sha256": "2110a539142c78867d0da6dd85ce4c78359a5773f047752b588e56850d399557"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0004",
+      "Nama Pemeriksaan": "PEWARNAAN GRAM",
+      "legacy_sha256": "1d83b15a0486b984da07b2169aa99cda6655f536036bb22baaec77d090ae2064"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0005",
+      "Nama Pemeriksaan": "PEWARNAAN DIPHTERI",
+      "legacy_sha256": "4e0627117faf99e619b21b962440a7ad9d56297baaf8c46526f4e646299abf18"
+    },
+    {
+      "Kode Material": "ODL2001-STN-0006",
+      "Nama Pemeriksaan": "TRICHOMONAS",
+      "legacy_sha256": "13c26b6a174ae6f91fe45001b36d5b3b8b2254b6004adad34e08a80bdde70675"
+    },
+    {
+      "Kode Material": "ODL3001-CYT-0001",
+      "Nama Pemeriksaan": "PAP SMEAR (KONVENSIONAL)",
+      "legacy_sha256": "22c2f448469d2e16fe61707c00afcdca63808f38e4b5f6b7a6c8b3f6184e9c97"
+    },
+    {
+      "Kode Material": "ODL3001-CYT-0001",
+      "Nama Pemeriksaan": "PAP SMEAR (KONVENSIONAL)",
+      "legacy_sha256": "89ece20c7038b5a2e1f1ef85dbc16cb477c150d969df513d0832c90ec67b599f"
+    },
+    {
+      "Kode Material": "ODL3001-CYT-0002",
+      "Nama Pemeriksaan": "SITOLOGI",
+      "legacy_sha256": "753ec62004652872fef751e3dbe3b1b0770ebd8b2cc5ba0c15491ffdc8cb3828"
+    },
+    {
+      "Kode Material": "ODL3001-CYT-0003",
+      "Nama Pemeriksaan": "PAPSMEAR THIN PREP",
+      "legacy_sha256": "7bdc652e1b823828729fbacb431d8006725ba7decd2da4fbb79ffbe607c5aa6c"
+    },
+    {
+      "Kode Material": "ODL3001-CYT-0003",
+      "Nama Pemeriksaan": "PAPSMEAR THIN PREP",
+      "legacy_sha256": "3ead35e7ea34b5f096a2828c3b2f85b1cd75df4f1d82d8f0778b78ccf76ee4cd"
+    },
+    {
+      "Kode Material": "ODL3001-HIS-0001",
+      "Nama Pemeriksaan": "JARINGAN KECIL",
+      "legacy_sha256": "0f679f098e2475ee3976863bf136ab4262ad1c2ad6e0c1607cb7100b7b103314"
+    },
+    {
+      "Kode Material": "ODL3001-HIS-0002",
+      "Nama Pemeriksaan": "JARINGAN SEDANG",
+      "legacy_sha256": "512a87942fe0541cda99a779499acceaf354fb2185a84e651f68609e4d1816ad"
+    },
+    {
+      "Kode Material": "ODL3001-HIS-0003",
+      "Nama Pemeriksaan": "JARINGAN BESAR",
+      "legacy_sha256": "95b79c30831c14d873c718f0678e78429ec00800ee33b3ef13bd6d074576e970"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "014d43dc4693d058177ea41590156780c61b6ffcaec20e99c327c5d2936af5da"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "0f5aece7a17afed46e9e0486e2d17b975a8e9d84ee8deec4bf128ccfd16b610d"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "ae9ce3327fe3b4891a032216eba5bad3d9c0fb4535d0125f30bbd9d1a4975231"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "0b21cd82a5c5b0c11457524192bc48ab0848c0b136d0788636979076a4a0ebc1"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "9528c9343b5703c3b42b4bb56cc39668367cee3b266f34d4f66c803bd1c014cd"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "3d3999162eef8d77db21f090fe9ccb38c9270eab0626f3405508edabd175f6ef"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "264411ac25ee2a0a28871faa948c251ade20371634920889ee9eeaa9372f3693"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0001",
+      "Nama Pemeriksaan": "Kamar Dagang (PANEL PAYUDARA)",
+      "legacy_sha256": "3006e75bead3ca897480fd29dfc297ed11fcf8442c915fdb6b0e4f6af2db504c"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0002",
+      "Nama Pemeriksaan": "IHK (KASUS SULIT)",
+      "legacy_sha256": "c2846526f16cac50db7f1fd3cc9b332e806bcf29913c8a4a3f84770f7b2ea3b7"
+    },
+    {
+      "Kode Material": "ODL3001-IHK-0003",
+      "Nama Pemeriksaan": "EGFR MUTASI",
+      "legacy_sha256": "e62bb862ba297fa323e0ad9acbe0edb46d4456fb6fc14c34c8fc948e4f1a139a"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0001",
+      "Nama Pemeriksaan": "PCR CHLAMYDIA TRACHOMATIS",
+      "legacy_sha256": "032f584ab019dd27fdbbc8aab1deded4afead82c5a5f30bdd01db36f7b2d24ac"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0002",
+      "Nama Pemeriksaan": "PCR NEISSERIA GONORRHOEAE",
+      "legacy_sha256": "726ba8bc4a7317ac55fb21238811bf07414a6bdbab4e67e7f48034f43767151d"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0003",
+      "Nama Pemeriksaan": "PCR PARVOVIRUS B19",
+      "legacy_sha256": "5574a58f3b090f7427093a34245663c94b23358c84b3a3c5ac83ee7006f1b6e1"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0004",
+      "Nama Pemeriksaan": "PCR EBV KUALITATIF",
+      "legacy_sha256": "f6cee02302465253e87ae0e2694f4efd11eddc2d79bb08af92cd39608155eca7"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0005",
+      "Nama Pemeriksaan": "PCR EBV KUANTITATIF",
+      "legacy_sha256": "266c1ea2dd85cfbc09747560ec90bc89e7ca26c0dfbe5f25039d9cd042cde04b"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0005",
+      "Nama Pemeriksaan": "PCR EBV KUANTITATIF",
+      "legacy_sha256": "664f6d8cbd0510f683528b2188035f80efda27a26b90c209dd48702a0601acbc"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0006",
+      "Nama Pemeriksaan": "PCR CMV KUALITATIF",
+      "legacy_sha256": "b2bfb2e86e175baa81fdece05291f7725a792039894e04ccda30c29195cccdf1"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0007",
+      "Nama Pemeriksaan": "PCR CMV KUANTITATIF",
+      "legacy_sha256": "1ff1f3809422ecf4b28d88a45ce73f427e0c571d0429a0f4b4d3578dac7b977f"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0007",
+      "Nama Pemeriksaan": "PCR CMV KUANTITATIF",
+      "legacy_sha256": "ebb147b9ae9a75cfc3fae9ac49580bb7cd8afc9d9be991ba18536aca36f57213"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0008",
+      "Nama Pemeriksaan": "PCR HSV 1 & 2",
+      "legacy_sha256": "0b049ba7a5c62a1310e9f8306620da01b8723affd758652bd03ed1e725b623cf"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0009",
+      "Nama Pemeriksaan": "PCR TOXOPLASMA",
+      "legacy_sha256": "bdb44671043fdc62b6182a1a876a1b06a2bf96e7d3eae0a81cee6f9b4675a011"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0010",
+      "Nama Pemeriksaan": "PCR VARICELLA ZOSTER (VZV)",
+      "legacy_sha256": "3af9285584ce8dbd3a06ee34aac83b72e75357fdb701b735b61e123117e0e0ac"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0011",
+      "Nama Pemeriksaan": "PCR SARS COV 2019",
+      "legacy_sha256": "963c627f086146970032f26d0654f199dfdcad815e4e915a9242e9506a8a7ede"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0012",
+      "Nama Pemeriksaan": "PCR REAL TIME - KUANTITATIF DNA HBV",
+      "legacy_sha256": "1d037c84ec3b6f0ba63b28f556300e84f71b4abedde30cc79d097569ccf3a691"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0012",
+      "Nama Pemeriksaan": "PCR REAL TIME - KUANTITATIF DNA HBV",
+      "legacy_sha256": "80f1dd11b3620058be63103b536c42ffd4f25de18d09110ae50bcbf4f89af853"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0013",
+      "Nama Pemeriksaan": "PCR REAL TIME - KUANTITATIF RNA HCV",
+      "legacy_sha256": "cd063666c791b04a9670bef211d8da7a287f160a508ea2eea520d9889f2966cf"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0013",
+      "Nama Pemeriksaan": "PCR REAL TIME - KUANTITATIF RNA HCV",
+      "legacy_sha256": "c000521f52fe75f3dfe8235eb9c3aafc0670bb521df554da9212971f617df2ba"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0014",
+      "Nama Pemeriksaan": "RNA HCV KUALITATIF",
+      "legacy_sha256": "47483f13ad2ace95bfee1912d0f200ea86e6c67a020847034b5792010442f6a8"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0015",
+      "Nama Pemeriksaan": "GENOTIPING RNA HCV",
+      "legacy_sha256": "14ac7becdb604a32a44a681b158576df2e72340c2b500ecf85beb8491695b529"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0016",
+      "Nama Pemeriksaan": "PCR MYCOBACTERIUM TB",
+      "legacy_sha256": "147c47e49136b640305a57a8629023adf1754fcdb8f711617b602160b6b207c4"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0016",
+      "Nama Pemeriksaan": "PCR MYCOBACTERIUM TB",
+      "legacy_sha256": "0383e17349efb61c48a3ee25fdb210086b1f855ccc1da64f9d2ac93ca05a0058"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0017",
+      "Nama Pemeriksaan": "PCR SALMONELLA",
+      "legacy_sha256": "b42fbbed7a5d800de004db644a0821a4c4606ff904f167fc693585d99906b6fe"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0018",
+      "Nama Pemeriksaan": "PCR DENGUE",
+      "legacy_sha256": "519524b4bfc5333fa3d1b882904ef3c0640a81d55dc7907b86e47204f8b87dcb"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0018",
+      "Nama Pemeriksaan": "PCR DENGUE",
+      "legacy_sha256": "730276f18a19d16c37802ad87e656cd82eda441e6ecac7c959520bff7a8b8fa8"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0019",
+      "Nama Pemeriksaan": "PCR MALARIA",
+      "legacy_sha256": "1dd4152dd556692dfe27152cc05b90db9ca03b0424cb231fc145357f8e9f8f5f"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0019",
+      "Nama Pemeriksaan": "PCR MALARIA",
+      "legacy_sha256": "469600fb6b72269e3999b80b1a3dd649995bbd954b319dc3b7598111ddde2193"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0020",
+      "Nama Pemeriksaan": "PCR HIV - BEBAN VIRUS",
+      "legacy_sha256": "900675d17fc2562ba92240b49619669e993f7e6d895f0d7e8cb03c29e49f2496"
+    },
+    {
+      "Kode Material": "ODL4009-INF-0020",
+      "Nama Pemeriksaan": "PCR HIV - BEBAN VIRUS",
+      "legacy_sha256": "927dd79fd4ceacc8d1fbedc9fcc5ab03b96b041b682f975ca0f9b284b93b2862"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0001",
+      "Nama Pemeriksaan": "PANEL PERNAPASAN PCR",
+      "legacy_sha256": "05e64f53b739acb5322c37c7d097b8209755a07a8a4a5326f8ab51a1d174e803"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0002",
+      "Nama Pemeriksaan": "PANEL GASTROINTESTINAL PCR",
+      "legacy_sha256": "91a744e5f37f01e64d382c2408ab4f734b1f3317df1424ae0cbba3258fe079a9"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0003",
+      "Nama Pemeriksaan": "PANEL INFEKSI MENULAR SEKSUAL PCR",
+      "legacy_sha256": "eb97b8b360430c8a22853caed64f68ec3d8566b37d56366e38b3b8e61ca02cd9"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0004",
+      "Nama Pemeriksaan": "GENOTIPING DNA HPV PCR",
+      "legacy_sha256": "0d84c22432d0d585a28a48e9f123b5fd369c81275b3ab1459ccb3a0c099d13d9"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0004",
+      "Nama Pemeriksaan": "GENOTIPING DNA HPV PCR",
+      "legacy_sha256": "3f25dcde4a9d182f26553e89c3807df0551af82ca2f5a445ab2238ee0fcf26f8"
+    },
+    {
+      "Kode Material": "ODL4009-MSP-0004",
+      "Nama Pemeriksaan": "GENOTIPING DNA HPV PCR",
+      "legacy_sha256": "a7c64d0b0488697eb4963acd611e9ac1e9e32daf8b47748838cfff80d1480b58"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0001",
+      "Nama Pemeriksaan": "MUTASI PCR JAK2",
+      "legacy_sha256": "6e963c45bed82fd91e8a67185458727317a3300ef9798ed9ead439ea2a814798"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0002",
+      "Nama Pemeriksaan": "GENOTIPE APOLIPOPROTEIN E (APOE) PCR",
+      "legacy_sha256": "42b4696f75a8a6f78b8d04fa87338b31ba7406737a10ddd1566e9cd417018109"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0002",
+      "Nama Pemeriksaan": "GENOTIPE APOLIPOPROTEIN E (APOE) PCR",
+      "legacy_sha256": "a7a1cb7d05acc45f2d3055d2e5e5f5068f6dcfb28180bac4762d8ebd62705138"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0003",
+      "Nama Pemeriksaan": "PCR BRCA 1/2 GARIS GERMINAL",
+      "legacy_sha256": "db1781fa18b1070300170d38af458f4dc510f0942098fccbb6811558380a9137"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0004",
+      "Nama Pemeriksaan": "PCR MCED KOMPREHENSIF",
+      "legacy_sha256": "f40ed3ccf4b30964c3c1d701fdd45eea924e6f6e807ea4f59b12e0039876cc3e"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0005",
+      "Nama Pemeriksaan": "PCR MCED PEREMPUAN",
+      "legacy_sha256": "85856939cc65ce1f8123ae37aae8c90f7e5334e068bb425e84e921ddae1c4f7a"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0006",
+      "Nama Pemeriksaan": "PCR MCED PRIA",
+      "legacy_sha256": "d8521ed81d49f1005f5a46d1853463a862dc54a442bc1c05a42b7f2cff49d901"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0007",
+      "Nama Pemeriksaan": "PCR THALASIQ",
+      "legacy_sha256": "eac4b5b3ddc55e61cc97063cc28d98cfb86174ec9fe878684246ac3a1ee3e79e"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0008",
+      "Nama Pemeriksaan": "PCR BCR-ABL, KUANTITATIF",
+      "legacy_sha256": "2b229d7545795d8b0e9e7631efdedab6846590f61c3e32986bbfba29f79f3df2"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0008",
+      "Nama Pemeriksaan": "PCR BCR-ABL, KUANTITATIF",
+      "legacy_sha256": "32fdbaa8d471f715301df65813f324c20c322b3340c57a8144f35730115483da"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0009",
+      "Nama Pemeriksaan": "PCR BCR-ABL, KUALITATIF",
+      "legacy_sha256": "6575f3d8f9fe30da07e2fa762e63004ff168a251657cd9af3e29fc9600520e47"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0010",
+      "Nama Pemeriksaan": "TIPE HLA B27 (PCR)",
+      "legacy_sha256": "88f781cd3d00e771002edb59a4ece6772cc818f4aa867f0153a230e6e7c76fda"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0011",
+      "Nama Pemeriksaan": "Fenotipik HLA B27",
+      "legacy_sha256": "1b85efc220101f8af10ff06d9d9dd10a3c29a3a67b4ba2368a48b973e1fa3fdd"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0012",
+      "Nama Pemeriksaan": "MASSA TITIK 10",
+      "legacy_sha256": "8f557a5ecd141a465cb3f02b5c6091b068d719a247466e763f3c2e58abc7c8b5"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0013",
+      "Nama Pemeriksaan": "SPOTMASS CRC",
+      "legacy_sha256": "2cd48f31df1c4f363a943c23d9554b7b925d990ee749dbe4aafc4f5c2c73fbaf"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0014",
+      "Nama Pemeriksaan": "MASSA TITIK EPHIREA",
+      "legacy_sha256": "9bf3d57dfb8aecf73128f859b12bcd7a52a92c3266b7f5589681fa74fbb86fb4"
+    },
+    {
+      "Kode Material": "ODL4009-ONC-0015",
+      "Nama Pemeriksaan": "SPOT MASS EVA",
+      "legacy_sha256": "80b42fb33304a29bf16909cc3e90f6ac3211c5b443ca291aa2164ad7cf56de5d"
+    },
+    {
+      "Kode Material": "ODL4009-LFW-0001",
+      "Nama Pemeriksaan": "PCR SUPERGENIX PREMIUM",
+      "legacy_sha256": "bda42b57de2628ef01ec4cadcb643cc025fb8aaed31cc4757401e6dfca498574"
+    },
+    {
+      "Kode Material": "ODL4009-LFW-0002",
+      "Nama Pemeriksaan": "PCR SUPERGENIX ELITE",
+      "legacy_sha256": "0085092a8e9730a59811c12b186e95cc2d809ffc62b7300ef02dad6a4fcbb6f7"
+    },
+    {
+      "Kode Material": "ODL4009-LFW-0003",
+      "Nama Pemeriksaan": "PCR SUPERGENIX SUPREME",
+      "legacy_sha256": "57781ed28062c4a7cd904152ebf16dfcbdd32aaee5e7e6489ee7203c66f087d1"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0001",
+      "Nama Pemeriksaan": "NIPT ULTIMATE",
+      "legacy_sha256": "2a7efa8994de278a2416c8a5d88437efbd790ced980837a84c20489f06d2bd43"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0002",
+      "Nama Pemeriksaan": "NIPT LANJUTAN",
+      "legacy_sha256": "ed1131a3c175d9a6c04458b6352e18f4a5564b4291cd6fb7a21cb4f45cd7f4ca"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0003",
+      "Nama Pemeriksaan": "NIPT PRIME",
+      "legacy_sha256": "4d7fada1efebdd19e5c62723c317bce676107be7737cc9f75f3d1584c2f83c96"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0004",
+      "Nama Pemeriksaan": "NIPT GENE BASIC (SINGAPURA)",
+      "legacy_sha256": "57b2f53b0f44921640c966d172de6ebf56a1961533d8ffd0310f9783193a88f5"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0005",
+      "Nama Pemeriksaan": "NIPT GENE CORE (SINGAPURA)",
+      "legacy_sha256": "34e6ca0dce5b5992bca57650bde5e34087a4d09573e843d299de6d47c26799ee"
+    },
+    {
+      "Kode Material": "ODL4009-NPT-0006",
+      "Nama Pemeriksaan": "NIPT GENE COMPREHENSIVE (SINGAPORE)",
+      "legacy_sha256": "8bd8b8b7b2b0db6ea71ba4fddee01fde0f04a3c18c926864b3cfd30264c9f705"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "79a6c8933590a5c707245eae71ec8eb54a50fe42900d8c0e5e48481f1f1cf4d7"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "92a23bc7f3f9b514cd50eec373c72f8efc95c22293cd9249e933168b554ef77c"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "3bffe909c681c491264a194bfe84d96e021f89ca6e98dd8ed1f9df39c7ef7096"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "2eda5050211cbcaa6042f754750d8d2a348e8f525b0819af7433cd2ba50a6153"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "52807a7c5923ce215c677dd0aa755e2a0d0c3091caa9b75e79dfdb414ed4f769"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "06dd01cfc0f5fcd863540516e7f3a0cf1485824d19d8c35d60f7af63f6daa11c"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "9fc4f9daf03a3694bf75b0885f3a31d1f5272eb63921e1790d3189c63c69fa7d"
+    },
+    {
+      "Kode Material": "ODL1011-DGN-0001",
+      "Nama Pemeriksaan": "EKG",
+      "legacy_sha256": "b260fccd7471fe4d1dd581babae47c3bf96333681708e0efc6c782b8b5e3d6a4"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "29a6c0304c7bcd655dd72ce7ebbcf9dd7e57f18756df333e0708bab3e4c4f6b2"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "b0c295b4d0a94af610b6a3241a5cd6859d5d8c91074b88de3570cece38380013"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "daec05c7343cc0c3203776f573cc09aeba7810d0a2537ef78cfb01d62a1e9bce"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "078f2361ab632042de82fc5c0ffb342e912aeadff630f6831c8e15cee2688820"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "b31395108e3a2240b5230c7d13553f2ba2ba200316130070bb1fafd5d72d2654"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "685dea97546d579b97ec593cde9507a330f8864cb7087c6b94f2d252874168f4"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "14023a5d5b8f413a45b4605050eadedfbdcbf1e32ee4171feeb044636ad60f05"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "0b12ed5092debeb80be8a2cbac42832671af780998bede2f878476f2c9223dfe"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "2e0cf5e3f8e840065e324ba8c7476e7f0f476de4473018e223de7439b22d59ac"
+    },
+    {
+      "Kode Material": "ODL1011-MEX-0001",
+      "Nama Pemeriksaan": "PEMERIKSAAN FISIK",
+      "legacy_sha256": "8413f95fa3b63e5c2622c30274b4a2d676adc7795e23a229c041663faa49e8e9"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0001",
+      "Nama Pemeriksaan": "TORAKS",
+      "legacy_sha256": "63bbc1ae2975b2a068ce016eee1776c38908bf056bbea535559ad6d7dc82ae10"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0002",
+      "Nama Pemeriksaan": "TORAKS AP/LAT",
+      "legacy_sha256": "c4cde44b1542b6accb54154fc7d1c044ab66e219f9c42b270258f9ed75d51e57"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0003",
+      "Nama Pemeriksaan": "AP SERVIKAL",
+      "legacy_sha256": "0277556f4c9a4fde3814db788902f517705b84219cb5b6056d25536ecc329afc"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0004",
+      "Nama Pemeriksaan": "LATIN SERVIKAL",
+      "legacy_sha256": "47455e27200272aaabd8a4cdeb2ed7ac226c20850fb149cf615553e2540d8590"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0005",
+      "Nama Pemeriksaan": "THORAKAL AP",
+      "legacy_sha256": "7913d082cf6e797d42ad5fbd6c93e1a79eda70f68e9a809f2accf13d8458c3fc"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0006",
+      "Nama Pemeriksaan": "THORAKAL LAT",
+      "legacy_sha256": "7278e0377baf059d00d11969a83f383fcf47f2bdf3bcdc8d290e5e2d9102a2c8"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0007",
+      "Nama Pemeriksaan": "AP/LAT ASLI",
+      "legacy_sha256": "5a96337f91de0654d049f041dceb62242c3c041d1f9891e786cfbfe679a64938"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0008",
+      "Nama Pemeriksaan": "KAKI AP/LAT",
+      "legacy_sha256": "5ea96826684db646dd6950d7a03f59d6b3027e9168641c3576d1c6f21fad277a"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0009",
+      "Nama Pemeriksaan": "SENDI PERGELANGAN KAKI AP/LAT",
+      "legacy_sha256": "e0df096dc5aafd56e213533e1eb588d3de95b06bb497c088d659bbf7a7ec9d97"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0010",
+      "Nama Pemeriksaan": "PEDIS AP/LAT",
+      "legacy_sha256": "d9fd3b0fb7a507589a4b6b193dc40da442c8b3732ccb89ad9de8c1683be1c17e"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0011",
+      "Nama Pemeriksaan": "SARUNG TANGAN AP/LAT",
+      "legacy_sha256": "90830c90b283ead2f8de886d8e366014e6a8f7ac0d7932471ad360c470d67833"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0012",
+      "Nama Pemeriksaan": "PERGELANGAN TANGAN AP/LAT",
+      "legacy_sha256": "b97380a67edf304df9b2861ef9fe21599d176e5b8da9c752145653c039000ed2"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0013",
+      "Nama Pemeriksaan": "LENGAN BAWAH AP/AKHIR",
+      "legacy_sha256": "928cf7eb43aa6fdb02e3c4dc2506f06b7eae5b92208bf252da324b37bfe7a6d8"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0014",
+      "Nama Pemeriksaan": "SENDI SIKU AP/LAT",
+      "legacy_sha256": "355eaf0b5a463cfd05c15e2ef8e6eac4384f3c8bebc74abea06733ccb7b26db3"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0015",
+      "Nama Pemeriksaan": "HUMOR AP/LAT",
+      "legacy_sha256": "4ea76be4734838b0a078ae52e9a224efe79992664e683af90f66e2459eb03f48"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0016",
+      "Nama Pemeriksaan": "BAHU AP/LAT",
+      "legacy_sha256": "9e2d3305cc86c930629ac953ea9c1b5a93dc56fa9f743a86f3c3c38644bbb12c"
+    },
+    {
+      "Kode Material": "ODL1011-RAD-0017",
+      "Nama Pemeriksaan": "TULANG SELANGKA",
+      "legacy_sha256": "a441f32246f096d257782863b416d2d6864a6343a912be5def65d804ea44af74"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0001",
+      "Nama Pemeriksaan": "KLINIK - VITAMIN C",
+      "legacy_sha256": "df8cab2b08ff39a02e58ec13e45285416f983254bc09e10ba72a6580d560405b"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0002",
+      "Nama Pemeriksaan": "KLINIK - VITAMIN B",
+      "legacy_sha256": "9eb7e65cf73d5bcdbb9c11634ed15e32ff233de0aa2d96126f5bcf62c5bcaa12"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0003",
+      "Nama Pemeriksaan": "KLINIK - RL 500",
+      "legacy_sha256": "0c9d2996c141aa1f072e64968eafc76b6891b0082593f8702cc227442490f068"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0004",
+      "Nama Pemeriksaan": "KLINIK - RANITIDINE",
+      "legacy_sha256": "6e6c072dac05e455921708a0ff4db5f9fac3d6414628ba5ebf3986d4d6303712"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0005",
+      "Nama Pemeriksaan": "KLINIK - BUCSOPAN",
+      "legacy_sha256": "9066bc872cf289b074b175d1d495377fceb9c682b5706479b628815e3123fe6c"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0006",
+      "Nama Pemeriksaan": "KLINIK - METOCLOPRAMIDE",
+      "legacy_sha256": "10e745d653517da83ed1961b7c31b9e3c436d89fb07d3196026260bad588617a"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0007",
+      "Nama Pemeriksaan": "KLINIK - OMEPRAZOLE",
+      "legacy_sha256": "4b7fb9825b215be30ebd5fb1500b0eee452a7f7b3eba5d18fba60ff623aa8a69"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0008",
+      "Nama Pemeriksaan": "KLINIK - ONDANSENTRONE",
+      "legacy_sha256": "f3547df7ac691c5a1cea2af7f490ed7daa95b06f653b79f7d659095124fa2f7c"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0009",
+      "Nama Pemeriksaan": "KLINIK - INJEKSI",
+      "legacy_sha256": "2c7ae4bbb719886ce1ab7f71c3302f7d1ce0b38a4265cb1010c9238253208e5e"
+    },
+    {
+      "Kode Material": "ODL1011-FAR-0010",
+      "Nama Pemeriksaan": "KLINIK - INFUS",
+      "legacy_sha256": "0779bdd7ccc72d2fed2d0698ff74fabceb589c66f346c14011e37691c964e6ea"
+    },
+    {
+      "Kode Material": "ODL1001-RGN-0002",
+      "Nama Pemeriksaan": "HITUNGAN DARAH LENGKAP + DIFF",
+      "legacy_sha256": "add86b8d0b5fe47f9f76cfb21b785fdd0025729e5538cbad16a65f14b4cd13c2"
+    }
+  ]
+}

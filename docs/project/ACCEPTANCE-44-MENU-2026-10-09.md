@@ -18,7 +18,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-nurse-station | episode/form/work orders | handover, flowsheet, MAR sumber farmasi, tugas dan eskalasi |
 | rs-discharge | 0092–0104: keputusan signed→rekonsiliasi obat→source resume/housekeeping→invoice/jurnal→episode closure | seluruh jalur legacy/cutover, penjamin/exception/clinical amendment dan pengaitan unit lain belum acceptance penuh |
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
-| rs-inpatient-billing | inpatient_charges + 0082–85; invoice/jurnal sumber; cashier deposit/refund/application dan direct payment/refund, saldo dan review sumber | kontrak/eligibility penjamin, pembagian manfaat payer/patient dan settlement penjamin; belum acceptance penuh |
+| rs-inpatient-billing | 0082–0091: source invoice/journal, deposit/direct pay/refund, eligibility reviewed, payer/patient allocation dan payer settlement/reversal | override tarif kamar/metode kontrak, plafon selain per-stay, pengaitan semua unit dan exception terpadu; vendor claim/ACK belum aktif |
 | rs-capacity | kapasitas bed + resources | BOR/ALOS/TOI/BTO historis dari interval sah, cutover dan denominator |
 | rs-clinical-forms | 0076 + reviewer/privilege 0081 | formulir spesifik/MAR/flowsheet dan seluruh jalur legacy terkait |
 | rs-operating-room | resource booking + work orders | checklist/source klinis/anestesi/recovery/CSSD/billing terpadu |
@@ -45,11 +45,11 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | cfg-facility | his_master_records existing | semua referensi unit/resource/bed valid dan digunakan downstream |
 | cfg-practitioner | registry + workforce 0081 SQL9/UI5 | hubungan user–employee/praktisi sumber, jadwal dan seluruh clinical legacy gate |
 | cfg-patient | MPI/patient sources | identity/link/consent/penjamin, duplication/error dan downstream admission |
-| cfg-corporate | contract/benefit sources | review/effective/version dan penggunaan harga/eligibility nyata |
+| cfg-corporate | corporate_contract + 0087–0091 reviewed eligibility/snapshot/effective dan manfaat per-stay | lifecycle master kontrak lengkap, override harga/metode kamar, cap selain per-stay dan seluruh jalur downstream |
 | cfg-mcu | parameter/package sources | versi parameter digunakan pada MCU/report/review |
 | cfg-payment | payment sources | metode/account/fees/reversal/settlement benar-benar diterapkan |
 | cfg-queue | queue sources | flow/config/loket/device → ticket/call/serve/close dan tenancy |
-| cfg-medicine | pharmacy/master sources | formularium/aturan sah → resep/verifikasi/dispense/MAR sumber |
+| cfg-medicine | 0092–0104 binding/formulary/harga → reviewed Rx/dispense/MAR/custody sumber | CRUD master/versi/retirement formularium, valuasi/COGS, ownership alergi legacy dan seluruh downstream |
 
 ## Bukti tahap ini
 

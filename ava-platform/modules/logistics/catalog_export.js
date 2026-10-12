@@ -1,248 +1,443 @@
-// ═══════════════════════════════════════════════════════════════
-// MODUL: Master Katalog Tes & Ekspor LIS
-//
-// Versi sebelumnya tidak punya panggilan data, dan yang dikarang bukan
-// sekadar daftar: rentang rujukan ikut ditulis tangan di berkas ini —
-// Hb 12–16, glukosa puasa 70–99, AMH 1,5–4,0 — lengkap dengan
-// keterangan sumber yang terdengar meyakinkan.
-//
-// Rentang rujukan adalah angka yang menentukan hasil pasien disebut
-// normal atau tidak. Ia bergantung pada metode, reagen, dan populasi
-// pasien tiap lab, dan wajib divalidasi sebelum dipakai. Menuliskannya
-// di berkas tampilan berarti angka itu berubah hanya kalau ada yang
-// menyunting kode, tanpa jejak siapa menetapkannya — dan itu persis
-// yang tidak boleh pada dokumen yang diperiksa saat akreditasi.
-//
-// Sekarang membaca public.products dan public.ref_ranges yang sudah ada.
-//
-// ── Yang sengaja dirancang begini ────────────────────────────
-//
-// Pemeriksaan yang BELUM punya rentang rujukan ditandai menyala, bukan
-// disembunyikan. Katalog yang terlihat lengkap padahal separuhnya belum
-// punya rujukan adalah katalog yang menyesatkan penggunanya.
-//
-// Ekspor hanya menyertakan yang punya rujukan lengkap. Mengekspor baris
-// setengah jadi ke LIS pihak lain memindahkan lubangnya ke sistem orang.
-//
-// Prefiks "ce".
-// ═══════════════════════════════════════════════════════════════
-
-let ceData = null;
-let ceHanyaLengkap = false;
-
-function ceEsc(s) {
-  return String(s ?? '').replace(/[&<>"']/g,
-    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-}
-
-async function ceMuat() {
-  if (typeof sbGet !== 'function') { ceData = null; return; }
-  const aman = (t, q) => sbGet(t, q).catch(() => []);
+// OWNED_BY: generic. Actual source method review and export; no demo patient ranges.
+let ceData,
+  ceSources,
+  ceOffset = 0,
+  ceSourceOffset = 0,
+  ceSearch = "",
+  ceEpoch = 0,
+  ceScope;
+const ceEsc = (v) =>
+  String(v ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+const ceContext = () =>
+  JSON.stringify([
+    window.currentUser?.id,
+    window.currentUser?.tenant_id ||
+      window.currentUser?.profile?.tenant_id ||
+      window.AVA_RUNTIME_CONFIG?.tenantId,
+  ]);
+const ceCurrent = (scope, epoch) =>
+  scope === ceContext() &&
+  epoch === ceEpoch &&
+  (typeof currentPage !== "string" || currentPage === "catalog-export");
+async function renderReviewedCatalog() {
+  const scope = ceContext(),
+    epoch = ++ceEpoch,
+    main = document.getElementById("main-content");
+  if (ceScope && ceScope !== scope) {
+    ceOffset = ceSourceOffset = 0;
+    ceSearch = "";
+    ceData = ceSources = undefined;
+  }
+  ceScope = scope;
+  main.innerHTML =
+    "<h1>Katalog & Review Metode Tenant</h1><p>Memuat sumber…</p>";
   try {
-    const [produk, rujukan] = await Promise.all([
-      sbGet('products', 'select=*&order=nama_tes&limit=2000'),
-      aman('ref_ranges', 'select=*&limit=5000'),
+    const [board, sources] = await Promise.all([
+      sbRpc("lis_catalog_board", { p_offset: ceOffset }),
+      sbRpc("lis_catalog_sources", {
+        p_search: ceSearch,
+        p_offset: ceSourceOffset,
+      }),
     ]);
-    ceData = { produk, rujukan };
-  } catch (e) { ceData = null; }
-}
-
-async function renderCatalogExport() {
-  const content = document.getElementById('main-content');
-  if (!content) return;
-  content.innerHTML = '<div class="loading-row" style="padding:40px"><div class="spinner"></div></div>';
-
-  await ceMuat();
-
-  if (ceData === null) {
-    content.innerHTML = `
-      <div class="page-header"><div><h1>Master Katalog Tes</h1></div></div>
-      <div class="card" style="padding:20px; font-size:13px; line-height:1.75">
-        <strong>Katalog tidak dapat dibaca.</strong><br>
-        Tabel <code>products</code> belum tersedia.
-      </div>`;
-    return;
+    if (!ceCurrent(scope, epoch)) return;
+    ceData = board;
+    ceSources = sources;
+    main.innerHTML = `<section class=ce-review><style>.ce-review{max-width:1100px;margin:auto;padding:16px}.ce-review article,.ce-review form{padding:16px;margin:12px 0;border:1px solid #b7c6ce;border-radius:8px}.ce-review label{display:block;margin:10px 0}.ce-review input,.ce-review select,.ce-review textarea{width:100%;box-sizing:border-box;padding:9px}.ce-review button{padding:9px;margin:4px}.ce-review .ce-range{border:1px solid #aaa;padding:12px;margin:12px 0}.ce-review pre{white-space:pre-wrap;overflow-wrap:anywhere}</style><h1>Katalog & Review Metode Tenant</h1><p>Mapping LOINC/UCUM, specimen, metode/alat/reagen, IFU dan kelompok rujukan disahkan profesional berprivilege. Katalog generik merupakan proposal. Master dan versi original dipertahankan.</p><p>Pengaturan ini menyiapkan ekspor tenant; penerapan ke interpretasi hasil LIS legacy memerlukan adapter sumber yang teruji.</p><button id=ce-new>Konfigurasi metode baru</button><button id=ce-reload>Muat ulang</button><p id=ce-error role=alert></p><div id=ce-editor></div><form id=ce-search><label>Cari sumber pemeriksaan / analit<input name=search value="${ceEsc(ceSearch)}" maxlength=200></label><button>Cari sumber</button></form><p>Sumber halaman ${1 + ceSourceOffset / 50}: ${
+      sources.rows
+        .slice(0, 50)
+        .map((s) => ceEsc(s.examination_name + " → " + s.analyte_name))
+        .join(" · ") || "Tidak ditemukan"
+    }</p><button id=ce-source-prev ${ceSourceOffset === 0 ? "disabled" : ""}>Sumber sebelumnya</button><button id=ce-source-next ${sources.rows.length <= 50 ? "disabled" : ""}>Sumber berikutnya</button>${
+      board.rows
+        .slice(0, 50)
+        .map(
+          (r) =>
+            `<article><h2>${ceEsc(r.source_snapshot.examination_name)} → ${ceEsc(r.source_snapshot.item_name)}</h2><p>${ceEsc(r.method_id)} · revisi ${r.revision} · ${ceEsc(r.state)} · #${r.id}</p><p>${ceEsc(r.definition.primary_name)} · LOINC ${ceEsc(r.definition.loinc)} · UCUM ${ceEsc(r.definition.ucum || "kualitatif")}</p><p>${ceEsc(r.definition.method)} · ${ceEsc(r.definition.specimen)} · ${ceEsc(r.definition.device_reagent)}</p><p>Acuan ${ceEsc(r.definition.source_version)} · ${ceEsc(r.definition.reference_evidence)}</p><p>Berlaku ${ceEsc(r.valid_from)} sampai ${ceEsc(r.valid_until)} · Reviewer ${ceEsc(r.reviewed_by || "Belum disahkan")}</p><ul>${r.definition.ranges.map((g) => `<li>Usia ${ceEsc(g.age_min)}–${ceEsc(g.age_max)} ${ceEsc({ d: "hari", mo: "bulan", a: "tahun" }[r.definition.age_unit])}; batas awal ${g.age_lower_inclusive ? "termasuk" : "tidak termasuk"}, batas akhir ${g.age_upper_inclusive ? "termasuk" : "tidak termasuk"} · ${ceEsc({ all: "Semua", male: "Laki-laki", female: "Perempuan" }[g.sex])} · ${ceEsc(g.condition)} · ${r.definition.result_type === "qualitative" ? ceEsc(g.expected_values.join(", ")) : ceEsc(g.operator === "BETWEEN" ? g.lower + "–" + g.upper : g.operator + " " + (g.upper ?? g.lower)) + " " + ceEsc(r.definition.ucum)}</li>`).join("")}</ul>${(r.state === "draft" ? ["submit"] : r.state === "in_review" ? ["approve", "reject"] : r.state === "approved" ? ["activate", "retire"] : r.state === "active" ? ["export", "retire"] : []).map((a) => `<button data-action=${a} data-id=${r.id}>${{ submit: "Ajukan review", approve: "Sahkan", reject: "Tolak", activate: "Aktifkan", retire: "Retire", export: "Ekspor CSV tenant" }[a]}</button>`).join("")}</article>`,
+        )
+        .join("") ||
+      "<p>Belum ada konfigurasi metode tenant. Tidak ada range default yang dianggap terverifikasi.</p>"
+    }<nav><button id=ce-prev ${ceOffset === 0 ? "disabled" : ""}>Sebelumnya</button> Halaman ${1 + ceOffset / 50} <button id=ce-next ${board.rows.length <= 50 ? "disabled" : ""}>Berikutnya</button></nav><p>Terminologi LOINC mengacu <a href="https://loinc.org/license" target=_blank rel=noopener>lisensi Regenstrief</a>. Review metode/IFU tenant tetap diperlukan.</p></section>`;
+    main.querySelector("#ce-new").onclick = () => ceForm("create");
+    main.querySelector("#ce-reload").onclick = () => renderReviewedCatalog();
+    main.querySelector("#ce-prev").onclick = () => {
+      ceOffset = Math.max(0, ceOffset - 50);
+      renderReviewedCatalog();
+    };
+    main.querySelector("#ce-next").onclick = () => {
+      ceOffset += 50;
+      renderReviewedCatalog();
+    };
+    main.querySelector("#ce-source-prev").onclick = () => {
+      ceSourceOffset = Math.max(0, ceSourceOffset - 50);
+      renderReviewedCatalog();
+    };
+    main.querySelector("#ce-source-next").onclick = () => {
+      ceSourceOffset += 50;
+      renderReviewedCatalog();
+    };
+    main.querySelector("#ce-search").onsubmit = (e) => {
+      e.preventDefault();
+      ceSearch = e.target.elements.search.value;
+      ceSourceOffset = 0;
+      renderReviewedCatalog();
+    };
+    main.querySelectorAll("[data-action]").forEach(
+      (b) =>
+        (b.onclick = () => {
+          const row = board.rows.find((r) => r.id === Number(b.dataset.id));
+          if (b.dataset.action === "export") ceExport(row);
+          else ceForm(b.dataset.action, row);
+        }),
+    );
+  } catch (e) {
+    if (ceCurrent(scope, epoch))
+      main.innerHTML =
+        "<h1>Katalog belum dapat dibaca</h1><p role=alert>" +
+        ceEsc(e.message) +
+        "</p><button id=ce-retry>Coba lagi</button>";
+    const retry = main.querySelector("#ce-retry");
+    if (retry) retry.onclick = () => renderReviewedCatalog();
   }
-  ceGambar();
 }
-
-function ceRujukanOf(productId) {
-  return (ceData.rujukan || []).filter(r => r.product_id === productId);
+function ceInput(label, name, type = "text", extra = "") {
+  return `<label>${ceEsc(label)}<input name=${name} type=${type} ${extra} required></label>`;
 }
-
-// Siap ekspor bila punya kode, LOINC, satuan, dan minimal satu rentang
-// rujukan dengan batas yang terisi.
-function ceLengkap(p) {
-  const r = ceRujukanOf(p.id);
-  const adaRentang = r.some(x =>
-    x.range_min !== null && x.range_min !== undefined
-    && x.range_max !== null && x.range_max !== undefined);
-  return !!(p.kode_internal && p.loinc_code && p.satuan_hasil && adaRentang);
+function ceSelect(label, name, options) {
+  return `<label>${ceEsc(label)}<select name=${name} required><option value="">Pilih</option>${options.map(([value, label]) => `<option value="${ceEsc(value)}">${ceEsc(label)}</option>`).join("")}</select></label>`;
 }
-
-function ceKurang(p) {
-  const k = [];
-  if (!p.kode_internal) k.push('kode');
-  if (!p.loinc_code) k.push('LOINC');
-  if (!p.satuan_hasil) k.push('satuan');
-  if (!ceRujukanOf(p.id).some(x => x.range_min != null && x.range_max != null)) {
-    k.push('rentang rujukan');
-  }
-  return k;
+function ceRange(form) {
+  const box = document.createElement("div");
+  box.className = "ce-range";
+  const select = (label, name, options) =>
+      ceSelect(label, "r_" + name, options),
+    input = (label, name, type = "number", extra = "step=any") =>
+      ceInput(label, "r_" + name, type, extra);
+  box.innerHTML =
+    input("Usia min", "age_min") +
+    input("Usia max", "age_max") +
+    select("Batas bawah usia inklusif", "age_lower_inclusive", [
+      ["true", "Ya"],
+      ["false", "Tidak"],
+    ]) +
+    select("Batas atas usia inklusif", "age_upper_inclusive", [
+      ["true", "Ya"],
+      ["false", "Tidak"],
+    ]) +
+    select("Jenis kelamin", "sex", [
+      ["all", "Semua"],
+      ["male", "Laki-laki"],
+      ["female", "Perempuan"],
+    ]) +
+    input("Kondisi / kelompok acuan", "condition", "text", "") +
+    select(
+      "Operator kuantitatif",
+      "operator",
+      ["BETWEEN", "<", "<=", ">", ">=", "="].map((v) => [v, v]),
+    ) +
+    input("Batas bawah", "lower") +
+    input("Batas atas", "upper") +
+    "<label>Expected values kualitatif — satu per baris<textarea name=r_expected_values></textarea></label><button type=button class=ce-remove>Hapus kelompok</button>";
+  box.querySelector(".ce-remove").onclick = () => box.remove();
+  form.querySelector("#ce-ranges").append(box);
+  box.querySelector("[name=r_operator]").onchange = () => ceRangeType(form);
+  ceRangeType(form);
 }
-
-function ceGambar() {
-  const P = ceData.produk || [];
-  const lengkap = P.filter(ceLengkap);
-  const belum = P.filter(p => !ceLengkap(p));
-  const daftar = ceHanyaLengkap ? lengkap : P;
-
-  document.getElementById('main-content').innerHTML = `
-    <div class="page-header">
-      <div>
-        <h1>Master Katalog Tes &amp; Ekspor LIS</h1>
-        <p class="muted">Katalog pemeriksaan dengan pemetaan LOINC dan rentang rujukan.</p>
-      </div>
-      ${lengkap.length ? `<div><button class="btn btn-primary" onclick="ceEkspor()">
-        Ekspor CSV (${lengkap.length} siap)</button></div>` : ''}
-    </div>
-
-    ${!P.length ? `
-      <div class="card" style="padding:32px; text-align:center">
-        <div style="font-size:28px; opacity:.4; margin-bottom:8px">📚</div>
-        <div style="font-weight:700; margin-bottom:6px">Katalog pemeriksaan masih kosong</div>
-        <div style="font-size:13px; color:var(--text3); max-width:520px; margin:0 auto;
-                    line-height:1.8">
-          Versi sebelumnya menampilkan contoh rentang rujukan yang ditulis
-          di berkas tampilan. Rentang rujukan menentukan hasil pasien
-          disebut normal atau tidak, bergantung metode dan reagen tiap lab,
-          dan wajib divalidasi sebelum dipakai — jadi ia harus datang dari
-          master lab ini sendiri.
-        </div>
-      </div>` : `
-      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
-                  gap:12px; margin-bottom:16px">
-        <div class="card" style="padding:14px">
-          <div style="font-size:12px; color:var(--text3)">Pemeriksaan terdaftar</div>
-          <div style="font-size:22px; font-weight:800">${P.length}</div>
-        </div>
-        <div class="card" style="padding:14px">
-          <div style="font-size:12px; color:var(--text3)">Siap diekspor</div>
-          <div style="font-size:22px; font-weight:800; color:var(--success)">${lengkap.length}</div>
-        </div>
-        <div class="card" style="padding:14px">
-          <div style="font-size:12px; color:var(--text3)">Belum lengkap</div>
-          <div style="font-size:22px; font-weight:800;
-                      color:${belum.length ? 'var(--warning)' : 'var(--text3)'}">
-            ${belum.length}</div>
-        </div>
-      </div>
-
-      ${belum.length ? `
-        <div class="card" style="padding:12px 16px; margin-bottom:12px;
-                                 border-left:3px solid var(--warning)">
-          <b>${belum.length} pemeriksaan belum lengkap</b> dan tidak ikut
-          diekspor. Mengekspor baris setengah jadi ke LIS pihak lain hanya
-          memindahkan lubangnya ke sistem orang.
-        </div>` : ''}
-
-      <div class="card" style="padding:10px 16px; margin-bottom:12px">
-        <label style="font-size:13px; cursor:pointer">
-          <input type="checkbox" ${ceHanyaLengkap ? 'checked' : ''}
-                 onchange="ceSaring(this.checked)"> Tampilkan hanya yang siap diekspor
-        </label>
-      </div>
-
-      <div class="card" style="overflow-x:auto">
-        <table class="data-table"><thead><tr>
-          <th>Kode</th><th>Pemeriksaan</th><th>Kategori</th>
-          <th>LOINC</th><th>Satuan</th><th>Metode</th>
-          <th>Rentang Rujukan</th><th>Status</th>
-        </tr></thead><tbody>
-        ${daftar.map(p => {
-          const r = ceRujukanOf(p.id);
-          const ok = ceLengkap(p);
-          const kurang = ceKurang(p);
-          return `<tr style="${ok ? '' : 'background:rgba(255,180,0,.05)'}">
-            <td><b>${ceEsc(p.kode_internal || '—')}</b></td>
-            <td>${ceEsc(p.nama_tes)}</td>
-            <td style="font-size:12px">${ceEsc(p.kategori || '—')}</td>
-            <td style="font-size:12px">${p.loinc_code
-              ? ceEsc(p.loinc_code)
-              : '<span style="color:var(--warning)">belum dipetakan</span>'}</td>
-            <td style="font-size:12px">${ceEsc(p.satuan_hasil || '—')}</td>
-            <td style="font-size:12px">${ceEsc(p.metode || '—')}</td>
-            <td style="font-size:12px">${r.length
-              ? r.slice(0, 3).map(x =>
-                  `${x.range_min ?? '?'}–${x.range_max ?? '?'} ${ceEsc(x.unit || '')}`
-                  + (x.gender && x.gender !== 'All' ? ` (${ceEsc(x.gender)})` : '')
-                  + (x.condition_name && x.condition_name !== 'Normal'
-                      ? ` [${ceEsc(x.condition_name)}]` : '')
-                ).join('<br>') + (r.length > 3 ? `<br>+${r.length - 3} lagi` : '')
-              : '<span style="color:var(--warning)">belum ditetapkan</span>'}</td>
-            <td>${ok
-              ? '<span style="color:var(--success); font-weight:600">siap</span>'
-              : `<span style="color:var(--warning); font-size:11px">
-                   kurang: ${kurang.join(', ')}</span>`}</td>
-          </tr>`;
-        }).join('')}
-        </tbody></table>
-      </div>
-
-      <div class="card" style="padding:12px 16px; margin-top:12px; font-size:12px;
-                               color:var(--text3); line-height:1.7">
-        Rentang rujukan dibaca dari <code>ref_ranges</code>, bukan ditulis
-        di berkas ini. Ia menentukan hasil pasien disebut normal atau
-        tidak, bergantung metode dan populasi tiap lab, dan harus punya
-        jejak siapa menetapkannya.
-      </div>`}`;
-}
-
-function ceSaring(v) { ceHanyaLengkap = v; ceGambar(); }
-
-function ceEkspor() {
-  const lengkap = (ceData.produk || []).filter(ceLengkap);
-  if (!lengkap.length) { alert('Tidak ada pemeriksaan yang siap diekspor.'); return; }
-
-  const baris = [[
-    'kode_material', 'nama_pemeriksaan', 'kategori', 'loinc_obx3', 'ucum_obx6',
-    'metode', 'gender', 'usia_min', 'usia_max', 'kondisi',
-    'batas_bawah', 'batas_atas', 'kritis_bawah', 'kritis_atas', 'interpretasi',
-  ]];
-
-  for (const p of lengkap) {
-    // Panel dipecah menjadi satu baris per rentang: satu pemeriksaan bisa
-    // punya rujukan berbeda per jenis kelamin dan usia, dan menggabungkannya
-    // jadi satu baris menghilangkan perbedaan itu.
-    for (const r of ceRujukanOf(p.id)) {
-      if (r.range_min == null || r.range_max == null) continue;
-      baris.push([
-        p.kode_internal, p.nama_tes, p.kategori || '', p.loinc_code,
-        r.unit || p.satuan_hasil || '', p.metode || '',
-        r.gender || 'All', r.age_min ?? '', r.age_max ?? '',
-        r.condition_name || 'Normal',
-        r.range_min, r.range_max,
-        r.critical_low ?? '', r.critical_high ?? '',
-        r.interpretation || '',
-      ]);
+function ceRangeType(form) {
+  const qualitative = form.elements.result_type.value === "qualitative";
+  for (const box of form.querySelectorAll(".ce-range")) {
+    const op = box.querySelector("[name=r_operator]");
+    op.disabled = qualitative;
+    op.required = !qualitative;
+    for (const name of ["lower", "upper"]) {
+      const el = box.querySelector(`[name=r_${name}]`),
+        allowed =
+          !qualitative &&
+          (op.value === "BETWEEN" ||
+            (name === "upper" && ["<", "<="].includes(op.value)) ||
+            (name === "lower" && [">", ">=", "="].includes(op.value)));
+      el.disabled = !allowed;
+      el.required = allowed;
     }
+    box.querySelector("[name=r_expected_values]").disabled = !qualitative;
+    box.querySelector("[name=r_expected_values]").required = qualitative;
   }
-
-  const csv = baris.map(b => b.map(v => {
-    const s = String(v ?? '');
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  }).join(',')).join('\n');
-
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `katalog-tes-ava-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(a.href);
+  form.elements.ucum.required = !qualitative;
 }
-
-window.renderCatalogExport = renderCatalogExport;
-window.ceSaring = ceSaring;
-window.ceEkspor = ceEkspor;
+async function ceForm(action, row) {
+  const scope = ceContext(),
+    epoch = ceEpoch;
+  if (ceScope !== scope) throw Error("Tenant/petugas berubah; muat ulang");
+  const target = document.getElementById("ce-editor");
+  let fields = "";
+  if (action === "create") {
+    fields =
+      ceSelect(
+        "Pemeriksaan → analit sumber",
+        "item_id",
+        ceSources.rows
+          .slice(0, 50)
+          .map((s) => [s.item_id, s.examination_name + " → " + s.analyte_name]),
+      ) +
+      ceInput("Kode analit sumber", "analyte_code", "text", "readonly") +
+      ceInput("Versi katalog", "catalog_version") +
+      ceInput("Metode ID", "method_id") +
+      ceSelect("Jenis hasil", "result_type", [
+        ["numeric", "Kuantitatif"],
+        ["qualitative", "Kualitatif"],
+      ]) +
+      ceInput("LOINC", "loinc") +
+      "<button type=button id=ce-lookup>Ambil definisi primer LOINC</button>" +
+      ceInput("Nama primer LOINC", "primary_name", "text", "readonly") +
+      ceInput(
+        "URL sumber terminologi primer",
+        "terminology_url",
+        "url",
+        "readonly",
+      ) +
+      ceInput("UCUM", "ucum") +
+      ceInput("Specimen", "specimen") +
+      ceInput("Metode pemeriksaan", "method") +
+      ceInput("Alat / reagen / konfigurasi metode", "device_reagent") +
+      ceInput("Bukti review mapping", "mapping_evidence") +
+      ceInput("Bukti acuan / IFU rentang", "reference_evidence") +
+      ceInput("Versi acuan", "source_version") +
+      ceInput("Timezone fasilitas IANA", "timezone") +
+      ceSelect("Unit usia untuk seluruh kelompok", "age_unit", [
+        ["d", "Hari"],
+        ["mo", "Bulan"],
+        ["a", "Tahun"],
+      ]) +
+      ceInput(
+        "Berlaku mulai — waktu browser " +
+          Intl.DateTimeFormat().resolvedOptions().timeZone,
+        "valid_from",
+        "datetime-local",
+      ) +
+      ceInput(
+        "Berlaku sampai — waktu browser",
+        "valid_until",
+        "datetime-local",
+      ) +
+      "<div id=ce-ranges></div><button type=button id=ce-add-range>Tambah kelompok acuan</button>";
+  }
+  if (action === "approve")
+    fields +=
+      "<label><input type=checkbox name=mapping_reviewed required> Saya memeriksa analit, specimen, LOINC/UCUM dan sumber primer</label><label><input type=checkbox name=method_reviewed required> Saya memeriksa metode, alat/reagen dan IFU</label><label><input type=checkbox name=reference_reviewed required> Saya mengesahkan reference/expected values, demografi, versi dan masa berlaku</label>";
+  target.innerHTML = `<form><h2>${ceEsc(action)} ${row ? "#" + row.id : ""}</h2>${fields}<label>Alasan / bukti<textarea name=reason required minlength=5></textarea></label><p id=ce-form-error role=alert></p><button type=submit>Simpan</button><button type=button id=ce-cancel>Tutup</button></form>`;
+  const form = target.querySelector("form"),
+    key = crypto.randomUUID();
+  form.querySelector("#ce-cancel").onclick = () => target.replaceChildren();
+  if (action === "create") {
+    ceRange(form);
+    form.querySelector("#ce-lookup").onclick = async () => {
+      const code = form.elements.loinc.value;
+      try {
+        const term = await sbRpc("lis_catalog_primary_term", { p_code: code });
+        if (
+          form.isConnected &&
+          ceCurrent(scope, epoch) &&
+          form.elements.loinc.value === code
+        ) {
+          form.elements.primary_name.value = term.long_name;
+          form.elements.terminology_url.value = term.canonical_url;
+          form.querySelector("#ce-form-error").textContent = "";
+        }
+      } catch (e) {
+        if (form.isConnected && ceCurrent(scope, epoch)) {
+          form.elements.primary_name.value = "";
+          form.elements.terminology_url.value = "";
+          form.querySelector("#ce-form-error").textContent = e.message;
+        }
+      }
+    };
+    form.elements.loinc.oninput = () => {
+      form.elements.primary_name.value = "";
+      form.elements.terminology_url.value = "";
+    };
+    form.querySelector("#ce-add-range").onclick = () => ceRange(form);
+    form.elements.result_type.onchange = () => ceRangeType(form);
+    form.elements.item_id.onchange = async () => {
+      const id = form.elements.item_id.value,
+        s = ceSources.rows.find((s) => s.item_id === Number(id));
+      form.elements.analyte_code.value = "";
+      if (!s) return;
+      const bytes = new TextEncoder().encode(
+          JSON.stringify([
+            s.source_snapshot.source_product_code,
+            s.source_snapshot.item_code,
+          ]),
+        ),
+        digest = await crypto.subtle.digest("SHA-256", bytes);
+      if (
+        form.isConnected &&
+        ceCurrent(scope, epoch) &&
+        form.elements.item_id.value === id
+      )
+        form.elements.analyte_code.value =
+          "AN-" +
+          Array.from(new Uint8Array(digest))
+            .map((x) => x.toString(16).padStart(2, "0"))
+            .join("")
+            .slice(0, 24)
+            .toUpperCase();
+    };
+  }
+  form.onsubmit = async (event) => {
+    event.preventDefault();
+    const submit = form.querySelector("[type=submit]");
+    if (submit.disabled) return;
+    submit.disabled = true;
+    try {
+      if (!ceCurrent(scope, epoch))
+        throw Error("Tenant/petugas atau halaman berubah; muat ulang");
+      let data = { reason: form.elements.reason.value };
+      if (row) {
+        data.id = row.id;
+        data.version = row.version;
+      }
+      if (action === "approve")
+        for (const field of [
+          "mapping_reviewed",
+          "method_reviewed",
+          "reference_reviewed",
+        ])
+          data[field] = form.elements[field].checked;
+      if (action === "create") {
+        const source = ceSources.rows.find(
+          (s) => s.item_id === Number(form.elements.item_id.value),
+        );
+        data = {
+          ...data,
+          product_id: source.product_id,
+          item_id: source.item_id,
+          source_snapshot: source.source_snapshot,
+          analyte_code: form.elements.analyte_code.value,
+          catalog_version: form.elements.catalog_version.value,
+          method_id: form.elements.method_id.value,
+          valid_from: new Date(form.elements.valid_from.value).toISOString(),
+          valid_until: new Date(form.elements.valid_until.value).toISOString(),
+          definition: {},
+        };
+        for (const field of [
+          "result_type",
+          "loinc",
+          "primary_name",
+          "terminology_url",
+          "ucum",
+          "specimen",
+          "method",
+          "device_reagent",
+          "mapping_evidence",
+          "reference_evidence",
+          "source_version",
+          "timezone",
+          "age_unit",
+        ])
+          data.definition[field] = form.elements[field].value;
+        data.definition.ranges = Array.from(
+          form.querySelectorAll(".ce-range"),
+        ).map((box) => {
+          const value = (name) => box.querySelector(`[name=r_${name}]`).value,
+            boolean = (name) => {
+              if (!["true", "false"].includes(value(name)))
+                throw Error("Pilihan batas usia inklusif wajib");
+              return value(name) === "true";
+            },
+            numeric = (name) => {
+              if (!value(name).trim() || !Number.isFinite(Number(value(name))))
+                throw Error("Nilai numerik wajib: " + name);
+              return Number(value(name));
+            },
+            r = {
+              age_min: numeric("age_min"),
+              age_max: numeric("age_max"),
+              age_lower_inclusive: boolean("age_lower_inclusive"),
+              age_upper_inclusive: boolean("age_upper_inclusive"),
+              sex: value("sex"),
+              condition: value("condition"),
+            };
+          if (data.definition.result_type === "qualitative")
+            r.expected_values = value("expected_values")
+              .split(/\r?\n/)
+              .map((s) => s.trim())
+              .filter(Boolean);
+          else {
+            r.operator = value("operator");
+            r.lower = ["BETWEEN", ">", ">=", "="].includes(r.operator)
+              ? numeric("lower")
+              : null;
+            r.upper = ["BETWEEN", "<", "<="].includes(r.operator)
+              ? numeric("upper")
+              : null;
+          }
+          return r;
+        });
+      }
+      await sbRpc("lis_catalog_command", {
+        p_action: action,
+        p_data: data,
+        p_key: key,
+      });
+      if (form.isConnected && ceCurrent(scope, epoch))
+        await renderReviewedCatalog();
+    } catch (e) {
+      if (form.isConnected && ceCurrent(scope, epoch))
+        form.querySelector("#ce-form-error").textContent = e.message;
+    } finally {
+      if (submit.isConnected) submit.disabled = false;
+    }
+  };
+  target.scrollIntoView({ block: "start" });
+}
+async function ceExport(row) {
+  const scope = ceContext(),
+    epoch = ceEpoch;
+  try {
+    if (!ceCurrent(scope, epoch))
+      throw Error("Tenant/petugas berubah; muat ulang");
+    const data = await sbRpc("lis_catalog_export", { p_id: row.id });
+    if (!ceCurrent(scope, epoch)) return;
+    if (!Array.isArray(data.rows) || !data.rows.length)
+      throw Error("Server tidak mengonfirmasi ekspor sumber");
+    const headers = Object.keys(data.rows[0]),
+      quote = (v) => '"' + String(v ?? "").replace(/"/g, '""') + '"',
+      csv =
+        headers.map(quote).join(",") +
+        "\n" +
+        data.rows
+          .map((r) =>
+            headers
+              .map((h) =>
+                quote(
+                  typeof r[h] === "object" && r[h] !== null
+                    ? JSON.stringify(r[h])
+                    : r[h],
+                ),
+              )
+              .join(","),
+          )
+          .join("\n") +
+        "\n",
+      url = URL.createObjectURL(
+        new Blob([csv], { type: "text/csv;charset=utf-8" }),
+      ),
+      a = document.createElement("a");
+    a.href = url;
+    a.download = "catalog-tenant-method-" + row.id + ".csv";
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (e) {
+    if (ceCurrent(scope, epoch))
+      document.getElementById("ce-error").textContent = e.message;
+  }
+}
+window.renderReviewedCatalog = renderReviewedCatalog;
+window.renderCatalogExport = renderReviewedCatalog;
