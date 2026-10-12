@@ -4501,7 +4501,7 @@ async function agSyncLiveState() {
 async function initAgenticModule() {
   const main = document.getElementById('main-content');
   if (!main) return;
-  if(window.TechPages?.enabled()){
+  if(window.WorkspaceNavigation?.enabled()||window.TechPages?.enabled()){
     const title=AG_TABS_2026.find(tab=>tab.id===_agTabActive)?.label.replace(/^[^a-zA-Z]+/,'')||'Agentic';
     main.innerHTML='<header class="page-header"><div><h1>'+agEsc(title)+'</h1><p>Ruang kerja Agentic</p></div></header><div id="ag-tab-content" class="tech-agentic-content"></div>';
     await renderActiveAgTabContent();return;

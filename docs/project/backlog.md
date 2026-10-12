@@ -40,8 +40,8 @@ OWNED_BY: generic.
 - [x] P3: Configurable Template Engine (5 Presets, kop/logo/kolom/spasi/TTE, SMM bundler & E-Hasil).
 - [x] P4: Batch Content Engine (531 panduan pasien, 4-minggu kalender LinkedIn).
 - [x] P5: Compounding Proof System (Case study generator Before vs After).
-- [ ] Fase Ekspansi Lanjutan (Scale-up & Pilot):
-  - [ ] Microservice headless Chromium/Puppeteer untuk ekspor biner PDF langsung dari command line/server tanpa interaksi browser manual.
-  - [ ] Adapter REST API SATUSEHAT Kemenkes RI untuk sinkronisasi otomatis Resource DiagnosticReport & Observation.
+- [x] Fase Ekspansi Lanjutan (Scale-up & Pilot):
+  - [x] Microservice headless Chromium/Playwright untuk ekspor biner PDF langsung dari command line/server tanpa interaksi browser manual (`lib/template_engine/pdf_exporter.js` & `scripts/export_doc_pdf.cjs`).
+  - [x] Adapter REST API SATUSEHAT Kemenkes RI untuk sinkronisasi otomatis Resource DiagnosticReport & Observation (`lib/interop/satusehat_client.js` & `scripts/uji/test_satusehat_client.js`).
   - [ ] Pilot onboarding 1 klinik eksternal nyata untuk uji coba deployment tenant baru.
 

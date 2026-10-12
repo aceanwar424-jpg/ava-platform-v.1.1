@@ -64,3 +64,5 @@ body { font-family:Inter,'Segoe UI',sans-serif; }
  .apps-sidebar-scrim[hidden] { display:none; }
 }
 @media(prefers-reduced-motion:reduce) { .app-sidebar { transition:none; } }
+
+#login-screen .role-pill-span.active{color:#066367!important}

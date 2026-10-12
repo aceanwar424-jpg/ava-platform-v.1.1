@@ -6,7 +6,7 @@ const FIN_TABS = ['invoice','payment','report','commission'];
 let finInvoices=[], finPayments=[];
 
 async function renderFinance(tabAwal) {
-  if(window.TechPages?.enabled()) tabAwal=TechPages.selection('finance',tabAwal||'invoice',!!tabAwal);
+  if((window.WorkspaceNavigation?.enabled()||window.TechPages?.enabled())) tabAwal=(window.WorkspaceNavigation||window.TechPages).selection('finance',tabAwal||'invoice',!!tabAwal);
   document.getElementById('main-content').innerHTML = `
     <div class="page-header">
       <div><h1>Finance & Billing</h1>
@@ -91,9 +91,9 @@ async function renderFinance(tabAwal) {
   // di layar yang persis sama — menu yang menjanjikan tiga tujuan berbeda
   // tetapi memberi satu. Kini tab awalnya ikut ditentukan.
   if (tabAwal && tabAwal !== 'invoice') switchFinTab(tabAwal);
-  if(window.TechPages?.enabled()) {
+  if((window.WorkspaceNavigation?.enabled()||window.TechPages?.enabled())) {
     document.getElementById('fin-tabs')?.remove();
-    document.querySelector('#main-content h1').textContent=TechPages.sections.finance.find(x=>x[1]===tabAwal)?.[0]||'Finance';
+    document.querySelector('#main-content h1').textContent=(window.WorkspaceNavigation||window.TechPages).sections.finance.find(x=>x[1]===tabAwal)?.[0]||'Finance';
   }
 }
 

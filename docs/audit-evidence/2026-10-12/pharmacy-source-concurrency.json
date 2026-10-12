@@ -1,0 +1,24 @@
+{
+  "synthetic": true,
+  "results": [
+    {
+      "name": "two dispensing requests create one actual dispense, one FEFO deduction and one source charge",
+      "native_source_lock": true,
+      "status": "passed"
+    },
+    {
+      "name": "two custody approvals cannot return more than actual patient-held medication",
+      "native_source_lock": true,
+      "status": "passed"
+    },
+    {
+      "name": "two tenant approvals cannot claim the same unassigned opening batch",
+      "native_source_lock": true,
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "results": [
+    {
+      "name": "two licensed source discharge requests produce one resume, execution and housekeeping order",
+      "native_source_lock": true,
+      "status": "passed"
+    }
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

@@ -8,6 +8,12 @@
   const panels = {
     'tech-control-plane': [['Ringkasan operasi','ringkasan'],['Kesehatan sistem','kesehatan'],['Tiket & tindak lanjut','tiket'],['Deployment tenant','deployment'],['Pengaturan & trace','pengaturan']]
   };
+  const sections={finance:[['Invoice','invoice'],['Pembayaran','payment'],['Laporan','report'],['Komisi sales','commission']],hrd:[['Data karyawan','emp'],['Absensi & cuti','leave'],['Penggajian','payroll']],agentic:[['Kanvas operasi','canvas'],['Organisasi','org'],['Dokumen mutu','docs'],['Kotak masuk','inbox'],['Konten','studio'],['Integrasi','mcp'],['Pengetahuan','rag']]};
+  const selections={};
+  const enabled=()=>document.body.classList.contains('ava-ops-shell');
+  function selection(page,fallback,explicit=false){const target=window.workspacePanelTarget;if(target?.page===page){selections[page]=target.panel;window.workspacePanelTarget=null;}else if(explicit)selections[page]=fallback;return selections[page]||fallback;}
+  function destinations(item){if(/\{\s*tab\s*:/.test(item.action||''))return null;return (window.TechNavigation?.enabled()?window.TechPages?.sections[item.page]:null)||sections[item.page]||panels[item.page];}
+  function leaves(group,s,i,prefix=''){const item=group.services[s].items[i],parts=destinations(item);return parts?parts.map(([label,panel])=>child(group,s,i,panel,prefix+label)).join(''):child(group,s,i,null,item.label);}
   const settingsIcon=document.querySelector('#workspace-settings-btn > span:first-child');
   if(settingsIcon){settingsIcon.innerHTML=svg('settings');settingsIcon.style.color='inherit';}
   const notification=document.querySelector('.topbar-btn[title="Notifikasi Sistem"]');
@@ -43,10 +49,10 @@
     let cards;
     if(!group) cards=groups().map(g=>tile(g.name,`${g.services.reduce((n,s)=>n+s.items.length,0)} fungsi sesuai akses Anda`,'',`data-group="${esc(g.id)}"`)).join('');
     else cards=group.services.map((service,s)=>{
-      if(service.name&&service.items.length>1) return tile(service.name,`${service.items.length} fungsi tersedia`,service.items.map((item,i)=>child(group,s,i)).join(''),'');
+      if(service.name&&service.items.length>1) return tile(service.name,`${service.items.length} fungsi tersedia`,service.items.map((item,i)=>leaves(group,s,i,item.label+' · ')).join(''),'');
       return service.items.map((item,i)=>{
-        const destinations=window.TechNavigation?.enabled() ? (window.TechPages?.sections[item.page] || panels[item.page]) : panels[item.page];
-        const children=destinations?.map(([label,panel])=>child(group,s,i,panel,label)).join('');
+        const parts=destinations(item);
+        const children=parts?.map(([label,panel])=>child(group,s,i,panel,label)).join('');
         const unavailable=item.soon||item.status==='belum';
         return tile(item.label,item.desc||'Buka halaman kerja',children,children?'':`data-service="${s}" data-item="${i}" ${unavailable?'disabled':''}`,unavailable?'Belum tersedia':item.status==='parsial'?'Fungsi terbatas':'');
       }).join('');
@@ -74,6 +80,7 @@
           const page=group.services[+b.dataset.service].items[+b.dataset.item].page;
           const target=window.TechNavigation?.enabled()&&window.TechPages?.sections[page]?.find(entry=>entry[1]===b.dataset.panel)?.[2];
           if(target){window.workspacePanelTarget=null;window.navigate(target.page,target.params||{});return;}
+          if(page==='agentic'){window.navigate(page,{tab:b.dataset.panel});return;}
           window.workspacePanelTarget={page,panel:b.dataset.panel};
         }
         window.navigateFromContext(group.id,+b.dataset.service,+b.dataset.item);
@@ -93,5 +100,5 @@
   }
   document.addEventListener('click',e=>{if(!e.target.closest('.workspace-tile'))closeChildren();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeChildren(true);});
-  window.WorkspaceNavigation={directory,onPage};
+  window.WorkspaceNavigation={enabled,directory,onPage,selection,sections};
 })();

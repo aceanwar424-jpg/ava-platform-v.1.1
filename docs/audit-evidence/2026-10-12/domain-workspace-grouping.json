@@ -1,0 +1,86 @@
+{
+  "synthetic": true,
+  "results": [
+    {
+      "domain": "his",
+      "workspace": "his",
+      "groups": 17,
+      "leaves": 105,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "lis",
+      "workspace": "lis",
+      "groups": 10,
+      "leaves": 0,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "ops",
+      "workspace": "ops",
+      "groups": 61,
+      "leaves": 19,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "care",
+      "workspace": "wellness",
+      "groups": 19,
+      "leaves": 7,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "nutri",
+      "workspace": "wellness",
+      "groups": 19,
+      "leaves": 7,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "sanctuary",
+      "workspace": "wellness",
+      "groups": 19,
+      "leaves": 7,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "tech",
+      "workspace": "tech",
+      "groups": 6,
+      "leaves": 26,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "console",
+      "workspace": "tech",
+      "groups": 6,
+      "leaves": 26,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    },
+    {
+      "domain": "wellness",
+      "workspace": "wellness",
+      "groups": 19,
+      "leaves": 7,
+      "mobileOverflow": false,
+      "restrictedRole": true,
+      "errors": []
+    }
+  ]
+}

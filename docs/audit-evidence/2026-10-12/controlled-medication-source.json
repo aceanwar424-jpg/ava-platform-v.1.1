@@ -1,0 +1,12 @@
+{
+  "synthetic": true,
+  "results": [
+    "controlled dispensing without recipient identity rolls back all stock, source register and dispensing rows",
+    "actual controlled register projects only tenant ledger balance and source recipient; global aggregate and legacy register stay private",
+    "reviewed return creates actual controlled IN register, stock ledger and credit once; originals and unassigned history remain untouched"
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

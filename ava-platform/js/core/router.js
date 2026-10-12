@@ -396,7 +396,7 @@ async function navigate(page, params={}) {
     case 'rs-bed-reservation': await safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
     case 'rs-housekeeping': await safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
     case 'rs-nurse-station': await safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
-    case 'rs-discharge': await safeRun('renderHospitalOperations', {page:'rs-discharge'}); break;
+    case 'rs-discharge': await safeRun('renderSignedDischarge'); break;
     case 'rs-igd-flow': await safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
     case 'rs-inpatient-billing': await safeRun('renderRoomBilling'); break;
     case 'rs-capacity': await safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
@@ -405,7 +405,7 @@ async function navigate(page, params={}) {
     case 'rs-diet': await safeRun('renderHospitalOperations', {page:'rs-diet'}); break;
     case 'rs-transfusion': await safeRun('renderHospitalOperations', {page:'rs-transfusion'}); break;
     case 'rs-ppi': await safeRun('renderHospitalOperations', {page:'rs-ppi'}); break;
-    case 'rs-ward-pharmacy': await safeRun('renderHospitalOperations', {page:'rs-ward-pharmacy'}); break;
+    case 'rs-ward-pharmacy': await safeRun('renderWardPharmacy'); break;
     case 'rs-transport': await safeRun('renderHospitalOperations', {page:'rs-transport'}); break;
     case 'rs-critical-care': await safeRun('renderHospitalOperations', {page:'rs-critical-care'}); break;
     case 'rs-maternity': await safeRun('renderHospitalOperations', {page:'rs-maternity'}); break;
@@ -420,7 +420,7 @@ async function navigate(page, params={}) {
     // punya rute sama sekali, jadi tidak pernah bisa dibuka. Yang tampil
     // di layar justru yang karangan.
     case 'pharmacy':
-    case 'farmasi':     await safeRun('renderPharmacy', params);       break;
+    case 'farmasi':     await safeRun('renderWardPharmacy', params);       break;
     case 'emr':
     case 'emr_soap':
     case 'emr-soap':    await safeRun('renderEmrSoap', params);        break;
@@ -558,7 +558,7 @@ async function navigate(page, params={}) {
     case 'cfg-queue-flow':
     case 'cfg-queue-device': await safeRun('renderQueueConfig');           break;
     case 'cfg-medicine':
-    case 'cfg-medicine-reference': await safeRun('renderPharmacy');        break;
+    case 'cfg-medicine-reference': await safeRun('renderWardPharmacy');        break;
     case 'cfg-equipment': await safeRun('renderAssets');                   break;
     case 'cfg-service-class': await safeRun('renderConfigPackage');        break;
     case 'cfg-job-master': await safeRun('renderOrgStructure');            break;

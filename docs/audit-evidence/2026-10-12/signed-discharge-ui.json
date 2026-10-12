@@ -1,0 +1,14 @@
+{
+  "synthetic": true,
+  "results": [
+    "UI pending medication prevents source discharge without partial records",
+    "UI doctor records and signs an explicit source decision with no clinical defaults",
+    "UI verified custody to actual signed resume, discharged source stay and bed cleaning",
+    "UI closes actual care episode and encounter using the source signed discharge decision",
+    "immutable clinical originals and desktop/mobile UI without overflow or page errors"
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "mar_return_complete": false,
+  "results": [
+    "licensed signed prescription uses canonical admission identity and explicit tenant price; retry produces one Rx",
+    "unknown expiry batch is excluded from FEFO and cannot borrow another tenant lot",
+    "separate pharmacist verification→actual FEFO within tenant→one drug ledger→actual dispensing source charge; unrelated lot intact",
+    "administrator and expired individual physician credentials cannot prescribe",
+    "private legacy core and foreign tenant cannot bypass the licensed source workflow"
+  ],
+  "cleanup": {
+    "database_closed": true,
+    "live_records_created": 0
+  }
+}

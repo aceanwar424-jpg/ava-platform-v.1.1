@@ -41,7 +41,21 @@
     "title": "AVA Health — Portal Layanan",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "role-pill-span active",
+        "text": "Pasien",
+        "size": 14,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -104,7 +118,47 @@
     "title": "Portal Nakes — AVA Home Care",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "DIV",
+        "class": "lbl",
+        "text": "Bagikan Lokasi Live",
+        "size": 13,
+        "color": "rgb(255, 255, 255)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Admin & pasien dapat melihat posisi Anda",
+        "size": 11,
+        "color": "rgb(157, 180, 208)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.13
+      },
+      {
+        "tag": "DIV",
+        "class": "status",
+        "text": "Aktifkan saat berangkat ke lokasi pasien.",
+        "size": 12,
+        "color": "rgb(207, 224, 242)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1.35
+      }
+    ],
     "errors": []
   },
   {
@@ -113,7 +167,21 @@
     "title": "AVA Health — Portal Layanan",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "role-pill-span active",
+        "text": "Perusahaan",
+        "size": 14,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -122,7 +190,21 @@
     "title": "Lacak Nakes — AVA Home Care",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "P",
+        "class": "",
+        "text": "AVA Home Care",
+        "size": 11,
+        "color": "rgb(147, 164, 189)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.53
+      }
+    ],
     "errors": []
   },
   {
@@ -131,7 +213,60 @@
     "title": "AVA GLOBAL ECOSYSTEM — Display Antrian Ruang Tunggu",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 1",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 2",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 3",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Layanan MCU",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -140,7 +275,21 @@
     "title": "AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor",
     "overflow": false,
     "scrollWidth": 1440,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "A",
+        "class": "",
+        "text": "Buka workspace CRM ↗",
+        "size": 14,
+        "color": "rgb(196, 241, 223)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1.24
+      }
+    ],
     "errors": []
   },
   {
@@ -194,7 +343,21 @@
     "title": "AVA Health — Portal Layanan",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "role-pill-span active",
+        "text": "Pasien",
+        "size": 14,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -257,7 +420,47 @@
     "title": "Portal Nakes — AVA Home Care",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "DIV",
+        "class": "lbl",
+        "text": "Bagikan Lokasi Live",
+        "size": 13,
+        "color": "rgb(255, 255, 255)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Admin & pasien dapat melihat posisi Anda",
+        "size": 11,
+        "color": "rgb(157, 180, 208)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.13
+      },
+      {
+        "tag": "DIV",
+        "class": "status",
+        "text": "Aktifkan saat berangkat ke lokasi pasien.",
+        "size": 12,
+        "color": "rgb(207, 224, 242)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1.35
+      }
+    ],
     "errors": []
   },
   {
@@ -266,7 +469,21 @@
     "title": "AVA Health — Portal Layanan",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "role-pill-span active",
+        "text": "Perusahaan",
+        "size": 14,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -275,7 +492,21 @@
     "title": "Lacak Nakes — AVA Home Care",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "P",
+        "class": "",
+        "text": "AVA Home Care",
+        "size": 11,
+        "color": "rgb(147, 164, 189)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 2.53
+      }
+    ],
     "errors": []
   },
   {
@@ -284,7 +515,60 @@
     "title": "AVA GLOBAL ECOSYSTEM — Display Antrian Ruang Tunggu",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 1",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 2",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Loket 3",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      },
+      {
+        "tag": "SPAN",
+        "class": "",
+        "text": "Layanan MCU",
+        "size": 16,
+        "color": "rgb(8, 126, 128)",
+        "bg": [
+          232,
+          245,
+          244
+        ],
+        "contrast": 4.37
+      }
+    ],
     "errors": []
   },
   {
@@ -293,7 +577,21 @@
     "title": "AVA GLOBAL ECOSYSTEM — CRM & Sales Live Monitor",
     "overflow": false,
     "scrollWidth": 390,
-    "findings": [],
+    "findings": [
+      {
+        "tag": "A",
+        "class": "",
+        "text": "Buka workspace CRM ↗",
+        "size": 14,
+        "color": "rgb(196, 241, 223)",
+        "bg": [
+          255,
+          255,
+          255
+        ],
+        "contrast": 1.24
+      }
+    ],
     "errors": []
   },
   {

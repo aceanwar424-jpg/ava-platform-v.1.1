@@ -24,25 +24,58 @@
   - [x] Dukungan banner peringatan Nilai Kritis (*Critical Panic Alert Banner*) sesuai ISO 15189 cl. 7.4.1.6.
   - [x] Pencatatan jejak waktu audit spesimen (Waktu Pengambilan, Penerimaan, Validasi) sesuai PMK 24/2022 & CLSI GP44-A4.
   - [x] Kolom Metode Uji per baris analit terintegrasi.
+- [x] Perluasan SATUSEHAT FHIR R4 Playbook (`lib/interop/satusehat_client.js`):
+  - [x] `createServiceRequest`: Pembuatan order lab DPJP (SNOMED CT 108252007, LOINC).
+  - [x] `createSpecimen`: Spesimen flebotomi darah/urin (SNOMED CT 119297000).
+  - [x] `createObservation`: Hasil uji analit dengan LOINC (OBX-3) & UCUM (OBX-6).
+  - [x] `createDiagnosticReport`: Laporan kumulatif hasil lab terintegrasi.
+- [x] Forensik Integritas Katalog & Piramida Dokumen Mutu Level 3 & 4:
+  - [x] Pembersihan artefak terjemahan mesin ("T4 GRATIS", "Protein Jones", dsb.) tanpa merusak kunci relasional `Kode Material` dan `Nama Pemeriksaan`.
+  - [x] Matriks Nilai Kritis Terpusat: `data/catalog/critical_panic_ranges.json` (12 analit gawat darurat dengan batas panik & SLA TBaK 30m).
+  - [x] 4 Instruksi Kerja Teknis Meja Analis (Level 3 SMM ISO 15189):
+    * `SMM_L3_001_WI_Pengendalian_Dokumen.md` (Pengendalian dokumen mutu).
+    * `SMM_L3_002_IK_Prosedur_Flebotomi_Darah_Vena.md` (CLSI GP41-Ed7, order of draw, asepsis).
+    * `SMM_L3_003_IK_Penanganan_Tumpahan_Bahan_Infeksius_Spill_Kit.md` (Spill Kit B3 & desinfeksi Klorin 0.5%).
+    * `SMM_L3_004_IK_Pemeliharaan_Harian_Kalibrasi_Analyzer.md` (Background check & QC Westgard).
+  - [x] 6 Formulir Kendali Mutu Level 4 ISO 15189: `templates/smm/forms/` (Inspeksi Reagen, Log Suhu Kulkas, Uji EP26-A, Matriks Delta Check, Log TBaK, Manifest B3).
+- [x] Paket Operasional Lapangan & Komersialisasi Produk:
+  - [x] `docs/commercial/ONE-PAGER-LIS-CATALOG-SMM.md`: One-pager penawaran lisensi data katalog & bundel SMM untuk faskes luar.
+  - [x] `docs/commercial/CHECKLIST-ONBOARDING-LIS-KLIEN.md`: Formulir gap analysis menu tes dan verifikasi IFU reagen vendor klien.
+  - [x] `docs/technical/PANDUAN-KONEKSI-ANALYZER-RS232.md`: Panduan teknisi pinout kabel DB9, Moxa NPort & handshake ASTM :9999.
+  - [x] `docs/technical/PANDUAN-SATUSEHAT-PRODUKSI.md`: Prosedur administratif pengajuan Client ID & Secret Production Kemenkes RI DTO.
 - [x] Verifikasi Regresi Menyeluruh:
+  - [x] `scripts/uji/run_all_tests.js`: **17 DARI 17 SUITE PENGUJIAN LULUS (100% PASS)** (Fase 0 s/d Fase 4, Gate QC, P1-P5, LIS Super Suite, 3 Pilar, Antrean, Wellness, LIS Tech, Klaim Penjamin, HIS, Alur Tagihan).
   - [x] `scripts/uji/test_akselerator_p1_p5.js`: 7/7 Skenario PASS (100%).
   - [x] `scripts/uji/test_p1_multilab_engine.js`: 17/17 Skenario PASS (100% — Skor Kepatuhan Medika & Sentosa: 100% AUDIT READY).
   - [x] `scripts/uji/test_template_configuration.cjs`: 13/13 Skenario PASS (100%).
   - [x] `scripts/uji/test_p3_p4_p5_all.js`: 9/9 Skenario PASS (100%).
   - [x] `scripts/audit_lis_subdomain.cjs`: 56/56 Skenario PASS (100%).
+  - [x] `scripts/export_doc_pdf.cjs`: Ekspor biner PDF A4 resmi (`artifacts/pdf/sample_result.pdf` 228 KB & `artifacts/pdf/smm_bundle_medika.pdf` 324 KB) via Playwright Edge headless.
+  - [x] `scripts/uji/test_satusehat_client.js`: 6/6 Skenario PASS (100%) untuk Client REST API SATUSEHAT FHIR R4 (4-Resource Playbook).
+  - [x] `scripts/build_full_master_catalog.cjs`: 633 analit terurai tervalidasi 100% integritas relasional (0 Error, 0 Warning).
 
 ### Bukti Verifikasi
-1. **Pustaka Dokumen Mutu SMM ISO 15189:2022 (12 Modul Penuh):**
-   - 12/12 Modul SMM terkompilasi bersih tanpa kegagalan placeholder dan tanpa string hardcode AVA.
-   - Evaluasi kesiapan audit: **100% (12/12 klausul terpenuhi, Status: AUDIT READY)**.
-2. **System Contekan Lengkap (6 Skills Terdaftar):**
+1. **Master Test Runner Ekosistem Global (`scripts/uji/run_all_tests.js`):**
+   - **17 DARI 17 SUITE PENGUJIAN LULUS (100% PASS)** tanpa error out-of-memory.
+2. **Piramida Dokumen Mutu SMM ISO 15189:2022 Lengkap (4 Level):**
+   - Level 1: 2 Pedoman/Kebijakan Mutu.
+   - Level 2: 9 SOP Terakreditasi (12 klausul terpenuhi, Skor 100% AUDIT READY).
+   - Level 3: 4 Instruksi Kerja Teknis Meja Analis (Flebotomi, Spill Kit, Maintenance Alat, Pengendalian Dokumen).
+   - Level 4: 6 Formulir Kendali Mutu di `templates/smm/forms/`.
+3. **Ekspor Biner PDF Standar ISO 15189 (`lib/template_engine/pdf_exporter.js` & `scripts/export_doc_pdf.cjs`):**
+   - Berhasil memproduksi PDF cetak A4 langsung dari CLI tanpa interaksi manual peramban.
+   - Ukuran file: `smm_bundle_medika.pdf` (324.4 KB), `sample_result.pdf` (227.9 KB).
+4. **Adapter REST API SATUSEHAT Kemenkes RI 4-Resource Playbook (`lib/interop/satusehat_client.js`):**
+   - Autentikasi OAuth2 Client Credentials terverifikasi.
+   - Pengiriman Resource `ServiceRequest`, `Specimen`, `Observation`, dan `DiagnosticReport` lolos pengujian unit 6/6 skenario PASS (`test_satusehat_client.js`).
+5. **System Contekan Lengkap (6 Skills Terdaftar):**
    - `.agents/skills/assemble-smm-pack/SKILL.md`
    - `.agents/skills/audit-lis-workflow/SKILL.md`
    - `.agents/skills/configure-template/SKILL.md`
    - `.agents/skills/map-satusehat-fhir/SKILL.md`
    - `.agents/skills/validate-catalog/SKILL.md`
    - `.agents/skills/verify-iso15189-readiness/SKILL.md`
-3. **Konfigurasi Deklaratif E-Hasil & Tata Letak:**
+6. **Konfigurasi Deklaratif E-Hasil & Tata Letak:**
    - Preset tata letak, banner panic alert, kolom metode uji, dan QR TTE tervalidasi via unit tests.
 
 ### Implikasi IP & Kepatuhan
@@ -3633,3 +3666,44 @@ OWNED_BY: generic. Kontrak dummy, tidak ada pasien/harga/kontrak privat. Tidak a
 Subtask <=1 jam: binding formulary/harga generik per tenant dan ownership batch operasional (tanpa mengubah join key/master); explicit cutover/opening direview; wrapper Rx/FEFO/ledger aktual dan resep dengan identitas admission sumber; verifikasi apoteker berprivilege individu; jadwal dokter dan MAR unit-dose terkait item dispensing aktual; retur ke batch/ledger setelah verifikasi sealed/expiry dan kuantitas; rekonsiliasi/stop/pulang; UI/API/source gates; SQL/browser/negative/race/retry dan cleanup.
 ### Implikasi IP & Kepatuhan
 OWNED_BY: generic untuk adapter baru. Sumber pharmacy_drugs/batches/prescriptions/dispenses/ledger dan mar_jadwal/pemberian tetap dengan provenance asli. Tidak mengubah Kode Material/Nama Pemeriksaan maupun schema master. Master obat dapat generik bersama; harga/formulary dan batch tenant memakai metadata operasional terpisah. Tidak membuat dosis/interaksi atau SOP klinis otomatis; dokter/apoteker/perawat kompeten dan berprivilege individual memasukkan/menandatangani instruksi, kuantitas serta jadwal eksplisit. Histori lama dan koreksi append-only; no patient real/vendor/prod.
+## Perbaikan gate reviewer profesi — 12 Oktober 2026
+### Plan → Execute → Verify
+Review source menemukan core policy 0074 masih menolak apoteker/perawat/bidan/analis walau gate individu 0081 telah memverifikasi privilege mereka. Adapter 0092 melengkapi whitelist profesi core dan staff picker serta akses menu policy; gate kredensial/privilege individu dan maker-checker 0081 tetap wajib. Tidak memberikan privilege klinis dari role semata. Binding pharmacy 0092 diuji dengan pharmacist terdaftar, kredensial/privilege dan authority yang dibuat melalui command sebenarnya.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Tidak mengubah master schema atau join key; RBAC extension hanya memungkinkan reviewer profesi yang secara individual telah diotorisasi untuk scope/action tertentu. Tidak membuat STR/SIP nyata atau persetujuan klinis produksi. Data dan identitas tes sintetis; database disposable telah ditutup/dihapus.
+
+## UI dan grouping lintas domain — 12 Oktober 2026
+### Plan → Execute → Verify
+- [x] Inventaris 17 domain/entrypoint dan pola navigasi; pertahankan menu hasil RBAC (<=1 jam).
+- [x] Satukan grouping menu operasional: menu utama → kartu submenu → dropdown tujuan terminal, termasuk bagian Finance/HRD/Agentic (<=1 jam).
+- [x] Seragamkan shell, akses keyboard, sidebar responsif dan gaya portal/service sesuai fungsi masing-masing (<=1 jam).
+- [x] Uji menu tiap workspace/domain, akses role, desktop/mobile, regresi Tech; simpan bukti (<=1 jam).
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Perubahan presentasi dan navigasi memakai menu/domain existing; tidak mengubah schema/master, kontrak klinis, RBAC, tenant atau integrasi. Fixture sintetis; tidak menulis DB produksi atau mempublikasikan domain live. Portal pasien, layar kiosk/monitor dan halaman bertoken tetap memakai entrypoint serta tujuan pengguna masing-masing.
+
+### Execute & Verify
+- Shared WorkspaceNavigation mengekspansi bagian Finance/HRD/Agentic pada dropdown tujuan; layanan bernama juga meratakan tujuan bagian ke dropdown yang sama. Alias dengan tab eksplisit tetap menuju tujuan existing. Bagian Finance/HRD langsung terpilih dan navigasi tab internal dihilangkan pada semua operational shell; Agentic memakai header/panel light yang sama pada semua operational shell.
+- Shell warna/layout/header/sidebar existing menjadi acuan bersama. Portal pasien/korporat memakai directory role existing; kiosk, monitor dan halaman bertoken memakai service-design sehingga tidak diberi menu admin. Review keterbacaan memperbaiki teks Nakes, lacak, label loket, tautan CRM dan pilihan role portal yang masih memakai warna tema gelap/kontras rendah. Cache asset lintas entrypoint diperbarui.
+- `scripts/uji/test_domain_workspace_grouping.cjs` lulus pada 9 domain operasional (HIS, LIS, Ops, Care, Nutri, Sanctuary, Tech, Console, Wellness): menu asli sesuai workspace, tanpa dropdown bersarang, Escape/fokus, role terbatas dan lebar mobile. Renderer Finance/HRD aktual juga diuji pada HIS dengan API sintetis. Bukti `docs/audit-evidence/2026-10-12/domain-workspace-grouping.json` dan screenshot directory per domain.
+- Regresi Tech router 16 skenario, record-pages dan workspace navigation lulus. Syntax dan diff checks untuk file perubahan, generator menu/domain, batas aplikasi 6/17 domain serta static deploy readiness lulus. Tidak ada penambahan hak akses atau perubahan kontrak bisnis.
+- Audit browser entrypoint 17 domain x desktop/mobile = 34 tampilan lokal dengan seluruh request diintersep; bukti `docs/audit-evidence/2026-10-12/entrypoints/domain-browser.json`. Hasil final 34/34: tanpa overflow, pageerror, atau temuan keterbacaan otomatis (kontras/ukuran teks). Ini pemeriksaan entry/login/publik, bukan acceptance seluruh transaksi setelah login; grouping memakai fixture autentikasi sintetis, bukan akun produksi.
+- Semua perubahan tetap lokal, belum deploy/live; pekerjaan ini tidak menerapkan migrasi 0086 atau melakukan sinkronisasi vendor.
+## Adapter stok farmasi dan rekonsiliasi pasien — 12 Oktober 2026
+### Plan → Execute → Verify
+0093 memakai rx_receive_stock/rx_adjust_stock asli dengan metadata scope batch dan ledger lokal; biaya penerimaan, qty step, timezone dan expiry eksplisit. Sumber private direvoke dari authenticated, retry stable dan source/balance dipastikan cocok. Uji awal 6 skenario binding/receipt/adjust/private-bypass/tenant lulus dan cluster telah dihapus.
+0094–0095 mengaitkan rekonsiliasi ke encounter/episode sumber aktif, identitas admission dan alergi yang dipilih/disahkan; ownership legacy belum jelas menahan persetujuan. Rx memakai harga tenant, attestasi dokter dan review apoteker berprivilege individual; FEFO dibatasi batch tenant, ledger obat asli dan billing dispense_items sumber. Dose/frequency/duration ditulis manusia; tidak dibuat algoritme klinis. MAR/retur/UI terpadu dan uji keseluruhan masih berlangsung.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic adapter baru; provenance source farmasi/MAR asli dipertahankan. Master keys tidak berubah; harga/stock total global tidak disalin ke snapshot katalog tenant. Tidak ada pasien/biaya nyata, production DB atau vendor. Paket adapter dipasang bersama UI/gate lengkap, bukan parsial untuk operasional. Timezone untuk expiry/kredensial ditetapkan eksplisit; snapshot identitas/form/kekuatan/golongan obat berubah menahan dispensing hingga amendment yang sah.
+
+## Farmasi, MAR dan custody sumber — 12 Oktober 2026
+### Plan → Execute → Verify
+0092–0100 menghubungkan binding/harga tenant, ownership opening batch, stock receipt/adjustment, rekonsiliasi pasien, resep dokter, review apoteker, dispensing FEFO, ledger/billing aktual, jadwal signed dokter, MAR perawat dan return/waste/take-home. Retur memiliki credit sumber append-only, custody keluar menunggu stop jadwal dokter, semua quantity terkait item/batch dispensing asli. Jalur read global/private RPC lama ditutup; board/UI mengambil sumber tenant. Source MAR/dispense/custody posted immutable dan amendment MAR tetap menyimpan original. Pengujian lengkap ulang sedang berjalan; 8 skenario MAR/custody/source guard dan 6 browser source desktop/mobile telah lulus sebelum hardening tambahan. Dua backend PostgreSQL dengan PID berbeda benar-benar menunggu Lock: dispensing ganda hanya satu source transaksi, retur bersaing tidak melampaui custody pasien.
+Belum menerima keseluruhan 44 menu atau master obat/edit/formulary lifecycle lengkap. Clinical discharge legacy masih perlu gate keputusan dokter signed/privilege individu dan alur invoice terpadu; akan dilengkapi pada subtask berikutnya.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic adapter; source original provenance tetap. Tidak ada dosis/keputusan klinis yang dihitung AI. SOP qty/window/identity/retur/waste billing dipilih eksplisit dan direview profesional. Clinical instruction/credential individu, maker-checker, tenant dan audit wajib. Nominal kredit yang melampaui precision harus ditolak, bukan dibulatkan diam-diam. Pengujian sintetis local disposable; tidak menerapkan DB produksi atau vendor. Bukti jumlah/status diringkas di sini; output test milik subtask ini dibersihkan setelah validasi akhir.
+
+## Pemulangan sumber dengan keputusan klinis — rencana 12 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: keputusan pemulangan dari signed doctor clinical record + scope/grant yang sah; wrapper sumber discharge dengan retry/version/audit, semua parameter klinis berasal dari record; gate legacy pada visit yang masuk episode engine; source resep/MAR/custody reconcile sebelum pulang; alur source discharge → housekeeping bed → proposal room/invoice/journal dan browser/negative/race. Histori discharge asli tidak ditimpa. Keputusan vendor/prod tidak dilibatkan.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Metadata operasional baru sudah dalam persetujuan skema/local sebelumnya; tidak mengubah master join keys. Dokter kompeten menulis/mengesahkan keputusan menurut SOP tenant reviewed, tanpa clinical default atau rekomendasi otomatis. Preserve source dan amendment append-only, semua data uji sintetis. Role administrator tidak menggantikan kredensial klinis. Acceptance 44 menu tetap terbuka hingga bukti unit/downstream penuh.

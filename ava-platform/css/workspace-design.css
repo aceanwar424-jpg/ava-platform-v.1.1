@@ -128,7 +128,7 @@ body.ava-ops-shell .tech-detail-grid dt{font-size:12px;color:var(--text3);margin
 body.ava-ops-shell .tech-detail-grid dd{margin:0;font-size:14px;overflow-wrap:anywhere}
 body.ava-ops-shell .tech-list-pagination{display:flex;justify-content:flex-end;align-items:center;gap:14px;margin-top:18px}
 body.ava-ops-shell .tech-record-content [role=alert]{color:var(--danger-strong,#b91c1c);padding:12px;border:1px solid currentColor;border-radius:6px}
-body.tech-pages-enabled .tech-agentic-content{border:1px solid var(--border);border-radius:10px;background:var(--ava-surface);padding:20px;min-height:300px}
+body.ava-ops-shell .tech-agentic-content{border:1px solid var(--border);border-radius:10px;background:var(--ava-surface);padding:20px;min-height:300px}
 @media(max-width:600px){body.ava-ops-shell .tech-detail-grid{grid-template-columns:1fr}body.ava-ops-shell .tech-list-pagination{justify-content:center;gap:8px}}
 body.tech-pages-enabled #db-grid-wrapper table{color:var(--text)!important}
 body.tech-pages-enabled #db-grid-wrapper thead tr{background:var(--bg)!important;border-color:var(--border)!important}

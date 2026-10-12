@@ -80,9 +80,9 @@ async function renderHRD() {
     </div>`;
 
   await Promise.all([loadEmployees(), loadLeaves()]);
-  if(window.TechPages?.enabled()){
-    const selected=TechPages.selection('hrd','emp');switchHRDTab(selected);document.getElementById('hrd-tabs')?.remove();
-    document.querySelector('#main-content h1').textContent=TechPages.sections.hrd.find(x=>x[1]===selected)?.[0]||'HRD';
+  if((window.WorkspaceNavigation?.enabled()||window.TechPages?.enabled())){
+    const selected=(window.WorkspaceNavigation||window.TechPages).selection('hrd','emp');switchHRDTab(selected);document.getElementById('hrd-tabs')?.remove();
+    document.querySelector('#main-content h1').textContent=(window.WorkspaceNavigation||window.TechPages).sections.hrd.find(x=>x[1]===selected)?.[0]||'HRD';
   }
 }
 

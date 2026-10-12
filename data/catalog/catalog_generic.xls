@@ -46,7 +46,7 @@
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1001-RGN-0001</Data></Cell>
     <Cell><Data ss:Type="String">HITUNGAN DARAH LENGKAP (HB, HT, ER, LE, PLT, MCV, MCH, MCHC)</Data></Cell>
-    <Cell><Data ss:Type="String">HITUNGAN Parameter</Data></Cell>
+    <Cell><Data ss:Type="String">Darah Lengkap (Hemogram)</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">12</Data></Cell>
     <Cell><Data ss:Type="Number">17.5</Data></Cell>
@@ -57,21 +57,21 @@
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
     <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
-    <Cell><Data ss:Type="String">Penetapan analit kuantitatif HITUNGAN Parameter mengacu pada panduan baku ISO 15189.</Data></Cell>
+    <Cell><Data ss:Type="String">Penetapan analit kuantitatif Darah Lengkap (Hemogram) mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1001-RGN-0003</Data></Cell>
     <Cell><Data ss:Type="String">PEMERIKSAAN DARAH LENGKAP (CBC + DIFF + LED)</Data></Cell>
     <Cell><Data ss:Type="String">FULL BLOOD COUNT</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="Number">20</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">30341-2</Data></Cell>
+    <Cell><Data ss:Type="String">mm/h</Data></Cell>
+    <Cell><Data ss:Type="String">ICSH / CLSI H02-A5</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif FULL BLOOD COUNT mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -80,14 +80,14 @@
     <Cell><Data ss:Type="String">JUMLAH RETIKULOSIT</Data></Cell>
     <Cell><Data ss:Type="String">RETICULOCYTE COUNT</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">0.5</Data></Cell>
+    <Cell><Data ss:Type="Number">2.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">17849-1</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">CLSI H44-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif RETICULOCYTE COUNT mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -128,14 +128,14 @@
     <Cell><Data ss:Type="String">LED – LAJU SEDIMEN ERITROSIT (ESR)</Data></Cell>
     <Cell><Data ss:Type="String">LED – ERYTHROCYTE SEDIMENT RATE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="Number">20</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">30341-2</Data></Cell>
+    <Cell><Data ss:Type="String">mm/h</Data></Cell>
+    <Cell><Data ss:Type="String">ICSH / CLSI H02-A5</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif LED – ERYTHROCYTE SEDIMENT RATE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -368,13 +368,13 @@
     <Cell><Data ss:Type="String">G6PD (ERITROSIT) KUANTITATIF</Data></Cell>
     <Cell><Data ss:Type="String">G6PD  KUANTITATIVE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">5.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">789-8</Data></Cell>
+    <Cell><Data ss:Type="String">10*6/uL</Data></Cell>
     <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif G6PD  KUANTITATIVE mengacu pada panduan baku ISO 15189.</Data></Cell>
@@ -464,14 +464,14 @@
     <Cell><Data ss:Type="String">WAKTU PROTROMBIN (PT)-INR</Data></Cell>
     <Cell><Data ss:Type="String">PROTHROMBIN TIME -INR</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">0.8</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">6301-6</Data></Cell>
+    <Cell><Data ss:Type="String">{INR}</Data></Cell>
+    <Cell><Data ss:Type="String">WHO Sensitivity Index</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PROTHROMBIN TIME -INR mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -480,14 +480,14 @@
     <Cell><Data ss:Type="String">WAKTU TROMBOPLASTIN PARSIAL TERAKTIFKAN (APTT)</Data></Cell>
     <Cell><Data ss:Type="String">ACTIVATED PARTIAL THROMBOPLASTIN TIME</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ACTIVATED PARTIAL THROMBOPLASTIN TIME mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -528,13 +528,13 @@
     <Cell><Data ss:Type="String">TES AGREGASI TROMBOSIT TAT</Data></Cell>
     <Cell><Data ss:Type="String">TAT-PLATELET AGGREGATION TEST</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">150</Data></Cell>
+    <Cell><Data ss:Type="Number">450</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">777-3</Data></Cell>
+    <Cell><Data ss:Type="String">10*3/uL</Data></Cell>
     <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TAT-PLATELET AGGREGATION TEST mengacu pada panduan baku ISO 15189.</Data></Cell>
@@ -624,14 +624,14 @@
     <Cell><Data ss:Type="String">PROTEIN C</Data></Cell>
     <Cell><Data ss:Type="String">PROTEIN C</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">70</Data></Cell>
+    <Cell><Data ss:Type="Number">140</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">27816-8</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">Chromogenic Assay</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PROTEIN C mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -640,14 +640,14 @@
     <Cell><Data ss:Type="String">PROTEIN S</Data></Cell>
     <Cell><Data ss:Type="String">PROTEIN S</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">60</Data></Cell>
+    <Cell><Data ss:Type="Number">130</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">27821-8</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">Free Antigen Assay</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PROTEIN S mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -688,14 +688,14 @@
     <Cell><Data ss:Type="String">D-DIMER</Data></Cell>
     <Cell><Data ss:Type="String">D-DIMER</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">0</Data></Cell>
+    <Cell><Data ss:Type="Number">500</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
+    <Cell><Data ss:Type="String">48065-7</Data></Cell>
+    <Cell><Data ss:Type="String">ng/mL</Data></Cell>
+    <Cell><Data ss:Type="String">Immunoturbidimetric</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif D-DIMER mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -832,13 +832,13 @@
     <Cell><Data ss:Type="String">ANTIBODI TROMBOSITU (ANTIBODI TROMBOSIT)</Data></Cell>
     <Cell><Data ss:Type="String">THROMBOCYTE ANTIBODY</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">12</Data></Cell>
-    <Cell><Data ss:Type="Number">17.5</Data></Cell>
+    <Cell><Data ss:Type="Number">150</Data></Cell>
+    <Cell><Data ss:Type="Number">450</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">718-7</Data></Cell>
-    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">777-3</Data></Cell>
+    <Cell><Data ss:Type="String">10*3/uL</Data></Cell>
     <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif THROMBOCYTE ANTIBODY mengacu pada panduan baku ISO 15189.</Data></Cell>
@@ -976,14 +976,14 @@
     <Cell><Data ss:Type="String">TOTAL BILIRUBIN</Data></Cell>
     <Cell><Data ss:Type="String">BILIRUBIN TOTAL</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.2</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">1975-2</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC Reference Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif BILIRUBIN TOTAL mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -993,13 +993,13 @@
     <Cell><Data ss:Type="String">BILIRUBIN DIRECT</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.3</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">1968-7</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC Reference Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif BILIRUBIN DIRECT mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1008,14 +1008,14 @@
     <Cell><Data ss:Type="String">BILIRUBIN TOTAL DIREK INDIREK</Data></Cell>
     <Cell><Data ss:Type="String">BILIRUBIN TOTAL DIREK INDIREK</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.2</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">1975-2</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC Reference Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif BILIRUBIN TOTAL DIREK INDIREK mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1025,13 +1025,13 @@
     <Cell><Data ss:Type="String">SGOT / AST</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">35</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
+    <Cell><Data ss:Type="String">1920-8</Data></Cell>
     <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC 37°C</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif SGOT / AST mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1041,13 +1041,13 @@
     <Cell><Data ss:Type="String">SGPT / ALT</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">45</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
+    <Cell><Data ss:Type="String">1742-6</Data></Cell>
     <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC 37°C</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif SGPT / ALT mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1056,14 +1056,14 @@
     <Cell><Data ss:Type="String">FOSFATASE ALKALIN</Data></Cell>
     <Cell><Data ss:Type="String">ALKALINE PHOSPHATASE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">40</Data></Cell>
+    <Cell><Data ss:Type="Number">150</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
+    <Cell><Data ss:Type="String">6768-6</Data></Cell>
     <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC 37°C</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ALKALINE PHOSPHATASE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1072,14 +1072,14 @@
     <Cell><Data ss:Type="String">GAMMA GT (GGT)</Data></Cell>
     <Cell><Data ss:Type="String">GAMMA GT</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
+    <Cell><Data ss:Type="Number">55</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
+    <Cell><Data ss:Type="String">2324-2</Data></Cell>
     <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">IFCC 37°C</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif GAMMA GT mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1088,14 +1088,14 @@
     <Cell><Data ss:Type="String">ALBUMIN</Data></Cell>
     <Cell><Data ss:Type="String">ALBUMIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">1751-7</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">BCG Method / IFCC</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ALBUMIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1104,14 +1104,14 @@
     <Cell><Data ss:Type="String">PROTEIN TOTAL</Data></Cell>
     <Cell><Data ss:Type="String">TOTAL PROTEIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">6.4</Data></Cell>
+    <Cell><Data ss:Type="Number">8.3</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2885-2</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Biuret Method / IFCC</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TOTAL PROTEIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1120,14 +1120,14 @@
     <Cell><Data ss:Type="String">GLOBULIN</Data></Cell>
     <Cell><Data ss:Type="String">GLOBULIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2336-6</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif GLOBULIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1168,14 +1168,14 @@
     <Cell><Data ss:Type="String">ELEKTROFORESIS PROTEIN</Data></Cell>
     <Cell><Data ss:Type="String">PROTEIN ELECTROPHORESIS</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">6.4</Data></Cell>
+    <Cell><Data ss:Type="Number">8.3</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2885-2</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Capillary Electrophoresis</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PROTEIN ELECTROPHORESIS mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1233,13 +1233,13 @@
     <Cell><Data ss:Type="String">TROPONIN T HS</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.014</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">6598-7</Data></Cell>
+    <Cell><Data ss:Type="String">ng/mL</Data></Cell>
+    <Cell><Data ss:Type="String">High-Sensitivity Troponin</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TROPONIN T HS mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1249,13 +1249,13 @@
     <Cell><Data ss:Type="String">TROPONIN I QUANTITATIVE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.04</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">10839-9</Data></Cell>
+    <Cell><Data ss:Type="String">ng/mL</Data></Cell>
+    <Cell><Data ss:Type="String">High-Sensitivity Troponin</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TROPONIN I QUANTITATIVE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1329,13 +1329,13 @@
     <Cell><Data ss:Type="String">TROPONIN I</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.04</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">10839-9</Data></Cell>
+    <Cell><Data ss:Type="String">ng/mL</Data></Cell>
+    <Cell><Data ss:Type="String">High-Sensitivity Troponin</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TROPONIN I mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1345,13 +1345,13 @@
     <Cell><Data ss:Type="String">TROPONIN T</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.014</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">6598-7</Data></Cell>
+    <Cell><Data ss:Type="String">ng/mL</Data></Cell>
+    <Cell><Data ss:Type="String">High-Sensitivity Troponin</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TROPONIN T mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1360,14 +1360,14 @@
     <Cell><Data ss:Type="String">UREA</Data></Cell>
     <Cell><Data ss:Type="String">UREUM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">10</Data></Cell>
+    <Cell><Data ss:Type="Number">50</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">3094-0</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Konsensus Nefrologi</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif UREUM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1376,14 +1376,14 @@
     <Cell><Data ss:Type="String">KREATININ</Data></Cell>
     <Cell><Data ss:Type="String">CREATININE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">0.6</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2160-0</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IDMS-traceable Enzymatic</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CREATININE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1392,14 +1392,14 @@
     <Cell><Data ss:Type="String">ASAM URAT</Data></Cell>
     <Cell><Data ss:Type="String">URIC ACID</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">7.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">3084-1</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Uricase Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif URIC ACID mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1536,14 +1536,14 @@
     <Cell><Data ss:Type="String">GLIKO HB (HBA1C)</Data></Cell>
     <Cell><Data ss:Type="String">GLYCO HB</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">5.7</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">4548-4</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">NGSP &amp; ADA 2024</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif GLYCO HB mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1568,14 +1568,14 @@
     <Cell><Data ss:Type="String">ALBUMIN TERGLIKASI</Data></Cell>
     <Cell><Data ss:Type="String">GLYCATED ALBUMIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">1751-7</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">BCG Method / IFCC</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif GLYCATED ALBUMIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1680,14 +1680,14 @@
     <Cell><Data ss:Type="String">C-PEPTIDA</Data></Cell>
     <Cell><Data ss:Type="String">C-PEPTIDE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif C-PEPTIDE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1728,14 +1728,14 @@
     <Cell><Data ss:Type="String">C-PEPTIDE SEWAKTU</Data></Cell>
     <Cell><Data ss:Type="String">C-PEPTIDE SEWAKTU</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif C-PEPTIDE SEWAKTU mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1744,14 +1744,14 @@
     <Cell><Data ss:Type="String">C-PEPTIDE 2 JAM PP</Data></Cell>
     <Cell><Data ss:Type="String">C-PEPTIDE 2 JAM PP</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif C-PEPTIDE 2 JAM PP mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1809,13 +1809,13 @@
     <Cell><Data ss:Type="String">TRIGLISERIDA</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">150</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2571-8</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">NCEP ATP III</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif TRIGLISERIDA mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -1825,13 +1825,13 @@
     <Cell><Data ss:Type="String">RATIO CHOLESTEROL TOTAL / HDL</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">200</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2093-3</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">NCEP ATP III</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif RATIO CHOLESTEROL TOTAL / HDL mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2000,14 +2000,14 @@
     <Cell><Data ss:Type="String">NATRIUM (NA)</Data></Cell>
     <Cell><Data ss:Type="String">NATRIUM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">135</Data></Cell>
+    <Cell><Data ss:Type="Number">145</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2951-2</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif NATRIUM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2016,14 +2016,14 @@
     <Cell><Data ss:Type="String">KALIUM (K)</Data></Cell>
     <Cell><Data ss:Type="String">KALIUM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2823-3</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif KALIUM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2032,14 +2032,14 @@
     <Cell><Data ss:Type="String">KLORIDA (CL)</Data></Cell>
     <Cell><Data ss:Type="String">CHLORIDE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">96</Data></Cell>
+    <Cell><Data ss:Type="Number">106</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2075-0</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CHLORIDE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2048,14 +2048,14 @@
     <Cell><Data ss:Type="String">KALSIUM TOTAL</Data></Cell>
     <Cell><Data ss:Type="String">CALCIUM TOTAL</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">8.5</Data></Cell>
+    <Cell><Data ss:Type="Number">10.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">17861-6</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Arsenazo III Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CALCIUM TOTAL mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2064,14 +2064,14 @@
     <Cell><Data ss:Type="String">ION KALSIUM</Data></Cell>
     <Cell><Data ss:Type="String">CALCIUM ION</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">8.5</Data></Cell>
+    <Cell><Data ss:Type="Number">10.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">17861-6</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Arsenazo III Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CALCIUM ION mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2080,14 +2080,14 @@
     <Cell><Data ss:Type="String">FOSFOR ANORGANIK</Data></Cell>
     <Cell><Data ss:Type="String">PHOSPHOR ANORGANIC</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">2.5</Data></Cell>
+    <Cell><Data ss:Type="Number">4.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2777-1</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Phosphomolybdate Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PHOSPHOR ANORGANIC mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2096,14 +2096,14 @@
     <Cell><Data ss:Type="String">MAGNESIUM</Data></Cell>
     <Cell><Data ss:Type="String">MAGNESIUM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">100</Data></Cell>
+    <Cell><Data ss:Type="Number">1.7</Data></Cell>
+    <Cell><Data ss:Type="Number">2.4</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">1000-0</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">19123-9</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Xylidyl Blue Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif MAGNESIUM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -2993,13 +2993,13 @@
     <Cell><Data ss:Type="String">HBsAg QUALITATIVE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">5196-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">CLIA / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif HBsAg QUALITATIVE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3009,13 +3009,13 @@
     <Cell><Data ss:Type="String">HBsAg QUANTITATIVE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">5196-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">CLIA / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif HBsAg QUANTITATIVE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3025,13 +3025,13 @@
     <Cell><Data ss:Type="String">HBsAg CONFIRMATOR</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">5196-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">CLIA / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif HBsAg CONFIRMATOR mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3121,13 +3121,13 @@
     <Cell><Data ss:Type="String">ANTI HCV TOTAL</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">13955-0</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">CLIA / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI HCV TOTAL mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3137,13 +3137,13 @@
     <Cell><Data ss:Type="String">ANTI HCV IgM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">13955-0</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">CLIA / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI HCV IgM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3185,13 +3185,13 @@
     <Cell><Data ss:Type="String">ANTI HIV</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">75622-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Rapid 3-Test Strategy / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI HIV mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3201,13 +3201,13 @@
     <Cell><Data ss:Type="String">ANTI HIV SCREENING</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">75622-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Rapid 3-Test Strategy / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI HIV SCREENING mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3217,13 +3217,13 @@
     <Cell><Data ss:Type="String">ANTI HIV CONFIRMATORY</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">0.9</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
+    <Cell><Data ss:Type="String">75622-1</Data></Cell>
     <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Rapid 3-Test Strategy / ECLIA</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI HIV CONFIRMATORY mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3776,14 +3776,14 @@
     <Cell><Data ss:Type="String">ANTI LEPTOSPIRA IGG</Data></Cell>
     <Cell><Data ss:Type="String">ANTI LEPTOSPIRA IGG</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
-    <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI LEPTOSPIRA IGG mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -3792,14 +3792,14 @@
     <Cell><Data ss:Type="String">ANTI LEPTOSPIRA IGM</Data></Cell>
     <Cell><Data ss:Type="String">ANTI LEPTOSPIRA IGM</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
-    <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ANTI LEPTOSPIRA IGM mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -4240,14 +4240,14 @@
     <Cell><Data ss:Type="String">MIKROGLOBULIN BETA-2</Data></Cell>
     <Cell><Data ss:Type="String">BETA-2 MICROGLOBULIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">1</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">22312-3</Data></Cell>
-    <Cell><Data ss:Type="String">index</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">2336-6</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif BETA-2 MICROGLOBULIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -5159,7 +5159,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">13967-5</Data></Cell>
     <Cell><Data ss:Type="String">nmol/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik SHBG pada panel SHBG (SEX HORMON BINDING GLOBULIN).</Data></Cell>
    </Row>
@@ -5175,7 +5175,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">13967-5</Data></Cell>
     <Cell><Data ss:Type="String">nmol/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik SHBG pada panel SHBG (SEX HORMON BINDING GLOBULIN).</Data></Cell>
    </Row>
@@ -5447,7 +5447,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3053-6</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T3 Total pada panel T3 TOTAL.</Data></Cell>
    </Row>
@@ -5463,7 +5463,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3053-6</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T3 Total pada panel T3 TOTAL.</Data></Cell>
    </Row>
@@ -5479,7 +5479,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3026-2</Data></Cell>
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T4 Total pada panel T4 TOTAL.</Data></Cell>
    </Row>
@@ -5495,7 +5495,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3026-2</Data></Cell>
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T4 Total pada panel T4 TOTAL.</Data></Cell>
    </Row>
@@ -5511,7 +5511,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3026-2</Data></Cell>
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T4 Total pada panel T4 TOTAL.</Data></Cell>
    </Row>
@@ -5527,7 +5527,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3051-0</Data></Cell>
     <Cell><Data ss:Type="String">pg/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T3 (FT3) pada panel FREE T3.</Data></Cell>
    </Row>
@@ -5543,7 +5543,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3051-0</Data></Cell>
     <Cell><Data ss:Type="String">pg/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T3 (FT3) pada panel FREE T3.</Data></Cell>
    </Row>
@@ -5559,7 +5559,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3024-7</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T4 (FT4) pada panel FREE T4.</Data></Cell>
    </Row>
@@ -5575,7 +5575,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3024-7</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T4 (FT4) pada panel FREE T4.</Data></Cell>
    </Row>
@@ -5591,7 +5591,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3024-7</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T4 (FT4) pada panel FREE T4.</Data></Cell>
    </Row>
@@ -5607,7 +5607,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">3024-7</Data></Cell>
     <Cell><Data ss:Type="String">ng/dL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Free T4 (FT4) pada panel FREE T4.</Data></Cell>
    </Row>
@@ -5623,7 +5623,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH pada panel TSH SENSITIVE.</Data></Cell>
    </Row>
@@ -5639,7 +5639,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH pada panel TSH SENSITIVE.</Data></Cell>
    </Row>
@@ -5655,7 +5655,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH pada panel TSH SENSITIVE.</Data></Cell>
    </Row>
@@ -5671,7 +5671,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH pada panel TSH SENSITIVE.</Data></Cell>
    </Row>
@@ -5687,7 +5687,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH Neonatus pada panel TSH SENSITIVE (NEONATUS).</Data></Cell>
    </Row>
@@ -5703,7 +5703,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3016-3</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TSH Neonatus pada panel TSH SENSITIVE (NEONATUS).</Data></Cell>
    </Row>
@@ -5719,7 +5719,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3050-2</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T3 Uptake pada panel T3 UPTAKE.</Data></Cell>
    </Row>
@@ -5735,7 +5735,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3050-2</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik T3 Uptake pada panel T3 UPTAKE.</Data></Cell>
    </Row>
@@ -5815,7 +5815,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3013-0</Data></Cell>
     <Cell><Data ss:Type="String">ng/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Thyroglobulin pada panel THYROGLOBULIN ANTIGEN.</Data></Cell>
    </Row>
@@ -5831,7 +5831,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">3013-0</Data></Cell>
     <Cell><Data ss:Type="String">ng/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Thyroglobulin pada panel THYROGLOBULIN ANTIGEN.</Data></Cell>
    </Row>
@@ -5847,7 +5847,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">3013-0</Data></Cell>
     <Cell><Data ss:Type="String">ng/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Thyroglobulin pada panel THYROGLOBULIN ANTIGEN.</Data></Cell>
    </Row>
@@ -5863,7 +5863,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">8098-4</Data></Cell>
     <Cell><Data ss:Type="String">IU/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Anti-Thyroglobulin (Anti-Tg) pada panel THYROGLOBULIN ANTIBODY.</Data></Cell>
    </Row>
@@ -5895,7 +5895,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">51596-5</Data></Cell>
     <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">ATA Guidelines</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik TRAb – Negatif pada panel TSH RECEPTOR ANTIBODY (TRAB).</Data></Cell>
    </Row>
@@ -5911,7 +5911,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">33871-5</Data></Cell>
     <Cell><Data ss:Type="String">IU/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik Thyroid-Stimulating Immunoglobulin (TSI) pada panel THYROID-STIMULATING IMMUNOGLOBULIN.</Data></Cell>
    </Row>
@@ -6071,7 +6071,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">2731-8</Data></Cell>
     <Cell><Data ss:Type="String">pg/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik PTH Intact pada panel PTH INTACT.</Data></Cell>
    </Row>
@@ -6087,7 +6087,7 @@
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">2731-8</Data></Cell>
     <Cell><Data ss:Type="String">pg/mL</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik PTH Intact pada panel PTH INTACT.</Data></Cell>
    </Row>
@@ -6126,7 +6126,7 @@
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1005-ADR-0002</Data></Cell>
     <Cell><Data ss:Type="String">KORTISOL SORE ²</Data></Cell>
-    <Cell><Data ss:Type="String">Kortisol Sore (16:00)</Data></Cell>
+    <Cell><Data ss:Type="String">Kortisol Sore (Cortisol PM) (16:00)</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">0</Data></Cell>
     <Cell><Data ss:Type="Number">100</Data></Cell>
@@ -6137,12 +6137,12 @@
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
     <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
-    <Cell><Data ss:Type="String">Evaluasi parameter analitik Kortisol Sore (16:00) pada panel CORTISOL AFTERNOON ².</Data></Cell>
+    <Cell><Data ss:Type="String">Evaluasi parameter analitik Kortisol Sore (Cortisol PM) (16:00) pada panel CORTISOL AFTERNOON ².</Data></Cell>
    </Row>
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1005-ADR-0002</Data></Cell>
     <Cell><Data ss:Type="String">KORTISOL SORE ²</Data></Cell>
-    <Cell><Data ss:Type="String">Kortisol Sore (16:00)</Data></Cell>
+    <Cell><Data ss:Type="String">Kortisol Sore (Cortisol PM) (16:00)</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">3</Data></Cell>
     <Cell><Data ss:Type="Number">15</Data></Cell>
@@ -6153,7 +6153,7 @@
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
     <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
-    <Cell><Data ss:Type="String">Evaluasi parameter analitik Kortisol Sore (16:00) pada panel CORTISOL AFTERNOON ².</Data></Cell>
+    <Cell><Data ss:Type="String">Evaluasi parameter analitik Kortisol Sore (Cortisol PM) (16:00) pada panel CORTISOL AFTERNOON ².</Data></Cell>
    </Row>
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1005-ADR-0002</Data></Cell>
@@ -6470,8 +6470,8 @@
     <Cell><Data ss:Type="String">Anak</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">1695-6</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IDMS-traceable Enzymatic</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik 5-HIAA Urin (rasio kreatinin) pada panel 5 HIAA.</Data></Cell>
    </Row>
@@ -6486,8 +6486,8 @@
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
     <Cell><Data ss:Type="String">1695-6</Data></Cell>
-    <Cell><Data ss:Type="String">U/L</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
+    <Cell><Data ss:Type="String">IDMS-traceable Enzymatic</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik 5-HIAA Urin (rasio kreatinin) pada panel 5 HIAA.</Data></Cell>
    </Row>
@@ -6640,14 +6640,14 @@
     <Cell><Data ss:Type="String">IMUNOGLOBULI D</Data></Cell>
     <Cell><Data ss:Type="String">IMMUNOGLOBULIN D</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">200</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">5059-1</Data></Cell>
-    <Cell><Data ss:Type="String">IU/mL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI I/LA21-A2</Data></Cell>
+    <Cell><Data ss:Type="String">2336-6</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif IMMUNOGLOBULIN D mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -6688,14 +6688,14 @@
     <Cell><Data ss:Type="String">ALPHA 2-MAKROGLOBULIN</Data></Cell>
     <Cell><Data ss:Type="String">ALPHA 2-MACROGLOBULIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">200</Data></Cell>
+    <Cell><Data ss:Type="Number">2</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">5059-1</Data></Cell>
-    <Cell><Data ss:Type="String">IU/mL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI I/LA21-A2</Data></Cell>
+    <Cell><Data ss:Type="String">2336-6</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">Calculated</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ALPHA 2-MACROGLOBULIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -6704,14 +6704,14 @@
     <Cell><Data ss:Type="String">HAPTOGLOBIN</Data></Cell>
     <Cell><Data ss:Type="String">HAPTOGLOBIN</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">200</Data></Cell>
+    <Cell><Data ss:Type="Number">11</Data></Cell>
+    <Cell><Data ss:Type="Number">15</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">5059-1</Data></Cell>
-    <Cell><Data ss:Type="String">IU/mL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI I/LA21-A2</Data></Cell>
+    <Cell><Data ss:Type="String">5902-2</Data></Cell>
+    <Cell><Data ss:Type="String">s</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif HAPTOGLOBIN mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -6848,14 +6848,14 @@
     <Cell><Data ss:Type="String">RASIO PROTEIN KREATININ</Data></Cell>
     <Cell><Data ss:Type="String">PROTEIN CREATININE RATIO</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">70</Data></Cell>
+    <Cell><Data ss:Type="Number">140</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">27816-8</Data></Cell>
+    <Cell><Data ss:Type="String">%</Data></Cell>
+    <Cell><Data ss:Type="String">Chromogenic Assay</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PROTEIN CREATININE RATIO mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -6864,14 +6864,14 @@
     <Cell><Data ss:Type="String">RASIO ALBUMIN KREATININ</Data></Cell>
     <Cell><Data ss:Type="String">ALBUMIN CREATININE RATIO</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">1751-7</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">BCG Method / IFCC</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ALBUMIN CREATININE RATIO mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -6912,14 +6912,14 @@
     <Cell><Data ss:Type="String">DISMORFIK ERITROSIT</Data></Cell>
     <Cell><Data ss:Type="String">ERYTHROCYTE DISMORPHIC</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">4</Data></Cell>
+    <Cell><Data ss:Type="Number">5.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">789-8</Data></Cell>
+    <Cell><Data ss:Type="String">10*6/uL</Data></Cell>
+    <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif ERYTHROCYTE DISMORPHIC mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7504,14 +7504,14 @@
     <Cell><Data ss:Type="String">UREUM URIN</Data></Cell>
     <Cell><Data ss:Type="String">UREUM URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">10</Data></Cell>
+    <Cell><Data ss:Type="Number">50</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">3094-0</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">Konsensus Nefrologi</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif UREUM URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7520,14 +7520,14 @@
     <Cell><Data ss:Type="String">KREATININ URIN</Data></Cell>
     <Cell><Data ss:Type="String">CREATININ URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">0.6</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">2160-0</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">IDMS-traceable Enzymatic</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CREATININ URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7536,14 +7536,14 @@
     <Cell><Data ss:Type="String">ASAM URAT URIN</Data></Cell>
     <Cell><Data ss:Type="String">URIC ACID URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">7.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">3084-1</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">Uricase Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif URIC ACID URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7552,14 +7552,14 @@
     <Cell><Data ss:Type="String">NATRIUM URIN</Data></Cell>
     <Cell><Data ss:Type="String">SODIUM URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">135</Data></Cell>
+    <Cell><Data ss:Type="Number">145</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">2951-2</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif SODIUM URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7568,14 +7568,14 @@
     <Cell><Data ss:Type="String">KALIUM URIN</Data></Cell>
     <Cell><Data ss:Type="String">POTASSIUM URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">2823-3</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif POTASSIUM URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7584,14 +7584,14 @@
     <Cell><Data ss:Type="String">URIN KLORIDA</Data></Cell>
     <Cell><Data ss:Type="String">CHLORIDE URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">96</Data></Cell>
+    <Cell><Data ss:Type="Number">106</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">2075-0</Data></Cell>
+    <Cell><Data ss:Type="String">mmol/L</Data></Cell>
+    <Cell><Data ss:Type="String">ISE Direct</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CHLORIDE URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7600,14 +7600,14 @@
     <Cell><Data ss:Type="String">KALSIUM URIN</Data></Cell>
     <Cell><Data ss:Type="String">CALCIUM URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">8.5</Data></Cell>
+    <Cell><Data ss:Type="Number">10.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">17861-6</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">Arsenazo III Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CALCIUM URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7616,14 +7616,14 @@
     <Cell><Data ss:Type="String">URIN ANORGANIK FOSFOR</Data></Cell>
     <Cell><Data ss:Type="String">PHOSPOR ANORGANIC URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">2.5</Data></Cell>
+    <Cell><Data ss:Type="Number">4.5</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">2777-1</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">Phosphomolybdate Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif PHOSPOR ANORGANIC URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7664,14 +7664,14 @@
     <Cell><Data ss:Type="String">MIKROALBUMIN URIN</Data></Cell>
     <Cell><Data ss:Type="String">MICRO-ALBUMIN URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">3.5</Data></Cell>
+    <Cell><Data ss:Type="Number">5.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
-    <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">1751-7</Data></Cell>
+    <Cell><Data ss:Type="String">g/dL</Data></Cell>
+    <Cell><Data ss:Type="String">BCG Method / IFCC</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif MICRO-ALBUMIN URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7680,14 +7680,14 @@
     <Cell><Data ss:Type="String">URIN MAGNESIUM</Data></Cell>
     <Cell><Data ss:Type="String">MAGNESIUM URINE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">1.7</Data></Cell>
+    <Cell><Data ss:Type="Number">2.4</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">19123-9</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">Xylidyl Blue Method</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif MAGNESIUM URINE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -7696,14 +7696,14 @@
     <Cell><Data ss:Type="String">Klirens Kreatinin</Data></Cell>
     <Cell><Data ss:Type="String">CREATININE CLEARANCE</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
-    <Cell><Data ss:Type="Number">0</Data></Cell>
-    <Cell><Data ss:Type="Number">15</Data></Cell>
+    <Cell><Data ss:Type="Number">0.6</Data></Cell>
+    <Cell><Data ss:Type="Number">1.2</Data></Cell>
     <Cell><Data ss:Type="String">Kuantitatif</Data></Cell>
     <Cell><Data ss:Type="String">Dewasa</Data></Cell>
     <Cell><Data ss:Type="String">Semua</Data></Cell>
-    <Cell><Data ss:Type="String">24356-8</Data></Cell>
+    <Cell><Data ss:Type="String">2160-0</Data></Cell>
     <Cell><Data ss:Type="String">mg/dL</Data></Cell>
-    <Cell><Data ss:Type="String">CLSI GP16-A3</Data></Cell>
+    <Cell><Data ss:Type="String">IDMS-traceable Enzymatic</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Penetapan analit kuantitatif CREATININE CLEARANCE mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
@@ -8327,7 +8327,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">16112-5</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik ER (Estrogen Receptor) pada panel IHK (BREAST PANEL).</Data></Cell>
    </Row>
@@ -8343,7 +8343,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">16112-5</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik ER (Estrogen Receptor) pada panel IHK (BREAST PANEL).</Data></Cell>
    </Row>
@@ -8359,7 +8359,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">16113-3</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik PR (Progesterone Receptor) pada panel IHK (BREAST PANEL).</Data></Cell>
    </Row>
@@ -8375,7 +8375,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">16113-3</Data></Cell>
     <Cell><Data ss:Type="String">%</Data></Cell>
-    <Cell><Data ss:Type="String">IFU Kit Reagen</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik PR (Progesterone Receptor) pada panel IHK (BREAST PANEL).</Data></Cell>
    </Row>
@@ -9351,7 +9351,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT Ultimate – Trisomi 21 pada panel NIPT ULTIMATE.</Data></Cell>
    </Row>
@@ -9367,7 +9367,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT Advanced – Trisomi 21 pada panel NIPT ADVANCED.</Data></Cell>
    </Row>
@@ -9383,7 +9383,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT Prime – Trisomi 21 pada panel NIPT PRIME.</Data></Cell>
    </Row>
@@ -9399,7 +9399,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT iGene Basic – Trisomi 21 pada panel NIPT IGENE BASIC (SINGAPORE).</Data></Cell>
    </Row>
@@ -9415,7 +9415,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT iGene Core – Trisomi 21 pada panel NIPT IGENE CORE (SINGAPORE).</Data></Cell>
    </Row>
@@ -9431,7 +9431,7 @@
     <Cell><Data ss:Type="String">Perempuan</Data></Cell>
     <Cell><Data ss:Type="String">1000-0</Data></Cell>
     <Cell><Data ss:Type="String">U/mL</Data></Cell>
-    <Cell><Data ss:Type="String">WHO International Standard</Data></Cell>
+    <Cell><Data ss:Type="String">Thromboplastin Reagent</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
     <Cell><Data ss:Type="String">Evaluasi parameter analitik NIPT iGene Comprehensive – Trisomi 21 pada panel NIPT IGENE COMPREHENSIVE (SINGAPORE).</Data></Cell>
    </Row>
@@ -10158,7 +10158,7 @@
    <Row ss:StyleID="RowStyle">
     <Cell><Data ss:Type="String">ODL1001-RGN-0002</Data></Cell>
     <Cell><Data ss:Type="String">HITUNGAN DARAH LENGKAP + DIFF</Data></Cell>
-    <Cell><Data ss:Type="String">HITUNGAN Parameter</Data></Cell>
+    <Cell><Data ss:Type="String">Darah Lengkap (Hemogram)</Data></Cell>
     <Cell><Data ss:Type="String">BETWEEN</Data></Cell>
     <Cell><Data ss:Type="Number">12</Data></Cell>
     <Cell><Data ss:Type="Number">17.5</Data></Cell>
@@ -10169,7 +10169,7 @@
     <Cell><Data ss:Type="String">g/dL</Data></Cell>
     <Cell><Data ss:Type="String">CLSI H20-A2</Data></Cell>
     <Cell><Data ss:Type="String">VERIFIED</Data></Cell>
-    <Cell><Data ss:Type="String">Penetapan analit kuantitatif HITUNGAN Parameter mengacu pada panduan baku ISO 15189.</Data></Cell>
+    <Cell><Data ss:Type="String">Penetapan analit kuantitatif Darah Lengkap (Hemogram) mengacu pada panduan baku ISO 15189.</Data></Cell>
    </Row>
   </Table>
  </Worksheet>

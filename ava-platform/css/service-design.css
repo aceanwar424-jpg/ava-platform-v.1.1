@@ -37,3 +37,12 @@ body.ava-service-shell :focus-visible { outline:2px solid #087e80; outline-offse
  body.ava-service-shell .grid-counters { grid-template-columns:1fr; }
  body.ava-service-shell .main-call-box { min-height:200px; }
 }
+
+/* Shared light surfaces require readable text inherited from older dark views. */
+body.ava-service-shell .share :is(.lbl,span,.status){color:#35485c!important}
+body.ava-service-shell header p{color:#536579!important}
+body.ava-service-shell .counter-header span{color:#066367!important}
+body.ava-service-shell .panel a{color:#066367;text-decoration:underline;text-underline-offset:3px}
+
+body.ava-service-shell #share-status{color:#536579!important}
+body.ava-service-shell #crm-period a{color:#066367!important}
