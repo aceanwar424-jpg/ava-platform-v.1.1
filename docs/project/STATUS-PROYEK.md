@@ -3723,3 +3723,10 @@ OWNED_BY: generic. Source asli dipertahankan dan seluruh data uji sintetis. Tida
 
 ### Bukti gate katalog
 633 baris: 0 error struktural, 678 warning (633 unverified + 45 mismatch label hemoglobin 718-7), clinical_ready=false. Kode Material/Nama Pemeriksaan dan nilai rentang tetap sama; status hasil generator menjadi UNVERIFIED_GENERATED. Export clinical_import dan penghilangan audit flag ditolak untuk hasil yang belum siap. Tiga uji gate katalog PASS; regresi akselerator P1–P5 7/7 PASS. Ini koreksi klaim auto-VERIFIED, bukan verifikasi klinis dataset atau penggantian rentang dengan tebakan. Referensi kode primer: https://loinc.org/718-7/ diakses 12 Oktober 2026.
+
+## Isolasi konteks UI operasi Tech — 12 Oktober 2026
+### Plan → Execute → Verify
+Subtask <=1 jam: cegah board, formulir dan retry lama sesudah pergantian akun/tenant; reset pagination/data pada konteks baru. Uji browser delayed-response, stale-form, scope reset dan error lama. Delivery/SLA sumber tetap acceptance terpisah, tidak dinyatakan selesai oleh perbaikan UI.
+### Implikasi IP & Kepatuhan
+OWNED_BY: generic. Tidak mengubah skema/master atau mengintegrasikan vendor. UI guard melengkapi RLS server; tidak menggantikan otorisasi server. Fixture browser sintetis tanpa pasien/DB nyata, tanpa output sementara yang disimpan.
+Bukti: node --check operational_lifecycle.js PASS; test_tech_ui_scope.cjs 4 PASS (late board, pagination/context reset, stale form no command, late error). Browser ditutup di finally; tidak membuat DB/data/output file sementara. Tiga menu Tech tetap parsial untuk hubungan delivery/acceptance/SLA sumber.
