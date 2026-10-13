@@ -2,6 +2,8 @@
 
 OWNED_BY: generic. Persetujuan 1A/2A/3A: preserve histori + explicit cutover/opening, SOP non-RS konfigurabel direview, reviewer klinis individu saat setup. Pengembangan dan tes sintetis lokal diizinkan; produksi/vendor tidak diizinkan. Status menu tidak dinaikkan hanya berdasarkan renderer, total agregat, simulator, atau transaksi yang diblokir.
 
+Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109 (scope/onboarding/milestone/deployment/tiket SLA elapsed/penerimaan/follow-up/closure, native source race dan real app authenticated). 1 menu tuntas untuk batas lokal yang dinyatakan; 43 menu lainnya masih parsial. Detail dan batas SLA/vendor: RUNBOOK-TECH-DELIVERY-0109.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi atau seluruh 44 selesai.
+
 Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/RLS/audit, alur SQL dan UI positif/negatif, error/retry, serta teardown dummy. Kolom terakhir mencatat acceptance yang masih harus dibuktikan, bukan keputusan baru yang perlu ditanyakan ulang.
 
 | Menu | Sumber / bagian yang tersedia | Acceptance lanjutan |
@@ -10,7 +12,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | tech-roadmap | tech_changes, 0079 SQL6/UI6 | pengaitan delivery/acceptance dan regresi navigasi aplikasi penuh |
 | tech-modul | perubahan sukses → tech_module_deployments, 0079 | pengaitan delivery; telemetry vendor tetap nonaktif |
 | tech-isu | tech_support_tickets, 0079 | SLA eksplisit, pengaitan delivery/customer success |
-| tech-delivery | sumber Tech existing | kontrak, onboarding, milestone, acceptance, SLA dan penutupan berbukti |
+| tech-delivery | 0109: immutable scope/license snapshot, reviewed milestone/deployment, source ticket SLA elapsed, acceptance/follow-up/closure; SQL9/app8 + scope regression4 | Tuntas lokal untuk workflow dan SLA elapsed yang dinyatakan; vendor/produksi dan kalender jam kerja bukan klaim paket ini |
 | his-integration | order_terintegrasi_papan | handoff sumber → inbox/outbox → retry/reconcile; simulator diberi label |
 | rs-patient-flow | admissions + episode 0080, SQL9/UI6 | pengaitan bed, billing, unit klinis dan revisits dalam simulasi terpadu |
 | rs-bed-reservation | inpatient_beds + 0071/73 | alur booking/admisi/pindah/pulang terintegrasi episode; race native lulus |

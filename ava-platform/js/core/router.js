@@ -576,7 +576,7 @@ async function navigate(page, params={}) {
     case 'partner-rewards': await safeRun('renderReadiness', { panel: 'partner-rewards' }); break;
     case 'nutrition-quality': await safeRun('renderReadiness', { panel: 'nutrition-quality' }); break;
     case 'sanctuary-operations': await safeRun('renderReadiness', { panel: 'sanctuary-operations' }); break;
-    case 'tech-delivery': await safeRun('renderReadiness', { panel: 'tech-delivery' }); break;
+    case 'tech-delivery': await safeRun('renderTechDelivery'); break;
     case 'evidence-register': await safeRun('renderReadiness', { panel: 'evidence-register' }); break;
     default:
       renderRouterError(page, 'Halaman ini belum tersedia.');

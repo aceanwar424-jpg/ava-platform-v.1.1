@@ -3051,7 +3051,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech_saas": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3061,7 +3062,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "license-manager": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3071,7 +3073,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "saas-console": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3081,7 +3084,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-control-plane": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -3091,7 +3095,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "lis-phlebotomy": [
   "modules/lab/qcEngine.js",
@@ -4067,7 +4072,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-telemetri": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4077,7 +4083,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-harga": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4087,7 +4094,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tenants": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4097,7 +4105,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "db-studio": [
   "modules/system/config/config_family.js",
@@ -4126,7 +4135,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-modul": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4136,7 +4146,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-isu": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4146,7 +4157,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "tech-sprint": [
   "modules/tech-platform/techLicenseActivation.js",
@@ -4156,7 +4168,8 @@ window.MODUL_HALAMAN = {
   "modules/tech-platform/tenants.js",
   "modules/tech-platform/techControlPlane.js",
   "modules/tech-platform/team_sprint.js",
-  "modules/tech-platform/operational_lifecycle.js"
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ],
  "cfg-rs-policy": [
   "modules/system/config/config_family.js",
@@ -4846,6 +4859,17 @@ window.MODUL_HALAMAN = {
   "modules/finance/holding_finance.js",
   "modules/finance/payables.js",
   "modules/finance/subscription.js"
+ ],
+ "tech-delivery": [
+  "modules/tech-platform/techLicenseActivation.js",
+  "modules/tech-platform/techPricingPlans.js",
+  "modules/tech-platform/techTelemetry.js",
+  "modules/tech-platform/tech_saas.js",
+  "modules/tech-platform/tenants.js",
+  "modules/tech-platform/techControlPlane.js",
+  "modules/tech-platform/team_sprint.js",
+  "modules/tech-platform/operational_lifecycle.js",
+  "modules/tech-platform/delivery.js"
  ]
 };
 
@@ -4993,5 +5017,6 @@ window.MODUL_SEMUA = [
  "modules/his/inpatient_deposits.js",
  "modules/his/payer_billing.js",
  "modules/his/ward_pharmacy.js",
- "modules/his/signed_discharge.js"
+ "modules/his/signed_discharge.js",
+ "modules/tech-platform/delivery.js"
 ];
