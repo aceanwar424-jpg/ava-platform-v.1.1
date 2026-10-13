@@ -1,0 +1,43 @@
+// OWNED_BY: generic. Actual app boot/router + authenticated SQL; historical values are declared math fixtures.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),f=require('../lib/capacity-source-fixture.cjs');
+const {chromium}=require('../lib/playwright.cjs'),{createAuthenticatedBrowserSql}=require('../lib/authenticated-browser-sql.cjs');let pg,browser,release;
+(async()=>{let count=0;try{const s=await f.createCapacityFixture();pg=s.pg;
+ const archive=(await s.q("INSERT INTO rs_capacity_setups(tenant_id,policy,state,created_by,reviewed_by,cutover_at) VALUES($1,$2,'retired',$3,$4,current_date-interval '5 days') RETURNING id",[s.A,JSON.stringify(s.policy()),s.admin,s.receiver]))[0].id;
+ const dates=(await s.q("SELECT (current_date-3)::text a,(current_date-1)::text b,current_date::text today"))[0];
+ const add=(kind,id,snapshot,time)=>s.q("INSERT INTO rs_capacity_source_events(tenant_id,setup_id,kind,source_id,snapshot,observed_at,event_type) VALUES($1,$2,$3,$4,$5,current_date+$6::interval,'opening')",[s.A,archive,kind,id,JSON.stringify(snapshot),time]);
+ await add('bed',1,{id:1,is_active:true,status:'Terisi'},'-5 days');await add('stay',8001,{id:8001,bed_id:1,status:'Dirawat',admitted_at:dates.a+'T08:00:00'},'-3 days 8 hours');await add('stay',8001,{id:8001,bed_id:1,status:'Pulang',admitted_at:dates.a+'T08:00:00',discharged_at:dates.b+'T12:00:00'},'-1 days 12 hours');
+ const allowed=['rs_capacity_board','rs_capacity_command','rs_capacity_report'],rpc=await createAuthenticatedBrowserSql(pg,allowed);let hold=null,entered,commands=0;
+ browser=await chromium.launch({headless:true,channel:'msedge'});const page=await browser.newPage({viewport:{width:1365,height:850}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.addInitScript(()=>sessionStorage.setItem('ol_token','synthetic.jwt.token'));
+ await page.route('**/*',async route=>{const req=route.request(),url=new URL(req.url()),json=(body,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(body)});
+ if(url.pathname==='/api/runtime-config.js')return route.fulfill({contentType:'application/javascript',body:'window.AVA_RUNTIME_CONFIG={supabaseUrl:"https://synthetic-db.invalid",supabaseAnonKey:"synthetic-key"};'});
+ if(url.hostname==='synthetic-db.invalid'){
+  if(url.pathname==='/auth/v1/user')return json({id:s.admin,email:'synthetic@example.invalid'});
+  if(url.pathname.includes('/user_profiles'))return json([{id:s.admin,tenant_id:s.A,role:'super_admin',full_name:'Synthetic statistics admin',is_active:true}]);
+  const name=url.pathname.split('/rpc/')[1];if(allowed.includes(name)){try{if(name==='rs_capacity_command')commands++;const result=await rpc(name,req.postDataJSON());if(hold&&name==='rs_capacity_report'){entered?.();await hold;}return json(result);}catch(e){return json({message:e.message},400);}}return json([]);
+ }
+ if(url.hostname==='tech.avahealth.sbs'){const relative=url.pathname==='/'?'index.html':decodeURIComponent(url.pathname.slice(1)),file=path.resolve('ava-platform',relative),root=path.resolve('ava-platform');if(file.startsWith(root+path.sep)&&fs.existsSync(file)&&fs.statSync(file).isFile())return route.fulfill({contentType:file.endsWith('.js')?'application/javascript':file.endsWith('.css')?'text/css':file.endsWith('.html')?'text/html':'application/octet-stream',body:fs.readFileSync(file)});}
+ return route.fulfill({status:200,body:''});});
+ const check=async(name,fn)=>{await fn();count++;console.log('PASS '+name);},actor=async(id=s.admin,tenant=s.A,role='super_admin')=>{await s.actor(id,tenant);await page.evaluate(({id,tenant,role})=>{currentUser={id,tenant_id:tenant,role,profile:{id,tenant_id:tenant,role}};return renderCapacityHistory();},{id,tenant,role});};
+ const submit=async()=>{await page.locator('#ch-editor [type=submit]').click();await page.locator('#ch-editor form').waitFor({state:'detached'});};
+ const action=async name=>{await page.locator('[data-action='+name+']').first().click();await page.locator('#ch-editor [name=reason]').fill('Synthetic statistical review');};
+ await check('real boot/router loads historical capacity and current snapshot',async()=>{await page.goto('https://tech.avahealth.sbs/?techPage=rs-capacity');await page.locator('#ch-new').waitFor();assert.ok((await page.evaluate(()=>MODUL_HALAMAN['rs-capacity'])).includes('modules/his/capacity_history.js'));assert.match(await page.locator('#main-content').textContent(),/Bed aktif sekarang/);});
+ await check('typed statistical definition goes through independent review and actual opening cutover',async()=>{
+  await page.locator('#ch-new').click();const policy=s.policy();for(const k of ['timezone','source_timezone','census_time','source_reference','source_version','review_reference'])await page.locator('#ch-editor [name='+k+']').fill(policy[k]);for(const k of ['patient_day_method','bed_denominator','same_day_patient_days','same_day_los_days'])await page.locator('#ch-editor [name='+k+']').selectOption(String(policy[k]));await page.locator('#ch-editor [name=reason]').fill('Synthetic new statistical definition');await submit();await action('submit');await submit();await action('approve');await page.locator('#ch-editor [type=submit]').click();await page.waitForFunction(()=>document.getElementById('ch-error')?.textContent.includes('berbeda'));
+  await actor(s.receiver,s.A,'direktur');await action('approve');await submit();await actor();await action('activate');await submit();assert.equal((await s.q("SELECT count(*)::int n FROM rs_capacity_source_events WHERE event_type='opening' AND setup_id<>$1",[archive]))[0].n,2);
+ });
+ await check('authenticated report renders exact historical fixture values and denominator table',async()=>{
+  await page.locator('#ch-query [name=setup]').selectOption(String(archive));await page.locator('#ch-query [name=from]').fill(dates.a);await page.locator('#ch-query [name=to]').fill(dates.b);await page.locator('#ch-query [type=submit]').click();await page.locator('#ch-report tbody tr').first().waitFor();assert.equal(await page.locator('#ch-report tbody tr').count(),3);assert.deepEqual(await page.locator('#ch-report h2').allTextContents(),['100','2','0','1']);assert.match(await page.locator('#ch-report').textContent(),/belum dikirim ke SIRS/);
+ });
+ await check('uncovered period is rejected and old report cleared rather than reused',async()=>{
+  const active=(await s.q("SELECT id FROM rs_capacity_setups WHERE state='active'"))[0].id;await page.locator('#ch-query [name=setup]').selectOption(String(active));await page.locator('#ch-query [type=submit]').click();await page.waitForFunction(()=>document.getElementById('ch-error')?.textContent.includes('cutover'));assert.equal(await page.locator('#ch-report tbody tr').count(),0);
+ });
+ await check('stale definition form cannot send a command after identity changes',async()=>{
+  await page.locator('#ch-new').click();await page.evaluate(()=>{document.querySelector('#ch-editor form').noValidate=true;currentUser.id='changed';});const before=commands;await page.locator('#ch-editor [type=submit]').click();await page.waitForFunction(()=>document.getElementById('ch-error')?.textContent.includes('berubah'));assert.equal(commands,before);await actor();
+ });
+ await check('delayed prior-tenant report is discarded; scope pagination resets and mobile fits',async()=>{
+  await page.locator('#ch-query [name=setup]').selectOption(String(archive));await page.locator('#ch-query [name=from]').fill(dates.a);await page.locator('#ch-query [name=to]').fill(dates.b);const started=new Promise(resolve=>entered=resolve);hold=new Promise(resolve=>release=resolve);await page.locator('#ch-query [type=submit]').click();await started;await actor(s.foreign,s.B);release();hold=null;await page.waitForFunction(()=>document.querySelector('#ch-query button')&&!document.querySelector('#ch-query button').disabled);assert.equal(await page.locator('#ch-report tbody tr').count(),0);await page.evaluate(async()=>{chOffset=50;currentUser.id='scope-change';await renderCapacityHistory();});assert.equal(await page.evaluate(()=>chOffset),0);
+  await actor();await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.deepEqual(errors,[]);
+ });
+ console.log(count+' authenticated capacity app scenarios passed');
+}finally{release?.();if(browser)await browser.close();if(pg)await pg.close();if(process.env.RS_TEST_RUNTIME)assert.equal(fs.existsSync(path.join(process.env.RS_TEST_RUNTIME,'cluster')),false);console.log('Browser/dummy database removed; no new output files retained');}})().catch(e=>{console.error(e.stack);process.exitCode=1;});

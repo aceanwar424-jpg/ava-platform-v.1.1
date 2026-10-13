@@ -399,7 +399,7 @@ async function navigate(page, params={}) {
     case 'rs-discharge': await safeRun('renderSignedDischarge'); break;
     case 'rs-igd-flow': await safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
     case 'rs-inpatient-billing': await safeRun('renderRoomBilling'); break;
-    case 'rs-capacity': await safeRun('renderHospitalOperations', {page:'rs-capacity'}); break;
+    case 'rs-capacity': await safeRun('renderCapacityHistory'); break;
     case 'rs-operating-room': await safeRun('renderHospitalOperations', {page:'rs-operating-room'}); break;
     case 'rs-cssd': await safeRun('renderHospitalOperations', {page:'rs-cssd'}); break;
     case 'rs-diet': await safeRun('renderHospitalOperations', {page:'rs-diet'}); break;

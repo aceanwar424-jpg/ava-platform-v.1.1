@@ -2,7 +2,7 @@
 
 OWNED_BY: generic. Persetujuan 1A/2A/3A: preserve histori + explicit cutover/opening, SOP non-RS konfigurabel direview, reviewer klinis individu saat setup. Pengembangan dan tes sintetis lokal diizinkan; produksi/vendor tidak diizinkan. Status menu tidak dinaikkan hanya berdasarkan renderer, total agregat, simulator, atau transaksi yang diblokir.
 
-Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109 (scope/onboarding/milestone/deployment/tiket SLA elapsed/penerimaan/follow-up/closure, native source race dan real app authenticated). 1 menu tuntas untuk batas lokal yang dinyatakan; 43 menu lainnya masih parsial. Detail dan batas SLA/vendor: RUNBOOK-TECH-DELIVERY-0109.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi atau seluruh 44 selesai.
+Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109; rs-capacity memenuhi acceptance lokal observasi historis/definisi/cutover/denominator/statistik pada 0110. 2 menu tuntas untuk batas lokal yang dinyatakan; 42 menu lainnya masih parsial. Detail: RUNBOOK-TECH-DELIVERY-0109.md dan RUNBOOK-KAPASITAS-HISTORIS-0110.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi, rekonstruksi histori tidak diketahui, atau seluruh 44 selesai.
 
 Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/RLS/audit, alur SQL dan UI positif/negatif, error/retry, serta teardown dummy. Kolom terakhir mencatat acceptance yang masih harus dibuktikan, bukan keputusan baru yang perlu ditanyakan ulang.
 
@@ -21,7 +21,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-discharge | 0092–0104: keputusan signed→rekonsiliasi obat→source resume/housekeeping→invoice/jurnal→episode closure | seluruh jalur legacy/cutover, penjamin/exception/clinical amendment dan pengaitan unit lain belum acceptance penuh |
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
 | rs-inpatient-billing | 0082–0091: source invoice/journal, deposit/direct pay/refund, eligibility reviewed, payer/patient allocation dan payer settlement/reversal | override tarif kamar/metode kontrak, plafon selain per-stay, pengaitan semua unit dan exception terpadu; vendor claim/ACK belum aktif |
-| rs-capacity | kapasitas bed + resources | BOR/ALOS/TOI/BTO historis dari interval sah, cutover dan denominator |
+| rs-capacity | 0110 reviewed definition/cutover/opening/observed source ledger, dated denominator, BOR/ALOS/TOI/BTO; source10/app6/licensed discharge integration3 | Tuntas lokal untuk sumber sah sesudah cutover; sumber tidak konsisten/backdate yang belum direkonsiliasi ditolak, bukan direkonstruksi/angka palsu. Pelaporan SIRS produksi tidak diaktifkan |
 | rs-clinical-forms | 0076 + reviewer/privilege 0081 | formulir spesifik/MAR/flowsheet dan seluruh jalur legacy terkait |
 | rs-operating-room | resource booking + work orders | checklist/source klinis/anestesi/recovery/CSSD/billing terpadu |
 | rs-cssd | shared stock + quality work orders | set individual, cycle indikator/Bowie-Dick sesuai SOP, release dan recall |
