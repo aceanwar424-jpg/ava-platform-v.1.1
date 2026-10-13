@@ -22,7 +22,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
 | rs-inpatient-billing | 0082–0091: source invoice/journal, deposit/direct pay/refund, eligibility reviewed, payer/patient allocation dan payer settlement/reversal | override tarif kamar/metode kontrak, plafon selain per-stay, pengaitan semua unit dan exception terpadu; vendor claim/ACK belum aktif |
 | rs-capacity | 0110 reviewed definition/cutover/opening/observed source ledger, dated denominator, BOR/ALOS/TOI/BTO; source10/app6/licensed discharge integration3 | Tuntas lokal untuk sumber sah sesudah cutover; sumber tidak konsisten/backdate yang belum direkonsiliasi ditolak, bukan direkonstruksi/angka palsu. Pelaporan SIRS produksi tidak diaktifkan |
-| rs-clinical-forms | 0076 + reviewer/privilege 0081 | formulir spesifik/MAR/flowsheet dan seluruh jalur legacy terkait |
+| rs-clinical-forms | 0111: semua template aktif authorized, paging/source labels, typed SOP metadata, amendment affinity/linear signed head, race amendment–MAR; SQL7/app6/MAR8/discharge3 | formulir spesifik unit/flowsheet/handover dan seluruh jalur legacy terkait; setup policy belum filter/paging penuh |
 | rs-operating-room | resource booking + work orders | checklist/source klinis/anestesi/recovery/CSSD/billing terpadu |
 | rs-cssd | shared stock + quality work orders | set individual, cycle indikator/Bowie-Dick sesuai SOP, release dan recall |
 | rs-diet | tugas gizi | asesmen diet, order kitchen, produksi/distribusi/retur, alergi dan stok |
