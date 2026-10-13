@@ -544,7 +544,7 @@ async function navigate(page, params={}) {
     case 'cfg-practitioner-fee': await safeRun('renderMasterRegistry', 'fee'); break;
     case 'cfg-unit-room':await safeRun('renderMasterRegistry', 'unit');    break;
     case 'cfg-diagnosis-reference': await safeRun('renderMasterRegistry', 'icd10'); break;
-    case 'cfg-patient':
+    case 'cfg-patient': await safeRun('renderMpiManagement'); break;
     case 'cfg-patient-reference': await safeRun('renderConfigFamily');     break;
     case 'cfg-corporate':
     case 'cfg-corporate-contract': await safeRun('renderConfigCorporate');  break;

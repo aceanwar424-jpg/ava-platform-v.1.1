@@ -46,7 +46,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | cfg-rs-policy | governance 0074 + reviewer 0081 | seluruh rule benar-benar digunakan mesin dan gate legacy |
 | cfg-facility | his_master_records existing | semua referensi unit/resource/bed valid dan digunakan downstream |
 | cfg-practitioner | registry + workforce 0081 SQL9/UI5 | hubungan user–employee/praktisi sumber, jadwal dan seluruh clinical legacy gate |
-| cfg-patient | MPI/patient sources | identity/link/consent/penjamin, duplication/error dan downstream admission |
+| cfg-patient | 0112: actual temporary/definitive person, explicit encounter binding, independent reviewed alias merge/immutable source logs, drift/tenant/race; SQL10/app5, episode identity projection | koreksi tautan, lifecycle consent/identifier, rekonsiliasi alergi/penjamin serta seluruh legacy downstream; tidak auto-transfer consent/benefit |
 | cfg-corporate | corporate_contract + 0087–0091 reviewed eligibility/snapshot/effective dan manfaat per-stay | lifecycle master kontrak lengkap, override harga/metode kamar, cap selain per-stay dan seluruh jalur downstream |
 | cfg-mcu | parameter/package sources | versi parameter digunakan pada MCU/report/review |
 | cfg-payment | payment sources | metode/account/fees/reversal/settlement benar-benar diterapkan |
