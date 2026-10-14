@@ -2,16 +2,16 @@
 
 OWNED_BY: generic. Persetujuan 1A/2A/3A: preserve histori + explicit cutover/opening, SOP non-RS konfigurabel direview, reviewer klinis individu saat setup. Pengembangan dan tes sintetis lokal diizinkan; produksi/vendor tidak diizinkan. Status menu tidak dinaikkan hanya berdasarkan renderer, total agregat, simulator, atau transaksi yang diblokir.
 
-Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109; rs-capacity memenuhi acceptance lokal observasi historis/definisi/cutover/denominator/statistik pada 0110. Update 14 Oktober 2026: rs-nurse-station memenuhi acceptance lokal sumber kanonis pada 0113. Total 3 menu tuntas untuk batas lokal yang dinyatakan; 41 menu lainnya masih parsial. Detail: RUNBOOK-TECH-DELIVERY-0109.md dan RUNBOOK-KAPASITAS-HISTORIS-0110.md dan RUNBOOK-NURSE-STATION-0113.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi, rekonstruksi histori tidak diketahui, atau seluruh 44 selesai.
+Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109; rs-capacity memenuhi acceptance lokal observasi historis/definisi/cutover/denominator/statistik pada 0110. Update 14 Oktober 2026: rs-nurse-station memenuhi acceptance lokal sumber kanonis pada 0113. Update 14 Oktober 2026 berikutnya: tech-roadmap/tech-modul/tech-isu memenuhi acceptance sumber operasi lokal dan linkage delivery pada 0114. Total 6 menu tuntas untuk batas lokal yang dinyatakan; 38 menu lainnya masih parsial. Detail: RUNBOOK-TECH-DELIVERY-0109.md dan RUNBOOK-KAPASITAS-HISTORIS-0110.md RUNBOOK-NURSE-STATION-0113.md dan RUNBOOK-TECH-OPERATIONS-0114.md. Acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi, rekonstruksi histori tidak diketahui, atau seluruh 44 selesai.
 
 Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/RLS/audit, alur SQL dan UI positif/negatif, error/retry, serta teardown dummy. Kolom terakhir mencatat acceptance yang masih harus dibuktikan, bukan keputusan baru yang perlu ditanyakan ulang.
 
 | Menu | Sumber / bagian yang tersedia | Acceptance lanjutan |
 |---|---|---|
 | evidence-register | compliance/master existing | evidence berversi → risk/CAPA → verifikasi efektivitas, tautan sumber |
-| tech-roadmap | tech_changes, 0079 SQL6/UI6 | pengaitan delivery/acceptance dan regresi navigasi aplikasi penuh |
-| tech-modul | perubahan sukses → tech_module_deployments, 0079 | pengaitan delivery; telemetry vendor tetap nonaktif |
-| tech-isu | tech_support_tickets, 0079 | SLA eksplisit, pengaitan delivery/customer success |
+| tech-roadmap | 0079/0109/0114: change source create/review/preflight/result/release/rollback, authenticated real app + server menu access/history, delivery linkage | Tuntas lokal untuk recorded source lifecycle dan penerimaan delivery; eksekusi deploy/produksi terpisah |
+| tech-modul | SUCCEEDED source release/version → installed module evidence → independent verify/revoke; rollback invalidates source; readable history/linkage delivery | Tuntas lokal untuk instalasi berbukti manual sesuai scope; telemetry/live vendor/produksi terpisah |
+| tech-isu | source owner triage/wait/resume/resolve/independent close/reopen; 50+ event audit; explicit elapsed source SLA and delivery/customer acceptance/follow-up | Tuntas lokal untuk source ticket/customer-success linkage dan SLA elapsed_24x7; calendar business-hours/notification scheduler terpisah |
 | tech-delivery | 0109: immutable scope/license snapshot, reviewed milestone/deployment, source ticket SLA elapsed, acceptance/follow-up/closure; SQL9/app8 + scope regression4 | Tuntas lokal untuk workflow dan SLA elapsed yang dinyatakan; vendor/produksi dan kalender jam kerja bukan klaim paket ini |
 | his-integration | order_terintegrasi_papan | handoff sumber → inbox/outbox → retry/reconcile; simulator diberi label |
 | rs-patient-flow | admissions + episode 0080, SQL9/UI6 | pengaitan bed, billing, unit klinis dan revisits dalam simulasi terpadu |

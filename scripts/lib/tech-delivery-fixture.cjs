@@ -9,6 +9,7 @@ async function createDeliveryFixture(){const pg=await f.createTechFixture();try{
  await pg.exec("INSERT INTO tech_paket(kode,nama,modul_termasuk) VALUES('SYN-PACK','Synthetic package','[\"his\"]');");
  await pg.query("INSERT INTO tech_lisensi(tenant_id,paket_id,kode_lisensi,status,tgl_mulai,tgl_berakhir) VALUES($1,1,'SYN-SECRET-NEVER-EXPORT','Aktif',current_date-1,current_date+30),($2,1,'SYN-FOREIGN-SECRET','Aktif',current_date-1,current_date+30)",[f.A,f.B]);
  await pg.exec(fs.readFileSync(path.resolve(__dirname,'../../db/migrations/0109_tech_delivery_source_workflow.sql'),'utf8'));
+ if(process.env.RS_TEST_MIGRATION_0114==='1')await pg.exec(fs.readFileSync(path.resolve(__dirname,'../../db/migrations/0114_tech_operations_menu_access.sql'),'utf8'));
  let seq=0;const key=()=>`synthetic-delivery-${++seq}`;
  const q=async(sql,args=[]) => (await pg.query(sql,args)).rows;
  const actor=async(id=f.admin,tenant=f.A)=>q("SELECT set_config('app.user_id',$1,false),set_config('app.tenant_id',$2,false)",[id,tenant]);

@@ -31,3 +31,5 @@ Aturan generik per tenant, data uji sintetis, tanpa data pasien/harga/kontrak/kl
 Keputusan tercatat, implementasi dan acceptance masih harus dibuktikan. Matriks terakhir tetap 2 menu tuntas lokal dan 42 parsial.
 
 Update 14 Oktober 2026: 0113 memenuhi alur kanonis Nurse Station; matriks menjadi 3 tuntas lokal/41 parsial. Ini tidak mengubah pilihan pemilik atau menyatakan seluruh legacy/produksi selesai.
+
+Update 14 Oktober 2026 berikutnya: acceptance0114 untuk tiga menu sumber operasi Tech; matriks menjadi 6 tuntas lokal/38 parsial. Tidak mengganti keputusan pemilik atau izin produksi/vendor.

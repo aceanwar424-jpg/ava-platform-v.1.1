@@ -170,6 +170,7 @@ const ROLE_DEFAULT_PAGES = {
 };
 
 const ROLES = {
+  tech: {label:'Tim Teknis',color:'#455A64',desc:'Bukti rilis, instalasi modul, tiket dan delivery tenant; review independen diperiksa server',pages:['dashboard','tech-roadmap','tech-modul','tech-isu','tech-delivery'],canDelete:false,canBulkDelete:false,canExport:false,canManageUsers:false},
   nurse: {label:'Perawat',color:'#0d6470',desc:'Operasional RS sesuai peran; persetujuan tahap diperiksa server',pages:["dashboard","rs-patient-flow","rs-bed-reservation","rs-housekeeping","rs-nurse-station","rs-discharge","rs-igd-flow","rs-ppi","rs-ward-pharmacy","rs-critical-care","rs-maternity","rs-day-care","rs-mortuary","rs-capacity"],canDelete:false,canBulkDelete:false,canExport:false,canManageUsers:false},
   pharmacist: {label:'Apoteker',color:'#0d6470',desc:'Operasional RS sesuai peran; persetujuan tahap diperiksa server',pages:["dashboard","rs-discharge","rs-ward-pharmacy"],canDelete:false,canBulkDelete:false,canExport:false,canManageUsers:false},
   housekeeping: {label:'Housekeeping',color:'#0d6470',desc:'Operasional RS sesuai peran; persetujuan tahap diperiksa server',pages:["dashboard","rs-housekeeping","rs-linen"],canDelete:false,canBulkDelete:false,canExport:false,canManageUsers:false},
