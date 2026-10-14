@@ -108,7 +108,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "avahealth": [
   "modules/business_units/ava_health.js",
@@ -197,7 +198,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "inventory": [
   "modules/logistics/assets.js",
@@ -250,7 +252,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "shift-calendar": [
   "modules/hrd/attendance.js",
@@ -618,7 +621,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "hc-staff": [
   "modules/his/admission.js",
@@ -650,7 +654,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "hc-tariff": [
   "modules/his/admission.js",
@@ -682,7 +687,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "hc-billing": [
   "modules/his/admission.js",
@@ -714,7 +720,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "hc-report": [
   "modules/his/admission.js",
@@ -746,7 +753,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "attendance": [
   "modules/hrd/attendance.js",
@@ -836,7 +844,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "homecare-order": [
   "modules/his/admission.js",
@@ -868,7 +877,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "homecare": [
   "modules/his/admission.js",
@@ -900,7 +910,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his": [
   "modules/his/admission.js",
@@ -932,7 +943,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "klinik": [
   "modules/his/admission.js",
@@ -964,7 +976,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "poliklinik": [
   "modules/his/admission.js",
@@ -996,7 +1009,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "clinic": [
   "modules/his/admission.js",
@@ -1028,7 +1042,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "fmcg": [
   "modules/crm/crm_pipeline.js",
@@ -1078,7 +1093,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "regis": [
   "modules/his/admission.js",
@@ -1110,7 +1126,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "registrasi": [
   "modules/his/admission.js",
@@ -1142,7 +1159,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "registration": [
   "modules/his/admission.js",
@@ -1174,7 +1192,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "admission": [
   "modules/his/admission.js",
@@ -1206,7 +1225,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "laboratorium": [
   "modules/lab/qcEngine.js",
@@ -1677,7 +1697,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-patient-flow": [
   "modules/his/admission.js",
@@ -1709,7 +1730,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-bed-reservation": [
   "modules/his/admission.js",
@@ -1741,7 +1763,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-housekeeping": [
   "modules/his/admission.js",
@@ -1773,7 +1796,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-nurse-station": [
   "modules/his/admission.js",
@@ -1805,7 +1829,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-discharge": [
   "modules/his/admission.js",
@@ -1837,7 +1862,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-igd-flow": [
   "modules/his/admission.js",
@@ -1869,7 +1895,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-inpatient-billing": [
   "modules/his/admission.js",
@@ -1901,7 +1928,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-capacity": [
   "modules/his/admission.js",
@@ -1933,7 +1961,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-operating-room": [
   "modules/his/admission.js",
@@ -1965,7 +1994,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-cssd": [
   "modules/his/admission.js",
@@ -1997,7 +2027,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-diet": [
   "modules/his/admission.js",
@@ -2029,7 +2060,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-transfusion": [
   "modules/his/admission.js",
@@ -2061,7 +2093,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-ppi": [
   "modules/his/admission.js",
@@ -2093,7 +2126,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-ward-pharmacy": [
   "modules/his/admission.js",
@@ -2125,7 +2159,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-transport": [
   "modules/his/admission.js",
@@ -2157,7 +2192,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-critical-care": [
   "modules/his/admission.js",
@@ -2189,7 +2225,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-maternity": [
   "modules/his/admission.js",
@@ -2221,7 +2258,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-day-care": [
   "modules/his/admission.js",
@@ -2253,7 +2291,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-linen": [
   "modules/his/admission.js",
@@ -2285,7 +2324,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-facility": [
   "modules/his/admission.js",
@@ -2317,7 +2357,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-mortuary": [
   "modules/his/admission.js",
@@ -2349,7 +2390,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "inpatient": [
   "modules/his/admission.js",
@@ -2381,7 +2423,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "pharmacy": [
   "modules/his/admission.js",
@@ -2413,7 +2456,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "farmasi": [
   "modules/his/admission.js",
@@ -2445,7 +2489,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "emr": [
   "modules/his/admission.js",
@@ -2477,7 +2522,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "emr_soap": [
   "modules/his/admission.js",
@@ -2509,7 +2555,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "emr-soap": [
   "modules/his/admission.js",
@@ -2541,7 +2588,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "subscription": [
   "modules/finance/accounting.js",
@@ -2764,7 +2812,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "queue-console": [
   "modules/his/admission.js",
@@ -2796,7 +2845,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "queue-config": [
   "modules/his/admission.js",
@@ -2828,7 +2878,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "queue-kiosk": [
   "modules/his/admission.js",
@@ -2860,7 +2911,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "appointments": [
   "modules/his/admission.js",
@@ -2892,7 +2944,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "kasir": [
   "modules/finance/accounting.js",
@@ -3026,7 +3079,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "anamnesa": [
   "modules/his/admission.js",
@@ -3058,7 +3112,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "import": [
   "modules/system/config/config_family.js",
@@ -3599,7 +3654,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-orders": [
   "modules/his/admission.js",
@@ -3631,7 +3687,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "package-service": [
   "modules/his/admission.js",
@@ -3663,7 +3720,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-clinical-pathology": [
   "modules/his/admission.js",
@@ -3695,7 +3753,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-microbiology": [
   "modules/his/admission.js",
@@ -3727,7 +3786,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-anatomical-pathology": [
   "modules/his/admission.js",
@@ -3759,7 +3819,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rad-ekspertise": [
   "modules/radiology/dicomViewer.js",
@@ -3799,7 +3860,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-procedures": [
   "modules/his/admission.js",
@@ -3831,7 +3893,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "sm-usg": [
   "modules/his/admission.js",
@@ -3863,7 +3926,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "sm-endoskopi": [
   "modules/his/admission.js",
@@ -3895,7 +3959,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "sm-fisioterapi": [
   "modules/his/admission.js",
@@ -3927,7 +3992,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-immunization": [
   "modules/his/admission.js",
@@ -3959,7 +4025,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "his-mr-governance": [
   "modules/his/admission.js",
@@ -3991,7 +4058,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "igd-triase": [
   "modules/his/admission.js",
@@ -4023,7 +4091,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "skrining-risiko": [
   "modules/his/admission.js",
@@ -4055,7 +4124,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "mar": [
   "modules/his/admission.js",
@@ -4087,7 +4157,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "keselamatan-ikp": [
   "modules/compliance/audit.js",
@@ -4291,7 +4362,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-resource-booking": [
   "modules/his/admission.js",
@@ -4323,7 +4395,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "rs-shared-stock": [
   "modules/his/admission.js",
@@ -4355,7 +4428,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "apps-hub": [
   "modules/system/config/config_family.js",
@@ -4494,7 +4568,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-patient-reference": [
   "modules/system/config/config_family.js",
@@ -4553,7 +4628,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-mcu-parameter": [
   "modules/his/admission.js",
@@ -4585,7 +4661,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-mcu-assessment": [
   "modules/his/admission.js",
@@ -4617,7 +4694,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-payment": [
   "modules/finance/accounting.js",
@@ -4676,7 +4754,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-queue-flow": [
   "modules/his/admission.js",
@@ -4708,7 +4787,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-queue-device": [
   "modules/his/admission.js",
@@ -4740,7 +4820,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-medicine": [
   "modules/his/admission.js",
@@ -4772,7 +4853,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-medicine-reference": [
   "modules/his/admission.js",
@@ -4804,7 +4886,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "cfg-equipment": [
   "modules/logistics/assets.js",
@@ -4884,7 +4967,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "admission-medical-kit": [
   "modules/his/admission.js",
@@ -4916,7 +5000,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "admission-package": [
   "modules/his/admission.js",
@@ -4948,7 +5033,8 @@ window.MODUL_HALAMAN = {
   "modules/his/payer_billing.js",
   "modules/his/ward_pharmacy.js",
   "modules/his/signed_discharge.js",
-  "modules/his/capacity_history.js"
+  "modules/his/capacity_history.js",
+  "modules/his/nursing_station.js"
  ],
  "admission-subscription": [
   "modules/finance/accounting.js",
@@ -5127,5 +5213,6 @@ window.MODUL_SEMUA = [
  "modules/his/ward_pharmacy.js",
  "modules/his/signed_discharge.js",
  "modules/tech-platform/delivery.js",
- "modules/his/capacity_history.js"
+ "modules/his/capacity_history.js",
+ "modules/his/nursing_station.js"
 ];

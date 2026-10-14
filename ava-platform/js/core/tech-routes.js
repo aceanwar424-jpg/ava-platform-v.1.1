@@ -43,7 +43,8 @@
     else history.pushState({techIndex:++index},'',url);
   }
   function paramsFor(page,params){
-    if(!enabled())return params;
+    // RS encounter context stays in memory; Tech URL cleanup still excludes patient context.
+    if(!enabled()||page.startsWith('rs-'))return params;
     const supplied=Object.keys(params||{}).length;
     const saved=read();let out=clean(!active&&!supplied&&saved?.page===page?saved.params:params);
     const pending=window.workspacePanelTarget;

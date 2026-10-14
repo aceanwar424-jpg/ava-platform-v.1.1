@@ -1,4 +1,5 @@
 // OWNED_BY: generic. Actual authorized source templates and immutable clinical records.
+let rsFormFieldEpoch=0;
 let rsFormAdmission='',rsFormTemplates=[],rsFormRecords=[],rsFormEpoch=0,rsFormScope,rsFormRecordOffset=0,rsFormTemplateOffset=0;
 const rsFormEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const rsFormContext=()=>JSON.stringify([window.currentUser?.id,window.currentUser?.tenant_id||window.currentUser?.profile?.tenant_id||window.AVA_RUNTIME_CONFIG?.tenantId]);
@@ -26,7 +27,26 @@ async function rsFormNew(previous,offset=0){const scope=rsFormContext(),epoch=rs
   return sbRpc('rs_clinical_command',{p_action:'record',p_data:{admission_id:Number(admission),policy_id:p.id,values,amendment_of:previous?.id??null,reason:d.get('reason')},p_request_key:key});
  });
  if(previous){document.getElementById('rf-amend-prev').onclick=()=>rsFormNew(previous,Math.max(0,offset-50));document.getElementById('rf-amend-next').onclick=()=>rsFormNew(previous,offset+50);}
- document.getElementById('rf-policy').onchange=e=>{const p=templates.find(p=>p.id===Number(e.target.value));document.getElementById('rf-fields').innerHTML=p?p.payload.fields.map(f=>`<label>${rsFormEscape(f.label)}${f.unit?' ('+rsFormEscape(f.unit)+')':''}${f.type==='boolean'?`<select name="f_${f.key}" ${f.required?'required':''}><option value="">Pilih</option><option value="true">Ya</option><option value="false">Tidak</option></select>`:f.type==='text'?`<textarea name="f_${f.key}" ${f.required?'required':''}></textarea>`:`<input name="f_${f.key}" type="${f.type==='number'?'number':'date'}" ${f.type==='number'?'step="any"':''} ${f.required?'required':''}>`}</label>`).join(''):'';};
+ const policySelect=document.getElementById('rf-policy');
+ const renderFields=async(e,referenceOffset=0,previousValues={})=>{
+  if(scope!==rsFormContext()||epoch!==rsFormEpoch||!e.target.isConnected||(typeof currentPage==='string'&&currentPage!=='rs-clinical-forms'))return;
+  const p=templates.find(p=>p.id===Number(e.target.value)),token=++rsFormFieldEpoch,host=document.getElementById('rf-fields'),form=host.closest('form'),button=form.querySelector('[type=submit]');host.innerHTML='';document.getElementById('rf-error').textContent='';if(!p)return;button.disabled=true;
+  try{let reference={staff:[],tasks:[]};const nursingReference=['nursing_task','nursing_task_reassignment','nursing_task_outcome'].includes(p.payload.purpose)&&p.payload.fields.some(f=>['assignee_id','task_id'].includes(f.key));
+   if(nursingReference){host.textContent='Memuat referensi penugasan kunjungan…';reference=await sbRpc('rs_nursing_board',{p_admission:Number(admission),p_offset:referenceOffset});}
+   if(scope!==rsFormContext()||epoch!==rsFormEpoch||token!==rsFormFieldEpoch||!form.isConnected||(typeof currentPage==='string'&&currentPage!=='rs-clinical-forms'))return;
+   host.innerHTML=p.payload.fields.map(f=>{let options=null;
+    if(nursingReference&&f.key==='assignee_id')options=reference.staff.map(u=>[u.id,u.name]);
+    if(nursingReference&&f.key==='task_id')options=reference.tasks.filter(t=>p.payload.purpose!=='nursing_task_reassignment'||t.state==='open').slice(0,50).map(t=>[t.id,'#'+t.id+' '+t.title+' · '+t.state]);
+    if(p.payload.purpose==='nursing_observation'&&f.key==='measurement_code')options=p.payload.measurements.map(m=>[m.code,m.label+' · '+m.unit]);
+    if(p.payload.purpose==='nursing_observation'&&f.key==='status')options=[['valid','Nilai valid'],...(previous?[['entered_in_error','Entry salah — koreksi sumber']]:[])];
+    const required=f.required?'required':'';return '<label>'+rsFormEscape(f.label)+(f.unit?' ('+rsFormEscape(f.unit)+')':'')+(options?'<select name="f_'+f.key+'" '+required+'><option value="">Pilih</option>'+options.map(([v,l])=>'<option value="'+rsFormEscape(v)+'">'+rsFormEscape(l)+'</option>').join('')+'</select>':f.type==='boolean'?'<select name="f_'+f.key+'" '+required+'><option value="">Pilih</option><option value="true">Ya</option><option value="false">Tidak</option></select>':f.type==='text'?'<textarea name="f_'+f.key+'" '+required+'></textarea>':'<input name="f_'+f.key+'" type="'+(f.type==='number'?'number':'date')+'" '+(f.type==='number'?'step="any"':'')+' '+required+'>')+'</label>';
+   }).join('');
+   for(const [name,value] of Object.entries(previousValues)){if(name==='f_task_id')continue;const field=form.elements.namedItem(name);if(field&&field.value!==undefined)field.value=value;}
+   if(nursingReference&&p.payload.fields.some(f=>f.key==='task_id')){const nav=document.createElement('div');nav.innerHTML='<p>Referensi tugas halaman '+(referenceOffset/50+1)+'</p><button type="button" id="rf-reference-prev" '+(referenceOffset===0?'disabled':'')+'>Tugas sebelumnya</button><button type="button" id="rf-reference-next" '+(reference.tasks.length<=50?'disabled':'')+'>Tugas berikutnya</button>';host.prepend(nav);for(const [id,delta] of [['rf-reference-prev',-50],['rf-reference-next',50]])document.getElementById(id).onclick=()=>renderFields({target:policySelect},Math.max(0,referenceOffset+delta),Object.fromEntries(new FormData(form)));}
+   button.disabled=false;
+  }catch(error){if(scope===rsFormContext()&&epoch===rsFormEpoch&&token===rsFormFieldEpoch&&form.isConnected){host.textContent='Referensi sumber belum dapat dimuat.';document.getElementById('rf-error').textContent=error.message;}}
+ };
+ policySelect.onchange=e=>renderFields(e);
 }
 function rsFormSign(r){rsFormEditor(`<h2>Sahkan catatan #${r.id}</h2><p>Pastikan isi, versi dan profesi sesuai. Source amendment wajib head signed terbaru. Pengesahan tidak menghapus histori.</p>`,async(d,key)=>sbRpc('rs_clinical_command',{p_action:'sign',p_data:{id:r.id,reason:d.get('reason')},p_request_key:key}));}
 window.renderClinicalForms=renderClinicalForms;

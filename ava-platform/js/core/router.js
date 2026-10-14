@@ -395,7 +395,7 @@ async function navigate(page, params={}) {
     case 'rs-patient-flow': await safeRun('renderCareEpisodes'); break;
     case 'rs-bed-reservation': await safeRun('renderHospitalOperations', {page:'rs-bed-reservation'}); break;
     case 'rs-housekeeping': await safeRun('renderHospitalOperations', {page:'rs-housekeeping'}); break;
-    case 'rs-nurse-station': await safeRun('renderHospitalOperations', {page:'rs-nurse-station'}); break;
+    case 'rs-nurse-station': await safeRun('renderNursingStation', params); break;
     case 'rs-discharge': await safeRun('renderSignedDischarge'); break;
     case 'rs-igd-flow': await safeRun('renderHospitalOperations', {page:'rs-igd-flow'}); break;
     case 'rs-inpatient-billing': await safeRun('renderRoomBilling'); break;
@@ -405,7 +405,7 @@ async function navigate(page, params={}) {
     case 'rs-diet': await safeRun('renderHospitalOperations', {page:'rs-diet'}); break;
     case 'rs-transfusion': await safeRun('renderHospitalOperations', {page:'rs-transfusion'}); break;
     case 'rs-ppi': await safeRun('renderHospitalOperations', {page:'rs-ppi'}); break;
-    case 'rs-ward-pharmacy': await safeRun('renderWardPharmacy'); break;
+    case 'rs-ward-pharmacy': await safeRun('renderWardPharmacy', params); break;
     case 'rs-transport': await safeRun('renderHospitalOperations', {page:'rs-transport'}); break;
     case 'rs-critical-care': await safeRun('renderHospitalOperations', {page:'rs-critical-care'}); break;
     case 'rs-maternity': await safeRun('renderHospitalOperations', {page:'rs-maternity'}); break;
@@ -531,7 +531,7 @@ async function navigate(page, params={}) {
     case 'tech-isu':     await safeRun('renderTechOperations',{page});     break;
     case 'tech-sprint':  await safeRun('renderTeamSprint');                break;
     case 'cfg-rs-policy': await safeRun('renderOperationalPolicies');      break;
-    case 'rs-clinical-forms': await safeRun('renderClinicalForms');        break;
+    case 'rs-clinical-forms': await safeRun('renderClinicalForms', params);        break;
     case 'rs-resource-booking': await safeRun('renderResourceBooking');    break;
     case 'rs-shared-stock': await safeRun('renderSharedStock');    break;
     case 'apps-hub':     await safeRun('renderPortalAkses');              break;

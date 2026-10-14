@@ -2,7 +2,7 @@
 
 OWNED_BY: generic. Persetujuan 1A/2A/3A: preserve histori + explicit cutover/opening, SOP non-RS konfigurabel direview, reviewer klinis individu saat setup. Pengembangan dan tes sintetis lokal diizinkan; produksi/vendor tidak diizinkan. Status menu tidak dinaikkan hanya berdasarkan renderer, total agregat, simulator, atau transaksi yang diblokir.
 
-Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109; rs-capacity memenuhi acceptance lokal observasi historis/definisi/cutover/denominator/statistik pada 0110. 2 menu tuntas untuk batas lokal yang dinyatakan; 42 menu lainnya masih parsial. Detail: RUNBOOK-TECH-DELIVERY-0109.md dan RUNBOOK-KAPASITAS-HISTORIS-0110.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi, rekonstruksi histori tidak diketahui, atau seluruh 44 selesai.
+Update 13 Oktober 2026: tech-delivery memenuhi acceptance lokal lifecycle sumber pada 0109; rs-capacity memenuhi acceptance lokal observasi historis/definisi/cutover/denominator/statistik pada 0110. Update 14 Oktober 2026: rs-nurse-station memenuhi acceptance lokal sumber kanonis pada 0113. Total 3 menu tuntas untuk batas lokal yang dinyatakan; 41 menu lainnya masih parsial. Detail: RUNBOOK-TECH-DELIVERY-0109.md dan RUNBOOK-KAPASITAS-HISTORIS-0110.md dan RUNBOOK-NURSE-STATION-0113.md. Pengaitan delivery pada roadmap/modul/isu sudah tersedia, tetapi acceptance gabungan menu lainnya tetap terbuka. Ini tidak menyatakan produksi, rekonstruksi histori tidak diketahui, atau seluruh 44 selesai.
 
 Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/RLS/audit, alur SQL dan UI positif/negatif, error/retry, serta teardown dummy. Kolom terakhir mencatat acceptance yang masih harus dibuktikan, bukan keputusan baru yang perlu ditanyakan ulang.
 
@@ -17,7 +17,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-patient-flow | admissions + episode 0080, SQL9/UI6 | pengaitan bed, billing, unit klinis dan revisits dalam simulasi terpadu |
 | rs-bed-reservation | inpatient_beds + 0071/73 | alur booking/admisi/pindah/pulang terintegrasi episode; race native lulus |
 | rs-housekeeping | work orders + source bed | checklist riil/turnaround, pengaitan PPI dan indikator |
-| rs-nurse-station | episode/form/work orders | handover, flowsheet, MAR sumber farmasi, tugas dan eskalasi |
+| rs-nurse-station | 0113: tugas/owner/deadline dari instruksi signed; SBAR sender/recipient; typed observations + amendment; escalation/inbox; reassignment/withdrawal; transfer → MAR → signed discharge → invoice/journal → close; SQL13/app11 + MAR8/clinical7/app6/discharge3/router16 | Tuntas lokal untuk sumber kanonis dan eskalasi saat papan dimonitor; histori/tugas legacy tidak dimigrasikan otomatis, SOP tenant/produksi dan scheduler offline terpisah |
 | rs-discharge | 0092–0104: keputusan signed→rekonsiliasi obat→source resume/housekeeping→invoice/jurnal→episode closure | seluruh jalur legacy/cutover, penjamin/exception/clinical amendment dan pengaitan unit lain belum acceptance penuh |
 | rs-igd-flow | episode IGD + form/template | triage/tindakan/disposition, timestamp dan indikator sumber |
 | rs-inpatient-billing | 0082–0091: source invoice/journal, deposit/direct pay/refund, eligibility reviewed, payer/patient allocation dan payer settlement/reversal | override tarif kamar/metode kontrak, plafon selain per-stay, pengaitan semua unit dan exception terpadu; vendor claim/ACK belum aktif |
