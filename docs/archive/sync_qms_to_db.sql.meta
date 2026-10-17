@@ -1,0 +1,10 @@
+{
+  "original_path": "data/sync_qms_to_db.sql",
+  "archive_pointer": "docs/archive/sync_qms_to_db.sql.meta",
+  "blob_sha": "b09dadaeff923e133fa596768c22301a745ce891",
+  "size_bytes": 242655,
+  "github_url": "https://github.com/aceanwar424-jpg/ava-platform-v.1.1/blob/main/data/sync_qms_to_db.sql",
+  "archived_at": "2026-10-17T00:00:00Z",
+  "archived_by": "aceanwar424-jpg",
+  "reason": "Generated SQL seed for QMS registry. Marked for archival per housekeeping policy; originals retained until explicit delete approval."
+}

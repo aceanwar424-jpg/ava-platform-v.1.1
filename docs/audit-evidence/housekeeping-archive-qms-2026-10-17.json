@@ -1,0 +1,28 @@
+{
+  "archive_run_id": "housekeeping-archive-qms-2026-10-17",
+  "created_at": "2026-10-17T00:00:00Z",
+  "created_by": "aceanwar424-jpg",
+  "items": [
+    {
+      "original_path": "data/qms_registry_synced.json",
+      "archive_meta_path": "docs/archive/qms_registry_synced.json.meta",
+      "blob_sha": "25ff7b19e76c7a174c4094fa618f457f3b6c6685",
+      "size_bytes": 202614,
+      "action": "archived_pointer_created",
+      "notes": "File is generated SSOT. Copied pointer metadata; original file left in place until deletion authorized."
+    },
+    {
+      "original_path": "data/sync_qms_to_db.sql",
+      "archive_meta_path": "docs/archive/sync_qms_to_db.sql.meta",
+      "blob_sha": "b09dadaeff923e133fa596768c22301a745ce891",
+      "size_bytes": 242655,
+      "action": "archived_pointer_created",
+      "notes": "Generated SQL seed; pointer metadata saved. Originals retained."
+    }
+  ],
+  "note": "This housekeeping operation created pointer metadata files under docs/archive/ and an audit log. Originals were NOT deleted; delete requires separate approval.",
+  "refs": {
+    "branch": "housekeeping/archive-qms-2026-10-17",
+    "commit_message": "Archive pointers for QMS artefacts: qms_registry_synced.json, sync_qms_to_db.sql"
+  }
+}

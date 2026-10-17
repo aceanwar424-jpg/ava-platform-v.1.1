@@ -1,0 +1,10 @@
+{
+  "original_path": "data/qms_registry_synced.json",
+  "archive_pointer": "docs/archive/qms_registry_synced.json.meta",
+  "blob_sha": "25ff7b19e76c7a174c4094fa618f457f3b6c6685",
+  "size_bytes": 202614,
+  "github_url": "https://github.com/aceanwar424-jpg/ava-platform-v.1.1/blob/main/data/qms_registry_synced.json",
+  "archived_at": "2026-10-17T00:00:00Z",
+  "archived_by": "aceanwar424-jpg",
+  "reason": "Generated SSOT JSON for QMS documents. Marked for archival per housekeeping policy; originals retained until explicit delete approval."
+}
