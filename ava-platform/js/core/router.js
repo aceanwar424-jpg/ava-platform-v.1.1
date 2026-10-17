@@ -558,7 +558,7 @@ async function navigate(page, params={}) {
     case 'cfg-queue-flow':
     case 'cfg-queue-device': await safeRun('renderQueueConfig');           break;
     case 'cfg-medicine':
-    case 'cfg-medicine-reference': await safeRun('renderWardPharmacy');        break;
+    case 'cfg-medicine-reference': await safeRun('renderMedicineOperations', params); break;
     case 'cfg-equipment': await safeRun('renderAssets');                   break;
     case 'cfg-service-class': await safeRun('renderConfigPackage');        break;
     case 'cfg-job-master': await safeRun('renderOrgStructure');            break;

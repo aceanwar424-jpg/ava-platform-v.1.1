@@ -130,7 +130,7 @@
         const privileged=['super_admin','head_operation','direktur','SUPERADMIN','HQ_EXECUTIVE'].includes(userRole);
         return privileged || (Array.isArray(root.roleConfig?.pages) && root.roleConfig.pages.includes(targetRoute));
       }
-      if (['tech-roadmap','tech-modul','tech-isu','tech-delivery'].includes(targetRoute)) {
+      if (['tech-roadmap','tech-modul','tech-isu','tech-delivery','cfg-medicine','cfg-medicine-reference'].includes(targetRoute)) {
         const pages=Array.isArray(root.serverAccess?.pages)?root.serverAccess.pages:root.roleConfig?.pages;
         return Array.isArray(pages)&&pages.includes(targetRoute);
       }

@@ -28,7 +28,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | rs-diet | tugas gizi | asesmen diet, order kitchen, produksi/distribusi/retur, alergi dan stok |
 | rs-transfusion | quality work orders; patient issue diblokir | komponen individual, uji/crossmatch profesional, reservation/issue/reaction/return |
 | rs-ppi | work orders | surveillance sumber, denominator/version, HAIs/isolasi/CAPA |
-| rs-ward-pharmacy | 0092–0104: source pharmacy/ledger, Rx/verifikasi/FEFO/billing, MAR, custody/controlled register; SQL/browser/race aktual | master obat/ownership alergi legacy, formulary lifecycle/valuasi dan penerimaan unit terpadu masih terbuka |
+| rs-ward-pharmacy | 0092–0104/0115: source pharmacy/ledger, Rx/verifikasi/FEFO/billing, MAR/custody; biaya batch aktual, reviewed journal/reversal, retur biaya asli, cutover eksplisit | master obat/ownership alergi legacy, formulary lifecycle dan penerimaan unit terpadu masih terbuka; biaya batch lokal sudah diuji |
 | rs-transport | source work orders | request berbasis pasien/unit, dispatch/receive, resource/safety/turnaround |
 | rs-resource-booking | 0077 SQL7/UI5; race native | pengaitan unit klinis dan actual legacy source penuh |
 | rs-shared-stock | 0078 SQL8/UI6; race native | adapters pharmacy/component/set; pengaitan transaksi unit end-to-end |
@@ -51,7 +51,7 @@ Setiap baris memerlukan kontrak source ID, transaksi/version/idempotency, role/R
 | cfg-mcu | parameter/package sources | versi parameter digunakan pada MCU/report/review |
 | cfg-payment | payment sources | metode/account/fees/reversal/settlement benar-benar diterapkan |
 | cfg-queue | queue sources | flow/config/loket/device → ticket/call/serve/close dan tenancy |
-| cfg-medicine | 0092–0104 binding/formulary/harga → reviewed Rx/dispense/MAR/custody sumber | CRUD master/versi/retirement formularium, valuasi/COGS, ownership alergi legacy dan seluruh downstream |
+| cfg-medicine | 0092–0104/0115 binding/formulary/harga → reviewed Rx/dispense/MAR/custody; setup akun tenant/biaya batch/COGS/retur/reversal/histori aktual | CRUD master/versi/retirement formularium, ownership alergi legacy dan seluruh downstream; valuasi/COGS lokal ditutup pada0115 |
 
 ## Bukti tahap ini
 
